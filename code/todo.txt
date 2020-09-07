@@ -1,0 +1,2 @@
+
+move the rest of pygame code to graphics_2d_pygame.py 

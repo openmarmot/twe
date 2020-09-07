@@ -1,0 +1,33 @@
+TWE Project : Change Log
+
+-----------------------------------------------------
+September 06 2020
+
+- blew off the dust on this project .. again :D 
+- started working on the input handling - trying to keep it in
+graphics_2d_pygame as much as possible.
+
+-----------------------------------------------------
+April 12 2020
+
+- blew off the dust on this project 
+- started moving pygame stuff from twe.py and world.py to graphics_2d_pygame.py 
+
+-----------------------------------------------------
+June 18 2016
+
+- added image rotation
+-the correct image orientation is apparently forward is 'up'
+- confirmed that world transforms are behaving correctly.
+- remember on screen coordinate y starts at zero and gets bigger as
+it goes down
+-----------------------------------------------------
+June 18 2016
+
+-created project
+-worked on coordinate system and world->screen transforms
+-moved to using tuples for coordinates from a dedicated class for simplicity
+may change in the future.
+-created man.png
+-created kubelwagen.png
+-----------------------------------------------------

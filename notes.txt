@@ -1,0 +1,21 @@
+TWE
+
+"To Whatever End"
+
+-- Coordinate System ----------------------
+
+world_coords=(x,y) : ?
+
+screen_coords=(x,y) : 0,0 is the upper left coords. centered on player object
+
+
+--Web Resources----------------------------
+
+# rotation
+http://thepythongamebook.com/en:pygame:step021
+http://stackoverflow.com/questions/7329837/2d-sprite-face-the-direction-its-moving-in-pygame
+
+--Install-----------------------------------
+
+#Fedora 25 and later
+sudo dnf install python3-pygame
