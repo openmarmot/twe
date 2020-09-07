@@ -1,7 +1,7 @@
 # twe
 ww2 eastern front sim 
 
-![ScreenShot1](“https://raw.githubusercontent.com/openmarmot/twe/master/screenshots/twe-feb-09-2020.png”)
+![](/screenshots/twe-feb-09-2020.png "boop")
 
 
 TWE is short for 'To Whatever End' which was the title of a game I worked on from about 2007-2010.
