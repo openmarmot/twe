@@ -1,9 +1,14 @@
 # twe
 ww2 eastern front sim 
 
+![ScreenShot1](“https://raw.githubusercontent.com/openmarmot/twe/master/screenshots/twe-feb-09-2020.png”)
+
+
 TWE is short for 'To Whatever End' which was the title of a game I worked on from about 2007-2010.
 The game was written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
 Sometime in 2010 I lost all the code due to a accidentally formatting the NAS where it was stored.
+
+
 
 This repo is a fresh start at TWE using Python3 and Pygame. This time around I'm using 2d as I found making models and doing animation was a huge time 
 sink on the old game that I didn't really enjoy. It is written completely from scratch based on my memory of previous game engines I've made. I will put reference notes in the code where possible when I copy significant code from the internet.
