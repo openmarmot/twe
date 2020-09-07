@@ -24,7 +24,14 @@ Progress
   - just getting started with the basics
   
   Check the changelog for more details
+  
+To Play 
+- Note : I'm nowhere near a release that is playable.
+- install python3 and pygame
+- download code
+- python3 twe.py
 
 
 License / Whatever
-- I want to do this project completely by myself to improve my python skills and just as a fun hobby. However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks!
+- I want to do this project completely by myself to improve my python skills and just as a fun hobby. 
+- However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks!
