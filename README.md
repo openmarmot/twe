@@ -22,16 +22,13 @@ General Concepts
 - not balanced on purpose. russian advantage as existed in the real life time period
 - empasis on iron man mode. strategic game doesn't start over when player dies they just spawn again
 
-Progress
-- Strategic Mode
-- Tactical Mode
-- Engine 
-  - just getting started with the basics
-  
-  Check the changelog for more details
+Current State on Master branch
+The game runs. There is basic movement for the user and a bot will turn to face you.
+
+
+Check the changelog on the Dev branch to see what I've been working on.
   
 To Play 
-- Note : I'm nowhere near a release that is playable.
 - install python3 and pygame
 - download code
 - python3 twe.py
