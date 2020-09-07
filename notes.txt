@@ -15,7 +15,9 @@ screen_coords=(x,y) : 0,0 is the upper left coords. centered on player object
 http://thepythongamebook.com/en:pygame:step021
 http://stackoverflow.com/questions/7329837/2d-sprite-face-the-direction-its-moving-in-pygame
 
+# move an object in the direction its facing
+https://stackoverflow.com/questions/19355026/move-an-object-in-the-direction-its-facing-using-2d-html5canvas-and-ctx-rotate-f
+
 --Install-----------------------------------
 
-#Fedora 25 and later
-sudo dnf install python3-pygame
+

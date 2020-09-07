@@ -80,7 +80,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEMOTION:
                 #print(str(event.pos))
                 pass
-        print(self.keyPressed('w'))
+        #print(self.keyPressed('w'))
 
 #------------------------------------------------------------------------------
     def keyPressed(self, KEY):

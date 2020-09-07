@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+September 07 2020
+- added in simple movement for the player 
+- confirmed that ai zombie rotation code seems to work great
+- confirmed that world coord to screen coord translation seems to work great 
+-----------------------------------------------------
 September 06 2020
 
 - blew off the dust on this project .. again :D 
