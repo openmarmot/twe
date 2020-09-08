@@ -10,6 +10,7 @@ notes :
 
 
 #import built in modules
+import random
 
 #import custom packages
 
@@ -22,7 +23,7 @@ from world_objects.wo_player import WOPlayer
 
 # module specific variables
 module_version='0.1' #module software version
-module_last_update_date='April 12 2020' #date of last update
+module_last_update_date='Sept 07 2020' #date of last update
 
 #global variables
 
@@ -50,10 +51,15 @@ def load():
     player.wo_start()
     world.player=player
 
-    bob=WOMan(world)
-    bob.name='bob'
-    bob.world_coords=[0.,0.]
-    bob.wo_start()
+    # bob generator 
+    for x in range(500):
+        bob=WOMan(world)
+        bob.name='bob'
+        bob.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
+        bob.speed=float(random.randint(10,40))
+        bob.wo_start()
+
+ 
 
 #------------------------------------------------------------------------------
 def run():

@@ -5,6 +5,8 @@ September 07 2020
 - added in simple movement for the player 
 - confirmed that ai zombie rotation code seems to work great
 - confirmed that world coord to screen coord translation seems to work great 
+- added in 'move to target' math
+- tested engine with 500 'bob' zombies - everything was still fast
 -----------------------------------------------------
 September 06 2020
 
