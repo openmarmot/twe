@@ -1,11 +1,11 @@
 
 '''
-module : ai_base.py
+module : math_2d.py
 version : see module_version variable
 Language : Python 3.x
 author : andrew christ
 email : andrew@openmarmot.com
-notes :
+notes : 
 
 static module consisting of math functions.
 import as needed
@@ -19,7 +19,7 @@ import math
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='July 02 2016' #date of last update
+module_last_update_date='September 07 2020' #date of last update
 
 #global variables
 
