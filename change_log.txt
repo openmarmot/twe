@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+September 08 2020
+- started fleshing out a gun object and gun_mag object 
+    - started with a mp40 as per tradition
+- added inventory to the base world_object class 
+- fixed a confusing logic error in wo_man and wo_player where i wasn't triggering init of the 
+    base class. it confuses me why this wasn't breaking anything. very odd
+- some code formatting cleanup
+-----------------------------------------------------
 September 07 2020
 - added in simple movement for the player 
 - confirmed that ai zombie rotation code seems to work great

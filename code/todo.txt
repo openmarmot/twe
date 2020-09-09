@@ -1,2 +1,16 @@
 
-move the rest of pygame code to graphics_2d_pygame.py 
+======== Engine Stuff ====================================
+
+- need some basic collision modeling 
+
+- need some kind of persistent particle handling for brass and other stuff 
+
+
+======== Tactical Mode Stuff =============================
+
+-- ART --
+- need some place holders for weapons, people, vehicles, etc 
+
+
+
+======= Strategic Mode (MAP) Stuff =======================

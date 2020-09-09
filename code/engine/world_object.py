@@ -23,10 +23,10 @@ module_last_update_date='June 13 2016' #date of last update
 
 class WorldObject(object):
 
-    def __init__(self, world, name):
+    def __init__(self, world):
 
         self.world = world
-        self.name = name
+        self.name = None
         self.image_name = 'none'
         self.world_coords=[0.,0.]
         self.screen_coords=[0.,0.]
@@ -36,9 +36,15 @@ class WorldObject(object):
         self.render=True
         self.is_player=False
         self.ai=None
-
+        
+        # list of other wo_objects
+        self.inventory=[]
 
         self.id = 0
+
+    #add_inventory
+
+    #remove_inventory
 
     def wo_start(self):
         self.world.add_object(self)

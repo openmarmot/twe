@@ -18,13 +18,13 @@ It should not have any specific graphic engine code (pygame, etc)
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 12 2020' #date of last update
+module_last_update_date='September 08 2020' #date of last update
 
 #global variables
 
 
 class World(object):
-
+    #---------------------------------------------------------------------------
     def __init__(self,graphic_engine):
 
         self.wo_objects=[]
@@ -33,12 +33,14 @@ class World(object):
         self.graphic_engine.world=self
         self.player=None
 
+    #---------------------------------------------------------------------------
     def add_object(self, worldobject):
         if(worldobject.render):
             self.graphic_engine.add_object(worldobject)
 
         self.wo_objects.append(worldobject)
 
+    #---------------------------------------------------------------------------
     def remove_object(self, worldobject):
         self.graphic_engine.remove_object(worldobject)
 
@@ -52,12 +54,14 @@ class World(object):
 #        else:
 #            return None
 
+    #---------------------------------------------------------------------------
     def update(self):
         self.graphic_engine.update()
 
         for b in self.wo_objects:
             b.update(self.graphic_engine.time_passed_seconds)
 
+    #---------------------------------------------------------------------------
     def render(self):
         self.graphic_engine.render()
 
