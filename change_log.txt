@@ -1,6 +1,9 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+September 14 2020
+- created some place holder art for weapons and various soldier uniforms
+-----------------------------------------------------
 September 08 2020
 - started fleshing out a gun object and gun_mag object 
     - started with a mp40 as per tradition

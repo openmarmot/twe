@@ -26,15 +26,15 @@ class WOGun(WorldObject):
 
     def __init__(self, world,type):
         super().__init__(world)
-        self.image_name='man'
+        self.image_name='mp40'
         self.render_level=1
         self.type=type
         self.mag=None # mag object is a wo_gun_mag
        # self.ai=AIZombie(self) # not sure this needs multiple AI
 
-       if type=='mp40':
-           # generate a new mag
-           self.mag=
+        if type=='mp40':
+            # generate a new mag
+            self.mag=WOGunMag(world,'mp40')
 
     #---------------------------------------------------------------------------
     def update(self, time_passed):
