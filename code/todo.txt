@@ -5,12 +5,25 @@
 
 - need some kind of persistent particle handling for brass and other stuff 
 
+- need a frames per second (FPS) count / display
+
+- need a simple gui menu system for debug console stuff 
+
+- is determining whether to render stuff based on if its viewable worth the bother?
+    seems like a lot of work to do each update cycle
+
+- need some sort of world_objects bool to designate an item that will never get added to world 
+    small stuff that is to small to bother rendering like bullets, gun mags, food, small parts etc 
+    should only exist in inventories of other world_objects 
 
 ======== Tactical Mode Stuff =============================
 
 -- ART --
-- need some place holders for weapons, people, vehicles, etc 
+- need some sort of container to hold objects that are too small to render in the world 
 
+- gun and gun mag world_objects need to be finished
+    - does firing the gun take place in the gun class, or is it a function 
+        of soldier AI ?
 
 
 ======= Strategic Mode (MAP) Stuff =======================

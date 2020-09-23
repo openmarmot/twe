@@ -8,7 +8,9 @@ notes :
 
 gun magazine class
 
-No AI needed. update function will be skipped 
+No AI needed. update function will be skipped.
+
+Not 100% sure this will have art. its too small to be visible in the game world
 
 '''
 
@@ -33,7 +35,7 @@ class WOGunMag(WorldObject):
         self.bullet_type=None #string
 
         if type=='mp40':
-            self.max_capacity=30
-            self.bullets=30
+            self.max_capacity=32
+            self.bullets=self.max_capacity
             self.bullet_type='9mm'
 

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+September 22 2020
+- removed un-needed functions to add/remove objects in graphics_2d_pygame 
+- started puzzling through map loading. not sure what code file will handle that yet
+    - may not be a responsibility of 'world' class 
+-----------------------------------------------------
 September 14 2020
 - created some place holder art for weapons and various soldier uniforms
 -----------------------------------------------------

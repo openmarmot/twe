@@ -18,7 +18,7 @@ from engine.world_object import WorldObject
 from wo_gun_mag import WOGunMag
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Sept 08 2020' #date of last update
+module_last_update_date='Sept 22 2020' #date of last update
 
 #global variables
 
@@ -37,16 +37,18 @@ class WOGun(WorldObject):
             self.mag=WOGunMag(world,'mp40')
 
     #---------------------------------------------------------------------------
+    def change_magazine(self,magazine):
+        ''' change magazine. input is new magazine. output is old magazine'''
+        old=self.mag
+        self.mag=magazine
+        return old
+
+    #---------------------------------------------------------------------------
     def update(self, time_passed):
         ''' overrides base update '''
         # no need for a seperate AI in this class as all guns should have the same AI
 
         # but -- does this even an update at all?
 
-    #---------------------------------------------------------------------------
-    def change_magazine(magazine)
-        ''' change magazine. input is new magazine. output is old magazine'''
-        old=self.mag
-        self.mag=magazine
-        return old
+
 
