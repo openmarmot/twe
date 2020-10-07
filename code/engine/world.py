@@ -28,6 +28,7 @@ class World(object):
     def __init__(self,graphic_engine):
 
         self.wo_objects=[]
+        self.wo_objects_collision=[]
         self.entity_id = 0
         self.graphic_engine=graphic_engine
         self.graphic_engine.world=self
@@ -37,11 +38,15 @@ class World(object):
     def add_object(self, worldobject):
         #maybe should check if the object is already in there to prevent duplicates
         self.wo_objects.append(worldobject)
+        if worldobject.collision:
+            self.wo_objects_collision.append(worldobject)
 
     #---------------------------------------------------------------------------
     def remove_object(self, worldobject):
         if worldobject in self.wo_objects:
             self.wo_objects.remove(worldobject)
+        if worldobject.collision and worldobject in self.wo_objects_collision:
+            self.wo_objects_collision.remove(worldobject)
 
     #---------------------------------------------------------------------------
     def load_map(self):

@@ -15,7 +15,7 @@ notes :
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='June 13 2016' #date of last update
+module_last_update_date='October 06 2020' #date of last update
 
 #global variables
 
@@ -28,7 +28,9 @@ class WorldObject(object):
         self.world = world
         self.name = None
         self.image_name = 'none'
+        # updated by the object AI
         self.world_coords=[0.,0.]
+        # note these are only updated by the graphic engine when the obj is on screen
         self.screen_coords=[0.,0.]
         self.speed = 0.
         self.rotation_angle=0.
@@ -36,10 +38,17 @@ class WorldObject(object):
         self.render=True
         self.is_player=False
         self.ai=None
+        #collision (bool) - used by world class
+        # true - obj will be added to collision list
+        # false - obj will not be added to collision list, nothing can collide with it
+        self.collision=True
+        # radius of collision circle in world coords
+        self.collision_radius=5
         
-        # list of other wo_objects
+        # list of other wo_objects contained within this one
         self.inventory=[]
 
+        # is this used? pretty sure its not 
         self.id = 0
 
     #add_inventory

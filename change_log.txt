@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+October 06 2020
+- added another list to world class to track which objects can be collided with 
+    this is useful to differentiate between objects that are just particles
+- added a basic collision square function to math_2d 
+- added selection of objects in the screen space with the mouse to graphics_2d_pygame 
+    this is there instead of math_2d because its more specific to the graphics engine
+    and specificaly the render lists and screen space coords 
+
+-----------------------------------------------------
 September 22 2020
 - removed un-needed functions to add/remove objects in graphics_2d_pygame 
 - started puzzling through map loading. not sure what code file will handle that yet

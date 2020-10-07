@@ -52,7 +52,7 @@ def load():
     world.player=player
 
     # bob generator 
-    for x in range(1):
+    for x in range(50):
         bob=WOMan(world)
         bob.name='bob'
         bob.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]

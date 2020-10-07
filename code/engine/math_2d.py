@@ -10,6 +10,9 @@ notes :
 static module consisting of math functions.
 import as needed
 
+# ref
+# notes on som differenct collisiong algos
+# https://www.h3xed.com/programming/bounding-box-vs-bounding-circle-collision-detection-performance-as3#:~:text=%2F%2F%20Collision!,-%7D&text=The%20above%20run%20took%20164,the%20nature%20of%20your%20game.
 '''
 
 
@@ -19,7 +22,7 @@ import math
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='September 07 2020' #date of last update
+module_last_update_date='October 06 2020' #date of last update
 
 #global variables
 
@@ -57,4 +60,27 @@ def moveTowardsTarget(speed,location,destination, time_passed):
 	travel_distance=min(distance,time_passed*speed)
 	change=[heading[0]*travel_distance,heading[1]*travel_distance]
 	return [location[0]+change[0],location[1]+change[1]]
+
+#------------------------------------------------------------------------------
+def checkCollisionSquareOneResult(wo, collision_list):
+	# wo - (worldobject)the object possibly doing the colliding 
+	# collision_list - (list[worldobject] a list of all possible objects that 
+	# could be collided with
+
+	# checks collision based on a bounding box style check where the box is made
+	# with the collision radius (so its a square)
+
+	# returns the first result only
+
+	collided=None
+	for b in collision_list:
+		if wo.world_coords[0]+wo.collision_radius > b.world_coords[0]:
+			if wo.world_coords[0] < b.world_coords[0]+b.collision_radius:
+				if wo.world_coords[1]+wo.collision_radius > b.world_coords[1]:
+					if wo.world_coords[1] < b.world_coords[1]+b.collision_radius:
+						collided=b
+						break
+	return collided
+
+
 

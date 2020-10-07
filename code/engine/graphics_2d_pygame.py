@@ -62,10 +62,17 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 print(str(event.key))
-                
+                # tilde
+                if event.key==96:
+                    print('player world coords : '+str(self.world.player.world_coords))
+                    print('player screen coords : '+str(self.world.player.screen_coords))
+                    print('mouse screen coords : '+ str(pygame.mouse.get_pos()))
             if event.type==pygame.MOUSEBUTTONDOWN:
                 if event.button==1:
                     print("left click!")
+                    b=self.selectFromScreen(120)
+                    if b!=None:
+                        print(b.name)
                 if event.button==2:
                     print("some other mouse button?")
                 if event.button==3:
@@ -202,3 +209,21 @@ class Graphics_2D_Pygame(object):
 
         return translate
 #------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def selectFromScreen(self, radius):
+        '''
+        return a object that is 'under' the mouse cursor
+        radius is actually the side of a square. kind of. >100 works best
+        '''
+        x,y=pygame.mouse.get_pos()
+        collided=None
+        # just checking the middle render list for now
+        for b in self.renderlists[1]:
+            if x+radius > b.screen_coords[0]:
+                if x < b.screen_coords[0]+b.collision_radius:
+                    if y+radius > b.screen_coords[1]:
+                        if y < b.screen_coords[1]+b.collision_radius:
+                            collided=b
+                            break
+        return collided
