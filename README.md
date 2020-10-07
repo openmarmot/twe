@@ -16,7 +16,7 @@ Sometime in 2010 I lost all the code due to a accidentally formatting the NAS wh
 - empasis on iron man mode. strategic game doesn't start over when player dies they just spawn again
 
 ### Current State on Master branch
--The game runs. There is basic movement for the user and a bot will turn to face you.
+-The game runs. There is basic movement for the user and bots will chase you around the screen.
 
 
 ### Check the changelog on the Dev branch to see what I've been working on.

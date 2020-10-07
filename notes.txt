@@ -21,3 +21,10 @@ https://stackoverflow.com/questions/19355026/move-an-object-in-the-direction-its
 --Install-----------------------------------
 
 
+--Design Notes-----------------------------
+
+- small items 
+    - small items will be too small to render. will not exist in world map,
+        only exist in inventories. 
+        example : gun magazines.
+        

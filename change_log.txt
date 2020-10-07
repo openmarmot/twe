@@ -1,6 +1,31 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+October 06 2020
+- added another list to world class to track which objects can be collided with 
+    this is useful to differentiate between objects that are just particles
+- added a basic collision square function to math_2d 
+- added selection of objects in the screen space with the mouse to graphics_2d_pygame 
+    this is there instead of math_2d because its more specific to the graphics engine
+    and specificaly the render lists and screen space coords 
+
+-----------------------------------------------------
+September 22 2020
+- removed un-needed functions to add/remove objects in graphics_2d_pygame 
+- started puzzling through map loading. not sure what code file will handle that yet
+    - may not be a responsibility of 'world' class 
+-----------------------------------------------------
+September 14 2020
+- created some place holder art for weapons and various soldier uniforms
+-----------------------------------------------------
+September 08 2020
+- started fleshing out a gun object and gun_mag object 
+    - started with a mp40 as per tradition
+- added inventory to the base world_object class 
+- fixed a confusing logic error in wo_man and wo_player where i wasn't triggering init of the 
+    base class. it confuses me why this wasn't breaking anything. very odd
+- some code formatting cleanup
+-----------------------------------------------------
 September 07 2020
 - added in simple movement for the player 
 - confirmed that ai zombie rotation code seems to work great

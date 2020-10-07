@@ -35,7 +35,7 @@ world=None
 def load():
     global world
 
-# note - a lot of this crap needs to go somewhere else
+# note - this all needs to be moved to a dedicated world_load file
 
     world = World(Graphics_2D_Pygame(SCREEN_SIZE))
 
@@ -52,7 +52,7 @@ def load():
     world.player=player
 
     # bob generator 
-    for x in range(500):
+    for x in range(50):
         bob=WOMan(world)
         bob.name='bob'
         bob.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]

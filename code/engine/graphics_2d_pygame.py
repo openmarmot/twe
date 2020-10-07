@@ -23,7 +23,7 @@ from pygame.locals import *
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Sept 06 2020' #date of last update
+module_last_update_date='Sept 22 2020' #date of last update
 
 #global variables
 
@@ -51,12 +51,6 @@ class Graphics_2D_Pygame(object):
         # will cause everything to exit
         self.quit=False
 
-    def add_object(self,obj):
-        self.renderlists[obj.render_level].append(obj)
-
-    def remove_object(self,obj):
-        self.renderlists[obj.render_level].remove(obj)
-
 #------------------------------------------------------------------------------
     def handleInput(self):
 
@@ -68,11 +62,17 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 print(str(event.key))
-                
-                #print(str(pygame.key.get_pressed()))
+                # tilde
+                if event.key==96:
+                    print('player world coords : '+str(self.world.player.world_coords))
+                    print('player screen coords : '+str(self.world.player.screen_coords))
+                    print('mouse screen coords : '+ str(pygame.mouse.get_pos()))
             if event.type==pygame.MOUSEBUTTONDOWN:
                 if event.button==1:
                     print("left click!")
+                    b=self.selectFromScreen(120)
+                    if b!=None:
+                        print(b.name)
                 if event.button==2:
                     print("some other mouse button?")
                 if event.button==3:
@@ -155,6 +155,10 @@ class Graphics_2D_Pygame(object):
              screen area, and if so, translates their world coordinates
              to screen coordinates
         '''
+        # note - i wonder if computing this is slower than just rendering everything
+        # should add an ability to toggle this once i get a FPS count setup
+
+        # note - this does not check world_object.render bool but maybe it should
 
         viewrange_x=(self.world.player.world_coords[0]+
             self.screen_size[0], self.world.player.world_coords[0]-
@@ -202,15 +206,24 @@ class Graphics_2D_Pygame(object):
         player_x=self.world.player.world_coords[0]
         player_y=self.world.player.world_coords[1]
         translate=[center_x-player_x,center_y-player_y]
-        #translate=[0.,0.]
-        # if player_x<center_x:
-        #     translate[0]=center_x-player_x
-        # elif player_x>center_x:
-        #     translate[0]=player_x-center_x
-        # if player_y<center_y:
-        #     translate[1]=center_y-player_y
-        # elif player_y>center_y:
-        #     translate[1]=player_y-center_y
-        # print('translate '+str(translate))
+
         return translate
 #------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def selectFromScreen(self, radius):
+        '''
+        return a object that is 'under' the mouse cursor
+        radius is actually the side of a square. kind of. >100 works best
+        '''
+        x,y=pygame.mouse.get_pos()
+        collided=None
+        # just checking the middle render list for now
+        for b in self.renderlists[1]:
+            if x+radius > b.screen_coords[0]:
+                if x < b.screen_coords[0]+b.collision_radius:
+                    if y+radius > b.screen_coords[1]:
+                        if y < b.screen_coords[1]+b.collision_radius:
+                            collided=b
+                            break
+        return collided
