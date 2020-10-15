@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+October 14 2020
+- moved the world building stuff to a new world_builder file
+
+
+-----------------------------------------------------
 October 06 2020
 - added another list to world class to track which objects can be collided with 
     this is useful to differentiate between objects that are just particles

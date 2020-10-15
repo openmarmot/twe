@@ -24,6 +24,6 @@ class WOMan(WorldObject):
 
     def __init__(self, world):
         super().__init__(world)
-        self.image_name='man'
+        self.image_name='russian_soldier'
         self.render_level=1
         self.ai=AIZombie(self)
