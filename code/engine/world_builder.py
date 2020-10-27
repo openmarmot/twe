@@ -27,10 +27,11 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from world_objects.wo_man import WOMan
 from world_objects.wo_player import WOPlayer
 
+from world_objects.wo_gun import WOGun
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='October 14 2020' #date of last update
+module_last_update_date='October 26 2020' #date of last update
 
 #global variables
 
@@ -88,3 +89,8 @@ def load_test_environment(world):
         bob.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
         bob.speed=float(random.randint(10,40))
         bob.wo_start()
+
+    # add mp40
+    mp40=WOGun(world,'mp40')
+    mp40.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
+    mp40.wo_start()

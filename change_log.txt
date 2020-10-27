@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+October 26 2020
+- made a couple small changes to wo_gun so it could be added to the test world 
+
+# issue notes
+- hit box seems bad - at least when determining what is under the mouse cursor.
+    it seems way to the left
+
+-----------------------------------------------------
 October 14 2020
 - moved the world building stuff to a new world_builder file
 

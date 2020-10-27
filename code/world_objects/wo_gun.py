@@ -15,10 +15,10 @@ gun class that should be re-usable for all regular guns in game
 
 #import custom packages
 from engine.world_object import WorldObject
-from wo_gun_mag import WOGunMag
+from world_objects.wo_gun_mag import WOGunMag
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Sept 22 2020' #date of last update
+module_last_update_date='Oct 26 2020' #date of last update
 
 #global variables
 
@@ -26,7 +26,7 @@ class WOGun(WorldObject):
 
     def __init__(self, world,type):
         super().__init__(world)
-        self.image_name='mp40'
+        
         self.render_level=1
         self.type=type
         self.mag=None # mag object is a wo_gun_mag
@@ -35,6 +35,8 @@ class WOGun(WorldObject):
         if type=='mp40':
             # generate a new mag
             self.mag=WOGunMag(world,'mp40')
+            self.image_name='mp40'
+            self.name='mp40'
 
     #---------------------------------------------------------------------------
     def change_magazine(self,magazine):
