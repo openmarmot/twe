@@ -1,4 +1,8 @@
 
+========= Code Cleanup ================================
+- i need to pick a style. maybe try PEP8?
+
+
 ======== Engine Stuff ====================================
 
 - need some basic collision modeling 
