@@ -18,6 +18,12 @@ http://stackoverflow.com/questions/7329837/2d-sprite-face-the-direction-its-movi
 # move an object in the direction its facing
 https://stackoverflow.com/questions/19355026/move-an-object-in-the-direction-its-facing-using-2d-html5canvas-and-ctx-rotate-f
 
+# font rendering
+https://stackoverflow.com/questions/20842801/how-to-display-text-in-pygame
+https://pythonprogramming.net/displaying-text-pygame-screen/
+https://pygame.readthedocs.io/en/latest/4_text/text.html
+
+
 --Install-----------------------------------
 
 
