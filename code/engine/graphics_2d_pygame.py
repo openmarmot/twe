@@ -19,6 +19,7 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 #import built in modules
 import pygame
 from pygame.locals import *
+import pygame.freetype
 #import custom packages
 
 # module specific variables
@@ -48,6 +49,14 @@ class Graphics_2D_Pygame(object):
         self.time_passed=None
         self.time_passed_seconds=None
 
+        # text stuff
+        # Different text sizes for in menus
+        self.small_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 12)
+        self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
+        self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
+
+        self.text_queue=['hello','hello','hello']
+
         # will cause everything to exit
         self.quit=False
 
@@ -64,9 +73,9 @@ class Graphics_2D_Pygame(object):
                 print(str(event.key))
                 # tilde
                 if event.key==96:
-                    print('player world coords : '+str(self.world.player.world_coords))
-                    print('player screen coords : '+str(self.world.player.screen_coords))
-                    print('mouse screen coords : '+ str(pygame.mouse.get_pos()))
+                    self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
+                    self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
+                    self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
             if event.type==pygame.MOUSEBUTTONDOWN:
                 if event.button==1:
                     print("left click!")
@@ -132,6 +141,11 @@ class Graphics_2D_Pygame(object):
                 #print('rendering : '+c.name+' coords : '+str(c.screen_coords))
                 #do any special rendering for the object
                 c.render_pass_2()
+
+        # text stuff
+        self.small_font.render_to(self.screen, (40, 10), self.text_queue[0], (0, 0, 255))
+        self.small_font.render_to(self.screen, (45, 20), self.text_queue[1], (0, 0, 255))
+        self.small_font.render_to(self.screen, (50, 30), self.text_queue[2], (0, 0, 255))
 
         pygame.display.update()
 

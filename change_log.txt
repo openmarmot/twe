@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+November 03 2020
+- added a text queue and some basic text handling
+
+-----------------------------------------------------
 October 26 2020
 - made a couple small changes to wo_gun so it could be added to the test world 
 
