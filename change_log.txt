@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+-----------------------------------------------------
+November 29 2020
+- moved graphics_2d_pygame object creation into world class to solve clean up the init ordering
+- moved init for world pointer in graphics_2d_game into the init function where it should logically be 
+- created a class for the world_menu that will be used to interact with objects
+
+
 -----------------------------------------------------
 November 03 2020
 - added a text queue and some basic text handling

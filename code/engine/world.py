@@ -14,7 +14,8 @@ It should not have any specific graphic engine code (pygame, etc)
 
 
 #import custom packages
-
+from engine.graphics_2d_pygame import Graphics_2D_Pygame
+from engine.world_menu import World_Menu
 
 # module specific variables
 module_version='0.0' #module software version
@@ -25,13 +26,13 @@ module_last_update_date='September 22 2020' #date of last update
 
 class World(object):
     #---------------------------------------------------------------------------
-    def __init__(self,graphic_engine):
+    def __init__(self,SCREEN_SIZE):
 
         self.wo_objects=[]
         self.wo_objects_collision=[]
         self.entity_id = 0
-        self.graphic_engine=graphic_engine
-        self.graphic_engine.world=self
+        self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
+        self.world_menu=World_Menu(self)
         self.player=None
 
     #---------------------------------------------------------------------------

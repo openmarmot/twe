@@ -11,6 +11,8 @@ static module with the following responsibilities
 - build worlds
 - load art assets (?)
 
+should this be a class called by world instead of a static file that creates world??
+
 # ref
 
 '''
@@ -22,7 +24,7 @@ import random
 
 #import custom packages
 from engine.world import World
-from engine.graphics_2d_pygame import Graphics_2D_Pygame
+#from engine.graphics_2d_pygame import Graphics_2D_Pygame
 
 from world_objects.wo_man import WOMan
 from world_objects.wo_player import WOPlayer
@@ -41,7 +43,7 @@ def initialize_world(SCREEN_SIZE):
     returns a world object that has completed basic init
     '''
 
-    world = World(Graphics_2D_Pygame(SCREEN_SIZE))
+    world = World(SCREEN_SIZE)
 
     load_images(world)
 
