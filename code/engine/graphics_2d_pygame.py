@@ -24,7 +24,7 @@ import pygame.freetype
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Nov 29 2020' #date of last update
+module_last_update_date='Dec 29 2020' #date of last update
 
 #global variables
 
@@ -79,15 +79,17 @@ class Graphics_2D_Pygame(object):
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
             if event.type==pygame.MOUSEBUTTONDOWN:
+                # left click
                 if event.button==1:
-                    print("left click!")
                     b=self.selectFromScreen(120)
                     if b!=None:
                         print(b.name)
+                # middle button click
                 if event.button==2:
-                    print("some other mouse button?")
+                    pass
+                # right click
                 if event.button==3:
-                    print("right click!")
+                    pass
             if event.type==pygame.MOUSEMOTION:
                 #print(str(event.pos))
                 pass

@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+-----------------------------------------------------
+December 29 2020
+- moved project over to windows from mac
+- minor code cleanup in graphics_2d_pygame.py 
+
 
 -----------------------------------------------------
 November 29 2020
