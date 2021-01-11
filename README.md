@@ -5,7 +5,7 @@ TWE is short for 'To Whatever End' which was the title of a game I worked on fro
 The game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
 Sometime in 2010 I lost all the code due to a accidentally formatting the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
 
-![screenshot](/screenshots/twe-feb-09-2020.png "boop")
+![screenshot](/screenshots/twe-jan-10-2021.png "boop")
 
 
 ### General Concepts

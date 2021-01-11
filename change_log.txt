@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+Jan 10 2021
+- created crate.png art 
+- code for crate image load 
+- wo_crate object  
+
+-----------------------------------------------------
+December 29 2020
+- moved project over to windows from mac
+- minor code cleanup in graphics_2d_pygame.py 
+
+-----------------------------------------------------
+November 29 2020
+- moved graphics_2d_pygame object creation into world class to solve clean up the init ordering
+- moved init for world pointer in graphics_2d_game into the init function where it should logically be 
+- created a class for the world_menu that will be used to interact with objects
+
+
+-----------------------------------------------------
 November 03 2020
 - added a text queue and some basic text handling
 
@@ -15,7 +33,6 @@ October 26 2020
 -----------------------------------------------------
 October 14 2020
 - moved the world building stuff to a new world_builder file
-
 
 -----------------------------------------------------
 October 06 2020

@@ -24,7 +24,7 @@ import pygame.freetype
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Sept 22 2020' #date of last update
+module_last_update_date='Dec 29 2020' #date of last update
 
 #global variables
 
@@ -32,9 +32,11 @@ module_last_update_date='Sept 22 2020' #date of last update
 class Graphics_2D_Pygame(object):
     ''' 2D Graphics Engine using PyGame '''
 
-    def __init__(self,screen_size):
+    def __init__(self,Screen_size,World):
+        # called by World.__init__
+
         self.images=dict()
-        self.screen_size=screen_size
+        self.screen_size=Screen_size
         pygame.init()
         self.screen=pygame.display.set_mode(self.screen_size,0,32)
         
@@ -42,7 +44,7 @@ class Graphics_2D_Pygame(object):
         self.background.fill((255, 255, 255))
         #pygame.draw.circle(self.background, (200, 255, 200), NEST_POSITION, int(NEST_SIZE))
         self.renderlists=[[],[],[]]
-        self.world=None
+        self.world=World
         
         # time stuff
         self.clock=pygame.time.Clock()
@@ -77,15 +79,17 @@ class Graphics_2D_Pygame(object):
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
             if event.type==pygame.MOUSEBUTTONDOWN:
+                # left click
                 if event.button==1:
-                    print("left click!")
                     b=self.selectFromScreen(120)
                     if b!=None:
                         print(b.name)
+                # middle button click
                 if event.button==2:
-                    print("some other mouse button?")
+                    pass
+                # right click
                 if event.button==3:
-                    print("right click!")
+                    pass
             if event.type==pygame.MOUSEMOTION:
                 #print(str(event.pos))
                 pass
@@ -95,6 +99,7 @@ class Graphics_2D_Pygame(object):
     def keyPressed(self, KEY):
         # returns bool as to whether keyPressed is KEY
         # not sure whether this works great or not
+        # used by ai_player for movement
 
         keys=pygame.key.get_pressed()
         if KEY=='w':

@@ -2,6 +2,9 @@ TWE
 
 "To Whatever End"
 
+-- Code Style ----------------------------
+leaning towards using underscores in variable and method names. its very readable 
+
 -- Coordinate System ----------------------
 
 world_coords=(x,y) : ?
