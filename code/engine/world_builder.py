@@ -72,6 +72,9 @@ def load_images(world):
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
 
+    #crates?
+    world.graphic_engine.loadImage('crate','images/crate.png')
+
 #------------------------------------------------------------------------------
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
