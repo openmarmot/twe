@@ -10,6 +10,8 @@ This class should hold as much of the pygame specifc code as possibe.
 The idea is to keep the graphics engine seperate from the rest of the code,
  so it is portable to different graphics engines
 
+currently instantiated by the world class
+
  ref:
  # pygame.key.get_pressed() and general input theory
  https://stackoverflow.com/questions/17372314/is-it-me-or-is-pygame-key-get-pressed-not-working
@@ -24,7 +26,7 @@ import pygame.freetype
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Dec 29 2020' #date of last update
+module_last_update_date='Feb 03 2021' #date of last update
 
 #global variables
 
@@ -78,6 +80,31 @@ class Graphics_2D_Pygame(object):
                     self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
+
+                # send number events to world_menu for ingame menus 
+                # translate to a string corresponding to the actual key to simplify the code
+                # on the other end
+                elif event.key==48:
+                    self.world.world_menu.handle_input("0")
+                elif event.key==49:
+                    self.world.world_menu.handle_input("1")
+                elif event.key==50:
+                    self.world.world_menu.handle_input("2")
+                elif event.key==51:
+                    self.world.world_menu.handle_input("3")
+                elif event.key==52:
+                    self.world.world_menu.handle_input("4")
+                elif event.key==53:
+                    self.world.world_menu.handle_input("5")
+                elif event.key==54:
+                    self.world.world_menu.handle_input("6")
+                elif event.key==55:
+                    self.world.world_menu.handle_input("7")
+                elif event.key==56:
+                    self.world.world_menu.handle_input("8")
+                elif event.key==57:
+                    self.world.world_menu.handle_input("9")
+
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:

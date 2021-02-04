@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+Feb 03 2021
+- added code to graphics_2d_game to push number key events to world_menu 
+    for ingame menu usage 
+- started on some world_menu code - got stuck on how this is being displayed
+    probably need another text queue -- but do i really want all of these to be 
+    stored in the graphics_2d_pygame class? maybe i need a text object game object 
+
+- thought - why is world menu in the world class at all? 
+    - I guess it needs to be somewhere 
+-----------------------------------------------------
 Jan 10 2021
 - created crate.png art 
 - code for crate image load 

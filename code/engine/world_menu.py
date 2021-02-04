@@ -6,6 +6,7 @@ author : andrew christ
 email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu
+instantiated by the world class
 '''
 
 
@@ -28,11 +29,36 @@ class World_Menu(object):
         # called/created by world.__init__
 
         self.world=World
-        self.gun_menu=False
-        self.vehicle_menu=False
-        self.crate_menu=False
+        self.selected_object=Null
+        self.active_menu='none'
+        self.menu_state='none'
 
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
         # Key is a string corresponding to the actual key being pressed
+
+        if self.active_menu=='vehicle':
+            self.vehicle_menu(Key)
+        
+
+    def activate_menu(self, Selected_Object, Active_Menu):
+        self.selected_object=Selected_Object
+        self.active_menu=Active_Menu
+        self.menu_state='none'
+
+    def deactivate_menu(self):
+        self.selected_object=Null
+        self.active_menu='none'
+        self.menu_state='none'
+
+    def crate_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            pass
+
+    def vehicle_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            pass
+
         pass
