@@ -29,7 +29,7 @@ class World_Menu(object):
         # called/created by world.__init__
 
         self.world=World
-        self.selected_object=Null
+        self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
 
@@ -37,8 +37,17 @@ class World_Menu(object):
         # called by graphics_2d_pygame when there is a suitable key press
         # Key is a string corresponding to the actual key being pressed
 
+        # '~' is used to activate/deactivate the debug menu
+        if Key=='tilde':
+            if self.menu_state=='debug':
+                self.deactivate_menu()
+            else :
+                self.menu_state='debug'
+
         if self.active_menu=='vehicle':
             self.vehicle_menu(Key)
+        elif self.active_menu=='debug':
+            self.debug_menu(Key)
         
 
     def activate_menu(self, Selected_Object, Active_Menu):
@@ -47,7 +56,7 @@ class World_Menu(object):
         self.menu_state='none'
 
     def deactivate_menu(self):
-        self.selected_object=Null
+        self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
 
@@ -61,4 +70,5 @@ class World_Menu(object):
             # print out the basic menu
             pass
 
+    def debug_menu(self, Key):
         pass

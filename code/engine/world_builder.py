@@ -10,8 +10,10 @@ notes :
 static module with the following responsibilities
 - build worlds
 - load art assets (?)
+- create world objects (can be called by anything)
 
-should this be a class called by world instead of a static file that creates world??
+the idea is this static class holds the standard way for creating objects
+- anything that creates objects should do it here
 
 # ref
 
@@ -28,12 +30,13 @@ from engine.world import World
 
 from world_objects.wo_man import WOMan
 from world_objects.wo_player import WOPlayer
+from world_objects.wo_zombie import WOZombie
 
 from world_objects.wo_gun import WOGun
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='October 26 2020' #date of last update
+module_last_update_date='feb 27 2021' #date of last update
 
 #global variables
 
@@ -59,6 +62,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_soldier','images/german_soldier.png')
     world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/german_ss_fall_helm_soldier.png')
     world.graphic_engine.loadImage('russian_soldier','images/russian_soldier.png')
+    world.graphic_engine.loadImage('zombie_soldier','images/zombie_soldier.png')
 
     # weapons
     world.graphic_engine.loadImage('1911','images/1911.png')
@@ -87,15 +91,22 @@ def load_test_environment(world):
     player.wo_start()
     world.player=player
 
-    # bob generator 
-    for x in range(50):
-        bob=WOMan(world)
-        bob.name='bob'
-        bob.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
-        bob.speed=float(random.randint(10,40))
-        bob.wo_start()
+    # zombie generator 
+    spawn_zombie_horde(world, [10,10], 50)
 
     # add mp40
     mp40=WOGun(world,'mp40')
     mp40.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
     mp40.wo_start()
+
+#------------------------------------------------------------------------------
+def spawn_zombie(world,world_coords):
+    z=WOZombie(world)
+    z.name='Klaus Hammer'
+    z.world_coords=world_coords
+    z.wo_start()
+
+#------------------------------------------------------------------------------
+def spawn_zombie_horde(world, world_coords, amount):
+    for x in range(amount):
+        spawn_zombie(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]])

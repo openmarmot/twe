@@ -22,6 +22,7 @@ currently instantiated by the world class
 import pygame
 from pygame.locals import *
 import pygame.freetype
+from itertools import islice
 #import custom packages
 
 # module specific variables
@@ -59,7 +60,7 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.text_queue=['hello','hello','hello']
+        self.text_queue=[]
 
         # will cause everything to exit
         self.quit=False
@@ -104,6 +105,8 @@ class Graphics_2D_Pygame(object):
                     self.world.world_menu.handle_input("8")
                 elif event.key==57:
                     self.world.world_menu.handle_input("9")
+                elif event.key==96:
+                    self.world.world_menu.handle_input("tilde")
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -174,10 +177,12 @@ class Graphics_2D_Pygame(object):
                 #do any special rendering for the object
                 c.render_pass_2()
 
-        # text stuff
-        self.small_font.render_to(self.screen, (40, 10), self.text_queue[0], (0, 0, 255))
-        self.small_font.render_to(self.screen, (45, 20), self.text_queue[1], (0, 0, 255))
-        self.small_font.render_to(self.screen, (50, 30), self.text_queue[2], (0, 0, 255))
+
+        # text stuff 
+        self.h=0
+        for b in islice(self.text_queue,3):
+            self.h+=10
+            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
 
         pygame.display.update()
 

@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+Feb 27 2021
+- added a new to me 'islice' in graphics_2d_pygame to display the first three lines from the text queue 
+- created a new zombie object to serve as a good test object 
+    - quick zombie art 
+    - moved speed randomization code to the init of the wo_zombie world object 
+    - speed for other objects should probably be declared in init as well 
+- repurposing world_builder as a static generator that will be used to generate ALL world objects 
+    - can be referenced from any object, static file not a class, no state 
+- added zombie and zombie horde generators to world_builder 
+
+-----------------------------------------------------
 Feb 03 2021
 - added code to graphics_2d_game to push number key events to world_menu 
     for ingame menu usage 
