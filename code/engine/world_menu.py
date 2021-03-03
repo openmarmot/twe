@@ -14,10 +14,11 @@ instantiated by the world class
 
 
 #import custom packages
+import engine.world_builder 
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Nov 29 2020' #date of last update
+module_last_update_date='March 02 2021' #date of last update
 
 #global variables
 
@@ -30,8 +31,8 @@ class World_Menu(object):
 
         self.world=World
         self.selected_object=None
-        self.active_menu='none'
-        self.menu_state='none'
+        self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
+        self.menu_state='none' # where you are in the menu
 
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
@@ -39,10 +40,11 @@ class World_Menu(object):
 
         # '~' is used to activate/deactivate the debug menu
         if Key=='tilde':
-            if self.menu_state=='debug':
+            if self.active_menu=='debug':
                 self.deactivate_menu()
             else :
-                self.menu_state='debug'
+                self.active_menu='debug'
+                print("poooooooo!")
 
         if self.active_menu=='vehicle':
             self.vehicle_menu(Key)
@@ -59,6 +61,7 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
+        self.world.graphic_engine.menu_text_queue.clear()
 
     def crate_menu(self, Key):
         if self.menu_state=='none':
@@ -71,4 +74,17 @@ class World_Menu(object):
             pass
 
     def debug_menu(self, Key):
-        pass
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
+            self.world.graphic_engine.menu_text_queue.append('1 - exciting option coming soon')
+            self.world.graphic_engine.menu_text_queue.append('2 - spawn like 50 zombies')
+            self.world.graphic_engine.menu_text_queue.append('3 - exciting option coming soon')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            elif Key=='2':
+                engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 50)
+
+        

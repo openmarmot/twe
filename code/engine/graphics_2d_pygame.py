@@ -60,7 +60,11 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
+        # used for temporary text. max 3 lines displayed
         self.text_queue=[]
+
+        # used for the menu system. no limits enforced by this class
+        self.menu_text_queue=[]
 
         # will cause everything to exit
         self.quit=False
@@ -76,15 +80,15 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 print(str(event.key))
+                # send number events to world_menu for ingame menus 
+                # translate to a string corresponding to the actual key to simplify the code
+                # on the other end
                 # tilde
                 if event.key==96:
                     self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
-
-                # send number events to world_menu for ingame menus 
-                # translate to a string corresponding to the actual key to simplify the code
-                # on the other end
+                    self.world.world_menu.handle_input("tilde")
                 elif event.key==48:
                     self.world.world_menu.handle_input("0")
                 elif event.key==49:
@@ -105,8 +109,7 @@ class Graphics_2D_Pygame(object):
                     self.world.world_menu.handle_input("8")
                 elif event.key==57:
                     self.world.world_menu.handle_input("9")
-                elif event.key==96:
-                    self.world.world_menu.handle_input("tilde")
+                    
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -181,7 +184,12 @@ class Graphics_2D_Pygame(object):
         # text stuff 
         self.h=0
         for b in islice(self.text_queue,3):
-            self.h+=10
+            self.h+=13
+            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
+
+        self.h+=20
+        for b in self.menu_text_queue:
+            self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
 
         pygame.display.update()

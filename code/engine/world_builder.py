@@ -92,7 +92,7 @@ def load_test_environment(world):
     world.player=player
 
     # zombie generator 
-    spawn_zombie_horde(world, [10,10], 50)
+    #spawn_zombie_horde(world, [10,10], 50)
 
     # add mp40
     mp40=WOGun(world,'mp40')

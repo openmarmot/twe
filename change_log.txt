@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 02 2021
+- more work on world_menu (lots to do here)
+    - added world_menu text_queue to display via graphics_2d_pygame 
+    - implemented debug menu (~) 
+    - fixed some logic errors
+- disabled zombie spawning on start. you can now spawn them from the debug menu 
+
+thoughts 
+- graphics_2d_pygame could use a bit of a rewrite to make it cleaner and more isolated
+    ideally it should be easy to replace with another graphics library
+- desire to implement my cat intensifies 
+-----------------------------------------------------
 Feb 27 2021
 - added a new to me 'islice' in graphics_2d_pygame to display the first three lines from the text queue 
 - created a new zombie object to serve as a good test object 

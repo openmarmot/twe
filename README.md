@@ -26,6 +26,10 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 - download code
 - python3 twe.py (windows would be py)
 
+### Controls
+- '~' opens/closes debug menu (spawn zombies!)
+- 'w/s/a/d' movement
+
 
 ### License / Whatever
 - I want to do this project completely by myself to improve my python skills and just as a fun hobby. 
