@@ -10,6 +10,8 @@ This class should hold as much of the pygame specifc code as possibe.
 The idea is to keep the graphics engine seperate from the rest of the code,
  so it is portable to different graphics engines
 
+currently instantiated by the world class
+
  ref:
  # pygame.key.get_pressed() and general input theory
  https://stackoverflow.com/questions/17372314/is-it-me-or-is-pygame-key-get-pressed-not-working
@@ -20,11 +22,12 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 import pygame
 from pygame.locals import *
 import pygame.freetype
+from itertools import islice
 #import custom packages
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Dec 29 2020' #date of last update
+module_last_update_date='Feb 03 2021' #date of last update
 
 #global variables
 
@@ -57,7 +60,11 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.text_queue=['hello','hello','hello']
+        # used for temporary text. max 3 lines displayed
+        self.text_queue=[]
+
+        # used for the menu system. no limits enforced by this class
+        self.menu_text_queue=[]
 
         # will cause everything to exit
         self.quit=False
@@ -73,11 +80,37 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 print(str(event.key))
+                # send number events to world_menu for ingame menus 
+                # translate to a string corresponding to the actual key to simplify the code
+                # on the other end
                 # tilde
                 if event.key==96:
                     self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
+                    self.world.world_menu.handle_input("tilde")
+                elif event.key==48:
+                    self.world.world_menu.handle_input("0")
+                elif event.key==49:
+                    self.world.world_menu.handle_input("1")
+                elif event.key==50:
+                    self.world.world_menu.handle_input("2")
+                elif event.key==51:
+                    self.world.world_menu.handle_input("3")
+                elif event.key==52:
+                    self.world.world_menu.handle_input("4")
+                elif event.key==53:
+                    self.world.world_menu.handle_input("5")
+                elif event.key==54:
+                    self.world.world_menu.handle_input("6")
+                elif event.key==55:
+                    self.world.world_menu.handle_input("7")
+                elif event.key==56:
+                    self.world.world_menu.handle_input("8")
+                elif event.key==57:
+                    self.world.world_menu.handle_input("9")
+                    
+
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
@@ -147,10 +180,17 @@ class Graphics_2D_Pygame(object):
                 #do any special rendering for the object
                 c.render_pass_2()
 
-        # text stuff
-        self.small_font.render_to(self.screen, (40, 10), self.text_queue[0], (0, 0, 255))
-        self.small_font.render_to(self.screen, (45, 20), self.text_queue[1], (0, 0, 255))
-        self.small_font.render_to(self.screen, (50, 30), self.text_queue[2], (0, 0, 255))
+
+        # text stuff 
+        self.h=0
+        for b in islice(self.text_queue,3):
+            self.h+=13
+            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
+
+        self.h+=20
+        for b in self.menu_text_queue:
+            self.h+=15
+            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
 
         pygame.display.update()
 

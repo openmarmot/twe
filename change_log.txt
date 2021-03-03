@@ -1,6 +1,39 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 02 2021
+- more work on world_menu (lots to do here)
+    - added world_menu text_queue to display via graphics_2d_pygame 
+    - implemented debug menu (~) 
+    - fixed some logic errors
+- disabled zombie spawning on start. you can now spawn them from the debug menu 
+
+thoughts 
+- graphics_2d_pygame could use a bit of a rewrite to make it cleaner and more isolated
+    ideally it should be easy to replace with another graphics library
+- desire to implement my cat intensifies 
+-----------------------------------------------------
+Feb 27 2021
+- added a new to me 'islice' in graphics_2d_pygame to display the first three lines from the text queue 
+- created a new zombie object to serve as a good test object 
+    - quick zombie art 
+    - moved speed randomization code to the init of the wo_zombie world object 
+    - speed for other objects should probably be declared in init as well 
+- repurposing world_builder as a static generator that will be used to generate ALL world objects 
+    - can be referenced from any object, static file not a class, no state 
+- added zombie and zombie horde generators to world_builder 
+
+-----------------------------------------------------
+Feb 03 2021
+- added code to graphics_2d_game to push number key events to world_menu 
+    for ingame menu usage 
+- started on some world_menu code - got stuck on how this is being displayed
+    probably need another text queue -- but do i really want all of these to be 
+    stored in the graphics_2d_pygame class? maybe i need a text object game object 
+
+- thought - why is world menu in the world class at all? 
+    - I guess it needs to be somewhere 
+-----------------------------------------------------
 Jan 10 2021
 - created crate.png art 
 - code for crate image load 

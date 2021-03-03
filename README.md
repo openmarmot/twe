@@ -3,7 +3,7 @@ WW2 Eastern Front Sim
 
 TWE is short for 'To Whatever End' which was the title of a game I worked on from about 2007-2010.
 The game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
-Sometime in 2010 I lost all the code due to a accidentally formatting the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
+Sometime in 2010 I lost all the code when I accidentally erased the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
 
 ![screenshot](/screenshots/twe-jan-10-2021.png "boop")
 
@@ -24,7 +24,11 @@ Sometime in 2010 I lost all the code due to a accidentally formatting the NAS wh
 ### To Play 
 - install python3 and pygame
 - download code
-- python3 twe.py
+- python3 twe.py (windows would be py)
+
+### Controls
+- '~' opens/closes debug menu (spawn zombies!)
+- 'w/s/a/d' movement
 
 
 ### License / Whatever
