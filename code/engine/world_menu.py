@@ -18,7 +18,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 02 2021' #date of last update
+module_last_update_date='March 08 2021' #date of last update
 
 #global variables
 
@@ -76,15 +76,18 @@ class World_Menu(object):
     def debug_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
+            # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
-            self.world.graphic_engine.menu_text_queue.append('1 - exciting option coming soon')
+            self.world.graphic_engine.menu_text_queue.append('1 - spawn a crate')
             self.world.graphic_engine.menu_text_queue.append('2 - spawn like 50 zombies')
             self.world.graphic_engine.menu_text_queue.append('3 - exciting option coming soon')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
+                engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas")
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 50)
+            elif Key=='3':
+                engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords)
 
         

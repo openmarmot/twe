@@ -1,6 +1,25 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 08 2021
+- crate object stuff 
+    - some code cleanup in wo_crate to make it a usable object 
+    - added wo_crate to world_builder
+    - added spawn option to debug menu ( hit ~) 
+    - i initially accidentally set the crate coords to a reference of the player , 
+        resulting in the crate following me around
+- kubelwagen 
+    - started adding some base code for the kubelwagen as 
+        implementing some rudimentary vehicles is on the near term 
+        to do list 
+
+graphics note 
+- rendering seems to be better when im on my laptop and not hooked into my
+    external 4k. rendering on the 4k monitor seems to have a slight chop or jitter
+
+- the crate looks like vinyl flooring. maybe thats where i got the texture from 
+
+-----------------------------------------------------
 March 02 2021
 - more work on world_menu (lots to do here)
     - added world_menu text_queue to display via graphics_2d_pygame 

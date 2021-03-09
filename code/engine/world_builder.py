@@ -23,6 +23,7 @@ the idea is this static class holds the standard way for creating objects
 #import built in modules
 import math
 import random
+import copy 
 
 #import custom packages
 from engine.world import World
@@ -31,12 +32,13 @@ from engine.world import World
 from world_objects.wo_man import WOMan
 from world_objects.wo_player import WOPlayer
 from world_objects.wo_zombie import WOZombie
+from world_objects.wo_crate import WOCrate
 
 from world_objects.wo_gun import WOGun
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='feb 27 2021' #date of last update
+module_last_update_date='march 08 2021' #date of last update
 
 #global variables
 
@@ -73,6 +75,9 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # vehicle
+    world.graphic_engine.loadImage('kubelwagen','images/kubelwagen.png')
+
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
 
@@ -98,6 +103,23 @@ def load_test_environment(world):
     mp40=WOGun(world,'mp40')
     mp40.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
     mp40.wo_start()
+
+#------------------------------------------------------------------------------
+def spawn_crate(world,world_coords, crate_type):
+    # crate_type -- string denoting crate type 
+    z=WOCrate(world,crate_type)
+    z.world_coords=copy.copy(world_coords)
+    z.wo_start()
+
+
+#------------------------------------------------------------------------------
+def spawn_kubelwagen(world,world_coords):
+    #z=WOKubelwagen(world)
+    #z.name='Klaus Hammer'
+    #z.world_coords=world_coords
+    #z.wo_start()
+    pass
+
 
 #------------------------------------------------------------------------------
 def spawn_zombie(world,world_coords):
