@@ -36,6 +36,8 @@ from world_objects.wo_crate import WOCrate
 
 from world_objects.wo_gun import WOGun
 
+from world_objects.wo_vehicle import WOVehicle
+
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='march 08 2021' #date of last update
@@ -114,10 +116,9 @@ def spawn_crate(world,world_coords, crate_type):
 
 #------------------------------------------------------------------------------
 def spawn_kubelwagen(world,world_coords):
-    #z=WOKubelwagen(world)
-    #z.name='Klaus Hammer'
-    #z.world_coords=world_coords
-    #z.wo_start()
+    z=WOVehicle(world,'kubelwagen')
+    z.world_coords=copy.copy(world_coords)
+    z.wo_start()
     pass
 
 
