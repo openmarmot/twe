@@ -18,21 +18,22 @@ from engine.world_object import WorldObject
 from world_objects.wo_gun_mag import WOGunMag
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Oct 26 2020' #date of last update
+module_last_update_date='March 10 2021' #date of last update
 
 #global variables
 
 class WOGun(WorldObject):
 
-    def __init__(self, world,type):
+    def __init__(self, world,gun_type):
         super().__init__(world)
         
         self.render_level=1
-        self.type=type
+        self.gun_type=gun_type
+        self.is_gun=True
         self.mag=None # mag object is a wo_gun_mag
        # self.ai=AIZombie(self) # not sure this needs multiple AI
 
-        if type=='mp40':
+        if gun_type=='mp40':
             # generate a new mag
             self.mag=WOGunMag(world,'mp40')
             self.image_name='mp40'

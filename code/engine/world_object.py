@@ -15,7 +15,7 @@ notes :
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='October 06 2020' #date of last update
+module_last_update_date='March 10 2021' #date of last update
 
 #global variables
 
@@ -36,8 +36,15 @@ class WorldObject(object):
         self.rotation_angle=0.
         self.render_level=1
         self.render=True
+
+        # these are used by other objects to determine how this object can be interacted with
+        # might just make this a string or something but bools are fast and easy to use 
         self.is_player=False
+        self.is_vehicle=False
+        self.is_gun=False
+        self.is_crate=False
         self.ai=None
+
         #collision (bool) - used by world class
         # true - obj will be added to collision list
         # false - obj will not be added to collision list, nothing can collide with it

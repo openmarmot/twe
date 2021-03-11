@@ -18,7 +18,7 @@ from engine.world_object import WorldObject
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 09 2021' #date of last update
+module_last_update_date='March 10 2021' #date of last update
 
 #global variables
 
@@ -29,6 +29,7 @@ class WOVehicle(WorldObject):
         
         self.render_level=1
         self.vehicle_type=vehicle_type
+        self.is_vehicle=True
        # self.ai=AIZombie(self) # not sure this needs multiple AI
 
         if vehicle_type=='kubelwagen':

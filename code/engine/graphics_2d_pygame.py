@@ -27,7 +27,7 @@ from itertools import islice
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Feb 03 2021' #date of last update
+module_last_update_date='March 10 2021' #date of last update
 
 #global variables
 
@@ -109,6 +109,8 @@ class Graphics_2D_Pygame(object):
                     self.world.world_menu.handle_input("8")
                 elif event.key==57:
                     self.world.world_menu.handle_input("9")
+                elif event.key==27:
+                    self.world.world_menu.handle_input("esc")
                     
 
             if event.type==pygame.MOUSEBUTTONDOWN:
@@ -117,6 +119,8 @@ class Graphics_2D_Pygame(object):
                     b=self.selectFromScreen(120)
                     if b!=None:
                         print(b.name)
+                        # send it over to world menu to figure out
+                        self.world.world_menu.activate_menu(b)
                 # middle button click
                 if event.button==2:
                     pass

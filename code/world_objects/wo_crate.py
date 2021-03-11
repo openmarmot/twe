@@ -33,6 +33,7 @@ class WOCrate(WorldObject):
         self.crate_type=crate_type
         self.image_name='crate'
         self.name='crate'
+        self.is_crate=True
         
        # self.ai=AIZombie(self) # not sure this needs multiple AI
 
