@@ -22,8 +22,8 @@ module_last_update_date='september 08 2020' #date of last update
 
 class WOMan(WorldObject):
 
-    def __init__(self, world):
+    def __init__(self, world,IMAGE_NAME,AI):
         super().__init__(world)
-        self.image_name='russian_soldier'
+        self.image_name=IMAGE_NAME
         self.render_level=1
-        self.ai=AIZombie(self)
+        self.ai=AI(self)

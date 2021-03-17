@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 16 2021
+- collapsed wo_zombie, wo_player, and wo_man all into wo_man and made
+    world_builder the object constructor
+    - I wasn't sure passing in a imported class as a variable would work but it did 
+- 
+
+-----------------------------------------------------
+March 10 2021
+- added some bools to world_object to identify whether something is a vehicle, player, or gun 
+    these are the three main things you can interact with at the moment 
+    long term this may not be a great system 
+- worked on object menus for guns/crates/vehicles
+
+-----------------------------------------------------
+March 09 2021
+- created vehicle class for kubelwagen
+
+-----------------------------------------------------
 March 08 2021
 - crate object stuff 
     - some code cleanup in wo_crate to make it a usable object 

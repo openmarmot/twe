@@ -30,13 +30,13 @@ from engine.world import World
 #from engine.graphics_2d_pygame import Graphics_2D_Pygame
 
 from world_objects.wo_man import WOMan
-from world_objects.wo_player import WOPlayer
-from world_objects.wo_zombie import WOZombie
 from world_objects.wo_crate import WOCrate
-
 from world_objects.wo_gun import WOGun
-
 from world_objects.wo_vehicle import WOVehicle
+
+
+from ai.ai_zombie import AIZombie
+from ai.ai_player import AIPlayer
 
 # module specific variables
 module_version='0.0' #module software version
@@ -91,12 +91,7 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
     #add a player
-    player=WOPlayer(world)
-    player.is_player=True
-    player.world_coords=[50.,50.]
-    player.name='player'
-    player.wo_start()
-    world.player=player
+    spawn_player(world, [50.,50.])
 
     # zombie generator 
     #spawn_zombie_horde(world, [10,10], 50)
@@ -122,11 +117,24 @@ def spawn_kubelwagen(world,world_coords):
     pass
 
 
+
 #------------------------------------------------------------------------------
-def spawn_zombie(world,world_coords):
-    z=WOZombie(world)
+def spawn_player(world,world_coords):
+    z=WOMan(world,'man',AIPlayer)
     z.name='Klaus Hammer'
     z.world_coords=world_coords
+    #z.speed=float(random.randint(10,40))
+    z.is_player=True
+    z.wo_start()
+    world.player=z
+
+#------------------------------------------------------------------------------
+def spawn_zombie(world,world_coords):
+    #z=WOZombie(world)
+    z=WOMan(world,'zombie_soldier',AIZombie)
+    z.name='Klaus Hammer'
+    z.world_coords=world_coords
+    z.speed=float(random.randint(10,40))
     z.wo_start()
 
 #------------------------------------------------------------------------------
