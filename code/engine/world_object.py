@@ -15,7 +15,7 @@ notes :
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 10 2021' #date of last update
+module_last_update_date='March 17 2021' #date of last update
 
 #global variables
 
@@ -59,8 +59,12 @@ class WorldObject(object):
         self.id = 0
 
     #add_inventory
+    def add_inventory(self, ITEM):
+        self.inventory.append(ITEM)
 
     #remove_inventory
+    def remove_inventory(self, ITEM):
+        self.inventory.remove(ITEM)
 
     def wo_start(self):
         self.world.add_object(self)

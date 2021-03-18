@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 17 2021
+- thinking about inventory and weapons systems. started fleshing 
+    out inventory functions in world_object 
+-
+
+-----------------------------------------------------
 March 16 2021
 - collapsed wo_zombie, wo_player, and wo_man all into wo_man and made
     world_builder the object constructor

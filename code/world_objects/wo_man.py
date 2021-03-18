@@ -27,3 +27,5 @@ class WOMan(WorldObject):
         self.image_name=IMAGE_NAME
         self.render_level=1
         self.ai=AI(self)
+
+        
