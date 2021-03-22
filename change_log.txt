@@ -1,11 +1,21 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 22 2021
+- realized there was no strong need for child classes from WorldObject and 
+    rewrote code to just spawn WorldObject objects directly
+    - under this design any code that makes the world_object unique will be in the AI sub class 
+    - deleted wo_crate, wo_player, wo_vehicle, etc 
+    - object creation code continues to be centralized in world_builder 
+
+note 
+- need to create a debug utility to dump a txt file with object details for every object in the world 
+
+-----------------------------------------------------
 March 17 2021
 - thinking about inventory and weapons systems. started fleshing 
     out inventory functions in world_object 
--
-
+    - added basic item pickup to gun menu 
 -----------------------------------------------------
 March 16 2021
 - collapsed wo_zombie, wo_player, and wo_man all into wo_man and made

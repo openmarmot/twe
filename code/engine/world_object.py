@@ -23,11 +23,11 @@ module_last_update_date='March 17 2021' #date of last update
 
 class WorldObject(object):
 
-    def __init__(self, world):
+    def __init__(self, world,IMAGE_NAME,AI):
 
         self.world = world
         self.name = None
-        self.image_name = 'none'
+        self.image_name = IMAGE_NAME
         # updated by the object AI
         self.world_coords=[0.,0.]
         # note these are only updated by the graphic engine when the obj is on screen
@@ -43,7 +43,9 @@ class WorldObject(object):
         self.is_vehicle=False
         self.is_gun=False
         self.is_crate=False
-        self.ai=None
+
+        # AI where any unique code for the object is held
+        self.ai=AI
 
         #collision (bool) - used by world class
         # true - obj will be added to collision list

@@ -20,9 +20,12 @@ module_last_update_date='July 02 2016' #date of last update
 #global variables
 
 class AIBase(object):
-	def __init__(self, owner):
-		self.owner=owner #WorldObject that is the parent
+	def __init__(self, OWNER):
+		self.owner=OWNER #WorldObject that is the parent
 
 
 	def update(self, time_passed):
+		pass
+
+	def handleEvent(self, EVENT):
 		pass
