@@ -18,7 +18,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 02 2021' #date of last update
+module_last_update_date='March 17 2021' #date of last update
 
 #global variables
 
@@ -44,18 +44,37 @@ class World_Menu(object):
                 self.deactivate_menu()
             else :
                 self.active_menu='debug'
-                print("poooooooo!")
+
+        if Key=='esc':
+            # exit any active menu
+            self.deactivate_menu()
 
         if self.active_menu=='vehicle':
             self.vehicle_menu(Key)
         elif self.active_menu=='debug':
             self.debug_menu(Key)
+        elif self.active_menu=='gun':
+            self.gun_menu(Key)
+        elif self.active_menu=='crate':
+            self.crate_menu(Key)
         
 
-    def activate_menu(self, Selected_Object, Active_Menu):
+    def activate_menu(self, Selected_Object):
+        # clear any current menu
+        self.deactivate_menu()
         self.selected_object=Selected_Object
-        self.active_menu=Active_Menu
-        self.menu_state='none'
+
+        if Selected_Object.is_vehicle: 
+            self.active_menu='vehicle'
+            self.vehicle_menu(None)
+        elif Selected_Object.is_gun:
+            self.active_menu='gun'
+            self.gun_menu(None)
+        elif Selected_Object.is_crate:
+            self.active_menu='crate'
+            self.crate_menu(None)
+
+
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -66,25 +85,56 @@ class World_Menu(object):
     def crate_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            pass
+            self.world.graphic_engine.menu_text_queue.append('-- Crate Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - info ?')
+            self.world.graphic_engine.menu_text_queue.append('2 - ?')
+            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.menu_state='base'
+            
 
-    def vehicle_menu(self, Key):
+    def gun_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            pass
-
-    def debug_menu(self, Key):
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
-            self.world.graphic_engine.menu_text_queue.append('1 - exciting option coming soon')
-            self.world.graphic_engine.menu_text_queue.append('2 - spawn like 50 zombies')
-            self.world.graphic_engine.menu_text_queue.append('3 - exciting option coming soon')
+            self.world.graphic_engine.menu_text_queue.append('-- Gun Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 pass
             elif Key=='2':
+                pass
+            elif Key=='3':
+                self.world.player.add_inventory(self.selected_object)
+                self.world.remove_object(self.selected_object)
+                self.deactivate_menu()
+
+    def vehicle_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('--Vehicle Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('2 - enter (not implemented)')
+            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.menu_state='base'
+            
+
+    def debug_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            # eventually 'spawn' should get its own submenu
+            self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
+            self.world.graphic_engine.menu_text_queue.append('1 - spawn a crate')
+            self.world.graphic_engine.menu_text_queue.append('2 - spawn like 50 zombies')
+            self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas")
+            elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 50)
+            elif Key=='3':
+                engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords)
 
         

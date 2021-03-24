@@ -1,6 +1,64 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 24 2021
+- fixing a lot of bugs introduced in the last couple updates
+
+
+-----------------------------------------------------
+March 22 2021
+- realized there was no strong need for child classes from WorldObject and 
+    rewrote code to just spawn WorldObject objects directly
+    - under this design any code that makes the world_object unique will be in the AI sub class 
+    - deleted wo_crate, wo_player, wo_vehicle, etc 
+    - object creation code continues to be centralized in world_builder 
+
+note 
+- need to create a debug utility to dump a txt file with object details for every object in the world 
+
+-----------------------------------------------------
+March 17 2021
+- thinking about inventory and weapons systems. started fleshing 
+    out inventory functions in world_object 
+    - added basic item pickup to gun menu 
+-----------------------------------------------------
+March 16 2021
+- collapsed wo_zombie, wo_player, and wo_man all into wo_man and made
+    world_builder the object constructor
+    - I wasn't sure passing in a imported class as a variable would work but it did 
+- 
+
+-----------------------------------------------------
+March 10 2021
+- added some bools to world_object to identify whether something is a vehicle, player, or gun 
+    these are the three main things you can interact with at the moment 
+    long term this may not be a great system 
+- worked on object menus for guns/crates/vehicles
+
+-----------------------------------------------------
+March 09 2021
+- created vehicle class for kubelwagen
+
+-----------------------------------------------------
+March 08 2021
+- crate object stuff 
+    - some code cleanup in wo_crate to make it a usable object 
+    - added wo_crate to world_builder
+    - added spawn option to debug menu ( hit ~) 
+    - i initially accidentally set the crate coords to a reference of the player , 
+        resulting in the crate following me around
+- kubelwagen 
+    - started adding some base code for the kubelwagen as 
+        implementing some rudimentary vehicles is on the near term 
+        to do list 
+
+graphics note 
+- rendering seems to be better when im on my laptop and not hooked into my
+    external 4k. rendering on the 4k monitor seems to have a slight chop or jitter
+
+- the crate looks like vinyl flooring. maybe thats where i got the texture from 
+
+-----------------------------------------------------
 March 02 2021
 - more work on world_menu (lots to do here)
     - added world_menu text_queue to display via graphics_2d_pygame 

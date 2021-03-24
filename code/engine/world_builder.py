@@ -23,20 +23,27 @@ the idea is this static class holds the standard way for creating objects
 #import built in modules
 import math
 import random
+import copy 
 
 #import custom packages
 from engine.world import World
 #from engine.graphics_2d_pygame import Graphics_2D_Pygame
 
-from world_objects.wo_man import WOMan
-from world_objects.wo_player import WOPlayer
-from world_objects.wo_zombie import WOZombie
+from engine.world_object import WorldObject
 
-from world_objects.wo_gun import WOGun
+#from world_objects.wo_man import WOMan
+#from world_objects.wo_crate import WOCrate
+#from world_objects.wo_gun import WOGun
+#from world_objects.wo_vehicle import WOVehicle
 
+
+from ai.ai_zombie import AIZombie
+from ai.ai_player import AIPlayer
+from ai.ai_gun import AIGun
+from ai.ai_none import AINone
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='feb 27 2021' #date of last update
+module_last_update_date='march 08 2021' #date of last update
 
 #global variables
 
@@ -73,6 +80,9 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # vehicle
+    world.graphic_engine.loadImage('kubelwagen','images/kubelwagen.png')
+
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
 
@@ -84,26 +94,62 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
     #add a player
-    player=WOPlayer(world)
-    player.is_player=True
-    player.world_coords=[50.,50.]
-    player.name='player'
-    player.wo_start()
-    world.player=player
+    spawn_player(world, [50.,50.])
 
     # zombie generator 
     #spawn_zombie_horde(world, [10,10], 50)
 
     # add mp40
-    mp40=WOGun(world,'mp40')
-    mp40.world_coords=[float(random.randint(0,500)),float(random.randint(0,500))]
-    mp40.wo_start()
+    #spawn_gun(world,[float(random.randint(0,500)),float(random.randint(0,500))],'mp40')
+    
+
+#------------------------------------------------------------------------------
+def spawn_crate(world,world_coords, crate_type):
+    # crate_type -- string denoting crate type 
+    z=WorldObject(world,'crate',AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.is_crate=True
+        
+    z.wo_start()
+
+
+#------------------------------------------------------------------------------
+def spawn_gun(world,world_coords,GUN_TYPE):
+
+    if GUN_TYPE=='mp40':
+        z=WorldObject(world,'mp40',AIPlayer)
+        z.name='Klaus Hammer'
+        z.world_coords=world_coords
+        z.is_gun=True
+        z.wo_start()
+
+
+#------------------------------------------------------------------------------
+def spawn_kubelwagen(world,world_coords):
+    z=WorldObject(world,'kubelwagen',AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.is_vehicle=True
+
+    z.wo_start()
+
+
+
+#------------------------------------------------------------------------------
+def spawn_player(world,world_coords):
+    z=WorldObject(world,'man',AIPlayer)
+    z.name='Klaus Hammer'
+    z.world_coords=world_coords
+    #z.speed=float(random.randint(10,40))
+    z.is_player=True
+    z.wo_start()
+    world.player=z
 
 #------------------------------------------------------------------------------
 def spawn_zombie(world,world_coords):
-    z=WOZombie(world)
+    z=WorldObject(world,'zombie_soldier',AIZombie)
     z.name='Klaus Hammer'
     z.world_coords=world_coords
+    z.speed=float(random.randint(10,40))
     z.wo_start()
 
 #------------------------------------------------------------------------------

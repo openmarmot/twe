@@ -29,6 +29,8 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 ### Controls
 - '~' opens/closes debug menu (spawn zombies!)
 - 'w/s/a/d' movement
+- left click on a gun or vehicle to open context menu
+- 'esc' to exit menu
 
 
 ### License / Whatever
