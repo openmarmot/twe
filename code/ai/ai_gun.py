@@ -20,13 +20,14 @@ module_last_update_date='July 02 2016' #date of last update
 
 #global variables
 
-class AIZombie(AIBase):
+class AIGun(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
         self.owner.speed=20
 
     #---------------------------------------------------------------------------
     def update(self, time_passed):
+        print('boop')
         ''' overrides base update '''
         self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
         #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,self.owner.world.player.screen_coords)

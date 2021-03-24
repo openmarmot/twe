@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 -----------------------------------------------------
+March 24 2021
+- fixing a lot of bugs introduced in the last couple updates
+
+
+-----------------------------------------------------
 March 22 2021
 - realized there was no strong need for child classes from WorldObject and 
     rewrote code to just spawn WorldObject objects directly

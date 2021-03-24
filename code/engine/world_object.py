@@ -45,7 +45,8 @@ class WorldObject(object):
         self.is_crate=False
 
         # AI where any unique code for the object is held
-        self.ai=AI
+        # note that 'AI' is a class that is passed in
+        self.ai=AI(self)
 
         #collision (bool) - used by world class
         # true - obj will be added to collision list
@@ -75,7 +76,6 @@ class WorldObject(object):
         self.world.remove_object(self)
 
     def update(self, time_passed):
-        if self.ai!=None:
             self.ai.update(time_passed)
 
     def render_pass_2(self):
