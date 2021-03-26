@@ -100,7 +100,7 @@ def load_test_environment(world):
     #spawn_zombie_horde(world, [10,10], 50)
 
     # add mp40
-    #spawn_gun(world,[float(random.randint(0,500)),float(random.randint(0,500))],'mp40')
+    spawn_gun(world,[float(random.randint(0,500)),float(random.randint(0,500))],'mp40')
     
 
 #------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ def spawn_crate(world,world_coords, crate_type):
 def spawn_gun(world,world_coords,GUN_TYPE):
 
     if GUN_TYPE=='mp40':
-        z=WorldObject(world,'mp40',AIPlayer)
+        z=WorldObject(world,'mp40',AIGun)
         z.name='Klaus Hammer'
         z.world_coords=world_coords
         z.is_gun=True
