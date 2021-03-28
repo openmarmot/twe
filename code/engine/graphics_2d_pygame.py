@@ -178,8 +178,8 @@ class Graphics_2D_Pygame(object):
             #    print(str(c.rotation_angle))
                 #this calculation would be better done in the world object
                 #and probably only done once
-                w, h = self.images[c.image_name].get_size()
-                self.screen.blit(self.get_rotated_image(self.images[c.image_name],c.rotation_angle), (x-w/2, y-h/2))
+                w, h = self.images[c.image_list[c.image_index]].get_size()
+                self.screen.blit(self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle), (x-w/2, y-h/2))
                 #print('rendering : '+c.name+' coords : '+str(c.screen_coords))
                 #do any special rendering for the object
                 c.render_pass_2()

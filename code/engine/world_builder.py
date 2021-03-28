@@ -43,7 +43,7 @@ from ai.ai_gun import AIGun
 from ai.ai_none import AINone
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='march 08 2021' #date of last update
+module_last_update_date='march 28 2021' #date of last update
 
 #global variables
 
@@ -80,6 +80,10 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # buildings
+    world.graphic_engine.loadImage('warehouse-inside','images/warehouse-inside.png')
+    world.graphic_engine.loadImage('warehouse-outside','images/warehouse-outside.png')
+
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/kubelwagen.png')
 
@@ -106,7 +110,7 @@ def load_test_environment(world):
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords, crate_type):
     # crate_type -- string denoting crate type 
-    z=WorldObject(world,'crate',AINone)
+    z=WorldObject(world,['crate'],AINone)
     z.world_coords=copy.copy(world_coords)
     z.is_crate=True
         
@@ -117,7 +121,7 @@ def spawn_crate(world,world_coords, crate_type):
 def spawn_gun(world,world_coords,GUN_TYPE):
 
     if GUN_TYPE=='mp40':
-        z=WorldObject(world,'mp40',AIGun)
+        z=WorldObject(world,['mp40'],AIGun)
         z.name='Klaus Hammer'
         z.world_coords=world_coords
         z.is_gun=True
@@ -126,7 +130,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
 
 #------------------------------------------------------------------------------
 def spawn_kubelwagen(world,world_coords):
-    z=WorldObject(world,'kubelwagen',AINone)
+    z=WorldObject(world,['kubelwagen'],AINone)
     z.world_coords=copy.copy(world_coords)
     z.is_vehicle=True
 
@@ -136,7 +140,7 @@ def spawn_kubelwagen(world,world_coords):
 
 #------------------------------------------------------------------------------
 def spawn_player(world,world_coords):
-    z=WorldObject(world,'man',AIPlayer)
+    z=WorldObject(world,['man'],AIPlayer)
     z.name='Klaus Hammer'
     z.world_coords=world_coords
     #z.speed=float(random.randint(10,40))
@@ -146,7 +150,7 @@ def spawn_player(world,world_coords):
 
 #------------------------------------------------------------------------------
 def spawn_zombie(world,world_coords):
-    z=WorldObject(world,'zombie_soldier',AIZombie)
+    z=WorldObject(world,['zombie_soldier'],AIZombie)
     z.name='Klaus Hammer'
     z.world_coords=world_coords
     z.speed=float(random.randint(10,40))

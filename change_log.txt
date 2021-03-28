@@ -1,9 +1,27 @@
 TWE Project : Change Log
 
+---------------------------------
+March 28 2021
+- implemented image lists so object can animate/change appearance 
+    - need to come up with standard image orders 
+        - for example a human object would have the following  [standing,walking,shooting,dead]
+        - a chest may have [closed,open]
+
+- made some horrid art for a warehouse to use the new image system 
+    - inside 
+    - outside 
+
+
+i suppose the object AI could just switch the image name instead of having a list and changing the index 
+    but by having a list I can keep all the image names in world_builder so they are easy to swap out. 
+    this keeps the AI code more reusable 
+---------------------------------
+March 25 2021
+- fixed gun object so it is using ai_gun instead of ai_player
+
 -----------------------------------------------------
 March 24 2021
 - fixing a lot of bugs introduced in the last couple updates
-
 
 -----------------------------------------------------
 March 22 2021

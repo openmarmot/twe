@@ -23,11 +23,19 @@ module_last_update_date='March 17 2021' #date of last update
 
 class WorldObject(object):
 
-    def __init__(self, world,IMAGE_NAME,AI):
+    def __init__(self, world,IMAGE_LIST,AI):
 
         self.world = world
         self.name = None
-        self.image_name = IMAGE_NAME
+        
+        # list of images, the AI will set image_index to the current one
+        #   that should be used
+        self.image_list=IMAGE_LIST
+        self.image_index=0
+        # human [default(standing?),walking,fighting,dead]
+
+
+
         # updated by the object AI
         self.world_coords=[0.,0.]
         # note these are only updated by the graphic engine when the obj is on screen
