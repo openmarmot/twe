@@ -23,22 +23,20 @@ module_last_update_date='Feb 07 2020' #date of last update
 class AIPlayer(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-
     #---------------------------------------------------------------------------
     def update(self, time_passed):
         ''' overrides base update '''
-        speed=50
 
         if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=speed*time_passed
+            self.owner.world_coords[1]-=self.owner.speed*time_passed
             self.owner.rotation_angle=0
         if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=speed*time_passed
+            self.owner.world_coords[1]+=self.owner.speed*time_passed
             self.owner.rotation_angle=180
         if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=speed*time_passed
+            self.owner.world_coords[0]-=self.owner.speed*time_passed
             self.owner.rotation_angle=90
         if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=speed*time_passed
+            self.owner.world_coords[0]+=self.owner.speed*time_passed
             self.owner.rotation_angle=270
     #---------------------------------------------------------------------------

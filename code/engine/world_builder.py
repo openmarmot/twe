@@ -41,6 +41,7 @@ from ai.ai_zombie import AIZombie
 from ai.ai_player import AIPlayer
 from ai.ai_gun import AIGun
 from ai.ai_none import AINone
+from ai.ai_building import AIBuilding
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='march 28 2021' #date of last update
@@ -105,6 +106,9 @@ def load_test_environment(world):
 
     # add mp40
     spawn_gun(world,[float(random.randint(0,500)),float(random.randint(0,500))],'mp40')
+
+    # add warehouse
+    spawn_warehouse(world,[float(random.randint(0,500)),float(random.randint(0,500))])
     
 
 #------------------------------------------------------------------------------
@@ -113,6 +117,7 @@ def spawn_crate(world,world_coords, crate_type):
     z=WorldObject(world,['crate'],AINone)
     z.world_coords=copy.copy(world_coords)
     z.is_crate=True
+    z.render_level=2
         
     z.wo_start()
 
@@ -125,6 +130,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.name='Klaus Hammer'
         z.world_coords=world_coords
         z.is_gun=True
+        z.render_level=2
         z.wo_start()
 
 
@@ -133,7 +139,7 @@ def spawn_kubelwagen(world,world_coords):
     z=WorldObject(world,['kubelwagen'],AINone)
     z.world_coords=copy.copy(world_coords)
     z.is_vehicle=True
-
+    z.render_level=3
     z.wo_start()
 
 
@@ -143,10 +149,20 @@ def spawn_player(world,world_coords):
     z=WorldObject(world,['man'],AIPlayer)
     z.name='Klaus Hammer'
     z.world_coords=world_coords
-    #z.speed=float(random.randint(10,40))
+    z.speed=50.
     z.is_player=True
+    z.render_level=3
     z.wo_start()
     world.player=z
+
+#------------------------------------------------------------------------------
+def spawn_warehouse(world,world_coords):
+    z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
+    z.name='Klaus Hammer'
+    z.world_coords=world_coords
+    z.speed=0
+    z.render_level=1
+    z.wo_start()
 
 #------------------------------------------------------------------------------
 def spawn_zombie(world,world_coords):
@@ -154,6 +170,7 @@ def spawn_zombie(world,world_coords):
     z.name='Klaus Hammer'
     z.world_coords=world_coords
     z.speed=float(random.randint(10,40))
+    z.render_level=3
     z.wo_start()
 
 #------------------------------------------------------------------------------

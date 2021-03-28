@@ -11,6 +11,19 @@ March 28 2021
     - inside 
     - outside 
 
+- implemented a warehouse object that utilizes the new image lists to show 
+    a outside and inside view depending how close the player is. 
+    this is kind of hacky for now. distance from the object doesn't work well with a 
+    rectangular object as you just have to use a radius
+
+- rethought render levels and added a couple levels 
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
+
 
 i suppose the object AI could just switch the image name instead of having a list and changing the index 
     but by having a list I can keep all the image names in world_builder so they are easy to swap out. 

@@ -45,8 +45,14 @@ class Graphics_2D_Pygame(object):
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
-        #pygame.draw.circle(self.background, (200, 255, 200), NEST_POSITION, int(NEST_SIZE))
-        self.renderlists=[[],[],[]]
+        
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
+        self.renderlists=[[],[],[],[],[]]
         self.world=World
         
         # time stuff
@@ -231,7 +237,7 @@ class Graphics_2D_Pygame(object):
             self.screen_size[1])
 
         #clear out the render levels
-        self.renderlists=[[],[],[]]
+        self.renderlists=[[],[],[],[],[]]
         translation=self.get_translation()
        # print(str(translation))
         for b in self.world.wo_objects:
@@ -281,8 +287,8 @@ class Graphics_2D_Pygame(object):
         '''
         x,y=pygame.mouse.get_pos()
         collided=None
-        # just checking the middle render list for now
-        for b in self.renderlists[1]:
+        # just checking the 'object lying on ground' render level for now
+        for b in self.renderlists[2]:
             if x+radius > b.screen_coords[0]:
                 if x < b.screen_coords[0]+b.collision_radius:
                     if y+radius > b.screen_coords[1]:

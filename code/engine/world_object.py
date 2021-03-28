@@ -15,7 +15,7 @@ notes :
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 17 2021' #date of last update
+module_last_update_date='March 27 2021' #date of last update
 
 #global variables
 
@@ -30,19 +30,33 @@ class WorldObject(object):
         
         # list of images, the AI will set image_index to the current one
         #   that should be used
-        self.image_list=IMAGE_LIST
-        self.image_index=0
         # human [default(standing?),walking,fighting,dead]
+        # building [outside, inside]
+        self.image_list=IMAGE_LIST
+        # the index of the image in the list that should be rendered
+        self.image_index=0
 
 
 
         # updated by the object AI
         self.world_coords=[0.,0.]
-        # note these are only updated by the graphic engine when the obj is on screen
+
+        # updated automatically by the graphic engine when 
+        #   the object is renderable 
         self.screen_coords=[0.,0.]
+
         self.speed = 0.
         self.rotation_angle=0.
+
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
         self.render_level=1
+
+        # not sure this is used at the moment
         self.render=True
 
         # these are used by other objects to determine how this object can be interacted with
