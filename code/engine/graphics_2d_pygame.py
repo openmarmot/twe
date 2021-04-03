@@ -144,6 +144,9 @@ class Graphics_2D_Pygame(object):
         # not sure whether this works great or not
         # used by ai_player for movement
 
+        # mouse support - returns list of three bools [left, middle, right]
+       # print(str(pygame.mouse.get_pressed()))
+
         keys=pygame.key.get_pressed()
         if KEY=='w':
             if keys[pygame.K_w]:
@@ -162,6 +165,16 @@ class Graphics_2D_Pygame(object):
                 return False
         elif KEY=='d':
             if keys[pygame.K_d]:
+                return True
+            else:
+                return False
+        elif KEY=='f':
+            if keys[pygame.K_f]:
+                return True
+            else:
+                return False
+        elif KEY=='g':
+            if keys[pygame.K_g]:
                 return True
             else:
                 return False

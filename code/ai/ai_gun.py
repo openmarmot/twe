@@ -23,7 +23,18 @@ module_last_update_date='July 02 2016' #date of last update
 class AIGun(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-        self.owner.speed=20
+        #int representing round count in current mag 
+        self.magazine=0
+        #max mag capacity - this limits us from using different mag types. hrmm
+        # is this even needed??
+        self.mag_capacity=0
+        
+        #
+        #time since last fired
+        self.fire_time_passed=0. 
+
+        # fire rate in seconds?
+        self.rate_of_fire=0.5 
 
     #---------------------------------------------------------------------------
     def update(self, time_passed):
@@ -36,8 +47,29 @@ class AIGun(AIBase):
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
-    def change_magazine(self,magazine):
+    def change_magazine(self):
         ''' change magazine. input is new magazine. output is old magazine'''
-        old=self.mag
-        self.mag=magazine
-        return old
+        pass
+
+    #---------------------------------------------------------------------------
+    def fire(self, time_passed):
+        ''' fire the gun '''
+        self.fire_time_passed+=time_passed
+  
+        # start with a time check
+        if(self.fire_time_passed>self.rate_of_fire):
+            self.fire_time_passed=0.
+            # start by ruling out empty mag 
+            if self.magazine<1:
+                # auto reload ?
+                print("magazine empty")
+            else :
+                print("pew pew")
+                self.magazine-=1
+        
+
+
+    #---------------------------------------------------------------------------
+    def reload_current_mag(self):
+        ''' reload the current magazine'''
+        pass

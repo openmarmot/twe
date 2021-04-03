@@ -64,7 +64,9 @@ class WorldObject(object):
         self.is_player=False
         self.is_vehicle=False
         self.is_gun=False
+        self.is_gun_mag_carrier=False
         self.is_crate=False
+
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in

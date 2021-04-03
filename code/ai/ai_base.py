@@ -27,5 +27,5 @@ class AIBase(object):
 	def update(self, time_passed):
 		pass
 
-	def handleEvent(self, EVENT):
+	def handleEvent(self, EVENT, EVENT_DATA):
 		pass
