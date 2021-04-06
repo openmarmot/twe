@@ -28,25 +28,42 @@ class AIMan(AIBase):
         self.throwable=None
 
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
         if(self.owner.is_player):
-            self.handle_player(time_passed)
+            self.handle_player()
         else :
             # must be AI controlled
             pass
 
-        
+    #---------------------------------------------------------------------------
+    def event_inventory(self,EVENT_DATA):
+        if EVENT_DATA.is_gun :
+            if self.primary_weapon==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.primary_weapon=EVENT_DATA
+            else:
+                # if current weapon is empty, swap for the new one
+                pass
+
+    #---------------------------------------------------------------------------
+    def fire(self):
+        ''' fires the (primary?) weapon '''    
+        if self.primary_weapon!=None:
+            self.primary_weapon.ai.fire()
+
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
         # not sure what to do here yet. will have to think of some standard events
-        pass
+        if EVENT=='add_inventory':
+            self.event_inventory(EVENT_DATA)
 
     #---------------------------------------------------------------------------
-    def handle_player(self,time_passed):
+    def handle_player(self):
         ''' handle any player specific code'''
-
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if(self.owner.world.graphic_engine.keyPressed('w')):
             self.owner.world_coords[1]-=self.owner.speed*time_passed
             self.owner.rotation_angle=0

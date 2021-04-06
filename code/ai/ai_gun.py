@@ -16,7 +16,7 @@ from ai.ai_base import AIBase
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='July 02 2016' #date of last update
+module_last_update_date='April 05 2021' #date of last update
 
 #global variables
 
@@ -37,7 +37,7 @@ class AIGun(AIBase):
         self.rate_of_fire=0.5 
 
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
         #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
         #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,self.owner.world.player.screen_coords)
@@ -52,9 +52,9 @@ class AIGun(AIBase):
         pass
 
     #---------------------------------------------------------------------------
-    def fire(self, time_passed):
+    def fire(self):
         ''' fire the gun '''
-        self.fire_time_passed+=time_passed
+        self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
   
         # start with a time check
         if(self.fire_time_passed>self.rate_of_fire):

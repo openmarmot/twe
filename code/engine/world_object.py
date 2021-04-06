@@ -88,6 +88,7 @@ class WorldObject(object):
     #add_inventory
     def add_inventory(self, ITEM):
         self.inventory.append(ITEM)
+        self.ai.handle_event('add_inventory',ITEM)
 
     #remove_inventory
     def remove_inventory(self, ITEM):
@@ -99,8 +100,8 @@ class WorldObject(object):
     def wo_stop(self):
         self.world.remove_object(self)
 
-    def update(self, time_passed):
-            self.ai.update(time_passed)
+    def update(self):
+            self.ai.update()
 
     def render_pass_2(self):
         ''' only override if the object needs special additional rendering'''

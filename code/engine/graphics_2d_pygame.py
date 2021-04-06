@@ -27,7 +27,7 @@ from itertools import islice
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 10 2021' #date of last update
+module_last_update_date='April 05 2021' #date of last update
 
 #global variables
 
@@ -67,6 +67,7 @@ class Graphics_2D_Pygame(object):
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
         # used for temporary text. max 3 lines displayed
+        # used like this : self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
         self.text_queue=[]
 
         # used for the menu system. no limits enforced by this class
@@ -74,6 +75,10 @@ class Graphics_2D_Pygame(object):
 
         # will cause everything to exit
         self.quit=False
+
+
+        # max_fps max frames for every second.
+        self.max_fps=40
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -225,8 +230,11 @@ class Graphics_2D_Pygame(object):
         '''
         self.handleInput()
 
+        #print("tick " + str(pygame.time.get_ticks()))
+        #print("clock.get_fps", self.clock.get_fps())
+
         # update time
-        self.time_passed=self.clock.tick(30)
+        self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
 

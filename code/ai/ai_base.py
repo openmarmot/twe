@@ -24,7 +24,7 @@ class AIBase(object):
 		self.owner=OWNER #WorldObject that is the parent
 
 
-	def update(self, time_passed):
+	def update(self):
 		pass
 
 	def handleEvent(self, EVENT, EVENT_DATA):

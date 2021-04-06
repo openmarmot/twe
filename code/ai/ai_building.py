@@ -28,7 +28,7 @@ class AIBuilding(AIBase):
         self.show_interior=False
         self.show_interior_distance=500
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
         if self.show_interior :
             # check timeout to see if we should check distance to player

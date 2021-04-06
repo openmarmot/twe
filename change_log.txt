@@ -1,5 +1,27 @@
 TWE Project : Change Log
 
+
+
+---------------------------------
+April 05 2021
+
+
+
+ai_man 
+- added logic to auto equip a weapon if one is picked up 
+- should weapon just be a reference to something in the inventory, or should i 
+    actually remove the weapon from inventory when it is equipped ?
+
+removed 'time_passed' as a parameter from a bunch of functions. 
+- passing it from function to function in long chains was getting ridiculous
+- easier/cleaner to just reference it directly when needed from graphics_2d_pygame
+
+graphics_2d_pygame
+- added in max_fps value (pygame will limit to this max). set to 40 for now 
+- added in line in update method to print fps - disabled for now 
+    - game currently stays at about max until zombie count gets over several hundred 
+
+
 ---------------------------------
 April 02 2021
 
