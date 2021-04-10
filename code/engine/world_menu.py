@@ -128,6 +128,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - spawn a crate')
             self.world.graphic_engine.menu_text_queue.append('2 - spawn like 50 zombies')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
+            self.world.graphic_engine.menu_text_queue.append('4 - spawn a warehouse')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
@@ -136,5 +137,7 @@ class World_Menu(object):
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 50)
             elif Key=='3':
                 engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords)
+            elif Key=='4':
+                engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords)
 
         

@@ -19,7 +19,7 @@ from engine.world_menu import World_Menu
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='September 22 2020' #date of last update
+module_last_update_date='April 05 2021' #date of last update
 
 #global variables
 
@@ -69,7 +69,7 @@ class World(object):
         self.graphic_engine.update()
 
         for b in self.wo_objects:
-            b.update(self.graphic_engine.time_passed_seconds)
+            b.update()
 
     #---------------------------------------------------------------------------
     def render(self):

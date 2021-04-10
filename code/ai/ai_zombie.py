@@ -26,8 +26,9 @@ class AIZombie(AIBase):
         self.owner.speed=20
 
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
         self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
         #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,self.owner.world.player.screen_coords)
         #print(str(self.rotation_angle))

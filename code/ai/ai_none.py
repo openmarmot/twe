@@ -27,7 +27,7 @@ class AINone(AIBase):
         super().__init__(owner)
 
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
 
     #---------------------------------------------------------------------------

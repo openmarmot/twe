@@ -1,9 +1,93 @@
 TWE Project : Change Log
 
+
+---------------------------------
+April 10 2021
+
+graphics_2d_pygame
+- added new 'debug_text_queue' with fps and other stats 
+    - always on for now, but will probably toggle from the debug menu in the future
+- added a bool to toggle drawing collision circles (very helpful for debug)
+
+ai_man, ai_gun, ai_projectile, math_2d
+- added a ton of code to support projectiles 
+- the gun can now fire!! ( pick up gun then press f)
+
+misc thoughts
+- need to add expiration for projectiles and think about speed and other values 
+- need to add collision for bullets and see what the performance impact is
+---------------------------------
+April 05 2021
+
+ai_man 
+- added logic to auto equip a weapon if one is picked up 
+- should weapon just be a reference to something in the inventory, or should i 
+    actually remove the weapon from inventory when it is equipped ?
+
+removed 'time_passed' as a parameter from a bunch of functions. 
+- passing it from function to function in long chains was getting ridiculous
+- easier/cleaner to just reference it directly when needed from graphics_2d_pygame
+
+graphics_2d_pygame
+- added in max_fps value (pygame will limit to this max). set to 40 for now 
+- added in line in update method to print fps - disabled for now 
+    - game currently stays at about max until zombie count gets over several hundred 
+
+
+---------------------------------
+April 02 2021
+
+thinking about guns and gun mags but haven't reached any conclusions 
+on how to handle it yet. 
+- i think i want to abstract mags, they would be too small to be 
+    easily visible on the world map 
+- one possibility is to have bandoleers/satchels/etc that dictate how many mags 
+    you have 
+- i kinda think that i want mags to be tossed on the ground when you reload 
+    - and make them non-retrievable (as mags aren't modeled as their own objects)
+
+need to think about whether the player needs their own AI class 
+    - thinking it would make more sense to combine it with a ai_man class 
+        - that way player could easily jump in and out of bots
+    - decision was to go through with combining. 
+
+- some work on building out functions for ai_gun and ai_man
+
+---------------------------------
+March 28 2021
+- implemented image lists so object can animate/change appearance 
+    - need to come up with standard image orders 
+        - for example a human object would have the following  [standing,walking,shooting,dead]
+        - a chest may have [closed,open]
+
+- made some horrid art for a warehouse to use the new image system 
+    - inside 
+    - outside 
+
+- implemented a warehouse object that utilizes the new image lists to show 
+    a outside and inside view depending how close the player is. 
+    this is kind of hacky for now. distance from the object doesn't work well with a 
+    rectangular object as you just have to use a radius
+
+- rethought render levels and added a couple levels 
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
+
+
+i suppose the object AI could just switch the image name instead of having a list and changing the index 
+    but by having a list I can keep all the image names in world_builder so they are easy to swap out. 
+    this keeps the AI code more reusable 
+---------------------------------
+March 25 2021
+- fixed gun object so it is using ai_gun instead of ai_player
+
 -----------------------------------------------------
 March 24 2021
 - fixing a lot of bugs introduced in the last couple updates
-
 
 -----------------------------------------------------
 March 22 2021

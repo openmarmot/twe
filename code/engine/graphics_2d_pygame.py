@@ -27,7 +27,7 @@ from itertools import islice
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 10 2021' #date of last update
+module_last_update_date='April 10 2021' #date of last update
 
 #global variables
 
@@ -45,8 +45,18 @@ class Graphics_2D_Pygame(object):
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
-        #pygame.draw.circle(self.background, (200, 255, 200), NEST_POSITION, int(NEST_SIZE))
-        self.renderlists=[[],[],[]]
+        
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
+        self.renderlists=[[],[],[],[],[]]
+
+        # count of rendered objects
+        self.renderCount=0
+
         self.world=World
         
         # time stuff
@@ -61,13 +71,25 @@ class Graphics_2D_Pygame(object):
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
         # used for temporary text. max 3 lines displayed
+        # used like this : self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
         self.text_queue=[]
 
         # used for the menu system. no limits enforced by this class
         self.menu_text_queue=[]
 
+        # debug info queue
+        self.debug_mode=True
+        self.debug_text_queue=[]
+
+        # draw collision circles
+        self.draw_collision=True
+
         # will cause everything to exit
         self.quit=False
+
+
+        # max_fps max frames for every second.
+        self.max_fps=40
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -116,7 +138,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.selectFromScreen(120)
+                    b=self.selectFromScreen(15)
                     if b!=None:
                         print(b.name)
                         # send it over to world menu to figure out
@@ -137,6 +159,9 @@ class Graphics_2D_Pygame(object):
         # returns bool as to whether keyPressed is KEY
         # not sure whether this works great or not
         # used by ai_player for movement
+
+        # mouse support - returns list of three bools [left, middle, right]
+       # print(str(pygame.mouse.get_pressed()))
 
         keys=pygame.key.get_pressed()
         if KEY=='w':
@@ -159,6 +184,16 @@ class Graphics_2D_Pygame(object):
                 return True
             else:
                 return False
+        elif KEY=='f':
+            if keys[pygame.K_f]:
+                return True
+            else:
+                return False
+        elif KEY=='g':
+            if keys[pygame.K_g]:
+                return True
+            else:
+                return False
         else:
             return False
 
@@ -178,11 +213,14 @@ class Graphics_2D_Pygame(object):
             #    print(str(c.rotation_angle))
                 #this calculation would be better done in the world object
                 #and probably only done once
-                w, h = self.images[c.image_name].get_size()
-                self.screen.blit(self.get_rotated_image(self.images[c.image_name],c.rotation_angle), (x-w/2, y-h/2))
+                w, h = self.images[c.image_list[c.image_index]].get_size()
+                self.screen.blit(self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle), (x-w/2, y-h/2))
                 #print('rendering : '+c.name+' coords : '+str(c.screen_coords))
                 #do any special rendering for the object
                 c.render_pass_2()
+
+                if(self.draw_collision):
+                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
 
         # text stuff 
@@ -196,6 +234,12 @@ class Graphics_2D_Pygame(object):
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
 
+        if(self.debug_mode):
+            self.h=0
+            for b in self.debug_text_queue:
+                self.h+=15
+                self.small_font.render_to(self.screen, (540, self.h), b, (0, 0, 255))
+
         pygame.display.update()
 
 
@@ -206,10 +250,20 @@ class Graphics_2D_Pygame(object):
         '''
         self.handleInput()
 
+        if(self.debug_mode):
+            self.update_debug_info()
+
+
         # update time
-        self.time_passed=self.clock.tick(30)
+        self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
+#------------------------------------------------------------------------------
+    def update_debug_info(self):
+        self.debug_text_queue=[]
+        self.debug_text_queue.append('FPS: '+str(int(self.clock.get_fps())))
+        self.debug_text_queue.append('World Objects: '+ str(len(self.world.wo_objects)))
+        self.debug_text_queue.append('Rendered Objects: '+ str(self.renderCount))
 
 #------------------------------------------------------------------------------
     def update_render_info(self):
@@ -231,9 +285,10 @@ class Graphics_2D_Pygame(object):
             self.screen_size[1])
 
         #clear out the render levels
-        self.renderlists=[[],[],[]]
+        self.renderlists=[[],[],[],[],[]]
         translation=self.get_translation()
-       # print(str(translation))
+
+        self.renderCount=0
         for b in self.world.wo_objects:
             #determine whether object 'b' world_coords are within
             #the viewport bounding box
@@ -243,10 +298,28 @@ class Graphics_2D_Pygame(object):
                     b.world_coords[1]>viewrange_y[1]):
                     #object is within the viewport, add it to the render list
                     self.renderlists[b.render_level].append(b)
-
+                    self.renderCount+=1
                     #apply transform to generate screen coords
                     b.screen_coords[0]=b.world_coords[0]+translation[0]
                     b.screen_coords[1]=b.world_coords[1]+translation[1]
+
+#------------------------------------------------------------------------------
+    def get_mouse_screen_coords(self):
+        return pygame.mouse.get_pos()
+
+#------------------------------------------------------------------------------
+    def get_mouse_world_coords(self):
+        ''' return world coords of mouse'''
+        # pretty sure this math doesnt make any sense
+        x,y=pygame.mouse.get_pos()
+        player_x=self.world.player.world_coords[0]
+        player_y=self.world.player.world_coords[1]
+        return [player_x-x,player_y-y]
+
+#-----------------------------------------------------------------------------
+    def get_player_screen_coords(self):
+        ''' return player screen coordinates'''
+        return [self.screen_size[0]/2,self.screen_size[1]/2]
 
 #------------------------------------------------------------------------------
     def get_rotated_image(self, image, angle):
@@ -281,8 +354,8 @@ class Graphics_2D_Pygame(object):
         '''
         x,y=pygame.mouse.get_pos()
         collided=None
-        # just checking the middle render list for now
-        for b in self.renderlists[1]:
+        # just checking the 'object lying on ground' render level for now
+        for b in self.renderlists[2]:
             if x+radius > b.screen_coords[0]:
                 if x < b.screen_coords[0]+b.collision_radius:
                     if y+radius > b.screen_coords[1]:

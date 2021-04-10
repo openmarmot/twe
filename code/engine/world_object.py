@@ -15,7 +15,7 @@ notes :
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 17 2021' #date of last update
+module_last_update_date='March 27 2021' #date of last update
 
 #global variables
 
@@ -23,18 +23,44 @@ module_last_update_date='March 17 2021' #date of last update
 
 class WorldObject(object):
 
-    def __init__(self, world,IMAGE_NAME,AI):
+    def __init__(self, world,IMAGE_LIST,AI):
 
         self.world = world
         self.name = None
-        self.image_name = IMAGE_NAME
+        
+        # list of images, the AI will set image_index to the current one
+        #   that should be used
+        # human [default(standing?),walking,fighting,dead]
+        # building [outside, inside]
+        self.image_list=IMAGE_LIST
+        # the index of the image in the list that should be rendered
+        self.image_index=0
+
+
+
         # updated by the object AI
         self.world_coords=[0.,0.]
-        # note these are only updated by the graphic engine when the obj is on screen
+
+        # updated automatically by the graphic engine when 
+        #   the object is renderable 
         self.screen_coords=[0.,0.]
+
         self.speed = 0.
+        # rotation_angle - mainly used to rotate the object sprite
         self.rotation_angle=0.
+        # heading is a direction vector used by some objects
+        # can be set with math_2d.get_heading_vector
+        self.heading=[0,0]
+
+        # render level kind of a 'z' layer
+        # 0 - ground cover
+        # 1 - man made ground cover (cement, building insides)
+        # 2 - objects laying on the ground (weapons,etc)
+        # 3 - objects walking on the ground (humans, animals, vehicles)
+        # 4 - objects above ground (birds, planes, clouds, etc)
         self.render_level=1
+
+        # not sure this is used at the moment
         self.render=True
 
         # these are used by other objects to determine how this object can be interacted with
@@ -42,7 +68,9 @@ class WorldObject(object):
         self.is_player=False
         self.is_vehicle=False
         self.is_gun=False
+        self.is_gun_mag_carrier=False
         self.is_crate=False
+
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in
@@ -64,6 +92,7 @@ class WorldObject(object):
     #add_inventory
     def add_inventory(self, ITEM):
         self.inventory.append(ITEM)
+        self.ai.handle_event('add_inventory',ITEM)
 
     #remove_inventory
     def remove_inventory(self, ITEM):
@@ -75,8 +104,8 @@ class WorldObject(object):
     def wo_stop(self):
         self.world.remove_object(self)
 
-    def update(self, time_passed):
-            self.ai.update(time_passed)
+    def update(self):
+            self.ai.update()
 
     def render_pass_2(self):
         ''' only override if the object needs special additional rendering'''

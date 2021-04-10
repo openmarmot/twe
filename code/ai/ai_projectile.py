@@ -16,21 +16,20 @@ from ai.ai_base import AIBase
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='July 02 2016' #date of last update
+module_last_update_date='April 10 2021' #date of last update
 
 #global variables
 
-class AIZombie(AIBase):
+class AIProjectile(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-        self.owner.speed=20
+
 
     #---------------------------------------------------------------------------
-    def update(self, time_passed):
+    def update(self):
         ''' overrides base update '''
-        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
-        #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,self.owner.world.player.screen_coords)
-        #print(str(self.rotation_angle))
 
-        self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        # move along path
+        self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
     #---------------------------------------------------------------------------

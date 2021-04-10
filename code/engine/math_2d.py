@@ -22,44 +22,9 @@ import math
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='October 06 2020' #date of last update
+module_last_update_date='April 10 2021' #date of last update
 
 #global variables
-
-#------------------------------------------------------------------------------
-def get_vector_length(vec2):
-	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
-
-#------------------------------------------------------------------------------
-def get_rotation(coords, target_coords):
-	delta_x=coords[0]-target_coords[0]
-	delta_y=coords[1]-target_coords[1]
-	return math.atan2(delta_x,delta_y) *180 / math.pi
-
-#------------------------------------------------------------------------------
-def get_distance(coords1, coords2):
-	x=coords1[0]-coords2[0]
-	y=coords1[1]-coords2[1]
-	return math.sqrt(x*x+y*y)
-
-#------------------------------------------------------------------------------
-def get_normalized(vec2):
-	l=math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
-	b=[0.,0.]
-	try:
-		b=[vec2[0]/l,vec2[1]/l]
-	except ZeroDivisionError:
-		pass
-	return b 
-
-#------------------------------------------------------------------------------
-def moveTowardsTarget(speed,location,destination, time_passed):
-	vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
-	distance=get_vector_length(vec_to_dest)
-	heading=get_normalized(vec_to_dest)
-	travel_distance=min(distance,time_passed*speed)
-	change=[heading[0]*travel_distance,heading[1]*travel_distance]
-	return [location[0]+change[0],location[1]+change[1]]
 
 #------------------------------------------------------------------------------
 def checkCollisionSquareOneResult(wo, collision_list):
@@ -81,6 +46,62 @@ def checkCollisionSquareOneResult(wo, collision_list):
 						collided=b
 						break
 	return collided
+
+#------------------------------------------------------------------------------
+def get_vector_length(vec2):
+	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
+
+#------------------------------------------------------------------------------
+def get_rotation(coords, target_coords):
+	delta_x=coords[0]-target_coords[0]
+	delta_y=coords[1]-target_coords[1]
+	return math.atan2(delta_x,delta_y) *180 / math.pi
+
+#------------------------------------------------------------------------------
+def get_distance(coords1, coords2):
+	x=coords1[0]-coords2[0]
+	y=coords1[1]-coords2[1]
+	return math.sqrt(x*x+y*y)
+
+#------------------------------------------------------------------------------
+def get_heading_vector(location,destination):
+	''' normalized vector representing the heading (direction) to a target'''
+	# location = [float,float]
+	# destination = [float,float]
+	vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
+	heading=get_normalized(vec_to_dest)
+	return heading 
+
+#------------------------------------------------------------------------------
+def get_normalized(vec2):
+	l=math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
+	b=[0.,0.]
+	try:
+		b=[vec2[0]/l,vec2[1]/l]
+	except ZeroDivisionError:
+		pass
+	return b 
+
+
+#------------------------------------------------------------------------------
+def moveAlongVector(speed,location,heading,time_passed):
+	''' returns a location vector that has been moved along a heading vector'''
+	travel_distance=speed*time_passed
+	change=[heading[0]*travel_distance,heading[1]*travel_distance]
+	return [location[0]+change[0],location[1]+change[1]]
+
+
+#------------------------------------------------------------------------------
+def moveTowardsTarget(speed,location,destination, time_passed):
+	vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
+	distance=get_vector_length(vec_to_dest)
+	heading=get_normalized(vec_to_dest)
+	# basically takes the minimum of distance or travel so as not to go past the target
+	travel_distance=min(distance,time_passed*speed)
+	change=[heading[0]*travel_distance,heading[1]*travel_distance]
+	return [location[0]+change[0],location[1]+change[1]]
+
+
 
 
 
