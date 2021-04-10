@@ -46,7 +46,11 @@ class WorldObject(object):
         self.screen_coords=[0.,0.]
 
         self.speed = 0.
+        # rotation_angle - mainly used to rotate the object sprite
         self.rotation_angle=0.
+        # heading is a direction vector used by some objects
+        # can be set with math_2d.get_heading_vector
+        self.heading=[0,0]
 
         # render level kind of a 'z' layer
         # 0 - ground cover

@@ -1,11 +1,23 @@
 TWE Project : Change Log
 
 
+---------------------------------
+April 10 2021
 
+graphics_2d_pygame
+- added new 'debug_text_queue' with fps and other stats 
+    - always on for now, but will probably toggle from the debug menu in the future
+- added a bool to toggle drawing collision circles (very helpful for debug)
+
+ai_man, ai_gun, ai_projectile, math_2d
+- added a ton of code to support projectiles 
+- the gun can now fire!! ( pick up gun then press f)
+
+misc thoughts
+- need to add expiration for projectiles and think about speed and other values 
+- need to add collision for bullets and see what the performance impact is
 ---------------------------------
 April 05 2021
-
-
 
 ai_man 
 - added logic to auto equip a weapon if one is picked up 

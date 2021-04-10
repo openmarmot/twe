@@ -13,10 +13,12 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 - two modes : real time tactical environment and a strategic map
 - strategic map size is not limited, each tile with be generated as needed
 - not balanced on purpose. russians should inevitably push the germans west
-- empasis on iron man mode. strategic game doesn't start over when player dies they just spawn again
+- emphasis on iron man mode. strategic game doesn't start over when player dies they just take over a new bot
 
 ### Current State on Master branch
--The game runs. There is basic movement for the user and bots will chase you around the screen.
+- spawn objects with the debug menu
+- pick up a gun and fire it
+- spawnable zombies will chase you 
 
 
 ### Check the changelog on the Dev branch to see what I've been working on.
@@ -31,6 +33,7 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 - 'w/s/a/d' movement
 - left click on a gun or vehicle to open context menu
 - 'esc' to exit menu
+- 'f' to fire weapon (if you have one)
 
 
 ### License / Whatever

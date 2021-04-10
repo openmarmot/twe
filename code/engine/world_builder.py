@@ -27,21 +27,20 @@ import copy
 
 #import custom packages
 from engine.world import World
-#from engine.graphics_2d_pygame import Graphics_2D_Pygame
+import engine.math_2d
 
 from engine.world_object import WorldObject
 
-#from world_objects.wo_man import WOMan
-#from world_objects.wo_crate import WOCrate
-#from world_objects.wo_gun import WOGun
-#from world_objects.wo_vehicle import WOVehicle
 
 
+# load AI 
 from ai.ai_zombie import AIZombie
 from ai.ai_man import AIMan
 from ai.ai_gun import AIGun
 from ai.ai_none import AINone
 from ai.ai_building import AIBuilding
+from ai.ai_projectile import AIProjectile
+
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='march 28 2021' #date of last update
@@ -80,6 +79,9 @@ def load_images(world):
     world.graphic_engine.loadImage('ppk','images/ppk.png')
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
+
+    # projectiles
+    world.graphic_engine.loadImage('projectile','images/projectile.png')
 
     # buildings
     world.graphic_engine.loadImage('warehouse-inside','images/warehouse-inside.png')
@@ -128,10 +130,11 @@ def spawn_gun(world,world_coords,GUN_TYPE):
     if GUN_TYPE=='mp40':
         z=WorldObject(world,['mp40'],AIGun)
         z.name='Klaus Hammer'
-        z.world_coords=world_coords
+        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
+        z.ai.rate_of_fire=0.05
         z.render_level=2
         z.wo_start()
 
@@ -147,15 +150,38 @@ def spawn_kubelwagen(world,world_coords):
 
 
 #------------------------------------------------------------------------------
-def spawn_player(world,world_coords):
+def spawn_player(world,WORLD_COORDS):
     z=WorldObject(world,['man'],AIMan)
     z.name='Klaus Hammer'
-    z.world_coords=world_coords
+    z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=50.
     z.is_player=True
     z.render_level=3
     z.wo_start()
     world.player=z
+
+#------------------------------------------------------------------------------
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS):
+    z=WorldObject(WORLD,['projectile'],AIProjectile)
+    z.name='projectile'
+    z.world_coords=copy.copy(WORLD_COORDS)
+    z.speed=100.
+    z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
+    z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+    z.render=3
+    z.wo_start()
+
+#------------------------------------------------------------------------------
+def spawn_projectile_mouse(WORLD,WORLD_COORDS):
+    ''' spawn projectile using mouse aim '''
+    z=WorldObject(WORLD,['projectile'],AIProjectile)
+    z.name='projectile'
+    z.world_coords=copy.copy(WORLD_COORDS)
+    z.speed=150.
+    z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
+    z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
+    z.render=3
+    z.wo_start()   
 
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords):

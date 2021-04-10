@@ -14,6 +14,8 @@ notes :
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
+import engine.world_builder 
+
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='April 05 2021' #date of last update
@@ -34,7 +36,7 @@ class AIGun(AIBase):
         self.fire_time_passed=0. 
 
         # fire rate in seconds?
-        self.rate_of_fire=0.5 
+        self.rate_of_fire=0. 
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -52,7 +54,7 @@ class AIGun(AIBase):
         pass
 
     #---------------------------------------------------------------------------
-    def fire(self):
+    def fire(self,WORLD_COORDS,TARGET_COORDS,IS_PLAYER):
         ''' fire the gun '''
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
   
@@ -62,10 +64,17 @@ class AIGun(AIBase):
             # start by ruling out empty mag 
             if self.magazine<1:
                 # auto reload ?
-                print("magazine empty")
+                if(IS_PLAYER):
+                    print("magazine empty")
+                    # infinite ammo cheat for now
+                    self.magazine=self.mag_capacity
             else :
-                print("pew pew")
                 self.magazine-=1
+                if(IS_PLAYER):
+                    engine.world_builder.spawn_projectile_mouse(self.owner.world,WORLD_COORDS)
+                else:
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS)
+
         
 
 

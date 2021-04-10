@@ -48,10 +48,10 @@ class AIMan(AIBase):
                 pass
 
     #---------------------------------------------------------------------------
-    def fire(self):
+    def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
         if self.primary_weapon!=None:
-            self.primary_weapon.ai.fire()
+            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS,self.owner.is_player)
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -78,7 +78,7 @@ class AIMan(AIBase):
             self.owner.rotation_angle=270
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
-            pass 
+            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             pass 

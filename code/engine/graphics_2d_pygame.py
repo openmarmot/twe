@@ -27,7 +27,7 @@ from itertools import islice
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 05 2021' #date of last update
+module_last_update_date='April 10 2021' #date of last update
 
 #global variables
 
@@ -53,6 +53,10 @@ class Graphics_2D_Pygame(object):
         # 3 - objects walking on the ground (humans, animals, vehicles)
         # 4 - objects above ground (birds, planes, clouds, etc)
         self.renderlists=[[],[],[],[],[]]
+
+        # count of rendered objects
+        self.renderCount=0
+
         self.world=World
         
         # time stuff
@@ -72,6 +76,13 @@ class Graphics_2D_Pygame(object):
 
         # used for the menu system. no limits enforced by this class
         self.menu_text_queue=[]
+
+        # debug info queue
+        self.debug_mode=True
+        self.debug_text_queue=[]
+
+        # draw collision circles
+        self.draw_collision=True
 
         # will cause everything to exit
         self.quit=False
@@ -127,7 +138,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.selectFromScreen(120)
+                    b=self.selectFromScreen(15)
                     if b!=None:
                         print(b.name)
                         # send it over to world menu to figure out
@@ -208,6 +219,9 @@ class Graphics_2D_Pygame(object):
                 #do any special rendering for the object
                 c.render_pass_2()
 
+                if(self.draw_collision):
+                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
+
 
         # text stuff 
         self.h=0
@@ -220,6 +234,12 @@ class Graphics_2D_Pygame(object):
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
 
+        if(self.debug_mode):
+            self.h=0
+            for b in self.debug_text_queue:
+                self.h+=15
+                self.small_font.render_to(self.screen, (540, self.h), b, (0, 0, 255))
+
         pygame.display.update()
 
 
@@ -230,13 +250,20 @@ class Graphics_2D_Pygame(object):
         '''
         self.handleInput()
 
-        #print("tick " + str(pygame.time.get_ticks()))
-        #print("clock.get_fps", self.clock.get_fps())
+        if(self.debug_mode):
+            self.update_debug_info()
+
 
         # update time
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
+#------------------------------------------------------------------------------
+    def update_debug_info(self):
+        self.debug_text_queue=[]
+        self.debug_text_queue.append('FPS: '+str(int(self.clock.get_fps())))
+        self.debug_text_queue.append('World Objects: '+ str(len(self.world.wo_objects)))
+        self.debug_text_queue.append('Rendered Objects: '+ str(self.renderCount))
 
 #------------------------------------------------------------------------------
     def update_render_info(self):
@@ -260,7 +287,8 @@ class Graphics_2D_Pygame(object):
         #clear out the render levels
         self.renderlists=[[],[],[],[],[]]
         translation=self.get_translation()
-       # print(str(translation))
+
+        self.renderCount=0
         for b in self.world.wo_objects:
             #determine whether object 'b' world_coords are within
             #the viewport bounding box
@@ -270,10 +298,28 @@ class Graphics_2D_Pygame(object):
                     b.world_coords[1]>viewrange_y[1]):
                     #object is within the viewport, add it to the render list
                     self.renderlists[b.render_level].append(b)
-
+                    self.renderCount+=1
                     #apply transform to generate screen coords
                     b.screen_coords[0]=b.world_coords[0]+translation[0]
                     b.screen_coords[1]=b.world_coords[1]+translation[1]
+
+#------------------------------------------------------------------------------
+    def get_mouse_screen_coords(self):
+        return pygame.mouse.get_pos()
+
+#------------------------------------------------------------------------------
+    def get_mouse_world_coords(self):
+        ''' return world coords of mouse'''
+        # pretty sure this math doesnt make any sense
+        x,y=pygame.mouse.get_pos()
+        player_x=self.world.player.world_coords[0]
+        player_y=self.world.player.world_coords[1]
+        return [player_x-x,player_y-y]
+
+#-----------------------------------------------------------------------------
+    def get_player_screen_coords(self):
+        ''' return player screen coordinates'''
+        return [self.screen_size[0]/2,self.screen_size[1]/2]
 
 #------------------------------------------------------------------------------
     def get_rotated_image(self, image, angle):
