@@ -36,7 +36,11 @@ class AIGun(AIBase):
         self.fire_time_passed=0. 
 
         # fire rate in seconds?
-        self.rate_of_fire=0. 
+        self.rate_of_fire=0.
+
+        # the object (human) that actually equipped this weapon
+        # set by ai_man.event_inventory
+        self.equipper=None
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -54,7 +58,7 @@ class AIGun(AIBase):
         pass
 
     #---------------------------------------------------------------------------
-    def fire(self,WORLD_COORDS,TARGET_COORDS,IS_PLAYER):
+    def fire(self,WORLD_COORDS,TARGET_COORDS):
         ''' fire the gun '''
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
   
@@ -64,16 +68,16 @@ class AIGun(AIBase):
             # start by ruling out empty mag 
             if self.magazine<1:
                 # auto reload ?
-                if(IS_PLAYER):
+                if self.equipper.is_player:
                     print("magazine empty")
                     # infinite ammo cheat for now
                     self.magazine=self.mag_capacity
             else :
                 self.magazine-=1
-                if(IS_PLAYER):
-                    engine.world_builder.spawn_projectile_mouse(self.owner.world,WORLD_COORDS)
+                if self.equipper.is_player:
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],True)
                 else:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],False)
 
         
 

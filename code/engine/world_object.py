@@ -66,10 +66,13 @@ class WorldObject(object):
         # these are used by other objects to determine how this object can be interacted with
         # might just make this a string or something but bools are fast and easy to use 
         self.is_player=False
+        self.is_human=False
+        self.is_zombie=False
         self.is_vehicle=False
         self.is_gun=False
         self.is_gun_mag_carrier=False
         self.is_crate=False
+        self.is_projectile=False
 
 
         # AI where any unique code for the object is held

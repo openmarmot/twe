@@ -34,7 +34,6 @@ from engine.world_object import WorldObject
 
 
 # load AI 
-from ai.ai_zombie import AIZombie
 from ai.ai_man import AIMan
 from ai.ai_gun import AIGun
 from ai.ai_none import AINone
@@ -43,7 +42,7 @@ from ai.ai_projectile import AIProjectile
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='march 28 2021' #date of last update
+module_last_update_date='april 11 2021' #date of last update
 
 #global variables
 
@@ -96,6 +95,9 @@ def load_images(world):
     #crates?
     world.graphic_engine.loadImage('crate','images/crate.png')
 
+    # effects 
+    world.graphic_engine.loadImage('blood_splatter','images/blood_splatter.png')
+
 #------------------------------------------------------------------------------
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
@@ -113,6 +115,14 @@ def load_test_environment(world):
     #spawn_warehouse(world,[float(random.randint(0,1500)),float(random.randint(0,1500))])
     
 
+def spawn_blood_splatter(world,world_coords):
+    z=WorldObject(world,['blood_splatter'],AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.render_level=2
+    z.name='blood_splatter'
+    z.rotation_angle=float(random.randint(0,359))  
+    z.wo_start()   
+
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords, crate_type):
     # crate_type -- string denoting crate type 
@@ -120,6 +130,7 @@ def spawn_crate(world,world_coords, crate_type):
     z.world_coords=copy.copy(world_coords)
     z.is_crate=True
     z.render_level=2
+    z.name='crate'
         
     z.wo_start()
 
@@ -129,7 +140,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
 
     if GUN_TYPE=='mp40':
         z=WorldObject(world,['mp40'],AIGun)
-        z.name='Klaus Hammer'
+        z.name='mp40'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=30
@@ -157,36 +168,38 @@ def spawn_player(world,WORLD_COORDS):
     z.speed=50.
     z.is_player=True
     z.render_level=3
+    z.is_human=True
     z.wo_start()
     world.player=z
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,MOUSE_AIM):
+    # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=100.
-    z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
-    z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+    z.speed=175.
     z.render=3
+    z.ai.maxTime=6.
+    z.is_projectile=True
+    z.render_level=3
+    z.ai.ignore_list=IGNORE_LIST
+
+    if MOUSE_AIM :
+        # do computations based off of where the mouse is. TARGET_COORDS is ignored
+        z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
+        z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
+    else :
+        z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
+        z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+
     z.wo_start()
 
-#------------------------------------------------------------------------------
-def spawn_projectile_mouse(WORLD,WORLD_COORDS):
-    ''' spawn projectile using mouse aim '''
-    z=WorldObject(WORLD,['projectile'],AIProjectile)
-    z.name='projectile'
-    z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=150.
-    z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
-    z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
-    z.render=3
-    z.wo_start()   
-
+ 
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords):
     z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
-    z.name='Klaus Hammer'
+    z.name='warehouse'
     z.world_coords=copy.copy(world_coords)
     z.speed=0
     z.render_level=1
@@ -194,11 +207,14 @@ def spawn_warehouse(world,world_coords):
 
 #------------------------------------------------------------------------------
 def spawn_zombie(world,world_coords):
-    z=WorldObject(world,['zombie_soldier'],AIZombie)
-    z.name='Klaus Hammer'
+    z=WorldObject(world,['zombie_soldier'],AIMan)
+    z.name='Zombie Klaus Hammer'
     z.world_coords=world_coords
-    z.speed=float(random.randint(10,40))
+    z.speed=float(random.randint(10,60))
     z.render_level=3
+    z.collision_radius=10
+    z.is_human=True
+    z.is_zombie=True
     z.wo_start()
 
 #------------------------------------------------------------------------------

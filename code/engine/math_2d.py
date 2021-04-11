@@ -27,9 +27,10 @@ module_last_update_date='April 10 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
-def checkCollisionSquareOneResult(wo, collision_list):
+def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
 	# wo - (worldobject)the object possibly doing the colliding 
 	# collision_list - (list[worldobject] a list of all possible objects that 
+	# list of objects to ignore
 	# could be collided with
 
 	# checks collision based on a bounding box style check where the box is made
@@ -43,8 +44,9 @@ def checkCollisionSquareOneResult(wo, collision_list):
 			if wo.world_coords[0] < b.world_coords[0]+b.collision_radius:
 				if wo.world_coords[1]+wo.collision_radius > b.world_coords[1]:
 					if wo.world_coords[1] < b.world_coords[1]+b.collision_radius:
-						collided=b
-						break
+						if wo!=b and (b not in ignore_list):
+							collided=b
+							break
 	return collided
 
 #------------------------------------------------------------------------------

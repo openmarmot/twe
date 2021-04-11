@@ -14,6 +14,8 @@ notes :
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
+import engine.world_builder
+
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='Feb 07 2020' #date of last update
@@ -26,15 +28,29 @@ class AIMan(AIBase):
 
         self.primary_weapon=None
         self.throwable=None
+        self.health=100
 
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+
+        # -- general stuff for all objects --
+        if self.health<1:
+            print('d e d : dead')
+            self.owner.world.remove_object(self.owner)
+
         if(self.owner.is_player):
-            self.handle_player()
+            self.handle_player_update()
         else :
-            # must be AI controlled
-            pass
+            if(self.owner.is_zombie):
+                self.handle_zombie_update()
+
+    #---------------------------------------------------------------------------
+    def event_collision(self,EVENT_DATA):
+        if EVENT_DATA.is_projectile:
+            self.health-=25
+            engine.world_builder.spawn_blood_splatter(self.owner.world,self.owner.world_coords)
+
 
     #---------------------------------------------------------------------------
     def event_inventory(self,EVENT_DATA):
@@ -43,6 +59,7 @@ class AIMan(AIBase):
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
             else:
                 # if current weapon is empty, swap for the new one
                 pass
@@ -51,17 +68,22 @@ class AIMan(AIBase):
     def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
         if self.primary_weapon!=None:
-            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS,self.owner.is_player)
+            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
+        # EVENT - text describing event
+        # EVENT_DATA - most likely a world_object but could be anything
+
         # not sure what to do here yet. will have to think of some standard events
         if EVENT=='add_inventory':
             self.event_inventory(EVENT_DATA)
+        elif EVENT=='collision':
+            self.event_collision(EVENT_DATA)
 
     #---------------------------------------------------------------------------
-    def handle_player(self):
+    def handle_player_update(self):
         ''' handle any player specific code'''
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if(self.owner.world.graphic_engine.keyPressed('w')):
@@ -82,3 +104,9 @@ class AIMan(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             pass 
+
+    #---------------------------------------------------------------------------
+    def handle_zombie_update(self):
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
+        self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
