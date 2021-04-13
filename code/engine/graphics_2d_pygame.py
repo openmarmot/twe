@@ -82,7 +82,7 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue=[]
 
         # draw collision circles
-        self.draw_collision=True
+        self.draw_collision=False
 
         # will cause everything to exit
         self.quit=False

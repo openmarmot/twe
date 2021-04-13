@@ -16,6 +16,7 @@ It should not have any specific graphic engine code (pygame, etc)
 #import custom packages
 from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
+import engine.math_2d
 
 # module specific variables
 module_version='0.0' #module software version
@@ -28,8 +29,13 @@ class World(object):
     #---------------------------------------------------------------------------
     def __init__(self,SCREEN_SIZE):
 
+
+        # object lists 
         self.wo_objects=[]
         self.wo_objects_collision=[]
+        self.wo_objects_human=[]
+
+
         self.entity_id = 0
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
@@ -41,6 +47,32 @@ class World(object):
         self.wo_objects.append(worldobject)
         if worldobject.collision:
             self.wo_objects_collision.append(worldobject)
+        if worldobject.is_human:
+            self.wo_objects_human.append(worldobject)
+
+    #---------------------------------------------------------------------------
+    def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
+        ''' collision check. returns bool as to whether there was a collision.'''
+        # COLLIDER - worldobject doing the colliding
+        # IGNORE LIST - list of objects to ignore
+        collided=False
+
+        if CHECK_ALL :
+            # this should maybe be wo_objects_collision - not really using that atm though
+            temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects,IGNORE_LIST)
+            if temp !=None:
+                print('Collision with '+temp.name )
+                temp.ai.handle_event("collision",COLLIDER)
+                collided=True
+        else :
+            if CHECK_HUMAN :
+                temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
+                if temp !=None:
+                    print('Collision with '+temp.name )
+                    temp.ai.handle_event("collision",COLLIDER)
+                    collided=True
+
+        return collided
 
     #---------------------------------------------------------------------------
     def remove_object(self, worldobject):
@@ -48,6 +80,13 @@ class World(object):
             self.wo_objects.remove(worldobject)
         if worldobject.collision and worldobject in self.wo_objects_collision:
             self.wo_objects_collision.remove(worldobject)
+        if worldobject.is_human:
+            self.wo_objects_human.remove(worldobject)
+
+    #---------------------------------------------------------------------------
+    def render(self):
+        self.graphic_engine.render()
+
 
     #---------------------------------------------------------------------------
     def load_map(self):
@@ -71,9 +110,7 @@ class World(object):
         for b in self.wo_objects:
             b.update()
 
-    #---------------------------------------------------------------------------
-    def render(self):
-        self.graphic_engine.render()
+
 
 
  #   def get_close_entity(self, name, location, e_range=100):

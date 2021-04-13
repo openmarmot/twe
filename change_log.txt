@@ -1,5 +1,44 @@
 TWE Project : Change Log
 
+---------------------------------
+April 13 2021
+
+summary 
+- added object code and spawns for a couple more weapons
+- added rotation and changed spawn locations for weapons a bit for variety 
+- added code to drop your current weapon if you pickup a new one 
+- added code so that gun ai actually gets updates when equipped which fixed a timing bug with firing 
+
+---------------------------------
+April 11 2021
+
+summary 
+- added collision checking for projectiles 
+- added collision handling for humanoids
+- added blood splatter as a visual indication that you hit something 
+
+ai_projectile
+- added a max flight time so bullets despawn after awhile 
+- ai.update now checks collision
+
+ai_zombie 
+- elimated class and moved the code to ai_man 
+
+ai_man 
+- added collision event handler
+- added health. collision with projectile removes health 
+- health<1 means the object is removed.. for now  
+
+world 
+- added a new object collection for humans 
+    - part of keeping collision lists as small as possible 
+- added a collision checker class 
+
+general/misc
+- lots of misc code cleanup to make things easier to use 
+
+now that I can optionally draw collision circles I would say that collision appears to work pretty great.
+
 
 ---------------------------------
 April 10 2021
