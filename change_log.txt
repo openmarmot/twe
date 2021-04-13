@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+---------------------------------
+April 13 2021
+
+summary 
+- added object code and spawns for a couple more weapons
+- added rotation and changed spawn locations for weapons a bit for variety 
+- added code to drop your current weapon if you pickup a new one 
+- added code so that gun ai actually gets updates when equipped which fixed a timing bug with firing 
 
 ---------------------------------
 April 11 2021

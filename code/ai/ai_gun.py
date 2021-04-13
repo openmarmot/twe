@@ -45,11 +45,7 @@ class AIGun(AIBase):
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
-        #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
-        #self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,self.owner.world.player.screen_coords)
-        #print(str(self.rotation_angle))
-
-       # self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)
+        self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
@@ -60,7 +56,7 @@ class AIGun(AIBase):
     #---------------------------------------------------------------------------
     def fire(self,WORLD_COORDS,TARGET_COORDS):
         ''' fire the gun '''
-        self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
+
   
         # start with a time check
         if(self.fire_time_passed>self.rate_of_fire):

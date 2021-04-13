@@ -10,6 +10,8 @@ notes :
 
 
 #import built in modules
+import random
+import copy
 
 #import custom packages
 from ai.ai_base import AIBase
@@ -39,6 +41,10 @@ class AIMan(AIBase):
             print('d e d : dead')
             self.owner.world.remove_object(self.owner)
 
+        if self.primary_weapon!=None:
+            # needs updates for time tracking and other stuff
+            self.primary_weapon.update()
+
         if(self.owner.is_player):
             self.handle_player_update()
         else :
@@ -48,7 +54,7 @@ class AIMan(AIBase):
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
-            self.health-=25
+            self.health-=random.randint(20,60)
             engine.world_builder.spawn_blood_splatter(self.owner.world,self.owner.world_coords)
 
 
@@ -61,8 +67,14 @@ class AIMan(AIBase):
                 self.primary_weapon=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # if current weapon is empty, swap for the new one
-                pass
+                # drop the current weapon and pick up the new one
+                self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.primary_weapon)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+
 
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):

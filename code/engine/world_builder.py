@@ -108,8 +108,11 @@ def load_test_environment(world):
     # zombie generator 
     #spawn_zombie_horde(world, [10,10], 50)
 
-    # add mp40
-    spawn_gun(world,[float(random.randint(0,500)),float(random.randint(0,500))],'mp40')
+    # add a couple guns 
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'ppk')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'tt33')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911')
 
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(0,1500)),float(random.randint(0,1500))])
@@ -147,6 +150,43 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.ai.mag_capacity=30
         z.ai.rate_of_fire=0.05
         z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='ppk':
+        z=WorldObject(world,['ppk'],AIGun)
+        z.name='ppk'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=7
+        z.ai.mag_capacity=7
+        z.ai.rate_of_fire=0.7
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='tt33':
+        z=WorldObject(world,['tt33'],AIGun)
+        z.name='tt33'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=8
+        z.ai.mag_capacity=8
+        z.ai.rate_of_fire=0.9
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='1911':
+        z=WorldObject(world,['1911'],AIGun)
+        z.name='1911'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=7
+        z.ai.mag_capacity=7
+        z.ai.rate_of_fire=0.8
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
 
 
