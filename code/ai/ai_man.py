@@ -56,6 +56,8 @@ class AIMan(AIBase):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(20,60)
             engine.world_builder.spawn_blood_splatter(self.owner.world,self.owner.world_coords)
+        elif EVENT_DATA.is_grenade:
+            print('who throws grenades at people?? Rude!')
 
 
     #---------------------------------------------------------------------------
@@ -73,6 +75,20 @@ class AIMan(AIBase):
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_grenade :
+            if self.throwable==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.throwable=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.throwable.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.primary_weapon)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.throwable=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
 
 
@@ -115,10 +131,18 @@ class AIMan(AIBase):
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
-            pass 
+            self.throw([]) 
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
         self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
+
+    #---------------------------------------------------------------------------
+    def throw(self,TARGET_COORDS):
+        ''' throw like you know the thing. cmon man '''    
+        if self.throwable!=None:
+            self.throwable.ai.throw(TARGET_COORDS)
+            self.owner.world.add_object(self.throwable)
+            self.throwable=None

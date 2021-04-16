@@ -57,6 +57,8 @@ class World_Menu(object):
             self.gun_menu(Key)
         elif self.active_menu=='crate':
             self.crate_menu(Key)
+        elif self.active_menu=='generic':
+            self.generic_item_menu(Key)
         
 
     def activate_menu(self, Selected_Object):
@@ -73,6 +75,10 @@ class World_Menu(object):
         elif Selected_Object.is_crate:
             self.active_menu='crate'
             self.crate_menu(None)
+        else :
+            # just dump everything else in here for now
+            self.active_menu='generic'
+            self.generic_item_menu(None)
 
 
 
@@ -91,6 +97,24 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             self.menu_state='base'
             
+    def generic_item_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- Item Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                self.world.player.add_inventory(self.selected_object)
+                self.world.remove_object(self.selected_object)
+                self.deactivate_menu()
+
 
     def gun_menu(self, Key):
         if self.menu_state=='none':
