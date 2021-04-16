@@ -39,6 +39,7 @@ from ai.ai_gun import AIGun
 from ai.ai_none import AINone
 from ai.ai_building import AIBuilding
 from ai.ai_projectile import AIProjectile
+from ai.ai_grenade import AIGrenade
 
 # module specific variables
 module_version='0.0' #module software version
@@ -70,7 +71,7 @@ def load_images(world):
     world.graphic_engine.loadImage('russian_soldier','images/russian_soldier.png')
     world.graphic_engine.loadImage('zombie_soldier','images/zombie_soldier.png')
 
-    # weapons
+    # guns
     world.graphic_engine.loadImage('1911','images/1911.png')
     world.graphic_engine.loadImage('dp28','images/dp28.png')
     world.graphic_engine.loadImage('mp40','images/mp40.png')
@@ -79,8 +80,12 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # grenades
+    world.graphic_engine.loadImage('model24','images/model24.png')
+
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectile.png')
+    world.graphic_engine.loadImage('shrapnel','images/shrapnel.png')
 
     # buildings
     world.graphic_engine.loadImage('warehouse-inside','images/warehouse-inside.png')
@@ -114,6 +119,12 @@ def load_test_environment(world):
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'tt33')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911')
 
+    # and some grenades! 
+    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
+    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
+    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
+    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
+
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(0,1500)),float(random.randint(0,1500))])
     
@@ -136,6 +147,20 @@ def spawn_crate(world,world_coords, crate_type):
     z.name='crate'
         
     z.wo_start()
+
+
+#------------------------------------------------------------------------------
+def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE):
+
+    if GRENADE_TYPE=='model24':
+        z=WorldObject(WORLD,['model24'],AIGrenade)
+        z.name='model24'
+        z.is_grenade=True
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.speed=50.
+        z.ai.maxTime=5.
+        z.render_level=2
+        z.wo_start()
 
 
 #------------------------------------------------------------------------------
@@ -219,7 +244,6 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,MOUSE_AIM):
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=175.
-    z.render=3
     z.ai.maxTime=6.
     z.is_projectile=True
     z.render_level=3
@@ -235,7 +259,27 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,MOUSE_AIM):
 
     z.wo_start()
 
- 
+#------------------------------------------------------------------------------
+# basically just a different kind of projectile
+def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
+    # MOUSE_AIM bool as to whether to use mouse aim for calculations
+    z=WorldObject(WORLD,['shrapnel'],AIProjectile)
+    z.name='shrapnel'
+    z.world_coords=copy.copy(WORLD_COORDS)
+    z.speed=175.
+    z.ai.maxTime=2.
+    z.is_projectile=True
+    z.render_level=3
+    z.ai.ignore_list=IGNORE_LIST
+    z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
+    z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+
+#------------------------------------------------------------------------------
+def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
+    for x in range(AMOUNT):
+        target_coords=[float(random.randint(-50,50))+WORLD_COORDS[0],float(random.randint(-50,50))+WORLD_COORDS[1]]
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords):
     z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
