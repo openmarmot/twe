@@ -131,7 +131,7 @@ class AIMan(AIBase):
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
-            pass 
+            self.throw([]) 
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
@@ -144,5 +144,5 @@ class AIMan(AIBase):
         ''' throw like you know the thing. cmon man '''    
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
-            self.world.add_object(self.throwable)
+            self.owner.world.add_object(self.throwable)
             self.throwable=None

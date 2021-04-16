@@ -16,9 +16,8 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 - emphasis on iron man mode. strategic game doesn't start over when player dies they just take over a new bot
 
 ### Current State on Master branch
-- spawn objects with the debug menu
-- pick up a gun and fire it
-- spawnable zombies will chase you 
+- spawn objects and zombies with the debug menu
+- try out different weapons on some helpless zombies 
 
 
 ### Check the changelog on the Dev branch to see what I've been working on.
@@ -31,9 +30,10 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 ### Controls
 - '~' opens/closes debug menu (spawn zombies!)
 - 'w/s/a/d' movement
-- left click on a gun or vehicle to open context menu
+- left click on a object to open context menu
 - 'esc' to exit menu
 - 'f' to fire weapon (if you have one)
+- 'g' throw grenade (if you have one)
 
 
 ### License / Whatever

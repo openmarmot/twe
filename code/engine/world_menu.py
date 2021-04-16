@@ -57,7 +57,7 @@ class World_Menu(object):
             self.gun_menu(Key)
         elif self.active_menu=='crate':
             self.crate_menu(Key)
-        elif self.active_menu=='generic'
+        elif self.active_menu=='generic':
             self.generic_item_menu(Key)
         
 
@@ -100,7 +100,7 @@ class World_Menu(object):
     def generic_item_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Gun Menu --')
+            self.world.graphic_engine.menu_text_queue.append('-- Item Menu --')
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('3 - pick up')

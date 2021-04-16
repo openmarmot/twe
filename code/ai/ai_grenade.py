@@ -10,6 +10,7 @@ notes :
 
 
 #import built in modules
+import copy
 
 #import custom packages
 from ai.ai_base import AIBase
@@ -46,26 +47,32 @@ class AIGrenade(AIBase):
         ''' overrides base update '''
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
-        self.flightTime+=time_passed
-        if(self.flightTime>self.maxTime):
-            self.explode()
+
 
         if self.thrown:
+            self.flightTime+=time_passed
+            if(self.flightTime>self.maxTime):
+                self.explode()
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
                 # just stop the grenade. maybe some spin or reverse movement?
-                self.owner.speed=0
+                if self.owner.speed>1:
+                    self.owner.speed=-1
+                else:
+                    self.owner.speed-=2
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
     def explode(self):
         # kablooey!
-        # remove the grenade
-        self.owner.world.remove_object(self.owner)
         # add the shrapnel
         engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count)
+
+        # remove the grenade
+        # this also stops code execution for this object as its not anywhere else
+        self.owner.world.remove_object(self.owner)
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
@@ -75,6 +82,8 @@ class AIGrenade(AIBase):
         # MOUSE_AIM bool as to whether you want to throw it at the mouse
         self.thrown=True
 
+        # reset coords 
+        self.owner.world_coords=copy.copy(self.equipper.world_coords)
         if self.equipper.is_player :
             # do computations based off of where the mouse is. TARGET_COORDS is ignored
             self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())

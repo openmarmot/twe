@@ -1,5 +1,27 @@
 TWE Project : Change Log
 
+
+---------------------------------
+April 15 2021
+
+added grenades. this was more work than i initially thought
+
+pick up grenade like a gun and then throw with 'g'
+
+grenades collision detect in flight and will stop and 'bounce back' a bit 
+if they hit something. If they explode to close you may get hurt 
+
+when grenades explode they throw shrapnel. this has random 
+trajectories but it ended up being more or less a circle around it 
+-- idk why it isn't more random 
+
+summary 
+- created quick art for a german mod 24 stick grenade, and shrapnel
+- shrapnel spawn code - basically the same as a projectile for now 
+- grenade ai. combo of projectile code and weapon code 
+- added a generic menu because i don't want to code a menu for every stupid thing 
+- slowed down zombies so you have more time to experiment with them 
+
 ---------------------------------
 April 13 2021
 

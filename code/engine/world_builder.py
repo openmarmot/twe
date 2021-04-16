@@ -157,8 +157,8 @@ def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE):
         z.name='model24'
         z.is_grenade=True
         z.world_coords=copy.copy(WORLD_COORDS)
-        z.speed=50.
-        z.ai.maxTime=5.
+        z.speed=140.
+        z.ai.maxTime=2.
         z.render_level=2
         z.wo_start()
 
@@ -266,13 +266,14 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=175.
-    z.ai.maxTime=2.
+    z.speed=200.
+    z.ai.maxTime=1.
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+    z.wo_start()
 
 #------------------------------------------------------------------------------
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
@@ -294,7 +295,7 @@ def spawn_zombie(world,world_coords):
     z=WorldObject(world,['zombie_soldier'],AIMan)
     z.name='Zombie Klaus Hammer'
     z.world_coords=world_coords
-    z.speed=float(random.randint(10,60))
+    z.speed=float(random.randint(5,10))
     z.render_level=3
     z.collision_radius=10
     z.is_human=True
