@@ -80,6 +80,9 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # airplanes
+    world.graphic_engine.loadImage('ju88-winter-weathered','images/ju88-winter-weathered.png')
+
     # grenades
     world.graphic_engine.loadImage('model24','images/model24.png')
 
@@ -125,8 +128,11 @@ def load_test_environment(world):
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
 
+    # add ju88
+    spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))])
+
     # add warehouse
-    #spawn_warehouse(world,[float(random.randint(0,1500)),float(random.randint(0,1500))])
+    #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
     
 
 def spawn_blood_splatter(world,world_coords):
@@ -216,6 +222,14 @@ def spawn_gun(world,world_coords,GUN_TYPE):
 
 
 #------------------------------------------------------------------------------
+def spawn_ju88(world,world_coords):
+    z=WorldObject(world,['ju88-winter-weathered'],AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.render_level=3
+    z.wo_start()
+
+
+#------------------------------------------------------------------------------
 def spawn_kubelwagen(world,world_coords):
     z=WorldObject(world,['kubelwagen'],AINone)
     z.world_coords=copy.copy(world_coords)
@@ -267,18 +281,20 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=200.
-    z.ai.maxTime=1.
+    z.ai.maxTime=random.uniform(0.3, 0.9)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+    # increase the collision radius to make sure we get hits
+    z.collision_radius=10
     z.wo_start()
 
 #------------------------------------------------------------------------------
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
     for x in range(AMOUNT):
-        target_coords=[float(random.randint(-50,50))+WORLD_COORDS[0],float(random.randint(-50,50))+WORLD_COORDS[1]]
+        target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
 
 #------------------------------------------------------------------------------
@@ -295,7 +311,7 @@ def spawn_zombie(world,world_coords):
     z=WorldObject(world,['zombie_soldier'],AIMan)
     z.name='Zombie Klaus Hammer'
     z.world_coords=world_coords
-    z.speed=float(random.randint(5,10))
+    z.speed=float(random.randint(5,20))
     z.render_level=3
     z.collision_radius=10
     z.is_human=True

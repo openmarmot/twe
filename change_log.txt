@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+---------------------------------
+April 18 2021
+
+summary 
+- created ju88 art and added it as a no ai object 
+- small tweaks to grenades and overall damage model 
+
 
 ---------------------------------
 April 15 2021
