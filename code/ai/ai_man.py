@@ -60,6 +60,8 @@ class AIMan(AIBase):
             print('who throws grenades at people?? Rude!')
 
 
+
+
     #---------------------------------------------------------------------------
     def event_inventory(self,EVENT_DATA):
         if EVENT_DATA.is_gun :
@@ -136,9 +138,17 @@ class AIMan(AIBase):
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
-        self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
 
+        if self.health>50:
+            self.owner.speed=35
+            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
+            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
+        else :
+            self.owner.speed=-35
+            self.health+=5*time_passed
+            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.player.world_coords,self.owner.world_coords)
+            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
+  
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    

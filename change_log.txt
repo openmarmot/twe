@@ -4,11 +4,16 @@ TWE Project : Change Log
 April 18 2021
 
 summary 
-- created ju88 art and added it as a no ai object 
+- created ju88 art and added it as a static model 
 - small tweaks to grenades and overall damage model
 - tweaked fire rates for all guns 
-- added dp28 and stg44 
+- added dp28 and stg44
+- added a run away behavior to zombies when < 50 health 
+- also added health regen to zombies when < 50 health 
+- added 'civilian man' art 
 
+will probably build out state machine ai for civilian man soon. 
+also need to add more random 'clutter' objects 
 
 ---------------------------------
 April 15 2021
