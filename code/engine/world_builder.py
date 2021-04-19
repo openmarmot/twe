@@ -118,6 +118,8 @@ def load_test_environment(world):
 
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'dp28')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'ppk')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'tt33')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911')
@@ -177,9 +179,33 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.name='mp40'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
+        z.ai.magazine=32
+        z.ai.mag_capacity=32
+        z.ai.rate_of_fire=0.12
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='stg44':
+        z=WorldObject(world,['stg44'],AIGun)
+        z.name='stg44'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
-        z.ai.rate_of_fire=0.05
+        z.ai.rate_of_fire=0.1
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='dp28':
+        z=WorldObject(world,['dp28'],AIGun)
+        z.name='dp28'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=47
+        z.ai.mag_capacity=47
+        z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -191,7 +217,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=0.6
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -203,7 +229,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=8
         z.ai.mag_capacity=8
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=0.8
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -215,7 +241,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
-        z.ai.rate_of_fire=0.8
+        z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()

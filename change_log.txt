@@ -5,7 +5,9 @@ April 18 2021
 
 summary 
 - created ju88 art and added it as a no ai object 
-- small tweaks to grenades and overall damage model 
+- small tweaks to grenades and overall damage model
+- tweaked fire rates for all guns 
+- added dp28 and stg44 
 
 
 ---------------------------------
