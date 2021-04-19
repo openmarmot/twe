@@ -36,7 +36,7 @@ class AIGrenade(AIBase):
         self.maxTime=5.
 
         # amount of shrapnel (basically grenade power)
-        self.shrapnel_count=20
+        self.shrapnel_count=40
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory

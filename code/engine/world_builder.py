@@ -80,6 +80,9 @@ def load_images(world):
     world.graphic_engine.loadImage('stg44','images/stg44.png')
     world.graphic_engine.loadImage('tt33','images/tt33.png')
 
+    # airplanes
+    world.graphic_engine.loadImage('ju88-winter-weathered','images/ju88-winter-weathered.png')
+
     # grenades
     world.graphic_engine.loadImage('model24','images/model24.png')
 
@@ -115,6 +118,8 @@ def load_test_environment(world):
 
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'dp28')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'ppk')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'tt33')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911')
@@ -125,8 +130,11 @@ def load_test_environment(world):
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
 
+    # add ju88
+    spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))])
+
     # add warehouse
-    #spawn_warehouse(world,[float(random.randint(0,1500)),float(random.randint(0,1500))])
+    #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
     
 
 def spawn_blood_splatter(world,world_coords):
@@ -171,9 +179,33 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.name='mp40'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
+        z.ai.magazine=32
+        z.ai.mag_capacity=32
+        z.ai.rate_of_fire=0.12
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='stg44':
+        z=WorldObject(world,['stg44'],AIGun)
+        z.name='stg44'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
-        z.ai.rate_of_fire=0.05
+        z.ai.rate_of_fire=0.1
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='dp28':
+        z=WorldObject(world,['dp28'],AIGun)
+        z.name='dp28'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=47
+        z.ai.mag_capacity=47
+        z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -185,7 +217,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=0.6
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -197,7 +229,7 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=8
         z.ai.mag_capacity=8
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=0.8
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
@@ -209,10 +241,18 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
-        z.ai.rate_of_fire=0.8
+        z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
+
+
+#------------------------------------------------------------------------------
+def spawn_ju88(world,world_coords):
+    z=WorldObject(world,['ju88-winter-weathered'],AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.render_level=3
+    z.wo_start()
 
 
 #------------------------------------------------------------------------------
@@ -267,18 +307,20 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=200.
-    z.ai.maxTime=1.
+    z.ai.maxTime=random.uniform(0.3, 0.9)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+    # increase the collision radius to make sure we get hits
+    z.collision_radius=10
     z.wo_start()
 
 #------------------------------------------------------------------------------
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
     for x in range(AMOUNT):
-        target_coords=[float(random.randint(-50,50))+WORLD_COORDS[0],float(random.randint(-50,50))+WORLD_COORDS[1]]
+        target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
 
 #------------------------------------------------------------------------------
@@ -295,7 +337,7 @@ def spawn_zombie(world,world_coords):
     z=WorldObject(world,['zombie_soldier'],AIMan)
     z.name='Zombie Klaus Hammer'
     z.world_coords=world_coords
-    z.speed=float(random.randint(5,10))
+    z.speed=float(random.randint(5,20))
     z.render_level=3
     z.collision_radius=10
     z.is_human=True
