@@ -63,7 +63,7 @@ class AIMan(AIBase):
 
 
     #---------------------------------------------------------------------------
-    def event_inventory(self,EVENT_DATA):
+    def event_add_inventory(self,EVENT_DATA):
         if EVENT_DATA.is_gun :
             if self.primary_weapon==None:
                 if self.owner.is_player :
@@ -92,6 +92,10 @@ class AIMan(AIBase):
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.throwable=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
+        if EVENT_DATA.is_consumable:
+            self.health+=100
+            if self.owner.is_player :
+                self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ': You eat the whole cheese wheel ]')
 
 
     #---------------------------------------------------------------------------
@@ -108,7 +112,7 @@ class AIMan(AIBase):
 
         # not sure what to do here yet. will have to think of some standard events
         if EVENT=='add_inventory':
-            self.event_inventory(EVENT_DATA)
+            self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
 

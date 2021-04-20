@@ -5,6 +5,8 @@ TWE is short for 'To Whatever End' which was the title of a game I worked on fro
 The game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
 Sometime in 2010 I lost all the code when I accidentally erased the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
 
+I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. For example before writing this I added in several types of cheese - just for fun.
+
 ![screenshot](/screenshots/twe-ju88.png "ju88")
 
 
@@ -15,9 +17,10 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 - not balanced on purpose. russians should inevitably push the germans west
 - emphasis on iron man mode. strategic game doesn't start over when player dies they just take over a new bot
 
-### Current State on Master branch
+### Things to do
 - spawn objects and zombies with the debug menu
 - try out different weapons on some helpless zombies 
+- find and eat all four types of cheese
 
 
 ### Check the changelog on the Dev branch to see what I've been working on.

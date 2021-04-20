@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+
+---------------------------------
+April 19 2021
+
+summary 
+- organized the images folder with some sub folders as the amount of 
+    art continues to grow 
+- minor change to menus to have them display the object name 
+- added 4 different german cheese 'rations' - it gives you a massive health boost. just like in real life 
+
+I want to add more small objects although the scale of the game would 
+make them too tiny to see. the compromise is to make them slightly too large 
+
+Overall scale in this game is kind of fuzzy 
 ---------------------------------
 April 18 2021
 

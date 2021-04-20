@@ -65,26 +65,26 @@ def load_images(world):
     load art assets
     '''
     # people
-    world.graphic_engine.loadImage('man','images/man.png')
-    world.graphic_engine.loadImage('german_soldier','images/german_soldier.png')
-    world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/german_ss_fall_helm_soldier.png')
-    world.graphic_engine.loadImage('russian_soldier','images/russian_soldier.png')
-    world.graphic_engine.loadImage('zombie_soldier','images/zombie_soldier.png')
+    world.graphic_engine.loadImage('man','images/humans/man.png')
+    world.graphic_engine.loadImage('german_soldier','images/humans/german_soldier.png')
+    world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
+    world.graphic_engine.loadImage('russian_soldier','images/humans/russian_soldier.png')
+    world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
 
     # guns
-    world.graphic_engine.loadImage('1911','images/1911.png')
-    world.graphic_engine.loadImage('dp28','images/dp28.png')
-    world.graphic_engine.loadImage('mp40','images/mp40.png')
-    world.graphic_engine.loadImage('panzerfaust','images/panzerfaust.png')
-    world.graphic_engine.loadImage('ppk','images/ppk.png')
-    world.graphic_engine.loadImage('stg44','images/stg44.png')
-    world.graphic_engine.loadImage('tt33','images/tt33.png')
+    world.graphic_engine.loadImage('1911','images/weapons/1911.png')
+    world.graphic_engine.loadImage('dp28','images/weapons/dp28.png')
+    world.graphic_engine.loadImage('mp40','images/weapons/mp40.png')
+    world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
+    world.graphic_engine.loadImage('ppk','images/weapons/ppk.png')
+    world.graphic_engine.loadImage('stg44','images/weapons/stg44.png')
+    world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
 
     # airplanes
-    world.graphic_engine.loadImage('ju88-winter-weathered','images/ju88-winter-weathered.png')
+    world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
 
     # grenades
-    world.graphic_engine.loadImage('model24','images/model24.png')
+    world.graphic_engine.loadImage('model24','images/weapons/model24.png')
 
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectile.png')
@@ -95,7 +95,7 @@ def load_images(world):
     world.graphic_engine.loadImage('warehouse-outside','images/warehouse-outside.png')
 
     # vehicle
-    world.graphic_engine.loadImage('kubelwagen','images/kubelwagen.png')
+    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
 
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
@@ -105,6 +105,12 @@ def load_images(world):
 
     # effects 
     world.graphic_engine.loadImage('blood_splatter','images/blood_splatter.png')
+
+    # consumables
+    world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
+    world.graphic_engine.loadImage('camembert-cheese','images/consumables/camembert-cheese.png')
+    world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
+    world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -135,8 +141,53 @@ def load_test_environment(world):
 
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
-    
 
+    #cheese 
+    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
+    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
+    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
+    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+
+
+#------------------------------------------------------------------------------    
+def spawn_cheese(world,world_coords,CHEESE_TYPE):
+    if CHEESE_TYPE=='adler-cheese':
+        z=WorldObject(world,['adler-cheese'],AINone)
+        z.world_coords=copy.copy(world_coords)
+        z.render_level=2
+        z.name='Adler cheese'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+        z.wo_start() 
+
+    if CHEESE_TYPE=='camembert-cheese':
+        z=WorldObject(world,['camembert-cheese'],AINone)
+        z.world_coords=copy.copy(world_coords)
+        z.render_level=2
+        z.name='Camembert cheese'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+        z.wo_start() 
+
+    if CHEESE_TYPE=='champignon-cheese':
+        z=WorldObject(world,['champignon-cheese'],AINone)
+        z.world_coords=copy.copy(world_coords)
+        z.render_level=2
+        z.name='Champignon cheese'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+        z.wo_start() 
+
+    if CHEESE_TYPE=='karwendel-cheese':
+        z=WorldObject(world,['karwendel-cheese'],AINone)
+        z.world_coords=copy.copy(world_coords)
+        z.render_level=2
+        z.name='Karwendel cheese'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+        z.wo_start() 
+
+#------------------------------------------------------------------------------
 def spawn_blood_splatter(world,world_coords):
     z=WorldObject(world,['blood_splatter'],AINone)
     z.world_coords=copy.copy(world_coords)

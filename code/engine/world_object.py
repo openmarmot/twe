@@ -70,9 +70,11 @@ class WorldObject(object):
         self.is_zombie=False
         self.is_vehicle=False
         self.is_gun=False
+        self.is_grenade=False
         self.is_gun_mag_carrier=False
         self.is_crate=False
         self.is_projectile=False
+        self.is_consumable=False
 
 
         # AI where any unique code for the object is held
