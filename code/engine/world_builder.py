@@ -70,6 +70,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
     world.graphic_engine.loadImage('russian_soldier','images/humans/russian_soldier.png')
     world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
+    world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
 
     # guns
     world.graphic_engine.loadImage('1911','images/weapons/1911.png')
@@ -79,6 +80,9 @@ def load_images(world):
     world.graphic_engine.loadImage('ppk','images/weapons/ppk.png')
     world.graphic_engine.loadImage('stg44','images/weapons/stg44.png')
     world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
+    world.graphic_engine.loadImage('kar98k','images/weapons/kar98k.png')
+    world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
+    world.graphic_engine.loadImage('mosin-nagant','images/weapons/mosin-nagant.png')
 
     # airplanes
     world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
@@ -117,18 +121,24 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
     #add a player
-    spawn_player(world, [50.,50.])
+    spawn_human(world, [50.,50.],'player')
+
+    # add civilians 
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
 
     # zombie generator 
     #spawn_zombie_horde(world, [10,10], 50)
 
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40')
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44')
+    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'dp28')
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'ppk')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mg34')
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'tt33')
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911')
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin-nagant')
 
     # and some grenades! 
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24')
@@ -297,6 +307,76 @@ def spawn_gun(world,world_coords,GUN_TYPE):
         z.rotation_angle=float(random.randint(0,359))
         z.wo_start()
 
+    if GUN_TYPE=='mg34':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='mg34'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=75
+        z.ai.mag_capacity=75
+        z.ai.rate_of_fire=0.05
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='kar98k':
+        z=WorldObject(world,['kar98k'],AIGun)
+        z.name='kar98k'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=5
+        z.ai.mag_capacity=5
+        z.ai.rate_of_fire=0.7
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+    if GUN_TYPE=='mosin-nagant':
+        z=WorldObject(world,['mosin-nagant'],AIGun)
+        z.name='mosin-nagant'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=2
+        z.ai.mag_capacity=2
+        z.ai.rate_of_fire=0.7
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        z.wo_start()
+
+#------------------------------------------------------------------------------
+def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE):
+    if HUMAN_TYPE=='zombie':
+        z=WorldObject(WORLD,['zombie_soldier'],AIMan)
+        z.name='Zombie Klaus Hammer'
+        z.world_coords=WORLD_COORDS
+        z.speed=float(random.randint(5,20))
+        z.render_level=3
+        z.collision_radius=10
+        z.is_human=True
+        z.is_zombie=True
+        z.wo_start()
+    if HUMAN_TYPE=='player':
+        z=WorldObject(WORLD,['man'],AIMan)
+        z.name='Klaus Hammer'
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.speed=50.
+        z.is_player=True
+        z.render_level=3
+        z.is_human=True
+        z.wo_start()
+        WORLD.player=z
+    if HUMAN_TYPE=='civilian-man':
+        z=WorldObject(WORLD,['civilian-man'],AIMan)
+        z.name='Reginald Thimblebottom'
+        z.world_coords=WORLD_COORDS
+        z.speed=float(random.randint(18,25))
+        z.render_level=3
+        z.collision_radius=10
+        z.is_human=True
+        z.is_zombie=True # turn on for now so it gets zombie AI
+        z.is_civilian=True
+        z.wo_start()
+
 
 #------------------------------------------------------------------------------
 def spawn_ju88(world,world_coords):
@@ -314,19 +394,6 @@ def spawn_kubelwagen(world,world_coords):
     z.render_level=3
     z.wo_start()
 
-
-
-#------------------------------------------------------------------------------
-def spawn_player(world,WORLD_COORDS):
-    z=WorldObject(world,['man'],AIMan)
-    z.name='Klaus Hammer'
-    z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=50.
-    z.is_player=True
-    z.render_level=3
-    z.is_human=True
-    z.wo_start()
-    world.player=z
 
 #------------------------------------------------------------------------------
 def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,MOUSE_AIM):
@@ -384,18 +451,6 @@ def spawn_warehouse(world,world_coords):
     z.wo_start()
 
 #------------------------------------------------------------------------------
-def spawn_zombie(world,world_coords):
-    z=WorldObject(world,['zombie_soldier'],AIMan)
-    z.name='Zombie Klaus Hammer'
-    z.world_coords=world_coords
-    z.speed=float(random.randint(5,20))
-    z.render_level=3
-    z.collision_radius=10
-    z.is_human=True
-    z.is_zombie=True
-    z.wo_start()
-
-#------------------------------------------------------------------------------
 def spawn_zombie_horde(world, world_coords, amount):
     for x in range(amount):
-        spawn_zombie(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]])
+        spawn_human(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]],'zombie')

@@ -31,7 +31,12 @@ class AIMan(AIBase):
         self.primary_weapon=None
         self.throwable=None
         self.health=100
+        self.ai_state='None'
 
+        # the ai group that this human is a part of 
+        self.group=None
+        self.target=None
+        self.destination=None
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -115,6 +120,11 @@ class AIMan(AIBase):
             self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+
+    #-----------------------------------------------------------------------
+    def handle_civilian_update(self):
+        ''' handle code for civilian AI '''
+        
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
