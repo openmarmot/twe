@@ -1,5 +1,37 @@
 TWE Project : Change Log
 
+---------------------------------
+April 21 2021
+
+summary 
+- added weapons : mg34, kar98k, mosin nagant
+- added a human civilian object 
+    - just uses zombie AI at the moment. civilian AI coming 
+- reorg of some code 
+
+---------------------------------
+April 20 2021
+
+thinking about AI. 
+I think I will reimplement the main ai concept from 
+my previous game where soldiers are in a group and basically just 
+follow around the groups central location. the group itself then 
+makes the decisions as far as where to go, etc 
+
+the group gets marching orders from the faction tactical ai 
+
+Factions 
+- german : major faction, in the decline 
+- russian : major faction, power is on the rise 
+- america : major faction - starts as maybe two small isolated areas 
+- civilian : true neutral 
+- partisian : opposed to all major factions, poorly equipped 
+
+General AI Structure 
+ai_faction_strategic : strategic map decision (think axis and allies)
+ai_faction_tactical : tactical map decision 
+ai_group : unit (squad) ai 
+ai_man : individual human ai 
 
 ---------------------------------
 April 19 2021

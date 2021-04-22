@@ -124,10 +124,10 @@ def load_test_environment(world):
     spawn_human(world, [50.,50.],'player')
 
     # add civilians 
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian-man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man')
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man')
 
     # zombie generator 
     #spawn_zombie_horde(world, [10,10], 50)
@@ -365,8 +365,8 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE):
         z.is_human=True
         z.wo_start()
         WORLD.player=z
-    if HUMAN_TYPE=='civilian-man':
-        z=WorldObject(WORLD,['civilian-man'],AIMan)
+    if HUMAN_TYPE=='civilian_man':
+        z=WorldObject(WORLD,['civilian_man'],AIMan)
         z.name='Reginald Thimblebottom'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))

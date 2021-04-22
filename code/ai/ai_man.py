@@ -50,11 +50,14 @@ class AIMan(AIBase):
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
 
-        if(self.owner.is_player):
+        if self.owner.is_soldier:
+            pass
+        elif self.owner.is_player:
             self.handle_player_update()
-        else :
-            if(self.owner.is_zombie):
-                self.handle_zombie_update()
+        else : 
+            self.handle_zombie_update()
+
+
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
