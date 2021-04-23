@@ -167,7 +167,10 @@ class AIMan(AIBase):
                     pass
                 # do we need a gun ?
                 elif self.primary_weapon==None :
-                    
+                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                    self.ai_goal='pickup'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'
                 # do we need ammo ?
                 
                 # are we a soldier and are we far from our group?

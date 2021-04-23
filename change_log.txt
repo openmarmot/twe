@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ---------------------------------
+April 23 2021
+
+summary
+-a bit more work on the ai system. 
+- added get_closest_gun to world
+    - required maintaining a gun list 
+not functioning or tested atm 
+
+---------------------------------
 April 22 2021
 
 working on the main ai state system for ai_man 

@@ -17,6 +17,7 @@ It should not have any specific graphic engine code (pygame, etc)
 from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
 import engine.math_2d
+import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
@@ -34,6 +35,7 @@ class World(object):
         self.wo_objects=[]
         self.wo_objects_collision=[]
         self.wo_objects_human=[]
+        self.wo_objects_guns=[]
 
 
         self.entity_id = 0
@@ -49,6 +51,8 @@ class World(object):
             self.wo_objects_collision.append(worldobject)
         if worldobject.is_human:
             self.wo_objects_human.append(worldobject)
+        if worldobject.is_gun:
+            self.wo_objects_guns.append(worldobject)
 
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
@@ -75,6 +79,24 @@ class World(object):
         return collided
 
     #---------------------------------------------------------------------------
+    def get_closest_gun(self, WORLD_COORDS):
+        best_distance=100000
+        best_object=None
+        for b in self.wo_objects_guns:
+            d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
+            if d<best_distance:
+                best_distance=d 
+                best_object=b
+        if best_object==None:
+            # spawn a new gun and return it
+            engine.world_builder.spawn_gun(world,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'mp40')
+            # hmm we don't have the object reference, so lets just run this method again
+            # does this make sense? am i insane? HA HA HAHAHAHA
+            print('warning mind bender insane o loop activated in world.get_closest_gun')
+            return self.get_closest_gun(WORLD_COORDS)
+        else : 
+            return best_object
+    #---------------------------------------------------------------------------
     def remove_object(self, worldobject):
         if worldobject in self.wo_objects:
             self.wo_objects.remove(worldobject)
@@ -82,6 +104,8 @@ class World(object):
             self.wo_objects_collision.remove(worldobject)
         if worldobject.is_human:
             self.wo_objects_human.remove(worldobject)
+        if worldobject.is_gun:
+            self.wo_objects_guns.remove(worldobject)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -113,15 +137,4 @@ class World(object):
 
 
 
- #   def get_close_entity(self, name, location, e_range=100):
-#
-#        location = Vector2(*location)
-#
-#
- #       for entity in self.entities.values():
-#
- #           if entity.name == name:
-  #              distance = location.get_distance_to(entity.location)
-   #             if distance < e_range:
-    #                return entity
-     #   return None
+
