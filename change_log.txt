@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ---------------------------------
+April 22 2021
+
+working on the main ai state system for ai_man 
+- quite a bit more work to do here. not functional at the moment 
+
+---------------------------------
 April 21 2021
 
 summary 
@@ -8,6 +14,10 @@ summary
 - added a human civilian object 
     - just uses zombie AI at the moment. civilian AI coming 
 - reorg of some code 
+
+had a crash on the rotate image call in graphics_engine 
+- first time this happened and it did not repeat
+- possibly to do with a random starting rotation value being wrong?
 
 ---------------------------------
 April 20 2021

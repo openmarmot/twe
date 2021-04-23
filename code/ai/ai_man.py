@@ -31,11 +31,12 @@ class AIMan(AIBase):
         self.primary_weapon=None
         self.throwable=None
         self.health=100
-        self.ai_state='None'
-
+        self.ai_state='none'
+        self.ai_goal='none'
+        self.time_since_ai_transition=0.
         # the ai group that this human is a part of 
         self.group=None
-        self.target=None
+        self.target_object=None
         self.destination=None
     #---------------------------------------------------------------------------
     def update(self):
@@ -50,12 +51,12 @@ class AIMan(AIBase):
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
 
-        if self.owner.is_soldier:
-            pass
-        elif self.owner.is_player:
+        if self.owner.is_player:
             self.handle_player_update()
-        else : 
+        elif self.owner.is_zombie:
             self.handle_zombie_update()
+        else :
+            self.handle_normal_ai_update()
 
 
 
@@ -125,9 +126,62 @@ class AIMan(AIBase):
             self.event_collision(EVENT_DATA)
 
     #-----------------------------------------------------------------------
-    def handle_civilian_update(self):
+    def handle_normal_ai_update(self):
         ''' handle code for civilian AI '''
-        
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        self.time_since_ai_transition+=time_passed
+
+        if self.time_since_ai_transition>2. :
+            # this is basically a thinking state - assess current progress
+
+            if self.ai_state=='moving':
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
+                print('distance: '+distance)
+                if distance <5 :
+                    if self.ai_goal=='pickup':
+                        print('pickup thingy')
+                        self.owner.add_inventory(self.target_object)
+                        self.owner.world.remove_object(self.target_object)
+                        self.time_since_ai_transition=0
+                        self.ai_state='sleeping'
+            elif self.ai_state=='engaging':
+                # check if target is dead 
+                if self.target_object.ai.health<1:
+                    self.time_since_ai_transition=0
+                    self.ai_state='sleeping'
+                
+                # check if target is too far 
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
+                if distance >50. :
+                    self.ai_goal='close_with_target'
+                    self.destination=copy.copy(self.target_object.world_coords)
+                    self.time_since_ai_transition=0
+                    self.ai_state='start_moving'
+                # check if we are out of ammo
+
+        if self.ai_state=='moving':
+            # move towards target
+            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed) 
+            # check distance?
+                  
+        elif self.ai_state=='engaging':
+            self.fire(self.target_object.world_coords)
+        elif self.ai_state=='sleeping':
+            pass
+        elif self.ai_state=='start_moving':
+            # maybe change into moving animation image?
+            # set the rotation angle for the image 
+            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+            # transition to moving
+            self.time_since_ai_transition=0
+            self.ai_state='moving'
+
+
+
+
+
+
+
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
