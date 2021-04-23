@@ -157,12 +157,28 @@ class AIMan(AIBase):
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.time_since_ai_transition=0
                     self.ai_state='start_moving'
+
                 # check if we are out of ammo
+            else :
+                # what should we be doing ??
+
+                # are we low on health? 
+                if self.health<50:
+                    pass
+                # do we need a gun ?
+                elif self.primary_weapon==None :
+                    
+                # do we need ammo ?
+                
+                # are we a soldier and are we far from our group?
+                if self.owner.is_soldier :
+                    # check distance from group 
+                    pass 
+
 
         if self.ai_state=='moving':
             # move towards target
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed) 
-            # check distance?
                   
         elif self.ai_state=='engaging':
             self.fire(self.target_object.world_coords)
