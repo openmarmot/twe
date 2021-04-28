@@ -10,9 +10,9 @@ notes : AI that makes decisions for groups
 
 
 #import built in modules
+import random 
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
@@ -21,14 +21,25 @@ module_last_update_date='April 21 2021' #date of last update
 
 #global variables
 
-class AINone(AIBase):
-    def __init__(self, owner):
-        super().__init__(owner)
+class AISquad(object):
+    def __init__(self):
 
         # ai in the group will try to stay close to the group world coords
         self.world_coords=[0.,0.]
+        # people in the squad 
+        self.members=[] 
+
+    
+    #---------------------------------------------------------------------------
+    def spawn_on_map():
+        '''spawns the squad on the map at the squads world coords '''
+
+        for b in self.members :
+            b.world_coords=[self.world_coords[0]+float(random.randint(-15,15),self.world_coords[1]+float(random.randint(-15,15)]
+            b.wo_start()
+
     #---------------------------------------------------------------------------
     def update(self):
-        ''' overrides base update '''
+        pass
 
     #---------------------------------------------------------------------------

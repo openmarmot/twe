@@ -1,6 +1,33 @@
 TWE Project : Change Log
 
 ---------------------------------
+April 27 2021
+
+summary
+- renamed ai_group to ai_squad to better represent what it is 
+    - initially thought civilians would use this as well but i think it 
+        will be soldiers only 
+- some work on ai_squad 
+- world_builder squad spawning code 
+
+
+---------------------------------
+April 26 2021
+
+summary 
+- more work on the ai_man code 
+- reworked world_builder code to return the object 
+    - also added a bool as to whether it should be spawned in the world or not 
+    - this was needed as prep for spawning soldiers with equipment pre-equipped 
+
+did some reading on german squad Structure
+- trying to figure out if i want to keep track of every man, or 
+    every squad or what 
+- i need to read up on soviet organization as well - i am less familiar 
+    with it 
+
+
+---------------------------------
 April 23 2021
 
 summary

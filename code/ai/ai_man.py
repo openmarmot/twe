@@ -133,21 +133,25 @@ class AIMan(AIBase):
 
         if self.time_since_ai_transition>2. :
             # this is basically a thinking state - assess current progress
+            self.time_since_ai_transition=0
 
             if self.ai_state=='moving':
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
                 print('distance: '+distance)
-                if distance <5 :
-                    if self.ai_goal=='pickup':
+
+                if self.ai_goal=='pickup':
+                    if distance<5:
                         print('pickup thingy')
                         self.owner.add_inventory(self.target_object)
                         self.owner.world.remove_object(self.target_object)
-                        self.time_since_ai_transition=0
                         self.ai_state='sleeping'
+                elif self.ai_goale=='close_with_target':
+                    if distance<30:
+                        print('in range of target')
+                        self.owner.ai_state='engaging'
             elif self.ai_state=='engaging':
                 # check if target is dead 
                 if self.target_object.ai.health<1:
-                    self.time_since_ai_transition=0
                     self.ai_state='sleeping'
                 
                 # check if target is too far 
@@ -155,10 +159,10 @@ class AIMan(AIBase):
                 if distance >50. :
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
-                    self.time_since_ai_transition=0
                     self.ai_state='start_moving'
 
                 # check if we are out of ammo
+
             else :
                 # what should we be doing ??
 
@@ -173,16 +177,21 @@ class AIMan(AIBase):
                     self.ai_state='start_moving'
                 # do we need ammo ?
                 
+                # should we be engaging a enemy? 
+
                 # are we a soldier and are we far from our group?
                 if self.owner.is_soldier :
-                    # check distance from group 
-                    pass 
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.group.world_coords)
+                    if distance >50. :
+                        self.ai_goal='close_with_group'
+                        self.destination=copy.copy(self.group.world_coords)
+                        self.time_since_ai_transition=0
+                        self.ai_state='start_moving'
 
 
         if self.ai_state=='moving':
             # move towards target
-            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed) 
-                  
+            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed)           
         elif self.ai_state=='engaging':
             self.fire(self.target_object.world_coords)
         elif self.ai_state=='sleeping':
