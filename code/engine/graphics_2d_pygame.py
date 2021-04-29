@@ -264,6 +264,9 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue.append('FPS: '+str(int(self.clock.get_fps())))
         self.debug_text_queue.append('World Objects: '+ str(len(self.world.wo_objects)))
         self.debug_text_queue.append('Rendered Objects: '+ str(self.renderCount))
+        self.debug_text_queue.append('Germans: '+ str(len(self.world.wo_objects_german)))
+        self.debug_text_queue.append('Soviets: '+ str(len(self.world.wo_objects_soviet)))
+        self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
 
 #------------------------------------------------------------------------------
     def update_render_info(self):

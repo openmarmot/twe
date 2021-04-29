@@ -18,6 +18,7 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
 import engine.math_2d
 import engine.world_builder
+from ai.ai_faction_tactical import AIFactionTactical
 
 # module specific variables
 module_version='0.0' #module software version
@@ -29,13 +30,22 @@ module_last_update_date='April 05 2021' #date of last update
 class World(object):
     #---------------------------------------------------------------------------
     def __init__(self,SCREEN_SIZE):
+        
+        # tactical AIs
+        self.german_ai=AIFactionTactical()
+        self.soviet_ai=AIFactionTactical()
+        self.american_ai=AIFactionTactical()
 
 
         # object lists 
         self.wo_objects=[]
+        # not sure this one is used
         self.wo_objects_collision=[]
         self.wo_objects_human=[]
         self.wo_objects_guns=[]
+        self.wo_objects_german=[]
+        self.wo_objects_soviet=[]
+        self.wo_objects_american=[]
 
 
         self.entity_id = 0
@@ -53,6 +63,12 @@ class World(object):
             self.wo_objects_human.append(worldobject)
         if worldobject.is_gun:
             self.wo_objects_guns.append(worldobject)
+        if world_object.is_german:
+            self.wo_objects_german.append(worldobject)
+        if worldobject.is_soviet:
+            self.wo_objects_soviet.append(worldobject)
+        if worldobject.is_american:
+            self.wo_objects_american.append(worldobject)
 
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
@@ -106,6 +122,12 @@ class World(object):
             self.wo_objects_human.remove(worldobject)
         if worldobject.is_gun:
             self.wo_objects_guns.remove(worldobject)
+        if world_object.is_german:
+            self.wo_objects_german.remove(worldobject)
+        if worldobject.is_soviet:
+            self.wo_objects_soviet.remove(worldobject)
+        if worldobject.is_american:
+            self.wo_objects_american.remove(worldobject)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -133,6 +155,11 @@ class World(object):
 
         for b in self.wo_objects:
             b.update()
+
+        # temporary for now 
+        german_ai.update()
+        soviet_ai.update()
+        american_ai.update()
 
 
 

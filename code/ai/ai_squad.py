@@ -22,13 +22,29 @@ module_last_update_date='April 21 2021' #date of last update
 #global variables
 
 class AISquad(object):
-    def __init__(self):
+    def __init__(self,WORLD):
+
+        self.world=World
+        # controls how fast he group world_coords moves. 
+        # not sure what a good speed is
+        self.speed=50
 
         # ai in the group will try to stay close to the group world coords
+        # moves towards destination
         self.world_coords=[0.,0.]
+
+        # destination - this is set by the faction tactical ai
+        self.destination=[0.,0.]
         # people in the squad 
         self.members=[] 
 
+        # near enemies
+        self.near_enemies=[]
+
+        # faction - german/soviet/american
+        self.faction='none'
+
+        self.time_since_enemy_update=0.
     
     #---------------------------------------------------------------------------
     def spawn_on_map():
@@ -40,6 +56,29 @@ class AISquad(object):
 
     #---------------------------------------------------------------------------
     def update(self):
-        pass
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        self.time_since_enemy_update+=time_passed
+        
+        # update enemy list every 5 seconds or so
+        if self.time_since_enemy_update>5:
+            self.update_near_enemy_list
+
+        # update location ??
+        self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
+
 
     #---------------------------------------------------------------------------
+    def update_near_enemy_list():
+        enemylist=[]
+        self.near_enemies=[]
+        if self.faction=='german':
+            enemylist=self.world.wo_objects_soviet+self.world.wo_objects_american
+        elif self.faction=='american':
+            enemylist=self.world.wo_objects_soviet+self.world.wo_objects_german
+        elif self.faction=='soviet':
+            enemylist=self.world.wo_objects_german+self.world.wo_objects_american
+        
+        for b in enemylist:
+            d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
+            if d<500:
+                self.near_enemies.append(b)

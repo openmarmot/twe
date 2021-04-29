@@ -155,6 +155,8 @@ def load_test_environment(world):
     spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
     spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
 
+    # create and spawn german squad
+    world.german_ai.squads.append(spawn_squad(world[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
 
 #------------------------------------------------------------------------------    
 def spawn_cheese(world,world_coords,CHEESE_TYPE):
@@ -231,57 +233,7 @@ def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE,SPAWN):
         z.wo_start()
     return z
 
-#------------------------------------------------------------------------------
-def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
-    ''' returns ai_squad object populated with soldiers'''
 
-    s=AISquad()
-    s.world_coords=copy.copy(WORLD_COORDS)
-
-    if SQUAD_TYPE=='german_rifle_44':
-
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        s.members.append(z)
-        # mg
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
-        s.members.append(z)
-        # mg helper 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        s.members.append(z)
-        # mg helper 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        s.members.append(z)
-        # squad leader 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
-        s.members.append(z)
-    
-    return s
 #------------------------------------------------------------------------------
 def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
 
@@ -430,6 +382,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
+        z.is_geman=True
     if HUMAN_TYPE=='russian_soldier':
         z=WorldObject(WORLD,['russian_soldier'],AIMan)
         z.name='Boris Volvakov'
@@ -439,6 +392,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
+        z.is_soviet=True
     if SPAWN :
         z.wo_start()
     return z
@@ -506,6 +460,61 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+
+#------------------------------------------------------------------------------
+def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
+    ''' returns ai_squad object populated with soldiers'''
+
+    s=AISquad(WORLD)
+    s.world_coords=copy.copy(WORLD_COORDS)
+
+    if SQUAD_TYPE=='german_rifle_44':
+        s.faction='german'
+        # rifle
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # rifle 
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # rifle 
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        s.members.append(z)
+        # mg
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
+        s.members.append(z)
+        # mg helper 
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        s.members.append(z)
+        # mg helper 
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        s.members.append(z)
+        # squad leader 
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
+        s.members.append(z)
+    
+    # spawn - this needs to be done at some point - no reason to delay
+    s.spawn_on_map()
+
+    return s
 
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords):

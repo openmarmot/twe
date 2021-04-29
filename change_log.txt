@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+
+---------------------------------
+April 28 2021
+
+summary 
+- hacking together more ai code 
+- added world lists for german/soviet/american factions 
+- added squad mechanisms to update the squad position and near enemy list 
+    - this may more or less complete squad ai 
+    
+
+the number of lists im keeping track of keeps growing 
+     but - its an effective way of keeping searches fast 
+
+Im at the point where i need to figure out if the americans and soviets
+    are on the same side or not. of course they were in ww2 - but the 
+    game is set in the late war and is only roughly historical. having 
+    america and the soviets fight would be more interesting
+
 ---------------------------------
 April 27 2021
 

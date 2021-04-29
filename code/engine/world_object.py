@@ -77,7 +77,9 @@ class WorldObject(object):
         self.is_crate=False
         self.is_projectile=False
         self.is_consumable=False
-
+        self.is_german=False
+        self.is_soviet=False
+        self.is_american=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in

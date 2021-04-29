@@ -21,10 +21,14 @@ module_last_update_date='April 21 2021' #date of last update
 
 #global variables
 
-class AISquad(object):
+class AIFactionTactical(object):
     def __init__(self):
 
-        # ai in the group will try to stay close to the group world coords
-        self.world_coords=[0.,0.]
         # people in the squad 
-        self.members=[] 
+        self.squads=[] 
+
+    def update(self):
+
+        # squad doesn't do anything with update at the moment
+        for b in self.squads:
+            b.update()
