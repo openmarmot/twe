@@ -45,6 +45,16 @@ class AISquad(object):
         self.faction='none'
 
         self.time_since_enemy_update=0.
+
+    #---------------------------------------------------------------------------
+    def get_enemy():
+        ''' return a enemy if one exists '''
+
+        if len(self.near_enemies)>0:
+            # return last item in the list (and remove it from the list)
+            return self.near_enemies.pop()
+        else:
+            return None
     
     #---------------------------------------------------------------------------
     def spawn_on_map():

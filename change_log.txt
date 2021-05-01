@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+---------------------------------
+April 30 2021
+
+summary 
+- more work on tactical ai code 
+
+thinking about maps 
+- need points of interest that should be attacked/defended for objectives 
+- need to make more buildings and ground clutter 
+- need building group generation code 
+- in general i need code to procedurally generate maps with building clusters and points of interest 
+
+soldier AI could use a 'engaging while moving' 
+
+civilians do not currently have the ability to shoot things 
+- may change this in the future 
 
 ---------------------------------
 April 28 2021
@@ -9,7 +25,7 @@ summary
 - added world lists for german/soviet/american factions 
 - added squad mechanisms to update the squad position and near enemy list 
     - this may more or less complete squad ai 
-    
+
 
 the number of lists im keeping track of keeps growing 
      but - its an effective way of keeping searches fast 

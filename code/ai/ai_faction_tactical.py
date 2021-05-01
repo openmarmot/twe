@@ -24,11 +24,23 @@ module_last_update_date='April 21 2021' #date of last update
 class AIFactionTactical(object):
     def __init__(self):
 
-        # people in the squad 
+        # squads in the faction who are present on this map
         self.squads=[] 
+
+        # current ai state
+        self.ai_state='none'
+
+        # current ai goal
+        self.ai_goal='none'
+
+        # general map goal (attack/defend/scout ?)
 
     def update(self):
 
-        # squad doesn't do anything with update at the moment
+        # run the update for each squad
         for b in self.squads:
             b.update()
+
+        # set squad destinations to move squads around 
+
+

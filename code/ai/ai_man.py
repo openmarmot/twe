@@ -35,7 +35,7 @@ class AIMan(AIBase):
         self.ai_goal='none'
         self.time_since_ai_transition=0.
         # the ai group that this human is a part of 
-        self.group=None
+        self.squad=None
         self.target_object=None
         self.destination=None
     #---------------------------------------------------------------------------
@@ -177,16 +177,20 @@ class AIMan(AIBase):
                     self.ai_state='start_moving'
                 # do we need ammo ?
                 
-                # should we be engaging a enemy? 
 
                 # are we a soldier and are we far from our group?
                 if self.owner.is_soldier :
                     distance=engine.math_2d.get_distance(self.owner.world_coords,self.group.world_coords)
-                    if distance >50. :
+                    if distance >100. :
                         self.ai_goal='close_with_group'
                         self.destination=copy.copy(self.group.world_coords)
                         self.time_since_ai_transition=0
                         self.ai_state='start_moving'
+                    else:
+                        self.target_object=self.squad.get_enemy()
+                        if self.target_object!=None:
+                            self.ai_state='engaging'
+                            self.ai_goal='none'
 
 
         if self.ai_state=='moving':

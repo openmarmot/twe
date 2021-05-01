@@ -473,42 +473,52 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         # rifle
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # rifle 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # rifle 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.squad=s
         s.members.append(z)
         # mg
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
+        z.squad=s
         s.members.append(z)
         # mg helper 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.squad=s
         s.members.append(z)
         # mg helper 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.squad=s
         s.members.append(z)
         # squad leader 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
+        z.squad=s
         s.members.append(z)
     
     # spawn - this needs to be done at some point - no reason to delay
