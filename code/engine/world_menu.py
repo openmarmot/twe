@@ -156,12 +156,12 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas")
+                engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 5)
             elif Key=='3':
-                engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords)
+                engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords,True)
             elif Key=='4':
-                engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords)
+                engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords,True)
 
         

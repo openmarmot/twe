@@ -137,7 +137,7 @@ class AIMan(AIBase):
 
             if self.ai_state=='moving':
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
-                print('distance: '+distance)
+                print('distance: '+str(distance))
 
                 if self.ai_goal=='pickup':
                     if distance<5:
@@ -145,7 +145,7 @@ class AIMan(AIBase):
                         self.owner.add_inventory(self.target_object)
                         self.owner.world.remove_object(self.target_object)
                         self.ai_state='sleeping'
-                elif self.ai_goale=='close_with_target':
+                elif self.ai_goal=='close_with_target':
                     if distance<30:
                         print('in range of target')
                         self.owner.ai_state='engaging'
@@ -180,10 +180,13 @@ class AIMan(AIBase):
 
                 # are we a soldier and are we far from our group?
                 if self.owner.is_soldier :
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.group.world_coords)
+                    print(self.owner.name)
+                    print(self.owner.world_coords)
+                    print(self.squad.world_coords)
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
                     if distance >100. :
                         self.ai_goal='close_with_group'
-                        self.destination=copy.copy(self.group.world_coords)
+                        self.destination=copy.copy(self.squad.world_coords)
                         self.time_since_ai_transition=0
                         self.ai_state='start_moving'
                     else:

@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 03 2021
+
+summary 
+- fixed most of the bugs/logic errors/syntax errors in the new code 
+
+the AI is already behaving in ways that does not make sense to me at first glance 
+so i think i am getting close to feature parity with my old 3d game that this is based on 
+
+starting to rethink the recently implemented squad spawning. Instead of spawning pre-determined squads 
+i think maybe the system will keep track of individual humans and sort them into squad sizes when 
+spawned in map. this makes the main unit to keep track of in the future database the human (and vehicles i suppose)
+
+that way i can keep track of stats 
+
+note that the new 'civilians' are currently using zombie AI - i need to change that.
+civilians get the soldier AI minus the ability to belong to a squad and to attack things
+
+at the moment civilians don't get a faction and are therefore not targeted or noticed by the AI 
+
+---------------------------------
 April 30 2021
 
 summary 

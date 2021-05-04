@@ -54,21 +54,21 @@ class World(object):
         self.player=None
 
     #---------------------------------------------------------------------------
-    def add_object(self, worldobject):
+    def add_object(self, WORLD_OBJECT):
         #maybe should check if the object is already in there to prevent duplicates
-        self.wo_objects.append(worldobject)
-        if worldobject.collision:
-            self.wo_objects_collision.append(worldobject)
-        if worldobject.is_human:
-            self.wo_objects_human.append(worldobject)
-        if worldobject.is_gun:
-            self.wo_objects_guns.append(worldobject)
-        if world_object.is_german:
-            self.wo_objects_german.append(worldobject)
-        if worldobject.is_soviet:
-            self.wo_objects_soviet.append(worldobject)
-        if worldobject.is_american:
-            self.wo_objects_american.append(worldobject)
+        self.wo_objects.append(WORLD_OBJECT)
+        if WORLD_OBJECT.collision:
+            self.wo_objects_collision.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_human:
+            self.wo_objects_human.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_gun:
+            self.wo_objects_guns.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_german:
+            self.wo_objects_german.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_soviet:
+            self.wo_objects_soviet.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_american:
+            self.wo_objects_american.append(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
@@ -157,9 +157,9 @@ class World(object):
             b.update()
 
         # temporary for now 
-        german_ai.update()
-        soviet_ai.update()
-        american_ai.update()
+        self.german_ai.update()
+        self.soviet_ai.update()
+        self.american_ai.update()
 
 
 

@@ -24,7 +24,7 @@ module_last_update_date='April 21 2021' #date of last update
 class AISquad(object):
     def __init__(self,WORLD):
 
-        self.world=World
+        self.world=WORLD
         # controls how fast he group world_coords moves. 
         # not sure what a good speed is
         self.speed=50
@@ -47,7 +47,7 @@ class AISquad(object):
         self.time_since_enemy_update=0.
 
     #---------------------------------------------------------------------------
-    def get_enemy():
+    def get_enemy(self):
         ''' return a enemy if one exists '''
 
         if len(self.near_enemies)>0:
@@ -57,16 +57,16 @@ class AISquad(object):
             return None
     
     #---------------------------------------------------------------------------
-    def spawn_on_map():
+    def spawn_on_map(self):
         '''spawns the squad on the map at the squads world coords '''
 
         for b in self.members :
-            b.world_coords=[self.world_coords[0]+float(random.randint(-15,15),self.world_coords[1]+float(random.randint(-15,15)]
+            b.world_coords=[self.world_coords[0]+float(random.randint(-15,15)),self.world_coords[1]+float(random.randint(-15,15))]
             b.wo_start()
 
     #---------------------------------------------------------------------------
     def update(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        time_passed=self.world.graphic_engine.time_passed_seconds
         self.time_since_enemy_update+=time_passed
         
         # update enemy list every 5 seconds or so
