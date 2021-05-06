@@ -1,5 +1,173 @@
 TWE Project : Change Log
 
+
+---------------------------------
+May 05 2021
+
+summary 
+- testing random stuff after all the changes 
+- some bug fixing 
+- took civilians off of zombie AI. 
+    -civilian ai needs to be fleshed out more. they will grab guns but don't 
+    have the AI targeting code 
+- soldiers have a odd AI behavior where they walk in a line sometimes.
+    - might just have something to do with how the movement code works 
+
+if you want a gun you have to grab one quick before the civilians scoop them up 
+- currently if there are no guns and a bot wants one the game will spawn one 
+    - if you watch for this you can grab it first 
+
+I thought i had unique player art but apparently its the same as german_soldier. odd 
+- will have to fix this in the future 
+
+this update will probably get merged into master as it has no game breaking bugs (afaik)
+---------------------------------
+May 03 2021
+
+summary 
+- fixed most of the bugs/logic errors/syntax errors in the new code 
+
+the AI is already behaving in ways that does not make sense to me at first glance 
+so i think i am getting close to feature parity with my old 3d game that this is based on 
+
+starting to rethink the recently implemented squad spawning. Instead of spawning pre-determined squads 
+i think maybe the system will keep track of individual humans and sort them into squad sizes when 
+spawned in map. this makes the main unit to keep track of in the future database the human (and vehicles i suppose)
+
+that way i can keep track of stats 
+
+note that the new 'civilians' are currently using zombie AI - i need to change that.
+civilians get the soldier AI minus the ability to belong to a squad and to attack things
+
+at the moment civilians don't get a faction and are therefore not targeted or noticed by the AI 
+
+---------------------------------
+April 30 2021
+
+summary 
+- more work on tactical ai code 
+
+thinking about maps 
+- need points of interest that should be attacked/defended for objectives 
+- need to make more buildings and ground clutter 
+- need building group generation code 
+- in general i need code to procedurally generate maps with building clusters and points of interest 
+
+soldier AI could use a 'engaging while moving' 
+
+civilians do not currently have the ability to shoot things 
+- may change this in the future 
+
+---------------------------------
+April 28 2021
+
+summary 
+- hacking together more ai code 
+- added world lists for german/soviet/american factions 
+- added squad mechanisms to update the squad position and near enemy list 
+    - this may more or less complete squad ai 
+
+
+the number of lists im keeping track of keeps growing 
+     but - its an effective way of keeping searches fast 
+
+Im at the point where i need to figure out if the americans and soviets
+    are on the same side or not. of course they were in ww2 - but the 
+    game is set in the late war and is only roughly historical. having 
+    america and the soviets fight would be more interesting
+
+---------------------------------
+April 27 2021
+
+summary
+- renamed ai_group to ai_squad to better represent what it is 
+    - initially thought civilians would use this as well but i think it 
+        will be soldiers only 
+- some work on ai_squad 
+- world_builder squad spawning code 
+
+
+---------------------------------
+April 26 2021
+
+summary 
+- more work on the ai_man code 
+- reworked world_builder code to return the object 
+    - also added a bool as to whether it should be spawned in the world or not 
+    - this was needed as prep for spawning soldiers with equipment pre-equipped 
+
+did some reading on german squad Structure
+- trying to figure out if i want to keep track of every man, or 
+    every squad or what 
+- i need to read up on soviet organization as well - i am less familiar 
+    with it 
+
+
+---------------------------------
+April 23 2021
+
+summary
+-a bit more work on the ai system. 
+- added get_closest_gun to world
+    - required maintaining a gun list 
+not functioning or tested atm 
+
+---------------------------------
+April 22 2021
+
+working on the main ai state system for ai_man 
+- quite a bit more work to do here. not functional at the moment 
+
+---------------------------------
+April 21 2021
+
+summary 
+- added weapons : mg34, kar98k, mosin nagant
+- added a human civilian object 
+    - just uses zombie AI at the moment. civilian AI coming 
+- reorg of some code 
+
+had a crash on the rotate image call in graphics_engine 
+- first time this happened and it did not repeat
+- possibly to do with a random starting rotation value being wrong?
+
+---------------------------------
+April 20 2021
+
+thinking about AI. 
+I think I will reimplement the main ai concept from 
+my previous game where soldiers are in a group and basically just 
+follow around the groups central location. the group itself then 
+makes the decisions as far as where to go, etc 
+
+the group gets marching orders from the faction tactical ai 
+
+Factions 
+- german : major faction, in the decline 
+- russian : major faction, power is on the rise 
+- america : major faction - starts as maybe two small isolated areas 
+- civilian : true neutral 
+- partisian : opposed to all major factions, poorly equipped 
+
+General AI Structure 
+ai_faction_strategic : strategic map decision (think axis and allies)
+ai_faction_tactical : tactical map decision 
+ai_group : unit (squad) ai 
+ai_man : individual human ai 
+
+---------------------------------
+April 19 2021
+
+summary 
+- organized the images folder with some sub folders as the amount of 
+    art continues to grow 
+- minor change to menus to have them display the object name 
+- added 4 different german cheese 'rations' - it gives you a massive health boost. just like in real life 
+
+I want to add more small objects although the scale of the game would 
+make them too tiny to see. the compromise is to make them slightly too large 
+
+Overall scale in this game is kind of fuzzy 
 ---------------------------------
 April 18 2021
 

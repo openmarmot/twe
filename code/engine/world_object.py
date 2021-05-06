@@ -68,12 +68,18 @@ class WorldObject(object):
         self.is_player=False
         self.is_human=False
         self.is_zombie=False
+        self.is_civilian=False
+        self.is_soldier=False
         self.is_vehicle=False
         self.is_gun=False
+        self.is_grenade=False
         self.is_gun_mag_carrier=False
         self.is_crate=False
         self.is_projectile=False
-
+        self.is_consumable=False
+        self.is_german=False
+        self.is_soviet=False
+        self.is_american=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in

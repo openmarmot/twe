@@ -17,9 +17,7 @@ contains the main loop.
 import random
 
 #import custom packages
-
 import engine.world_builder
-
 
 # module specific variables
 module_version='0.1' #module software version
