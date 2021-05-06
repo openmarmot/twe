@@ -10,7 +10,9 @@ The world class should handle all of the world logic and world objects.
 It should not have any specific graphic engine code (pygame, etc)
 '''
 
-
+#import built in modules
+import random
+import copy 
 
 
 #import custom packages
@@ -105,7 +107,7 @@ class World(object):
                 best_object=b
         if best_object==None:
             # spawn a new gun and return it
-            engine.world_builder.spawn_gun(world,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'mp40')
+            engine.world_builder.spawn_gun(self,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'ppk',True)
             # hmm we don't have the object reference, so lets just run this method again
             # does this make sense? am i insane? HA HA HAHAHAHA
             print('warning mind bender insane o loop activated in world.get_closest_gun')
@@ -113,21 +115,21 @@ class World(object):
         else : 
             return best_object
     #---------------------------------------------------------------------------
-    def remove_object(self, worldobject):
-        if worldobject in self.wo_objects:
-            self.wo_objects.remove(worldobject)
-        if worldobject.collision and worldobject in self.wo_objects_collision:
-            self.wo_objects_collision.remove(worldobject)
-        if worldobject.is_human:
-            self.wo_objects_human.remove(worldobject)
-        if worldobject.is_gun:
-            self.wo_objects_guns.remove(worldobject)
-        if world_object.is_german:
-            self.wo_objects_german.remove(worldobject)
-        if worldobject.is_soviet:
-            self.wo_objects_soviet.remove(worldobject)
-        if worldobject.is_american:
-            self.wo_objects_american.remove(worldobject)
+    def remove_object(self, WORLDOBJECT):
+        if WORLDOBJECT in self.wo_objects:
+            self.wo_objects.remove(WORLDOBJECT)
+        if WORLDOBJECT.collision and WORLDOBJECT in self.wo_objects_collision:
+            self.wo_objects_collision.remove(WORLDOBJECT)
+        if WORLDOBJECT.is_human:
+            self.wo_objects_human.remove(WORLDOBJECT)
+        if WORLDOBJECT.is_gun:
+            self.wo_objects_guns.remove(WORLDOBJECT)
+        if WORLDOBJECT.is_german:
+            self.wo_objects_german.remove(WORLDOBJECT)
+        if WORLDOBJECT.is_soviet:
+            self.wo_objects_soviet.remove(WORLDOBJECT)
+        if WORLDOBJECT.is_american:
+            self.wo_objects_american.remove(WORLDOBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):

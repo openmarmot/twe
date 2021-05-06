@@ -1,5 +1,26 @@
 TWE Project : Change Log
 
+
+---------------------------------
+May 05 2021
+
+summary 
+- testing random stuff after all the changes 
+- some bug fixing 
+- took civilians off of zombie AI. 
+    -civilian ai needs to be fleshed out more. they will grab guns but don't 
+    have the AI targeting code 
+- soldiers have a odd AI behavior where they walk in a line sometimes.
+    - might just have something to do with how the movement code works 
+
+if you want a gun you have to grab one quick before the civilians scoop them up 
+- currently if there are no guns and a bot wants one the game will spawn one 
+    - if you watch for this you can grab it first 
+
+I thought i had unique player art but apparently its the same as german_soldier. odd 
+- will have to fix this in the future 
+
+this update will probably get merged into master as it has no game breaking bugs (afaik)
 ---------------------------------
 May 03 2021
 

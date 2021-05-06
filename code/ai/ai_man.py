@@ -34,6 +34,7 @@ class AIMan(AIBase):
         self.ai_state='none'
         self.ai_goal='none'
         self.time_since_ai_transition=0.
+        self.ai_think_rate=0
         # the ai group that this human is a part of 
         self.squad=None
         self.target_object=None
@@ -44,7 +45,7 @@ class AIMan(AIBase):
 
         # -- general stuff for all objects --
         if self.health<1:
-            print('d e d : dead')
+            print(self.owner.name+' has died')
             self.owner.world.remove_object(self.owner)
 
         if self.primary_weapon!=None:
@@ -127,28 +128,39 @@ class AIMan(AIBase):
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
-        ''' handle code for civilian AI '''
+        ''' handle code for civilians and soldiers '''
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         self.time_since_ai_transition+=time_passed
 
-        if self.time_since_ai_transition>2. :
+        if self.time_since_ai_transition>self.ai_think_rate :
             # this is basically a thinking state - assess current progress
             self.time_since_ai_transition=0
 
+            # set the time before the next update
+            self.ai_think_rate=random.uniform(0.5,4)
+
             if self.ai_state=='moving':
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
-                print('distance: '+str(distance))
+                #print('distance: '+str(distance))
 
                 if self.ai_goal=='pickup':
                     if distance<5:
                         print('pickup thingy')
-                        self.owner.add_inventory(self.target_object)
-                        self.owner.world.remove_object(self.target_object)
+                        if self.target_object in self.owner.world.wo_objects:
+                            self.owner.add_inventory(self.target_object)
+                            self.owner.world.remove_object(self.target_object)
+                        else:
+                            # hmm object is gone. someone else must have grabbed it
+                            print('robbed!!')
                         self.ai_state='sleeping'
                 elif self.ai_goal=='close_with_target':
                     if distance<30:
                         print('in range of target')
-                        self.owner.ai_state='engaging'
+                        self.ai_state='engaging'
+                else:
+                    # catchall for random moving related goals:
+                    if distance<3:
+                        self.ai_state='sleeping'
             elif self.ai_state=='engaging':
                 # check if target is dead 
                 if self.target_object.ai.health<1:
@@ -166,25 +178,24 @@ class AIMan(AIBase):
             else :
                 # what should we be doing ??
 
-                # are we low on health? 
-                if self.health<50:
-                    pass
-                # do we need a gun ?
-                elif self.primary_weapon==None :
-                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-                # do we need ammo ?
-                
-
-                # are we a soldier and are we far from our group?
+                #---- soldier ------------------------------------------------------
                 if self.owner.is_soldier :
-                    print(self.owner.name)
-                    print(self.owner.world_coords)
-                    print(self.squad.world_coords)
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                    if distance >100. :
+
+                    # distance from group 
+                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+                    
+                    # are we low on health? 
+                    if self.health<50:
+                        pass
+                    # do we need a gun ?
+                    elif self.primary_weapon==None :
+                        self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                        self.ai_goal='pickup'
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'
+                    # do we need ammo ?
+                    # are we too far from the group?
+                    elif distance_group >100. :
                         self.ai_goal='close_with_group'
                         self.destination=copy.copy(self.squad.world_coords)
                         self.time_since_ai_transition=0
@@ -194,6 +205,39 @@ class AIMan(AIBase):
                         if self.target_object!=None:
                             self.ai_state='engaging'
                             self.ai_goal='none'
+                        else:
+                            # health is good
+                            # weapon is good
+                            # we are near the group
+                            # there are no enemies to engage
+                            # hunt for cheese??
+                            # nah lets just wander around a bit
+                            self.ai_goal='booored'
+                            # soldier gets a much tighter roam distance than civilians
+                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                            self.ai_state='start_moving'
+
+                #---- civilian ---------------------------------------------------------------
+                else  :
+
+                    # are we low on health? 
+                    if self.health<50:
+                        pass
+                    # do we need a gun ?
+                    elif self.primary_weapon==None :
+                        self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                        self.ai_goal='pickup'
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'
+                    # do we need ammo ?
+                    else:
+                        # health is good
+                        # weapon is good
+                        # hunt for cheese??
+                        # nah lets just wander around a bit
+                        self.ai_goal='booored'
+                        self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
+                        self.ai_state='start_moving'
 
 
         if self.ai_state=='moving':

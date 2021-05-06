@@ -206,7 +206,7 @@ def spawn_blood_splatter(world,world_coords):
     z.wo_start()   
 
 #------------------------------------------------------------------------------
-def spawn_crate(world,world_coords, crate_type):
+def spawn_crate(world,world_coords, crate_type,SPAWN):
     # crate_type -- string denoting crate type 
     z=WorldObject(world,['crate'],AINone)
     z.world_coords=copy.copy(world_coords)
@@ -373,7 +373,6 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
-        z.is_zombie=True # turn on for now so it gets zombie AI
         z.is_civilian=True
     if HUMAN_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier'],AIMan)
