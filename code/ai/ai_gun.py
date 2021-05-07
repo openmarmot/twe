@@ -66,12 +66,15 @@ class AIGun(AIBase):
                 # auto reload ?
                 if self.equipper.is_player:
                     print("magazine empty")
-                    # infinite ammo cheat for now
-                    self.magazine=self.mag_capacity
+                # infinite ammo cheat for now
+                self.magazine=self.mag_capacity
             else :
                 self.magazine-=1
                 if self.equipper.is_player:
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],True)
+                elif self.equipper.is_soldier:
+                    # make the squad immune to prevent friendly fire
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,self.equipper.ai.squad.members,False)
                 else:
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],False)
 

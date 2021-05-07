@@ -46,6 +46,9 @@ class AIMan(AIBase):
         # -- general stuff for all objects --
         if self.health<1:
             print(self.owner.name+' has died')
+            for b in self.owner.inventory:
+                b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+                self.owner.world.add_object(b)
             self.owner.world.remove_object(self.owner)
 
         if self.primary_weapon!=None:
@@ -136,7 +139,7 @@ class AIMan(AIBase):
         self.time_since_ai_transition=0
 
         # randomize time before we hit this method again
-        self.ai_think_rate=random.uniform(0.5,4)
+        self.ai_think_rate=random.uniform(0.1,1.5)
 
         if self.ai_state=='moving':
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
@@ -153,9 +156,21 @@ class AIMan(AIBase):
                         print('robbed!!')
                     self.ai_state='sleeping'
             elif self.ai_goal=='close_with_target':
-                if distance<30:
+                # check if target is dead 
+                if self.target_object.ai.health<1:
+                    self.ai_state='sleeping'
+                    self.ai_goal='none'
+                    self.target_object=None
+                elif distance<200:
                     print('in range of target')
                     self.ai_state='engaging'
+                    self.ai_goal='none'
+                else:
+                    # reset the destination coordinates
+                    self.ai_goal='close_with_target'
+                    self.destination=copy.copy(self.target_object.world_coords)
+                    self.ai_state='start_moving'
+                    print('close with target')
             else:
                 # catchall for random moving related goals:
                 if distance<3:
@@ -164,13 +179,16 @@ class AIMan(AIBase):
             # check if target is dead 
             if self.target_object.ai.health<1:
                 self.ai_state='sleeping'
-            
-            # check if target is too far 
-            distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-            if distance >50. :
-                self.ai_goal='close_with_target'
-                self.destination=copy.copy(self.target_object.world_coords)
-                self.ai_state='start_moving'
+                self.ai_goal='none'
+                self.target_object=None
+            else:
+                # check if target is too far 
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
+                if distance >350. :
+                    self.ai_goal='close_with_target'
+                    self.destination=copy.copy(self.target_object.world_coords)
+                    self.ai_state='start_moving'
+                    print('closing with target')
 
             # check if we are out of ammo
 
@@ -199,6 +217,7 @@ class AIMan(AIBase):
                     self.destination=copy.copy(self.squad.world_coords)
                     self.time_since_ai_transition=0
                     self.ai_state='start_moving'
+                    print('getting closer to group')
                 else:
                     self.target_object=self.squad.get_enemy()
                     if self.target_object!=None:
@@ -215,6 +234,7 @@ class AIMan(AIBase):
                         # soldier gets a much tighter roam distance than civilians
                         self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                         self.ai_state='start_moving'
+                        print('soldier - bored')
 
             #---- civilian ---------------------------------------------------------------
             else  :

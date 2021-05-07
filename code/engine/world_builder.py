@@ -158,6 +158,9 @@ def load_test_environment(world):
     # create and spawn german squad
     world.german_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
 
+    # create a soviet squad 
+    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
+
 #------------------------------------------------------------------------------    
 def spawn_cheese(world,world_coords,CHEESE_TYPE):
     if CHEESE_TYPE=='adler-cheese':
@@ -383,7 +386,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
-        z.is_geman=True
+        z.is_german=True
     if HUMAN_TYPE=='russian_soldier':
         z=WorldObject(WORLD,['russian_soldier'],AIMan)
         z.name='Boris Volvakov'
@@ -472,6 +475,7 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
 
     s=AISquad(WORLD)
     s.world_coords=copy.copy(WORLD_COORDS)
+    s.destination=copy.copy(WORLD_COORDS)
 
     if SQUAD_TYPE=='german_rifle_44':
         s.faction='german'
@@ -522,6 +526,54 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         s.members.append(z)
         # squad leader 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
+        z.ai.squad=s
+        s.members.append(z)
+    if SQUAD_TYPE=='soviet_rifle_44':
+        # 9 man squad
+        s.faction='soviet'
+        # rifle
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # rifle 
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # rifle 
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # rifle
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # mg
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # mg helper 
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.ai.squad=s
+        s.members.append(z)
+        # squad leader 
+        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
         z.ai.squad=s
         s.members.append(z)
