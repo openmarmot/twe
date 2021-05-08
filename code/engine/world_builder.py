@@ -3,7 +3,6 @@
 module : world_builder.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes : 
 
@@ -121,7 +120,9 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
     #add a player
-    spawn_human(world, [50.,50.],'player',True)
+    p=spawn_human(world, [50.,50.],'player',True)
+    p.add_inventory(spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
+    p.add_inventory(spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
 
     # add civilians 
     spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
@@ -159,6 +160,7 @@ def load_test_environment(world):
     world.german_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
 
     # create a soviet squad 
+    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
     world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
 
 #------------------------------------------------------------------------------    
@@ -367,6 +369,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_player=True
         z.render_level=3
         z.is_human=True
+        z.is_german=True
         WORLD.player=z
     if HUMAN_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man'],AIMan)
@@ -424,24 +427,27 @@ def spawn_kubelwagen(world,world_coords,SPAWN):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,MOUSE_AIM):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=175.
-    z.ai.maxTime=6.
+    z.speed=200.
+    z.ai.maxTime=5.
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
-        z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
-        z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),WORLD.graphic_engine.get_mouse_screen_coords())
+        dst=WORLD.graphic_engine.get_mouse_screen_coords()
+        dst=[dst[0]+SPREAD[0],dst[1]+SPREAD[1]]
+        z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),dst)
+        z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),dst)
     else :
-        z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
-        z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
+        dst=[TARGET_COORDS[0]+SPREAD[0],TARGET_COORDS[1]+SPREAD[1]]
+        z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,dst)
+        z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
 
     z.wo_start()
 

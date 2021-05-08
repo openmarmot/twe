@@ -3,7 +3,6 @@
 module : ai_group.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes : AI that makes decisions for groups 
 '''

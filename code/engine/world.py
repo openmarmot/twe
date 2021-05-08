@@ -3,7 +3,6 @@
 module : engine.world.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 The world class should handle all of the world logic and world objects.
@@ -50,10 +49,12 @@ class World(object):
         self.wo_objects_american=[]
 
 
-        self.entity_id = 0
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
         self.player=None
+
+        # a way to pause the action
+        self.is_paused=False
 
     #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
@@ -144,24 +145,19 @@ class World(object):
     def unload_map(self):
         pass
 
-#    def get(self, entity_id):
-#
-#        if entity_id in self.wo_objects:
-#            return self.wo_objects[entity_id]
-#        else:
-#            return None
 
     #---------------------------------------------------------------------------
     def update(self):
         self.graphic_engine.update()
 
-        for b in self.wo_objects:
-            b.update()
+        if self.is_paused==False:
+            for b in self.wo_objects:
+                b.update()
 
-        # temporary for now 
-        self.german_ai.update()
-        self.soviet_ai.update()
-        self.american_ai.update()
+            # temporary for now 
+            self.german_ai.update()
+            self.soviet_ai.update()
+            self.american_ai.update()
 
 
 

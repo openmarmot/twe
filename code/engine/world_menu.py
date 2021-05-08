@@ -2,7 +2,6 @@
 module : world_menu.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu
@@ -42,8 +41,11 @@ class World_Menu(object):
         if Key=='tilde':
             if self.active_menu=='debug':
                 self.deactivate_menu()
+                self.world.is_paused=False
             else :
                 self.active_menu='debug'
+                self.world.is_paused=True
+                print('Game Paused')
 
         if Key=='esc':
             # exit any active menu
