@@ -119,10 +119,11 @@ def load_images(world):
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
+    # this is done by world menu now
     #add a player
-    p=spawn_human(world, [50.,50.],'player',True)
-    p.add_inventory(spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
-    p.add_inventory(spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
+    #p=spawn_human(world, [50.,50.],'player',True)
+    #p.add_inventory(spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
+    #p.add_inventory(spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
 
     # add civilians 
     spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
@@ -369,7 +370,6 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_player=True
         z.render_level=3
         z.is_human=True
-        z.is_german=True
         WORLD.player=z
     if HUMAN_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man'],AIMan)
@@ -540,32 +540,32 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         s.faction='soviet'
         # rifle
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # rifle 
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # rifle 
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # rifle
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
         z.ai.squad=s
         s.members.append(z)
         # mg
@@ -578,9 +578,9 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
         z.ai.squad=s
         s.members.append(z)
-        # squad leader 
+        # squad leader - does he get a smg??
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
         z.ai.squad=s
         s.members.append(z)
     

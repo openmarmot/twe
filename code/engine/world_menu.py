@@ -10,7 +10,7 @@ instantiated by the world class
 
 
 #import built in modules
-
+import random
 
 #import custom packages
 import engine.world_builder 
@@ -61,9 +61,12 @@ class World_Menu(object):
             self.crate_menu(Key)
         elif self.active_menu=='generic':
             self.generic_item_menu(Key)
+        elif self.active_menu=='start':
+            self.start_menu(Key)
         
 
     def activate_menu(self, Selected_Object):
+        ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
         # clear any current menu
         self.deactivate_menu()
         self.selected_object=Selected_Object
@@ -165,5 +168,44 @@ class World_Menu(object):
                 engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords,True)
             elif Key=='4':
                 engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords,True)
+
+    def start_menu(self, Key):
+        if self.menu_state=='none':
+            self.world.is_paused=True
+            # print out the basic menu
+            # eventually 'spawn' should get its own submenu
+            self.world.graphic_engine.menu_text_queue.append('TWE')
+            self.world.graphic_engine.menu_text_queue.append('---------------')
+            self.world.graphic_engine.menu_text_queue.append('Pick a Faction')
+            self.world.graphic_engine.menu_text_queue.append('1 - American')
+            self.world.graphic_engine.menu_text_queue.append('2 - German')
+            self.world.graphic_engine.menu_text_queue.append('3 - Soviet')
+            self.world.graphic_engine.menu_text_queue.append('4 - Civilian/Neutral')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            faction='none'
+            if Key=='1':
+                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'1911',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
+                self.world.player.is_american=True
+                self.world.wo_objects_american.append(self.world.player)
+            elif Key=='2':
+                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
+                self.world.player.is_german=True
+                self.world.wo_objects_german.append(self.world.player)
+            elif Key=='3':
+                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin-nagant',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
+                self.world.player.is_soviet=True
+                self.world.wo_objects_soviet.append(self.world.player)
+            elif Key=='4':
+                self.world.player.is_civilian=True
+            
+            if Key=='1' or Key=='2' or Key=='3' or Key=='4':
+                # eventually load other menus
+                self.world.is_paused=False
+                self.deactivate_menu()
+                engine.world_builder.load_test_environment(self.world)
 
         

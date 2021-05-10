@@ -31,7 +31,15 @@ SCREEN_SIZE = (800, 800)
 def run():
 
     world=engine.world_builder.initialize_world(SCREEN_SIZE)
-    engine.world_builder.load_test_environment(world)
+
+    # this has to be here because graphics engine uses player coords in its update
+    #  so it needs to be created
+    p=engine.world_builder.spawn_human(world, [50.,50.],'player',True)
+
+    world.world_menu.active_menu='start'
+    world.world_menu.menu_state='none'
+    # fake input to get the text added
+    world.world_menu.handle_input('none')
 
     while world.graphic_engine.quit==False:
 

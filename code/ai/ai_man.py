@@ -233,7 +233,7 @@ class AIMan(AIBase):
                         # soldier gets a much tighter roam distance than civilians
                         self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                         self.ai_state='start_moving'
-                        print('soldier - bored')
+                        #print('soldier - bored')
 
             #---- civilian ---------------------------------------------------------------
             else  :

@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+
+---------------------------------
+May 10 2021
+
+summary 
+- realized i had a mosin nagant in game already and updated 
+    the russian rifle squads to use only russian weapons 
+- added a basic start menu where you can pick a faction 
+    - civilians start without a weapon - usually you can find one pretty easily 
+- if the player is killed it sends out a ring of frags 
+    i did not intend this to happen, i think it must be a grenade in the 
+    inventory being dropped (which sets it off?)
+- created a known_issues.txt file. not sure if i will use it or not 
+
+the start menu is super low effort - it just uses the same code that in-game context 
+menus use. that is fine for now 
+
 ---------------------------------
 May 07 2021
 

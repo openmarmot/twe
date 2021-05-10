@@ -1,0 +1,20 @@
+
+Some issues that I am aware of 
+
+
+Minor Issues 
+- when grenades are thrown it seems they are not removed from inventory 
+    - inventory removal needs cleanup
+- you can select and pickup blood spots 
+- soldier ai seems to occasionally get stuck - not sure in what state but possibly movement 
+
+
+
+# ----- Major Issues -----
+
+- occasinonal crash on start with some sort of render math error 
+    File "/home/andrew/git/twe/code/engine/graphics_2d_pygame.py", line 216, in render
+        self.screen.blit(self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle), (x-w/2, y-h/2))
+    File "/home/andrew/git/twe/code/engine/graphics_2d_pygame.py", line 337, in get_rotated_image
+        rot_image = rot_image.subsurface(rot_rect).copy()
+    ValueError: subsurface rectangle outside surface area
