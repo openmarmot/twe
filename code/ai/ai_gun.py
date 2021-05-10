@@ -3,13 +3,13 @@
 module : ai_zombie.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 '''
 
 
 #import built in modules
+import random 
 
 #import custom packages
 from ai.ai_base import AIBase
@@ -37,6 +37,9 @@ class AIGun(AIBase):
 
         # fire rate in seconds?
         self.rate_of_fire=0.
+
+        # spread
+        self.spread=15
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
@@ -66,14 +69,18 @@ class AIGun(AIBase):
                 # auto reload ?
                 if self.equipper.is_player:
                     print("magazine empty")
-                    # infinite ammo cheat for now
-                    self.magazine=self.mag_capacity
+                # infinite ammo cheat for now
+                self.magazine=self.mag_capacity
             else :
                 self.magazine-=1
+                spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
                 if self.equipper.is_player:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],True)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],True)
+                elif self.equipper.is_soldier:
+                    # squad gets added to make immune to friendly fire
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,self.equipper.ai.squad.members,False)
                 else:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,[self.equipper],False)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False)
 
         
 

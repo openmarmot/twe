@@ -3,7 +3,6 @@
 module : math_2d.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes : 
 

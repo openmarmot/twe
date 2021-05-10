@@ -3,7 +3,6 @@
 module : ai_group.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes : AI that makes decisions for groups 
 '''
@@ -71,14 +70,15 @@ class AISquad(object):
         
         # update enemy list every 5 seconds or so
         if self.time_since_enemy_update>5:
-            self.update_near_enemy_list
+            self.time_since_enemy_update=0
+            self.update_near_enemy_list()
 
         # update location ??
         self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
 
 
     #---------------------------------------------------------------------------
-    def update_near_enemy_list():
+    def update_near_enemy_list(self):
         enemylist=[]
         self.near_enemies=[]
         if self.faction=='german':
@@ -87,8 +87,10 @@ class AISquad(object):
             enemylist=self.world.wo_objects_soviet+self.world.wo_objects_german
         elif self.faction=='soviet':
             enemylist=self.world.wo_objects_german+self.world.wo_objects_american
+        else:
+            print('error! unknown squad!')
         
         for b in enemylist:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
-            if d<500:
+            if d<1500:
                 self.near_enemies.append(b)

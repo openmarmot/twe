@@ -2,6 +2,49 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 10 2021
+
+summary 
+- realized i had a mosin nagant in game already and updated 
+    the russian rifle squads to use only russian weapons 
+- added a basic start menu where you can pick a faction 
+    - civilians start without a weapon - usually you can find one pretty easily 
+- if the player is killed it sends out a ring of frags 
+    i did not intend this to happen, i think it must be a grenade in the 
+    inventory being dropped (which sets it off?)
+- created a known_issues.txt file. not sure if i will use it or not 
+
+the start menu is super low effort - it just uses the same code that in-game context 
+menus use. that is fine for now 
+
+---------------------------------
+May 07 2021
+
+summary 
+- added bullet spread in an attempt to reduce lethality 
+    - may have made bots more dangerous
+- added a second russian team 
+- made player german for now to test combat -- need to make a game entry point/menu 
+- added a bool in 'world' that pauses the game 
+    - may be used for a future entry point menu 
+
+next big need seems to be a start menu for the game 
+
+there is no reaction when the player dies - something needs to happen there 
+
+---------------------------------
+May 06 2021
+
+summary 
+- added a russian rifle squad so i could start bug testing combat ai 
+- made a lot of changes to soldier ai but im still not happy with it 
+- added code to make inventory drop when someone dies 
+
+combat ai was super bad when i started work today. now its just bad
+I fixed a lot of bugs and cut the wait on ai think down from a max of 5 to a max of 2.
+I think the whole thing kind of needs a rewrite 
+
+---------------------------------
 May 05 2021
 
 summary 
