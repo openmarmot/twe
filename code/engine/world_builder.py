@@ -82,6 +82,7 @@ def load_images(world):
     world.graphic_engine.loadImage('kar98k','images/weapons/kar98k.png')
     world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
     world.graphic_engine.loadImage('mosin-nagant','images/weapons/mosin-nagant.png')
+    world.graphic_engine.loadImage('ppsh43','images/weapons/ppsh43.png')
 
     # airplanes
     world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
@@ -252,6 +253,17 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=32
         z.ai.mag_capacity=32
+        z.ai.rate_of_fire=0.12
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    if GUN_TYPE=='ppsh43':
+        z=WorldObject(world,['ppsh43'],AIGun)
+        z.name='ppsh43'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=35
+        z.ai.mag_capacity=35
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -432,7 +444,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=200.
+    z.speed=300.
     z.ai.maxTime=5.
     z.is_projectile=True
     z.render_level=3
@@ -522,12 +534,12 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         s.members.append(z)
         # mg helper 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'ppk',False))
         z.ai.squad=s
         s.members.append(z)
         # mg helper 
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'ppk',False))
         z.ai.squad=s
         s.members.append(z)
         # squad leader 
@@ -580,7 +592,7 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
         s.members.append(z)
         # squad leader - does he get a smg??
         z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.add_inventory(spawn_gun(WORLD,[0,0],'ppsh43',False))
         z.ai.squad=s
         s.members.append(z)
     

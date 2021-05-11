@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 11 2021
+
+summary 
+- added ppsh43 (35 round mag)
+    - changed soviet player spawn to use ppsh43
+    - changed soviet squad squad lead to ppsh43 from pistol 
+
+
+
+---------------------------------
 May 10 2021
 
 summary 
@@ -13,6 +23,8 @@ summary
     i did not intend this to happen, i think it must be a grenade in the 
     inventory being dropped (which sets it off?)
 - created a known_issues.txt file. not sure if i will use it or not 
+- increased bullet speed again. not sure how fast i want to get.
+     they are still dodgeable at the moment 
 
 the start menu is super low effort - it just uses the same code that in-game context 
 menus use. that is fine for now 

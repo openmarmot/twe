@@ -195,7 +195,7 @@ class World_Menu(object):
                 self.world.player.is_german=True
                 self.world.wo_objects_german.append(self.world.player)
             elif Key=='3':
-                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin-nagant',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'ppsh43',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
                 self.world.player.is_soviet=True
                 self.world.wo_objects_soviet.append(self.world.player)
