@@ -8,7 +8,10 @@ summary
 - added ppsh43 (35 round mag)
     - changed soviet player spawn to use ppsh43
     - changed soviet squad squad lead to ppsh43 from pistol 
-
+- some bug fixes 
+- moved mouse object select function to world.py as it will be 
+    using object lists so that you can't accidentally select blood spots 
+- started adding in basic code needed for future vehicle support
 
 
 ---------------------------------

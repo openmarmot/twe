@@ -41,10 +41,10 @@ class World_Menu(object):
         if Key=='tilde':
             if self.active_menu=='debug':
                 self.deactivate_menu()
-                self.world.is_paused=False
+                #self.world.is_paused=False
             else :
                 self.active_menu='debug'
-                self.world.is_paused=True
+                #self.world.is_paused=True
                 print('Game Paused')
 
         if Key=='esc':
@@ -144,10 +144,22 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('--Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter (not implemented)')
+            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit (partially implemented)')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             self.menu_state='base'
-            
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            if Key=='2':
+                # enter the vehicle 
+                self.selected_object.add_inventory(self.world.player)
+                # remove the player from the world so we don't have a ghost
+                self.world.remove_object(self.world.player)
+                # reset player reference so the game doesn't break
+                self.world.player=self.selected_object
+                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                self.deactivate_menu()
+
 
     def debug_menu(self, Key):
         if self.menu_state=='none':
@@ -165,7 +177,7 @@ class World_Menu(object):
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 5)
             elif Key=='3':
-                engine.world_builder.spawn_kubelwagen(self.world, self.world.player.world_coords,True)
+                engine.world_builder.spawn_vehicle(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':
                 engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords,True)
 

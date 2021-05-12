@@ -153,10 +153,10 @@ def load_test_environment(world):
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
     #cheese 
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
 
     # create and spawn german squad
     world.german_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
@@ -166,8 +166,8 @@ def load_test_environment(world):
     world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
 
 #------------------------------------------------------------------------------    
-def spawn_cheese(world,world_coords,CHEESE_TYPE):
-    if CHEESE_TYPE=='adler-cheese':
+def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
+    if CONSUMABLE_TYPE=='adler-cheese':
         z=WorldObject(world,['adler-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -176,7 +176,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='camembert-cheese':
+    if CONSUMABLE_TYPE=='camembert-cheese':
         z=WorldObject(world,['camembert-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -185,7 +185,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='champignon-cheese':
+    if CONSUMABLE_TYPE=='champignon-cheese':
         z=WorldObject(world,['champignon-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -194,7 +194,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='karwendel-cheese':
+    if CONSUMABLE_TYPE=='karwendel-cheese':
         z=WorldObject(world,['karwendel-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -428,17 +428,6 @@ def spawn_ju88(world,world_coords,SPAWN):
 
 
 #------------------------------------------------------------------------------
-def spawn_kubelwagen(world,world_coords,SPAWN):
-    z=WorldObject(world,['kubelwagen'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.is_vehicle=True
-    z.render_level=3
-    if SPAWN :
-        z.wo_start()
-    return z
-
-
-#------------------------------------------------------------------------------
 def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['projectile'],AIProjectile)
@@ -600,6 +589,18 @@ def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
     s.spawn_on_map()
 
     return s
+
+#------------------------------------------------------------------------------
+def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
+
+    if VEHICLE_TYPE=='kubelwagen':
+        z=WorldObject(WORLD,['kubelwagen'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_vehicle=True
+        z.render_level=3
+        if SPAWN :
+            z.wo_start()
+        return z
 
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords,SPAWN):

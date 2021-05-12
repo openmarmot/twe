@@ -27,7 +27,7 @@ class AIBase(object):
 	def update(self):
 		pass
 
-	def handleEvent(self, EVENT, EVENT_DATA):
+	def handle_event(self, EVENT, EVENT_DATA):
 		# EVENT - text describing event
         # EVENT_DATA - most likely a world_object but could be anything
 		pass
