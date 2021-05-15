@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+May 13 2021
+- some debugging/playtesting. minor 
+
 ---------------------------------
 May 11 2021
 
