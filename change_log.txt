@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 
+---------------------------------
+May 15 2021
+
+summary 
+- added spawn_soldier function to world_builder 
+    - basically spawns a human + equipement in their inventory 
+
+starting a rewrite of the squad system. I want the game to 
+track individual humans and dynamically squad them when they are 
+spawned. need some sort of template system for squads 
+
+world_builder is getting absolutely massive. I may break 
+some stuff off into a new file but i need to think of a 
+way to break it off that makes sense 
+
 
 ---------------------------------
 May 13 2021
