@@ -47,7 +47,7 @@ module_last_update_date='april 27 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
-def create_squads(WORLD,SOLDIERS):
+def create_squads(WORLD,SOLDIERS,FACTION):
     assault_rifles=[]
     rifles=[]
     semiauto_rifles=[]
@@ -67,13 +67,13 @@ def create_squads(WORLD,SOLDIERS):
             assault_rifles.append(b)
         elif b.ai.primary_weapon.name=='mp40':
             subguns.append(b)
-        elif b.ai_primary_weapon.name=='mg34':
+        elif b.ai.primary_weapon.name=='mg34':
             machineguns.append(b)
-        elif b.ai_primary_weapon.name=='mosin_nagant':
+        elif b.ai.primary_weapon.name=='mosin_nagant':
             rifles.append(b)
-        elif b.ai_primary_weapon.name=='ppsh43':
+        elif b.ai.primary_weapon.name=='ppsh43':
             subguns.append(b)
-        elif b.ai_primary_weapon.name=='dp28':
+        elif b.ai.primary_weapon.name=='dp28':
             machineguns.append(b)
 
     squad_list=[]
@@ -85,6 +85,7 @@ def create_squads(WORLD,SOLDIERS):
             buildsquads=False
         else :
             s=AISquad(WORLD)
+            s.faction=FACTION
 
             # -- build a rifle squad --
             if len(rifles)>7 :
@@ -187,7 +188,7 @@ def load_images(world):
     world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
     world.graphic_engine.loadImage('kar98k','images/weapons/kar98k.png')
     world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
-    world.graphic_engine.loadImage('mosin-nagant','images/weapons/mosin_nagant.png')
+    world.graphic_engine.loadImage('mosin_nagant','images/weapons/mosin_nagant.png')
     world.graphic_engine.loadImage('ppsh43','images/weapons/ppsh43.png')
 
     # airplanes
@@ -244,6 +245,7 @@ def load_test_environment(world):
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
 
 
     # and some grenades! 
@@ -284,7 +286,7 @@ def load_test_environment(world):
 
     
     # create german squads
-    world.german_ai.squads=create_squads(world,s)
+    world.german_ai.squads=create_squads(world,s,'german')
 
     # add ze russians
     s=[]
@@ -306,7 +308,11 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'soviet_ppsh43'))
 
     # create soviet squads 
-    world.soviet_ai.squads=create_squads(world,s)
+    world.soviet_ai.squads=create_squads(world,s,'soviet')
+
+    # spawn
+    world.german_ai.spawn_on_map()
+    world.soviet_ai.spawn_on_map()
 
 #------------------------------------------------------------------------------    
 def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):

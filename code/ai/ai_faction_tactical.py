@@ -35,6 +35,14 @@ class AIFactionTactical(object):
 
         # general map goal (attack/defend/scout ?)
 
+    def spawn_on_map(self):
+        for b in self.squads:
+            # random locations is temporary for now
+            b.world_coords=[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))]
+            b.destination=[float(random.randint(-200,200)),float(random.randint(-200,200))]
+            
+            b.spawn_on_map()
+
     def update(self):
 
         # run the update for each squad

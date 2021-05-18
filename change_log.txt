@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+May 17 2021
+
+summary 
+- bug fixes/code cleanup
+- realized that you could no longer pickup grenades or cheese 
+    - added two wo_object lists to cover these categories and added mouse select code 
+
+The new squad generation system is up and running 
+old system : you spawn a pre-defined squad (8 rifleman, 1 mg, 1 smg, etc )
+new system : you create soldiers and then the code builds squads based on the solder type and availability 
+
+the reason behind this is i want to eventually have a database that is keeping track of individual soldiers
+i don't want to track squads so that will be generated 
+
 ---------------------------------
 May 15 2021
 
