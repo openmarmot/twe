@@ -15,7 +15,7 @@ import random
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 21 2021' #date of last update
+module_last_update_date='May 17 2021' #date of last update
 
 
 #global variables
@@ -60,6 +60,8 @@ class AISquad(object):
         '''spawns the squad on the map at the squads world coords '''
 
         for b in self.members :
+            # set the squad - i don't think this is set anywhere else
+            b.ai.squad=self
             b.world_coords=[self.world_coords[0]+float(random.randint(-15,15)),self.world_coords[1]+float(random.randint(-15,15))]
             b.wo_start()
 

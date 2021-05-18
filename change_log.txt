@@ -1,6 +1,55 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+May 17 2021
+
+summary 
+- bug fixes/code cleanup
+- realized that you could no longer pickup grenades or cheese 
+    - added two wo_object lists to cover these categories and added mouse select code 
+
+The new squad generation system is up and running 
+old system : you spawn a pre-defined squad (8 rifleman, 1 mg, 1 smg, etc )
+new system : you create soldiers and then the code builds squads based on the solder type and availability 
+
+the reason behind this is i want to eventually have a database that is keeping track of individual soldiers
+i don't want to track squads so that will be generated 
+
+---------------------------------
+May 15 2021
+
+summary 
+- added spawn_soldier function to world_builder 
+    - basically spawns a human + equipement in their inventory 
+
+starting a rewrite of the squad system. I want the game to 
+track individual humans and dynamically squad them when they are 
+spawned. need some sort of template system for squads 
+
+world_builder is getting absolutely massive. I may break 
+some stuff off into a new file but i need to think of a 
+way to break it off that makes sense 
+
+
+---------------------------------
+May 13 2021
+- some debugging/playtesting. minor 
+
+---------------------------------
+May 11 2021
+
+summary 
+- added ppsh43 (35 round mag)
+    - changed soviet player spawn to use ppsh43
+    - changed soviet squad squad lead to ppsh43 from pistol 
+- some bug fixes 
+- moved mouse object select function to world.py as it will be 
+    using object lists so that you can't accidentally select blood spots 
+- started adding in basic code needed for future vehicle support
+
+
 ---------------------------------
 May 10 2021
 
@@ -13,6 +62,8 @@ summary
     i did not intend this to happen, i think it must be a grenade in the 
     inventory being dropped (which sets it off?)
 - created a known_issues.txt file. not sure if i will use it or not 
+- increased bullet speed again. not sure how fast i want to get.
+     they are still dodgeable at the moment 
 
 the start menu is super low effort - it just uses the same code that in-game context 
 menus use. that is fine for now 

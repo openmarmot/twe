@@ -23,7 +23,7 @@ from ai.ai_faction_tactical import AIFactionTactical
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 05 2021' #date of last update
+module_last_update_date='May 17 2021' #date of last update
 
 #global variables
 
@@ -47,6 +47,9 @@ class World(object):
         self.wo_objects_german=[]
         self.wo_objects_soviet=[]
         self.wo_objects_american=[]
+        self.wo_objects_vehicle=[]
+        self.wo_objects_grenade=[]
+        self.wo_objects_consumable=[]
 
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
@@ -72,6 +75,12 @@ class World(object):
             self.wo_objects_soviet.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_american:
             self.wo_objects_american.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_vehicle:
+            self.wo_objects_vehicle.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_grenade:
+            self.wo_objects_grenade.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_consumable:
+            self.wo_objects_consumable.append(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
@@ -116,25 +125,51 @@ class World(object):
         else : 
             return best_object
     #---------------------------------------------------------------------------
-    def remove_object(self, WORLDOBJECT):
-        if WORLDOBJECT in self.wo_objects:
-            self.wo_objects.remove(WORLDOBJECT)
-        if WORLDOBJECT.collision and WORLDOBJECT in self.wo_objects_collision:
-            self.wo_objects_collision.remove(WORLDOBJECT)
-        if WORLDOBJECT.is_human:
-            self.wo_objects_human.remove(WORLDOBJECT)
-        if WORLDOBJECT.is_gun:
-            self.wo_objects_guns.remove(WORLDOBJECT)
-        if WORLDOBJECT.is_german:
-            self.wo_objects_german.remove(WORLDOBJECT)
-        if WORLDOBJECT.is_soviet:
-            self.wo_objects_soviet.remove(WORLDOBJECT)
-        if WORLDOBJECT.is_american:
-            self.wo_objects_american.remove(WORLDOBJECT)
+    def remove_object(self, WORLD_OBJECT):
+        if WORLD_OBJECT in self.wo_objects:
+            self.wo_objects.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
+            self.wo_objects_collision.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_human:
+            self.wo_objects_human.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_gun:
+            self.wo_objects_guns.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_german:
+            self.wo_objects_german.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_soviet:
+            self.wo_objects_soviet.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_american:
+            self.wo_objects_american.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_vehicle:
+            self.wo_objects_vehicle.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_grenade:
+            self.wo_objects_grenade.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_consumable:
+            self.wo_objects_consumable.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
         self.graphic_engine.render()
+
+
+    #---------------------------------------------------------------------------
+    def select_with_mouse(self, radius):
+        '''
+        return a object that is 'under' the mouse cursor
+        radius is actually the side of a square. kind of. >100 works best
+        '''
+        mouse=self.graphic_engine.get_mouse_screen_coords()
+        collided=None
+        # this calculation should be moved to math_2d
+        ob_list=self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+self.wo_objects_consumable+self.wo_objects_grenade
+        for b in ob_list:
+            if mouse[0]+radius > b.screen_coords[0]:
+                if mouse[0] < b.screen_coords[0]+b.collision_radius:
+                    if mouse[1]+radius > b.screen_coords[1]:
+                        if mouse[1] < b.screen_coords[1]+b.collision_radius:
+                            collided=b
+                            break
+        return collided
 
 
     #---------------------------------------------------------------------------

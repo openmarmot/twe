@@ -47,6 +47,113 @@ module_last_update_date='april 27 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
+def create_squads(WORLD,SOLDIERS,FACTION):
+    assault_rifles=[]
+    rifles=[]
+    semiauto_rifles=[]
+    subguns=[]
+    machineguns=[]
+    antitank=[]
+    unarmed_vehicle=[]
+    armed_vehicle=[]
+    tank=[]
+    airplane=[]
+
+    # categorize 
+    for b in SOLDIERS:
+        if b.ai.primary_weapon.name=='kar98k':
+            rifles.append(b)
+        elif b.ai.primary_weapon.name=='stg44':
+            assault_rifles.append(b)
+        elif b.ai.primary_weapon.name=='mp40':
+            subguns.append(b)
+        elif b.ai.primary_weapon.name=='mg34':
+            machineguns.append(b)
+        elif b.ai.primary_weapon.name=='mosin_nagant':
+            rifles.append(b)
+        elif b.ai.primary_weapon.name=='ppsh43':
+            subguns.append(b)
+        elif b.ai.primary_weapon.name=='dp28':
+            machineguns.append(b)
+
+    squad_list=[]
+
+    buildsquads=True 
+
+    while buildsquads:
+        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank)<1:
+            buildsquads=False
+        else :
+            s=AISquad(WORLD)
+            s.faction=FACTION
+
+            # -- build a rifle squad --
+            if len(rifles)>7 :
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+                s.members.append(rifles.pop())
+
+                # mg ?
+                if len(machineguns)>0:
+                    s.members.append(machineguns.pop())
+
+                # squad lead subgun or assault rifle
+                if len(subguns)>0:
+                    s.members.append(subguns.pop())
+                elif len(assault_rifles)>0:
+                    s.members.append(assault_rifles.pop())
+            # -- assault squad --
+            elif len(assault_rifles)>4 :
+                s.members.append(assault_rifles.pop())
+                s.members.append(assault_rifles.pop())
+                s.members.append(assault_rifles.pop())
+                s.members.append(assault_rifles.pop())
+                s.members.append(assault_rifles.pop())
+            # -- erstaz groups --
+            else :
+                if len(rifles)>0:
+                    s.members.append(rifles.pop())
+                if len(semiauto_rifles)>0:
+                    s.members.append(semiauto_rifles.pop())
+                if len(subguns)>0:
+                    s.members.append(subguns.pop())
+                if len(assault_rifles)>0:
+                    s.members.append(assault_rifles.pop())
+                if len(machineguns)>0:
+                    s.members.append(machineguns.pop())
+                if len(antitank)>0:
+                    s.members.append(antitank.pop())
+
+                # lets do it again
+
+                if len(rifles)>0:
+                    s.members.append(rifles.pop())
+                if len(semiauto_rifles)>0:
+                    s.members.append(semiauto_rifles.pop())
+                if len(subguns)>0:
+                    s.members.append(subguns.pop())
+                if len(assault_rifles)>0:
+                    s.members.append(assault_rifles.pop())
+                if len(machineguns)>0:
+                    s.members.append(machineguns.pop())
+                if len(antitank)>0:
+                    s.members.append(antitank.pop())
+
+            squad_list.append(s)
+
+    return squad_list
+            
+
+
+
+
+
+#------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
     '''
     returns a world object that has completed basic init
@@ -67,7 +174,7 @@ def load_images(world):
     world.graphic_engine.loadImage('man','images/humans/man.png')
     world.graphic_engine.loadImage('german_soldier','images/humans/german_soldier.png')
     world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
-    world.graphic_engine.loadImage('russian_soldier','images/humans/russian_soldier.png')
+    world.graphic_engine.loadImage('soviet_soldier','images/humans/russian_soldier.png')
     world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
     world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
 
@@ -81,7 +188,8 @@ def load_images(world):
     world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
     world.graphic_engine.loadImage('kar98k','images/weapons/kar98k.png')
     world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
-    world.graphic_engine.loadImage('mosin-nagant','images/weapons/mosin-nagant.png')
+    world.graphic_engine.loadImage('mosin_nagant','images/weapons/mosin_nagant.png')
+    world.graphic_engine.loadImage('ppsh43','images/weapons/ppsh43.png')
 
     # airplanes
     world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
@@ -137,6 +245,7 @@ def load_test_environment(world):
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
+    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
 
 
     # and some grenades! 
@@ -152,21 +261,62 @@ def load_test_environment(world):
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
     #cheese 
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
-    spawn_cheese(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
+    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
 
-    # create and spawn german squad
-    world.german_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
+    # add ze germans
+    s=[]
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_stg44'))
+    s.append(spawn_soldiers(world,'german_mg34'))
+    s.append(spawn_soldiers(world,'german_mg34'))
 
-    # create a soviet squad 
-    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
-    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
+    
+    # create german squads
+    world.german_ai.squads=create_squads(world,s,'german')
+
+    # add ze russians
+    s=[]
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_dp28'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+
+    # create soviet squads 
+    world.soviet_ai.squads=create_squads(world,s,'soviet')
+
+    # spawn
+    world.german_ai.spawn_on_map()
+    world.soviet_ai.spawn_on_map()
 
 #------------------------------------------------------------------------------    
-def spawn_cheese(world,world_coords,CHEESE_TYPE):
-    if CHEESE_TYPE=='adler-cheese':
+def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
+    if CONSUMABLE_TYPE=='adler-cheese':
         z=WorldObject(world,['adler-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -175,7 +325,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='camembert-cheese':
+    if CONSUMABLE_TYPE=='camembert-cheese':
         z=WorldObject(world,['camembert-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -184,7 +334,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='champignon-cheese':
+    if CONSUMABLE_TYPE=='champignon-cheese':
         z=WorldObject(world,['champignon-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -193,7 +343,7 @@ def spawn_cheese(world,world_coords,CHEESE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-    if CHEESE_TYPE=='karwendel-cheese':
+    if CONSUMABLE_TYPE=='karwendel-cheese':
         z=WorldObject(world,['karwendel-cheese'],AINone)
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
@@ -252,6 +402,17 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=32
         z.ai.mag_capacity=32
+        z.ai.rate_of_fire=0.12
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    if GUN_TYPE=='ppsh43':
+        z=WorldObject(world,['ppsh43'],AIGun)
+        z.name='ppsh43'
+        z.world_coords=copy.copy(world_coords)
+        z.is_gun=True
+        z.ai.magazine=35
+        z.ai.mag_capacity=35
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -333,9 +494,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='mosin-nagant':
-        z=WorldObject(world,['mosin-nagant'],AIGun)
-        z.name='mosin-nagant'
+    if GUN_TYPE=='mosin_nagant':
+        z=WorldObject(world,['mosin_nagant'],AIGun)
+        z.name='mosin_nagant'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=2
@@ -390,8 +551,8 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
-    if HUMAN_TYPE=='russian_soldier':
-        z=WorldObject(WORLD,['russian_soldier'],AIMan)
+    if HUMAN_TYPE=='soviet_soldier':
+        z=WorldObject(WORLD,['soviet_soldier'],AIMan)
         z.name='Boris Volvakov'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
@@ -416,23 +577,12 @@ def spawn_ju88(world,world_coords,SPAWN):
 
 
 #------------------------------------------------------------------------------
-def spawn_kubelwagen(world,world_coords,SPAWN):
-    z=WorldObject(world,['kubelwagen'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.is_vehicle=True
-    z.render_level=3
-    if SPAWN :
-        z.wo_start()
-    return z
-
-
-#------------------------------------------------------------------------------
 def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=200.
+    z.speed=300.
     z.ai.maxTime=5.
     z.is_projectile=True
     z.render_level=3
@@ -475,119 +625,65 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
 
+
 #------------------------------------------------------------------------------
-def spawn_squad(WORLD,WORLD_COORDS, SQUAD_TYPE):
-    ''' returns ai_squad object populated with soldiers'''
-
-    s=AISquad(WORLD)
-    s.world_coords=copy.copy(WORLD_COORDS)
-    s.destination=copy.copy(WORLD_COORDS)
-
-    if SQUAD_TYPE=='german_rifle_44':
-        s.faction='german'
-        # rifle
+def spawn_soldiers(WORLD,SOLDIER_TYPE):
+    ''' return a soldier with full kit '''
+    # --------- german types ---------------------------------
+    if SOLDIER_TYPE=='german_kar98k':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # mg
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # mg helper 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # mg helper 
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # squad leader 
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
+    if SOLDIER_TYPE=='german_mp40':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
-        z.ai.squad=s
-        s.members.append(z)
-    if SQUAD_TYPE=='soviet_rifle_44':
-        # 9 man squad
-        s.faction='soviet'
-        # rifle
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle 
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # rifle
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin-nagant',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # mg
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # mg helper 
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.ai.squad=s
-        s.members.append(z)
-        # squad leader - does he get a smg??
-        z=spawn_human(WORLD,[0.0],'russian_soldier',False)
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.ai.squad=s
-        s.members.append(z)
-    
-    # spawn - this needs to be done at some point - no reason to delay
-    s.spawn_on_map()
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
+    if SOLDIER_TYPE=='german_mg34':
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
+    if SOLDIER_TYPE=='german_stg44':
+        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'stg44',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
 
-    return s
+    # --------- soviet types ----------------------------------------
+    if SOLDIER_TYPE=='soviet_mosin_nagant':
+        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin_nagant',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
+    if SOLDIER_TYPE=='soviet_ppsh43':
+        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'ppsh43',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z 
+    if SOLDIER_TYPE=='soviet_dp28':
+        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z 
+    if SOLDIER_TYPE=='soviet_tt33':
+        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
+        return z   
+
+#------------------------------------------------------------------------------
+def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
+
+    if VEHICLE_TYPE=='kubelwagen':
+        z=WorldObject(WORLD,['kubelwagen'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_vehicle=True
+        z.render_level=3
+        if SPAWN :
+            z.wo_start()
+        return z
 
 #------------------------------------------------------------------------------
 def spawn_warehouse(world,world_coords,SPAWN):
