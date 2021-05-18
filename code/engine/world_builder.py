@@ -144,6 +144,8 @@ def create_squads(WORLD,SOLDIERS):
                     s.members.append(antitank.pop())
 
             squad_list.append(s)
+
+    return squad_list
             
 
 
@@ -262,12 +264,49 @@ def load_test_environment(world):
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
 
-    # create and spawn german squad
-    world.german_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'german_rifle_44'))
+    # add ze germans
+    s=[]
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_stg44'))
+    s.append(spawn_soldiers(world,'german_mg34'))
+    s.append(spawn_soldiers(world,'german_mg34'))
 
-    # create a soviet squad 
-    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
-    world.soviet_ai.squads.append(spawn_squad(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'soviet_rifle_44'))
+    
+    # create german squads
+    world.german_ai.squads=create_squads(world,s)
+
+    # add ze russians
+    s=[]
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_dp28'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+
+    # create soviet squads 
+    world.soviet_ai.squads=create_squads(world,s)
 
 #------------------------------------------------------------------------------    
 def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
@@ -582,43 +621,51 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
 
 
 #------------------------------------------------------------------------------
-def spawn_soldiers(WORLD,WORLD_COORDS,SOLDIER_TYPE):
+def spawn_soldiers(WORLD,SOLDIER_TYPE):
     ''' return a soldier with full kit '''
     # --------- german types ---------------------------------
     if SOLDIER_TYPE=='german_kar98k':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
     if SOLDIER_TYPE=='german_mg34':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
     if SOLDIER_TYPE=='german_stg44':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
 
     # --------- soviet types ----------------------------------------
     if SOLDIER_TYPE=='soviet_mosin_nagant':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'mosin_nagant',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z
     if SOLDIER_TYPE=='soviet_ppsh43':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'ppsh43',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z 
     if SOLDIER_TYPE=='soviet_dp28':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        return z 
     if SOLDIER_TYPE=='soviet_tt33':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))     
+        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
+        return z   
 
 #------------------------------------------------------------------------------
 def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
