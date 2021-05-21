@@ -108,13 +108,8 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):
-        best_distance=100000
-        best_object=None
-        for b in self.wo_objects_guns:
-            d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
-            if d<best_distance:
-                best_distance=d 
-                best_object=b
+        ''' returns the closest gun. spawns one if there are none '''
+        best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns)
         if best_object==None:
             # spawn a new gun and return it
             engine.world_builder.spawn_gun(self,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'ppk',True)
@@ -124,6 +119,20 @@ class World(object):
             return self.get_closest_gun(WORLD_COORDS)
         else : 
             return best_object
+
+    #---------------------------------------------------------------------------
+    def get_closest_object(self, WORLD_COORDS,OBJECT_LIST):
+        ''' can be used on its own or referenced like get_closest_gun() does'''
+        best_distance=100000
+        best_object=None
+        for b in OBJECT_LIST:
+            d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
+            if d<best_distance:
+                best_distance=d 
+                best_object=b
+
+        return best_object
+
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
         if WORLD_OBJECT in self.wo_objects:

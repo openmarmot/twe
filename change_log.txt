@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 
+---------------------------------
+May 20 2021
+
+summary 
+- added a basic human menu (not much in it yet)
+- adjusted several distance limits in ai_man 
+    - seems to fix some of the worst behavior
+- renamed ai_man to ai_human (for the ladies!)
+- added a couple lines to ai_squad that basically kills squad movement if
+    enemies are close. 
+- added distance calculations to a couple menus to help judge relative distance 
+    for fine tuning AI 
+- added a generic 'get closest object' to world that the AI can use 
+- added routines for the AI to get consumables (medical) or run away when hurt 
+
 
 ---------------------------------
 May 17 2021

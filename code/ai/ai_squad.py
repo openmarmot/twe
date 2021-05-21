@@ -10,6 +10,7 @@ notes : AI that makes decisions for groups
 
 #import built in modules
 import random 
+import copy
 
 #import custom packages
 import engine.math_2d
@@ -94,5 +95,10 @@ class AISquad(object):
         
         for b in enemylist:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
-            if d<1500:
+            if d<1200:
                 self.near_enemies.append(b)
+                if d<800:
+                    # enemies are close, stop movement for now 
+                    if len(self.members)>0:
+                        self.destination=copy.copy(self.members[0].world_coords)
+                        self.world_coords=copy.copy(self.destination)

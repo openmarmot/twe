@@ -20,6 +20,7 @@ the idea is this static class holds the standard way for creating objects
 
 
 #import built in modules
+from ai.ai_human import AIHuman
 import math
 import random
 import copy 
@@ -33,7 +34,7 @@ from engine.world_object import WorldObject
 
 
 # load AI 
-from ai.ai_man import AIMan
+from ai.ai_human import AIHuman
 from ai.ai_gun import AIGun
 from ai.ai_none import AINone
 from ai.ai_building import AIBuilding
@@ -515,7 +516,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
     
     z=None
     if HUMAN_TYPE=='zombie':
-        z=WorldObject(WORLD,['zombie_soldier'],AIMan)
+        z=WorldObject(WORLD,['zombie_soldier'],AIHuman)
         z.name='Zombie Klaus Hammer'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(5,20))
@@ -524,7 +525,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_human=True
         z.is_zombie=True
     if HUMAN_TYPE=='player':
-        z=WorldObject(WORLD,['man'],AIMan)
+        z=WorldObject(WORLD,['man'],AIHuman)
         z.name='Klaus Hammer'
         z.world_coords=copy.copy(WORLD_COORDS)
         z.speed=50.
@@ -533,7 +534,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_human=True
         WORLD.player=z
     if HUMAN_TYPE=='civilian_man':
-        z=WorldObject(WORLD,['civilian_man'],AIMan)
+        z=WorldObject(WORLD,['civilian_man'],AIHuman)
         z.name='Reginald Thimblebottom'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
@@ -542,7 +543,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_human=True
         z.is_civilian=True
     if HUMAN_TYPE=='german_soldier':
-        z=WorldObject(WORLD,['german_soldier'],AIMan)
+        z=WorldObject(WORLD,['german_soldier'],AIHuman)
         z.name='Klaus Hammer'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
@@ -552,7 +553,7 @@ def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
         z.is_soldier=True
         z.is_german=True
     if HUMAN_TYPE=='soviet_soldier':
-        z=WorldObject(WORLD,['soviet_soldier'],AIMan)
+        z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
         z.name='Boris Volvakov'
         z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
