@@ -20,6 +20,7 @@ the idea is this static class holds the standard way for creating objects
 
 
 #import built in modules
+from ai.ai_vehicle import AIVehicle
 from ai.ai_human import AIHuman
 import math
 import random
@@ -678,7 +679,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
 def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
 
     if VEHICLE_TYPE=='kubelwagen':
-        z=WorldObject(WORLD,['kubelwagen'],AINone)
+        z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
         z.world_coords=copy.copy(WORLD_COORDS)
         z.is_vehicle=True
         z.render_level=3
