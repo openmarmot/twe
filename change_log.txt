@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+May 24 2021
+
+summary 
+- added ability to exit vehicles. this was harder and 
+    more ugly than initially expected. gotta rethink this code 
+    at some point when vehicle stuff is more hashed out 
+
+
+
+
 ---------------------------------
 May 22-23 2021
 

@@ -137,7 +137,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.world.select_with_mouse(15)
+                    b=self.world.select_with_mouse(20)
                     if b!=None:
                         print(b.name)
                         # send it over to world menu to figure out

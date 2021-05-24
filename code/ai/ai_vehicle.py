@@ -101,7 +101,13 @@ class AIVehicle(AIBase):
             else:
                 # don't care about NPCs, place them anywhere
                 self.passengers.append(EVENT_DATA)
-   
+
+    #---------------------------------------------------------------------------
+    def event_remove_inventory(self,EVENT_DATA):
+        if EVENT_DATA.is_human:
+            self.passengers.remove(EVENT_DATA)
+
+
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
@@ -119,6 +125,8 @@ class AIVehicle(AIBase):
             self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+        elif EVENT=='remove_inventory':
+            self.event_remove_inventory(EVENT_DATA)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):

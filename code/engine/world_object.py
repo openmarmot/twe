@@ -108,6 +108,7 @@ class WorldObject(object):
     #remove_inventory
     def remove_inventory(self, ITEM):
         self.inventory.remove(ITEM)
+        self.ai.handle_event('remove_inventory',ITEM)
 
     def wo_start(self):
         self.world.add_object(self)

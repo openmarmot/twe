@@ -169,22 +169,40 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('--Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit (partially implemented)')
+            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit ')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 pass
             if Key=='2':
-                # enter the vehicle 
-                self.selected_object.add_inventory(self.world.player)
-                # remove the player from the world so we don't have a ghost
-                self.world.remove_object(self.world.player)
-                # reset player reference so the game doesn't break
-                self.world.player=self.selected_object
-                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
-                self.deactivate_menu()
+                action='none'
+                if len(self.selected_object.ai.passengers)>0:
+                    if self.selected_object.ai.passengers[0].is_player:
+                        action='exit'
+                    else:
+                        action='enter'
+                else:
+                    action='enter'
+                if action=='enter':
 
+                    # enter the vehicle 
+                    self.selected_object.add_inventory(self.world.player)
+                    # remove the player from the world so we don't have a ghost
+                    self.world.remove_object(self.world.player)
+                    # reset player reference so the game doesn't break
+                    self.world.player=self.selected_object
+                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                    self.deactivate_menu()
+                else:
+                    # exit the vehicle
+
+                    # this is poor. need to keep track of player better
+                    p=self.selected_object.ai.passengers[0]
+                    self.selected_object.remove_inventory(p)
+                    self.world.add_object(p)
+                    self.world.player=p
+                    self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
 
     def debug_menu(self, Key):
         if self.menu_state=='none':
