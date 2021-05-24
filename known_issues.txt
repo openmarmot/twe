@@ -19,3 +19,8 @@ Minor Issues
         rot_image = rot_image.subsurface(rot_rect).copy()
     ValueError: subsurface rectangle outside surface area
     - NOTE - i think this is due to images that are not square 
+
+- graphics jitter 
+    when moving there is a very noticeable small oscillation of every object 
+        -especially noticeable when a lot of objects are close together 
+    - this probably is due a rounding or conversion with world to screen coords thats isn't precise enough 

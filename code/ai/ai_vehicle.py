@@ -312,28 +312,27 @@ class AIVehicle(AIBase):
                 if self.vehicle_speed<10 and self.vehicle_speed>0:
                     self.vehicle_speed=10
 
-        elif(self.owner.world.graphic_engine.keyPressed('s')):
+        if(self.owner.world.graphic_engine.keyPressed('s')):
             if self.vehicle_speed>self.owner.speed*-1:
                 self.vehicle_speed-=self.acceleration*time_passed
                 if self.vehicle_speed>-10 and self.vehicle_speed<0:
                     self.vehicle_speed=-10
 
-        elif(self.owner.world.graphic_engine.keyPressed('a')):
+        if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
 
-        elif(self.owner.world.graphic_engine.keyPressed('d')):
+        if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
         
-        else:
-             # -- deceleration --
-            if self.vehicle_speed>5:
-                self.vehicle_speed-=5*time_passed
-            elif self.vehicle_speed<-5:
-                self.vehicle_speed+=5*time_passed
-            elif self.vehicle_speed<9 and self.vehicle_speed>-9:
-                self.vehicle_speed=0
+            # -- deceleration --
+        if self.vehicle_speed>5:
+            self.vehicle_speed-=5*time_passed
+        elif self.vehicle_speed<-5:
+            self.vehicle_speed+=5*time_passed
+        elif self.vehicle_speed<9 and self.vehicle_speed>-9:
+            self.vehicle_speed=0
 
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
@@ -342,12 +341,13 @@ class AIVehicle(AIBase):
             # throw throwable object
             self.throw([]) 
 
+
+        # -- normalize angles --
         if self.owner.rotation_angle>360:
             self.owner.rotation_angle=0
-            print('angle oops')
-        if self.owner.rotation_angle<0:
+
+        elif self.owner.rotation_angle<0:
             self.owner.rotation_angle=360
-            print('angle oops')
 
 
 

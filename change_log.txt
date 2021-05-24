@@ -8,7 +8,20 @@ summary
 - work on vehicle ai 
 - worked on adding math for movement when all you have is a speed and angle (for human vehicle control)
 - removed a lot of the debug print code as it was really getting excessive
-- fixed kubelwagen png so it is now sqaure - this was causing visual issuses and possibly crashes
+- fixed kubelwagen png so it is now square - this was causing visual issuses and possibly crashes
+- fixed warehouse png dimensions
+- bumped up bullet speed a little. the idea is to make it hard to dodge but not impossible 
+
+
+kubelwagen is now driveable - however you can't get out at the moment
+
+movement in the kubel really shows the graphic jitter issue when you drive past things 
+- i think this is related to the world coords -> screen coords translation. I'll need to look into it 
+
+the guns/bullets/health in this game are a balance between realism and playability. 
+the bullets need to be somewhat dodgeable and hits need to be somewhat survivable to keep 
+this playable at all - otherwise everyone would be mowed down by the mg34 soldier in the first 
+couple seconds (can happen anyways :D )
 
 ---------------------------------
 May 21 2021

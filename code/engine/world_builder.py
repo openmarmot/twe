@@ -587,8 +587,8 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=300.
-    z.ai.maxTime=5.
+    z.speed=350.
+    z.ai.maxTime=4.
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
