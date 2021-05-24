@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='May 21 2021' #date of last update
+module_last_update_date='May 23 2021' #date of last update
 
 #global variables
 
@@ -41,6 +41,13 @@ class AIVehicle(AIBase):
 
         # current fuel type options : gas / diesel
         self.fuel_type='gas'
+
+        # passengers[0] determines how the AI is controlled
+        self.passengers=[]
+
+        # actual vehicle speed
+        self.vehicle_speed=0.
+        self.acceleration=0
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -57,12 +64,12 @@ class AIVehicle(AIBase):
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
 
-        if self.owner.is_player:
-            self.handle_player_update()
-        elif self.owner.is_zombie:
-            self.handle_zombie_update()
-        else :
-            self.handle_normal_ai_update()
+
+        if len(self.passengers)>0:
+            if self.passengers[0].is_player:
+                self.handle_player_update()
+            else :
+                self.handle_normal_ai_update()
 
 
 
@@ -87,6 +94,13 @@ class AIVehicle(AIBase):
                 print('filling up')
             else : 
                 pass 
+        elif EVENT_DATA.is_human :
+            if EVENT_DATA.is_player:
+                # passengers[0] controls the vehicle so put player there
+                self.passengers.insert(0,EVENT_DATA)
+            else:
+                # don't care about NPCs, place them anywhere
+                self.passengers.append(EVENT_DATA)
    
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):
@@ -287,24 +301,54 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
+
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        self.owner.world_coords=engine.math_2d.moveAlongVector(self.vehicle_speed,self.owner.world_coords,self.owner.heading,time_passed)
+        #print('speed: '+str(self.vehicle_speed))
+
         if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=0
-        if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=180
-        if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=90
-        if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=270
+            if self.vehicle_speed<self.owner.speed:
+                self.vehicle_speed+=self.acceleration*time_passed
+                if self.vehicle_speed<10 and self.vehicle_speed>0:
+                    self.vehicle_speed=10
+
+        elif(self.owner.world.graphic_engine.keyPressed('s')):
+            if self.vehicle_speed>self.owner.speed*-1:
+                self.vehicle_speed-=self.acceleration*time_passed
+                if self.vehicle_speed>-10 and self.vehicle_speed<0:
+                    self.vehicle_speed=-10
+
+        elif(self.owner.world.graphic_engine.keyPressed('a')):
+            self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
+            self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+
+        elif(self.owner.world.graphic_engine.keyPressed('d')):
+            self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
+            self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+        
+        else:
+             # -- deceleration --
+            if self.vehicle_speed>5:
+                self.vehicle_speed-=5*time_passed
+            elif self.vehicle_speed<-5:
+                self.vehicle_speed+=5*time_passed
+            elif self.vehicle_speed<9 and self.vehicle_speed>-9:
+                self.vehicle_speed=0
+
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             self.throw([]) 
+
+        if self.owner.rotation_angle>360:
+            self.owner.rotation_angle=0
+            print('angle oops')
+        if self.owner.rotation_angle<0:
+            self.owner.rotation_angle=360
+            print('angle oops')
+
+
 
 

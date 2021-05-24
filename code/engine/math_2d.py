@@ -9,6 +9,10 @@ notes :
 static module consisting of math functions.
 import as needed
 
+I'm pretty sure something is fundamentally wrong with my math in this game 
+some of these functions are the opposite of what they should be
+lets just pretend this is all sane. super sane
+
 # ref
 # notes on som differenct collisiong algos
 # https://www.h3xed.com/programming/bounding-box-vs-bounding-circle-collision-detection-performance-as3#:~:text=%2F%2F%20Collision!,-%7D&text=The%20above%20run%20took%20164,the%20nature%20of%20your%20game.
@@ -21,7 +25,7 @@ import math
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 10 2021' #date of last update
+module_last_update_date='may23 2021' #date of last update
 
 #global variables
 
@@ -72,6 +76,14 @@ def get_heading_vector(location,destination):
 	vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
 	heading=get_normalized(vec_to_dest)
 	return heading 
+
+#--------------------------------------------------------------------------------
+def get_heading_from_rotation(ROTATION):
+	''' get heading vector. input is rotation in degrees'''
+
+	r=math.radians(ROTATION)
+	b=[math.degrees(-math.sin(r)),-math.degrees(math.cos(r))]
+	return get_normalized(b)
 
 #------------------------------------------------------------------------------
 def get_normalized(vec2):

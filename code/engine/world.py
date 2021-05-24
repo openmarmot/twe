@@ -93,14 +93,14 @@ class World(object):
             # this should maybe be wo_objects_collision - not really using that atm though
             temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects,IGNORE_LIST)
             if temp !=None:
-                print('Collision with '+temp.name )
+                #print('Collision with '+temp.name )
                 temp.ai.handle_event("collision",COLLIDER)
                 collided=True
         else :
             if CHECK_HUMAN :
                 temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
                 if temp !=None:
-                    print('Collision with '+temp.name )
+                    #print('Collision with '+temp.name )
                     temp.ai.handle_event("collision",COLLIDER)
                     collided=True
 

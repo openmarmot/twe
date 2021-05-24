@@ -2,12 +2,25 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 22-23 2021
+
+summary
+- work on vehicle ai 
+- worked on adding math for movement when all you have is a speed and angle (for human vehicle control)
+- removed a lot of the debug print code as it was really getting excessive
+- fixed kubelwagen png so it is now sqaure - this was causing visual issuses and possibly crashes
+
+---------------------------------
 May 21 2021
 
 summary 
 - started working on vehicle ai 
 
+this may take awhile. its probably going to be patterned 
+after human AI but i have do new movement code for player control. 
 
+AI control will probably be the same movement as humans, but maybe 
+need a concept of acceleration/deceleration 
 
 ---------------------------------
 May 20 2021

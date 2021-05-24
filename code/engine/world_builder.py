@@ -259,6 +259,9 @@ def load_test_environment(world):
     # add ju88
     spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],True)
 
+    # kubelwagens 
+    spawn_vehicle(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
@@ -683,6 +686,9 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
         z.world_coords=copy.copy(WORLD_COORDS)
         z.is_vehicle=True
         z.render_level=3
+        z.speed=200
+        z.rotation_speed=25.
+        z.ai.acceleration=100
         if SPAWN :
             z.wo_start()
         return z

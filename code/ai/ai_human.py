@@ -44,7 +44,7 @@ class AIHuman(AIBase):
 
         # -- general stuff for all objects --
         if self.health<1:
-            print(self.owner.name+' has died')
+            #print(self.owner.name+' has died')
             for b in self.owner.inventory:
                 b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
                 self.owner.world.add_object(b)
@@ -146,13 +146,14 @@ class AIHuman(AIBase):
 
             if self.ai_goal=='pickup':
                 if distance<5:
-                    print('pickup thingy')
+                   # print('pickup thingy')
                     if self.target_object in self.owner.world.wo_objects:
                         self.owner.add_inventory(self.target_object)
                         self.owner.world.remove_object(self.target_object)
                     else:
                         # hmm object is gone. someone else must have grabbed it
-                        print('robbed!!')
+                       # print('robbed!!')
+                        pass
                     self.ai_state='sleeping'
             elif self.ai_goal=='close_with_target':
                 # check if target is dead 
@@ -161,7 +162,7 @@ class AIHuman(AIBase):
                     self.ai_goal='none'
                     self.target_object=None
                 elif distance<500:
-                    print('in range of target')
+                    #print('in range of target')
                     self.ai_state='engaging'
                     self.ai_goal='none'
                 else:
@@ -169,7 +170,7 @@ class AIHuman(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                    print('close with target')
+                   # print('close with target')
             else:
                 # catchall for random moving related goals:
                 if distance<3:
@@ -187,7 +188,7 @@ class AIHuman(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                    print('closing with target')
+                    #print('closing with target')
 
             # check if we are out of ammo
 
@@ -225,7 +226,7 @@ class AIHuman(AIBase):
                     self.destination=copy.copy(self.squad.world_coords)
                     self.time_since_ai_transition=0
                     self.ai_state='start_moving'
-                    print('getting closer to group')
+                    #print('getting closer to group')
                 else:
                     self.target_object=self.squad.get_enemy()
                     if self.target_object!=None:

@@ -7,7 +7,7 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 
 I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress.
 
-![screenshot](/screenshots/twe-ju88.png "ju88")
+![screenshot](/screenshots/twe-may-23-2021.png "TWE screenshot")
 
 
 ### General Concepts
@@ -18,8 +18,8 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - emphasis on iron man mode. strategic game doesn't start over when player dies they just take over a new bot
 
 ### Things to do
-- spawn objects and zombies with the debug menu
-- try out different weapons on some helpless zombies 
+- spawn different objects with the debug menu
+- depending on the build the AI might be in the middle of a large fire fight 
 - find and eat all four types of cheese
 
 
@@ -28,17 +28,21 @@ I am developing this game by just randomly working on whatever I feel like on a 
 ### To Play 
 - install python3 and pygame
 - download code
-- python3 twe.py (windows would be py)
+- change directory to the code directory
+- python3 twe.py (windows would be: py twe.py)
 
 ### Controls
 - '~' opens/closes debug menu (spawn zombies!)
 - 'w/s/a/d' movement
 - left click on a object to open context menu
 - 'esc' to exit menu
+- 1-0 number keys are used in menus
 - 'f' to fire weapon (if you have one)
 - 'g' throw grenade (if you have one)
 
 
 ### License / Whatever
 - I want to do this project completely by myself to improve my python skills and just as a fun hobby. 
-- However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks!
+- However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks! 
+- On this project it is rare that I copy code from the internet, almost most of it is from scratch (that is why the math is so bad) - 
+but when I have copied code I will try to include references from where I got it
