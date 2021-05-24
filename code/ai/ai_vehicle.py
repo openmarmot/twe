@@ -342,12 +342,13 @@ class AIVehicle(AIBase):
             # throw throwable object
             self.throw([]) 
 
+
+        # -- normalize angles --
         if self.owner.rotation_angle>360:
             self.owner.rotation_angle=0
-            print('angle oops')
-        if self.owner.rotation_angle<0:
+
+        elif self.owner.rotation_angle<0:
             self.owner.rotation_angle=360
-            print('angle oops')
 
 
 
