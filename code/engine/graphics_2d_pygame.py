@@ -100,7 +100,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                print(str(event.key))
+                #print(str(event.key))
                 # send number events to world_menu for ingame menus 
                 # translate to a string corresponding to the actual key to simplify the code
                 # on the other end

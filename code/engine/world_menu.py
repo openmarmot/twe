@@ -14,10 +14,10 @@ import random
 
 #import custom packages
 import engine.world_builder 
-
+import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 17 2021' #date of last update
+module_last_update_date='March 20 2021' #date of last update
 
 #global variables
 
@@ -65,21 +65,24 @@ class World_Menu(object):
             self.start_menu(Key)
         
 
-    def activate_menu(self, Selected_Object):
+    def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
         # clear any current menu
         self.deactivate_menu()
-        self.selected_object=Selected_Object
+        self.selected_object=SELECTED_OBJECT
 
-        if Selected_Object.is_vehicle: 
+        if SELECTED_OBJECT.is_vehicle: 
             self.active_menu='vehicle'
             self.vehicle_menu(None)
-        elif Selected_Object.is_gun:
+        elif SELECTED_OBJECT.is_gun:
             self.active_menu='gun'
             self.gun_menu(None)
-        elif Selected_Object.is_crate:
+        elif SELECTED_OBJECT.is_crate:
             self.active_menu='crate'
             self.crate_menu(None)
+        elif SELECTED_OBJECT.is_human:
+            self.active_menu='human'
+            self.human_menu(None)
         else :
             # just dump everything else in here for now
             self.active_menu='generic'
@@ -106,6 +109,8 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('3 - pick up')
@@ -125,6 +130,8 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('3 - pick up')
@@ -138,6 +145,24 @@ class World_Menu(object):
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
+
+    def human_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
+            self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
+            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('3 - ? (not implemented)?')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                pass
 
     def vehicle_menu(self, Key):
         if self.menu_state=='none':

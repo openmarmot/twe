@@ -45,7 +45,8 @@ class WorldObject(object):
         self.screen_coords=[0.,0.]
 
         self.speed = 0.
-        # rotation_angle - mainly used to rotate the object sprite
+        self.rotation_speed=0.
+        # rotation_angle - mainly used to rotate the object sprite. in degrees
         self.rotation_angle=0.
         # heading is a direction vector used by some objects
         # can be set with math_2d.get_heading_vector
@@ -79,6 +80,8 @@ class WorldObject(object):
         self.is_german=False
         self.is_soviet=False
         self.is_american=False
+        self.is_gas=False
+        self.is_diesel=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in

@@ -6,6 +6,7 @@ Minor Issues
 - when grenades are thrown it seems they are not removed from inventory 
     - inventory removal needs cleanup
 - soldier ai seems to occasionally get stuck - not sure in what state but possibly movement 
+    - i think this is due to low health, which was basically a pause state 
 - when entering a vehicle enemies still fire at your avatars previous position -- ghost in faction enemy lists??
 
 
@@ -17,3 +18,4 @@ Minor Issues
     File "/home/andrew/git/twe/code/engine/graphics_2d_pygame.py", line 337, in get_rotated_image
         rot_image = rot_image.subsurface(rot_rect).copy()
     ValueError: subsurface rectangle outside surface area
+    - NOTE - i think this is due to images that are not square 

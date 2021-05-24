@@ -23,7 +23,7 @@ module_last_update_date='Feb 07 2020' #date of last update
 
 #global variables
 
-class AIMan(AIBase):
+class AIHuman(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
@@ -44,7 +44,7 @@ class AIMan(AIBase):
 
         # -- general stuff for all objects --
         if self.health<1:
-            print(self.owner.name+' has died')
+            #print(self.owner.name+' has died')
             for b in self.owner.inventory:
                 b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
                 self.owner.world.add_object(b)
@@ -146,13 +146,14 @@ class AIMan(AIBase):
 
             if self.ai_goal=='pickup':
                 if distance<5:
-                    print('pickup thingy')
+                   # print('pickup thingy')
                     if self.target_object in self.owner.world.wo_objects:
                         self.owner.add_inventory(self.target_object)
                         self.owner.world.remove_object(self.target_object)
                     else:
                         # hmm object is gone. someone else must have grabbed it
-                        print('robbed!!')
+                       # print('robbed!!')
+                        pass
                     self.ai_state='sleeping'
             elif self.ai_goal=='close_with_target':
                 # check if target is dead 
@@ -160,8 +161,8 @@ class AIMan(AIBase):
                     self.ai_state='sleeping'
                     self.ai_goal='none'
                     self.target_object=None
-                elif distance<200:
-                    print('in range of target')
+                elif distance<500:
+                    #print('in range of target')
                     self.ai_state='engaging'
                     self.ai_goal='none'
                 else:
@@ -169,7 +170,7 @@ class AIMan(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                    print('close with target')
+                   # print('close with target')
             else:
                 # catchall for random moving related goals:
                 if distance<3:
@@ -183,11 +184,11 @@ class AIMan(AIBase):
             else:
                 # check if target is too far 
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                if distance >350. :
+                if distance >850. :
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                    print('closing with target')
+                    #print('closing with target')
 
             # check if we are out of ammo
 
@@ -201,8 +202,17 @@ class AIMan(AIBase):
                 distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
                 
                 # are we low on health? 
-                if self.health<50:
-                    pass
+                if self.health<10:
+                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+                    if o != None:
+                        self.target_object=o
+                        self.ai_goal='pickup'
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'  
+                    else :
+                        # no health to be had. time to run away
+                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
+                        self.ai_state='start_moving'  
                 # do we need a gun ?
                 elif self.primary_weapon==None :
                     self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
@@ -211,12 +221,12 @@ class AIMan(AIBase):
                     self.ai_state='start_moving'
                 # do we need ammo ?
                 # are we too far from the group?
-                elif distance_group >100. :
+                elif distance_group >300. :
                     self.ai_goal='close_with_group'
                     self.destination=copy.copy(self.squad.world_coords)
                     self.time_since_ai_transition=0
                     self.ai_state='start_moving'
-                    print('getting closer to group')
+                    #print('getting closer to group')
                 else:
                     self.target_object=self.squad.get_enemy()
                     if self.target_object!=None:
@@ -240,7 +250,16 @@ class AIMan(AIBase):
 
                 # are we low on health? 
                 if self.health<50:
-                    pass
+                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+                    if o != None:
+                        self.target_object=o
+                        self.ai_goal='pickup'
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'  
+                    else :
+                        # no health to be had. time to run away
+                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
+                        self.ai_state='start_moving'  
                 # do we need a gun ?
                 elif self.primary_weapon==None :
                     self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
