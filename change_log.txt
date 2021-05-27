@@ -3,14 +3,19 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 26 2021
+
+summary 
+- started working on 'world_area' system - which are strategic points on a 
+    map that the AI will seek to control 
+
+---------------------------------
 May 24 2021
 
 summary 
 - added ability to exit vehicles. this was harder and 
     more ugly than initially expected. gotta rethink this code 
     at some point when vehicle stuff is more hashed out 
-
-
 
 
 ---------------------------------
