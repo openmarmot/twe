@@ -37,3 +37,14 @@ https://pygame.readthedocs.io/en/latest/4_text/text.html
         only exist in inventories. 
         example : gun magazines.
         
+
+-- python profiling ------------------------------
+
+# install snakeviz 
+py -m pip install snakeviz --user 
+
+# run profile job 
+py -m cProfile -o p0.prof .\twe.py
+
+# launch snakeviz 
+py -m snakeviz .\p0.prof

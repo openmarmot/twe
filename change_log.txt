@@ -1,13 +1,40 @@
 TWE Project : Change Log
 
 
+---------------------------------
+May 28 2021
+
+summary 
+- more work on world_area system 
+- rewrite of the graphics_2d rendering code 
+- blurred the bullet graphic. looks a lot better now 
+
+For whatever reason drawing 4-5 of the warehouses on screen was causing a severe 10 fps drop 
+I'm honestly not sure what about this png is causing so much trouble.
+
+I did some profiling and found out that the get_rotated_image was one of the 
+highest time usage methods. This was getting called every render cycle for every object 
+that was visible. It got the current image and rotated it.
+
+To resolve this I did a rewrite of the rendering system. Now the rotated image is stored in 
+the world_object. When the world_object changes its rotation it updates a bool to let 
+graphics_engine know that a new image has to be generated. 
+
+The new code has significantly speed up and smoothed out the game 
 
 ---------------------------------
-May 26 2021
+May 26-27 2021
 
 summary 
 - started working on 'world_area' system - which are strategic points on a 
     map that the AI will seek to control 
+
+Some thoughts on world_area types 
+- exit_zone : possibly the 4 sides of the map. not sure if this will be a world_area or not 
+- town : small clump of buildings 
+- field_depot : supply dump / mechanical area 
+- train_depot : 
+- airport 
 
 ---------------------------------
 May 24 2021

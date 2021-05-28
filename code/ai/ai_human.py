@@ -302,6 +302,9 @@ class AIHuman(AIBase):
                 # maybe change into moving animation image?
                 # set the rotation angle for the image 
                 self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+
+                # tell graphics engine to redo the image 
+                self.owner.reset_image=True
                 # transition to moving
                 self.time_since_ai_transition=0
                 self.ai_state='moving'
@@ -314,15 +317,19 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('w')):
             self.owner.world_coords[1]-=self.owner.speed*time_passed
             self.owner.rotation_angle=0
+            self.owner.reset_image=True
         if(self.owner.world.graphic_engine.keyPressed('s')):
             self.owner.world_coords[1]+=self.owner.speed*time_passed
             self.owner.rotation_angle=180
+            self.owner.reset_image=True
         if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.world_coords[0]-=self.owner.speed*time_passed
             self.owner.rotation_angle=90
+            self.owner.reset_image=True
         if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.world_coords[0]+=self.owner.speed*time_passed
             self.owner.rotation_angle=270
+            self.owner.reset_image=True
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())

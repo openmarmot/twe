@@ -49,6 +49,7 @@ class WorldArea(object):
 
         if self.time_since_control_update>5:
             self.update_control()
+            self.time_since_control_update=0
         
 
     #---------------------------------------------------------------------------

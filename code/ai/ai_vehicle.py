@@ -329,11 +329,13 @@ class AIVehicle(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+            self.owner.reset_image=True
 
         if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-        
+            self.owner.reset_image=True
+
             # -- deceleration --
         if self.vehicle_speed>5:
             self.vehicle_speed-=5*time_passed

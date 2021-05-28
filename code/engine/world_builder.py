@@ -31,7 +31,7 @@ from engine.world import World
 import engine.math_2d
 
 from engine.world_object import WorldObject
-
+from engine.world_area import WorldArea
 
 
 # load AI 
@@ -161,6 +161,10 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE):
         for x in range(count):
             coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
             spawn_building(WORLD,coords,'warehouse',True)
+    
+    w=WorldArea(WORLD)
+    w.world_coords=WORLD_COORDS
+    WORLD.world_areas.append(w)
 
 #------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
@@ -322,12 +326,17 @@ def load_test_environment(world):
     # create soviet squads 
     world.soviet_ai.squads=create_squads(world,s,'soviet')
 
-    # generate some world areas 
-    generate_world_area()
 
     # spawn
     world.german_ai.spawn_on_map()
     world.soviet_ai.spawn_on_map()
+
+    # add some world areas
+    generate_world_area(world,[-2000,2000],'town')
+    generate_world_area(world,[2000,-2000],'town')
+    generate_world_area(world,[2000,2000],'town')
+
+    #generate_world_area(world,[0,0],'town')
 
 #------------------------------------------------------------------------------    
 def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
