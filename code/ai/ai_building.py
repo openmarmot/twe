@@ -27,23 +27,27 @@ class AIBuilding(AIBase):
         super().__init__(owner)
         self.show_interior=False
         self.show_interior_distance=500
+
+        self.time_since_vis_update=0
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
-        if self.show_interior :
-            # check timeout to see if we should check distance to player
-            pass
-        else :
+
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        self.time_since_vis_update+=time_passed
+
+        if self.time_since_vis_update>5 :
+            self.time_since_vis_update=0
             # check distance to player
             b=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
             #print(str(b))
             if b<self.show_interior_distance:
                 # show the inside
                 self.owner.image_index=1
-                # todo - start a cooldown before checking distance again
-                # this way building aren't constantly flicking between inside and outside
+                self.owner.reset_image=True
             else:
                 # show the outside
                 self.owner.image_index=0
+                self.owner.reset_image=True
             
     #---------------------------------------------------------------------------

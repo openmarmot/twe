@@ -49,3 +49,6 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+#import cProfile as profile
+#profile.run('run()')

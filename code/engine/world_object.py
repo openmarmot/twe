@@ -35,7 +35,14 @@ class WorldObject(object):
         # the index of the image in the list that should be rendered
         self.image_index=0
 
+        # the actual rotated image object. set by graphics_engine 
+        self.image=None 
 
+        # image width, height. set by graphics_engine
+        self.image_size=None
+
+        # tell graphicsEngine to reset the image (need to rotate, etc)
+        self.reset_image=True
 
         # updated by the object AI
         self.world_coords=[0.,0.]
@@ -62,6 +69,7 @@ class WorldObject(object):
 
         # not sure this is used at the moment
         self.render=True
+
 
         # these are used by other objects to determine how this object can be interacted with
         # might just make this a string or something but bools are fast and easy to use 
@@ -108,6 +116,7 @@ class WorldObject(object):
     #remove_inventory
     def remove_inventory(self, ITEM):
         self.inventory.remove(ITEM)
+        self.ai.handle_event('remove_inventory',ITEM)
 
     def wo_start(self):
         self.world.add_object(self)

@@ -101,7 +101,13 @@ class AIVehicle(AIBase):
             else:
                 # don't care about NPCs, place them anywhere
                 self.passengers.append(EVENT_DATA)
-   
+
+    #---------------------------------------------------------------------------
+    def event_remove_inventory(self,EVENT_DATA):
+        if EVENT_DATA.is_human:
+            self.passengers.remove(EVENT_DATA)
+
+
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
@@ -119,6 +125,8 @@ class AIVehicle(AIBase):
             self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+        elif EVENT=='remove_inventory':
+            self.event_remove_inventory(EVENT_DATA)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):
@@ -321,11 +329,13 @@ class AIVehicle(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+            self.owner.reset_image=True
 
         if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-        
+            self.owner.reset_image=True
+
             # -- deceleration --
         if self.vehicle_speed>5:
             self.vehicle_speed-=5*time_passed

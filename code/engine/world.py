@@ -51,6 +51,9 @@ class World(object):
         self.wo_objects_grenade=[]
         self.wo_objects_consumable=[]
 
+        #world areas
+        self.world_areas=[]
+
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
@@ -166,6 +169,8 @@ class World(object):
         '''
         return a object that is 'under' the mouse cursor
         radius is actually the side of a square. kind of. >100 works best
+
+        called by graphics_2d_pygame on mouse down event .. currently 
         '''
         mouse=self.graphic_engine.get_mouse_screen_coords()
         collided=None
@@ -198,10 +203,15 @@ class World(object):
             for b in self.wo_objects:
                 b.update()
 
-            # temporary for now 
+            # update world areas
+            for b in self.world_areas:
+                b.update()
+
+            # update tactical AIs
             self.german_ai.update()
             self.soviet_ai.update()
             self.american_ai.update()
+
 
 
 

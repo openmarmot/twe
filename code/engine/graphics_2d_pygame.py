@@ -137,7 +137,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.world.select_with_mouse(15)
+                    b=self.world.select_with_mouse(20)
                     if b!=None:
                         print(b.name)
                         # send it over to world menu to figure out
@@ -208,14 +208,12 @@ class Graphics_2D_Pygame(object):
         self.screen.blit(self.background, (0, 0))
         for b in self.renderlists:
             for c in b:
-                x, y = c.screen_coords
-            #    print(str(c.rotation_angle))
-                #this calculation would be better done in the world object
-                #and probably only done once
-                w, h = self.images[c.image_list[c.image_index]].get_size()
-                self.screen.blit(self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle), (x-w/2, y-h/2))
-                #print('rendering : '+c.name+' coords : '+str(c.screen_coords))
-                #do any special rendering for the object
+                if c.reset_image:
+                    c.reset_image=False
+                    c.image_size=self.images[c.image_list[c.image_index]].get_size()
+                    c.image=self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle)
+                self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
+
                 c.render_pass_2()
 
                 if(self.draw_collision):
