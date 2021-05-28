@@ -151,9 +151,16 @@ def create_squads(WORLD,SOLDIERS,FACTION):
     return squad_list
             
 
+#------------------------------------------------------------------------------
+def generate_world_area(WORLD,WORLD_COORDS,TYPE):
+    ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
+    # TYPE town, airport, bunkers, field_depot, train_depot 
 
-
-
+    if TYPE=='town':
+        count=random.randint(3,10)
+        for x in range(count):
+            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
+            spawn_building(WORLD,coords,'warehouse',True)
 
 #------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
@@ -315,6 +322,9 @@ def load_test_environment(world):
     # create soviet squads 
     world.soviet_ai.squads=create_squads(world,s,'soviet')
 
+    # generate some world areas 
+    generate_world_area()
+
     # spawn
     world.german_ai.spawn_on_map()
     world.soviet_ai.spawn_on_map()
@@ -364,7 +374,19 @@ def spawn_blood_splatter(world,world_coords):
     z.render_level=2
     z.name='blood_splatter'
     z.rotation_angle=float(random.randint(0,359))  
-    z.wo_start()   
+    z.wo_start()  
+
+#------------------------------------------------------------------------------
+def spawn_building(world,world_coords,TYPE,SPAWN):
+    if TYPE=='warehouse':
+        z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
+        z.name='warehouse'
+        z.world_coords=copy.copy(world_coords)
+        z.speed=0
+        z.render_level=1
+        if SPAWN :
+            z.wo_start()
+        return z 
 
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords, crate_type,SPAWN):
@@ -693,16 +715,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
             z.wo_start()
         return z
 
-#------------------------------------------------------------------------------
-def spawn_warehouse(world,world_coords,SPAWN):
-    z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
-    z.name='warehouse'
-    z.world_coords=copy.copy(world_coords)
-    z.speed=0
-    z.render_level=1
-    if SPAWN :
-        z.wo_start()
-    return z
+
 
 #------------------------------------------------------------------------------
 def spawn_zombie_horde(world, world_coords, amount):

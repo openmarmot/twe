@@ -68,4 +68,23 @@ class WorldArea(object):
                 elif b.is_american:
                     american_count+=1
 
-        # todo - determine who controls it
+        # determine who controls it
+        # todo - need to understand if it is a free for all or if soviets and americans are allied
+        if german_count>soviet_count and german_count>american_count:
+            self.faction='german'
+        elif soviet_count>german_count and soviet_count>american_count:
+            self.faction='soviet'
+        elif american_count>german_count and american_count>soviet_count:
+            self.faction='american'
+        else:
+            self.faction='none'
+
+        if german_count>0 and soviet_count>0:
+            self.is_contested=True
+        elif german_count>0 and american_count>0:
+            self.is_contested=True
+        elif soviet_count>0 and american_count>0:
+            # need to check if they are allies or not
+            self.is_contested=True
+        else:
+            self.is_contested=False
