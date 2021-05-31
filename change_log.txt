@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 31 2021
+
+- added a new building 'square_building'
+- adde a poorly written sorting algo so that the building spawns 
+    aren't all just clumped on top of eachother 
+- fixed building spawn in world_menu 
+- adjusted collision_radius on several objects 
+- gave the player character image a black shirt and a bare head 
+    to differentiate from NPCs
+
+man my 2d art is .. awful. 
+if this project ever takes off I will need to pay for some artwork
+
+---------------------------------
 May 28 2021
 
 summary 

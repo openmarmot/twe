@@ -115,6 +115,16 @@ def moveTowardsTarget(speed,location,destination, time_passed):
 	return [location[0]+change[0],location[1]+change[1]]
 
 
-
+#-----------------------------------------------------------------------------
+def collision_sort(RUNS,WO_OBJECTS):
+	''' moves around objects so they no longer collide'''
+	# RUNS - number of runs through the resort algo you want to do. probably >100
+	# WO_OBJECTS - list of objects to sort
+	for x in range(RUNS):
+		for a in WO_OBJECTS:
+			if checkCollisionSquareOneResult(a,WO_OBJECTS,[a]) !=None:
+                #collided. lets move the building in a super intelligent way
+				a.world_coords[0]+=430.
+				a.world_coords[1]+=211.
 
 

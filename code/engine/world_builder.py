@@ -167,13 +167,7 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE):
             group.append(spawn_building(WORLD,coords,'square_building',True))
     
     # do some sorting 
-    count=100
-    for x in range(count):
-        for a in group:
-            if engine.math2d.checkCollisionSquareOneResult(a,group,[a]) !=None:
-                #collided. lets move the building in a super intelligent way
-                a.world_coords[0]+200.
-                a.world_coors[1]+111.
+    engine.math_2d.collision_sort(200,group)
 
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
@@ -231,8 +225,8 @@ def load_images(world):
     # buildings
     world.graphic_engine.loadImage('warehouse-inside','images/buildings/warehouse-inside.png')
     world.graphic_engine.loadImage('warehouse-outside','images/buildings/warehouse-outside.png')
-    world.graphic_engine.loadImage('warehouse-inside','images/buildings/square_building_inside.png')
-    world.graphic_engine.loadImage('warehouse-outside','images/buildings/square_building_outside.png')
+    world.graphic_engine.loadImage('square_building_inside','images/buildings/square_building_inside.png')
+    world.graphic_engine.loadImage('square_building_outside','images/buildings/square_building_outside.png')
 
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
@@ -352,7 +346,7 @@ def load_test_environment(world):
     generate_world_area(world,[2000,-2000],'town')
     generate_world_area(world,[2000,2000],'town')
 
-    #generate_world_area(world,[0,0],'town')
+    generate_world_area(world,[0,0],'town')
 
 
 #------------------------------------------------------------------------------
@@ -372,6 +366,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
         z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
+        z.collision_radius=500
         if SPAWN :
             z.wo_start()
         return z 
@@ -381,6 +376,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
         z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
+        z.collision_radius=75
         if SPAWN :
             z.wo_start()
         return z 
@@ -636,6 +632,7 @@ def spawn_ju88(world,world_coords,SPAWN):
     z=WorldObject(world,['ju88-winter-weathered'],AINone)
     z.world_coords=copy.copy(world_coords)
     z.render_level=3
+    z.collision_radius=100
     if SPAWN :
         z.wo_start()
     return z
@@ -749,6 +746,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
         z.speed=200
         z.rotation_speed=25.
         z.ai.acceleration=100
+        z.collision_radius=50
         if SPAWN :
             z.wo_start()
         return z

@@ -210,19 +210,19 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - spawn a crate')
-            self.world.graphic_engine.menu_text_queue.append('2 - spawn 5 zombies')
+            self.world.graphic_engine.menu_text_queue.append('2 - spawn 50 zombies')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
-            self.world.graphic_engine.menu_text_queue.append('4 - spawn a warehouse')
+            self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 5)
+                engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 50)
             elif Key=='3':
                 engine.world_builder.spawn_vehicle(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':
-                engine.world_builder.spawn_warehouse(self.world, self.world.player.world_coords,True)
+                engine.world_builder.spawn_building(self.world, self.world.player.world_coords,'square_building',True)
 
     def start_menu(self, Key):
         if self.menu_state=='none':
