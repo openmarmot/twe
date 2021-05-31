@@ -33,8 +33,8 @@ module_last_update_date='may23 2021' #date of last update
 def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
 	# wo - (worldobject)the object possibly doing the colliding 
 	# collision_list - (list[worldobject] a list of all possible objects that 
-	# list of objects to ignore
-	# could be collided with
+	# list of objects to ignore (should include wo)
+	# 
 
 	# checks collision based on a bounding box style check where the box is made
 	# with the collision radius (so its a square)

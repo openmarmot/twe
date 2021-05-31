@@ -155,13 +155,27 @@ def create_squads(WORLD,SOLDIERS,FACTION):
 def generate_world_area(WORLD,WORLD_COORDS,TYPE):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # TYPE town, airport, bunkers, field_depot, train_depot 
-
+    group=[]
     if TYPE=='town':
-        count=random.randint(3,10)
+        count=random.randint(1,5)
         for x in range(count):
             coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            spawn_building(WORLD,coords,'warehouse',True)
+            group.append(spawn_building(WORLD,coords,'warehouse',True))
+        count=random.randint(2,15)
+        for x in range(count):
+            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
+            group.append(spawn_building(WORLD,coords,'square_building',True))
     
+    # do some sorting 
+    count=100
+    for x in range(count):
+        for a in group:
+            if engine.math2d.checkCollisionSquareOneResult(a,group,[a]) !=None:
+                #collided. lets move the building in a super intelligent way
+                a.world_coords[0]+200.
+                a.world_coors[1]+111.
+
+    # make the corresponding worldArea object
     w=WorldArea(WORLD)
     w.world_coords=WORLD_COORDS
     WORLD.world_areas.append(w)
@@ -215,8 +229,10 @@ def load_images(world):
     world.graphic_engine.loadImage('shrapnel','images/shrapnel.png')
 
     # buildings
-    world.graphic_engine.loadImage('warehouse-inside','images/warehouse-inside.png')
-    world.graphic_engine.loadImage('warehouse-outside','images/warehouse-outside.png')
+    world.graphic_engine.loadImage('warehouse-inside','images/buildings/warehouse-inside.png')
+    world.graphic_engine.loadImage('warehouse-outside','images/buildings/warehouse-outside.png')
+    world.graphic_engine.loadImage('warehouse-inside','images/buildings/square_building_inside.png')
+    world.graphic_engine.loadImage('warehouse-outside','images/buildings/square_building_outside.png')
 
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
@@ -338,6 +354,38 @@ def load_test_environment(world):
 
     #generate_world_area(world,[0,0],'town')
 
+
+#------------------------------------------------------------------------------
+def spawn_blood_splatter(world,world_coords):
+    z=WorldObject(world,['blood_splatter'],AINone)
+    z.world_coords=copy.copy(world_coords)
+    z.render_level=2
+    z.name='blood_splatter'
+    z.rotation_angle=float(random.randint(0,359))  
+    z.wo_start()  
+
+#------------------------------------------------------------------------------
+def spawn_building(world,world_coords,TYPE,SPAWN):
+    if TYPE=='warehouse':
+        z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
+        z.name='warehouse'
+        z.world_coords=copy.copy(world_coords)
+        z.speed=0
+        z.render_level=1
+        if SPAWN :
+            z.wo_start()
+        return z 
+    if TYPE=='square_building':
+        z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)
+        z.name='square building'
+        z.world_coords=copy.copy(world_coords)
+        z.speed=0
+        z.render_level=1
+        if SPAWN :
+            z.wo_start()
+        return z 
+
+
 #------------------------------------------------------------------------------    
 def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
     if CONSUMABLE_TYPE=='adler-cheese':
@@ -376,26 +424,7 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
         z.is_consumable=True 
         z.wo_start() 
 
-#------------------------------------------------------------------------------
-def spawn_blood_splatter(world,world_coords):
-    z=WorldObject(world,['blood_splatter'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.render_level=2
-    z.name='blood_splatter'
-    z.rotation_angle=float(random.randint(0,359))  
-    z.wo_start()  
 
-#------------------------------------------------------------------------------
-def spawn_building(world,world_coords,TYPE,SPAWN):
-    if TYPE=='warehouse':
-        z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
-        z.name='warehouse'
-        z.world_coords=copy.copy(world_coords)
-        z.speed=0
-        z.render_level=1
-        if SPAWN :
-            z.wo_start()
-        return z 
 
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords, crate_type,SPAWN):
