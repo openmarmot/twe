@@ -28,7 +28,7 @@ class AIBuilding(AIBase):
         self.show_interior=False
         self.show_interior_distance=500
 
-        self.time_since_vis_update=0
+        self.time_since_vis_update=6
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

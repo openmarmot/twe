@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 01 2021
+
+- updated building ai so that it does the inside/outside 
+    check immediately so they don't all change 5 seconds in 
+- fixed zombie image rotation 
+- gave civilian player spawn option a ppk and grenade becaues 
+    starting unarmed is annoying 
+
+
+---------------------------------
 May 31 2021
 
 - added a new building 'square_building'
