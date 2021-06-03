@@ -24,6 +24,16 @@ so they aren't just holding down the trigger all the time.
 
 ammo limits and an AI that understands them is also needed 
 
+git diff --stat
+ change_log.txt                    | 23 +++++++++++++
+ code/ai/ai_faction_tactical.py    | 68 +++++++++++++++++++++++++++++++++++----
+ code/engine/graphics_2d_pygame.py |  4 +++
+ code/engine/world.py              | 12 ++++---
+ code/engine/world_area.py         |  5 ++-
+ code/engine/world_builder.py      | 15 ++++++---
+ code/engine/world_object.py       |  1 +
+ 7 files changed, 112 insertions(+), 16 deletions(-)
+
 ---------------------------------
 June 01 2021
 
