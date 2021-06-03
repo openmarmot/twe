@@ -33,9 +33,9 @@ class World(object):
     def __init__(self,SCREEN_SIZE):
         
         # tactical AIs
-        self.german_ai=AIFactionTactical()
-        self.soviet_ai=AIFactionTactical()
-        self.american_ai=AIFactionTactical()
+        self.german_ai=AIFactionTactical(self,'german')
+        self.soviet_ai=AIFactionTactical(self,'soviet')
+        self.american_ai=AIFactionTactical(self,'american')
 
 
         # object lists 
@@ -50,6 +50,7 @@ class World(object):
         self.wo_objects_vehicle=[]
         self.wo_objects_grenade=[]
         self.wo_objects_consumable=[]
+        self.wo_objects_building=[]
 
         #world areas
         self.world_areas=[]
@@ -84,7 +85,8 @@ class World(object):
             self.wo_objects_grenade.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_consumable:
             self.wo_objects_consumable.append(WORLD_OBJECT)
-
+        if WORLD_OBJECT.is_building:
+            self.wo_objects_building.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -158,6 +160,8 @@ class World(object):
             self.wo_objects_grenade.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_consumable:
             self.wo_objects_consumable.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_building:
+            self.wo_objects_building.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):

@@ -152,7 +152,7 @@ def create_squads(WORLD,SOLDIERS,FACTION):
             
 
 #------------------------------------------------------------------------------
-def generate_world_area(WORLD,WORLD_COORDS,TYPE):
+def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # TYPE town, airport, bunkers, field_depot, train_depot 
     group=[]
@@ -172,6 +172,9 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE):
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
     w.world_coords=WORLD_COORDS
+    w.name=NAME
+
+    # register with world 
     WORLD.world_areas.append(w)
 
 #------------------------------------------------------------------------------
@@ -342,11 +345,11 @@ def load_test_environment(world):
     world.soviet_ai.spawn_on_map()
 
     # add some world areas
-    generate_world_area(world,[-2000,2000],'town')
-    generate_world_area(world,[2000,-2000],'town')
-    generate_world_area(world,[2000,2000],'town')
+    generate_world_area(world,[-2000,2000],'town','Alfa')
+    generate_world_area(world,[2000,-2000],'town','Bravo')
+    generate_world_area(world,[2000,2000],'town','Charlie')
 
-    generate_world_area(world,[0,0],'town')
+    generate_world_area(world,[0,0],'town','Danitza')
 
 
 #------------------------------------------------------------------------------
@@ -367,6 +370,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
         z.speed=0
         z.render_level=1
         z.collision_radius=500
+        z.is_building=True
         if SPAWN :
             z.wo_start()
         return z 
@@ -377,6 +381,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
         z.speed=0
         z.render_level=1
         z.collision_radius=75
+        z.is_building=True
         if SPAWN :
             z.wo_start()
         return z 

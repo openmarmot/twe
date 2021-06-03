@@ -2,6 +2,29 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 02 2021
+
+- added debug test to display what faction controls each 
+    world_area 
+- added support code for buildings so they can be more easily 
+    interacted with.
+- finally giving ai_faction_tactical some love. this class will 
+     use squad destinations to move troops around the map to 
+     attack/defend/reinforce world_areas 
+
+pretty soon here we are going to get into a situation where all the 
+action is going to be taking place around world_areas that are not near 
+the initial spawn point. 
+this is a bigger challenge for this game because it is 2d, so the field of view 
+area is TINY. you basically have to get lucky to see anything happen 
+
+part of a work around for this is battles really need to be slower 
+to do this we need to implement cover mechanics and change the AI 
+so they aren't just holding down the trigger all the time. 
+
+ammo limits and an AI that understands them is also needed 
+
+---------------------------------
 June 01 2021
 
 - updated building ai so that it does the inside/outside 

@@ -265,6 +265,10 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue.append('Soviets: '+ str(len(self.world.wo_objects_soviet)))
         self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
 
+        # world area data
+        for b in self.world.world_areas:
+            self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
+
 #------------------------------------------------------------------------------
     def update_render_info(self):
         '''
