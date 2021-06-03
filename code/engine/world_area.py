@@ -15,13 +15,16 @@ import random
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='May 26 2021' #date of last update
+module_last_update_date='June 02 2021' #date of last update
 
 
 #global variables
 
 class WorldArea(object):
     def __init__(self,WORLD):
+
+
+        self.name='none'
 
         # the ever present WORLD reference
         self.world=WORLD

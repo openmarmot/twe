@@ -2,6 +2,63 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 02 2021
+
+- added debug test to display what faction controls each 
+    world_area 
+- added support code for buildings so they can be more easily 
+    interacted with.
+- finally giving ai_faction_tactical some love. this class will 
+     use squad destinations to move troops around the map to 
+     attack/defend/reinforce world_areas 
+
+pretty soon here we are going to get into a situation where all the 
+action is going to be taking place around world_areas that are not near 
+the initial spawn point. 
+this is a bigger challenge for this game because it is 2d, so the field of view 
+area is TINY. you basically have to get lucky to see anything happen 
+
+part of a work around for this is battles really need to be slower 
+to do this we need to implement cover mechanics and change the AI 
+so they aren't just holding down the trigger all the time. 
+
+ammo limits and an AI that understands them is also needed 
+
+git diff --stat
+ change_log.txt                    | 23 +++++++++++++
+ code/ai/ai_faction_tactical.py    | 68 +++++++++++++++++++++++++++++++++++----
+ code/engine/graphics_2d_pygame.py |  4 +++
+ code/engine/world.py              | 12 ++++---
+ code/engine/world_area.py         |  5 ++-
+ code/engine/world_builder.py      | 15 ++++++---
+ code/engine/world_object.py       |  1 +
+ 7 files changed, 112 insertions(+), 16 deletions(-)
+
+---------------------------------
+June 01 2021
+
+- updated building ai so that it does the inside/outside 
+    check immediately so they don't all change 5 seconds in 
+- fixed zombie image rotation 
+- gave civilian player spawn option a ppk and grenade becaues 
+    starting unarmed is annoying 
+
+
+---------------------------------
+May 31 2021
+
+- added a new building 'square_building'
+- adde a poorly written sorting algo so that the building spawns 
+    aren't all just clumped on top of eachother 
+- fixed building spawn in world_menu 
+- adjusted collision_radius on several objects 
+- gave the player character image a black shirt and a bare head 
+    to differentiate from NPCs
+
+man my 2d art is .. awful. 
+if this project ever takes off I will need to pay for some artwork
+
+---------------------------------
 May 28 2021
 
 summary 
