@@ -10,9 +10,12 @@ June 03 2021
     have a performance impact so there seems to be no need 
     to have the objects expire 
 
-
-
-
+git diff --stat
+ change_log.txt               | 12 ++++++++++++
+ code/ai/ai_gun.py            |  3 +++
+ code/engine/world_builder.py | 14 +++++++++++++-
+ 3 files changed, 28 insertions(+), 1 deletion(-)
+ 
 ---------------------------------
 June 02 2021
 
