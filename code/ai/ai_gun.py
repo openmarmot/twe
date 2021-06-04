@@ -82,6 +82,9 @@ class AIGun(AIBase):
                 else:
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False)
 
+                # spawn brass 
+                engine.world_builder.spawn_brass(self.owner.world,WORLD_COORDS)
+
         
 
 

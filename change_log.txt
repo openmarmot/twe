@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 03 2021
+
+- small tweak to kubelwagen turn rate to make it not 
+    extremely annoying 
+- added ejected brass. initial tests suggest that it doesn't 
+    have a performance impact so there seems to be no need 
+    to have the objects expire 
+
+
+
+
+---------------------------------
 June 02 2021
 
 - added debug test to display what faction controls each 

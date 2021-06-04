@@ -242,6 +242,7 @@ def load_images(world):
 
     # effects 
     world.graphic_engine.loadImage('blood_splatter','images/blood_splatter.png')
+    world.graphic_engine.loadImage('brass','images/brass.png')
 
     # consumables
     world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
@@ -350,6 +351,17 @@ def load_test_environment(world):
     generate_world_area(world,[2000,2000],'town','Charlie')
 
     generate_world_area(world,[0,0],'town','Danitza')
+
+
+#------------------------------------------------------------------------------
+def spawn_brass(world,world_coords):
+    z=WorldObject(world,['brass'],AINone)
+    w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
+    z.world_coords=copy.copy(w)
+    z.render_level=2
+    z.name='brass'
+    z.rotation_angle=float(random.randint(0,359))  
+    z.wo_start()  
 
 
 #------------------------------------------------------------------------------
@@ -749,7 +761,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
         z.is_vehicle=True
         z.render_level=3
         z.speed=200
-        z.rotation_speed=25.
+        z.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
         if SPAWN :
