@@ -378,6 +378,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
     if TYPE=='warehouse':
         z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
+        z.world_builder_identity='building_warehouse'
         z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
@@ -389,6 +390,7 @@ def spawn_building(world,world_coords,TYPE,SPAWN):
     if TYPE=='square_building':
         z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
+        z.world_builder_identity='building_square'
         z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
@@ -406,6 +408,7 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
         z.name='Adler cheese'
+        z.world_builder_identity='consumable_adler'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
         z.wo_start() 
@@ -415,6 +418,7 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
         z.name='Camembert cheese'
+        z.world_builder_identity='consumable_camembert'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
         z.wo_start() 
@@ -424,6 +428,7 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
         z.name='Champignon cheese'
+        z.world_builder_identity='consumable_champignon'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
         z.wo_start() 
@@ -433,6 +438,7 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
         z.world_coords=copy.copy(world_coords)
         z.render_level=2
         z.name='Karwendel cheese'
+        z.world_builder_identity='consumable_karwendel'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
         z.wo_start() 
@@ -447,6 +453,7 @@ def spawn_crate(world,world_coords, crate_type,SPAWN):
     z.is_crate=True
     z.render_level=2
     z.name='crate'
+    z.world_builder_identity='crate'
         
     if SPAWN :
         z.wo_start()
@@ -459,6 +466,7 @@ def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE,SPAWN):
     if GRENADE_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
+        z.world_builder_identity='grenade_model24'
         z.is_grenade=True
         z.world_coords=copy.copy(WORLD_COORDS)
         z.speed=140.
@@ -476,6 +484,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='mp40':
         z=WorldObject(world,['mp40'],AIGun)
         z.name='mp40'
+        z.world_builder_identity='gun_mp40'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=32
@@ -487,6 +496,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='ppsh43':
         z=WorldObject(world,['ppsh43'],AIGun)
         z.name='ppsh43'
+        z.world_builder_identity='gun_ppsh43'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=35
@@ -498,6 +508,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='stg44':
         z=WorldObject(world,['stg44'],AIGun)
         z.name='stg44'
+        z.world_builder_identity='gun_stg44'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=30
@@ -509,6 +520,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='dp28':
         z=WorldObject(world,['dp28'],AIGun)
         z.name='dp28'
+        z.world_builder_identity='gun_dp28'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=47
@@ -520,6 +532,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='ppk':
         z=WorldObject(world,['ppk'],AIGun)
         z.name='ppk'
+        z.world_builder_identity='gun_ppk'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=7
@@ -531,6 +544,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='tt33':
         z=WorldObject(world,['tt33'],AIGun)
         z.name='tt33'
+        z.world_builder_identity='gun_tt33'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=8
@@ -542,6 +556,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='1911':
         z=WorldObject(world,['1911'],AIGun)
         z.name='1911'
+        z.world_builder_identity='gun_1911'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=7
@@ -553,6 +568,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='mg34':
         z=WorldObject(world,['mg34'],AIGun)
         z.name='mg34'
+        z.world_builder_identity='gun_mg34'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=75
@@ -564,6 +580,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='kar98k':
         z=WorldObject(world,['kar98k'],AIGun)
         z.name='kar98k'
+        z.world_builder_identity='gun_kar98k'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=5
@@ -575,6 +592,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
     if GUN_TYPE=='mosin_nagant':
         z=WorldObject(world,['mosin_nagant'],AIGun)
         z.name='mosin_nagant'
+        z.world_builder_identity='gun_mosin_nagant'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=2
@@ -711,21 +729,25 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     # --------- german types ---------------------------------
     if SOLDIER_TYPE=='german_kar98k':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
         z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_mp40'
         z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_mg34':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_mg34'
         z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_stg44':
         z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_stg44'
         z.add_inventory(spawn_gun(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z
@@ -733,21 +755,25 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     # --------- soviet types ----------------------------------------
     if SOLDIER_TYPE=='soviet_mosin_nagant':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.world_builder_identity='soviet_mosin_nagant'
         z.add_inventory(spawn_gun(WORLD,[0,0],'mosin_nagant',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='soviet_ppsh43':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.world_builder_identity='soviet_ppsh43'
         z.add_inventory(spawn_gun(WORLD,[0,0],'ppsh43',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z 
     if SOLDIER_TYPE=='soviet_dp28':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.world_builder_identity='soviet_dp28'
         z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
         return z 
     if SOLDIER_TYPE=='soviet_tt33':
         z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z.world_builder_identity='soviet_tt33'
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
         return z   
@@ -757,6 +783,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
 
     if VEHICLE_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
+        z.world_builder_identity='vehicle_kubelwagen'
         z.world_coords=copy.copy(WORLD_COORDS)
         z.is_vehicle=True
         z.render_level=3

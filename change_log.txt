@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 05 2021
+
+- started working on sqlite integration for 
+    save/load 
+
+
+---------------------------------
 June 03 2021
 
 - small tweak to kubelwagen turn rate to make it not 
