@@ -5,9 +5,7 @@ Some issues that I am aware of
 Minor Issues 
 - when grenades are thrown it seems they are not removed from inventory 
     - inventory removal needs cleanup
-- soldier ai seems to occasionally get stuck - not sure in what state but possibly movement 
-    - i think this is due to low health, which was basically a pause state 
-- when entering a vehicle enemies still fire at your avatars previous position -- ghost in faction enemy lists??
+
 
 
 # ----- Major Issues -----

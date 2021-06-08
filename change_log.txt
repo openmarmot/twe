@@ -1,6 +1,41 @@
 TWE Project : Change Log
 
+---------------------------------
+June 08 2021
 
+- more db code 
+- rewrote enter/exit vehicle from world_menu to fix teleporting
+    - also changed vehicle update so that it updates passenger locations to 
+        match the vehicle location. this may prevent some future issues with 
+        squad AI 
+
+played around with building sorting a bit but it is still hilariously terrible. 
+I wish I could remember exactly how I've done this before - probably requires 
+some actual thought. the current implementation was about 2 minutes of work 
+I do think the placements it ends up with look nice - but the buildings overlap 
+more than is acceptable 
+
+---------------------------------
+June 05 2021
+
+- started working on sqlite integration for 
+    save/load 
+
+---------------------------------
+June 03 2021
+
+- small tweak to kubelwagen turn rate to make it not 
+    extremely annoying 
+- added ejected brass. initial tests suggest that it doesn't 
+    have a performance impact so there seems to be no need 
+    to have the objects expire 
+
+git diff --stat
+ change_log.txt               | 12 ++++++++++++
+ code/ai/ai_gun.py            |  3 +++
+ code/engine/world_builder.py | 14 +++++++++++++-
+ 3 files changed, 28 insertions(+), 1 deletion(-)
+ 
 ---------------------------------
 June 02 2021
 

@@ -190,18 +190,13 @@ class World_Menu(object):
                     self.selected_object.add_inventory(self.world.player)
                     # remove the player from the world so we don't have a ghost
                     self.world.remove_object(self.world.player)
-                    # reset player reference so the game doesn't break
-                    self.world.player=self.selected_object
                     self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 else:
                     # exit the vehicle
-
-                    # this is poor. need to keep track of player better
                     p=self.selected_object.ai.passengers[0]
                     self.selected_object.remove_inventory(p)
                     self.world.add_object(p)
-                    self.world.player=p
                     self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
 
     def debug_menu(self, Key):

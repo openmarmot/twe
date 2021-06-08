@@ -26,6 +26,10 @@ class WorldObject(object):
 
         self.world = world
         self.name = None
+
+        # string that tells world_builder how to spawn this object
+        # used for saving/loading objects
+        self.world_builder_identity=''
         
         # list of images, the AI will set image_index to the current one
         #   that should be used
