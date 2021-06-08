@@ -71,6 +71,11 @@ class AIVehicle(AIBase):
             else :
                 self.handle_normal_ai_update()
 
+            # update passenger coords 
+            # this fixes a lot of other weirdness 
+            for b in self.passengers:
+                b.world_coords=copy.copy(self.owner.world_coords)
+
 
 
     #---------------------------------------------------------------------------

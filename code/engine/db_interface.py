@@ -41,10 +41,7 @@ def create_new_world(DATABASE_NAME):
     # DATABASE_NAME - this file should not already exist
     
     name='data/'+DATABASE_NAME
-    
-    # create database 
     db = sqlite3.connect(name)
-
     cursor = db.cursor()
 
     # create world_object table 
@@ -58,7 +55,26 @@ def create_new_world(DATABASE_NAME):
 
 
 #------------------------------------------------------------------------------
-def get_map_world_objects(MAP_X,MAP_Y):
+def select_map_world_objects(DATABASE_NAME,MAP_X,MAP_Y):
     ''' return a list of comma delineated strings representing rows 
         that match the MAP coords from the world_objects table '''
-    
+
+    name='data/'+DATABASE_NAME
+    db = sqlite3.connect(name)
+    cursor = db.cursor()
+
+    db.commit()
+    db.close()
+
+
+#------------------------------------------------------------------------------
+def insert_world_objects(DATABASE_NAME,OBJECTS):
+    ''' insert a list of world objects '''
+    # format 
+    # OBJECTS=[(name,world_builder_identity,faction,map_x,map_y)]
+    name='data/'+DATABASE_NAME
+    db = sqlite3.connect(name)
+    cursor = db.cursor()
+    cursor.executemany(''' INSERT INTO world_object(name,world_builder_identity,faction,map_x,map_y) VALUES(?,?,?,?,?)''', OBJECTS)
+    db.commit()
+    db.close()

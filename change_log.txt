@@ -1,12 +1,25 @@
 TWE Project : Change Log
 
+---------------------------------
+June 08 2021
+
+- more db code 
+- rewrote enter/exit vehicle from world_menu to fix teleporting
+    - also changed vehicle update so that it updates passenger locations to 
+        match the vehicle location. this may prevent some future issues with 
+        squad AI 
+
+played around with building sorting a bit but it is still hilariously terrible. 
+I wish I could remember exactly how I've done this before - probably requires 
+some actual thought. the current implementation was about 2 minutes of work 
+I do think the placements it ends up with look nice - but the buildings overlap 
+more than is acceptable 
 
 ---------------------------------
 June 05 2021
 
 - started working on sqlite integration for 
     save/load 
-
 
 ---------------------------------
 June 03 2021
