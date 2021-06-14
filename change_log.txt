@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 13 2021
+
+- updated image for shrapnel
+- upped shrapnel speed and lowered lifetime to compensate 
+- made panzerfaust projectile image 
+- added more soldiers to the initial test spawn to keep things interesting 
+
+thinking about collision/penetration for projectiles
+- buildings may get a 50% chance to block bullets to make humans inside buildings harder to hit 
+- a similar mechanic may be needed for going prone (need to add prone art and AI options )
+    - may NOT add prone so i don't have to do the additional artwork 
+
+
+
+
+---------------------------------
 June 08 2021
 
 - more db code 

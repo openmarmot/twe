@@ -222,8 +222,9 @@ def load_images(world):
     world.graphic_engine.loadImage('model24','images/weapons/model24.png')
 
     # projectiles
-    world.graphic_engine.loadImage('projectile','images/projectile.png')
-    world.graphic_engine.loadImage('shrapnel','images/shrapnel.png')
+    world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
+    world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
+    world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
 
     # buildings
     world.graphic_engine.loadImage('warehouse-inside','images/buildings/warehouse-inside.png')
@@ -313,6 +314,24 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'german_stg44'))
     s.append(spawn_soldiers(world,'german_mg34'))
     s.append(spawn_soldiers(world,'german_mg34'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_kar98k'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_mp40'))
+    s.append(spawn_soldiers(world,'german_stg44'))
+    s.append(spawn_soldiers(world,'german_mg34'))
+    s.append(spawn_soldiers(world,'german_mg34'))
+    s.append(spawn_soldiers(world,'german_stg44'))
+    s.append(spawn_soldiers(world,'german_stg44'))
+
 
     
     # create german squads
@@ -320,6 +339,22 @@ def load_test_environment(world):
 
     # add ze russians
     s=[]
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+    s.append(spawn_soldiers(world,'soviet_dp28'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    s.append(spawn_soldiers(world,'soviet_ppsh43'))
     s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
     s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
     s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
@@ -705,8 +740,8 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=200.
-    z.ai.maxTime=random.uniform(0.3, 0.9)
+    z.speed=300.
+    z.ai.maxTime=random.uniform(0.1, 0.5)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=IGNORE_LIST
