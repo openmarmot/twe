@@ -819,6 +819,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
     if VEHICLE_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
         z.world_builder_identity='vehicle_kubelwagen'
+        z.name='kubelwagen'
         z.world_coords=copy.copy(WORLD_COORDS)
         z.is_vehicle=True
         z.render_level=3

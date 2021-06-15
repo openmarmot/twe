@@ -1,5 +1,26 @@
 TWE Project : Change Log
 
+
+---------------------------------
+June 14 2021
+
+- changed bullet collision so it now checks vehicles and buildings in addition to humans 
+- added a passthrough check that gives a chance for a bullet to pass through an object 
+
+bullet collision changes mean that now being in a building will have decreased lethality 
+because the building will block a percentage of the bullets 
+- does not currently affect grenades 
+- early testinng indicates that building collision may be messed up. the results are odd 
+
+bullet pass through on humans will increase lethality against humans in the open 
+- for now the percentage is low as lethality in the open is already super high 
+
+i think there is a need for an effect to show passthrough when it happens 
+- also need some sort of effect for when a bullet is stopped by something 
+    - maybe similar to the blood spot only dust or something and make it temporary ? 
+
+as a unintended side effect you can now kill vehicles as they process collision events like humans 
+
 ---------------------------------
 June 13 2021
 
@@ -12,9 +33,6 @@ thinking about collision/penetration for projectiles
 - buildings may get a 50% chance to block bullets to make humans inside buildings harder to hit 
 - a similar mechanic may be needed for going prone (need to add prone art and AI options )
     - may NOT add prone so i don't have to do the additional artwork 
-
-
-
 
 ---------------------------------
 June 08 2021

@@ -1,9 +1,8 @@
 
 '''
-module : ai_zombie.py
+module : ai_projectile.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 '''
@@ -14,6 +13,7 @@ notes :
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
+import engine.penetration_calculator
 # module specific variables
 module_version='0.0' #module software version
 module_last_update_date='April 10 2021' #date of last update
@@ -39,8 +39,19 @@ class AIProjectile(AIBase):
         # move along path
         self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
-        if self.owner.world.check_collision_bool(self.owner,self.ignore_list,False,True):
-            self.owner.world.remove_object(self.owner)
+        # old method 
+        #if self.owner.world.check_collision_bool(self.owner,self.ignore_list,False,True):
+        #   self.owner.world.remove_object(self.owner)
+
+        # this is expensive, do we need to do it every update cycle? maybe put on a timer
+        collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False)
+        if collide_obj !=None:
+            if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                pass
+            else:
+                # bullet stuck in something. remove bullet from world
+                self.owner.world.remove_object(self.owner) 
+
 
 
 
