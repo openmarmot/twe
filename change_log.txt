@@ -1,6 +1,47 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+June 16 2021
+
+- reorganized world_builder to put brass and blood_splatter under a spawn_sprite function
+    sprite was a term from my old directx days that referred to a 2d effect 
+- added a new dirt sprite 
+- added event handling to building ai 
+- added dirt spawn on collision event to buildings 
+- added dirt spawn on bullet flight time expiration 
+- changed bullet collision behavior so if it gets a pass through on an object 
+    the object gets added to its ignore_list so it can't hit it again 
+    - had to revert this because it causes invulnerabilitiy. idk why 
+
+my change where i added pass through objects to the ignore list created an odd 
+situation where the AI could no longer hit eachother after a certain point. 
+I cannot figure out why this is happening 
+
+two theories 
+1. python 'in' operator cannot tell different objects of the same class apart 
+    - this seems possible but if true i think bullets would not work at all 
+    - 'in' is used heavily in collision detection as we use ignore lists to 
+    keep friendly fire down 
+2. something goofy with variable scope where somehow the ignore list is being shared 
+    across multiple bullets - or it is getting reset when it shouldn't be 
+    - i haven't been able to prove this yet 
+The most interesting part of this is the bullets from the player are not effected at all 
+
+After a lot more troubleshooting i changed the ignore list on ai_projectile to be a copy.copy 
+- this seems to have resolved the issue - but more testing is needed. 
+
+what this would indicate is that when i was appending objects to the ignore list I was 
+possibly accidentally adding items to the squad list - which the ignore list may have 
+accidentally been a pointer to 
+
+
+- changed ai_projectile by adding an else so a bullet couldn't be removed for 
+    timing out AND later be removed for hitting something (not sure what would happen)
+
+- added human health to the menu that pops up when you click on a human to help with debug 
+
 ---------------------------------
 June 14 2021
 

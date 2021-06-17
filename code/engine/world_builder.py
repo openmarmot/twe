@@ -241,9 +241,11 @@ def load_images(world):
     #crates?
     world.graphic_engine.loadImage('crate','images/crate.png')
 
-    # effects 
-    world.graphic_engine.loadImage('blood_splatter','images/blood_splatter.png')
-    world.graphic_engine.loadImage('brass','images/brass.png')
+    # effects (sprites)
+    world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
+    world.graphic_engine.loadImage('brass','images/sprites/brass.png')
+    # regular dirt was cool but it was huge. may use in future
+    world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
 
     # consumables
     world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
@@ -388,25 +390,8 @@ def load_test_environment(world):
     generate_world_area(world,[0,0],'town','Danitza')
 
 
-#------------------------------------------------------------------------------
-def spawn_brass(world,world_coords):
-    z=WorldObject(world,['brass'],AINone)
-    w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
-    z.world_coords=copy.copy(w)
-    z.render_level=2
-    z.name='brass'
-    z.rotation_angle=float(random.randint(0,359))  
-    z.wo_start()  
 
 
-#------------------------------------------------------------------------------
-def spawn_blood_splatter(world,world_coords):
-    z=WorldObject(world,['blood_splatter'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.render_level=2
-    z.name='blood_splatter'
-    z.rotation_angle=float(random.randint(0,359))  
-    z.wo_start()  
 
 #------------------------------------------------------------------------------
 def spawn_building(world,world_coords,TYPE,SPAWN):
@@ -718,7 +703,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.ai.maxTime=4.
     z.is_projectile=True
     z.render_level=3
-    z.ai.ignore_list=IGNORE_LIST
+    z.ai.ignore_list=copy.copy(IGNORE_LIST)
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
@@ -812,6 +797,34 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
         z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
         return z   
+
+
+#------------------------------------------------------------------------------
+def spawn_sprite(WORLD,WORLD_COORDS,TYPE):
+    ''' sprite being a static 2d 'effect' '''
+    if TYPE=='brass':
+        z=WorldObject(WORLD,['brass'],AINone)
+        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.render_level=2
+        z.name='brass'
+        z.rotation_angle=float(random.randint(0,359))  
+        z.wo_start()
+    elif TYPE=='blood_splatter':
+        z=WorldObject(WORLD,['blood_splatter'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.render_level=2
+        z.name='blood_splatter'
+        z.rotation_angle=float(random.randint(0,359))  
+        z.wo_start()     
+    elif TYPE=='dirt':
+        z=WorldObject(WORLD,['dirt'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.render_level=2
+        z.name='dirt'
+        z.rotation_angle=float(random.randint(0,359))  
+        z.wo_start()   
+
 
 #------------------------------------------------------------------------------
 def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):

@@ -67,7 +67,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
-            engine.world_builder.spawn_blood_splatter(self.owner.world,self.owner.world_coords)
+            engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'blood_splatter')
         elif EVENT_DATA.is_grenade:
             print('who throws grenades at people?? Rude!')
 

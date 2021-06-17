@@ -152,6 +152,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
+            self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('3 - ? (not implemented)?')
