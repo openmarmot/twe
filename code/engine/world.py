@@ -23,7 +23,7 @@ from ai.ai_faction_tactical import AIFactionTactical
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='May 17 2021' #date of last update
+module_last_update_date='June 17 2021' #date of last update
 
 #global variables
 
@@ -110,6 +110,33 @@ class World(object):
                     collided=True
 
         return collided
+
+
+    #---------------------------------------------------------------------------
+    def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
+        ''' collision check. returns colliding object or None'''
+        # COLLIDER - worldobject doing the colliding
+        # IGNORE LIST - list of objects to ignore
+        collided=None
+
+        if CHECK_ALL :
+            # in this case all is humans+vehicles+buidings
+            objects=self.wo_objects_human+self.wo_objects_building+self.wo_objects_vehicle
+            temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,objects,IGNORE_LIST)
+            if temp !=None:
+                #print('Collision with '+temp.name )
+                temp.ai.handle_event("collision",COLLIDER)
+                collided=temp
+        else :
+            if CHECK_HUMAN :
+                temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
+                if temp !=None:
+                    #print('Collision with '+temp.name )
+                    temp.ai.handle_event("collision",COLLIDER)
+                    collided=temp
+
+        return collided
+
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):
