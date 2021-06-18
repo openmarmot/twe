@@ -171,7 +171,7 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
 
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
-    w.world_coords=WORLD_COORDS
+    w.world_coords=copy.copy(WORLD_COORDS)
     w.name=NAME
 
     # register with world 
@@ -700,7 +700,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=350.
-    z.ai.maxTime=4.
+    z.ai.maxTime=3.5 + random.uniform(0.01, 0.5)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
@@ -729,7 +729,7 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z.ai.maxTime=random.uniform(0.1, 0.5)
     z.is_projectile=True
     z.render_level=3
-    z.ai.ignore_list=IGNORE_LIST
+    z.ai.ignore_list=copy.copy(IGNORE_LIST)
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
     # increase the collision radius to make sure we get hits
@@ -823,7 +823,9 @@ def spawn_sprite(WORLD,WORLD_COORDS,TYPE):
         z.render_level=2
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))  
-        z.wo_start()   
+        z.wo_start() 
+    else :
+        print('spawn_sprite error - TYPE not recognized :'+TYPE)  
 
 
 #------------------------------------------------------------------------------

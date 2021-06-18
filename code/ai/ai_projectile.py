@@ -28,6 +28,10 @@ class AIProjectile(AIBase):
         self.maxTime=5.
         self.ignore_list=[]
 
+        # the equipper of the gun that fired the projectile
+        # not used yet 
+        self.shooter=None
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

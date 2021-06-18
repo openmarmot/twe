@@ -22,3 +22,9 @@ Minor Issues
     when moving there is a very noticeable small oscillation of every object 
         -especially noticeable when a lot of objects are close together 
     - this probably is due a rounding or conversion with world to screen coords thats isn't precise enough 
+
+
+- collision seems to have a bias to the right side. 
+    this suggests either i have a +/- flipped or the math is just wrong 
+    - if you fire from the left of the house the dirt will pile up mid house 
+    - if you fire from the right of the house the dirt piles up right of the house by a good bit 

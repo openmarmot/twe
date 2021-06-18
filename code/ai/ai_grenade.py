@@ -30,6 +30,9 @@ class AIGrenade(AIBase):
         # whether the grenade is active or inactive
         self.thrown=False
 
+        # whether the grenade collided with something
+        self.collided=False
+
         # time in flight
         self.flightTime=0
         # max flight time, basically the fuse length
@@ -56,12 +59,12 @@ class AIGrenade(AIBase):
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
-            if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
-                # just stop the grenade. maybe some spin or reverse movement?
-                if self.owner.speed>1:
-                    self.owner.speed=-1
-                else:
-                    self.owner.speed-=2
+            
+            if self.collided==False:
+                if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
+                    # just stop the grenade. maybe some spin or reverse movement?
+                    self.owner.speed=-20
+                    self.collided=True
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------

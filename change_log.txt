@@ -2,6 +2,37 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 18 2021
+
+- modified ai_human so updates happen on a else from 
+    the death check - hopefully resolving an occasional 
+    issue where bots would manage to fire a bullet after they disappear (die)
+- made vehicles invulnerable for now 
+    - will revisit this later when i think more about vehicle damage modeling 
+- changed grenade so it stops collision checks after an initial collision 
+    - this was to prevent it colliding with the same thing a ton of times 
+        - other option would be to use ignore lists but the grenade only lasts 
+        a second or so before exploding so this was fine 
+- added AI behavior where getting hit by a grenade causes the AI to move in a 
+    random direction. unfortunately they do not move fast enough to avoid the 
+    grenade blast - but its a nice thought.
+    - after some play testing I updated this behavior to be triggered by any 
+        collision - making it kind of a stun lock. advantage to the AI is 
+        it may cause dodging in flight projectile streams  
+- added a little randomness to bullet flight time to make the dirt piles 
+    left behind when bullets run out of flight time a little more random 
+- accidentally changed grenade fragment lifetime randomness. so now its different 
+- updated shrapnel so it is using copy.copy (bug i found a couple days ago in projectile)
+- updated world_area creation to use copy.copy for world coords (probably didn't matter)
+im not keeping up with the 'last_modified' string on the files at all. 
+this was helpful to keep track of on small projects but is a bother on more active projects 
+
+collision seems to have a bias to the right side. 
+this suggests either i have a +/- flipped or the math is just wrong 
+- if you fire from the left of the house the dirt will pile up mid house 
+- if you fire from the right of the house the dirt piles up right of the house by a good bit 
+
+---------------------------------
 June 17 2021
 
 - play testing to make sure fixes from yesterday worked 

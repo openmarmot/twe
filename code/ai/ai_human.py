@@ -49,17 +49,18 @@ class AIHuman(AIBase):
                 b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
                 self.owner.world.add_object(b)
             self.owner.world.remove_object(self.owner)
-
-        if self.primary_weapon!=None:
-            # needs updates for time tracking and other stuff
-            self.primary_weapon.update()
-
-        if self.owner.is_player:
-            self.handle_player_update()
-        elif self.owner.is_zombie:
-            self.handle_zombie_update()
         else :
-            self.handle_normal_ai_update()
+
+            if self.primary_weapon!=None:
+                # needs updates for time tracking and other stuff
+                self.primary_weapon.update()
+
+            if self.owner.is_player:
+                self.handle_player_update()
+            elif self.owner.is_zombie:
+                self.handle_zombie_update()
+            else :
+                self.handle_normal_ai_update()
 
 
 
@@ -69,9 +70,14 @@ class AIHuman(AIBase):
             self.health-=random.randint(25,75)
             engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'blood_splatter')
         elif EVENT_DATA.is_grenade:
-            print('who throws grenades at people?? Rude!')
+            # not sure what to do here. the grenade explodes too fast to really do anything 
+            pass 
 
-
+        self.ai_goal='react to collision'
+        # move in a random direction to attempt to escape grenade/bullets/whatever 
+        self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
+        self.ai_state='start_moving'
+            
 
 
     #---------------------------------------------------------------------------
