@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 
+---------------------------------
+June 17 2021
+
+- play testing to make sure fixes from yesterday worked 
+- removed some un-needed debug messages 
 
 ---------------------------------
 June 16 2021

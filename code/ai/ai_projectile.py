@@ -49,11 +49,7 @@ class AIProjectile(AIBase):
                 if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
                     # add the collided object to ignore list so we don't hit it again
                     # this is mostly to deal with buildings where we would hit it a ton of times
-                    print('passthrough: '+collide_obj.name)
-                    # this causes invulnerability from AI bullets (but not from player bullets)
-                    # i do not know why. either something goofy with how that ref is being passed or .. ? 
                     self.ignore_list.append(collide_obj)
-                    print(len(self.ignore_list))
                 else:
                     # bullet stuck in something. remove bullet from world
                     self.owner.world.remove_object(self.owner) 
