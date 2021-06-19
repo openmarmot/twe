@@ -1,6 +1,36 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+June 18 2021 - part 2
+
+- minor misc code cleanup 
+- implemented a function in world to return a random object 
+- used the new function to change the gun spawn that can occur from get_closest_gun 
+    to spawn the gun in a random building instead of just in a random location 
+- changed up inital spawns a bit - eventually some of the clutter spawns will be handled by 
+    world_ai 
+- ai rewrite to introduce the concept of 'personal_enemies'
+    - this is a list of personal enemies that the bot has made 
+        - currently the bots add someone to the list if they get shot by them 
+    - rewrite also focused on making code more common between civilians and soldiers 
+
+This was one of my more interesting updates. 
+'personal_enemies' and the new AI decision trees add a lot of interesting depth to 
+the AI actions. 
+
+For example if you shoot (but not kill) a civilian they will add you to their 
+personal_enemies list and try to kill you. However first they will need a gun 
+- and I find that they often die to cross fire before they find a gun and 
+come back to kill you 
+
+This also makes the soldier combat a bit better as they are slightly less likely 
+to just sit there and get shot 
+
+It is also possible that soldiers on the same side could end up targeting eachother 
+if they get hit by friendly fire -  not sure if i will add a check for this or not 
+
 ---------------------------------
 June 18 2021
 

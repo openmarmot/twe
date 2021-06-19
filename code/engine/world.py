@@ -144,10 +144,17 @@ class World(object):
         best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns)
         if best_object==None:
             # spawn a new gun and return it
-            engine.world_builder.spawn_gun(self,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'ppk',True)
+
+            # first lets get a random building
+            b=self.get_random_object(self.wo_objects_building)
+
+            # randomize the coords a bit 
+            w=[b.world_coords[0]+float(random.randint(-20,20)),b.world_coords[1]+float(random.randint(-20,20))]
+
+            # spawn a ppk
+            engine.world_builder.spawn_gun(self,w,'ppk',True)
             # hmm we don't have the object reference, so lets just run this method again
             # does this make sense? am i insane? HA HA HAHAHAHA
-            print('warning mind bender insane o loop activated in world.get_closest_gun')
             return self.get_closest_gun(WORLD_COORDS)
         else : 
             return best_object
@@ -164,6 +171,12 @@ class World(object):
                 best_object=b
 
         return best_object
+
+    #---------------------------------------------------------------------------
+    def get_random_object(self,OBJECT_LIST):
+        ''' return a random object from a list '''
+        i=random.randint(0,len(OBJECT_LIST)-1)
+        return OBJECT_LIST[i]
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):

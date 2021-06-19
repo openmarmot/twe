@@ -257,32 +257,37 @@ def load_images(world):
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
-    # this is done by world menu now
-    #add a player
-    #p=spawn_human(world, [50.,50.],'player',True)
-    #p.add_inventory(spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
-    #p.add_inventory(spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
 
     # add civilians 
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
 
-    # zombie generator 
-    #spawn_zombie_horde(world, [10,10], 50)
 
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
+    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
+    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
 
 
     # and some grenades! 
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
 
     # add ju88
     spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],True)
@@ -694,8 +699,9 @@ def spawn_ju88(world,world_coords,SPAWN):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
+    # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
@@ -704,6 +710,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
+    z.ai.shooter=SHOOTER
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored

@@ -38,6 +38,10 @@ class AIHuman(AIBase):
         self.squad=None
         self.target_object=None
         self.destination=None
+
+        # list of personal enemies the AI has
+        # not assigned from squad - mostly assigned through getting shot at the moment 
+        self.personal_enemies=[]
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -69,6 +73,12 @@ class AIHuman(AIBase):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
             engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'blood_splatter')
+
+            # add the shooter of the bullet to the personal enemies list
+            # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
+            if EVENT_DATA.ai.shooter !=None:
+                self.personal_enemies.append(EVENT_DATA.ai.shooter)
+
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 
             pass 
@@ -77,6 +87,7 @@ class AIHuman(AIBase):
         # move in a random direction to attempt to escape grenade/bullets/whatever 
         self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
         self.ai_state='start_moving'
+
             
 
 
@@ -201,91 +212,95 @@ class AIHuman(AIBase):
         else :
             # what should we be doing ??
 
-            #---- soldier ------------------------------------------------------
-            if self.owner.is_soldier :
-
-                # distance from group 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                
-                # are we low on health? 
-                if self.health<10:
-                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-                    if o != None:
-                        self.target_object=o
-                        self.ai_goal='pickup'
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving'  
-                    else :
-                        # no health to be had. time to run away
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
-                        self.ai_state='start_moving'  
-                # do we need a gun ?
-                elif self.primary_weapon==None :
+            # 1. are we low on health? 
+            if self.health<10:
+                o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+                if o != None:
+                    self.target_object=o
+                    self.ai_goal='pickup'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'  
+                else :
+                    # no health to be had. time to run away
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
+                    self.ai_state='start_moving'  
+            
+            # 2. health is good. deal with personal enemies
+            elif len(self.personal_enemies)>0:
+                # first,  do we have a gun ? 
+                if self.primary_weapon==None :
                     self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
                     self.ai_goal='pickup'
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving'
-                # do we need ammo ?
-                # are we too far from the group?
-                elif distance_group >300. :
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.world_coords)
-                    self.time_since_ai_transition=0
-                    self.ai_state='start_moving'
-                    #print('getting closer to group')
                 else:
-                    self.target_object=self.squad.get_enemy()
-                    if self.target_object!=None:
+                    # we have a gun, lets make sure this enemy is alive
+                    #print(self.personal_enemies)
+                    if self.personal_enemies[0].ai.health>0:
+                        # engage first personal enemy
+                        self.target_object=self.personal_enemies[0]
                         self.ai_state='engaging'
                         self.ai_goal='none'
                     else:
-                        # health is good
-                        # weapon is good
-                        # we are near the group
-                        # there are no enemies to engage
-                        # hunt for cheese??
-                        # nah lets just wander around a bit
-                        self.ai_goal='booored'
-                        # soldier gets a much tighter roam distance than civilians
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                        # remove the enemy as it is dead
+                        self.personal_enemies.pop(0)
+
+            # 3. health is good, no personal enemies 
+            else :
+                # time for some class specific AI stuff
+
+                # -------------- Soldier AI ----------------------------------------------
+                if self.owner.is_soldier:
+                    # do we need ammo ?
+                    # are we too far from the group?
+                    # distance from group 
+                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+                    if distance_group >300. :
+                        self.ai_goal='close_with_group'
+                        self.destination=copy.copy(self.squad.world_coords)
+                        self.time_since_ai_transition=0
                         self.ai_state='start_moving'
-                        #print('soldier - bored')
+                        #print('getting closer to group')
+                    else:
+                        self.target_object=self.squad.get_enemy()
+                        if self.target_object!=None:
+                            self.ai_state='engaging'
+                            self.ai_goal='none'
+                        else:
+                            # health is good
+                            # weapon is good
+                            # we are near the group
+                            # there are no enemies to engage
+                            # hunt for cheese??
+                            # nah lets just wander around a bit
+                            self.ai_goal='booored'
+                            # soldier gets a much tighter roam distance than civilians
+                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                            self.ai_state='start_moving'
+                            #print('soldier - bored')
 
-            #---- civilian ---------------------------------------------------------------
-            else  :
-
-                # are we low on health? 
-                if self.health<50:
-                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-                    if o != None:
-                        self.target_object=o
-                        self.ai_goal='pickup'
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving'  
-                    else :
-                        # no health to be had. time to run away
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
-                        self.ai_state='start_moving'  
-                # do we need a gun ?
-                elif self.primary_weapon==None :
-                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-                # do we need ammo ?
+                # ---------------- Everything that isn't a soldier AI ----------------------
                 else:
-                    # health is good
-                    # weapon is good
-                    # hunt for cheese??
-                    # nah lets just wander around a bit
                     self.ai_goal='booored'
-                    self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
+                    # maybe replace this with traveling to a random building 
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-3000,3000)),self.owner.world_coords[1]+float(random.randint(-3000,3000))]
                     self.ai_state='start_moving'
+                    
+
+            
+
+
+
+
 
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
         ''' handle code for civilians and soldiers '''
+        # this is what the bot does when it isn't thinking 
+        # basically mindlessly carries on whatever task it is doing 
+        # if there is something that should be decided it goes in handle_normal_ai_think
+
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         self.time_since_ai_transition+=time_passed
 
