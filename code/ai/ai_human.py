@@ -83,8 +83,9 @@ class AIHuman(AIBase):
             # not sure what to do here. the grenade explodes too fast to really do anything 
             pass 
 
+        # this is very important because it breaks us out of whatever ai cycle we were in
+        # we are put in a very short movement cycle and then the AI can 'think' about what to do next
         self.ai_goal='react to collision'
-        # move in a random direction to attempt to escape grenade/bullets/whatever 
         self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
         self.ai_state='start_moving'
 
