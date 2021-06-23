@@ -137,6 +137,33 @@ class World(object):
 
         return collided
 
+    #---------------------------------------------------------------------------
+    def get_closest_ammo_source(self, WORLD_OBJECT):
+        ''' returns the world object that is the closest ammo source '''
+        # WORLD_OBJECT - the object that needs ammo 
+
+        # sources of ammo are : 
+        # 1 - your squad mates
+        # 2 - vehicles 
+        # 3 - ?? (non squad but same side?)
+
+        best_squad_mate=None 
+        if WORLD_OBJECT.ai.squad != None:
+            if len(WORLD_OBJECT.ai.squad.members)>0:
+                best_squad_mate=self.get_closest_object(WORLD_OBJECT.world_coords,WORLD_OBJECT.ai.squad.members)
+
+        if best_squad_mate != None:
+            return best_squad_mate
+        else:
+            # no squad mates for whatever reason
+            # just go to a building for now - eventually replace with ammo crate 
+            if len(self.wo_objects_building)>0:
+                best_building=self.get_closest_object(WORLD_OBJECT.world_coords,self.wo_objects_building)
+                return best_building
+            else:
+                print("Error: no suitable ammo sources")
+                # ehh just return a gun or whatever 
+                return self.get_closest_gun(WORLD_OBJECT.world_coords)
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):
@@ -144,10 +171,17 @@ class World(object):
         best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns)
         if best_object==None:
             # spawn a new gun and return it
-            engine.world_builder.spawn_gun(self,[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))],'ppk',True)
+
+            # first lets get a random building
+            b=self.get_random_object(self.wo_objects_building)
+
+            # randomize the coords a bit 
+            w=[b.world_coords[0]+float(random.randint(-20,20)),b.world_coords[1]+float(random.randint(-20,20))]
+
+            # spawn a ppk
+            engine.world_builder.spawn_gun(self,w,'ppk',True)
             # hmm we don't have the object reference, so lets just run this method again
             # does this make sense? am i insane? HA HA HAHAHAHA
-            print('warning mind bender insane o loop activated in world.get_closest_gun')
             return self.get_closest_gun(WORLD_COORDS)
         else : 
             return best_object
@@ -164,6 +198,12 @@ class World(object):
                 best_object=b
 
         return best_object
+
+    #---------------------------------------------------------------------------
+    def get_random_object(self,OBJECT_LIST):
+        ''' return a random object from a list '''
+        i=random.randint(0,len(OBJECT_LIST)-1)
+        return OBJECT_LIST[i]
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):

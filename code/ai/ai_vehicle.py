@@ -4,7 +4,7 @@ module : ai_vehicle.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
-notes :
+notes : a lot of this code came from ai_human but it has diverged a bit
 '''
 
 
@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='May 23 2021' #date of last update
+module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
@@ -81,14 +81,29 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
-            self.health-=random.randint(25,75)
-           # engine.world_builder.spawn_blood_splatter(self.owner.world,self.owner.world_coords)
+            #self.health-=random.randint(25,75)
+            engine.world_builder.spawn_sprite(self.owner.world,EVENT_DATA.world_coords,'dirt')
+
         elif EVENT_DATA.is_grenade:
             print('bonk')
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        if EVENT_DATA.is_gas :
+        if EVENT_DATA.is_gun :
+            if self.primary_weapon==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.primary_weapon)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_gas :
             if self.fuel_type=='gas':
                 print('filling up')
             else :
@@ -101,6 +116,7 @@ class AIVehicle(AIBase):
                 pass 
         elif EVENT_DATA.is_human :
             if EVENT_DATA.is_player:
+                self.owner.is_player=True
                 # passengers[0] controls the vehicle so put player there
                 self.passengers.insert(0,EVENT_DATA)
             else:
@@ -111,6 +127,8 @@ class AIVehicle(AIBase):
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA.is_human:
             self.passengers.remove(EVENT_DATA)
+            if EVENT_DATA.is_player:
+                self.owner.is_player=False
 
 
     #---------------------------------------------------------------------------

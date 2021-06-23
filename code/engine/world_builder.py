@@ -171,7 +171,7 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
 
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
-    w.world_coords=WORLD_COORDS
+    w.world_coords=copy.copy(WORLD_COORDS)
     w.name=NAME
 
     # register with world 
@@ -257,32 +257,37 @@ def load_images(world):
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
-    # this is done by world menu now
-    #add a player
-    #p=spawn_human(world, [50.,50.],'player',True)
-    #p.add_inventory(spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',False))
-    #p.add_inventory(spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',False))
 
     # add civilians 
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
 
-    # zombie generator 
-    #spawn_zombie_horde(world, [10,10], 50)
 
     # add a couple guns 
     spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
+    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
+    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
 
 
     # and some grenades! 
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
     spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
 
     # add ju88
     spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],True)
@@ -509,6 +514,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=32
         z.ai.mag_capacity=32
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -521,6 +528,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=35
         z.ai.mag_capacity=35
+        z.ai.magazine_count=4
+        z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -533,6 +542,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -545,6 +556,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=47
         z.ai.mag_capacity=47
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -557,6 +570,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.6
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -569,6 +584,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=8
         z.ai.mag_capacity=8
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -581,6 +598,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -593,6 +612,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=75
         z.ai.mag_capacity=75
+        z.ai.magazine_count=4
+        z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -605,6 +626,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=5
         z.ai.mag_capacity=5
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -615,8 +638,10 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.world_builder_identity='gun_mosin_nagant'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
-        z.ai.magazine=2
-        z.ai.mag_capacity=2
+        z.ai.magazine=5
+        z.ai.mag_capacity=5
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -694,16 +719,18 @@ def spawn_ju88(world,world_coords,SPAWN):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
+    # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=350.
-    z.ai.maxTime=4.
+    z.ai.maxTime=3.5 + random.uniform(0.01, 0.5)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
+    z.ai.shooter=SHOOTER
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
@@ -729,7 +756,7 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
     z.ai.maxTime=random.uniform(0.1, 0.5)
     z.is_projectile=True
     z.render_level=3
-    z.ai.ignore_list=IGNORE_LIST
+    z.ai.ignore_list=copy.copy(IGNORE_LIST)
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
     # increase the collision radius to make sure we get hits
@@ -823,7 +850,9 @@ def spawn_sprite(WORLD,WORLD_COORDS,TYPE):
         z.render_level=2
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))  
-        z.wo_start()   
+        z.wo_start() 
+    else :
+        print('spawn_sprite error - TYPE not recognized :'+TYPE)  
 
 
 #------------------------------------------------------------------------------
@@ -840,6 +869,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
         z.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
         if SPAWN :
             z.wo_start()
         return z

@@ -19,8 +19,9 @@ I am developing this game by just randomly working on whatever I feel like on a 
 
 ### Things to do
 - spawn different objects with the debug menu
-- depending on the build the AI might be in the middle of a large fire fight 
-- find and eat all four types of cheese
+- try not to die as the AI gets in large fire fights around you
+- take a leisurly drive in your new Kubelwagen 
+- find and eat all four types of cheese (gives a health bonus as in real life)
 
 
 ### Check the changelog on the Dev branch to see what I've been working on.

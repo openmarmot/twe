@@ -2,6 +2,113 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 22 2021
+
+- added code so grenades are once again dropped on death 
+- added ability for soldiers to throw grenades 
+    - grenades can cause accidental team or self damage easily this may need 
+    some tweaking but currently each soldier only gets one so it might not be
+     that bad 
+- ai_human now removes the object from the squad list on death 
+    - this is more efficient then having the squad check health 
+    - i didn't realize this wasn't done before now - may clear up some 
+    AI oddities as the squad relies on the person at squad.members[0] for 
+    some calculations 
+- changed ai_gun so it isn't infinite ammo anymore 
+    - however for the moment the bots can infinitely refill ammo from 
+    their squad mates and other sources 
+- added some more variables to track how many magazines you have for a gun 
+    - will need to figure out some historical data for normal ammo loads 
+    - current numbers are probably incorrect 
+- added AI routine to replenish ammo from the closest ammo source 
+    - currently this is nearby squad members or a building 
+- updated mosin nagant magazine capacity from 2 to the correct 5 
+
+
+weapon and ai changes over the last couple weeks have really upped the 
+lethality of the game world. team damage is becoming enough of a problem 
+that I will probably have to do something about it. 
+
+Ammo is no longer unlimited but when the AI runs out it can replenish 
+from a squad mate so it is still basically unlimited - there is just 
+a short walk involved. This will probably change in the future 
+
+The only way for the player to replenish ammo at the moment is to 
+pickup a different weapon. this will change in the future
+
+---------------------------------
+June 19 2021
+
+- hunting for uneven sized images to fix the occasional image rotation error 
+    - fixed one of the cheeses that was 19x20
+- removed inventory from world_object - it was creating duplication issues 
+    - makes more sense for the AI class to handle this 
+- gave the kubelwagen a mg34 because i realized it basically supports it 
+    for player use with only a couple small tweaks 
+
+
+
+---------------------------------
+June 18 2021 - part 2
+
+- minor misc code cleanup 
+- implemented a function in world to return a random object 
+- used the new function to change the gun spawn that can occur from get_closest_gun 
+    to spawn the gun in a random building instead of just in a random location 
+- changed up inital spawns a bit - eventually some of the clutter spawns will be handled by 
+    world_ai 
+- ai rewrite to introduce the concept of 'personal_enemies'
+    - this is a list of personal enemies that the bot has made 
+        - currently the bots add someone to the list if they get shot by them 
+    - rewrite also focused on making code more common between civilians and soldiers 
+
+This was one of my more interesting updates. 
+'personal_enemies' and the new AI decision trees add a lot of interesting depth to 
+the AI actions. 
+
+For example if you shoot (but not kill) a civilian they will add you to their 
+personal_enemies list and try to kill you. However first they will need a gun 
+- and I find that they often die to cross fire before they find a gun and 
+come back to kill you 
+
+This also makes the soldier combat a bit better as they are slightly less likely 
+to just sit there and get shot 
+
+It is also possible that soldiers on the same side could end up targeting eachother 
+if they get hit by friendly fire -  not sure if i will add a check for this or not 
+
+---------------------------------
+June 18 2021
+
+- modified ai_human so updates happen on a else from 
+    the death check - hopefully resolving an occasional 
+    issue where bots would manage to fire a bullet after they disappear (die)
+- made vehicles invulnerable for now 
+    - will revisit this later when i think more about vehicle damage modeling 
+- changed grenade so it stops collision checks after an initial collision 
+    - this was to prevent it colliding with the same thing a ton of times 
+        - other option would be to use ignore lists but the grenade only lasts 
+        a second or so before exploding so this was fine 
+- added AI behavior where getting hit by a grenade causes the AI to move in a 
+    random direction. unfortunately they do not move fast enough to avoid the 
+    grenade blast - but its a nice thought.
+    - after some play testing I updated this behavior to be triggered by any 
+        collision - making it kind of a stun lock. advantage to the AI is 
+        it may cause dodging in flight projectile streams  
+- added a little randomness to bullet flight time to make the dirt piles 
+    left behind when bullets run out of flight time a little more random 
+- accidentally changed grenade fragment lifetime randomness. so now its different 
+- updated shrapnel so it is using copy.copy (bug i found a couple days ago in projectile)
+- updated world_area creation to use copy.copy for world coords (probably didn't matter)
+im not keeping up with the 'last_modified' string on the files at all. 
+this was helpful to keep track of on small projects but is a bother on more active projects 
+
+collision seems to have a bias to the right side. 
+this suggests either i have a +/- flipped or the math is just wrong 
+- if you fire from the left of the house the dirt will pile up mid house 
+- if you fire from the right of the house the dirt piles up right of the house by a good bit 
+
+---------------------------------
 June 17 2021
 
 - play testing to make sure fixes from yesterday worked 
