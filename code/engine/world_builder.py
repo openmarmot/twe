@@ -514,6 +514,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=32
         z.ai.mag_capacity=32
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -526,6 +528,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=35
         z.ai.mag_capacity=35
+        z.ai.magazine_count=4
+        z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -538,6 +542,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -550,6 +556,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=47
         z.ai.mag_capacity=47
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -562,6 +570,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.6
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -574,6 +584,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=8
         z.ai.mag_capacity=8
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -586,6 +598,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
+        z.ai.magazine_count=2
+        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -598,6 +612,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=75
         z.ai.mag_capacity=75
+        z.ai.magazine_count=4
+        z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -610,6 +626,8 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.is_gun=True
         z.ai.magazine=5
         z.ai.mag_capacity=5
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -620,8 +638,10 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.world_builder_identity='gun_mosin_nagant'
         z.world_coords=copy.copy(world_coords)
         z.is_gun=True
-        z.ai.magazine=2
-        z.ai.mag_capacity=2
+        z.ai.magazine=5
+        z.ai.mag_capacity=5
+        z.ai.magazine_count=6
+        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.7
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -849,6 +869,7 @@ def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
         z.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
+        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
         if SPAWN :
             z.wo_start()
         return z

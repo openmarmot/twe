@@ -1,6 +1,52 @@
 TWE Project : Change Log
 
 
+---------------------------------
+June 22 2021
+
+- added code so grenades are once again dropped on death 
+- added ability for soldiers to throw grenades 
+    - grenades can cause accidental team or self damage easily this may need 
+    some tweaking but currently each soldier only gets one so it might not be
+     that bad 
+- ai_human now removes the object from the squad list on death 
+    - this is more efficient then having the squad check health 
+    - i didn't realize this wasn't done before now - may clear up some 
+    AI oddities as the squad relies on the person at squad.members[0] for 
+    some calculations 
+- changed ai_gun so it isn't infinite ammo anymore 
+    - however for the moment the bots can infinitely refill ammo from 
+    their squad mates and other sources 
+- added some more variables to track how many magazines you have for a gun 
+    - will need to figure out some historical data for normal ammo loads 
+    - current numbers are probably incorrect 
+- added AI routine to replenish ammo from the closest ammo source 
+    - currently this is nearby squad members or a building 
+- updated mosin nagant magazine capacity from 2 to the correct 5 
+
+
+weapon and ai changes over the last couple weeks have really upped the 
+lethality of the game world. team damage is becoming enough of a problem 
+that I will probably have to do something about it. 
+
+Ammo is no longer unlimited but when the AI runs out it can replenish 
+from a squad mate so it is still basically unlimited - there is just 
+a short walk involved. This will probably change in the future 
+
+The only way for the player to replenish ammo at the moment is to 
+pickup a different weapon. this will change in the future
+
+---------------------------------
+June 19 2021
+
+- hunting for uneven sized images to fix the occasional image rotation error 
+    - fixed one of the cheeses that was 19x20
+- removed inventory from world_object - it was creating duplication issues 
+    - makes more sense for the AI class to handle this 
+- gave the kubelwagen a mg34 because i realized it basically supports it 
+    for player use with only a couple small tweaks 
+
+
 
 ---------------------------------
 June 18 2021 - part 2

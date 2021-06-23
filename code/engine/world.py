@@ -137,6 +137,33 @@ class World(object):
 
         return collided
 
+    #---------------------------------------------------------------------------
+    def get_closest_ammo_source(self, WORLD_OBJECT):
+        ''' returns the world object that is the closest ammo source '''
+        # WORLD_OBJECT - the object that needs ammo 
+
+        # sources of ammo are : 
+        # 1 - your squad mates
+        # 2 - vehicles 
+        # 3 - ?? (non squad but same side?)
+
+        best_squad_mate=None 
+        if WORLD_OBJECT.ai.squad != None:
+            if len(WORLD_OBJECT.ai.squad.members)>0:
+                best_squad_mate=self.get_closest_object(WORLD_OBJECT.world_coords,WORLD_OBJECT.ai.squad.members)
+
+        if best_squad_mate != None:
+            return best_squad_mate
+        else:
+            # no squad mates for whatever reason
+            # just go to a building for now - eventually replace with ammo crate 
+            if len(self.wo_objects_building)>0:
+                best_building=self.get_closest_object(WORLD_OBJECT.world_coords,self.wo_objects_building)
+                return best_building
+            else:
+                print("Error: no suitable ammo sources")
+                # ehh just return a gun or whatever 
+                return self.get_closest_gun(WORLD_OBJECT.world_coords)
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):

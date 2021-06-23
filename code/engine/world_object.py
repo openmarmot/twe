@@ -107,20 +107,17 @@ class WorldObject(object):
         # radius of collision circle in world coords
         self.collision_radius=5
         
-        # list of other wo_objects contained within this one
-        self.inventory=[]
+
 
         # is this used? pretty sure its not 
         self.id = 0
 
     #add_inventory
     def add_inventory(self, ITEM):
-        self.inventory.append(ITEM)
         self.ai.handle_event('add_inventory',ITEM)
 
     #remove_inventory
     def remove_inventory(self, ITEM):
-        self.inventory.remove(ITEM)
         self.ai.handle_event('remove_inventory',ITEM)
 
     def wo_start(self):

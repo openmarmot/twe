@@ -1,6 +1,6 @@
 
 '''
-module : ai_zombie.py
+module : ai_gun.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
@@ -18,7 +18,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 05 2021' #date of last update
+module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
@@ -27,9 +27,16 @@ class AIGun(AIBase):
         super().__init__(owner)
         #int representing round count in current mag 
         self.magazine=0
-        #max mag capacity - this limits us from using different mag types. hrmm
-        # is this even needed??
+
+        # the ammo capacity of a magazine for this weapon
+        # for example a mp40 would be 32
         self.mag_capacity=0
+        
+        # how many full mags you have
+        self.magazine_count=0
+
+        # max full mags you can have 
+        self.max_magazines=0
         
         #
         #time since last fired
@@ -40,6 +47,9 @@ class AIGun(AIBase):
 
         # spread
         self.spread=15
+
+        # internal counter of rounds fired
+        self.rounds_fired=0
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
@@ -69,10 +79,19 @@ class AIGun(AIBase):
                 # auto reload ?
                 if self.equipper.is_player:
                     print("magazine empty")
-                # infinite ammo cheat for now
-                self.magazine=self.mag_capacity
+                if self.magazine_count>0:
+                    self.magazine_count-=1
+                    self.magazine=self.mag_capacity
+                    if self.equipper.is_player:
+                        print(" Remaining magazines: "+str(self.magazine_count)+ '  Rounds fired '+str(self.rounds_fired))
+                else:
+                    print(self.equipper.name + ' out of ammo for ' + self.owner.name + ' Rounds fired '+str(self.rounds_fired))
+
+                    if self.equipper.is_player:
+                        print(' out of ammo for ' + self.owner.name + ' Rounds fired '+str(self.rounds_fired))
             else :
                 self.magazine-=1
+                self.rounds_fired+=1
                 spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
                 if self.equipper.is_player:
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],True,self.equipper)

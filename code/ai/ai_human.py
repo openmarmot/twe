@@ -48,10 +48,19 @@ class AIHuman(AIBase):
 
         # -- general stuff for all objects --
         if self.health<1:
-            #print(self.owner.name+' has died')
-            for b in self.owner.inventory:
-                b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-                self.owner.world.add_object(b)
+            #drop primary weapon
+            if self.primary_weapon !=None:
+                self.primary_weapon.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+                self.owner.world.add_object(self.primary_weapon)
+            # drop throwing weapon 
+            if self.throwable !=None:
+                self.throwable.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+                self.owner.world.add_object(self.throwable)
+
+            # remove from squad 
+            if self.squad != None:
+                self.squad.members.remove(self.owner)
+
             self.owner.world.remove_object(self.owner)
         else :
 
@@ -173,6 +182,12 @@ class AIHuman(AIBase):
                        # print('robbed!!')
                         pass
                     self.ai_state='sleeping'
+            elif self.ai_goal=='get ammo':
+                if distance<5:
+                    print('replenishing ammo ')
+                    # get max count of fully loaded magazines
+                    self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
+                    self.ai_state='sleeping'
             elif self.ai_goal=='close_with_target':
                 # check if target is dead 
                 if self.target_object.ai.health<1:
@@ -194,22 +209,42 @@ class AIHuman(AIBase):
                 if distance<3:
                     self.ai_state='sleeping'
         elif self.ai_state=='engaging':
-            # check if target is dead 
-            if self.target_object.ai.health<1:
-                self.ai_state='sleeping'
-                self.ai_goal='none'
-                self.target_object=None
-            else:
-                # check if target is too far 
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                if distance >850. :
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                    #print('closing with target')
-
             # check if we are out of ammo
+            if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
 
+                # get more ammo 
+                self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
+                self.ai_goal='get ammo'
+                self.destination=self.target_object.world_coords
+                self.ai_state='start_moving'
+            else:
+                # we have ammo - what next ?
+
+                # check if target is dead 
+                if self.target_object.ai.health<1:
+                    self.ai_state='sleeping'
+                    self.ai_goal='none'
+                    self.target_object=None
+                else:
+                    # we have ammo, target is alive
+
+                    # check if target is too far 
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
+                    if distance >850. :
+                        self.ai_goal='close_with_target'
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                        #print('closing with target')
+                    elif distance<300:
+                        if distance>100:
+                            # maybe throw a grendate !
+                            if self.throwable != None:
+                                self.throw(self.target_object.world_coords)
+
+                    # basically if nothing else is changed we keep firing
+
+
+        # AI is not in a state that we do anything with. probably sleeping
         else :
             # what should we be doing ??
 

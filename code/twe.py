@@ -9,6 +9,10 @@ notes :
 the main python file for the project. 
 contains the main loop.
 
+python twe.py will run the project
+
+Project Github : https://github.com/openmarmot/twe 
+
 '''
 
 
@@ -20,7 +24,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.1' #module software version
-module_last_update_date='Sept 07 2020' #date of last update
+module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
