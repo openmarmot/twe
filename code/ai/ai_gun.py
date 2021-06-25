@@ -55,6 +55,9 @@ class AIGun(AIBase):
         # set by ai_man.event_inventory
         self.equipper=None
 
+        # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun
+        self.type=''
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Feb 07 2020' #date of last update
+module_last_update_date='June 24 2021' #date of last update
 
 #global variables
 
@@ -287,33 +287,67 @@ class AIHuman(AIBase):
 
                 # -------------- Soldier AI ----------------------------------------------
                 if self.owner.is_soldier:
-                    # do we need ammo ?
-                    # are we too far from the group?
-                    # distance from group 
-                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                    if distance_group >300. :
-                        self.ai_goal='close_with_group'
-                        self.destination=copy.copy(self.squad.world_coords)
-                        self.time_since_ai_transition=0
-                        self.ai_state='start_moving'
-                        #print('getting closer to group')
+
+                    # get an enemy from the squad
+                    self.target_object=self.squad.get_enemy()
+                    if self.target_object!=None:
+                        self.ai_state='engaging'
+                        self.ai_goal='none'
                     else:
-                        self.target_object=self.squad.get_enemy()
-                        if self.target_object!=None:
-                            self.ai_state='engaging'
-                            self.ai_goal='none'
-                        else:
-                            # health is good
-                            # weapon is good
-                            # we are near the group
-                            # there are no enemies to engage
-                            # hunt for cheese??
-                            # nah lets just wander around a bit
-                            self.ai_goal='booored'
-                            # soldier gets a much tighter roam distance than civilians
-                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                        # no enemies, what now?
+                        # are we too far from the group?
+                        # distance from group 
+                        distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+                        if distance_group >300. :
+                            self.ai_goal='close_with_group'
+                            self.destination=copy.copy(self.squad.world_coords)
+                            self.time_since_ai_transition=0
                             self.ai_state='start_moving'
-                            #print('soldier - bored')
+                            #print('getting closer to group')
+                        else:
+
+                            # healht is good, close to group, no enemies
+
+                            # grab another grenade?
+                            if self.throwable == None:
+                                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade)
+                                if b != None:
+                                    d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                                    # make sure its close - we don't want to wander far from the group
+                                    if d<400:
+                                        self.target_object=b
+                                        self.ai_goal='pickup'
+                                        self.destination=self.target_object.world_coords
+                                        self.ai_state='start_moving' 
+                                        print('picking up grenade')
+                            # upgrade weapon?
+                            elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
+                                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                                if b != None:
+                                    # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
+                                    # be picked up
+                                    if b.ai.type=='submachine gun' or b.ai.type=='assault rifle':
+                                        d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                                        # make sure its close - we don't want to wander far from the group
+                                        if d<500:
+                                            self.target_object=b
+                                            self.ai_goal='pickup'
+                                            self.destination=self.target_object.world_coords
+                                            self.ai_state='start_moving' 
+                                            print('swapping '+self.primary_weapon.name + 'for '+b.name)
+                                        else:
+                                            # readjust a bit 
+                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                            self.ai_state='start_moving'
+                            else:
+
+                                # hunt for cheese??
+                                # nah lets just wander around a bit
+                                self.ai_goal='booored'
+                                # soldier gets a much tighter roam distance than civilians
+                                self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                self.ai_state='start_moving'
+                                #print('soldier - bored')
 
                 # ---------------- Everything that isn't a soldier AI ----------------------
                 else:

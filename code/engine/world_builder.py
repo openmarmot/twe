@@ -494,8 +494,8 @@ def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE,SPAWN):
         z.world_builder_identity='grenade_model24'
         z.is_grenade=True
         z.world_coords=copy.copy(WORLD_COORDS)
-        z.speed=140.
-        z.ai.maxTime=2.
+        z.speed=180.
+        z.ai.maxTime=1.5
         z.render_level=2
 
     if SPAWN :
@@ -517,6 +517,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
+        z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -531,6 +532,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
+        z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -545,6 +547,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
+        z.ai.type='assault rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -559,6 +562,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -573,6 +577,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.6
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -587,6 +592,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -601,6 +607,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -615,6 +622,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -629,6 +637,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.7
+        z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -643,6 +652,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.7
+        z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 

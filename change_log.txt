@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ---------------------------------
+June 24 2021
+
+- added a ai option for a soldier to pick up a grenade if they dont have one 
+    - requires soldier to be in an idle state 
+- added ai option to swap a pistol or rifle for a nearby submachine gun or assault rifle 
+    - requires soldier to be in an idle state
+    - required adding weapon types 
+- swapped order of check enemies and check group proximit for solder ai to give a higher 
+    priority to finding enemies 
+    - hopefully resolving issue where soldiers walk past enemies 
+- increased grenade speed a bit 
+
+
+---------------------------------
 June 22 2021
 
 - added code so grenades are once again dropped on death 
