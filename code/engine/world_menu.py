@@ -153,6 +153,8 @@ class World_Menu(object):
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
+            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
+            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')

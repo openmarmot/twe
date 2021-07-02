@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 
+
+
+---------------------------------
+June 29 2021
+
+- added debug text to the menu for humans that shows ai_state and ai_goal
+- bumped up range a which ai will re-engage a target
+    - >850 == close with target 
+    - <700 == engage 
+
+distances that are used with the AI really need tweaking 
+- need to figure out a good range for the guns 
+
 ---------------------------------
 June 24 2021
 

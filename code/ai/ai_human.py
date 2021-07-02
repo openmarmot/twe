@@ -194,7 +194,7 @@ class AIHuman(AIBase):
                     self.ai_state='sleeping'
                     self.ai_goal='none'
                     self.target_object=None
-                elif distance<500:
+                elif distance<700:
                     #print('in range of target')
                     self.ai_state='engaging'
                     self.ai_goal='none'
