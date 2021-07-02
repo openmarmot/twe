@@ -1,7 +1,16 @@
 TWE Project : Change Log
 
+---------------------------------
+July 02 2021
 
+- added art and basic code for new 'german mg ammo can' object 
+    - based off of some pictures i found of german mg34 amo cans that 
+    were designed to hold belts of 7.92 ammo 
+- added the concept of 'container' which replaces 'crate' 
 
+I'm playing around with the idea of adding a bunch of bullet parameters to 
+ai_gun. the idea being these parameters will feed into a system to calculate 
+penetration and damage eventually 
 
 ---------------------------------
 June 29 2021

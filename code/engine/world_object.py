@@ -86,7 +86,7 @@ class WorldObject(object):
         self.is_gun=False
         self.is_grenade=False
         self.is_gun_mag_carrier=False
-        self.is_crate=False
+        self.is_container=False
         self.is_projectile=False
         self.is_consumable=False
         self.is_german=False

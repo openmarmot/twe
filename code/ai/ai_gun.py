@@ -45,6 +45,17 @@ class AIGun(AIBase):
         # fire rate in seconds?
         self.rate_of_fire=0.
 
+        # caliber
+
+        # bullet diameter in mm
+        self.bullet_diameter
+        
+        # bullet weight
+        self.bullet_weight
+
+        # muzzle velocity
+        self.muzzle_velocity
+
         # spread
         self.spread=15
 

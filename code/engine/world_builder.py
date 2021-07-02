@@ -238,8 +238,9 @@ def load_images(world):
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
 
-    #crates?
-    world.graphic_engine.loadImage('crate','images/crate.png')
+    #containers
+    world.graphic_engine.loadImage('crate','images/containers/crate.png')
+    world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -303,6 +304,12 @@ def load_test_environment(world):
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+
+
+    # spawnsome ammo cans 
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
 
     # add ze germans
     s=[]
@@ -471,18 +478,25 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_crate(world,world_coords, crate_type,SPAWN):
-    # crate_type -- string denoting crate type 
-    z=WorldObject(world,['crate'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.is_crate=True
-    z.render_level=2
-    z.name='crate'
-    z.world_builder_identity='crate'
-        
-    if SPAWN :
-        z.wo_start()
-    return z
+def spawn_container(WORLD,WORLD_COORDS,CONTAINER_TYPE):
+
+    if CONTAINER_TYPE=='crate':
+        z=WorldObject(WORLD,['crate'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_container=True
+        z.render_level=2
+        z.name='crate'
+        z.world_builder_identity='crate'
+        z.wo_start() 
+    elif CONTAINER_TYPE=='german_mg_ammo_can':
+        z=WorldObject(WORLD,['german_mg_ammo_can'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_container=True
+        z.render_level=2
+        z.name='german_mg_ammo_can'
+        z.world_builder_identity='german_mg_ammo_can'
+        z.wo_start() 
+
 
 
 #------------------------------------------------------------------------------
