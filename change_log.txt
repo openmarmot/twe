@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+
+---------------------------------
+July 03 2021
+
+- fixed some incomplete variable inits in ai_gun 
+
+
 ---------------------------------
 July 02 2021
 

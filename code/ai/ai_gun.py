@@ -48,13 +48,13 @@ class AIGun(AIBase):
         # caliber
 
         # bullet diameter in mm
-        self.bullet_diameter
+        self.bullet_diameter=0
         
         # bullet weight
-        self.bullet_weight
+        self.bullet_weight=0
 
         # muzzle velocity
-        self.muzzle_velocity
+        self.muzzle_velocity=0
 
         # spread
         self.spread=15
