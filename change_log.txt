@@ -5,7 +5,7 @@ TWE Project : Change Log
 ---------------------------------
 July 06 2021
 
-- added enough code to get map pointers working 
+- added enough code to get the new map pointers working 
 
 for now map pointers are toggleable from the debug menu (~)
 - they are a green line that points in the direction of the 
