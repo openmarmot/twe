@@ -1,0 +1,41 @@
+
+'''
+module : ai_map_pointer.py
+version : see module_version variable
+Language : Python 3.x
+email : andrew@openmarmot.com
+notes :
+'''
+
+
+#import built in modules
+
+#import custom packages
+from ai.ai_base import AIBase
+import engine.math_2d
+# module specific variables
+module_version='0.0' #module software version
+module_last_update_date='july 05 2021' #date of last update
+
+#global variables
+
+class AIMapPointer(AIBase):
+    def __init__(self, owner):
+        super().__init__(owner)
+
+        self.target_coords=None
+
+    #---------------------------------------------------------------------------
+    def update(self):
+        ''' overrides base update '''
+
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.player.world_coords,self.target_coords)
+        self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world.player.world_coords,self.target_coords)
+        self.owner.world_coords=engine.math_2d.moveAlongVector(125,self.owner.world.player.world_coords,self.owner.heading,1)
+        self.owner.reset_image=True
+
+
+
+
+
+    #---------------------------------------------------------------------------

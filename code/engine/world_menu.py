@@ -209,14 +209,14 @@ class World_Menu(object):
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
-            self.world.graphic_engine.menu_text_queue.append('1 - nothing ')
+            self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - spawn 500 zombies')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
+                self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 500)

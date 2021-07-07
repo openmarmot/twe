@@ -1,11 +1,28 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+July 06 2021
+
+- added enough code to get map pointers working 
+
+for now map pointers are toggleable from the debug menu (~)
+- they are a green line that points in the direction of the 
+    world areas (control points). currently these are clusters 
+    of buildings. eventually more colors may be added to point 
+    at other things 
+
+---------------------------------
+July 05 2021
+
+- added new 'map pointer' object 
+    - idea is it is a indicator pointing at a map feature like a town 
+
 ---------------------------------
 July 03 2021
 
 - fixed some incomplete variable inits in ai_gun 
-
 
 ---------------------------------
 July 02 2021

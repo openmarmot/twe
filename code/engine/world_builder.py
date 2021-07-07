@@ -42,9 +42,10 @@ from ai.ai_building import AIBuilding
 from ai.ai_projectile import AIProjectile
 from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
+from ai.ai_map_pointer import AIMapPointer
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='april 27 2021' #date of last update
+module_last_update_date='july 05 2021' #date of last update
 
 #global variables
 
@@ -253,6 +254,9 @@ def load_images(world):
     world.graphic_engine.loadImage('camembert-cheese','images/consumables/camembert-cheese.png')
     world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
+
+    # random 
+    world.graphic_engine.loadImage('map_pointer','images/map_pointer.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -740,6 +744,16 @@ def spawn_ju88(world,world_coords,SPAWN):
     if SPAWN :
         z.wo_start()
     return z
+
+
+#------------------------------------------------------------------------------
+def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
+    if TYPE=='normal':
+        z=WorldObject(WORLD,['map_pointer'],AIMapPointer)
+        z.ai.target_coords=TARGET_COORDS
+        z.render_level=4
+        z.is_map_pointer=True
+        z.wo_start()
 
 
 #------------------------------------------------------------------------------

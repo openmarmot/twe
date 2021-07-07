@@ -95,6 +95,7 @@ class WorldObject(object):
         self.is_gas=False
         self.is_diesel=False
         self.is_building=False
+        self.is_map_pointer=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in
