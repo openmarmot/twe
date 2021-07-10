@@ -45,6 +45,17 @@ class AIGun(AIBase):
         # fire rate in seconds?
         self.rate_of_fire=0.
 
+        # caliber
+
+        # bullet diameter in mm
+        self.bullet_diameter=0
+        
+        # bullet weight
+        self.bullet_weight=0
+
+        # muzzle velocity
+        self.muzzle_velocity=0
+
         # spread
         self.spread=15
 
@@ -54,6 +65,9 @@ class AIGun(AIBase):
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
         self.equipper=None
+
+        # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun
+        self.type=''
 
     #---------------------------------------------------------------------------
     def update(self):

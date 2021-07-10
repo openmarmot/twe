@@ -57,8 +57,8 @@ class World_Menu(object):
             self.debug_menu(Key)
         elif self.active_menu=='gun':
             self.gun_menu(Key)
-        elif self.active_menu=='crate':
-            self.crate_menu(Key)
+        elif self.active_menu=='container':
+            self.container_menu(Key)
         elif self.active_menu=='generic':
             self.generic_item_menu(Key)
         elif self.active_menu=='start':
@@ -77,8 +77,8 @@ class World_Menu(object):
         elif SELECTED_OBJECT.is_gun:
             self.active_menu='gun'
             self.gun_menu(None)
-        elif SELECTED_OBJECT.is_crate:
-            self.active_menu='crate'
+        elif SELECTED_OBJECT.is_container:
+            self.active_menu='container'
             self.crate_menu(None)
         elif SELECTED_OBJECT.is_human:
             self.active_menu='human'
@@ -96,10 +96,10 @@ class World_Menu(object):
         self.menu_state='none'
         self.world.graphic_engine.menu_text_queue.clear()
 
-    def crate_menu(self, Key):
+    def container_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Crate Menu --')
+            self.world.graphic_engine.menu_text_queue.append('-- Container Menu --')
             self.world.graphic_engine.menu_text_queue.append('1 - info ?')
             self.world.graphic_engine.menu_text_queue.append('2 - ?')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
@@ -153,6 +153,8 @@ class World_Menu(object):
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
+            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
+            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
@@ -207,14 +209,15 @@ class World_Menu(object):
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
-            self.world.graphic_engine.menu_text_queue.append('1 - spawn a crate')
+            self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - spawn 500 zombies')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
+                self.world.toggle_map()
+                #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 500)
             elif Key=='3':

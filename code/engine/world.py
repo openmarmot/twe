@@ -51,6 +51,7 @@ class World(object):
         self.wo_objects_grenade=[]
         self.wo_objects_consumable=[]
         self.wo_objects_building=[]
+        self.wo_objects_map_pointer=[]
 
         #world areas
         self.world_areas=[]
@@ -62,6 +63,9 @@ class World(object):
 
         # a way to pause the action
         self.is_paused=False
+
+        #bool
+        self.map_enabled=False
 
     #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
@@ -87,6 +91,8 @@ class World(object):
             self.wo_objects_consumable.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_building:
             self.wo_objects_building.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_map_pointer:
+            self.wo_objects_map_pointer.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -229,6 +235,8 @@ class World(object):
             self.wo_objects_consumable.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_building:
             self.wo_objects_building.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_map_pointer:
+            self.wo_objects_map_pointer.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -256,6 +264,23 @@ class World(object):
                             break
         return collided
 
+    #---------------------------------------------------------------------------
+    def toggle_map(self):
+        ''' enable/disable map features '''
+
+        if self.map_enabled:
+            self.map_enabled=False
+            # because removing items from the same list you are 
+            # iterating through causes odd issues. working with a copy is much 
+            # better
+            temp=copy.copy(self.wo_objects_map_pointer)
+            for b in temp:
+                self.remove_object(b)
+        else:
+            self.map_enabled=True
+
+            for b in self.world_areas:
+                engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
 
     #---------------------------------------------------------------------------
     def load_map(self):

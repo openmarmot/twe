@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='Feb 07 2020' #date of last update
+module_last_update_date='June 24 2021' #date of last update
 
 #global variables
 
@@ -30,8 +30,17 @@ class AIHuman(AIBase):
         self.primary_weapon=None
         self.throwable=None
         self.health=100
+
+        # what the ai is actually doing (an action)
         self.ai_state='none'
+        # what the ai is trying to accomplish
         self.ai_goal='none'
+
+        # the reason the ai jumped in the vehicle
+        self.ai_vehicle_goal='none'
+        # a destination the ai wants to get to with the vehicle
+        self.ai_vehicle_destination=None
+
         self.time_since_ai_transition=0.
         self.ai_think_rate=0
         # the ai group that this human is a part of 
@@ -171,43 +180,84 @@ class AIHuman(AIBase):
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
             #print('distance: '+str(distance))
 
-            if self.ai_goal=='pickup':
-                if distance<5:
-                   # print('pickup thingy')
-                    if self.target_object in self.owner.world.wo_objects:
-                        self.owner.add_inventory(self.target_object)
-                        self.owner.world.remove_object(self.target_object)
-                    else:
-                        # hmm object is gone. someone else must have grabbed it
-                       # print('robbed!!')
+            # should we get a vehicle instead of hoofing it to wherever we are going?
+            if distance>1500:
+                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
+                if b!=None:
+                    v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+
+                    # only bother with a vehicle if it will be faster
+                    if v_distance<distance:
+
+                        # head towards the vehicle
+                        # should check if the vehicle is hostile
+
+                        self.ai_vehicle_goal='travel'
+                        self.ai_vehicle_destination=copy.copy(self.destination)
+
+                        self.target_object=b
+                        self.ai_goal='enter object'
+                        # not using copy here because vehicle may move
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'
+
+                        print(self.owner.name + ' heading towards '+b.name+' distance: '+str(distance))
+                    else :
+                        # guess we might as well walk
                         pass
-                    self.ai_state='sleeping'
-            elif self.ai_goal=='get ammo':
-                if distance<5:
-                    print('replenishing ammo ')
-                    # get max count of fully loaded magazines
-                    self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
-                    self.ai_state='sleeping'
-            elif self.ai_goal=='close_with_target':
-                # check if target is dead 
-                if self.target_object.ai.health<1:
-                    self.ai_state='sleeping'
-                    self.ai_goal='none'
-                    self.target_object=None
-                elif distance<500:
-                    #print('in range of target')
-                    self.ai_state='engaging'
-                    self.ai_goal='none'
+
                 else:
-                    # reset the destination coordinates
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                   # print('close with target')
+                    # no vehicles ?
+                    pass
             else:
-                # catchall for random moving related goals:
-                if distance<3:
-                    self.ai_state='sleeping'
+                # ai_state=='moving AND distance <1000
+                if self.ai_goal=='pickup':
+                    if distance<5:
+                        if self.target_object in self.owner.world.wo_objects:
+                            self.owner.add_inventory(self.target_object)
+                            self.owner.world.remove_object(self.target_object)
+                        else:
+                            # hmm object is gone. someone else must have grabbed it
+                        # print('robbed!!')
+                            pass
+                        self.ai_state='sleeping'
+                elif self.ai_goal=='enter object':
+                    if distance<5:
+                        if self.target_object in self.owner.world.wo_objects:
+                            self.target_object.add_inventory(self.owner)
+                            self.owner.world.remove_object(self.owner)
+                            print(self.owner.name+' entered '+ self.target_object.name)
+                        else:
+                            # hmm object is gone. idk how that happened
+                            print('object I was going to enter disappeared')
+                            pass
+                        self.ai_state='sleeping'
+                elif self.ai_goal=='get ammo':
+                    if distance<5:
+                        print('replenishing ammo ')
+                        # get max count of fully loaded magazines
+                        self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
+                        self.ai_state='sleeping'
+                elif self.ai_goal=='close_with_target':
+                    # check if target is dead 
+                    if self.target_object.ai.health<1:
+                        self.ai_state='sleeping'
+                        self.ai_goal='none'
+                        self.target_object=None
+                    elif distance<700:
+                        #print('in range of target')
+                        self.ai_state='engaging'
+                        self.ai_goal='none'
+                    else:
+                        # reset the destination coordinates
+                        self.ai_goal='close_with_target'
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                    # print('close with target')
+                else:
+                    # catchall for random moving related goals:
+                    if distance<3:
+                        self.ai_state='sleeping'
         elif self.ai_state=='engaging':
             # check if we are out of ammo
             if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
@@ -287,33 +337,67 @@ class AIHuman(AIBase):
 
                 # -------------- Soldier AI ----------------------------------------------
                 if self.owner.is_soldier:
-                    # do we need ammo ?
-                    # are we too far from the group?
-                    # distance from group 
-                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                    if distance_group >300. :
-                        self.ai_goal='close_with_group'
-                        self.destination=copy.copy(self.squad.world_coords)
-                        self.time_since_ai_transition=0
-                        self.ai_state='start_moving'
-                        #print('getting closer to group')
+
+                    # get an enemy from the squad
+                    self.target_object=self.squad.get_enemy()
+                    if self.target_object!=None:
+                        self.ai_state='engaging'
+                        self.ai_goal='none'
                     else:
-                        self.target_object=self.squad.get_enemy()
-                        if self.target_object!=None:
-                            self.ai_state='engaging'
-                            self.ai_goal='none'
-                        else:
-                            # health is good
-                            # weapon is good
-                            # we are near the group
-                            # there are no enemies to engage
-                            # hunt for cheese??
-                            # nah lets just wander around a bit
-                            self.ai_goal='booored'
-                            # soldier gets a much tighter roam distance than civilians
-                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                        # no enemies, what now?
+                        # are we too far from the group?
+                        # distance from group 
+                        distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+                        if distance_group >300. :
+                            self.ai_goal='close_with_group'
+                            self.destination=copy.copy(self.squad.world_coords)
+                            self.time_since_ai_transition=0
                             self.ai_state='start_moving'
-                            #print('soldier - bored')
+                            #print('getting closer to group')
+                        else:
+
+                            # healht is good, close to group, no enemies
+
+                            # grab another grenade?
+                            if self.throwable == None:
+                                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade)
+                                if b != None:
+                                    d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                                    # make sure its close - we don't want to wander far from the group
+                                    if d<400:
+                                        self.target_object=b
+                                        self.ai_goal='pickup'
+                                        self.destination=self.target_object.world_coords
+                                        self.ai_state='start_moving' 
+                                        print('picking up grenade')
+                            # upgrade weapon?
+                            elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
+                                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                                if b != None:
+                                    # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
+                                    # be picked up
+                                    if b.ai.type=='submachine gun' or b.ai.type=='assault rifle':
+                                        d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                                        # make sure its close - we don't want to wander far from the group
+                                        if d<500:
+                                            self.target_object=b
+                                            self.ai_goal='pickup'
+                                            self.destination=self.target_object.world_coords
+                                            self.ai_state='start_moving' 
+                                            print('swapping '+self.primary_weapon.name + 'for '+b.name)
+                                        else:
+                                            # readjust a bit 
+                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                            self.ai_state='start_moving'
+                            else:
+
+                                # hunt for cheese??
+                                # nah lets just wander around a bit
+                                self.ai_goal='booored'
+                                # soldier gets a much tighter roam distance than civilians
+                                self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                self.ai_state='start_moving'
+                                #print('soldier - bored')
 
                 # ---------------- Everything that isn't a soldier AI ----------------------
                 else:
@@ -323,13 +407,7 @@ class AIHuman(AIBase):
                     self.ai_state='start_moving'
                     
 
-            
-
-
-
-
-
-
+        
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
         ''' handle code for civilians and soldiers '''

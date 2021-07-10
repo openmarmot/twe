@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='June 22 2021' #date of last update
+module_last_update_date='July 09 2021' #date of last update
 
 #global variables
 
@@ -167,35 +167,18 @@ class AIVehicle(AIBase):
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
             #print('distance: '+str(distance))
 
-            if self.ai_goal=='pickup':
-                if distance<5:
-                    print('pickup thingy')
-                    if self.target_object in self.owner.world.wo_objects:
-                        self.owner.add_inventory(self.target_object)
-                        self.owner.world.remove_object(self.target_object)
-                    else:
-                        # hmm object is gone. someone else must have grabbed it
-                        print('robbed!!')
+            if self.ai_goal=='drop off passenger':
+                if distance<30:
+                    print('dropping off passenger')
+
+                    b=self.passengers.pop(0)
+                    b.wo_start()
+                    print('dropped off '+b.name)
                     self.ai_state='sleeping'
-            elif self.ai_goal=='close_with_target':
-                # check if target is dead 
-                if self.target_object.ai.health<1:
-                    self.ai_state='sleeping'
-                    self.ai_goal='none'
-                    self.target_object=None
-                elif distance<500:
-                    print('in range of target')
-                    self.ai_state='engaging'
-                    self.ai_goal='none'
-                else:
-                    # reset the destination coordinates
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                    print('close with target')
             else:
                 # catchall for random moving related goals:
-                if distance<3:
+                # distance fuzzyness should be higher because the vehicle is more inexact
+                if distance<20:
                     self.ai_state='sleeping'
         elif self.ai_state=='engaging':
             # check if target is dead 
@@ -216,92 +199,24 @@ class AIVehicle(AIBase):
 
         else :
             # what should we be doing ??
+            # lets see what the passengers want to do
 
-            #---- soldier ------------------------------------------------------
-            if self.owner.is_soldier :
+            # would be better to sort passengers and drop off the closest
+            if self.passengers[0].ai.ai_vehicle_goal=='travel':
+                self.ai_goal='drop off passenger'
+                self.destination=copy.copy(self.passengers[0].ai.ai_vehicle_destination)
+                self.ai_state='start_moving'
 
-                # distance from group 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                
-                # are we low on health? 
-                if self.health<10:
-                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-                    if o != None:
-                        self.target_object=o
-                        self.ai_goal='pickup'
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving'  
-                    else :
-                        # no health to be had. time to run away
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
-                        self.ai_state='start_moving'  
-                # do we need a gun ?
-                elif self.primary_weapon==None :
-                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-                # do we need ammo ?
-                # are we too far from the group?
-                elif distance_group >300. :
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.world_coords)
-                    self.time_since_ai_transition=0
-                    self.ai_state='start_moving'
-                    print('getting closer to group')
-                else:
-                    self.target_object=self.squad.get_enemy()
-                    if self.target_object!=None:
-                        self.ai_state='engaging'
-                        self.ai_goal='none'
-                    else:
-                        # health is good
-                        # weapon is good
-                        # we are near the group
-                        # there are no enemies to engage
-                        # hunt for cheese??
-                        # nah lets just wander around a bit
-                        self.ai_goal='booored'
-                        # soldier gets a much tighter roam distance than civilians
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                        self.ai_state='start_moving'
-                        #print('soldier - bored')
 
-            #---- civilian ---------------------------------------------------------------
-            else  :
-
-                # are we low on health? 
-                if self.health<50:
-                    o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-                    if o != None:
-                        self.target_object=o
-                        self.ai_goal='pickup'
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving'  
-                    else :
-                        # no health to be had. time to run away
-                        self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
-                        self.ai_state='start_moving'  
-                # do we need a gun ?
-                elif self.primary_weapon==None :
-                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-                # do we need ammo ?
-                else:
-                    # health is good
-                    # weapon is good
-                    # hunt for cheese??
-                    # nah lets just wander around a bit
-                    self.ai_goal='booored'
-                    self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
-                    self.ai_state='start_moving'
 
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
         ''' handle code for civilians and soldiers '''
+        # this is what the bot does when it isn't thinking 
+        # basically mindlessly carries on whatever task it is doing 
+        # if there is something that should be decided it goes in handle_normal_ai_think
+
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         self.time_since_ai_transition+=time_passed
 
@@ -324,6 +239,9 @@ class AIVehicle(AIBase):
                 # maybe change into moving animation image?
                 # set the rotation angle for the image 
                 self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+
+                # tell graphics engine to redo the image 
+                self.owner.reset_image=True
                 # transition to moving
                 self.time_since_ai_transition=0
                 self.ai_state='moving'

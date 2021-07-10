@@ -42,9 +42,10 @@ from ai.ai_building import AIBuilding
 from ai.ai_projectile import AIProjectile
 from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
+from ai.ai_map_pointer import AIMapPointer
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='april 27 2021' #date of last update
+module_last_update_date='july 05 2021' #date of last update
 
 #global variables
 
@@ -238,8 +239,9 @@ def load_images(world):
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
 
-    #crates?
-    world.graphic_engine.loadImage('crate','images/crate.png')
+    #containers
+    world.graphic_engine.loadImage('crate','images/containers/crate.png')
+    world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -252,6 +254,9 @@ def load_images(world):
     world.graphic_engine.loadImage('camembert-cheese','images/consumables/camembert-cheese.png')
     world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
+
+    # random 
+    world.graphic_engine.loadImage('map_pointer','images/map_pointer.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -303,6 +308,12 @@ def load_test_environment(world):
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
     spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+
+
+    # spawnsome ammo cans 
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
+    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
 
     # add ze germans
     s=[]
@@ -471,18 +482,25 @@ def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_crate(world,world_coords, crate_type,SPAWN):
-    # crate_type -- string denoting crate type 
-    z=WorldObject(world,['crate'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.is_crate=True
-    z.render_level=2
-    z.name='crate'
-    z.world_builder_identity='crate'
-        
-    if SPAWN :
-        z.wo_start()
-    return z
+def spawn_container(WORLD,WORLD_COORDS,CONTAINER_TYPE):
+
+    if CONTAINER_TYPE=='crate':
+        z=WorldObject(WORLD,['crate'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_container=True
+        z.render_level=2
+        z.name='crate'
+        z.world_builder_identity='crate'
+        z.wo_start() 
+    elif CONTAINER_TYPE=='german_mg_ammo_can':
+        z=WorldObject(WORLD,['german_mg_ammo_can'],AINone)
+        z.world_coords=copy.copy(WORLD_COORDS)
+        z.is_container=True
+        z.render_level=2
+        z.name='german_mg_ammo_can'
+        z.world_builder_identity='german_mg_ammo_can'
+        z.wo_start() 
+
 
 
 #------------------------------------------------------------------------------
@@ -494,8 +512,8 @@ def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE,SPAWN):
         z.world_builder_identity='grenade_model24'
         z.is_grenade=True
         z.world_coords=copy.copy(WORLD_COORDS)
-        z.speed=140.
-        z.ai.maxTime=2.
+        z.speed=180.
+        z.ai.maxTime=1.5
         z.render_level=2
 
     if SPAWN :
@@ -517,6 +535,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
+        z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -531,6 +550,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
+        z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -545,6 +565,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
+        z.ai.type='assault rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -559,6 +580,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -573,6 +595,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.6
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -587,6 +610,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -601,6 +625,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
+        z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -615,6 +640,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -629,6 +655,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.7
+        z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -643,6 +670,7 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.7
+        z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -716,6 +744,16 @@ def spawn_ju88(world,world_coords,SPAWN):
     if SPAWN :
         z.wo_start()
     return z
+
+
+#------------------------------------------------------------------------------
+def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
+    if TYPE=='normal':
+        z=WorldObject(WORLD,['map_pointer'],AIMapPointer)
+        z.ai.target_coords=TARGET_COORDS
+        z.render_level=4
+        z.is_map_pointer=True
+        z.wo_start()
 
 
 #------------------------------------------------------------------------------

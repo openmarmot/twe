@@ -2,6 +2,83 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 09 2021
+
+- added 'enter object' routine to ai_human 
+    - will be used for entering vehicles and maybe other things 
+    in the future 
+- added a distance check on 'moving' ai_state to see if 
+    taking a vehicle would make more sense
+    - this probably won't trigger often with the current AI setup
+- rewrote the vehicle ai code so it can taking bots where they want 
+    to go and droppign them off. 
+
+the AI controlled vehicle code is pretty basic at the moment so a lot 
+of funny stuff is happening. if i add vehicle collision its going to be 
+really funny because they don't avoid anything. 
+
+I probably need to restrict civilian vehicle access 
+
+---------------------------------
+July 06 2021
+
+- added enough code to get the new map pointers working 
+
+for now map pointers are toggleable from the debug menu (~)
+- they are a green line that points in the direction of the 
+    world areas (control points). currently these are clusters 
+    of buildings. eventually more colors may be added to point 
+    at other things 
+
+---------------------------------
+July 05 2021
+
+- added new 'map pointer' object 
+    - idea is it is a indicator pointing at a map feature like a town 
+
+---------------------------------
+July 03 2021
+
+- fixed some incomplete variable inits in ai_gun 
+
+---------------------------------
+July 02 2021
+
+- added art and basic code for new 'german mg ammo can' object 
+    - based off of some pictures i found of german mg34 amo cans that 
+    were designed to hold belts of 7.92 ammo 
+- added the concept of 'container' which replaces 'crate' 
+
+I'm playing around with the idea of adding a bunch of bullet parameters to 
+ai_gun. the idea being these parameters will feed into a system to calculate 
+penetration and damage eventually 
+
+---------------------------------
+June 29 2021
+
+- added debug text to the menu for humans that shows ai_state and ai_goal
+- bumped up range a which ai will re-engage a target
+    - >850 == close with target 
+    - <700 == engage 
+
+distances that are used with the AI really need tweaking 
+- need to figure out a good range for the guns 
+
+---------------------------------
+June 24 2021
+
+- added a ai option for a soldier to pick up a grenade if they dont have one 
+    - requires soldier to be in an idle state 
+- added ai option to swap a pistol or rifle for a nearby submachine gun or assault rifle 
+    - requires soldier to be in an idle state
+    - required adding weapon types 
+- swapped order of check enemies and check group proximit for solder ai to give a higher 
+    priority to finding enemies 
+    - hopefully resolving issue where soldiers walk past enemies 
+- increased grenade speed a bit 
+
+
+---------------------------------
 June 22 2021
 
 - added code so grenades are once again dropped on death 
