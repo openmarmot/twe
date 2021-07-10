@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 
+---------------------------------
+July 09 2021
+
+- added 'enter object' routine to ai_human 
+    - will be used for entering vehicles and maybe other things 
+    in the future 
+- added a distance check on 'moving' ai_state to see if 
+    taking a vehicle would make more sense
+    - this probably won't trigger often with the current AI setup
+- rewrote the vehicle ai code so it can taking bots where they want 
+    to go and droppign them off. 
+
+the AI controlled vehicle code is pretty basic at the moment so a lot 
+of funny stuff is happening. if i add vehicle collision its going to be 
+really funny because they don't avoid anything. 
+
+I probably need to restrict civilian vehicle access 
 
 ---------------------------------
 July 06 2021
