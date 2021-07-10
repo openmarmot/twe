@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 09 2021 extras 
+
+- added an ability for a soldier to add a personal enemy to the squad 
+    enemy list, although it will only stay on there until the list refreshes (5 seconds)
+- changed ai for ai_human to update destination coords periodically when trying to enter an object 
+    this was an issue because vehicles move fast so sometimes bots would disappear by entering 
+    vehicles that were no longer where they thought they were 
+    - this will also mean the bot will have a hard time entering a moving vehicle 
+
+
+---------------------------------
 July 09 2021
 
 - added 'enter object' routine to ai_human 

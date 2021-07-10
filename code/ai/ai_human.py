@@ -97,6 +97,11 @@ class AIHuman(AIBase):
             if EVENT_DATA.ai.shooter !=None:
                 self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
+                # let the squad know (this is only until the enemy list is rebuilt)
+                # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
+                if self.owner.is_soldier:
+                    self.squad.near_enemies.append(self.personal_enemies[0])
+
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 
             pass 
@@ -181,7 +186,7 @@ class AIHuman(AIBase):
             #print('distance: '+str(distance))
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
-            if distance>1500:
+            if distance>2000:
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
                 if b!=None:
                     v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
@@ -222,16 +227,23 @@ class AIHuman(AIBase):
                             pass
                         self.ai_state='sleeping'
                 elif self.ai_goal=='enter object':
-                    if distance<5:
-                        if self.target_object in self.owner.world.wo_objects:
-                            self.target_object.add_inventory(self.owner)
-                            self.owner.world.remove_object(self.owner)
-                            print(self.owner.name+' entered '+ self.target_object.name)
-                        else:
-                            # hmm object is gone. idk how that happened
-                            print('object I was going to enter disappeared')
-                            pass
-                        self.ai_state='sleeping'
+
+                    # vehicles move around a lot so gotta check
+                    if self.destination!=self.target_object.world_coords:
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                    else:
+                        if distance<5:
+                            if self.target_object in self.owner.world.wo_objects:
+                                self.target_object.add_inventory(self.owner)
+                                self.owner.world.remove_object(self.owner)
+                                print(self.owner.name+' entered '+ self.target_object.name)
+
+                            else:
+                                # hmm object is gone. idk how that happened
+                                print('object I was going to enter disappeared')
+                                pass
+                            self.ai_state='sleeping'
                 elif self.ai_goal=='get ammo':
                     if distance<5:
                         print('replenishing ammo ')
@@ -319,6 +331,7 @@ class AIHuman(AIBase):
                     self.ai_goal='pickup'
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving'
+
                 else:
                     # we have a gun, lets make sure this enemy is alive
                     #print(self.personal_enemies)
@@ -327,6 +340,7 @@ class AIHuman(AIBase):
                         self.target_object=self.personal_enemies[0]
                         self.ai_state='engaging'
                         self.ai_goal='none'
+
                     else:
                         # remove the enemy as it is dead
                         self.personal_enemies.pop(0)
