@@ -417,7 +417,7 @@ class AIHuman(AIBase):
                 else:
                     self.ai_goal='booored'
                     # maybe replace this with traveling to a random building 
-                    self.destination=[self.owner.world_coords[0]+float(random.randint(-3000,3000)),self.owner.world_coords[1]+float(random.randint(-3000,3000))]
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-1500,1500)),self.owner.world_coords[1]+float(random.randint(-1500,1500))]
                     self.ai_state='start_moving'
                     
 

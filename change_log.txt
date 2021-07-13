@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
+---------------------------------
+July 12 2021
 
+- added distance from squad to the debug data that shows up when you click on a bot 
+- adjusted civilian bored moved down from a random location up to 3000 away to up to
+    1500 away. this puts it under the threshold where it will grab a car 
+- decreased the speed that the squad position moves from 50 to 5
 ---------------------------------
 July 09 2021 extras 
 
