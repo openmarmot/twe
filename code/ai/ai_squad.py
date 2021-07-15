@@ -27,7 +27,7 @@ class AISquad(object):
         self.world=WORLD
         # controls how fast the group world_coords moves. 
         # not sure what a good speed is
-        self.speed=5
+        self.speed=10
 
         # ai in the group will try to stay close to the group world coords
         # moves towards destination

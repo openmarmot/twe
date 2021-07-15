@@ -1,5 +1,27 @@
 TWE Project : Change Log
 
+
+---------------------------------
+July 14 2021
+
+- made some small tweaks to ai_human 
+- bumped ai_squad speed up from 5 to 10 to make squad movement less start stop 
+- some inital work on panzerfaust code 
+
+forgot that the AI is coded not to pickup machine guns. 
+the theory here is that the MGs are really crew served weapons and if 
+anyone can pick one up it would be rather over powered. may change this 
+in the future
+
+sometimes the combat is great and sometimes the combat is terrible.
+the biggest issue that im trying to fix is when a solider is calmy walking across 
+the map seemingly unaware that a bunch of enemies are shooting streams of bullets at it 
+this seems to be mostly an issue with how the squad hands out enemies
+
+note that at the moment i haven't observed the AI taking cars anymore. 
+I think civilians won't with their current rule set - but soldiers still 
+should (maybe??) squad location may move to slow to trigger getting into a car 
+
 ---------------------------------
 July 12 2021
 

@@ -207,7 +207,6 @@ def load_images(world):
     world.graphic_engine.loadImage('1911','images/weapons/1911.png')
     world.graphic_engine.loadImage('dp28','images/weapons/dp28.png')
     world.graphic_engine.loadImage('mp40','images/weapons/mp40.png')
-    world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
     world.graphic_engine.loadImage('ppk','images/weapons/ppk.png')
     world.graphic_engine.loadImage('stg44','images/weapons/stg44.png')
     world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
@@ -222,10 +221,14 @@ def load_images(world):
     # grenades
     world.graphic_engine.loadImage('model24','images/weapons/model24.png')
 
+    # at rockets
+    world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
+    world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
+
+
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
     world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
-    world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
 
     # buildings
     world.graphic_engine.loadImage('warehouse-inside','images/buildings/warehouse-inside.png')

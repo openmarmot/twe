@@ -384,6 +384,11 @@ class AIHuman(AIBase):
                                         self.destination=self.target_object.world_coords
                                         self.ai_state='start_moving' 
                                         print('picking up grenade')
+                                    else:
+                                        # readjust a bit 
+                                        self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                        self.ai_state='start_moving'
+                                        self.ai_goal='would like a grenade'
                             # upgrade weapon?
                             elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
                                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
@@ -401,8 +406,9 @@ class AIHuman(AIBase):
                                             print('swapping '+self.primary_weapon.name + 'for '+b.name)
                                         else:
                                             # readjust a bit 
-                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                                             self.ai_state='start_moving'
+                                            self.ai_goal='would like a better weapon'
                             else:
 
                                 # hunt for cheese??
