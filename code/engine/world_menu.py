@@ -17,7 +17,7 @@ import engine.world_builder
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 20 2021' #date of last update
+module_last_update_date='July 16 2021' #date of last update
 
 #global variables
 
@@ -74,7 +74,7 @@ class World_Menu(object):
         if SELECTED_OBJECT.is_vehicle: 
             self.active_menu='vehicle'
             self.vehicle_menu(None)
-        elif SELECTED_OBJECT.is_gun:
+        elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
             self.active_menu='gun'
             self.gun_menu(None)
         elif SELECTED_OBJECT.is_container:
@@ -226,9 +226,9 @@ class World_Menu(object):
             elif Key=='2':
                 engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 500)
             elif Key=='3':
-                engine.world_builder.spawn_vehicle(self.world, self.world.player.world_coords,'kubelwagen',True)
+                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':
-                engine.world_builder.spawn_building(self.world, self.world.player.world_coords,'square_building',True)
+                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
 
     def start_menu(self, Key):
         if self.menu_state=='none':
@@ -246,23 +246,23 @@ class World_Menu(object):
         if self.menu_state=='base':
             faction='none'
             if Key=='1':
-                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[0,0],'1911',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[0,0],'model24',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'1911',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_american=True
                 self.world.wo_objects_american.append(self.world.player)
             elif Key=='2':
-                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[0,0],'stg44',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[0,0],'model24',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_german=True
                 self.world.wo_objects_german.append(self.world.player)
             elif Key=='3':
-                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[0,0],'ppsh43',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[0,0],'model24',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_soviet=True
                 self.world.wo_objects_soviet.append(self.world.player)
             elif Key=='4':
-                self.world.player.add_inventory(engine.world_builder.spawn_gun(self.world,[0,0],'ppk',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_grenade(self.world,[0,0],'model24',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
+                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_civilian=True
             
             if Key=='1' or Key=='2' or Key=='3' or Key=='4':

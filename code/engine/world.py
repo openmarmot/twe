@@ -52,6 +52,7 @@ class World(object):
         self.wo_objects_consumable=[]
         self.wo_objects_building=[]
         self.wo_objects_map_pointer=[]
+        self.wo_objects_handheld_antitank=[]
 
         #world areas
         self.world_areas=[]
@@ -93,6 +94,8 @@ class World(object):
             self.wo_objects_building.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_map_pointer:
             self.wo_objects_map_pointer.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_handheld_antitank:
+            self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -185,7 +188,7 @@ class World(object):
             w=[b.world_coords[0]+float(random.randint(-20,20)),b.world_coords[1]+float(random.randint(-20,20))]
 
             # spawn a ppk
-            engine.world_builder.spawn_gun(self,w,'ppk',True)
+            engine.world_builder.spawn_object(self,w,'ppk',True)
             # hmm we don't have the object reference, so lets just run this method again
             # does this make sense? am i insane? HA HA HAHAHAHA
             return self.get_closest_gun(WORLD_COORDS)
@@ -237,6 +240,8 @@ class World(object):
             self.wo_objects_building.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_map_pointer:
             self.wo_objects_map_pointer.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_handheld_antitank:
+            self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -254,7 +259,7 @@ class World(object):
         mouse=self.graphic_engine.get_mouse_screen_coords()
         collided=None
         # this calculation should be moved to math_2d
-        ob_list=self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+self.wo_objects_consumable+self.wo_objects_grenade
+        ob_list=self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank
         for b in ob_list:
             if mouse[0]+radius > b.screen_coords[0]:
                 if mouse[0] < b.screen_coords[0]+b.collision_radius:

@@ -26,7 +26,7 @@ from itertools import islice
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 10 2021' #date of last update
+module_last_update_date='July 16 2021' #date of last update
 
 #global variables
 
@@ -190,6 +190,11 @@ class Graphics_2D_Pygame(object):
                 return False
         elif KEY=='g':
             if keys[pygame.K_g]:
+                return True
+            else:
+                return False
+        elif KEY=='t':
+            if keys[pygame.K_t]:
                 return True
             else:
                 return False

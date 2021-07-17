@@ -49,7 +49,7 @@ class WorldObject(object):
         self.reset_image=True
 
         # updated by the object AI
-        self.world_coords=[0.,0.]
+        self.world_coords=None
 
         # updated automatically by the graphic engine when 
         #   the object is renderable 
@@ -85,6 +85,7 @@ class WorldObject(object):
         self.is_vehicle=False
         self.is_gun=False
         self.is_grenade=False
+        self.is_handheld_antitank=False
         self.is_gun_mag_carrier=False
         self.is_container=False
         self.is_projectile=False

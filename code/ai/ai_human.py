@@ -29,6 +29,7 @@ class AIHuman(AIBase):
 
         self.primary_weapon=None
         self.throwable=None
+        self.antitank=None
         self.health=100
 
         # what the ai is actually doing (an action)
@@ -90,7 +91,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
-            engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'blood_splatter')
+            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
             # add the shooter of the bullet to the personal enemies list
             # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
@@ -140,10 +141,24 @@ class AIHuman(AIBase):
             else:
                 # drop the current weapon and pick up the new one
                 self.throwable.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.primary_weapon)
+                self.owner.world.add_object(self.throwable)
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.throwable=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_handheld_antitank :
+            if self.antitank==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.antitank=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.antitank.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.antitank)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
         if EVENT_DATA.is_consumable:
             self.health+=100
@@ -491,6 +506,9 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             self.throw([]) 
+        if(self.owner.world.graphic_engine.keyPressed('t')):
+            # launch anti tank
+            self.launch_antitank([])
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
@@ -507,6 +525,16 @@ class AIHuman(AIBase):
             self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.player.world_coords,self.owner.world_coords)
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
             self.owner.reset_image=True
+
+    #---------------------------------------------------------------------------
+    def launch_antitank(self,TARGET_COORDS):
+        ''' throw like you know the thing. cmon man ''' 
+        print('BLAMMO') 
+        if self.antitank!=None:
+            self.antitank.ai.launch(TARGET_COORDS)
+            self.owner.world.add_object(self.antitank)
+            self.antitank=None
+
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    

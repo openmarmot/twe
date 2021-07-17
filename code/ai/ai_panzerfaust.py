@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 15 2021' #date of last update
+module_last_update_date='July 16 2021' #date of last update
 
 #global variables
 
@@ -28,7 +28,7 @@ class AIPanzerfaust(AIBase):
         super().__init__(owner)
 
         # whether the grenade is active or inactive
-        self.thrown=False
+        self.launched=False
 
         # whether the grenade collided with something
         self.collided=False
@@ -52,7 +52,7 @@ class AIPanzerfaust(AIBase):
 
 
 
-        if self.thrown:
+        if self.launched:
             self.flightTime+=time_passed
             if(self.flightTime>self.maxTime):
                 self.explode()
@@ -60,11 +60,8 @@ class AIPanzerfaust(AIBase):
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             
-            if self.collided==False:
-                if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
-                    # just stop the grenade. maybe some spin or reverse movement?
-                    self.owner.speed=-20
-                    self.collided=True
+            if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
+                self.explode()
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
@@ -78,12 +75,14 @@ class AIPanzerfaust(AIBase):
         self.owner.world.remove_object(self.owner)
 
     #---------------------------------------------------------------------------
-    def throw(self,TARGET_COORDS):
+    def launch(self,TARGET_COORDS):
 
-        # whatever is calling this should add the grenade to the world map (if it isn't there)
+        # whatever is calling this should add the panzerfaust to the world map and remove it from inventory
 
-        # MOUSE_AIM bool as to whether you want to throw it at the mouse
-        self.thrown=True
+        self.launched=True
+
+        # change image from the whole thing to just the warhead
+        self.owner.image_index=1
 
         # reset coords 
         self.owner.world_coords=copy.copy(self.equipper.world_coords)
@@ -94,6 +93,8 @@ class AIPanzerfaust(AIBase):
         else :
             self.owner.rotation_angle=engine.math_2d.get_rotation(self.equipper.world_coords,TARGET_COORDS)
             self.owner.heading=engine.math_2d.get_heading_vector(self.equipper.world_coords,TARGET_COORDS)
+
+        self.owner.reset_image=True
 
 
 

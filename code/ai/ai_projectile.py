@@ -39,7 +39,7 @@ class AIProjectile(AIBase):
 
         self.flightTime+=time_passed
         if(self.flightTime>self.maxTime):
-            engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'dirt')
+            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
             self.owner.world.remove_object(self.owner)
         else:
 

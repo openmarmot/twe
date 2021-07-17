@@ -16,7 +16,7 @@ from ai.ai_base import AIBase
 import engine.math_2d
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='March 28 2021' #date of last update
+module_last_update_date='July 16 2021' #date of last update
 
 # this is for objects that don't need AI
 
@@ -56,7 +56,7 @@ class AIBuilding(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             #self.health-=random.randint(25,75)
-            engine.world_builder.spawn_sprite(self.owner.world,EVENT_DATA.world_coords,'dirt')
+            engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
         elif EVENT_DATA.is_grenade:
             print('The mighty building laughs at your puny grenade')
 

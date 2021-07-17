@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 16 2021
+
+- code refactoring in world_builder to combine some functions 
+- added panzerfaust to game 
+    - this ended up taking a fair amount of code 
+    - damage is like a grenade at the moment - this will change in the future 
+        - will probably do contact damage not AOE in the future 
+    - needs a smoke effect - but i do not have this yet 
+
+---------------------------------
 July 14 2021
 
 - made some small tweaks to ai_human 

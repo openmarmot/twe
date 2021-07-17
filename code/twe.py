@@ -38,7 +38,7 @@ def run():
 
     # this has to be here because graphics engine uses player coords in its update
     #  so it needs to be created
-    p=engine.world_builder.spawn_human(world, [50.,50.],'player',True)
+    p=engine.world_builder.spawn_object(world, [50.,50.],'player',True)
 
     world.world_menu.active_menu='start'
     world.world_menu.menu_state='none'

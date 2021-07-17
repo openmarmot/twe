@@ -43,9 +43,10 @@ from ai.ai_projectile import AIProjectile
 from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
+from ai.ai_panzerfaust import AIPanzerfaust
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='july 05 2021' #date of last update
+module_last_update_date='july 16 2021' #date of last update
 
 #global variables
 
@@ -161,11 +162,11 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
         count=random.randint(1,5)
         for x in range(count):
             coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            group.append(spawn_building(WORLD,coords,'warehouse',True))
+            group.append(spawn_object(WORLD,coords,'warehouse',True))
         count=random.randint(2,15)
         for x in range(count):
             coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            group.append(spawn_building(WORLD,coords,'square_building',True))
+            group.append(spawn_object(WORLD,coords,'square_building',True))
     
     # do some sorting 
     engine.math_2d.collision_sort(500,group)
@@ -267,56 +268,53 @@ def load_test_environment(world):
 
 
     # add civilians 
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_human(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
 
 
-    # add a couple guns 
-    spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
-    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'stg44',True)
-    #spawn_gun(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mosin_nagant',True)
+    # add a couple weapons 
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
 
-
-    # and some grenades! 
-    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
-    #spawn_grenade(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
 
     # add ju88
-    spawn_ju88(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
     # kubelwagens 
-    spawn_vehicle(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+
 
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
     #cheese 
-    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese')
-    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese')
-    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese')
-    spawn_consumable(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese')
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese',True)
 
 
-    # spawnsome ammo cans 
-    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
-    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
-    spawn_container(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can")
+    # spawn some ammo cans 
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
     # add ze germans
     s=[]
@@ -410,128 +408,85 @@ def load_test_environment(world):
 
 
 
-
-
 #------------------------------------------------------------------------------
-def spawn_building(world,world_coords,TYPE,SPAWN):
-    if TYPE=='warehouse':
-        z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
+def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
+    if OBJECT_TYPE=='warehouse':
+        z=WorldObject(WORLD,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
-        z.world_builder_identity='building_warehouse'
-        z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
         z.collision_radius=500
         z.is_building=True
-        if SPAWN :
-            z.wo_start()
-        return z 
-    if TYPE=='square_building':
-        z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)
+
+    elif OBJECT_TYPE=='square_building':
+        z=WorldObject(WORLD,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
-        z.world_builder_identity='building_square'
-        z.world_coords=copy.copy(world_coords)
         z.speed=0
         z.render_level=1
         z.collision_radius=85
         z.is_building=True
-        if SPAWN :
-            z.wo_start()
-        return z 
 
-
-#------------------------------------------------------------------------------    
-def spawn_consumable(world,world_coords,CONSUMABLE_TYPE):
-    if CONSUMABLE_TYPE=='adler-cheese':
-        z=WorldObject(world,['adler-cheese'],AINone)
-        z.world_coords=copy.copy(world_coords)
+    elif OBJECT_TYPE=='adler-cheese':
+        z=WorldObject(WORLD,['adler-cheese'],AINone)
         z.render_level=2
         z.name='Adler cheese'
-        z.world_builder_identity='consumable_adler'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
-        z.wo_start() 
 
-    if CONSUMABLE_TYPE=='camembert-cheese':
-        z=WorldObject(world,['camembert-cheese'],AINone)
-        z.world_coords=copy.copy(world_coords)
+    elif OBJECT_TYPE=='camembert-cheese':
+        z=WorldObject(WORLD,['camembert-cheese'],AINone)
         z.render_level=2
         z.name='Camembert cheese'
-        z.world_builder_identity='consumable_camembert'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
-        z.wo_start() 
 
-    if CONSUMABLE_TYPE=='champignon-cheese':
-        z=WorldObject(world,['champignon-cheese'],AINone)
-        z.world_coords=copy.copy(world_coords)
+    elif OBJECT_TYPE=='champignon-cheese':
+        z=WorldObject(WORLD,['champignon-cheese'],AINone)
         z.render_level=2
         z.name='Champignon cheese'
-        z.world_builder_identity='consumable_champignon'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
-        z.wo_start() 
 
-    if CONSUMABLE_TYPE=='karwendel-cheese':
-        z=WorldObject(world,['karwendel-cheese'],AINone)
-        z.world_coords=copy.copy(world_coords)
+    elif OBJECT_TYPE=='karwendel-cheese':
+        z=WorldObject(WORLD,['karwendel-cheese'],AINone)
         z.render_level=2
         z.name='Karwendel cheese'
-        z.world_builder_identity='consumable_karwendel'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
-        z.wo_start() 
 
-
-
-#------------------------------------------------------------------------------
-def spawn_container(WORLD,WORLD_COORDS,CONTAINER_TYPE):
-
-    if CONTAINER_TYPE=='crate':
+    elif OBJECT_TYPE=='crate':
         z=WorldObject(WORLD,['crate'],AINone)
-        z.world_coords=copy.copy(WORLD_COORDS)
         z.is_container=True
         z.render_level=2
         z.name='crate'
         z.world_builder_identity='crate'
-        z.wo_start() 
-    elif CONTAINER_TYPE=='german_mg_ammo_can':
+
+    elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AINone)
-        z.world_coords=copy.copy(WORLD_COORDS)
         z.is_container=True
         z.render_level=2
         z.name='german_mg_ammo_can'
         z.world_builder_identity='german_mg_ammo_can'
-        z.wo_start() 
 
+    elif OBJECT_TYPE=='panzerfaust':
+        z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
+        z.name='panzerfaust'
+        z.render_level=2
+        z.speed=250
+        z.is_handheld_antitank=True
 
-
-#------------------------------------------------------------------------------
-def spawn_grenade(WORLD,WORLD_COORDS,GRENADE_TYPE,SPAWN):
-
-    if GRENADE_TYPE=='model24':
+    elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
-        z.world_builder_identity='grenade_model24'
         z.is_grenade=True
-        z.world_coords=copy.copy(WORLD_COORDS)
         z.speed=180.
         z.ai.maxTime=1.5
         z.render_level=2
 
-    if SPAWN :
-        z.wo_start()
-    return z
-
-
-#------------------------------------------------------------------------------
-def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
-
-    if GUN_TYPE=='mp40':
-        z=WorldObject(world,['mp40'],AIGun)
+    elif OBJECT_TYPE=='mp40':
+        z=WorldObject(WORLD,['mp40'],AIGun)
         z.name='mp40'
         z.world_builder_identity='gun_mp40'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=32
         z.ai.mag_capacity=32
@@ -542,11 +497,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='ppsh43':
-        z=WorldObject(world,['ppsh43'],AIGun)
+    elif OBJECT_TYPE=='ppsh43':
+        z=WorldObject(WORLD,['ppsh43'],AIGun)
         z.name='ppsh43'
-        z.world_builder_identity='gun_ppsh43'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=35
         z.ai.mag_capacity=35
@@ -557,11 +510,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='stg44':
-        z=WorldObject(world,['stg44'],AIGun)
+    elif OBJECT_TYPE=='stg44':
+        z=WorldObject(WORLD,['stg44'],AIGun)
         z.name='stg44'
-        z.world_builder_identity='gun_stg44'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=30
         z.ai.mag_capacity=30
@@ -572,11 +523,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='dp28':
-        z=WorldObject(world,['dp28'],AIGun)
+    elif OBJECT_TYPE=='dp28':
+        z=WorldObject(WORLD,['dp28'],AIGun)
         z.name='dp28'
-        z.world_builder_identity='gun_dp28'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=47
         z.ai.mag_capacity=47
@@ -587,11 +536,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='ppk':
-        z=WorldObject(world,['ppk'],AIGun)
+    elif OBJECT_TYPE=='ppk':
+        z=WorldObject(WORLD,['ppk'],AIGun)
         z.name='ppk'
-        z.world_builder_identity='gun_ppk'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
@@ -602,11 +549,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='tt33':
-        z=WorldObject(world,['tt33'],AIGun)
+    elif OBJECT_TYPE=='tt33':
+        z=WorldObject(WORLD,['tt33'],AIGun)
         z.name='tt33'
-        z.world_builder_identity='gun_tt33'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=8
         z.ai.mag_capacity=8
@@ -617,11 +562,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='1911':
-        z=WorldObject(world,['1911'],AIGun)
+    elif OBJECT_TYPE=='1911':
+        z=WorldObject(WORLD,['1911'],AIGun)
         z.name='1911'
-        z.world_builder_identity='gun_1911'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=7
         z.ai.mag_capacity=7
@@ -632,11 +575,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='mg34':
-        z=WorldObject(world,['mg34'],AIGun)
+    elif OBJECT_TYPE=='mg34':
+        z=WorldObject(WORLD,['mg34'],AIGun)
         z.name='mg34'
-        z.world_builder_identity='gun_mg34'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=75
         z.ai.mag_capacity=75
@@ -647,11 +588,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='kar98k':
-        z=WorldObject(world,['kar98k'],AIGun)
+    elif OBJECT_TYPE=='kar98k':
+        z=WorldObject(WORLD,['kar98k'],AIGun)
         z.name='kar98k'
-        z.world_builder_identity='gun_kar98k'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=5
         z.ai.mag_capacity=5
@@ -662,11 +601,9 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if GUN_TYPE=='mosin_nagant':
-        z=WorldObject(world,['mosin_nagant'],AIGun)
+    elif OBJECT_TYPE=='mosin_nagant':
+        z=WorldObject(WORLD,['mosin_nagant'],AIGun)
         z.name='mosin_nagant'
-        z.world_builder_identity='gun_mosin_nagant'
-        z.world_coords=copy.copy(world_coords)
         z.is_gun=True
         z.ai.magazine=5
         z.ai.mag_capacity=5
@@ -677,73 +614,95 @@ def spawn_gun(world,world_coords,GUN_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
-    if SPAWN :
-        z.wo_start()
-    return z
+    elif OBJECT_TYPE=='kubelwagen':
+        z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
+        z.name='kubelwagen'
+        z.is_vehicle=True
+        z.render_level=3
+        z.speed=200
+        z.rotation_speed=40.
+        z.ai.acceleration=100
+        z.collision_radius=50
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
 
-#------------------------------------------------------------------------------
-def spawn_human(WORLD,WORLD_COORDS,HUMAN_TYPE,SPAWN):
-    # SPAWN -bool, whether to spawn in the world or not 
-    
-    z=None
-    if HUMAN_TYPE=='zombie':
+    elif OBJECT_TYPE=='ju88':
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AINone)
+        z.render_level=3
+        z.collision_radius=100  
+
+    elif OBJECT_TYPE=='zombie':
         z=WorldObject(WORLD,['zombie_soldier'],AIHuman)
         z.name='Zombie Klaus Hammer'
-        z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(5,20))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
         z.is_zombie=True
-    if HUMAN_TYPE=='player':
+
+    elif OBJECT_TYPE=='player':
         z=WorldObject(WORLD,['man'],AIHuman)
         z.name='Klaus Hammer'
-        z.world_coords=copy.copy(WORLD_COORDS)
         z.speed=50.
         z.is_player=True
         z.render_level=3
         z.is_human=True
         WORLD.player=z
-    if HUMAN_TYPE=='civilian_man':
+
+    elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man'],AIHuman)
         z.name='Reginald Thimblebottom'
-        z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
         z.is_civilian=True
-    if HUMAN_TYPE=='german_soldier':
+
+    elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier'],AIHuman)
         z.name='Klaus Hammer'
-        z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
-    if HUMAN_TYPE=='soviet_soldier':
+
+    elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
         z.name='Boris Volvakov'
-        z.world_coords=WORLD_COORDS
         z.speed=float(random.randint(18,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
         z.is_soviet=True
-    if SPAWN :
-        z.wo_start()
-    return z
 
+    elif OBJECT_TYPE=='brass':
+        z=WorldObject(WORLD,['brass'],AINone)
+        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.render_level=2
+        z.name='brass'
+        z.rotation_angle=float(random.randint(0,359))  
+    
+    elif OBJECT_TYPE=='blood_splatter':
+        z=WorldObject(WORLD,['blood_splatter'],AINone)
+        z.render_level=2
+        z.name='blood_splatter'
+        z.rotation_angle=float(random.randint(0,359))  
+           
+    elif OBJECT_TYPE=='dirt':
+        z=WorldObject(WORLD,['dirt'],AINone)
+        z.render_level=2
+        z.name='dirt'
+        z.rotation_angle=float(random.randint(0,359))  
 
-#------------------------------------------------------------------------------
-def spawn_ju88(world,world_coords,SPAWN):
-    z=WorldObject(world,['ju88-winter-weathered'],AINone)
-    z.world_coords=copy.copy(world_coords)
-    z.render_level=3
-    z.collision_radius=100
+    # -- generic settings that apply to all --
+    z.world_builder_identity=OBJECT_TYPE
+    # set world coords if they weren't already set
+    if z.world_coords==None:
+        z.world_coords=copy.copy(WORLD_COORDS)
+
     if SPAWN :
         z.wo_start()
     return z
@@ -816,108 +775,58 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     ''' return a soldier with full kit '''
     # --------- german types ---------------------------------
     if SOLDIER_TYPE=='german_kar98k':
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_kar98k'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'kar98k',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_mp40':
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mp40'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mp40',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_mg34':
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mg34'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='german_stg44':
-        z=spawn_human(WORLD,[0.0],'german_soldier',False)
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_stg44'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'stg44',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z
 
     # --------- soviet types ----------------------------------------
     if SOLDIER_TYPE=='soviet_mosin_nagant':
-        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_mosin_nagant'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mosin_nagant',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_nagant',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z
     if SOLDIER_TYPE=='soviet_ppsh43':
-        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_ppsh43'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'ppsh43',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z 
     if SOLDIER_TYPE=='soviet_dp28':
-        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_dp28'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'dp28',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'dp28',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         return z 
     if SOLDIER_TYPE=='soviet_tt33':
-        z=spawn_human(WORLD,[0.0],'soviet_soldier',False)
+        z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_tt33'
-        z.add_inventory(spawn_gun(WORLD,[0,0],'tt33',False))
-        z.add_inventory(spawn_grenade(WORLD,[0,0],'model24',False)) 
+        z.add_inventory(spawn_object(WORLD,[0,0],'tt33',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False)) 
         return z   
-
-
-#------------------------------------------------------------------------------
-def spawn_sprite(WORLD,WORLD_COORDS,TYPE):
-    ''' sprite being a static 2d 'effect' '''
-    if TYPE=='brass':
-        z=WorldObject(WORLD,['brass'],AINone)
-        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
-        z.world_coords=copy.copy(w)
-        z.render_level=2
-        z.name='brass'
-        z.rotation_angle=float(random.randint(0,359))  
-        z.wo_start()
-    elif TYPE=='blood_splatter':
-        z=WorldObject(WORLD,['blood_splatter'],AINone)
-        z.world_coords=copy.copy(WORLD_COORDS)
-        z.render_level=2
-        z.name='blood_splatter'
-        z.rotation_angle=float(random.randint(0,359))  
-        z.wo_start()     
-    elif TYPE=='dirt':
-        z=WorldObject(WORLD,['dirt'],AINone)
-        z.world_coords=copy.copy(WORLD_COORDS)
-        z.render_level=2
-        z.name='dirt'
-        z.rotation_angle=float(random.randint(0,359))  
-        z.wo_start() 
-    else :
-        print('spawn_sprite error - TYPE not recognized :'+TYPE)  
-
-
-#------------------------------------------------------------------------------
-def spawn_vehicle(WORLD,WORLD_COORDS,VEHICLE_TYPE,SPAWN):
-
-    if VEHICLE_TYPE=='kubelwagen':
-        z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
-        z.world_builder_identity='vehicle_kubelwagen'
-        z.name='kubelwagen'
-        z.world_coords=copy.copy(WORLD_COORDS)
-        z.is_vehicle=True
-        z.render_level=3
-        z.speed=200
-        z.rotation_speed=40.
-        z.ai.acceleration=100
-        z.collision_radius=50
-        z.add_inventory(spawn_gun(WORLD,[0,0],'mg34',False))
-        if SPAWN :
-            z.wo_start()
-        return z
-
 
 
 #------------------------------------------------------------------------------
 def spawn_zombie_horde(world, world_coords, amount):
     for x in range(amount):
-        spawn_human(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]],'zombie',True)
+        spawn_object(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]],'zombie',True)
