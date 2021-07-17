@@ -10,7 +10,8 @@ July 16 2021
     - damage is like a grenade at the moment - this will change in the future 
         - will probably do contact damage not AOE in the future 
     - needs a smoke effect - but i do not have this yet 
-
+    
+note that 't' launches the panzerfaust 
 ---------------------------------
 July 14 2021
 

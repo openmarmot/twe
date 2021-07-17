@@ -40,6 +40,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - 1-0 number keys are used in menus
 - 'f' to fire weapon (if you have one)
 - 'g' throw grenade (if you have one)
+- 't' launch panzerfaust (if you have one)
 
 
 ### License / Whatever
