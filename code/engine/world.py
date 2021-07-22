@@ -36,6 +36,7 @@ class World(object):
         self.german_ai=AIFactionTactical(self,'german')
         self.soviet_ai=AIFactionTactical(self,'soviet')
         self.american_ai=AIFactionTactical(self,'american')
+        self.civilian_ai=AIFactionTactical(self,'civilian')
 
 
         # object lists 

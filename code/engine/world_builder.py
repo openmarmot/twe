@@ -354,7 +354,7 @@ def load_test_environment(world):
 
     
     # create german squads
-    world.german_ai.squads=create_squads(world,s,'german')
+    world.german_ai.squads+=create_squads(world,s,'german')
 
     # add ze russians
     s=[]
@@ -392,7 +392,7 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'soviet_ppsh43'))
 
     # create soviet squads 
-    world.soviet_ai.squads=create_squads(world,s,'soviet')
+    world.soviet_ai.squads+=create_squads(world,s,'soviet')
 
 
     # spawn

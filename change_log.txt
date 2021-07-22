@@ -2,6 +2,26 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 21 2021
+
+- sort of added a 4th faction 'civilian' by adding a civilian tactical ai 
+    by default I don't think the civilans will be squadded up - but it 
+    allows the possibility of adding civilian squads in the future 
+- added code to create a squad object for the player on game start 
+    before this the player was not in a squad 
+- squad ai now recognizes when the player is in the squad 
+    - if player is in the squad then the squad follows the player instead 
+    of trying to get to the squad destination 
+- fixed a bug in world_menu where the menu options for human menu would never 
+    work. 
+- added a menu option to ask a human to join your squad. 
+    - at the moment this doesn't do much that is useful. civilians don't 
+        have the squad logic and solders don't seem to know what to do 
+        because the squad won't necesarrily have the right enemies for them 
+
+
+
+---------------------------------
 July 16 2021
 
 - code refactoring in world_builder to combine some functions 
@@ -10,7 +30,7 @@ July 16 2021
     - damage is like a grenade at the moment - this will change in the future 
         - will probably do contact damage not AOE in the future 
     - needs a smoke effect - but i do not have this yet 
-    
+
 note that 't' launches the panzerfaust 
 ---------------------------------
 July 14 2021

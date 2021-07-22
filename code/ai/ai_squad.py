@@ -78,8 +78,12 @@ class AISquad(object):
                 self.time_since_enemy_update=0
                 self.update_near_enemy_list()
 
-            # update location ??
-            self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
+            if self.members[0].is_player:
+                # if the squad is player controlled then keep the squad following the player
+                self.world_coords=self.members[0].world_coords
+            else:
+                # else slowly move the squad in the direction of the target the AI has assigned
+                self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
 
 
     #---------------------------------------------------------------------------

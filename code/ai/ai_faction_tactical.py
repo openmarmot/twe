@@ -46,7 +46,7 @@ class AIFactionTactical(object):
         # before they get re-tasked by faction_tactical
         self.think_rate=60
 
-        # faction - german/soviet/american
+        # faction - german/soviet/american/civilian
         self.faction=FACTION
 
     def spawn_on_map(self):

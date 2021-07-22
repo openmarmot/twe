@@ -529,7 +529,6 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man ''' 
-        print('BLAMMO') 
         if self.antitank!=None:
             self.antitank.ai.launch(TARGET_COORDS)
             self.owner.world.add_object(self.antitank)

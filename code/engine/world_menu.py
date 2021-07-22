@@ -11,6 +11,7 @@ instantiated by the world class
 
 #import built in modules
 import random
+from ai.ai_squad import AISquad
 
 #import custom packages
 import engine.world_builder 
@@ -63,6 +64,8 @@ class World_Menu(object):
             self.generic_item_menu(Key)
         elif self.active_menu=='start':
             self.start_menu(Key)
+        elif self.active_menu=='human':
+            self.human_menu(Key)
         
 
     def activate_menu(self, SELECTED_OBJECT):
@@ -163,14 +166,23 @@ class World_Menu(object):
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
             self.world.graphic_engine.menu_text_queue.append('3 - ? (not implemented)?')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
+                print('nothing much')
             elif Key=='2':
-                pass
+                # remove from old squad
+                if self.selected_object.ai.squad!=None:
+                    self.selected_object.ai.squad.members.remove(self.selected_object)
+
+                # add to player squad 
+                self.selected_object.ai.squad=self.world.player.ai.squad
+                self.selected_object.ai.squad.members.append(self.selected_object)
+
+                self.deactivate_menu()
+                
             elif Key=='3':
                 pass
 
@@ -208,6 +220,7 @@ class World_Menu(object):
                     self.selected_object.remove_inventory(p)
                     self.world.add_object(p)
                     self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
+                    self.deactivate_menu()
 
     def debug_menu(self, Key):
         if self.menu_state=='none':
@@ -250,20 +263,40 @@ class World_Menu(object):
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_american=True
                 self.world.wo_objects_american.append(self.world.player)
+                s=AISquad(self.world)
+                s.faction='american'
+                s.members.append(self.world.player)
+                self.world.american_ai.squads.append(s)
+                self.world.player.ai.squad=s
             elif Key=='2':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_german=True
                 self.world.wo_objects_german.append(self.world.player)
+                s=AISquad(self.world)
+                s.faction='german'
+                s.members.append(self.world.player)
+                self.world.german_ai.squads.append(s)
+                self.world.player.ai.squad=s
             elif Key=='3':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_soviet=True
                 self.world.wo_objects_soviet.append(self.world.player)
+                s=AISquad(self.world)
+                s.faction='soviet'
+                s.members.append(self.world.player)
+                self.world.soviet_ai.squads.append(s)
+                self.world.player.ai.squad=s
             elif Key=='4':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_civilian=True
+                s=AISquad(self.world)
+                s.faction='civilian'
+                s.members.append(self.world.player)
+                self.world.civilian_ai.squads.append(s)
+                self.world.player.ai.squad=s
             
             if Key=='1' or Key=='2' or Key=='3' or Key=='4':
                 # eventually load other menus
