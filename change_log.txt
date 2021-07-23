@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 22 2021
+
+- changed some collision variables while debugging collision issues 
+- realized that collisionSquare was implemented incorrectly. disabled 
+    method and replaced it with a collisionCircle 
+- messed with the building sorting a little but its still pretty far 
+    from perfect - even now that we have good collision 
+
+the new collisionCircle calculation is probably a good bit slower 
+but it didn't seem to matter. i may look at more optimal options later 
+
+The main thing this fixes is building collision for bullets - which was
+ super messed up before.
+
+---------------------------------
 July 21 2021
 
 - sort of added a 4th faction 'civilian' by adding a civilian tactical ai 
@@ -18,8 +33,6 @@ July 21 2021
     - at the moment this doesn't do much that is useful. civilians don't 
         have the squad logic and solders don't seem to know what to do 
         because the squad won't necesarrily have the right enemies for them 
-
-
 
 ---------------------------------
 July 16 2021

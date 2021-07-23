@@ -28,7 +28,7 @@ module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
-SCREEN_SIZE = (800, 800)
+SCREEN_SIZE = (900, 900)
  
 
 #------------------------------------------------------------------------------

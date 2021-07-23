@@ -169,7 +169,8 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
             group.append(spawn_object(WORLD,coords,'square_building',True))
     
     # do some sorting 
-    engine.math_2d.collision_sort(500,group)
+    engine.math_2d.collision_sort(600,group)
+
 
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
@@ -415,7 +416,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='warehouse'
         z.speed=0
         z.render_level=1
-        z.collision_radius=500
+        z.collision_radius=400
         z.is_building=True
 
     elif OBJECT_TYPE=='square_building':
@@ -423,7 +424,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='square building'
         z.speed=0
         z.render_level=1
-        z.collision_radius=85
+        z.collision_radius=60
         z.is_building=True
 
     elif OBJECT_TYPE=='adler-cheese':

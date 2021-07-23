@@ -106,14 +106,14 @@ class World(object):
 
         if CHECK_ALL :
             # this should maybe be wo_objects_collision - not really using that atm though
-            temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects,IGNORE_LIST)
+            temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,self.wo_objects,IGNORE_LIST)
             if temp !=None:
                 #print('Collision with '+temp.name )
                 temp.ai.handle_event("collision",COLLIDER)
                 collided=True
         else :
             if CHECK_HUMAN :
-                temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
+                temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
                 if temp !=None:
                     #print('Collision with '+temp.name )
                     temp.ai.handle_event("collision",COLLIDER)
@@ -132,14 +132,15 @@ class World(object):
         if CHECK_ALL :
             # in this case all is humans+vehicles+buidings
             objects=self.wo_objects_human+self.wo_objects_building+self.wo_objects_vehicle
-            temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,objects,IGNORE_LIST)
+            #temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,objects,IGNORE_LIST)
+            temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,objects,IGNORE_LIST)
             if temp !=None:
                 #print('Collision with '+temp.name )
                 temp.ai.handle_event("collision",COLLIDER)
                 collided=temp
         else :
             if CHECK_HUMAN :
-                temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
+                temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
                 if temp !=None:
                     #print('Collision with '+temp.name )
                     temp.ai.handle_event("collision",COLLIDER)
