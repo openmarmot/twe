@@ -116,7 +116,7 @@ class AIGun(AIBase):
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False,self.equipper)
 
                 # spawn brass 
-                engine.world_builder.spawn_sprite(self.owner.world,WORLD_COORDS,'brass')
+                engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
 
         
 

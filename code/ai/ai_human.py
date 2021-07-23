@@ -29,6 +29,7 @@ class AIHuman(AIBase):
 
         self.primary_weapon=None
         self.throwable=None
+        self.antitank=None
         self.health=100
 
         # what the ai is actually doing (an action)
@@ -90,12 +91,17 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
-            engine.world_builder.spawn_sprite(self.owner.world,self.owner.world_coords,'blood_splatter')
+            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
             # add the shooter of the bullet to the personal enemies list
             # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
             if EVENT_DATA.ai.shooter !=None:
                 self.personal_enemies.append(EVENT_DATA.ai.shooter)
+
+                # let the squad know (this is only until the enemy list is rebuilt)
+                # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
+                if self.owner.is_soldier:
+                    self.squad.near_enemies.append(self.personal_enemies[0])
 
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 
@@ -135,10 +141,24 @@ class AIHuman(AIBase):
             else:
                 # drop the current weapon and pick up the new one
                 self.throwable.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.primary_weapon)
+                self.owner.world.add_object(self.throwable)
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.throwable=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_handheld_antitank :
+            if self.antitank==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.antitank=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.antitank.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.antitank)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
         if EVENT_DATA.is_consumable:
             self.health+=100
@@ -181,7 +201,7 @@ class AIHuman(AIBase):
             #print('distance: '+str(distance))
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
-            if distance>1500:
+            if distance>2000:
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
                 if b!=None:
                     v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
@@ -222,16 +242,23 @@ class AIHuman(AIBase):
                             pass
                         self.ai_state='sleeping'
                 elif self.ai_goal=='enter object':
-                    if distance<5:
-                        if self.target_object in self.owner.world.wo_objects:
-                            self.target_object.add_inventory(self.owner)
-                            self.owner.world.remove_object(self.owner)
-                            print(self.owner.name+' entered '+ self.target_object.name)
-                        else:
-                            # hmm object is gone. idk how that happened
-                            print('object I was going to enter disappeared')
-                            pass
-                        self.ai_state='sleeping'
+
+                    # vehicles move around a lot so gotta check
+                    if self.destination!=self.target_object.world_coords:
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                    else:
+                        if distance<5:
+                            if self.target_object in self.owner.world.wo_objects:
+                                self.target_object.add_inventory(self.owner)
+                                self.owner.world.remove_object(self.owner)
+                                print(self.owner.name+' entered '+ self.target_object.name)
+
+                            else:
+                                # hmm object is gone. idk how that happened
+                                print('object I was going to enter disappeared')
+                                pass
+                            self.ai_state='sleeping'
                 elif self.ai_goal=='get ammo':
                     if distance<5:
                         print('replenishing ammo ')
@@ -319,6 +346,7 @@ class AIHuman(AIBase):
                     self.ai_goal='pickup'
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving'
+
                 else:
                     # we have a gun, lets make sure this enemy is alive
                     #print(self.personal_enemies)
@@ -327,6 +355,7 @@ class AIHuman(AIBase):
                         self.target_object=self.personal_enemies[0]
                         self.ai_state='engaging'
                         self.ai_goal='none'
+
                     else:
                         # remove the enemy as it is dead
                         self.personal_enemies.pop(0)
@@ -370,6 +399,11 @@ class AIHuman(AIBase):
                                         self.destination=self.target_object.world_coords
                                         self.ai_state='start_moving' 
                                         print('picking up grenade')
+                                    else:
+                                        # readjust a bit 
+                                        self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                        self.ai_state='start_moving'
+                                        self.ai_goal='would like a grenade'
                             # upgrade weapon?
                             elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
                                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
@@ -387,8 +421,9 @@ class AIHuman(AIBase):
                                             print('swapping '+self.primary_weapon.name + 'for '+b.name)
                                         else:
                                             # readjust a bit 
-                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                                            self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                                             self.ai_state='start_moving'
+                                            self.ai_goal='would like a better weapon'
                             else:
 
                                 # hunt for cheese??
@@ -403,7 +438,7 @@ class AIHuman(AIBase):
                 else:
                     self.ai_goal='booored'
                     # maybe replace this with traveling to a random building 
-                    self.destination=[self.owner.world_coords[0]+float(random.randint(-3000,3000)),self.owner.world_coords[1]+float(random.randint(-3000,3000))]
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-1500,1500)),self.owner.world_coords[1]+float(random.randint(-1500,1500))]
                     self.ai_state='start_moving'
                     
 
@@ -471,6 +506,9 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             self.throw([]) 
+        if(self.owner.world.graphic_engine.keyPressed('t')):
+            # launch anti tank
+            self.launch_antitank([])
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
@@ -487,6 +525,15 @@ class AIHuman(AIBase):
             self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.player.world_coords,self.owner.world_coords)
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
             self.owner.reset_image=True
+
+    #---------------------------------------------------------------------------
+    def launch_antitank(self,TARGET_COORDS):
+        ''' throw like you know the thing. cmon man ''' 
+        if self.antitank!=None:
+            self.antitank.ai.launch(TARGET_COORDS)
+            self.owner.world.add_object(self.antitank)
+            self.antitank=None
+
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    

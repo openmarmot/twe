@@ -25,7 +25,7 @@ def check_passthrough(PROJECTILE,TARGET):
     passthrough=False
 
     if TARGET.is_building:
-        if random.randint(1,5) >2:
+        if random.randint(1,5) >3:
             passthrough=True
     elif TARGET.is_human:
         if random.randint(1,5)>3:

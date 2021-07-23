@@ -16,11 +16,14 @@ lets just pretend this is all sane. super sane
 # ref
 # notes on som differenct collisiong algos
 # https://www.h3xed.com/programming/bounding-box-vs-bounding-circle-collision-detection-performance-as3#:~:text=%2F%2F%20Collision!,-%7D&text=The%20above%20run%20took%20164,the%20nature%20of%20your%20game.
+# more notes - similar 
+# https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 '''
 
 
 #import built in modules
 import math
+import random
 #import custom packages
 
 # module specific variables
@@ -30,27 +33,52 @@ module_last_update_date='may23 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
-def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
+def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 	# wo - (worldobject)the object possibly doing the colliding 
 	# collision_list - (list[worldobject] a list of all possible objects that 
 	# list of objects to ignore (should include wo)
-	# 
-
-	# checks collision based on a bounding box style check where the box is made
-	# with the collision radius (so its a square)
 
 	# returns the first result only
 
+
 	collided=None
 	for b in collision_list:
-		if wo.world_coords[0]+wo.collision_radius > b.world_coords[0]:
-			if wo.world_coords[0] < b.world_coords[0]+b.collision_radius:
-				if wo.world_coords[1]+wo.collision_radius > b.world_coords[1]:
-					if wo.world_coords[1] < b.world_coords[1]+b.collision_radius:
-						if wo!=b and (b not in ignore_list):
-							collided=b
-							break
+
+		distance=get_distance(wo.world_coords,b.world_coords)
+
+		if distance < (wo.collision_radius+b.collision_radius):
+			if wo!=b and (b not in ignore_list):
+				collided=b
+				break
 	return collided
+
+
+
+# #------------------------------------------------------------------------------
+# def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
+# 	# wo - (worldobject)the object possibly doing the colliding 
+# 	# collision_list - (list[worldobject] a list of all possible objects that 
+# 	# list of objects to ignore (should include wo)
+# 	# 
+
+# 	# checks collision based on a bounding box style check where the box is made
+# 	# with the collision radius (so its a square)
+
+# 	# returns the first result only
+
+# 	# !!! NOTE - this has a big error. this is meant to use width and height
+# 	#  instead it uses radius twice - resulting in errors 
+
+# 	collided=None
+# 	for b in collision_list:
+# 		if wo.world_coords[0]+wo.collision_radius > b.world_coords[0]:
+# 			if wo.world_coords[0] < b.world_coords[0]+b.collision_radius:
+# 				if wo.world_coords[1]+wo.collision_radius > b.world_coords[1]:
+# 					if wo.world_coords[1] < b.world_coords[1]+b.collision_radius:
+# 						if wo!=b and (b not in ignore_list):
+# 							collided=b
+# 							break
+# 	return collided
 
 #------------------------------------------------------------------------------
 def get_vector_length(vec2):
@@ -122,9 +150,9 @@ def collision_sort(RUNS,WO_OBJECTS):
 	# WO_OBJECTS - list of objects to sort
 	for x in range(RUNS):
 		for a in WO_OBJECTS:
-			if checkCollisionSquareOneResult(a,WO_OBJECTS,[a]) !=None:
+			if checkCollisionCircleOneResult(a,WO_OBJECTS,[a]) !=None:
                 #collided. lets move the building in a super intelligent way
-				a.world_coords[0]+=430.
-				a.world_coords[1]+=211.
+				a.world_coords[0]+=float(random.randint(-50,50))
+				a.world_coords[1]+=float(random.randint(-50,50))
 
 

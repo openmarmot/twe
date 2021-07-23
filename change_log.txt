@@ -2,6 +2,89 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 22 2021
+
+- changed some collision variables while debugging collision issues 
+- realized that collisionSquare was implemented incorrectly. disabled 
+    method and replaced it with a collisionCircle 
+- messed with the building sorting a little but its still pretty far 
+    from perfect - even now that we have good collision 
+
+the new collisionCircle calculation is probably a good bit slower 
+but it didn't seem to matter. i may look at more optimal options later 
+
+The main thing this fixes is building collision for bullets - which was
+ super messed up before.
+
+---------------------------------
+July 21 2021
+
+- sort of added a 4th faction 'civilian' by adding a civilian tactical ai 
+    by default I don't think the civilans will be squadded up - but it 
+    allows the possibility of adding civilian squads in the future 
+- added code to create a squad object for the player on game start 
+    before this the player was not in a squad 
+- squad ai now recognizes when the player is in the squad 
+    - if player is in the squad then the squad follows the player instead 
+    of trying to get to the squad destination 
+- fixed a bug in world_menu where the menu options for human menu would never 
+    work. 
+- added a menu option to ask a human to join your squad. 
+    - at the moment this doesn't do much that is useful. civilians don't 
+        have the squad logic and solders don't seem to know what to do 
+        because the squad won't necesarrily have the right enemies for them 
+
+---------------------------------
+July 16 2021
+
+- code refactoring in world_builder to combine some functions 
+- added panzerfaust to game 
+    - this ended up taking a fair amount of code 
+    - damage is like a grenade at the moment - this will change in the future 
+        - will probably do contact damage not AOE in the future 
+    - needs a smoke effect - but i do not have this yet 
+
+note that 't' launches the panzerfaust 
+---------------------------------
+July 14 2021
+
+- made some small tweaks to ai_human 
+- bumped ai_squad speed up from 5 to 10 to make squad movement less start stop 
+- some inital work on panzerfaust code 
+
+forgot that the AI is coded not to pickup machine guns. 
+the theory here is that the MGs are really crew served weapons and if 
+anyone can pick one up it would be rather over powered. may change this 
+in the future
+
+sometimes the combat is great and sometimes the combat is terrible.
+the biggest issue that im trying to fix is when a solider is calmy walking across 
+the map seemingly unaware that a bunch of enemies are shooting streams of bullets at it 
+this seems to be mostly an issue with how the squad hands out enemies
+
+note that at the moment i haven't observed the AI taking cars anymore. 
+I think civilians won't with their current rule set - but soldiers still 
+should (maybe??) squad location may move to slow to trigger getting into a car 
+
+---------------------------------
+July 12 2021
+
+- added distance from squad to the debug data that shows up when you click on a bot 
+- adjusted civilian bored moved down from a random location up to 3000 away to up to
+    1500 away. this puts it under the threshold where it will grab a car 
+- decreased the speed that the squad position moves from 50 to 5
+---------------------------------
+July 09 2021 extras 
+
+- added an ability for a soldier to add a personal enemy to the squad 
+    enemy list, although it will only stay on there until the list refreshes (5 seconds)
+- changed ai for ai_human to update destination coords periodically when trying to enter an object 
+    this was an issue because vehicles move fast so sometimes bots would disappear by entering 
+    vehicles that were no longer where they thought they were 
+    - this will also mean the bot will have a hard time entering a moving vehicle 
+
+
+---------------------------------
 July 09 2021
 
 - added 'enter object' routine to ai_human 

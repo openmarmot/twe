@@ -28,7 +28,7 @@ module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
-SCREEN_SIZE = (800, 800)
+SCREEN_SIZE = (900, 900)
  
 
 #------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ def run():
 
     # this has to be here because graphics engine uses player coords in its update
     #  so it needs to be created
-    p=engine.world_builder.spawn_human(world, [50.,50.],'player',True)
+    p=engine.world_builder.spawn_object(world, [50.,50.],'player',True)
 
     world.world_menu.active_menu='start'
     world.world_menu.menu_state='none'

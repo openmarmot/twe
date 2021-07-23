@@ -82,7 +82,7 @@ class AIVehicle(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             #self.health-=random.randint(25,75)
-            engine.world_builder.spawn_sprite(self.owner.world,EVENT_DATA.world_coords,'dirt')
+            engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
 
         elif EVENT_DATA.is_grenade:
             print('bonk')

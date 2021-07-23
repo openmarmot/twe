@@ -25,9 +25,9 @@ class AISquad(object):
     def __init__(self,WORLD):
 
         self.world=WORLD
-        # controls how fast he group world_coords moves. 
+        # controls how fast the group world_coords moves. 
         # not sure what a good speed is
-        self.speed=50
+        self.speed=10
 
         # ai in the group will try to stay close to the group world coords
         # moves towards destination
@@ -69,16 +69,21 @@ class AISquad(object):
 
     #---------------------------------------------------------------------------
     def update(self):
-        time_passed=self.world.graphic_engine.time_passed_seconds
-        self.time_since_enemy_update+=time_passed
-        
-        # update enemy list every 5 seconds or so
-        if self.time_since_enemy_update>5:
-            self.time_since_enemy_update=0
-            self.update_near_enemy_list()
+        if len(self.members)>0:
+            time_passed=self.world.graphic_engine.time_passed_seconds
+            self.time_since_enemy_update+=time_passed
+            
+            # update enemy list every 5 seconds or so
+            if self.time_since_enemy_update>5:
+                self.time_since_enemy_update=0
+                self.update_near_enemy_list()
 
-        # update location ??
-        self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
+            if self.members[0].is_player:
+                # if the squad is player controlled then keep the squad following the player
+                self.world_coords=self.members[0].world_coords
+            else:
+                # else slowly move the squad in the direction of the target the AI has assigned
+                self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
 
 
     #---------------------------------------------------------------------------
