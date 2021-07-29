@@ -2,6 +2,29 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 28 2021
+
+- added player world coords to the debug text on screen 
+- added spawn locations to world. north/south/east/west/center 
+- bumped squad speed from 10 to 18. solder speed is randomized from 18-25 at the moment 
+    need to find a balance with squad speed. too slow and the squad almost never moves
+    too fast and the soldiers cant keep up 
+- slowed down civilians a little bit 
+
+ Note that this update kills the fun map start where everyone is shooting at everything 
+ Now the factions are starting on opposite ends of the map and it takes longer for them to 
+ engage eachother 
+
+ this will force me to take a look at fixing the ai_faction_tactical ai orders. 
+ 
+ I did see a civilian drive a kubelwagen today so apparently in some instances that 
+ does still trigger 
+
+ the circle based collision is HORRIBLE for non square objects. This is especially 
+ noticeable with building collision for the L shaped building. might remove this 
+ building until a better collision option is available 
+
+---------------------------------
 July 22 2021
 
 - changed some collision variables while debugging collision issues 

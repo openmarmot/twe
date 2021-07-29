@@ -58,6 +58,12 @@ class World(object):
         #world areas
         self.world_areas=[]
 
+        # spawn locations
+        self.spawn_center=[0.,0.]
+        self.spawn_north=[0.,-4000.]
+        self.spawn_south=[0.,4000.]
+        self.spawn_west=[-4000.,0.]
+
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
