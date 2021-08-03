@@ -44,9 +44,11 @@ from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
+from ai.ai_airplane import AIAirplane
+
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='july 16 2021' #date of last update
+module_last_update_date='August 02 2021' #date of last update
 
 #global variables
 
@@ -628,9 +630,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AINone)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
+        z.name='Junkers Ju88'
+        z.speed=500
+        z.rotation_speed=50
+        z.ai.acceleration=100
         z.render_level=3
-        z.collision_radius=100  
+        z.collision_radius=200
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
+        z.is_airplane=True 
 
     elif OBJECT_TYPE=='zombie':
         z=WorldObject(WORLD,['zombie_soldier'],AIHuman)

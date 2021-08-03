@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 02 2021
+
+- added basic code to allow you to get into and control the ju88 
+    - the code was just a copy of the vehicle code so it doesn't 
+    'fly' or anything but its still kinda fun 
+- gave the ju88 a mg34 for fun 
+
+---------------------------------
 July 28 2021
 
 - added player world coords to the debug text on screen 

@@ -54,6 +54,7 @@ class World(object):
         self.wo_objects_building=[]
         self.wo_objects_map_pointer=[]
         self.wo_objects_handheld_antitank=[]
+        self.wo_objects_airplane=[]
 
         #world areas
         self.world_areas=[]
@@ -103,6 +104,8 @@ class World(object):
             self.wo_objects_map_pointer.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_handheld_antitank:
             self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_airplane:
+            self.wo_objects_airplane.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -250,6 +253,8 @@ class World(object):
             self.wo_objects_map_pointer.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_handheld_antitank:
             self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_airplane:
+            self.wo_objects_airplane.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -267,7 +272,9 @@ class World(object):
         mouse=self.graphic_engine.get_mouse_screen_coords()
         collided=None
         # this calculation should be moved to math_2d
-        ob_list=self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank
+        ob_list=(self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+
+            self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank+
+            self.wo_objects_airplane)
         for b in ob_list:
             if mouse[0]+radius > b.screen_coords[0]:
                 if mouse[0] < b.screen_coords[0]+b.collision_radius:
