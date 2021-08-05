@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 04 2021
+
+- added scaling (zoom) with the '[' and ']' buttons
+
+scaling took a lot of work to get right. the interaction between scaling 
+and the screen space to world space transform was particularily tricky. 
+
+one task left undone is fixing the rendering viewport. it needs to get 
+bigger when scaling gets smaller and the opposite as well 
+
+---------------------------------
 August 02 2021
 
 - added basic code to allow you to get into and control the ju88 

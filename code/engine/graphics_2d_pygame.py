@@ -90,6 +90,9 @@ class Graphics_2D_Pygame(object):
         # max_fps max frames for every second.
         self.max_fps=40
 
+        # scale. normal is .5 
+        self.scale=1
+
 #------------------------------------------------------------------------------
     def handleInput(self):
 
@@ -100,7 +103,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                #print(str(event.key))
+                print(str(event.key))
                 # send number events to world_menu for ingame menus 
                 # translate to a string corresponding to the actual key to simplify the code
                 # on the other end
@@ -110,6 +113,14 @@ class Graphics_2D_Pygame(object):
                     self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
                     self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
                     self.world.world_menu.handle_input("tilde")
+                elif event.key==91: # [
+                    self.scale-=0.1
+                    print('scale down')
+                    self.reset_all()
+                elif event.key==93: # ]
+                    self.scale+=0.1
+                    print('scale up')
+                    self.reset_all()
                 elif event.key==48:
                     self.world.world_menu.handle_input("0")
                 elif event.key==49:
@@ -216,7 +227,8 @@ class Graphics_2D_Pygame(object):
                 if c.reset_image:
                     c.reset_image=False
                     c.image_size=self.images[c.image_list[c.image_index]].get_size()
-                    c.image=self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle)
+                    c.image_size=[int(c.image_size[0]*self.scale),int(c.image_size[1]*self.scale)]
+                    c.image=self.get_rotated_scaled_image(self.images[c.image_list[c.image_index]],c.image_size,c.rotation_angle)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
 
                 c.render_pass_2()
@@ -244,6 +256,11 @@ class Graphics_2D_Pygame(object):
 
         pygame.display.update()
 
+#------------------------------------------------------------------------------
+    def reset_all(self):
+        ''' resize all world_objects'''
+        for b in self.world.wo_objects:
+            b.reset_image=True
 
 #------------------------------------------------------------------------------
     def update(self):
@@ -287,12 +304,12 @@ class Graphics_2D_Pygame(object):
 
         # note - this does not check world_object.render bool but maybe it should
 
-        viewrange_x=(self.world.player.world_coords[0]+
-            self.screen_size[0], self.world.player.world_coords[0]-
-            self.screen_size[0])
-        viewrange_y=(self.world.player.world_coords[1]+
-            self.screen_size[1], self.world.player.world_coords[1]-
-            self.screen_size[1])
+        viewrange_x=((self.world.player.world_coords[0]+
+            self.screen_size[0]), (self.world.player.world_coords[0]-
+            self.screen_size[0]))
+        viewrange_y=((self.world.player.world_coords[1]+
+            self.screen_size[1]), (self.world.player.world_coords[1]-
+            self.screen_size[1]))
 
         #clear out the render levels
         self.renderlists=[[],[],[],[],[]]
@@ -310,8 +327,9 @@ class Graphics_2D_Pygame(object):
                     self.renderlists[b.render_level].append(b)
                     self.renderCount+=1
                     #apply transform to generate screen coords
-                    b.screen_coords[0]=b.world_coords[0]+translation[0]
-                    b.screen_coords[1]=b.world_coords[1]+translation[1]
+
+                    b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
+                    b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
 
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
@@ -333,27 +351,32 @@ class Graphics_2D_Pygame(object):
         return [self.screen_size[0]/2,self.screen_size[1]/2]
 
 #------------------------------------------------------------------------------
-    def get_rotated_image(self, image, angle):
+    def get_rotated_scaled_image(self, image, IMAGE_SIZE, angle):
         """
         rotate an image while keeping its center and size
         image must be square
         adapted from : http://pygame.org/wiki/RotateCenter?parent=
+
+        new : also scale image
         """
+        # not sure if i should rotate or resize first
+
         orig_rect = image.get_rect()
         rot_image = pygame.transform.rotate(image, angle)
         rot_rect = orig_rect.copy()
         rot_rect.center = rot_image.get_rect().center
         rot_image = rot_image.subsurface(rot_rect).copy()
-        return rot_image
+        resize_image=pygame.transform.scale(rot_image,IMAGE_SIZE)
+        return resize_image
+
 #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
         center_x=self.screen_size[0]/2
         center_y=self.screen_size[1]/2
-        player_x=self.world.player.world_coords[0]
-        player_y=self.world.player.world_coords[1]
+        player_x=self.world.player.world_coords[0]*self.scale
+        player_y=self.world.player.world_coords[1]*self.scale
         translate=[center_x-player_x,center_y-player_y]
-
         return translate
 #------------------------------------------------------------------------------
 
