@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+---------------------------------
+August 10 2021
+- added view port scaling so everything that is more or less in the screen 
+    is still rendered when you zoom out 
+
+I was surprised to see a soldier driving a kubelwagen - i haven't seen 
+this behavior recently and thought it had been squeezed out by some new behavior
+limits in the AI code. The soldier may have been driving to town to re-stock ammo 
+before driving back to my location and killing me. He stopped the car directly on 
+me so a more fuzzy sense of arrival at destination is needed
 
 ---------------------------------
 August 04 2021

@@ -90,8 +90,11 @@ class Graphics_2D_Pygame(object):
         # max_fps max frames for every second.
         self.max_fps=40
 
-        # scale. normal is .5 
+        # scale. normal is 1
         self.scale=1
+
+        # adjustment to viewing area
+        self.view_adjust=0
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -115,10 +118,12 @@ class Graphics_2D_Pygame(object):
                     self.world.world_menu.handle_input("tilde")
                 elif event.key==91: # [
                     self.scale-=0.1
+                    self.view_adjust+=500
                     print('scale down')
                     self.reset_all()
                 elif event.key==93: # ]
                     self.scale+=0.1
+                    self.view_adjust-=100
                     print('scale up')
                     self.reset_all()
                 elif event.key==48:
@@ -305,11 +310,11 @@ class Graphics_2D_Pygame(object):
         # note - this does not check world_object.render bool but maybe it should
 
         viewrange_x=((self.world.player.world_coords[0]+
-            self.screen_size[0]), (self.world.player.world_coords[0]-
-            self.screen_size[0]))
+            self.screen_size[0]+self.view_adjust), (self.world.player.world_coords[0]-
+            self.screen_size[0]-self.view_adjust))
         viewrange_y=((self.world.player.world_coords[1]+
-            self.screen_size[1]), (self.world.player.world_coords[1]-
-            self.screen_size[1]))
+            self.screen_size[1]+self.view_adjust), (self.world.player.world_coords[1]-
+            self.screen_size[1])-self.view_adjust)
 
         #clear out the render levels
         self.renderlists=[[],[],[],[],[]]
