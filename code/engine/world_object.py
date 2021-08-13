@@ -83,6 +83,7 @@ class WorldObject(object):
         self.is_civilian=False
         self.is_soldier=False
         self.is_vehicle=False
+        self.is_airplane=False
         self.is_gun=False
         self.is_grenade=False
         self.is_handheld_antitank=False

@@ -44,9 +44,11 @@ from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
+from ai.ai_airplane import AIAirplane
+
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='july 16 2021' #date of last update
+module_last_update_date='August 02 2021' #date of last update
 
 #global variables
 
@@ -397,8 +399,9 @@ def load_test_environment(world):
 
 
     # spawn
-    world.german_ai.spawn_on_map()
-    world.soviet_ai.spawn_on_map()
+    # locations will eventually be determined by map control
+    world.german_ai.spawn_on_map(world.spawn_north)
+    world.soviet_ai.spawn_on_map(world.spawn_south)
 
     # add some world areas
     generate_world_area(world,[-2000,2000],'town','Alfa')
@@ -627,9 +630,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AINone)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
+        z.name='Junkers Ju88'
+        z.speed=500
+        z.rotation_speed=50
+        z.ai.acceleration=100
         z.render_level=3
-        z.collision_radius=100  
+        z.collision_radius=200
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
+        z.is_airplane=True 
 
     elif OBJECT_TYPE=='zombie':
         z=WorldObject(WORLD,['zombie_soldier'],AIHuman)
@@ -652,7 +661,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man'],AIHuman)
         z.name='Reginald Thimblebottom'
-        z.speed=float(random.randint(18,25))
+        z.speed=float(random.randint(10,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True

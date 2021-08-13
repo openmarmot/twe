@@ -72,6 +72,14 @@ class AIHuman(AIBase):
                 self.squad.members.remove(self.owner)
 
             self.owner.world.remove_object(self.owner)
+
+            if self.owner.is_player:
+                # turn on the player death menu
+                self.owner.world.world_menu.active_menu='death'
+                self.owner.world.world_menu.menu_state='none'
+                # fake input to get the text added
+                self.owner.world.world_menu.handle_input('none')
+
         else :
 
             if self.primary_weapon!=None:

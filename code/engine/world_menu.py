@@ -66,6 +66,10 @@ class World_Menu(object):
             self.start_menu(Key)
         elif self.active_menu=='human':
             self.human_menu(Key)
+        elif self.active_menu=='airplane':
+            self.airplane_menu(Key)
+        elif self.active_menu=='death':
+            self.death_menu(Key)
         
 
     def activate_menu(self, SELECTED_OBJECT):
@@ -86,12 +90,49 @@ class World_Menu(object):
         elif SELECTED_OBJECT.is_human:
             self.active_menu='human'
             self.human_menu(None)
+        elif SELECTED_OBJECT.is_airplane:
+            self.active_menu='airplane'
+            self.airplane_menu(None)
         else :
             # just dump everything else in here for now
             self.active_menu='generic'
             self.generic_item_menu(None)
 
+    def airplane_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('--Airplane Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit ')
+            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            if Key=='2':
+                action='none'
+                if len(self.selected_object.ai.passengers)>0:
+                    if self.selected_object.ai.passengers[0].is_player:
+                        action='exit'
+                    else:
+                        action='enter'
+                else:
+                    action='enter'
+                if action=='enter':
 
+                    # enter the vehicle 
+                    self.selected_object.add_inventory(self.world.player)
+                    # remove the player from the world so we don't have a ghost
+                    self.world.remove_object(self.world.player)
+                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the airplane ]')
+                    self.deactivate_menu()
+                else:
+                    # exit the vehicle
+                    p=self.selected_object.ai.passengers[0]
+                    self.selected_object.remove_inventory(p)
+                    self.world.add_object(p)
+                    self.world.graphic_engine.text_queue.insert(0, '[ You exit the airplane ]')
+                    self.deactivate_menu()
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -128,6 +169,27 @@ class World_Menu(object):
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    def death_menu(self,Key):
+        ''' menu options for when player dies '''
+        if self.menu_state=='none':
+            self.world.is_paused=True
+            self.world.graphic_engine.menu_text_queue.append('You Died')
+            self.world.graphic_engine.menu_text_queue.append('1 - respawn as random existing bot')
+            #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                self.world.random_player_spawn()
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                pass
+            if Key=='1' or Key=='2' or Key=='3' or Key=='4':
+                # eventually load other menus
+                self.world.is_paused=False
+                self.deactivate_menu()
 
     def gun_menu(self, Key):
         if self.menu_state=='none':

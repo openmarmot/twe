@@ -1,6 +1,6 @@
 
 '''
-module : ai_vehicle.py
+module : ai_airplane.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
@@ -19,11 +19,11 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='July 09 2021' #date of last update
+module_last_update_date='August 02 2021' #date of last update
 
 #global variables
 
-class AIVehicle(AIBase):
+class AIAirplane(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
@@ -288,9 +288,9 @@ class AIVehicle(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
-        #if(self.owner.world.graphic_engine.keyPressed('g')):
+        if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
-        #    self.throw([]) 
+            self.throw([]) 
 
 
         # -- normalize angles --

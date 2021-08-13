@@ -2,6 +2,67 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 12 2021
+- started working on a death menu for when the player dies 
+- added the option to respawn as one of the ai controlled bots on death 
+- removed 'g' button action from the player when in vehicle as the vehicle 
+    does not currently support throwing grenades 
+
+
+---------------------------------
+August 10 2021
+- added view port scaling so everything that is more or less in the screen 
+    is still rendered when you zoom out 
+
+I was surprised to see a soldier driving a kubelwagen - i haven't seen 
+this behavior recently and thought it had been squeezed out by some new behavior
+limits in the AI code. The soldier may have been driving to town to re-stock ammo 
+before driving back to my location and killing me. He stopped the car directly on 
+me so a more fuzzy sense of arrival at destination is needed
+
+---------------------------------
+August 04 2021
+
+- added scaling (zoom) with the '[' and ']' buttons
+
+scaling took a lot of work to get right. the interaction between scaling 
+and the screen space to world space transform was particularily tricky. 
+
+one task left undone is fixing the rendering viewport. it needs to get 
+bigger when scaling gets smaller and the opposite as well 
+
+---------------------------------
+August 02 2021
+
+- added basic code to allow you to get into and control the ju88 
+    - the code was just a copy of the vehicle code so it doesn't 
+    'fly' or anything but its still kinda fun 
+- gave the ju88 a mg34 for fun 
+
+---------------------------------
+July 28 2021
+
+- added player world coords to the debug text on screen 
+- added spawn locations to world. north/south/east/west/center 
+- bumped squad speed from 10 to 18. solder speed is randomized from 18-25 at the moment 
+    need to find a balance with squad speed. too slow and the squad almost never moves
+    too fast and the soldiers cant keep up 
+- slowed down civilians a little bit 
+
+ Note that this update kills the fun map start where everyone is shooting at everything 
+ Now the factions are starting on opposite ends of the map and it takes longer for them to 
+ engage eachother 
+
+ this will force me to take a look at fixing the ai_faction_tactical ai orders. 
+ 
+ I did see a civilian drive a kubelwagen today so apparently in some instances that 
+ does still trigger 
+
+ the circle based collision is HORRIBLE for non square objects. This is especially 
+ noticeable with building collision for the L shaped building. might remove this 
+ building until a better collision option is available 
+
+---------------------------------
 July 22 2021
 
 - changed some collision variables while debugging collision issues 
