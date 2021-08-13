@@ -226,6 +226,17 @@ class World(object):
         return OBJECT_LIST[i]
 
     #---------------------------------------------------------------------------
+    def random_player_spawn(self):
+        if len(self.wo_objects_human)>0:
+            b=random.randint(0,len(self.wo_objects_human)-1)
+            self.player=self.wo_objects_human[b]
+            self.player.is_player=True
+            print('You are now '+self.player.name)
+        else:
+            print('player spawn error : no humans left on the map')
+            # maybe spawn a new civilian ??
+
+    #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
         if WORLD_OBJECT in self.wo_objects:
             self.wo_objects.remove(WORLD_OBJECT)

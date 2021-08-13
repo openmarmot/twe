@@ -288,9 +288,9 @@ class AIVehicle(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
-        if(self.owner.world.graphic_engine.keyPressed('g')):
+        #if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
-            self.throw([]) 
+        #    self.throw([]) 
 
 
         # -- normalize angles --

@@ -68,6 +68,8 @@ class World_Menu(object):
             self.human_menu(Key)
         elif self.active_menu=='airplane':
             self.airplane_menu(Key)
+        elif self.active_menu=='death':
+            self.death_menu(Key)
         
 
     def activate_menu(self, SELECTED_OBJECT):
@@ -167,6 +169,27 @@ class World_Menu(object):
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    def death_menu(self,Key):
+        ''' menu options for when player dies '''
+        if self.menu_state=='none':
+            self.world.is_paused=True
+            self.world.graphic_engine.menu_text_queue.append('You Died')
+            self.world.graphic_engine.menu_text_queue.append('1 - respawn as random existing bot')
+            #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                self.world.random_player_spawn()
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                pass
+            if Key=='1' or Key=='2' or Key=='3' or Key=='4':
+                # eventually load other menus
+                self.world.is_paused=False
+                self.deactivate_menu()
 
     def gun_menu(self, Key):
         if self.menu_state=='none':
