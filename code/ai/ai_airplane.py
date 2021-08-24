@@ -41,6 +41,10 @@ class AIAirplane(AIBase):
 
         # current fuel type options : gas / diesel
         self.fuel_type='gas'
+        # max fuel load in liters
+        self.fuel_capacity=0
+        # current fuel amount
+        self.fuel=0
 
         # passengers[0] determines how the AI is controlled
         self.passengers=[]
@@ -48,6 +52,17 @@ class AIAirplane(AIBase):
         # actual vehicle speed
         self.vehicle_speed=0.
         self.acceleration=0
+
+        # flight controls
+        # 0 being neutral, + being up or right, negative being down or left
+        self.rudder=0 # moves plane left/right
+        self.flaps='up' # [up/down] 
+        self.left_aileron=0
+        self.right_aileron=0
+        self.elevator=0 # moves plan up/down
+        self.landing_gear='down' # [up/down]
+
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -76,7 +91,15 @@ class AIAirplane(AIBase):
             for b in self.passengers:
                 b.world_coords=copy.copy(self.owner.world_coords)
 
-
+        # update text
+        self.owner.world.graphic_engine.vehicle_text_queue=[]
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Fuel: '+str(self.fuel)+' liters')
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Rudder: '+str(self.rudder))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Elevator: '+str(self.elevator))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Flaps: '+str(self.flaps))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Landing Gear: '+str(self.landing_gear))
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):

@@ -125,6 +125,7 @@ class World_Menu(object):
                     # remove the player from the world so we don't have a ghost
                     self.world.remove_object(self.world.player)
                     self.world.graphic_engine.text_queue.insert(0, '[ You climb into the airplane ]')
+                    self.world.graphic_engine.display_vehicle_text=True
                     self.deactivate_menu()
                 else:
                     # exit the vehicle
@@ -132,6 +133,7 @@ class World_Menu(object):
                     self.selected_object.remove_inventory(p)
                     self.world.add_object(p)
                     self.world.graphic_engine.text_queue.insert(0, '[ You exit the airplane ]')
+                    self.world.graphic_engine.display_vehicle_text=False
                     self.deactivate_menu()
 
     def deactivate_menu(self):
