@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+---------------------------------
+August 24 2021
+
+noticed that a soviet group hangs back in spawn and does not seem to get a squad objective 
+this is because the soviets split into more groups and exhaust the squad objective 
+assignment queue. 
+
+- changed squad orders assignment to assign a random world_area if the objective 
+queues are empty 
 
 
 ---------------------------------
