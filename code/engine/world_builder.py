@@ -263,7 +263,9 @@ def load_images(world):
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
 
     # random 
-    world.graphic_engine.loadImage('map_pointer','images/map_pointer.png')
+    world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
+    world.graphic_engine.loadImage('map_pointer_blue','images/map/map_pointer_blue.png')
+    world.graphic_engine.loadImage('map_pointer_orange','images/map/map_pointer_orange.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -408,7 +410,7 @@ def load_test_environment(world):
     generate_world_area(world,[2000,-2000],'town','Bravo')
     generate_world_area(world,[2000,2000],'town','Charlie')
 
-    generate_world_area(world,[0,0],'town','Danitza')
+   # generate_world_area(world,[0,0],'town','Danitza')
 
 
 
@@ -419,7 +421,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='warehouse'
         z.speed=0
         z.render_level=1
-        z.collision_radius=400
+        z.collision_radius=200
         z.is_building=True
 
     elif OBJECT_TYPE=='square_building':
@@ -497,6 +499,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
+        z.ai.flight_time=2
         z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -510,6 +513,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
+        z.ai.flight_time=2
         z.ai.type='submachine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -523,6 +527,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
+        z.ai.flight_time=2.5
         z.ai.type='assault rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -536,6 +541,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
+        z.ai.flight_time=3.5
         z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -549,6 +555,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.6
+        z.ai.flight_time=1
         z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -562,6 +569,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
+        z.ai.flight_time=1
         z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -575,6 +583,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
+        z.ai.flight_time=1
         z.ai.type='pistol'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -588,6 +597,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
+        z.ai.flight_time=3.5
         z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -601,6 +611,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.7
+        z.ai.flight_time=3
         z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -614,6 +625,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.7
+        z.ai.flight_time=3
         z.ai.type='rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -638,6 +650,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=3
         z.collision_radius=200
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
+        z.ai.fuel_capacity=2900
+        z.ai.fuel=2900
         z.is_airplane=True 
 
     elif OBJECT_TYPE=='zombie':
@@ -721,7 +735,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 #------------------------------------------------------------------------------
 def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
     if TYPE=='normal':
-        z=WorldObject(WORLD,['map_pointer'],AIMapPointer)
+        z=WorldObject(WORLD,['map_pointer_green'],AIMapPointer)
         z.ai.target_coords=TARGET_COORDS
         z.render_level=4
         z.is_map_pointer=True
@@ -729,14 +743,15 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
+    # MAX_TIME - max flight time around 3.5 seconds is default
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=350.
-    z.ai.maxTime=3.5 + random.uniform(0.01, 0.5)
+    z.ai.maxTime=MAX_TIME + random.uniform(0.01, 0.05)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
@@ -775,8 +790,16 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
 
 #------------------------------------------------------------------------------
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
+    ''' creates a shrapnel starburst pattern. used for grenades '''
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+
+#------------------------------------------------------------------------------
+def spawn_shrapnel_cone(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT):
+    ''' creates a cone/line of shrapnel. used for panzerfaust'''
+    for x in range(AMOUNT):
+        target_coords=[float(random.randint(-20,20))+TARGET_COORDS[0],float(random.randint(-20,20))+TARGET_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
 
 

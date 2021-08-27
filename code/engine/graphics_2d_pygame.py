@@ -80,6 +80,10 @@ class Graphics_2D_Pygame(object):
         self.debug_mode=True
         self.debug_text_queue=[]
 
+        # vehicle text 
+        self.display_vehicle_text=False
+        self.vehicle_text_queue=[]
+
         # draw collision circles
         self.draw_collision=False
 
@@ -112,9 +116,6 @@ class Graphics_2D_Pygame(object):
                 # on the other end
                 # tilde
                 if event.key==96:
-                    self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
-                    self.text_queue.insert(0,('player screen coords : '+str(self.world.player.screen_coords)))
-                    self.text_queue.insert(0,('mouse screen coords : '+ str(pygame.mouse.get_pos())))
                     self.world.world_menu.handle_input("tilde")
                 elif event.key==91: # [
                     self.scale-=0.1
@@ -172,7 +173,8 @@ class Graphics_2D_Pygame(object):
 #------------------------------------------------------------------------------
     def keyPressed(self, KEY):
         # returns bool as to whether keyPressed is KEY
-        # not sure whether this works great or not
+        # the point of this is to translate pygame methods into generic keys 
+        # in order to keep all pygame references in this class 
         # used by ai_player for movement
 
         # mouse support - returns list of three bools [left, middle, right]
@@ -245,19 +247,25 @@ class Graphics_2D_Pygame(object):
         # text stuff 
         self.h=0
         for b in islice(self.text_queue,3):
-            self.h+=13
-            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
+            self.h+=15
+            self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
 
         self.h+=20
         for b in self.menu_text_queue:
             self.h+=15
-            self.small_font.render_to(self.screen, (40, self.h), b, (0, 0, 255))
+            self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
 
         if(self.debug_mode):
             self.h=0
             for b in self.debug_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (540, self.h), b, (0, 0, 255))
+                self.small_font.render_to(self.screen, (540, self.h), b, (255, 51, 51))
+
+        if(self.display_vehicle_text):
+            self.h=0
+            for b in self.vehicle_text_queue:
+                self.h+=15
+                self.small_font.render_to(self.screen, (300, self.h), b, (255, 51, 51))
 
         pygame.display.update()
 

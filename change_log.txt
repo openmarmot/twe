@@ -2,12 +2,79 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 27 2021
+
+- updated world.check_collision_bool 'CHECK_ALL' option to be humans+vehicles+buildings 
+    this is in align with other collision code 
+- updated panzerfaust code to do a CHECK_ALL collision check instead of CHECK_HUMANS so 
+    it could theoretically actually hit a vehicle 
+- disabled the center town for now as troubleshooting town combat is not the focus at the moment 
+- created a new explosion pattern for the panzerfaust shaped charge that is in more of a line 
+    than the starburst pattern used for grenades 
+- fixed a text display bug with the death menu 
+- added a couple different map pointer colors - to be used in the future 
+
+I just noticed that spawning as something other than neutral will spawn you at the respective spawn point 
+for that nation. that wasn't intentional - but it is a feature that I had planned on implementing anyways 
+
+---------------------------------
+August 24 2021
+
+noticed that a soviet group hangs back in spawn and does not seem to get a squad objective 
+this is because the soviets split into more groups and exhaust the squad objective 
+assignment queue. 
+
+- changed squad orders assignment to assign a random world_area if the objective 
+queues are empty 
+
+
+---------------------------------
+August 23 2021
+
+- reduced the random variation in bullet flight time slightly 
+- moved bullet flight time variable to ai_gun (flight_time) - used to be a fixed 3.5
+- bullet flight time changes 
+    - old model = everything 3.5 seconds
+    - new
+        pistols : 1 second 
+        submachine guns : 2 seconds 
+        assault rifles : 2.5 seconds
+        battle rifles : 3 seconds 
+        machine guns : 3.5 seconds
+
+Reducing bullet range was really necessary to reduce friendly fire, especially for the 
+player who is limited to seeing what is on screen 
+
+It was also really needed to provide more differentation between t he major weapon classes 
+
+I witnessed a german mg gunner turn around and wipe out a whole german squad so team killing is still 
+probably resulting in a fair amount of the combat deaths 
+
+---------------------------------
+August 22 2021
+
+- more airplane related code 
+- changed game text from blue to a red that i find easier to read
+- added new vehicle text queue - only used by airplane at the moment 
+- reduced the collision radius on the warehouse - i really just need to remove the warehouse
+    non square objects do not work well with the current collision system 
+
+
+noted that the ju88 moves faster than bullets 
+bullets should probably have the speed of the thing they are in added to their 
+speed when they start - will need to standardize how speed works between humans and vehicles first 
+
+---------------------------------
+August 21 2021
+
+- started adding some code for airplane controls.
+
+---------------------------------
 August 12 2021
 - started working on a death menu for when the player dies 
 - added the option to respawn as one of the ai controlled bots on death 
 - removed 'g' button action from the player when in vehicle as the vehicle 
     does not currently support throwing grenades 
-
 
 ---------------------------------
 August 10 2021

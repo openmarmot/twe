@@ -104,8 +104,8 @@ class AIFactionTactical(object):
                 b.destination=defend_queue.pop().world_coords
             else :
                 # seems like all the queues are empty
-                print('faction_tactial error - all queues are empty')
-                pass
+                # just send them somewhere random
+                b.destination=self.world.world_areas[random.randint(0,len(self.world.world_areas)-1)].world_coords
 
             if len(unassigned_squads)<1:
                 assign_orders=False

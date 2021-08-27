@@ -125,6 +125,7 @@ class World_Menu(object):
                     # remove the player from the world so we don't have a ghost
                     self.world.remove_object(self.world.player)
                     self.world.graphic_engine.text_queue.insert(0, '[ You climb into the airplane ]')
+                    self.world.graphic_engine.display_vehicle_text=True
                     self.deactivate_menu()
                 else:
                     # exit the vehicle
@@ -132,13 +133,14 @@ class World_Menu(object):
                     self.selected_object.remove_inventory(p)
                     self.world.add_object(p)
                     self.world.graphic_engine.text_queue.insert(0, '[ You exit the airplane ]')
+                    self.world.graphic_engine.display_vehicle_text=False
                     self.deactivate_menu()
 
     def deactivate_menu(self):
         self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
-        self.world.graphic_engine.menu_text_queue.clear()
+        self.world.graphic_engine.menu_text_queue=[]
 
     def container_menu(self, Key):
         if self.menu_state=='none':
@@ -173,6 +175,7 @@ class World_Menu(object):
         ''' menu options for when player dies '''
         if self.menu_state=='none':
             self.world.is_paused=True
+            self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('You Died')
             self.world.graphic_engine.menu_text_queue.append('1 - respawn as random existing bot')
             #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
