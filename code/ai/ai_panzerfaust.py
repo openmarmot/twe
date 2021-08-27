@@ -36,10 +36,10 @@ class AIPanzerfaust(AIBase):
         # time in flight
         self.flightTime=0
         # max flight time, basically the fuse length
-        self.maxTime=5.
+        self.maxTime=3.
 
         # amount of shrapnel (basically grenade power)
-        self.shrapnel_count=40
+        self.shrapnel_count=60
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
@@ -60,7 +60,7 @@ class AIPanzerfaust(AIBase):
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             
-            if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
+            if self.owner.world.check_collision_bool(self.owner,[self.equipper],True,False):
                 self.explode()
     #---------------------------------------------------------------------------
 
@@ -68,7 +68,8 @@ class AIPanzerfaust(AIBase):
     def explode(self):
         # kablooey!
         # add the shrapnel
-        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count)
+        target_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,2)
+        engine.world_builder.spawn_shrapnel_cone(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

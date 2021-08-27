@@ -140,7 +140,7 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
-        self.world.graphic_engine.menu_text_queue.clear()
+        self.world.graphic_engine.menu_text_queue=[]
 
     def container_menu(self, Key):
         if self.menu_state=='none':
@@ -175,6 +175,7 @@ class World_Menu(object):
         ''' menu options for when player dies '''
         if self.menu_state=='none':
             self.world.is_paused=True
+            self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('You Died')
             self.world.graphic_engine.menu_text_queue.append('1 - respawn as random existing bot')
             #self.world.graphic_engine.menu_text_queue.append('3 - pick up')

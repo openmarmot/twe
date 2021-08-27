@@ -263,7 +263,9 @@ def load_images(world):
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
 
     # random 
-    world.graphic_engine.loadImage('map_pointer','images/map_pointer.png')
+    world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
+    world.graphic_engine.loadImage('map_pointer_blue','images/map/map_pointer_blue.png')
+    world.graphic_engine.loadImage('map_pointer_orange','images/map/map_pointer_orange.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -408,7 +410,7 @@ def load_test_environment(world):
     generate_world_area(world,[2000,-2000],'town','Bravo')
     generate_world_area(world,[2000,2000],'town','Charlie')
 
-    generate_world_area(world,[0,0],'town','Danitza')
+   # generate_world_area(world,[0,0],'town','Danitza')
 
 
 
@@ -733,7 +735,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 #------------------------------------------------------------------------------
 def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
     if TYPE=='normal':
-        z=WorldObject(WORLD,['map_pointer'],AIMapPointer)
+        z=WorldObject(WORLD,['map_pointer_green'],AIMapPointer)
         z.ai.target_coords=TARGET_COORDS
         z.render_level=4
         z.is_map_pointer=True
@@ -788,8 +790,16 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
 
 #------------------------------------------------------------------------------
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
+    ''' creates a shrapnel starburst pattern. used for grenades '''
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+
+#------------------------------------------------------------------------------
+def spawn_shrapnel_cone(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT):
+    ''' creates a cone/line of shrapnel. used for panzerfaust'''
+    for x in range(AMOUNT):
+        target_coords=[float(random.randint(-20,20))+TARGET_COORDS[0],float(random.randint(-20,20))+TARGET_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
 
 
