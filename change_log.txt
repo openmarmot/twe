@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ---------------------------------
+September 05 2021
+
+- rewrote penetration_calculator to be a shared class from world instead of 
+    importing it for every projectile 
+- fixed the render range adjustment when zooming back in so that it works now 
+
+---------------------------------
 August 27 2021
 
 - updated world.check_collision_bool 'CHECK_ALL' option to be humans+vehicles+buildings 
