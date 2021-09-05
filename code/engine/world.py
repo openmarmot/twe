@@ -17,6 +17,7 @@ import copy
 #import custom packages
 from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
+from engine.penetration_calculator import Penetration_Calculator
 import engine.math_2d
 import engine.world_builder
 from ai.ai_faction_tactical import AIFactionTactical
@@ -68,6 +69,8 @@ class World(object):
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
+        self.penetration_calculator=Penetration_Calculator()
+
         self.player=None
 
         # a way to pause the action
