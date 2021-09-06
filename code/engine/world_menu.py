@@ -44,13 +44,15 @@ class World_Menu(object):
                 self.deactivate_menu()
                 #self.world.is_paused=False
             else :
-                self.active_menu='debug'
-                #self.world.is_paused=True
-                print('Game Paused')
+                if self.active_menu!='death':
+                    self.active_menu='debug'
+                    #self.world.is_paused=True
+                    #print('Game Paused')
 
         if Key=='esc':
             # exit any active menu
-            self.deactivate_menu()
+            if self.active_menu!='death':
+                self.deactivate_menu()
 
         if self.active_menu=='vehicle':
             self.vehicle_menu(Key)

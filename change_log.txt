@@ -7,7 +7,9 @@ September 05 2021
 - rewrote penetration_calculator to be a shared class from world instead of 
     importing it for every projectile 
 - fixed the render range adjustment when zooming back in so that it works now 
-
+- made it so you can't accidentally 'esc' or tilde out of the death menu 
+- added bleeding 
+- added bandage (b) option for player
 ---------------------------------
 August 27 2021
 

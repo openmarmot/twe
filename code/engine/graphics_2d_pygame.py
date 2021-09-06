@@ -216,6 +216,11 @@ class Graphics_2D_Pygame(object):
                 return True
             else:
                 return False
+        elif KEY=='b':
+            if keys[pygame.K_b]:
+                return True
+            else:
+                return False
         else:
             return False
 

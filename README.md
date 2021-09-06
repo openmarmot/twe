@@ -19,6 +19,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 
 ### Things to do
 - spawn different objects with the debug menu
+- spawn as a german or russian and follow your squad into combat
 - try not to die as the AI gets in large fire fights around you
 - take a leisurly drive in your new Kubelwagen 
 - find and eat all four types of cheese (gives a health bonus as in real life)
@@ -41,6 +42,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - 'f' to fire weapon (if you have one)
 - 'g' throw grenade (if you have one)
 - 't' launch panzerfaust (if you have one)
+- 'b' to bandage wound if you are bleeding
 - '[' zoom out
 - ']' zoom in 
 

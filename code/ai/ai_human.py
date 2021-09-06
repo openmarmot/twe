@@ -31,6 +31,7 @@ class AIHuman(AIBase):
         self.throwable=None
         self.antitank=None
         self.health=100
+        self.bleeding=False
 
         # what the ai is actually doing (an action)
         self.ai_state='none'
@@ -81,6 +82,10 @@ class AIHuman(AIBase):
                 self.owner.world.world_menu.handle_input('none')
 
         else :
+            
+            if self.bleeding:
+                self.health-=0.1*self.owner.world.graphic_engine.time_passed_seconds
+
 
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
@@ -99,7 +104,12 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
+            self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
+            if self.owner.is_player:
+                self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
+
 
             # add the shooter of the bullet to the personal enemies list
             # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
@@ -517,6 +527,11 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('t')):
             # launch anti tank
             self.launch_antitank([])
+        if(self.owner.world.graphic_engine.keyPressed('b')):
+            if self.bleeding:
+                self.bleeding=False
+                self.owner.world.graphic_engine.text_queue.insert(0,'You apply a bandage')
+
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):
