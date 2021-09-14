@@ -25,12 +25,13 @@ class AIProjectile(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
         self.flightTime=0.
+
+        # max flight time
         self.maxTime=5.
         self.ignore_list=[]
 
-        # --- specific bullet data used for damage and penetration calculation ---
-        # bullet/shrapnel/HEAT (high explosive anti tank shaped charge)
-        self.type=None
+        # matches up with the projectile_data dict in penetration_calculator.py
+        self.projectile_type=None
 
 
         # the equipper of the gun that fired the projectile

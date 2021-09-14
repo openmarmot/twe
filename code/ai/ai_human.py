@@ -180,6 +180,7 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
         if EVENT_DATA.is_consumable:
             self.health+=100
+            self.bleeding=False
             if self.owner.is_player :
                 self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ': You eat the whole cheese wheel ]')
 

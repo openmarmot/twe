@@ -1,6 +1,7 @@
 
 Some issues that I am aware of 
 
+- after you die if you respawn and click on your player you are identified as 'ppk'. this clears up after awhile 
 
 - objects are the wrong size 
     certain circumstances such as exiting a vehicle can cause objects to be the wrong size for awhile 

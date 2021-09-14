@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+---------------------------------
+September 13 2021
+- more work on gun and projectile variables 
+- added more complex projectile pass through calculations based on projectile material 
+- some changes to shrapnel clouds (grenades) and heat jet (panzerfaust) dispersion patterns 
+
+---------------------------------
+September 12 2021
+- eating food (consumable) now stops bleeding
+- more work on gun and projectile variables (not used yet)
 
 ---------------------------------
 September 05 2021
