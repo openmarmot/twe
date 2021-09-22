@@ -343,6 +343,7 @@ class World(object):
             self.german_ai.update()
             self.soviet_ai.update()
             self.american_ai.update()
+            self.civilian_ai.update()
 
 
 

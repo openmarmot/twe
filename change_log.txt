@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ---------------------------------
+September 22 2021
+- made bleeding more random 
+- bleeding now causes blood spots to be generated 
+- some small updates to make civilian squads functional 
+- changed personal_enemies so that same faction objects aren't added
+    this was to fix situations where a faction would wipe itself out due to 
+    friendly fire 
+---------------------------------
 September 13 2021
 - more work on gun and projectile variables 
 - added more complex projectile pass through calculations based on projectile material 

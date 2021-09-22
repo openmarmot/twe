@@ -81,6 +81,8 @@ def create_squads(WORLD,SOLDIERS,FACTION):
             subguns.append(b)
         elif b.ai.primary_weapon.name=='dp28':
             machineguns.append(b)
+        else:
+            print('error: unknown primary weapon in squad creation')
 
     squad_list=[]
 
