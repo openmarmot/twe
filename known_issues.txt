@@ -1,30 +1,13 @@
 
 Some issues that I am aware of 
 
+- after you die if you respawn and click on your player you are identified as 'ppk'. this clears up after awhile 
 
-Minor Issues 
-- when grenades are thrown it seems they are not removed from inventory 
-    - inventory removal needs cleanup
-
-
-
-# ----- Major Issues -----
-
-- occasinonal crash on start with some sort of render math error 
-    File "/home/andrew/git/twe/code/engine/graphics_2d_pygame.py", line 216, in render
-        self.screen.blit(self.get_rotated_image(self.images[c.image_list[c.image_index]],c.rotation_angle), (x-w/2, y-h/2))
-    File "/home/andrew/git/twe/code/engine/graphics_2d_pygame.py", line 337, in get_rotated_image
-        rot_image = rot_image.subsurface(rot_rect).copy()
-    ValueError: subsurface rectangle outside surface area
-    - NOTE - i think this is due to images that are not square 
+- objects are the wrong size 
+    certain circumstances such as exiting a vehicle can cause objects to be the wrong size for awhile 
 
 - graphics jitter 
     when moving there is a very noticeable small oscillation of every object 
         -especially noticeable when a lot of objects are close together 
     - this probably is due a rounding or conversion with world to screen coords thats isn't precise enough 
 
-
-- collision seems to have a bias to the right side. 
-    this suggests either i have a +/- flipped or the math is just wrong 
-    - if you fire from the left of the house the dirt will pile up mid house 
-    - if you fire from the right of the house the dirt piles up right of the house by a good bit 

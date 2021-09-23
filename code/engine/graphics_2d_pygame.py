@@ -124,7 +124,7 @@ class Graphics_2D_Pygame(object):
                     self.reset_all()
                 elif event.key==93: # ]
                     self.scale+=0.1
-                    self.view_adjust-=100
+                    self.view_adjust-=500
                     print('scale up')
                     self.reset_all()
                 elif event.key==48:
@@ -213,6 +213,11 @@ class Graphics_2D_Pygame(object):
                 return False
         elif KEY=='t':
             if keys[pygame.K_t]:
+                return True
+            else:
+                return False
+        elif KEY=='b':
+            if keys[pygame.K_b]:
                 return True
             else:
                 return False

@@ -42,7 +42,7 @@ class AISquad(object):
         # near enemies
         self.near_enemies=[]
 
-        # faction - german/soviet/american
+        # faction - german/soviet/american/civilian
         self.faction='none'
 
         self.time_since_enemy_update=0.
@@ -96,8 +96,10 @@ class AISquad(object):
             enemylist=self.world.wo_objects_soviet+self.world.wo_objects_german
         elif self.faction=='soviet':
             enemylist=self.world.wo_objects_german+self.world.wo_objects_american
+        elif self.faction=='civilian':
+            pass
         else:
-            print('error! unknown squad!')
+            print('error! unknown squad faction!')
         
         for b in enemylist:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)

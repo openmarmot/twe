@@ -3,7 +3,6 @@
 module : ai_grenade.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 '''
@@ -39,7 +38,7 @@ class AIPanzerfaust(AIBase):
         self.maxTime=3.
 
         # amount of shrapnel (basically grenade power)
-        self.shrapnel_count=60
+        self.shrapnel_count=20
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
@@ -69,7 +68,7 @@ class AIPanzerfaust(AIBase):
         # kablooey!
         # add the shrapnel
         target_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,2)
-        engine.world_builder.spawn_shrapnel_cone(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count)
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

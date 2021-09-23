@@ -31,6 +31,9 @@ class AIHuman(AIBase):
         self.throwable=None
         self.antitank=None
         self.health=100
+        self.bleeding=False
+        self.time_since_bleed=0
+        self.bleed_interval=0.5
 
         # what the ai is actually doing (an action)
         self.ai_state='none'
@@ -81,6 +84,17 @@ class AIHuman(AIBase):
                 self.owner.world.world_menu.handle_input('none')
 
         else :
+            
+            if self.bleeding:
+                
+                self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
+                if self.time_since_bleed>self.bleed_interval:
+                    # make this a bit random 
+                    self.bleed_interval=0.5+random.randint(0,20)
+                    self.health-=1+random.randint(0,10)
+                    self.time_since_bleed=0
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
 
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
@@ -99,17 +113,24 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
             self.health-=random.randint(25,75)
+            self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
+            if self.owner.is_player:
+                self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
+
 
             # add the shooter of the bullet to the personal enemies list
             # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
             if EVENT_DATA.ai.shooter !=None:
-                self.personal_enemies.append(EVENT_DATA.ai.shooter)
+                # had to add this check to stop friendly fire cascades
+                if EVENT_DATA.ai.shooter.squad.faction != self.squad.faction:
+                    self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
-                # let the squad know (this is only until the enemy list is rebuilt)
-                # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
-                if self.owner.is_soldier:
-                    self.squad.near_enemies.append(self.personal_enemies[0])
+                    # let the squad know (this is only until the enemy list is rebuilt)
+                    # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
+                    if self.owner.is_soldier:
+                        self.squad.near_enemies.append(self.personal_enemies[0])
 
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 
@@ -170,6 +191,7 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
         if EVENT_DATA.is_consumable:
             self.health+=100
+            self.bleeding=False
             if self.owner.is_player :
                 self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ': You eat the whole cheese wheel ]')
 
@@ -517,6 +539,11 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('t')):
             # launch anti tank
             self.launch_antitank([])
+        if(self.owner.world.graphic_engine.keyPressed('b')):
+            if self.bleeding:
+                self.bleeding=False
+                self.owner.world.graphic_engine.text_queue.insert(0,'You apply a bandage')
+
 
     #---------------------------------------------------------------------------
     def handle_zombie_update(self):

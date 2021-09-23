@@ -81,6 +81,8 @@ def create_squads(WORLD,SOLDIERS,FACTION):
             subguns.append(b)
         elif b.ai.primary_weapon.name=='dp28':
             machineguns.append(b)
+        else:
+            print('error: unknown primary weapon in squad creation')
 
     squad_list=[]
 
@@ -501,6 +503,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
         z.ai.type='submachine gun'
+        z.ai.projectile_type='9mm_ME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -515,6 +518,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
         z.ai.type='submachine gun'
+        z.ai.projectile_type='7.62x25'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -529,6 +533,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.1
         z.ai.flight_time=2.5
         z.ai.type='assault rifle'
+        z.ai.projectile_type='7.92x33_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -543,6 +548,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=3.5
         z.ai.type='machine gun'
+        z.ai.projectile_type='7.92x57_SSP'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -557,6 +563,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.6
         z.ai.flight_time=1
         z.ai.type='pistol'
+        z.ai.projectile_type='9mm_115'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -571,6 +578,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.8
         z.ai.flight_time=1
         z.ai.type='pistol'
+        z.ai.projectile_type='7.62x25'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -585,6 +593,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.7
         z.ai.flight_time=1
         z.ai.type='pistol'
+        z.ai.projectile_type='45acp'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -599,6 +608,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.05
         z.ai.flight_time=3.5
         z.ai.type='machine gun'
+        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -613,6 +623,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.7
         z.ai.flight_time=3
         z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -627,6 +638,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rate_of_fire=0.7
         z.ai.flight_time=3
         z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -743,7 +755,7 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     # MAX_TIME - max flight time around 3.5 seconds is default
@@ -756,6 +768,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
     z.ai.shooter=SHOOTER
+    z.ai.projectile_type=PROJECTILE_TYPE
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
@@ -772,16 +785,17 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
-def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST):
+def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
     z.speed=300.
-    z.ai.maxTime=random.uniform(0.1, 0.5)
+    z.ai.maxTime=random.uniform(MIN_TIME, MAX_TIME)
     z.is_projectile=True
     z.render_level=3
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
+    z.ai.projectile_type=PROJECTILE_TYPE
     z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,TARGET_COORDS)
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
     # increase the collision radius to make sure we get hits
@@ -793,14 +807,14 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4)
 
 #------------------------------------------------------------------------------
-def spawn_shrapnel_cone(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT):
+def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT):
     ''' creates a cone/line of shrapnel. used for panzerfaust'''
     for x in range(AMOUNT):
-        target_coords=[float(random.randint(-20,20))+TARGET_COORDS[0],float(random.randint(-20,20))+TARGET_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[])
+        target_coords=[float(random.randint(-5,5))+TARGET_COORDS[0],float(random.randint(-5,5))+TARGET_COORDS[1]]
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'HEAT_jet',0.1,0.3)
 
 
 #------------------------------------------------------------------------------

@@ -25,8 +25,14 @@ class AIProjectile(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
         self.flightTime=0.
+
+        # max flight time
         self.maxTime=5.
         self.ignore_list=[]
+
+        # matches up with the projectile_data dict in penetration_calculator.py
+        self.projectile_type=None
+
 
         # the equipper of the gun that fired the projectile
         # not used yet 
@@ -50,7 +56,7 @@ class AIProjectile(AIBase):
             # this is expensive, do we need to do it every update cycle? maybe put on a timer
             collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False)
             if collide_obj !=None:
-                if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
                     # add the collided object to ignore list so we don't hit it again
                     # this is mostly to deal with buildings where we would hit it a ton of times
                     self.ignore_list.append(collide_obj)
