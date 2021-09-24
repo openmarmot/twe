@@ -53,21 +53,25 @@ module_last_update_date='August 02 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
-def create_squads(WORLD,SOLDIERS,FACTION):
+def create_squads(WORLD,HUMANS,FACTION):
     assault_rifles=[]
     rifles=[]
     semiauto_rifles=[]
     subguns=[]
     machineguns=[]
     antitank=[]
+    unidentified_human=[]
+    unarmed_human=[]
     unarmed_vehicle=[]
     armed_vehicle=[]
     tank=[]
     airplane=[]
 
     # categorize 
-    for b in SOLDIERS:
-        if b.ai.primary_weapon.name=='kar98k':
+    for b in HUMANS:
+        if b.ai.primary_weapon==None:
+            unarmed_human.append(b)
+        elif b.ai.primary_weapon.name=='kar98k':
             rifles.append(b)
         elif b.ai.primary_weapon.name=='stg44':
             assault_rifles.append(b)
@@ -89,7 +93,7 @@ def create_squads(WORLD,SOLDIERS,FACTION):
     buildsquads=True 
 
     while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank)<1:
+        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+unarmed_human)<1:
             buildsquads=False
         else :
             s=AISquad(WORLD)
@@ -136,6 +140,8 @@ def create_squads(WORLD,SOLDIERS,FACTION):
                     s.members.append(machineguns.pop())
                 if len(antitank)>0:
                     s.members.append(antitank.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
 
                 # lets do it again
 
@@ -151,6 +157,8 @@ def create_squads(WORLD,SOLDIERS,FACTION):
                     s.members.append(machineguns.pop())
                 if len(antitank)>0:
                     s.members.append(antitank.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
 
             squad_list.append(s)
 
@@ -274,25 +282,6 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
 
-    # add civilians 
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-2000,2000))],'civilian_man',True)
-
-
     # add a couple weapons 
     spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
     spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
@@ -401,11 +390,40 @@ def load_test_environment(world):
     # create soviet squads 
     world.soviet_ai.squads+=create_squads(world,s,'soviet')
 
+    # add civilians
+    s=[]
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_object(world,[0,0],'civilian_man',False))
+
+
+    # create civilian squads 
+    world.civilian_ai.squads+=create_squads(world,s,'civilian')
+
+
 
     # spawn
     # locations will eventually be determined by map control
     world.german_ai.spawn_on_map(world.spawn_north)
     world.soviet_ai.spawn_on_map(world.spawn_south)
+    world.civilian_ai.spawn_on_map(world.spawn_center)
 
     # add some world areas
     generate_world_area(world,[-2000,2000],'town','Alfa')
@@ -418,6 +436,7 @@ def load_test_environment(world):
 
 #------------------------------------------------------------------------------
 def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
+    z=None
     if OBJECT_TYPE=='warehouse':
         z=WorldObject(WORLD,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
@@ -731,7 +750,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['dirt'],AINone)
         z.render_level=2
         z.name='dirt'
-        z.rotation_angle=float(random.randint(0,359))  
+        z.rotation_angle=float(random.randint(0,359))
+    else:
+        print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
 
     # -- generic settings that apply to all --
     z.world_builder_identity=OBJECT_TYPE

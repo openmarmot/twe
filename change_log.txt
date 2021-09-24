@@ -1,5 +1,18 @@
 TWE Project : Change Log
 
+
+---------------------------------
+September 23 2021
+- modified the squad builder so it can handle unarmed humans 
+- misc modifications required to get civilian squads working 
+- fixed bug from yesterday with friendly fire check 
+- made friendly fire check only for reporting to the squad so it doesn't 
+    completely eliminate friendly fire 
+- merged the human_ai code for civilians and soldiers together - there is no longer 
+    a major distinction - will probably add back in some differences later 
+- added some code to prevent a crash when a human dies and they are not in the 
+    squad that they should be. need to debug this more 
+
 ---------------------------------
 September 22 2021
 - made bleeding more random 
