@@ -76,7 +76,11 @@ class AIHuman(AIBase):
                     self.squad.members.remove(self.owner)
                 else: 
                     # this happens and I do not know why
+
                     print('!! Error : '+self.owner.name+' not in squad somehow')
+                    print('Squad list')
+                    for b in self.squad.members:
+                        print(b.name)
 
             self.owner.world.remove_object(self.owner)
 
@@ -106,8 +110,6 @@ class AIHuman(AIBase):
 
             if self.owner.is_player:
                 self.handle_player_update()
-            elif self.owner.is_zombie:
-                self.handle_zombie_update()
             else :
                 self.handle_normal_ai_update()
 
@@ -132,8 +134,10 @@ class AIHuman(AIBase):
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
-                if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
-                    self.squad.near_enemies.append(self.personal_enemies[0])
+                
+                if EVENT_DATA.ai.shooter.ai.squad != None:
+                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
+                        self.squad.near_enemies.append(self.personal_enemies[0])
 
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 
@@ -539,22 +543,6 @@ class AIHuman(AIBase):
                 self.bleeding=False
                 self.owner.world.graphic_engine.text_queue.insert(0,'You apply a bandage')
 
-
-    #---------------------------------------------------------------------------
-    def handle_zombie_update(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
-
-        if self.health>50:
-            self.owner.speed=35
-            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.owner.world.player.world_coords)
-            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
-            self.owner.reset_image=True
-        else :
-            self.owner.speed=-35
-            self.health+=5*time_passed
-            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.player.world_coords,self.owner.world_coords)
-            self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.owner.world.player.world_coords,time_passed)       
-            self.owner.reset_image=True
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):

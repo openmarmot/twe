@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ---------------------------------
+September 26 2021
+- updated menu code so it is harder to accidentally close the death menu 
+- rewrote the object selection code for mouse clicks to use the 
+    newer circle collision. It was still using the mathematically wrong 
+    box collision from earlier. This seems to have resolved some bugs
+- removed zombie code. not needed or used anymore and not worth adding into the tactical AI system 
+- added a faction!=None check to the ai_human collision event because some things that can shoot do 
+    not have factions yet - like vehicles 
+
+faction and squad code is becoming an issue. might need to rework so squad 
+is optional or have the faction variable at the ai_human level. Also - do vehicles 
+need squads or can the passengers just have the squad 
+
+---------------------------------
 September 23 2021
 - modified the squad builder so it can handle unarmed humans 
 - misc modifications required to get civilian squads working 

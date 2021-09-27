@@ -33,6 +33,25 @@ module_last_update_date='may23 2021' #date of last update
 #global variables
 
 #------------------------------------------------------------------------------
+def checkCollisionCircleMouse(MOUSE_COORDS, RADIUS, COLLISION_LIST):
+	''' collision check modified for mouse screen coords'''
+	# modified collision check for screen coords 
+	# radius is used for both objects because screen coords perspective 
+	# is scaled based on zoom 
+	# called by world.select_with_mouse at the moment
+
+	collided=None
+	for b in COLLISION_LIST:
+
+		distance=get_distance(MOUSE_COORDS,b.screen_coords)
+
+		if distance < (RADIUS*2):
+			collided=b
+			break
+	return collided
+
+
+#------------------------------------------------------------------------------
 def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 	# wo - (worldobject)the object possibly doing the colliding 
 	# collision_list - (list[worldobject] a list of all possible objects that 

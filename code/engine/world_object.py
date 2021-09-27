@@ -79,7 +79,6 @@ class WorldObject(object):
         # might just make this a string or something but bools are fast and easy to use 
         self.is_player=False
         self.is_human=False
-        self.is_zombie=False
         self.is_civilian=False
         self.is_soldier=False
         self.is_vehicle=False
