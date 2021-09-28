@@ -5,7 +5,12 @@ TWE Project : Change Log
 September 27 2021
 - moved the ai trigger for picking up a weapon to fix some edge cases with citizens who 
     start without a weapon 
+- removed some of the console text print outs. going to keep this mostly for debug
+    ingame text needs to use the onscreen system 
+- added debug text for when the game tries to delete an object but its not in the master object list
 
+confirmed that the weird mouse select bug that affects your characters after the first one dies still 
+exists. interesting how it always selects a weapon when you click on the character 
 ---------------------------------
 September 26 2021
 - updated menu code so it is harder to accidentally close the death menu 

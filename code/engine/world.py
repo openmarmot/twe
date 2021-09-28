@@ -245,6 +245,8 @@ class World(object):
     def remove_object(self, WORLD_OBJECT):
         if WORLD_OBJECT in self.wo_objects:
             self.wo_objects.remove(WORLD_OBJECT)
+        else:
+            print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
             self.wo_objects_collision.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_human:
@@ -286,7 +288,7 @@ class World(object):
         called by graphics_2d_pygame on mouse down event .. currently 
         '''
         mouse=self.graphic_engine.get_mouse_screen_coords()
-        # this calculation should be moved to math_2d
+
         ob_list=(self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+
             self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank+
             self.wo_objects_airplane)

@@ -432,7 +432,6 @@ class AIHuman(AIBase):
                                     self.ai_goal='pickup'
                                     self.destination=self.target_object.world_coords
                                     self.ai_state='start_moving' 
-                                    print('picking up grenade')
                                 else:
                                     # readjust a bit 
                                     self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
