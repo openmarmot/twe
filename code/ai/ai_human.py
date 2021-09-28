@@ -134,7 +134,7 @@ class AIHuman(AIBase):
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
-                
+
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
                         self.squad.near_enemies.append(self.personal_enemies[0])
@@ -323,37 +323,45 @@ class AIHuman(AIBase):
                     if distance<3:
                         self.ai_state='sleeping'
         elif self.ai_state=='engaging':
-            # check if we are out of ammo
-            if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
-
-                # get more ammo 
-                self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
-                self.ai_goal='get ammo'
+            if self.primary_weapon==None:
+                # get a gun 
+                self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                self.ai_goal='pickup'
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
             else:
-                # we have ammo - what next ?
+                # we have a primary weapon
+                # check if we are out of ammo
+                if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
 
-                # check if target is dead 
-                if self.target_object.ai.health<1:
-                    self.ai_state='sleeping'
-                    self.ai_goal='none'
-                    self.target_object=None
+                    # get more ammo 
+                    self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
+                    self.ai_goal='get ammo'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'
                 else:
-                    # we have ammo, target is alive
+                    # we have ammo - what next ?
 
-                    # check if target is too far 
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                    if distance >850. :
-                        self.ai_goal='close_with_target'
-                        self.destination=copy.copy(self.target_object.world_coords)
-                        self.ai_state='start_moving'
-                        #print('closing with target')
-                    elif distance<300:
-                        if distance>100:
-                            # maybe throw a grendate !
-                            if self.throwable != None:
-                                self.throw(self.target_object.world_coords)
+                    # check if target is dead 
+                    if self.target_object.ai.health<1:
+                        self.ai_state='sleeping'
+                        self.ai_goal='none'
+                        self.target_object=None
+                    else:
+                        # we have ammo, target is alive
+
+                        # check if target is too far 
+                        distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
+                        if distance >850. :
+                            self.ai_goal='close_with_target'
+                            self.destination=copy.copy(self.target_object.world_coords)
+                            self.ai_state='start_moving'
+                            #print('closing with target')
+                        elif distance<300:
+                            if distance>100:
+                                # maybe throw a grendate !
+                                if self.throwable != None:
+                                    self.throw(self.target_object.world_coords)
 
                     # basically if nothing else is changed we keep firing
 
@@ -377,25 +385,17 @@ class AIHuman(AIBase):
             
             # 2. health is good. deal with personal enemies
             elif len(self.personal_enemies)>0:
-                # first,  do we have a gun ? 
-                if self.primary_weapon==None :
-                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
+                # we have a gun, lets make sure this enemy is alive
+                #print(self.personal_enemies)
+                if self.personal_enemies[0].ai.health>0:
+                    # engage first personal enemy
+                    self.target_object=self.personal_enemies[0]
+                    self.ai_state='engaging'
+                    self.ai_goal='none'
 
                 else:
-                    # we have a gun, lets make sure this enemy is alive
-                    #print(self.personal_enemies)
-                    if self.personal_enemies[0].ai.health>0:
-                        # engage first personal enemy
-                        self.target_object=self.personal_enemies[0]
-                        self.ai_state='engaging'
-                        self.ai_goal='none'
-
-                    else:
-                        # remove the enemy as it is dead
-                        self.personal_enemies.pop(0)
+                    # remove the enemy as it is dead
+                    self.personal_enemies.pop(0)
 
             # 3. health is good, no personal enemies 
             else :

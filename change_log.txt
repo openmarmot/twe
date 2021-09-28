@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ---------------------------------
+September 27 2021
+- moved the ai trigger for picking up a weapon to fix some edge cases with citizens who 
+    start without a weapon 
+
+---------------------------------
 September 26 2021
 - updated menu code so it is harder to accidentally close the death menu 
 - rewrote the object selection code for mouse clicks to use the 
