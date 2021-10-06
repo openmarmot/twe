@@ -422,8 +422,9 @@ def load_test_environment(world):
 
     # spawn
     # locations will eventually be determined by map control
-    world.german_ai.spawn_on_map(world.spawn_north)
-    world.soviet_ai.spawn_on_map(world.spawn_south)
+    world.german_ai.spawn_on_map(world.spawn_west)
+    world.soviet_ai.spawn_on_map(world.spawn_east)
+    world.american_ai.spawn_on_map(world.spawn_north)
     world.civilian_ai.spawn_on_map(world.spawn_center)
 
     # add some world areas

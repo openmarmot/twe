@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 05 2021
+- fixed a issue where player would be spawned twice. this affected american/german/russian starts 
+probably for a long time, but only started affecting civilian spawns after civilian squads were setup.
+this was causing a ton of weird bugs because there would be multiple instances of the player in the game 
+- changed initial spawn for germans to west and russians to east.
+- added north spawn for americans (not initialized previously)
+
+I notice when i spawn in as american the count for americans is two - that will need looking into.
+I'm guessing there is more doubling up going on in the code 
+
+---------------------------------
 September 27 2021
 - moved the ai trigger for picking up a weapon to fix some edge cases with citizens who 
     start without a weapon 

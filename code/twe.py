@@ -38,7 +38,8 @@ def run():
 
     # this has to be here because graphics engine uses player coords in its update
     #  so it needs to be created
-    p=engine.world_builder.spawn_object(world, [50.,50.],'player',True)
+    # player will get spawned into the world by its squad
+    p=engine.world_builder.spawn_object(world, [50.,50.],'player',False)
 
     world.world_menu.active_menu='start'
     world.world_menu.menu_state='none'

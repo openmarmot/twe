@@ -65,6 +65,7 @@ class World(object):
         self.spawn_north=[0.,-4000.]
         self.spawn_south=[0.,4000.]
         self.spawn_west=[-4000.,0.]
+        self.spawn_east=[4000.,0.]
 
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
