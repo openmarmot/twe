@@ -110,7 +110,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                print(str(event.key))
+                #print(str(event.key))
                 # send number events to world_menu for ingame menus 
                 # translate to a string corresponding to the actual key to simplify the code
                 # on the other end
@@ -154,7 +154,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.world.select_with_mouse(20)
+                    b=self.world.select_with_mouse(10)
                     if b!=None:
                         print(b.name)
                         # send it over to world menu to figure out

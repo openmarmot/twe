@@ -65,6 +65,7 @@ class World(object):
         self.spawn_north=[0.,-4000.]
         self.spawn_south=[0.,4000.]
         self.spawn_west=[-4000.,0.]
+        self.spawn_east=[4000.,0.]
 
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
@@ -245,6 +246,8 @@ class World(object):
     def remove_object(self, WORLD_OBJECT):
         if WORLD_OBJECT in self.wo_objects:
             self.wo_objects.remove(WORLD_OBJECT)
+        else:
+            print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
             self.wo_objects_collision.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_human:
@@ -281,24 +284,17 @@ class World(object):
     def select_with_mouse(self, radius):
         '''
         return a object that is 'under' the mouse cursor
-        radius is actually the side of a square. kind of. >100 works best
+        radius of 10 or so seems fine
 
         called by graphics_2d_pygame on mouse down event .. currently 
         '''
         mouse=self.graphic_engine.get_mouse_screen_coords()
-        collided=None
-        # this calculation should be moved to math_2d
+
         ob_list=(self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+
             self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank+
             self.wo_objects_airplane)
-        for b in ob_list:
-            if mouse[0]+radius > b.screen_coords[0]:
-                if mouse[0] < b.screen_coords[0]+b.collision_radius:
-                    if mouse[1]+radius > b.screen_coords[1]:
-                        if mouse[1] < b.screen_coords[1]+b.collision_radius:
-                            collided=b
-                            break
-        return collided
+        
+        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,ob_list)
 
     #---------------------------------------------------------------------------
     def toggle_map(self):

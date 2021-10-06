@@ -2,6 +2,41 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 05 2021
+- fixed a issue where player would be spawned twice. this affected american/german/russian starts 
+probably for a long time, but only started affecting civilian spawns after civilian squads were setup.
+this was causing a ton of weird bugs because there would be multiple instances of the player in the game 
+- changed initial spawn for germans to west and russians to east.
+- added north spawn for americans (not initialized previously)
+
+I notice when i spawn in as american the count for americans is two - that will need looking into.
+I'm guessing there is more doubling up going on in the code 
+
+---------------------------------
+September 27 2021
+- moved the ai trigger for picking up a weapon to fix some edge cases with citizens who 
+    start without a weapon 
+- removed some of the console text print outs. going to keep this mostly for debug
+    ingame text needs to use the onscreen system 
+- added debug text for when the game tries to delete an object but its not in the master object list
+
+confirmed that the weird mouse select bug that affects your characters after the first one dies still 
+exists. interesting how it always selects a weapon when you click on the character 
+---------------------------------
+September 26 2021
+- updated menu code so it is harder to accidentally close the death menu 
+- rewrote the object selection code for mouse clicks to use the 
+    newer circle collision. It was still using the mathematically wrong 
+    box collision from earlier. This seems to have resolved some bugs
+- removed zombie code. not needed or used anymore and not worth adding into the tactical AI system 
+- added a faction!=None check to the ai_human collision event because some things that can shoot do 
+    not have factions yet - like vehicles 
+
+faction and squad code is becoming an issue. might need to rework so squad 
+is optional or have the faction variable at the ai_human level. Also - do vehicles 
+need squads or can the passengers just have the squad 
+
+---------------------------------
 September 23 2021
 - modified the squad builder so it can handle unarmed humans 
 - misc modifications required to get civilian squads working 

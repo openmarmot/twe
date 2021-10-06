@@ -214,6 +214,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_soldier','images/humans/german_soldier.png')
     world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
     world.graphic_engine.loadImage('soviet_soldier','images/humans/russian_soldier.png')
+    # not used at the moment
     world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
     world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
 
@@ -421,8 +422,9 @@ def load_test_environment(world):
 
     # spawn
     # locations will eventually be determined by map control
-    world.german_ai.spawn_on_map(world.spawn_north)
-    world.soviet_ai.spawn_on_map(world.spawn_south)
+    world.german_ai.spawn_on_map(world.spawn_west)
+    world.soviet_ai.spawn_on_map(world.spawn_east)
+    world.american_ai.spawn_on_map(world.spawn_north)
     world.civilian_ai.spawn_on_map(world.spawn_center)
 
     # add some world areas
@@ -685,15 +687,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel=2900
         z.is_airplane=True 
 
-    elif OBJECT_TYPE=='zombie':
-        z=WorldObject(WORLD,['zombie_soldier'],AIHuman)
-        z.name='Zombie Klaus Hammer'
-        z.speed=float(random.randint(5,20))
-        z.render_level=3
-        z.collision_radius=10
-        z.is_human=True
-        z.is_zombie=True
-
     elif OBJECT_TYPE=='player':
         z=WorldObject(WORLD,['man'],AIHuman)
         z.name='Klaus Hammer'
@@ -892,9 +885,3 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'tt33',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False)) 
         return z   
-
-
-#------------------------------------------------------------------------------
-def spawn_zombie_horde(world, world_coords, amount):
-    for x in range(amount):
-        spawn_object(world,[float(random.randint(0,500))+world_coords[0],float(random.randint(0,500))+world_coords[1]],'zombie',True)

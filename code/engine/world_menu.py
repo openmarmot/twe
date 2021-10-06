@@ -187,14 +187,10 @@ class World_Menu(object):
         if self.menu_state=='base':
             if Key=='1':
                 self.world.random_player_spawn()
-            elif Key=='2':
-                pass
-            elif Key=='3':
-                pass
-            if Key=='1' or Key=='2' or Key=='3' or Key=='4':
-                # eventually load other menus
                 self.world.is_paused=False
                 self.deactivate_menu()
+
+
 
     def gun_menu(self, Key):
         if self.menu_state=='none':
@@ -257,6 +253,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('--Vehicle Menu --')
+            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('2 - enter/exit ')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
@@ -279,6 +276,8 @@ class World_Menu(object):
                     self.selected_object.add_inventory(self.world.player)
                     # remove the player from the world so we don't have a ghost
                     self.world.remove_object(self.world.player)
+
+
                     self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 else:
@@ -295,7 +294,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
-            self.world.graphic_engine.menu_text_queue.append('2 - spawn 500 zombies')
+            self.world.graphic_engine.menu_text_queue.append('2 - player count')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
@@ -304,7 +303,11 @@ class World_Menu(object):
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                engine.world_builder.spawn_zombie_horde(self.world, self.world.player.world_coords, 500)
+                count=0
+                for b in self.world.wo_objects:
+                    if b.is_player:
+                        count+=1
+                print('players detected: '+str(count))
             elif Key=='3':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':
@@ -335,6 +338,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.american_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                print('Spawning as American')
             elif Key=='2':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
@@ -345,6 +349,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.german_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                print('Spawning as German')
             elif Key=='3':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
@@ -355,6 +360,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.soviet_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                print('Spawning as Soviet')
             elif Key=='4':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
@@ -364,6 +370,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.civilian_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                print('Spawning as Civilian')
             
             if Key=='1' or Key=='2' or Key=='3' or Key=='4':
                 # eventually load other menus
