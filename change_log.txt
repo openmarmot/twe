@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 07 2021
+- made some changes vehicle menu to split between internal/external menu based on 
+    whether the player is in the vehicle or not 
+
+---------------------------------
 Oct 05 2021
 - fixed a issue where player would be spawned twice. this affected american/german/russian starts 
 probably for a long time, but only started affecting civilian spawns after civilian squads were setup.
