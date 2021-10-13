@@ -35,6 +35,9 @@ class AIHuman(AIBase):
         self.time_since_bleed=0
         self.bleed_interval=0.5
 
+        self.confirmed_kills=0
+        self.probable_kills=0
+
         # what the ai is actually doing (an action)
         self.ai_state='none'
         # what the ai is trying to accomplish
@@ -138,6 +141,15 @@ class AIHuman(AIBase):
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
                         self.squad.near_enemies.append(self.personal_enemies[0])
+
+                # kill tracking
+                # just focus on humans for now
+                if EVENT_DATA.ai.shooter.is_human:
+                    if self.health<10:
+                        if self.health<1:
+                            EVENT_DATA.ai.shooter.ai.confirmed_kills+=1
+                        else:
+                            EVENT_DATA.ai.shooter.ai.probable_kills+=1
 
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 

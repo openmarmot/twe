@@ -131,12 +131,13 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Airplane Menu --')
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.world.graphic_engine.menu_text_queue.append('1 - Engines')
+            self.world.graphic_engine.menu_text_queue.append('2 - Flight Controls ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Landing Gear ')
+            self.world.graphic_engine.menu_text_queue.append('4 - Exit Plane ')
             if Key=='1':
                 pass
-            if Key=='2':
+            if Key=='4':
                 # exit the vehicle
                 p=self.selected_object.ai.passengers[0]
                 self.selected_object.remove_inventory(p)
@@ -232,6 +233,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
             self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+            self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
+            self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')

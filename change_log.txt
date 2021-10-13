@@ -2,6 +2,32 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 12 2021
+- adding airplane menu options (non functional at the moment)
+- added confirmed kills (a hit that takes health down to <1)
+- added probable kills ( a hit that takes health down to <10 but >0)
+- added confirmed and probable kills stats to the menu text for humans 
+
+I watched a group of 3 soviets that had picked up stg44s somewhere mow down about 8 germans 
+in a running gun battle. I'm not sure what makes some bots so much more successful than others. 
+the new kill stats may help track that a little. stg44s definitely help. They are one of the best 
+weapons in the game at the moment (other than MGs)
+
+The current human AI can lead to situations where one bot is 'closing with target' and the target 
+just turns around (do they actually turn? not sure) and blasts them away with no return fire from 
+the original bot. this has to do with the exact range at which close with target is satisfied vs 
+what counts as ok for range in a new engagement.Need to find a way to make this more fuzzy and 
+remove hard numbers from these decisions as it creates unnatural behavior 
+
+i still get situations where bots seems to be stuck in a sleep mode. i think its a result of the rigid 
+if/else waterfall that the current AI uses. need to make this code better deal with situations where the 
+task end up wtih can't be accomplished otherwise they get stuck in a loop of trying the same thing over and 
+over.
+
+kind of frustrating but i think the human AI needs another full rewrite. relying on cascading if/else is too awkward and 
+is getting harder and harder to add behaviors to 
+
+---------------------------------
 Oct 07 2021
 - made some changes vehicle menu to split between internal/external menu based on 
     whether the player is in the vehicle or not 
