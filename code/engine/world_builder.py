@@ -523,6 +523,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
+        z.ai.range=700
         z.ai.type='submachine gun'
         z.ai.projectile_type='9mm_ME'
         z.render_level=2
@@ -538,6 +539,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
+        z.ai.range=700
         z.ai.type='submachine gun'
         z.ai.projectile_type='7.62x25'
         z.render_level=2
@@ -553,6 +555,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
         z.ai.flight_time=2.5
+        z.ai.range=800
         z.ai.type='assault rifle'
         z.ai.projectile_type='7.92x33_SME'
         z.render_level=2
@@ -568,6 +571,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=3.5
+        z.ai.range=800
         z.ai.type='machine gun'
         z.ai.projectile_type='7.92x57_SSP'
         z.render_level=2
@@ -581,8 +585,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=7
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.6
+        z.ai.rate_of_fire=0.7
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='9mm_115'
         z.render_level=2
@@ -596,8 +601,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=8
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.8
+        z.ai.rate_of_fire=0.9
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='7.62x25'
         z.render_level=2
@@ -611,8 +617,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=7
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=0.8
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='45acp'
         z.render_level=2
@@ -628,6 +635,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
         z.ai.flight_time=3.5
+        z.ai.range=850
         z.ai.type='machine gun'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
@@ -641,8 +649,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=5
         z.ai.magazine_count=8
         z.ai.max_magazines=8
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=1.1
         z.ai.flight_time=3
+        z.ai.range=800
         z.ai.type='rifle'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
@@ -656,8 +665,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=5
         z.ai.magazine_count=6
         z.ai.max_magazines=6
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=1.1
         z.ai.flight_time=3
+        z.ai.range=800
         z.ai.type='rifle'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
@@ -708,7 +718,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier'],AIHuman)
         z.name='Klaus Hammer'
-        z.speed=float(random.randint(18,25))
+        z.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -718,7 +728,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
         z.name='Boris Volvakov'
-        z.speed=float(random.randint(18,25))
+        z.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True

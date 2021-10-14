@@ -320,7 +320,7 @@ class AIHuman(AIBase):
                         self.ai_state='sleeping'
                         self.ai_goal='none'
                         self.target_object=None
-                    elif distance<700:
+                    elif distance<self.primary_weapon.ai.range:
                         #print('in range of target')
                         self.ai_state='engaging'
                         self.ai_goal='none'
@@ -364,7 +364,7 @@ class AIHuman(AIBase):
 
                         # check if target is too far 
                         distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                        if distance >850. :
+                        if distance >self.primary_weapon.ai.range :
                             self.ai_goal='close_with_target'
                             self.destination=copy.copy(self.target_object.world_coords)
                             self.ai_state='start_moving'
