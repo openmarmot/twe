@@ -2,6 +2,26 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 22 2021
+- started tracking ownership for shrapnel so that bots can react to being hit by it better
+    they now shoot back if they survive a grenade attack 
+- added a wo_objects list and ui counter for civilians as they are kind of a faction now 
+- added the ability to toggle the debug text readout from the debug menu as it was getting rather large 
+
+I threw a grenade at a civilian and it didn't explode - i think they picked it up. 
+that is a theoretically possible but probably very rare occurence that I have never 
+seen before. the AI would have to be wanting to get a grenade, and able to pick it up 
+before it explodes. If they threw it I think it would explode immediately. 
+
+---------------------------------
+Oct 13 2021
+- made the game window a bit wider 
+- added range stat for weapons
+- changed human ai to use the new weapon ranges when deciding whether to fire or move closer to the target 
+- cut the range of speeds for soldiers a bit. new range is 20-25 from 18-25 hopefully it will tighten up group movement 
+- sped up squad from 18 to 25 so the squad center point will always be as fast as the fasted soldier
+- slowed down fire rate of pistols and rifles. rifles especially needed to be nerfed
+---------------------------------
 Oct 12 2021
 - adding airplane menu options (non functional at the moment)
 - added confirmed kills (a hit that takes health down to <1)

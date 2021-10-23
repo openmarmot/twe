@@ -304,6 +304,7 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue.append('Germans: '+ str(len(self.world.wo_objects_german)))
         self.debug_text_queue.append('Soviets: '+ str(len(self.world.wo_objects_soviet)))
         self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
+        self.debug_text_queue.append('Civilians: '+ str(len(self.world.wo_objects_civilian)))
         self.debug_text_queue.append('Player World Coords: '+str(self.world.player.world_coords))
 
         # world area data

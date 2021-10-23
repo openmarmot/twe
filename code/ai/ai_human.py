@@ -130,7 +130,7 @@ class AIHuman(AIBase):
 
 
             # add the shooter of the bullet to the personal enemies list
-            # will be none if its a projectile from a grenade as grenades do not track ownership at the moment
+            # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
                 # this creates a lot of friendly fire - but its interesting 
                 self.personal_enemies.append(EVENT_DATA.ai.shooter)
@@ -150,6 +150,8 @@ class AIHuman(AIBase):
                             EVENT_DATA.ai.shooter.ai.confirmed_kills+=1
                         else:
                             EVENT_DATA.ai.shooter.ai.probable_kills+=1
+            else:
+                print('Error - projectile shooter is none')
 
         elif EVENT_DATA.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything 

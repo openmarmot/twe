@@ -123,7 +123,7 @@ class World_Menu(object):
                 # remove the player from the world so we don't have a ghost
                 self.world.remove_object(self.world.player)
 
-
+                self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
 
@@ -142,6 +142,7 @@ class World_Menu(object):
                 p=self.selected_object.ai.passengers[0]
                 self.selected_object.remove_inventory(p)
                 self.world.add_object(p)
+                self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
@@ -281,7 +282,7 @@ class World_Menu(object):
                 # remove the player from the world so we don't have a ghost
                 self.world.remove_object(self.world.player)
 
-
+                self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
 
@@ -299,6 +300,7 @@ class World_Menu(object):
                 p=self.selected_object.ai.passengers[0]
                 self.selected_object.remove_inventory(p)
                 self.world.add_object(p)
+                self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
@@ -308,7 +310,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
-            self.world.graphic_engine.menu_text_queue.append('2 - player count')
+            self.world.graphic_engine.menu_text_queue.append('2 - toggle debug text')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
@@ -317,11 +319,10 @@ class World_Menu(object):
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                count=0
-                for b in self.world.wo_objects:
-                    if b.is_player:
-                        count+=1
-                print('players detected: '+str(count))
+                if self.world.graphic_engine.debug_mode==True:
+                    self.world.graphic_engine.debug_mode=False
+                else:
+                    self.world.graphic_engine.debug_mode=False
             elif Key=='3':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':
