@@ -58,42 +58,16 @@ class AIHuman(AIBase):
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
+
+        # inventory - for small non-gun objects 
+        self.inventory=[]
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
 
         # -- general stuff for all objects --
         if self.health<1:
-            #drop primary weapon
-            if self.primary_weapon !=None:
-                self.primary_weapon.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-                self.owner.world.add_object(self.primary_weapon)
-            # drop throwing weapon 
-            if self.throwable !=None:
-                self.throwable.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-                self.owner.world.add_object(self.throwable)
-
-            # remove from squad 
-            if self.squad != None:
-                if self.owner in self.squad.members:
-                    self.squad.members.remove(self.owner)
-                else: 
-                    # this happens and I do not know why
-
-                    print('!! Error : '+self.owner.name+' not in squad somehow')
-                    print('Squad list')
-                    for b in self.squad.members:
-                        print(b.name)
-
-            self.owner.world.remove_object(self.owner)
-
-            if self.owner.is_player:
-                # turn on the player death menu
-                self.owner.world.world_menu.active_menu='death'
-                self.owner.world.world_menu.menu_state='none'
-                # fake input to get the text added
-                self.owner.world.world_menu.handle_input('none')
-
+            self.handle_death()
         else :
             
             if self.bleeding:
@@ -168,6 +142,10 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
+
+        # add item to inventory no matter what
+        self.inventory.append(EVENT_DATA)
+
         if EVENT_DATA.is_gun :
             if self.primary_weapon==None:
                 if self.owner.is_player :
@@ -178,6 +156,7 @@ class AIHuman(AIBase):
                 # drop the current weapon and pick up the new one
                 self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
                 self.owner.world.add_object(self.primary_weapon)
+                self.inventory.remove(self.primary_weapon)
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.primary_weapon=EVENT_DATA
@@ -192,6 +171,7 @@ class AIHuman(AIBase):
                 # drop the current weapon and pick up the new one
                 self.throwable.world_coords=copy.copy(self.owner.world_coords)
                 self.owner.world.add_object(self.throwable)
+                self.inventory.remove(self.throwable)
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.throwable=EVENT_DATA
@@ -206,15 +186,13 @@ class AIHuman(AIBase):
                 # drop the current weapon and pick up the new one
                 self.antitank.world_coords=copy.copy(self.owner.world_coords)
                 self.owner.world.add_object(self.antitank)
+                self.inventory.remove(self.antitank)
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
-        if EVENT_DATA.is_consumable:
-            self.health+=100
-            self.bleeding=False
-            if self.owner.is_player :
-                self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ': You eat the whole cheese wheel ]')
+
+
 
 
     #---------------------------------------------------------------------------
@@ -222,6 +200,34 @@ class AIHuman(AIBase):
         ''' fires the (primary?) weapon '''    
         if self.primary_weapon!=None:
             self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
+
+    #---------------------------------------------------------------------------
+    def handle_death(self):
+        # drop inventory 
+        for b in self.inventory:
+            b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+            self.owner.world.add_object(b)
+
+        # remove from squad 
+        if self.squad != None:
+            if self.owner in self.squad.members:
+                self.squad.members.remove(self.owner)
+            else: 
+                # this happens and I do not know why
+
+                print('!! Error : '+self.owner.name+' not in squad somehow')
+                print('Squad list')
+                for b in self.squad.members:
+                    print(b.name)
+
+        self.owner.world.remove_object(self.owner)
+
+        if self.owner.is_player:
+            # turn on the player death menu
+            self.owner.world.world_menu.active_menu='death'
+            self.owner.world.world_menu.menu_state='none'
+            # fake input to get the text added
+            self.owner.world.world_menu.handle_input('none')
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):

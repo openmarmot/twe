@@ -393,26 +393,17 @@ def load_test_environment(world):
 
     # add civilians
     s=[]
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'pistol'))
+    s.append(spawn_civilians(world,'pistol'))
 
 
     # create civilian squads 
@@ -434,7 +425,21 @@ def load_test_environment(world):
 
    # generate_world_area(world,[0,0],'town','Danitza')
 
-
+#------------------------------------------------------------------------------
+def spawn_civilians(WORLD,CIVILIAN_TYPE):
+    ''' return a civilian with full kit '''
+    # --------- german types ---------------------------------
+    if CIVILIAN_TYPE=='default':
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        return z
+    if CIVILIAN_TYPE=='pistol':
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
+        return z
 
 #------------------------------------------------------------------------------
 def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):

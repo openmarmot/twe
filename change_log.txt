@@ -2,6 +2,19 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Oct 28 2021
+- added inventory to ai_human 
+- changed weapon adding code so that they are also added/removed from inventory
+- changed add inventory event in ai_human to add unknown objects to the new inventory list 
+    this removes previous code that would cause consumables to be eaten (giving health)
+    for now this means no more healing until this function is added to the AI 
+- changed ai_human death code so inventory items are dropped on death
+- added new civilian with pistol spawn 
+
+---------------------------------
+Oct 27 2021
+- started working on a civilian spawning method to enable different civilian equipement loadouts
+---------------------------------
 Oct 22 2021
 - started tracking ownership for shrapnel so that bots can react to being hit by it better
     they now shoot back if they survive a grenade attack 
