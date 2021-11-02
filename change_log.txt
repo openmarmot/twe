@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 01 2021
+- added 'big_cheese' 
+    unique civilian loadout. lots of cheese, mg34, 2x health 
+
+
+---------------------------------
 Oct 28 2021
 - added inventory to ai_human 
 - changed weapon adding code so that they are also added/removed from inventory

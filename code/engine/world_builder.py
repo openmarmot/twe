@@ -404,6 +404,7 @@ def load_test_environment(world):
     s.append(spawn_civilians(world,'default'))
     s.append(spawn_civilians(world,'pistol'))
     s.append(spawn_civilians(world,'pistol'))
+    s.append(spawn_civilians(world,'big_cheese'))
 
 
     # create civilian squads 
@@ -439,6 +440,27 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.world_builder_identity='civilian_default'
         z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
+        return z
+    if CIVILIAN_TYPE=='big_cheese':
+        '''goofy unique civilain. don't mess with big cheese'''
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.ai.health*=2
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
         return z
 
 #------------------------------------------------------------------------------
