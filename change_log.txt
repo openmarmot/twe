@@ -2,10 +2,20 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 06 2021
+- refactored ai_human a bit to seperate out the grenade throw decision from the 
+    gun engagement logic tree. This way grenades can be thrown if you don't have a gun 
+
+starting to tackle a rewrite of ai_human as it had turned into a big cascading if/else statement that 
+was getting increasingly difficult to manage.
+
+I noticed that grenade kills result in inaccurate kill counts because multiple fragments can hit a 
+dead object before it is removed (or at least i think that is what is happening)
+
+---------------------------------
 Nov 01 2021
 - added 'big_cheese' 
     unique civilian loadout. lots of cheese, mg34, 2x health 
-
 
 ---------------------------------
 Oct 28 2021

@@ -341,50 +341,30 @@ class AIHuman(AIBase):
                 else:
                     # catchall for random moving related goals:
                     if distance<3:
+                        print('ai_human movement error, unknown goal')
                         self.ai_state='sleeping'
         elif self.ai_state=='engaging':
-            if self.primary_weapon==None:
-                # get a gun 
-                self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                self.ai_goal='pickup'
-                self.destination=self.target_object.world_coords
-                self.ai_state='start_moving'
+            # check if target is still alive
+            if self.target_object.ai.health<1:
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                self.target_object=None
             else:
-                # we have a primary weapon
-                # check if we are out of ammo
-                if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
-
-                    # get more ammo 
-                    self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
-                    self.ai_goal='get ammo'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-                else:
-                    # we have ammo - what next ?
-
-                    # check if target is dead 
-                    if self.target_object.ai.health<1:
-                        self.ai_state='sleeping'
-                        self.ai_goal='none'
-                        self.target_object=None
+                #target is alive, determine the best way to engage
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
+                if distance>300:
+                    if self.primary_weapon==None:
+                        # get a gun 
+                        self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                        self.ai_goal='pickup'
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'
                     else:
-                        # we have ammo, target is alive
+                        self.think_engage_far(distance)
+                else:
+                    self.think_engage_close(distance)
 
-                        # check if target is too far 
-                        distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                        if distance >self.primary_weapon.ai.range :
-                            self.ai_goal='close_with_target'
-                            self.destination=copy.copy(self.target_object.world_coords)
-                            self.ai_state='start_moving'
-                            #print('closing with target')
-                        elif distance<300:
-                            if distance>100:
-                                # maybe throw a grendate !
-                                if self.throwable != None:
-                                    self.throw(self.target_object.world_coords)
-
-                    # basically if nothing else is changed we keep firing
-
+            # basically if the ai_state doesn't change we will keep firing the next action cycle
 
         # AI is not in a state that we do anything with. probably sleeping
         else :
@@ -439,7 +419,7 @@ class AIHuman(AIBase):
                         #print('getting closer to group')
                     else:
 
-                        # healht is good, close to group, no enemies
+                        # health is good, close to group, no enemies
 
                         # grab another grenade?
                         if self.throwable == None:
@@ -570,6 +550,39 @@ class AIHuman(AIBase):
             self.antitank.ai.launch(TARGET_COORDS)
             self.owner.world.add_object(self.antitank)
             self.antitank=None
+
+    #-----------------------------------------------------------------------
+    def think_engage_close(self, DISTANCE):
+        ''' engagements <301'''
+        # if the ai_state isn't changed the gun will be fired on the next action cycle
+        if DISTANCE>100:
+            # maybe throw a grendate !
+            if self.throwable != None:
+               self.throw(self.target_object.world_coords)
+
+
+    #-----------------------------------------------------------------------
+    def think_engage_far(self,DISTANCE):
+        ''' engagements >301. assumes primary weapon exists. assumes target is alive'''
+        # if the ai_state isn't changed the gun will be fired on the next action cycle
+        # we have a primary weapon
+        # check if we are out of ammo
+        if self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
+            # we are out of ammo
+            # get more ammo 
+            self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
+            self.ai_goal='get ammo'
+            self.destination=self.target_object.world_coords
+            self.ai_state='start_moving'
+        else:
+            # we have ammo, target is alive
+
+            # check if target is too far 
+            if DISTANCE >self.primary_weapon.ai.range :
+                self.ai_goal='close_with_target'
+                self.destination=copy.copy(self.target_object.world_coords)
+                self.ai_state='start_moving'
+                #print('closing with target')
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
