@@ -341,7 +341,6 @@ class AIHuman(AIBase):
                 else:
                     # catchall for random moving related goals:
                     if distance<3:
-                        print('ai_human movement error, unknown goal')
                         self.ai_state='sleeping'
         elif self.ai_state=='engaging':
             # check if target is still alive

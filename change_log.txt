@@ -12,6 +12,9 @@ was getting increasingly difficult to manage.
 I noticed that grenade kills result in inaccurate kill counts because multiple fragments can hit a 
 dead object before it is removed (or at least i think that is what is happening)
 
+at some point something changed with grenades and im seeing them appear to explode when a ai_human dies 
+and they are auto-dropped - but only sometimes 
+
 ---------------------------------
 Nov 01 2021
 - added 'big_cheese' 
