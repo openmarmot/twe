@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+---------------------------------
+Nov 07 2021
+- more ai refactoring
+
+no behavior changes, just moving code around 
 
 ---------------------------------
 Nov 06 2021
