@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ---------------------------------
+Nov 08 2021
+- more ai refactoring 
+
+some changes this time , mostly removing some dead end behaviors and allowing other options to 
+occur if the first option is not taken.
+
+this opens up an opportunity for adding more idle activities later
+
+---------------------------------
 Nov 07 2021
 - more ai refactoring
 

@@ -462,45 +462,9 @@ class AIHuman(AIBase):
         # health is fine
         # close to group
 
-        # grab another grenade?
-        if self.throwable == None:
-            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade)
-            if b != None:
-                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                # make sure its close - we don't want to wander far from the group
-                if d<400:
-                    self.target_object=b
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving' 
-                else:
-                    # readjust a bit 
-                    self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                    self.ai_state='start_moving'
-                    self.ai_goal='would like a grenade'
-        # upgrade weapon?
-        elif self.primary_weapon!=None:
-            if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
-                if b != None:
-                    # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
-                    # be picked up
-                    if b.ai.type=='submachine gun' or b.ai.type=='assault rifle':
-                        d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                        # make sure its close - we don't want to wander far from the group
-                        if d<500:
-                            self.target_object=b
-                            self.ai_goal='pickup'
-                            self.destination=self.target_object.world_coords
-                            self.ai_state='start_moving' 
-                            print('swapping '+self.primary_weapon.name + 'for '+b.name)
-                        else:
-                            # readjust a bit 
-                            self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                            self.ai_state='start_moving'
-                            self.ai_goal='would like a better weapon'
-        else:
-
+        # check if we can upgrade gear
+        if self.think_upgrade_gear()==False:
+            # we didn't upgrade gear. what should we do ?
             # hunt for cheese??
             # nah lets just wander around a bit
             self.ai_goal='booored'
@@ -599,6 +563,51 @@ class AIHuman(AIBase):
                 if distance<3:
                     self.ai_state='sleeping'
 
+    #-----------------------------------------------------------------------
+    def think_upgrade_gear(self):
+        '''think about upgrading gear. return True/False if upgrading'''
+        status=False
+        # grab another grenade?
+        if self.throwable == None:
+            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade)
+            if b != None:
+                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                # make sure its close - we don't want to wander far from the group
+                if d<400:
+                    status=True
+                    self.target_object=b
+                    self.ai_goal='pickup'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving' 
+
+        # upgrade weapon?
+        if status==False:
+            if self.primary_weapon!=None:
+                if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
+                    b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                    if b != None:
+                        # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
+                        # be picked up
+                        if b.ai.type=='submachine gun' or b.ai.type=='assault rifle':
+                            d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                            # make sure its close - we don't want to wander far from the group
+                            if d<500:
+                                status=True
+                                self.target_object=b
+                                self.ai_goal='pickup'
+                                self.destination=self.target_object.world_coords
+                                self.ai_state='start_moving' 
+                                print('swapping '+self.primary_weapon.name + 'for '+b.name)
+
+            else:
+                # could get a weapon - but maybe everything doesn't need one ??
+                pass
+
+        # upgrade clothes / armor
+
+        # top off ammo ?
+
+        return status
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    
