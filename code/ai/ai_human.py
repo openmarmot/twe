@@ -408,13 +408,8 @@ class AIHuman(AIBase):
 
         # 1. are we low on health? 
         if self.health<10:
-            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-            if o != None:
-                self.target_object=o
-                self.ai_goal='pickup'
-                self.destination=self.target_object.world_coords
-                self.ai_state='start_moving'  
-            else :
+ 
+            if self.think_healing_options()==False :
                 # no health to be had. time to run away
                 self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
                 self.ai_state='start_moving'  
@@ -454,6 +449,20 @@ class AIHuman(AIBase):
                 else:
                     self.think_idle()
 
+    #-----------------------------------------------------------------------
+    def think_healing_options(self):
+        '''evaluate health options return bool as to whether action is taken'''
+        status=False
+        # 1 check if we have anything in inventory
+        # 2 else check if anything is nearby
+        o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+        if o != None:
+            self.target_object=o
+            self.ai_goal='pickup'
+            self.destination=self.target_object.world_coords
+            self.ai_state='start_moving'
+            status=True
+        return status
 
     #-----------------------------------------------------------------------
     def think_idle(self):
