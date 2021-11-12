@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+---------------------------------
+Nov 11 2021
+- gave human_ai the ability to eat consumables from inventory to gain health
+
+
 ---------------------------------
 Nov 10 2021
 - more minor ai refactoring 

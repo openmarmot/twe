@@ -454,14 +454,28 @@ class AIHuman(AIBase):
         '''evaluate health options return bool as to whether action is taken'''
         status=False
         # 1 check if we have anything in inventory
-        # 2 else check if anything is nearby
-        o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
-        if o != None:
-            self.target_object=o
-            self.ai_goal='pickup'
-            self.destination=self.target_object.world_coords
-            self.ai_state='start_moving'
+        item=None
+        for b in self.inventory:
+            if b.is_consumable:
+                item=b
+                break
+        if item!=None:
+            # consume item. maybe there should be a function for this?
+            print('nom nom nom')
+            self.inventory.remove(item)
+            self.bleeding=False
+            self.health+=50
             status=True
+
+        # 2 else check if anything is nearby
+        if status==False:
+            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+            if o != None:
+                self.target_object=o
+                self.ai_goal='pickup'
+                self.destination=self.target_object.world_coords
+                self.ai_state='start_moving'
+                status=True
         return status
 
     #-----------------------------------------------------------------------
