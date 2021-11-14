@@ -2,10 +2,17 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 13 2021
+- created kubelwagen_destroyed art 
+- started working on a standardized container ai (vehicle wrecks will be containers)
+
+verified that consumable eating ai works 
+---------------------------------
 Nov 11 2021
 - gave human_ai the ability to eat consumables from inventory to gain health
 
-
+was not able to find evidence that it is working, more play testing probably required 
+might need to bump this action up over 10% health level that it is currently at
 ---------------------------------
 Nov 10 2021
 - more minor ai refactoring 
