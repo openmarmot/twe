@@ -19,7 +19,7 @@ import engine.world_builder
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='April 15 2021' #date of last update
+module_last_update_date='Oct 22 2021' #date of last update
 
 #global variables
 
@@ -71,7 +71,7 @@ class AIGrenade(AIBase):
     def explode(self):
         # kablooey!
         # add the shrapnel
-        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count)
+        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count,self.equipper)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

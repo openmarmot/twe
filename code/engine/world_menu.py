@@ -102,41 +102,49 @@ class World_Menu(object):
 
     def airplane_menu(self, Key):
         if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('--Airplane Menu --')
+
+            if self.world.player in self.selected_object.ai.passengers:
+                self.menu_state='internal'
+            else:
+                self.menu_state='external'
+
+        if self.menu_state=='external':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--External Airplane Menu --')
+            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit ')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
-            self.menu_state='base'
-        if self.menu_state=='base':
+            self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
+            self.world.graphic_engine.menu_text_queue.append('3 - storage (not implemented)')
             if Key=='1':
                 pass
             if Key=='2':
-                action='none'
-                if len(self.selected_object.ai.passengers)>0:
-                    if self.selected_object.ai.passengers[0].is_player:
-                        action='exit'
-                    else:
-                        action='enter'
-                else:
-                    action='enter'
-                if action=='enter':
+                # enter the vehicle 
+                self.selected_object.add_inventory(self.world.player)
+                # remove the player from the world so we don't have a ghost
+                self.world.remove_object(self.world.player)
 
-                    # enter the vehicle 
-                    self.selected_object.add_inventory(self.world.player)
-                    # remove the player from the world so we don't have a ghost
-                    self.world.remove_object(self.world.player)
-                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the airplane ]')
-                    self.world.graphic_engine.display_vehicle_text=True
-                    self.deactivate_menu()
-                else:
-                    # exit the vehicle
-                    p=self.selected_object.ai.passengers[0]
-                    self.selected_object.remove_inventory(p)
-                    self.world.add_object(p)
-                    self.world.graphic_engine.text_queue.insert(0, '[ You exit the airplane ]')
-                    self.world.graphic_engine.display_vehicle_text=False
-                    self.deactivate_menu()
+                self.world.graphic_engine.display_vehicle_text=True
+                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                self.deactivate_menu()
+
+        if self.menu_state=='internal':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Internal Airplane Menu --')
+            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.world.graphic_engine.menu_text_queue.append('1 - Engines')
+            self.world.graphic_engine.menu_text_queue.append('2 - Flight Controls ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Landing Gear ')
+            self.world.graphic_engine.menu_text_queue.append('4 - Exit Plane ')
+            if Key=='1':
+                pass
+            if Key=='4':
+                # exit the vehicle
+                p=self.selected_object.ai.passengers[0]
+                self.selected_object.remove_inventory(p)
+                self.world.add_object(p)
+                self.world.graphic_engine.display_vehicle_text=False
+                self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
+                self.deactivate_menu()
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -226,6 +234,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
             self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+            self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
+            self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
@@ -251,42 +261,48 @@ class World_Menu(object):
 
     def vehicle_menu(self, Key):
         if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('--Vehicle Menu --')
+
+            if self.world.player in self.selected_object.ai.passengers:
+                self.menu_state='internal'
+            else:
+                self.menu_state='external'
+
+        if self.menu_state=='external':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter/exit ')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
-            self.menu_state='base'
-        if self.menu_state=='base':
+            self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
+            self.world.graphic_engine.menu_text_queue.append('3 - storage (not implemented)')
             if Key=='1':
                 pass
             if Key=='2':
-                action='none'
-                if len(self.selected_object.ai.passengers)>0:
-                    if self.selected_object.ai.passengers[0].is_player:
-                        action='exit'
-                    else:
-                        action='enter'
-                else:
-                    action='enter'
-                if action=='enter':
+                # enter the vehicle 
+                self.selected_object.add_inventory(self.world.player)
+                # remove the player from the world so we don't have a ghost
+                self.world.remove_object(self.world.player)
 
-                    # enter the vehicle 
-                    self.selected_object.add_inventory(self.world.player)
-                    # remove the player from the world so we don't have a ghost
-                    self.world.remove_object(self.world.player)
+                self.world.graphic_engine.display_vehicle_text=True
+                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                self.deactivate_menu()
 
-
-                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
-                    self.deactivate_menu()
-                else:
-                    # exit the vehicle
-                    p=self.selected_object.ai.passengers[0]
-                    self.selected_object.remove_inventory(p)
-                    self.world.add_object(p)
-                    self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
-                    self.deactivate_menu()
+        if self.menu_state=='internal':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
+            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
+            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            if Key=='1':
+                pass
+            if Key=='2':
+                # exit the vehicle
+                p=self.selected_object.ai.passengers[0]
+                self.selected_object.remove_inventory(p)
+                self.world.add_object(p)
+                self.world.graphic_engine.display_vehicle_text=False
+                self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
+                self.deactivate_menu()
 
     def debug_menu(self, Key):
         if self.menu_state=='none':
@@ -294,7 +310,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
-            self.world.graphic_engine.menu_text_queue.append('2 - player count')
+            self.world.graphic_engine.menu_text_queue.append('2 - toggle debug text')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
@@ -303,11 +319,10 @@ class World_Menu(object):
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                count=0
-                for b in self.world.wo_objects:
-                    if b.is_player:
-                        count+=1
-                print('players detected: '+str(count))
+                if self.world.graphic_engine.debug_mode==True:
+                    self.world.graphic_engine.debug_mode=False
+                else:
+                    self.world.graphic_engine.debug_mode=True
             elif Key=='3':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'kubelwagen',True)
             elif Key=='4':

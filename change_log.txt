@@ -2,6 +2,134 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 15 2021
+- added 'spawn_container' which is really used to spawn static vehicle wrecks at the moment 
+    so kinda not a great name - but vehicle wrecks are basically just containers 
+- added vehicle_ai code so that it can die and spawn a static wreck when it does, it also 
+    boots out any passengers 
+- fixed a bug in the debug menu where debug text could be disabled but not re-enabled
+
+I'm pretty happy with my low effort destroyed kubelwagen art in game. maybe i will make a more 
+destroyed version and make this a 'weathered' skin instead 
+
+currently the kubelwagen dies pretty fast - especially to multi part explosives like grenades and panzerfausts
+eventually i will have it use the damage modeling that I had started to work on for bullet pass through 
+
+---------------------------------
+Nov 13 2021
+- created kubelwagen_destroyed art 
+- started working on a standardized container ai (vehicle wrecks will be containers)
+
+verified that consumable eating ai works 
+---------------------------------
+Nov 11 2021
+- gave human_ai the ability to eat consumables from inventory to gain health
+
+was not able to find evidence that it is working, more play testing probably required 
+might need to bump this action up over 10% health level that it is currently at
+---------------------------------
+Nov 10 2021
+- more minor ai refactoring 
+
+---------------------------------
+Nov 08 2021
+- more ai refactoring 
+
+some changes this time , mostly removing some dead end behaviors and allowing other options to 
+occur if the first option is not taken.
+
+this opens up an opportunity for adding more idle activities later
+
+---------------------------------
+Nov 07 2021
+- more ai refactoring
+
+no behavior changes, just moving code around 
+
+---------------------------------
+Nov 06 2021
+- refactored ai_human a bit to seperate out the grenade throw decision from the 
+    gun engagement logic tree. This way grenades can be thrown if you don't have a gun 
+
+starting to tackle a rewrite of ai_human as it had turned into a big cascading if/else statement that 
+was getting increasingly difficult to manage.
+
+I noticed that grenade kills result in inaccurate kill counts because multiple fragments can hit a 
+dead object before it is removed (or at least i think that is what is happening)
+
+at some point something changed with grenades and im seeing them appear to explode when a ai_human dies 
+and they are auto-dropped - but only sometimes 
+
+---------------------------------
+Nov 01 2021
+- added 'big_cheese' 
+    unique civilian loadout. lots of cheese, mg34, 2x health 
+
+---------------------------------
+Oct 28 2021
+- added inventory to ai_human 
+- changed weapon adding code so that they are also added/removed from inventory
+- changed add inventory event in ai_human to add unknown objects to the new inventory list 
+    this removes previous code that would cause consumables to be eaten (giving health)
+    for now this means no more healing until this function is added to the AI 
+- changed ai_human death code so inventory items are dropped on death
+- added new civilian with pistol spawn 
+
+---------------------------------
+Oct 27 2021
+- started working on a civilian spawning method to enable different civilian equipement loadouts
+---------------------------------
+Oct 22 2021
+- started tracking ownership for shrapnel so that bots can react to being hit by it better
+    they now shoot back if they survive a grenade attack 
+- added a wo_objects list and ui counter for civilians as they are kind of a faction now 
+- added the ability to toggle the debug text readout from the debug menu as it was getting rather large 
+
+I threw a grenade at a civilian and it didn't explode - i think they picked it up. 
+that is a theoretically possible but probably very rare occurence that I have never 
+seen before. the AI would have to be wanting to get a grenade, and able to pick it up 
+before it explodes. If they threw it I think it would explode immediately. 
+
+---------------------------------
+Oct 13 2021
+- made the game window a bit wider 
+- added range stat for weapons
+- changed human ai to use the new weapon ranges when deciding whether to fire or move closer to the target 
+- cut the range of speeds for soldiers a bit. new range is 20-25 from 18-25 hopefully it will tighten up group movement 
+- sped up squad from 18 to 25 so the squad center point will always be as fast as the fasted soldier
+- slowed down fire rate of pistols and rifles. rifles especially needed to be nerfed
+---------------------------------
+Oct 12 2021
+- adding airplane menu options (non functional at the moment)
+- added confirmed kills (a hit that takes health down to <1)
+- added probable kills ( a hit that takes health down to <10 but >0)
+- added confirmed and probable kills stats to the menu text for humans 
+
+I watched a group of 3 soviets that had picked up stg44s somewhere mow down about 8 germans 
+in a running gun battle. I'm not sure what makes some bots so much more successful than others. 
+the new kill stats may help track that a little. stg44s definitely help. They are one of the best 
+weapons in the game at the moment (other than MGs)
+
+The current human AI can lead to situations where one bot is 'closing with target' and the target 
+just turns around (do they actually turn? not sure) and blasts them away with no return fire from 
+the original bot. this has to do with the exact range at which close with target is satisfied vs 
+what counts as ok for range in a new engagement.Need to find a way to make this more fuzzy and 
+remove hard numbers from these decisions as it creates unnatural behavior 
+
+i still get situations where bots seems to be stuck in a sleep mode. i think its a result of the rigid 
+if/else waterfall that the current AI uses. need to make this code better deal with situations where the 
+task end up wtih can't be accomplished otherwise they get stuck in a loop of trying the same thing over and 
+over.
+
+kind of frustrating but i think the human AI needs another full rewrite. relying on cascading if/else is too awkward and 
+is getting harder and harder to add behaviors to 
+
+---------------------------------
+Oct 07 2021
+- made some changes vehicle menu to split between internal/external menu based on 
+    whether the player is in the vehicle or not 
+
+---------------------------------
 Oct 05 2021
 - fixed a issue where player would be spawned twice. this affected american/german/russian starts 
 probably for a long time, but only started affecting civilian spawns after civilian squads were setup.

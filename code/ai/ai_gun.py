@@ -53,11 +53,14 @@ class AIGun(AIBase):
         # bullet weight
         self.bullet_weight=0
 
-        # muzzle velocity
+        # muzzle velocity (not used)
         self.muzzle_velocity=0
 
         # flight time - basically how long the bullet will stay in the air 
         self.flight_time=0
+
+        # range - estimate of the distance a gun can hit out to. used by bot ai 
+        self.range=0
 
         # spread
         self.spread=15

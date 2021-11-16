@@ -49,6 +49,7 @@ class World(object):
         self.wo_objects_german=[]
         self.wo_objects_soviet=[]
         self.wo_objects_american=[]
+        self.wo_objects_civilian=[]
         self.wo_objects_vehicle=[]
         self.wo_objects_grenade=[]
         self.wo_objects_consumable=[]
@@ -110,6 +111,8 @@ class World(object):
             self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_airplane:
             self.wo_objects_airplane.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_civilian:
+            self.wo_objects_civilian.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -274,6 +277,8 @@ class World(object):
             self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_airplane:
             self.wo_objects_airplane.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_civilian:
+            self.wo_objects_civilian.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):

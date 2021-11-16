@@ -45,6 +45,7 @@ from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
 from ai.ai_airplane import AIAirplane
+from ai.ai_container import AIContainer
 
 # module specific variables
 module_version='0.0' #module software version
@@ -253,6 +254,7 @@ def load_images(world):
 
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
+    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen_destroyed.png')
 
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
@@ -393,26 +395,18 @@ def load_test_environment(world):
 
     # add civilians
     s=[]
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
-    s.append(spawn_object(world,[0,0],'civilian_man',False))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'default'))
+    s.append(spawn_civilians(world,'pistol'))
+    s.append(spawn_civilians(world,'pistol'))
+    s.append(spawn_civilians(world,'big_cheese'))
 
 
     # create civilian squads 
@@ -434,6 +428,55 @@ def load_test_environment(world):
 
    # generate_world_area(world,[0,0],'town','Danitza')
 
+#------------------------------------------------------------------------------
+def spawn_civilians(WORLD,CIVILIAN_TYPE):
+    ''' return a civilian with full kit '''
+    # --------- german types ---------------------------------
+    if CIVILIAN_TYPE=='default':
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        return z
+    if CIVILIAN_TYPE=='pistol':
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
+        return z
+    if CIVILIAN_TYPE=='big_cheese':
+        '''goofy unique civilain. don't mess with big cheese'''
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.ai.health*=2
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        return z
+
+#------------------------------------------------------------------------------
+# currently used to create 'wrecked' vehicles
+def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
+    z=WorldObject(WORLD,[IMAGE],AIContainer)
+    z.is_container=True
+    z.render_level=2
+    z.name=NAME
+    z.world_coords=WORLD_COORDS
+    z.rotation_angle=ROTATION_ANGLE
+    z.inventory=INVENTORY
+    z.world_builder_identity='skip'
+    z.wo_start()
 
 
 #------------------------------------------------------------------------------
@@ -523,6 +566,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
+        z.ai.range=700
         z.ai.type='submachine gun'
         z.ai.projectile_type='9mm_ME'
         z.render_level=2
@@ -538,6 +582,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=2
+        z.ai.range=700
         z.ai.type='submachine gun'
         z.ai.projectile_type='7.62x25'
         z.render_level=2
@@ -553,6 +598,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
         z.ai.flight_time=2.5
+        z.ai.range=800
         z.ai.type='assault rifle'
         z.ai.projectile_type='7.92x33_SME'
         z.render_level=2
@@ -568,6 +614,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
         z.ai.flight_time=3.5
+        z.ai.range=800
         z.ai.type='machine gun'
         z.ai.projectile_type='7.92x57_SSP'
         z.render_level=2
@@ -581,8 +628,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=7
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.6
+        z.ai.rate_of_fire=0.7
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='9mm_115'
         z.render_level=2
@@ -596,8 +644,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=8
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.8
+        z.ai.rate_of_fire=0.9
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='7.62x25'
         z.render_level=2
@@ -611,8 +660,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=7
         z.ai.magazine_count=2
         z.ai.max_magazines=2
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=0.8
         z.ai.flight_time=1
+        z.ai.range=380
         z.ai.type='pistol'
         z.ai.projectile_type='45acp'
         z.render_level=2
@@ -628,6 +678,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
         z.ai.flight_time=3.5
+        z.ai.range=850
         z.ai.type='machine gun'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
@@ -641,8 +692,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=5
         z.ai.magazine_count=8
         z.ai.max_magazines=8
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=1.1
         z.ai.flight_time=3
+        z.ai.range=800
         z.ai.type='rifle'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
@@ -656,15 +708,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.mag_capacity=5
         z.ai.magazine_count=6
         z.ai.max_magazines=6
-        z.ai.rate_of_fire=0.7
+        z.ai.rate_of_fire=1.1
         z.ai.flight_time=3
+        z.ai.range=800
         z.ai.type='rifle'
         z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='kubelwagen':
-        z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
+        z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
         z.is_vehicle=True
         z.render_level=3
@@ -708,7 +761,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier'],AIHuman)
         z.name='Klaus Hammer'
-        z.speed=float(random.randint(18,25))
+        z.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -718,7 +771,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
         z.name='Boris Volvakov'
-        z.speed=float(random.randint(18,25))
+        z.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -799,7 +852,8 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
-def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME):
+def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR):
+    # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
@@ -814,21 +868,24 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,TARGET_COORDS)
     # increase the collision radius to make sure we get hits
     z.collision_radius=10
+    z.ai.shooter=ORIGINATOR
     z.wo_start()
 
 #------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT):
+def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR):
     ''' creates a shrapnel starburst pattern. used for grenades '''
+    # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR)
 
 #------------------------------------------------------------------------------
-def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT):
+def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR):
     ''' creates a cone/line of shrapnel. used for panzerfaust'''
+    # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-5,5))+TARGET_COORDS[0],float(random.randint(-5,5))+TARGET_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'HEAT_jet',0.1,0.3)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR)
 
 
 #------------------------------------------------------------------------------
