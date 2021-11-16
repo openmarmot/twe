@@ -45,6 +45,7 @@ from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
 from ai.ai_airplane import AIAirplane
+from ai.ai_container import AIContainer
 
 # module specific variables
 module_version='0.0' #module software version
@@ -465,6 +466,20 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         return z
 
 #------------------------------------------------------------------------------
+# currently used to create 'wrecked' vehicles
+def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
+    z=WorldObject(WORLD,[IMAGE],AIContainer)
+    z.is_container=True
+    z.render_level=2
+    z.name=NAME
+    z.world_coords=WORLD_COORDS
+    z.rotation_angle=ROTATION_ANGLE
+    z.inventory=INVENTORY
+    z.world_builder_identity='skip'
+    z.wo_start()
+
+
+#------------------------------------------------------------------------------
 def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     z=None
     if OBJECT_TYPE=='warehouse':
@@ -702,7 +717,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='kubelwagen':
-        z=WorldObject(WORLD,['kubelwagen'],AIVehicle)
+        z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
         z.is_vehicle=True
         z.render_level=3

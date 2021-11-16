@@ -45,6 +45,9 @@ class AIVehicle(AIBase):
         # passengers[0] determines how the AI is controlled
         self.passengers=[]
 
+        # 
+        self.inventory=[]
+
         # actual vehicle speed
         self.vehicle_speed=0.
         self.acceleration=0
@@ -55,9 +58,13 @@ class AIVehicle(AIBase):
         # -- general stuff for all objects --
         if self.health<1:
             print(self.owner.name+' has died')
-            for b in self.owner.inventory:
+            engine.world_builder.spawn_container('cat',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
+
+            # dump passengers
+            for b in self.passengers:
                 b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
                 self.owner.world.add_object(b)
+
             self.owner.world.remove_object(self.owner)
 
         if self.primary_weapon!=None:
@@ -81,7 +88,7 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
-            #self.health-=random.randint(25,75)
+            self.health-=random.randint(3,15)
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
 
         elif EVENT_DATA.is_grenade:

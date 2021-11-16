@@ -2,6 +2,19 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 15 2021
+- added 'spawn_container' which is really used to spawn static vehicle wrecks at the moment 
+    so kinda not a great name - but vehicle wrecks are basically just containers 
+- added vehicle_ai code so that it can die and spawn a static wreck when it does, it also 
+    boots out any passengers 
+- fixed a bug in the debug menu where debug text could be disabled but not re-enabled
+
+I'm pretty happy with my low effort destroyed kubelwagen art in game. maybe i will make a more 
+destroyed version and make this a 'weathered' skin instead 
+
+currently the kubelwagen dies pretty fast - especially to multi part explosives like grenades and panzerfausts
+eventually i will have it use the damage modeling that I had started to work on for bullet pass through 
+---------------------------------
 Nov 13 2021
 - created kubelwagen_destroyed art 
 - started working on a standardized container ai (vehicle wrecks will be containers)
