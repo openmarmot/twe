@@ -14,6 +14,7 @@ destroyed version and make this a 'weathered' skin instead
 
 currently the kubelwagen dies pretty fast - especially to multi part explosives like grenades and panzerfausts
 eventually i will have it use the damage modeling that I had started to work on for bullet pass through 
+
 ---------------------------------
 Nov 13 2021
 - created kubelwagen_destroyed art 
