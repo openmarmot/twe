@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+Nov 18 2021
+- changed select_with_mouse function to only use objects that are in renderlists (actually visible)
+
+figured out the massive issue with mouse selection. it was looking at screen coords for objects that were 
+off screen and therefore the screen coords were out of date 
+
 ---------------------------------
 Nov 15 2021
 - added 'spawn_container' which is really used to spawn static vehicle wrecks at the moment 

@@ -88,7 +88,7 @@ class World_Menu(object):
             self.gun_menu(None)
         elif SELECTED_OBJECT.is_container:
             self.active_menu='container'
-            self.crate_menu(None)
+            self.container_menu(None)
         elif SELECTED_OBJECT.is_human:
             self.active_menu='human'
             self.human_menu(None)

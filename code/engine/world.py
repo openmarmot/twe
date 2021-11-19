@@ -294,12 +294,16 @@ class World(object):
         called by graphics_2d_pygame on mouse down event .. currently 
         '''
         mouse=self.graphic_engine.get_mouse_screen_coords()
+        possible_objects=[]
 
-        ob_list=(self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+
-            self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank+
-            self.wo_objects_airplane)
+        for b in self.graphic_engine.renderlists:
+            for c in b:
+                # could check is_gun, is_human etc here to narrow down
+                if c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle:
+                    possible_objects.append(c)
+
         
-        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,ob_list)
+        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
 
     #---------------------------------------------------------------------------
     def toggle_map(self):

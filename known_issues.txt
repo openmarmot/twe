@@ -1,18 +1,6 @@
 
 Some issues that I am aware of 
 
--  after you die if you respawn and click on your player you are identified as a weapon. this clears up after awhile 
-
-- multiple issues around entering and exiting vehicles and menus 
-    - possible to enter a vehicle and have the player still drawn on top of it 
-
-
-- when humans die they sometimes aren't in the members list of the squad they are assigned to and are thus unable
-    to remove themselves 
-
-- objects are the wrong size 
-    certain circumstances such as exiting a vehicle can cause objects to be the wrong size for awhile 
-
 - graphics jitter 
     when moving there is a very noticeable small oscillation of every object 
         -especially noticeable when a lot of objects are close together 
