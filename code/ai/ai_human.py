@@ -637,4 +637,5 @@ class AIHuman(AIBase):
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
             self.owner.world.add_object(self.throwable)
+            self.inventory.remove(self.throwable)
             self.throwable=None

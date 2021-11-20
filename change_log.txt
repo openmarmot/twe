@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 
+---------------------------------
+Nov 19 2021
+- added panzerfausts back to the list of things you can click on 
+- grenades are now removed from inventory when you throw them, fixing the 
+    bug where humans drop exploding grenades on death 
 
 ---------------------------------
 Nov 18 2021
@@ -9,6 +14,7 @@ Nov 18 2021
 figured out the massive issue with mouse selection. it was looking at screen coords for objects that were 
 off screen and therefore the screen coords were out of date 
 
+noticed a civilian ai that seemed stuck trying to engage without a weapon - that seems to be a new bug 
 ---------------------------------
 Nov 15 2021
 - added 'spawn_container' which is really used to spawn static vehicle wrecks at the moment 
