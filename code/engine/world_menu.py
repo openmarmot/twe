@@ -270,7 +270,9 @@ class World_Menu(object):
         if self.menu_state=='external':
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu --')
-            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.world.graphic_engine.menu_text_queue.append(self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
             self.world.graphic_engine.menu_text_queue.append('3 - storage (not implemented)')

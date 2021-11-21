@@ -2,6 +2,27 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 20 2021
+- added AI ability to pick up anti-tank 
+- added AI ability to pick up guns when idle 
+- minor text changes to external vehicle menu 
+- rewrote ai close engagement code to handle not having a gun or being out of ammo 
+- added ai ability to fire panzerfaust
+- started adding support for melee weapons 
+
+For the AI to both have a panzerfaust and be engaging a vehicle at >300 is going to be rare
+I bet I will forget about adding the code to do this and then will get surprised
+
+with the close combat ai I now see a need for melee weapons. I think melee is going to be automatic 
+if you are close enough to a target. perhaps melee damage will have a dodge check 
+
+this means the weapon slots are now as follows 
+primary_weapon - machine gun/ assault rifle / submachine gun / pistol / rifle 
+throwable - grenade
+antitank - panzerfaust 
+melee - in development ?
+
+---------------------------------
 Nov 19 2021
 - added panzerfausts back to the list of things you can click on 
 - grenades are now removed from inventory when you throw them, fixing the 

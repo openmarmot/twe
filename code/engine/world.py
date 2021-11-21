@@ -56,6 +56,7 @@ class World(object):
         self.wo_objects_building=[]
         self.wo_objects_map_pointer=[]
         self.wo_objects_handheld_antitank=[]
+        self.wo_objects_melee=[]
         self.wo_objects_airplane=[]
 
         #world areas
@@ -113,6 +114,8 @@ class World(object):
             self.wo_objects_airplane.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_civilian:
             self.wo_objects_civilian.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_melee:
+            self.wo_objects_melee.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -279,6 +282,8 @@ class World(object):
             self.wo_objects_airplane.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_civilian:
             self.wo_objects_civilian.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_melee:
+            self.wo_objects_melee.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
