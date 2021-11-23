@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Nov 22 2021
+- added green apple, but its kinda too small. i guess it will be mostly in containers 
+
+verified that AI can pickup and use panzerfaust
+
+---------------------------------
 Nov 20 2021
 - added AI ability to pick up anti-tank 
 - added AI ability to pick up guns when idle 
