@@ -304,7 +304,7 @@ class World(object):
         for b in self.graphic_engine.renderlists:
             for c in b:
                 # could check is_gun, is_human etc here to narrow down
-                if c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank:
+                if c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank or c.is_grenade:
                     possible_objects.append(c)
 
         

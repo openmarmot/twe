@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+---------------------------------
+Nov 28 2021
+- added in a chance to throw grenades back. this works automatically for the 
+    player and the AI 
+- added back in the ability to click on grenades with the mouse 
+- rewrote some of the ai code around health to try and make the AI care more about self preservation
+
+getting the grenade throw back mechanism working was WAY harder than I was expecting. 
+I ended up having to change a lot about how grenade collision works. 
+
+part of the issue is that collision checks are probably happening too often. this 
+should be re-visited for grenades and bullets
+---------------------------------
+Nov 27 2021
+- rewrote ai_human.think_generic to be more dynamic. 
+    - it should now remove dead enemies from its list faster
+    - consuming food no longer prevents the ai from taking other actions 
 
 ---------------------------------
 Nov 22 2021

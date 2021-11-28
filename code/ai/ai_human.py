@@ -128,15 +128,36 @@ class AIHuman(AIBase):
             else:
                 print('Error - projectile shooter is none')
 
-        elif EVENT_DATA.is_grenade:
-            # not sure what to do here. the grenade explodes too fast to really do anything 
-            pass 
+            if self.owner.is_civilian:
+                # civilian runs further
+                self.ai_goal='react to collision'
+                self.destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
+                self.ai_state='start_moving'
+            else:
+                # soldier just repositions
+                self.ai_goal='react to collision'
+                self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                self.ai_state='start_moving'
 
-        # this is very important because it breaks us out of whatever ai cycle we were in
-        # we are put in a very short movement cycle and then the AI can 'think' about what to do next
-        self.ai_goal='react to collision'
-        self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
-        self.ai_state='start_moving'
+        elif EVENT_DATA.is_grenade:
+            # not sure what to do here. the grenade explodes too fast to really do anything
+
+            # attempt to throw the grenade back
+            if random.randint(1,5)==1:
+                EVENT_DATA.ai.redirect(EVENT_DATA.ai.equipper.world_coords)
+            else:
+                self.ai_goal='react to collision'
+                self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
+                self.ai_state='start_moving'
+
+        else:
+            print('unidentified collision')
+
+            # this is very important because it breaks us out of whatever ai cycle we were in
+            # we are put in a very short movement cycle and then the AI can 'think' about what to do next
+            self.ai_goal='react to collision'
+            self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
+            self.ai_state='start_moving'
 
             
 
@@ -262,6 +283,16 @@ class AIHuman(AIBase):
         # AI is not in a state that we do anything with. probably sleeping
         else :
             self.think_generic()
+
+        # this should be last to over ride the other things we were going to do
+        if self.health<10: 
+            if self.think_healing_options()==False :
+                # no health to be had! (probably impossible with the amount of consumables)
+                # roll to see if we panic
+                if random.randint(1,5)==1:
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
+                    self.ai_state='start_moving'
+                    self.ai_goal='panic'
 
                     
     #-----------------------------------------------------------------------
@@ -442,48 +473,66 @@ class AIHuman(AIBase):
         ''' when the ai_state doesn't have any specific think actions'''
         # what should we be doing ??
 
+        # this is used as a more dynamic alternative to if/else cascades
+        action=False
+
         # 1. are we low on health? 
-        if self.health<10:
+        if self.health<50:
  
             if self.think_healing_options()==False :
-                # no health to be had. time to run away
-                self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
-                self.ai_state='start_moving'  
-        
-        # 2. health is good. deal with personal enemies
-        elif len(self.personal_enemies)>0:
-            # we have a gun, lets make sure this enemy is alive
-            #print(self.personal_enemies)
-            if self.personal_enemies[0].ai.health>0:
-                # engage first personal enemy
-                self.target_object=self.personal_enemies[0]
-                self.ai_state='engaging'
-                self.ai_goal='none'
-
-            else:
-                # remove the enemy as it is dead
-                self.personal_enemies.pop(0)
-
-        # 3. health is good, no personal enemies 
-        else :
-            # get an enemy from the squad
-            self.target_object=self.squad.get_enemy()
-            if self.target_object!=None:
-                self.ai_state='engaging'
-                self.ai_goal='none'
-            else:
-                # no enemies, what now?
-                # are we too far from the group?
-                # distance from group 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                if distance_group >300. :
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.world_coords)
-                    self.time_since_ai_transition=0
+                # no health to be had! (probably impossible with the amount of consumables)
+                # roll to see if we panic
+                if random.randint(1,5)==1:
+                    self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
                     self.ai_state='start_moving'
-                    #print('getting closer to group')
+                    self.ai_goal='panic'
+                    action=True 
+            else:
+                # this is needed in case the health option is to go pickup health
+                action=True
+
+        if action==False: 
+        
+            # 2. health is good. deal with personal enemies
+            if len(self.personal_enemies)>0:
+
+                # check personal enemy list for a live enemy
+                c=True
+                while c:
+                    if len(self.personal_enemies)>0:
+                        if self.personal_enemies[0].ai.health<1:
+                            self.personal_enemies.pop(0)
+                        else:
+                            # engage
+                            self.target_object=self.personal_enemies[0]
+                            self.ai_state='engaging'
+                            self.ai_goal='none'
+                            action=True
+                            c=False # exit while loop
+                    else:
+                        c=False # exit while loop
+
+            # 3. health is good, no personal enemies 
+            if action==False :
+                # get an enemy from the squad
+                self.target_object=self.squad.get_enemy()
+                if self.target_object!=None:
+                    self.ai_state='engaging'
+                    self.ai_goal='none'
+                    action=True
                 else:
-                    self.think_idle()
+                    # no enemies, what now?
+                    # are we too far from the group?
+                    # distance from group 
+                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+                    if distance_group >300. :
+                        self.ai_goal='close_with_group'
+                        self.destination=copy.copy(self.squad.world_coords)
+                        self.time_since_ai_transition=0
+                        self.ai_state='start_moving'
+                        #print('getting closer to group')
+                    else:
+                        self.think_idle()
 
     #-----------------------------------------------------------------------
     def think_healing_options(self):
