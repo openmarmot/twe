@@ -1,6 +1,64 @@
 TWE Project : Change Log
 
+---------------------------------
+Nov 28 2021
+- added in a chance to throw grenades back. this works automatically for the 
+    player and the AI 
+- added back in the ability to click on grenades with the mouse 
+- rewrote some of the ai code around health to try and make the AI care more about self preservation
 
+getting the grenade throw back mechanism working was WAY harder than I was expecting. 
+I ended up having to change a lot about how grenade collision works. 
+
+part of the issue is that collision checks are probably happening too often. this 
+should be re-visited for grenades and bullets
+---------------------------------
+Nov 27 2021
+- rewrote ai_human.think_generic to be more dynamic. 
+    - it should now remove dead enemies from its list faster
+    - consuming food no longer prevents the ai from taking other actions 
+
+---------------------------------
+Nov 22 2021
+- added green apple, but its kinda too small. i guess it will be mostly in containers 
+
+verified that AI can pickup and use panzerfaust
+
+---------------------------------
+Nov 20 2021
+- added AI ability to pick up anti-tank 
+- added AI ability to pick up guns when idle 
+- minor text changes to external vehicle menu 
+- rewrote ai close engagement code to handle not having a gun or being out of ammo 
+- added ai ability to fire panzerfaust
+- started adding support for melee weapons 
+
+For the AI to both have a panzerfaust and be engaging a vehicle at >300 is going to be rare
+I bet I will forget about adding the code to do this and then will get surprised
+
+with the close combat ai I now see a need for melee weapons. I think melee is going to be automatic 
+if you are close enough to a target. perhaps melee damage will have a dodge check 
+
+this means the weapon slots are now as follows 
+primary_weapon - machine gun/ assault rifle / submachine gun / pistol / rifle 
+throwable - grenade
+antitank - panzerfaust 
+melee - in development ?
+
+---------------------------------
+Nov 19 2021
+- added panzerfausts back to the list of things you can click on 
+- grenades are now removed from inventory when you throw them, fixing the 
+    bug where humans drop exploding grenades on death 
+
+---------------------------------
+Nov 18 2021
+- changed select_with_mouse function to only use objects that are in renderlists (actually visible)
+
+figured out the massive issue with mouse selection. it was looking at screen coords for objects that were 
+off screen and therefore the screen coords were out of date 
+
+noticed a civilian ai that seemed stuck trying to engage without a weapon - that seems to be a new bug 
 ---------------------------------
 Nov 15 2021
 - added 'spawn_container' which is really used to spawn static vehicle wrecks at the moment 

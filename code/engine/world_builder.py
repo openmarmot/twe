@@ -274,6 +274,7 @@ def load_images(world):
     world.graphic_engine.loadImage('camembert-cheese','images/consumables/camembert-cheese.png')
     world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
+    world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
@@ -308,6 +309,13 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese',True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese',True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese',True)
+
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
 
 
     # spawn some ammo cans 
@@ -497,6 +505,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=1
         z.collision_radius=60
         z.is_building=True
+
+    elif OBJECT_TYPE=='green_apple':
+        z=WorldObject(WORLD,['green_apple'],AINone)
+        z.render_level=2
+        z.name='Green Apple'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AINone)

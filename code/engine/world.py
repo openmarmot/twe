@@ -56,6 +56,7 @@ class World(object):
         self.wo_objects_building=[]
         self.wo_objects_map_pointer=[]
         self.wo_objects_handheld_antitank=[]
+        self.wo_objects_melee=[]
         self.wo_objects_airplane=[]
 
         #world areas
@@ -113,6 +114,8 @@ class World(object):
             self.wo_objects_airplane.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_civilian:
             self.wo_objects_civilian.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_melee:
+            self.wo_objects_melee.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -279,6 +282,8 @@ class World(object):
             self.wo_objects_airplane.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_civilian:
             self.wo_objects_civilian.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_melee:
+            self.wo_objects_melee.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -294,12 +299,16 @@ class World(object):
         called by graphics_2d_pygame on mouse down event .. currently 
         '''
         mouse=self.graphic_engine.get_mouse_screen_coords()
+        possible_objects=[]
 
-        ob_list=(self.wo_objects_guns+self.wo_objects_human+self.wo_objects_vehicle+
-            self.wo_objects_consumable+self.wo_objects_grenade+self.wo_objects_handheld_antitank+
-            self.wo_objects_airplane)
+        for b in self.graphic_engine.renderlists:
+            for c in b:
+                # could check is_gun, is_human etc here to narrow down
+                if c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank or c.is_grenade:
+                    possible_objects.append(c)
+
         
-        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,ob_list)
+        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
 
     #---------------------------------------------------------------------------
     def toggle_map(self):
