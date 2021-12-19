@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+
+---------------------------------
+Dec 03 2021
+- moved the kubelwagen images into their own folder 
+- started creating code to support turrets
+
+did some play testing. AI definitely needs a short distance limit when 
+deciding to pick up healing items 
+
 ---------------------------------
 Nov 28 2021
 - added in a chance to throw grenades back. this works automatically for the 

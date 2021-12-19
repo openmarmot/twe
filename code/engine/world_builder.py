@@ -253,8 +253,8 @@ def load_images(world):
     world.graphic_engine.loadImage('square_building_outside','images/buildings/square_building_outside.png')
 
     # vehicle
-    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
-    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen_destroyed.png')
+    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
+    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
 
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
