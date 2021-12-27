@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+---------------------------------
+Dec 26 2021
+- added the airplane back into the mouse selection list. I'm not sure when it fell off the
+list but its back now 
+- minor refactoring/reorganizing
+
 
 ---------------------------------
 Dec 03 2021
