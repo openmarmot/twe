@@ -52,7 +52,8 @@ module_version='0.0' #module software version
 module_last_update_date='August 02 2021' #date of last update
 
 #global variables
-
+list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
+,'champignon-cheese','karwendel-cheese']
 #------------------------------------------------------------------------------
 def create_squads(WORLD,HUMANS,FACTION):
     assault_rifles=[]
@@ -193,6 +194,16 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     # register with world 
     WORLD.world_areas.append(w)
 
+
+#------------------------------------------------------------------------------
+def get_random_from_list(WORLD,WORLD_COORDS,OBJECT_LIST,SPAWN):
+    ''' returns a random object from a list'''
+    # OBJECT_LIST : a list of strings that correspond to an object_Type for the 
+    # spawn_object function
+    index=random.randint(0,len(OBJECT_LIST)-1)
+    return spawn_object(WORLD,WORLD_COORDS,OBJECT_LIST[index],SPAWN)
+
+
 #------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
     '''
@@ -253,8 +264,8 @@ def load_images(world):
     world.graphic_engine.loadImage('square_building_outside','images/buildings/square_building_outside.png')
 
     # vehicle
-    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen.png')
-    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen_destroyed.png')
+    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
+    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
 
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
@@ -275,6 +286,8 @@ def load_images(world):
     world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
+    world.graphic_engine.loadImage('potato','images/consumables/potato.png')
+    world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
@@ -317,11 +330,25 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+
 
     # spawn some ammo cans 
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
+
+    # spawn some crates
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"crate",True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"crate",True)
 
     # add ze germans
     s=[]
@@ -513,6 +540,20 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
+    elif OBJECT_TYPE=='potato':
+        z=WorldObject(WORLD,['potato'],AINone)
+        z.render_level=2
+        z.name='potato'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+
+    elif OBJECT_TYPE=='turnip':
+        z=WorldObject(WORLD,['turnip'],AINone)
+        z.render_level=2
+        z.name='turnip'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AINone)
         z.render_level=2
@@ -542,14 +583,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='crate':
-        z=WorldObject(WORLD,['crate'],AINone)
+        z=WorldObject(WORLD,['crate'],AIContainer)
         z.is_container=True
         z.render_level=2
         z.name='crate'
         z.world_builder_identity='crate'
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
-        z=WorldObject(WORLD,['german_mg_ammo_can'],AINone)
+        z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
         z.is_container=True
         z.render_level=2
         z.name='german_mg_ammo_can'

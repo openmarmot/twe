@@ -60,7 +60,6 @@ class AIHuman(AIBase):
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
 
-        # inventory - for small non-gun objects 
         self.inventory=[]
     #---------------------------------------------------------------------------
     def update(self):
