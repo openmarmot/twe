@@ -3,6 +3,13 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Dec 31 2021
+- minor changes to world_builder
+- added random consumable spawns to crates
+- built out container menus so you can now list and remove objects 
+- added a inventory list to human menu 
+- updated german_mg_ammo_can to have AIContainer
+---------------------------------
 Dec 30 2021
 - added turnip
 

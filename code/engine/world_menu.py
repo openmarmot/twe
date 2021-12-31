@@ -150,10 +150,72 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- Container Menu --')
-            self.world.graphic_engine.menu_text_queue.append('1 - info ?')
-            self.world.graphic_engine.menu_text_queue.append('2 - ?')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.world.graphic_engine.menu_text_queue.append('1 - List')
+            self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Remove ')
             self.menu_state='base'
+
+        if self.menu_state=='base':
+            if Key=='1':
+                self.menu_state='list'
+            if Key=='2':
+                pass
+                #self.menu_state='add'
+            if Key=='3':
+                self.menu_state='remove'
+
+        if self.menu_state=='list':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- List Inventory Menu --')
+            for b in self.selected_object.ai.inventory:
+                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
+
+        if self.menu_state=='remove':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
+            selection_key=1
+            for b in self.selected_object.ai.inventory:
+                if selection_key<10:
+                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                    selection_key+=1
+
+            if Key=='1':
+                if len(self.selected_object.ai.inventory)>0:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(0))
+            if Key=='2':
+                if len(self.selected_object.ai.inventory)>1:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(1))
+            if Key=='3':
+                if len(self.selected_object.ai.inventory)>2:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(2))
+            if Key=='4':
+                if len(self.selected_object.ai.inventory)>3:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(3))
+            if Key=='5':
+                if len(self.selected_object.ai.inventory)>4:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(4))
+            if Key=='6':
+                if len(self.selected_object.ai.inventory)>5:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(5))
+            if Key=='7':
+                if len(self.selected_object.ai.inventory)>6:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(6))
+            if Key=='8':
+                if len(self.selected_object.ai.inventory)>7:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(7))
+            if Key=='9':
+                if len(self.selected_object.ai.inventory)>8:
+                    self.world.player.add_inventory(self.selected_object.ai.inventory.pop(8))
+
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
+            selection_key=1
+            for b in self.selected_object.ai.inventory:
+                if selection_key<10:
+                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                    selection_key+=1
+
+                    
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -262,7 +324,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
-            self.world.graphic_engine.menu_text_queue.append('3 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('3 - List Inventory')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
@@ -279,7 +341,13 @@ class World_Menu(object):
                 self.deactivate_menu()
                 
             elif Key=='3':
-                pass
+                self.menu_state='list'
+
+        if self.menu_state=='list':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Inventory List --')
+            for b in self.selected_object.ai.inventory:
+                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
 
     def start_menu(self, Key):
         if self.menu_state=='none':
