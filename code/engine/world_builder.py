@@ -275,6 +275,8 @@ def load_images(world):
     world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
     world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
+    world.graphic_engine.loadImage('potato','images/consumables/potato.png')
+    world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
@@ -316,6 +318,16 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
+
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
+
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
 
 
     # spawn some ammo cans 
@@ -510,6 +522,20 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['green_apple'],AINone)
         z.render_level=2
         z.name='Green Apple'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+
+    elif OBJECT_TYPE=='potato':
+        z=WorldObject(WORLD,['potato'],AINone)
+        z.render_level=2
+        z.name='potato'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True 
+
+    elif OBJECT_TYPE=='turnip':
+        z=WorldObject(WORLD,['turnip'],AINone)
+        z.render_level=2
+        z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
