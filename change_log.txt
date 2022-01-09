@@ -3,6 +3,23 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Jan 08 2022
+- added a function to switch menus. found that i can basically re-use 
+the container menu for other objects that have internal menus 
+- vehicle storage menu enabled
+- airplane storage menu enabled (had to add inventory)
+- renamed container menu to storage menu
+- bumped up random spawns in containers 
+- added random spawn into vehicle inventory 
+
+the whole world_menu class is a completely insane mess. I feel like it needs a total 
+rewrite at some point. It also needs a code cleanup to meet the standards i am using elsewhere
+
+i need a random loot adder thingy 
+
+i'm still going back and forth as to whether every ai_* should have an inventory
+
+---------------------------------
 Dec 31 2021
 - minor changes to world_builder
 - added random consumable spawns to crates

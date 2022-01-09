@@ -62,6 +62,7 @@ class AIAirplane(AIBase):
         self.elevator=0 # moves plan up/down
         self.landing_gear='down' # [up/down]
 
+        self.inventory=[]
 
     #---------------------------------------------------------------------------
     def update(self):

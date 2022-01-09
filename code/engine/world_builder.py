@@ -590,6 +590,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='crate'
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
@@ -784,6 +786,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.acceleration=100
         z.collision_radius=50
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 
     elif OBJECT_TYPE=='ju88':
         z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
