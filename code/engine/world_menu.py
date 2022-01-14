@@ -45,6 +45,7 @@ class World_Menu(object):
                 #self.world.is_paused=False
             else :
                 if self.active_menu!='death':
+                    self.deactivate_menu()
                     self.active_menu='debug'
                     #self.world.is_paused=True
                     #print('Game Paused')

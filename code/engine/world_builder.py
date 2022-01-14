@@ -384,7 +384,7 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'german_mg34'))
     s.append(spawn_soldiers(world,'german_stg44'))
     s.append(spawn_soldiers(world,'german_stg44'))
-
+    
 
     
     # create german squads
@@ -451,6 +451,10 @@ def load_test_environment(world):
 
     # spawn
     # locations will eventually be determined by map control
+
+    spawn_object(world,world.spawn_west,'panzerfaust',True)
+    spawn_object(world,world.spawn_west,'panzerfaust',True)
+
     world.german_ai.spawn_on_map(world.spawn_west)
     world.soviet_ai.spawn_on_map(world.spawn_east)
     world.american_ai.spawn_on_map(world.spawn_north)

@@ -1,5 +1,18 @@
 TWE Project : Change Log
 
+---------------------------------
+Jan 13 2022
+- some minor fixes to make the debug menu easier to open (~)
+- added two panzerfausts to spawn west for fun. 
+
+did some playtesting and saw a lot of soldiers taking shots while they were out of range. 
+that will take some pondering as i thought that was more or less fixed and had been for some time. 
+
+soldier awareness of surroundings still seems poor and firefights often seem one sided. 
+
+I also need to think about a way to keep every soldier from firing at the same enemy. 
+Theoretically this shouldn't be happening but maybe the personal enemy system is basically 
+overriding normal enemy priority. 
 
 
 ---------------------------------
