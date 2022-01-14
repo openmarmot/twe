@@ -256,6 +256,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
+            self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug text')
