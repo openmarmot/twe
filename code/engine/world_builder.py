@@ -347,8 +347,10 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
     # spawn some crates
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"crate",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"crate",True)
+    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"mp40")
+
 
     # add ze germans
     s=[]
@@ -505,7 +507,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         return z
 
 #------------------------------------------------------------------------------
-# currently used to create 'wrecked' vehicles
+# currently used to create 'wrecked' vehicles. could use a better name
 def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     z=WorldObject(WORLD,[IMAGE],AIContainer)
     z.is_container=True
@@ -517,9 +519,36 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     z.world_builder_identity='skip'
     z.wo_start()
 
+#------------------------------------------------------------------------------
+def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
+    z=WorldObject(WORLD,['crate'],AIContainer)
+    z.is_container=True
+    z.render_level=2
+    z.name='crate'
+    z.world_builder_identity='crate'
+
+    if CRATE_TYPE=='mp40':
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
+    elif CRATE_TYPE=="random_consumables":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+
+    z.world_builder_identity='crate'
+    # set world coords if they weren't already set
+    if z.world_coords==None:
+        z.world_coords=copy.copy(WORLD_COORDS)
+
+    z.wo_start()     
+
 
 #------------------------------------------------------------------------------
 def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
+    '''returns new object. optionally spawns it in the world'''
     z=None
     if OBJECT_TYPE=='warehouse':
         z=WorldObject(WORLD,['warehouse-outside','warehouse-inside'],AIBuilding)
@@ -586,16 +615,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
-    elif OBJECT_TYPE=='crate':
-        z=WorldObject(WORLD,['crate'],AIContainer)
-        z.is_container=True
-        z.render_level=2
-        z.name='crate'
-        z.world_builder_identity='crate'
-        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)

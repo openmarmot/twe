@@ -61,6 +61,14 @@ class AIHuman(AIBase):
         self.personal_enemies=[]
 
         self.inventory=[]
+
+        self.missions=[]
+        # a mission is a list in the following syntax ['action',target]
+        # action : move/kill/pickup/despawn
+        # target : either a coordinate or more often a world_object. dependent on the action
+        # a mission takes priority over some other actions like following a squad
+        # missions will be done in order, making it a sort of programming language for the bots
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

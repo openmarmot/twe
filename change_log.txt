@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ---------------------------------
+Jan 27 2022
+- created spawn_crate function with a couple preconfigured crate options
+- started work on missons 
+
+I came up with the idea of missions for the ai. Basically this is a list of lists. 
+Each child list will be in this syntax ['action',target]
+The missions will be done in sequential order and will take precendence over squad affinity.
+
+This has the effect of creating a simple programming language for the ai.
+For example after a big battle the world AI could spawn a civilian bot with the following mission list :
+- pick up gun/equipment from battle area 
+- move to a building 
+- despawn (thus removing the items it grabbed from the world)
+
+
+---------------------------------
 Jan 13 2022
 - some minor fixes to make the debug menu easier to open (~)
 - added two panzerfausts to spawn west for fun. 
