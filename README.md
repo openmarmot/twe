@@ -52,3 +52,5 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks! 
 - On this project it is rare that I copy code from the internet, almost most of it is from scratch (that is why the math is so bad) - 
 but when I have copied code I will try to include references from where I got it
+
+![screenshot](/screenshots/twe_battle_feb_03_2022.png "TWE screenshot")

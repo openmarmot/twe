@@ -55,6 +55,7 @@ module_last_update_date='August 02 2021' #date of last update
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese']
 #------------------------------------------------------------------------------
+''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
     assault_rifles=[]
     rifles=[]
@@ -521,6 +522,7 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
 
 #------------------------------------------------------------------------------
 def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
+    ''' generates different crate types with contents'''
     z=WorldObject(WORLD,['crate'],AIContainer)
     z.is_container=True
     z.render_level=2

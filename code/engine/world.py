@@ -84,6 +84,10 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
+
+        # reset the image so that the graphics engine can make sure it matches the current view scale
+        WORLD_OBJECT.reset_image=True
+
         #maybe should check if the object is already in there to prevent duplicates
         self.wo_objects.append(WORLD_OBJECT)
         if WORLD_OBJECT.collision:

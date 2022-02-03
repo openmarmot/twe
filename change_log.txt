@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+---------------------------------
+Feb 03 2022
+- fixed image scaling issue when bots die and drop objects 
+- added some comments and function descriptions
+- added a screen shot from a battle 
 ---------------------------------
 Jan 27 2022
 - created spawn_crate function with a couple preconfigured crate options

@@ -5,4 +5,5 @@ Some issues that I am aware of
     when moving there is a very noticeable small oscillation of every object 
         -especially noticeable when a lot of objects are close together 
     - this probably is due a rounding or conversion with world to screen coords thats isn't precise enough 
+    - possibly a float that is turning into a int?
 
