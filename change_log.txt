@@ -1,6 +1,58 @@
 TWE Project : Change Log
 
 
+---------------------------------
+Feb 03 2022
+- fixed image scaling issue when bots die and drop objects 
+- added some comments and function descriptions
+- added a screen shot from a battle 
+---------------------------------
+Jan 27 2022
+- created spawn_crate function with a couple preconfigured crate options
+- started work on missons 
+
+I came up with the idea of missions for the ai. Basically this is a list of lists. 
+Each child list will be in this syntax ['action',target]
+The missions will be done in sequential order and will take precendence over squad affinity.
+
+This has the effect of creating a simple programming language for the ai.
+For example after a big battle the world AI could spawn a civilian bot with the following mission list :
+- pick up gun/equipment from battle area 
+- move to a building 
+- despawn (thus removing the items it grabbed from the world)
+
+
+---------------------------------
+Jan 13 2022
+- some minor fixes to make the debug menu easier to open (~)
+- added two panzerfausts to spawn west for fun. 
+
+did some playtesting and saw a lot of soldiers taking shots while they were out of range. 
+that will take some pondering as i thought that was more or less fixed and had been for some time. 
+
+soldier awareness of surroundings still seems poor and firefights often seem one sided. 
+
+I also need to think about a way to keep every soldier from firing at the same enemy. 
+Theoretically this shouldn't be happening but maybe the personal enemy system is basically 
+overriding normal enemy priority. 
+
+
+---------------------------------
+Jan 08 2022
+- added a function to switch menus. found that i can basically re-use 
+the container menu for other objects that have internal menus 
+- vehicle storage menu enabled
+- airplane storage menu enabled (had to add inventory)
+- renamed container menu to storage menu
+- bumped up random spawns in containers 
+- added random spawn into vehicle inventory 
+
+the whole world_menu class is a completely insane mess. I feel like it needs a total 
+rewrite at some point. It also needs a code cleanup to meet the standards i am using elsewhere
+
+i need a random loot adder thingy 
+
+i'm still going back and forth as to whether every ai_* should have an inventory
 
 ---------------------------------
 Dec 31 2021

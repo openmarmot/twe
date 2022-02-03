@@ -45,6 +45,7 @@ class World_Menu(object):
                 #self.world.is_paused=False
             else :
                 if self.active_menu!='death':
+                    self.deactivate_menu()
                     self.active_menu='debug'
                     #self.world.is_paused=True
                     #print('Game Paused')
@@ -60,8 +61,8 @@ class World_Menu(object):
             self.debug_menu(Key)
         elif self.active_menu=='gun':
             self.gun_menu(Key)
-        elif self.active_menu=='container':
-            self.container_menu(Key)
+        elif self.active_menu=='storage':
+            self.storage_menu(Key)
         elif self.active_menu=='generic':
             self.generic_item_menu(Key)
         elif self.active_menu=='start':
@@ -87,8 +88,8 @@ class World_Menu(object):
             self.active_menu='gun'
             self.gun_menu(None)
         elif SELECTED_OBJECT.is_container:
-            self.active_menu='container'
-            self.container_menu(None)
+            self.active_menu='storage'
+            self.storage_menu(None)
         elif SELECTED_OBJECT.is_human:
             self.active_menu='human'
             self.human_menu(None)
@@ -114,7 +115,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - storage (not implemented)')
+            self.world.graphic_engine.menu_text_queue.append('3 - storage')
             if Key=='1':
                 pass
             if Key=='2':
@@ -126,6 +127,9 @@ class World_Menu(object):
                 self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
+            if Key=='3':
+                # pull up the storage/container menu
+                self.change_menu('storage')
 
         if self.menu_state=='internal':
             self.world.graphic_engine.menu_text_queue=[]
@@ -146,10 +150,19 @@ class World_Menu(object):
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
-    def container_menu(self, Key):
+    def change_menu(self,menu_name):
+        '''change the menu to the specified menu'''
+        self.menu_state='none'
+        # clear this just in case as it is rather inconsistently done
+        self.world.graphic_engine.menu_text_queue=[]
+        self.active_menu=menu_name
+        self.handle_input(None)
+
+
+    def storage_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Container Menu --')
+            self.world.graphic_engine.menu_text_queue.append('-- Storage Menu --')
             self.world.graphic_engine.menu_text_queue.append('1 - List')
             self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('3 - Remove ')
@@ -244,6 +257,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
+            self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug text')
@@ -324,7 +338,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
-            self.world.graphic_engine.menu_text_queue.append('3 - List Inventory')
+            self.world.graphic_engine.menu_text_queue.append('3 - Manage Inventory')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
@@ -341,13 +355,9 @@ class World_Menu(object):
                 self.deactivate_menu()
                 
             elif Key=='3':
-                self.menu_state='list'
+                # pull up the storage/container menu
+                self.change_menu('storage')
 
-        if self.menu_state=='list':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- Inventory List --')
-            for b in self.selected_object.ai.inventory:
-                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
 
     def start_menu(self, Key):
         if self.menu_state=='none':
@@ -431,7 +441,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - storage (not implemented)')
+            self.world.graphic_engine.menu_text_queue.append('3 - storage ')
             if Key=='1':
                 pass
             if Key=='2':
@@ -443,6 +453,10 @@ class World_Menu(object):
                 self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
+            if Key=='3':
+                # pull up the storage/container menu
+                self.change_menu('storage')
+
 
         if self.menu_state=='internal':
             self.world.graphic_engine.menu_text_queue=[]
