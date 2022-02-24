@@ -62,6 +62,7 @@ def create_squads(WORLD,HUMANS,FACTION):
     semiauto_rifles=[]
     subguns=[]
     machineguns=[]
+    pistols=[]
     antitank=[]
     unidentified_human=[]
     unarmed_human=[]
@@ -88,15 +89,21 @@ def create_squads(WORLD,HUMANS,FACTION):
             subguns.append(b)
         elif b.ai.primary_weapon.name=='dp28':
             machineguns.append(b)
+        elif b.ai.primary_weapon.name=='1911':
+            pistols.append(b)
+        elif b.ai.primary_weapon.name=='ppk':
+            pistols.append(b)
+        elif b.ai.primary_weapon.name=='tt33':
+            pistols.append(b)
         else:
-            print('error: unknown primary weapon in squad creation')
+            print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
 
     squad_list=[]
 
     buildsquads=True 
 
     while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+unarmed_human)<1:
+        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human)<1:
             buildsquads=False
         else :
             s=AISquad(WORLD)
@@ -117,11 +124,13 @@ def create_squads(WORLD,HUMANS,FACTION):
                 if len(machineguns)>0:
                     s.members.append(machineguns.pop())
 
-                # squad lead subgun or assault rifle
+                # squad lead 
                 if len(subguns)>0:
                     s.members.append(subguns.pop())
                 elif len(assault_rifles)>0:
                     s.members.append(assault_rifles.pop())
+                elif len(pistols)>0:
+                    s.members.append(pistols.pop())
             # -- assault squad --
             elif len(assault_rifles)>4 :
                 s.members.append(assault_rifles.pop())
@@ -145,6 +154,11 @@ def create_squads(WORLD,HUMANS,FACTION):
                     s.members.append(antitank.pop())
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+
 
                 # lets do it again
 
@@ -162,6 +176,30 @@ def create_squads(WORLD,HUMANS,FACTION):
                     s.members.append(antitank.pop())
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+
+                # and maybe one more time
+                if len(rifles)>0:
+                    s.members.append(rifles.pop())
+                if len(semiauto_rifles)>0:
+                    s.members.append(semiauto_rifles.pop())
+                if len(subguns)>0:
+                    s.members.append(subguns.pop())
+                if len(assault_rifles)>0:
+                    s.members.append(assault_rifles.pop())
+                if len(machineguns)>0:
+                    s.members.append(machineguns.pop())
+                if len(antitank)>0:
+                    s.members.append(antitank.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())               
 
             squad_list.append(s)
 

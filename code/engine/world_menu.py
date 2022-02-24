@@ -274,7 +274,7 @@ class World_Menu(object):
                 else:
                     self.world.graphic_engine.debug_mode=True
             elif Key=='3':
-                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'kubelwagen',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
 

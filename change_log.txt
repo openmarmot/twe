@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Feb 23 2022
+- squad creation changes 
+    - added 'pistols' category 
+    - added unarmed_humans to squads so they get a squad 
+- moved the kubelwagen spawn from the debug menu so that it is next to the player instead of on top of the player 
+
+I hadn't realized until now that unarmed and pistol armed bots were not getting assigned squads.
+I thought units that didn't have a squad would have errored out by now. kinda interesting
+
+honestly the squad behavior is not great for the civilians, i think I might have to add an option for them to 
+ignore squads, or go rogue 
+---------------------------------
 Feb 03 2022
 - fixed image scaling issue when bots die and drop objects 
 - added some comments and function descriptions
