@@ -86,7 +86,7 @@ class AIHuman(AIBase):
                     self.bleed_interval=0.5+random.randint(0,20)
                     self.health-=1+random.randint(0,10)
                     self.time_since_bleed=0
-                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
 
 
             if self.primary_weapon!=None:
@@ -103,6 +103,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
+            starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
@@ -127,11 +128,15 @@ class AIHuman(AIBase):
                 # kill tracking
                 # just focus on humans for now
                 if EVENT_DATA.ai.shooter.is_human:
-                    if self.health<10:
-                        if self.health<1:
-                            EVENT_DATA.ai.shooter.ai.confirmed_kills+=1
+                    if self.health<30:
+                        # protects from recording hits on something that was already dead
+                        if starting_health>0:
+                            if self.health<1:
+                                EVENT_DATA.ai.shooter.ai.confirmed_kills+=1
+                            else:
+                                EVENT_DATA.ai.shooter.ai.probable_kills+=1
                         else:
-                            EVENT_DATA.ai.shooter.ai.probable_kills+=1
+                            print('collision on a dead human ai detected')
             else:
                 print('Error - projectile shooter is none')
 
@@ -456,7 +461,7 @@ class AIHuman(AIBase):
                 action=True
             # we have a primary weapon
             # check if we are out of ammo
-            elif self.primary_weapon.ai.magazine<1 and self.primary_weapon.ai.magazine_count<1:
+            elif self.primary_weapon.ai.get_ammo_count<1:
                 # we are out of ammo
                 # get more ammo 
                 self.target_object=self.owner.world.get_closest_ammo_source(self.owner)
@@ -498,10 +503,11 @@ class AIHuman(AIBase):
                 # this is needed in case the health option is to go pickup health
                 action=True
 
-        if action==False: 
+        # possibly engage a enemy
+        if action==False and self.primary_weapon!=None: 
         
-            # 2. health is good. deal with personal enemies
-            if len(self.personal_enemies)>0:
+            # evaluate personal_enemies
+            if len(self.personal_enemies)>0 :
 
                 # check personal enemy list for a live enemy
                 c=True
@@ -510,16 +516,22 @@ class AIHuman(AIBase):
                         if self.personal_enemies[0].ai.health<1:
                             self.personal_enemies.pop(0)
                         else:
+                            # check distance. pad weapon range a bit as its a rough estimate
+                            distance=engine.math_2d.get_distance(self.owner.world_coords,self.personal_enemies[0].world_coords)
+                            if distance < (self.primary_weapon.ai.range+20) :
+                                # might as well forget them and check another one
+                                self.personal_enemies.pop(0)
+                            else:
                             # engage
-                            self.target_object=self.personal_enemies[0]
-                            self.ai_state='engaging'
-                            self.ai_goal='none'
-                            action=True
-                            c=False # exit while loop
+                                self.target_object=self.personal_enemies[0]
+                                self.ai_state='engaging'
+                                self.ai_goal='none'
+                                action=True
+                                c=False # exit while loop
                     else:
                         c=False # exit while loop
 
-            # 3. health is good, no personal enemies 
+            # get a squad enemy  
             if action==False :
                 # get an enemy from the squad
                 self.target_object=self.squad.get_enemy()
@@ -527,19 +539,19 @@ class AIHuman(AIBase):
                     self.ai_state='engaging'
                     self.ai_goal='none'
                     action=True
-                else:
-                    # no enemies, what now?
-                    # are we too far from the group?
-                    # distance from group 
-                    distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                    if distance_group >300. :
-                        self.ai_goal='close_with_group'
-                        self.destination=copy.copy(self.squad.world_coords)
-                        self.time_since_ai_transition=0
-                        self.ai_state='start_moving'
-                        #print('getting closer to group')
-                    else:
-                        self.think_idle()
+
+        
+        # got this far with no actions 
+        if action==False:
+            # distance from group 
+            distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
+            if distance_group >self.squad.max_distance :
+                self.ai_goal='close_with_group'
+                self.destination=copy.copy(self.squad.world_coords)
+                self.time_since_ai_transition=0
+                self.ai_state='start_moving'
+            else:
+                self.think_idle()
 
     #-----------------------------------------------------------------------
     def think_healing_options(self):
@@ -590,94 +602,119 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def think_move(self):
         ''' think about the current movement'''
+
+        # ! note - the logic flow here needs to be re-done. 
+
         distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
 
         # should we get a vehicle instead of hoofing it to wherever we are going?
         if distance>2000:
-            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
-            if b!=None:
-                v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-
-                # only bother with a vehicle if it will be faster
-                if v_distance<distance:
-
-                    # head towards the vehicle
-                    # should check if the vehicle is hostile
-
-                    self.ai_vehicle_goal='travel'
-                    self.ai_vehicle_destination=copy.copy(self.destination)
-
-                    self.target_object=b
-                    self.ai_goal='enter object'
-                    # not using copy here because vehicle may move
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
-
-                    print(self.owner.name + ' heading towards '+b.name+' distance: '+str(distance))
-                else :
-                    # guess we might as well walk
-                    pass
-
+            
+            # failsafe. we don't want to be going on long trips when we have personal enemies (who are generally close)
+            if len(self.personal_enemies)>0:
+                self.think_generic()
             else:
-                # no vehicles ?
-                pass
+                # fine lets go treking across the map
+                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
+                if b!=None:
+                    v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+
+                    # only bother with a vehicle if it will be faster
+                    if v_distance<distance:
+
+                        # head towards the vehicle
+                        # should check if the vehicle is hostile
+
+                        self.ai_vehicle_goal='travel'
+                        self.ai_vehicle_destination=copy.copy(self.destination)
+
+                        self.target_object=b
+                        self.ai_goal='enter object'
+                        # not using copy here because vehicle may move
+                        self.destination=self.target_object.world_coords
+                        self.ai_state='start_moving'
+
+                        print(self.owner.name + ' heading towards '+b.name+' distance: '+str(distance))
+                    else :
+                        # guess we might as well walk
+                        # this might be a logic trap because nothing else is considered after this. 
+                        # might have to pay attention to how often this happens
+                        pass
+
+                else:
+                    # no vehicles ?
+                    pass
         else:
-            # ai_state=='moving AND distance <1000
-            if self.ai_goal=='pickup':
-                if distance<5:
+            # another fail safe to stop movement if we are possibly being attacked
+            if distance >200 and len(self.personal_enemies)>0:
+                self.think_generic()
+            else:
+                self.think_move_close(distance)
+
+
+    #-----------------------------------------------------------------------
+    def think_move_close(self,DISTANCE):
+        ''' think about movement when you are close to the objective'''
+        # close is currently <200
+        # we are close to wherever we are going. don't worry about enemies too much
+
+        if self.ai_goal=='pickup':
+            if DISTANCE<5:
+                if self.target_object in self.owner.world.wo_objects:
+                    self.owner.add_inventory(self.target_object)
+                    self.owner.world.remove_object(self.target_object)
+                else:
+                    # hmm object is gone. someone else must have grabbed it
+                    pass
+                self.ai_state='sleeping'
+        elif self.ai_goal=='enter object':
+
+            # vehicles move around a lot so gotta check
+            if self.destination!=self.target_object.world_coords:
+                self.destination=copy.copy(self.target_object.world_coords)
+                self.ai_state='start_moving'
+            else:
+                if DISTANCE<5:
                     if self.target_object in self.owner.world.wo_objects:
-                        self.owner.add_inventory(self.target_object)
-                        self.owner.world.remove_object(self.target_object)
+                        self.target_object.add_inventory(self.owner)
+                        self.owner.world.remove_object(self.owner)
+                        print(self.owner.name+' entered '+ self.target_object.name)
+
                     else:
-                        # hmm object is gone. someone else must have grabbed it
-                    # print('robbed!!')
+                        # hmm object is gone. idk how that happened
+                        print('object I was going to enter disappeared')
                         pass
                     self.ai_state='sleeping'
-            elif self.ai_goal=='enter object':
-
-                # vehicles move around a lot so gotta check
-                if self.destination!=self.target_object.world_coords:
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                else:
-                    if distance<5:
-                        if self.target_object in self.owner.world.wo_objects:
-                            self.target_object.add_inventory(self.owner)
-                            self.owner.world.remove_object(self.owner)
-                            print(self.owner.name+' entered '+ self.target_object.name)
-
-                        else:
-                            # hmm object is gone. idk how that happened
-                            print('object I was going to enter disappeared')
-                            pass
-                        self.ai_state='sleeping'
-            elif self.ai_goal=='get ammo':
-                if distance<5:
-                    print('replenishing ammo ')
-                    # get max count of fully loaded magazines
-                    self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
-                    self.ai_state='sleeping'
-            elif self.ai_goal=='close_with_target':
-                # check if target is dead 
-                if self.target_object.ai.health<1:
-                    self.ai_state='sleeping'
-                    self.ai_goal='none'
-                    self.target_object=None
-                elif distance<self.primary_weapon.ai.range:
-                    #print('in range of target')
-                    self.ai_state='engaging'
-                    self.ai_goal='none'
+        elif self.ai_goal=='get ammo':
+            if DISTANCE<5:
+                print('replenishing ammo ')
+                # get max count of fully loaded magazines
+                self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
+                self.ai_state='sleeping'
+        elif self.ai_goal=='close_with_target':
+            # check if target is dead 
+            if self.target_object.ai.health<1:
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                self.target_object=None
+            elif DISTANCE<self.primary_weapon.ai.range:
+                #print('in range of target')
+                self.ai_state='engaging'
+                self.ai_goal='none'
+            else:
+                # failsafe to keep us from chasing enemies when closer ones are nearby
+                # personal enemies are generally close by
+                if len(self.personal_enemies)>0:
+                    self.think_generic()
                 else:
                     # reset the destination coordinates
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                # print('close with target')
-            else:
-                # catchall for random moving related goals:
-                if distance<3:
-                    self.ai_state='sleeping'
-
+        else:
+            # catchall for random moving related goals:
+            if DISTANCE<3:
+                self.ai_state='sleeping'
     #-----------------------------------------------------------------------
     def think_upgrade_gear(self):
         '''think about upgrading gear. return True/False if upgrading'''

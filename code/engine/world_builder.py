@@ -315,6 +315,7 @@ def load_images(world):
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
+    world.graphic_engine.loadImage('small_blood','images/sprites/small_blood.png')
     world.graphic_engine.loadImage('brass','images/sprites/brass.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
@@ -339,10 +340,10 @@ def load_test_environment(world):
 
 
     # add a couple weapons 
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
+    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-1200,1200))],'model24',True)
 
 
     # add ju88
@@ -357,10 +358,10 @@ def load_test_environment(world):
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
     #cheese 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'karwendel-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'adler-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'camembert-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'champignon-cheese',True)
 
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
@@ -386,9 +387,10 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"mp40")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"mp40")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"panzerfaust")
 
 
     # add ze germans
@@ -577,6 +579,11 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=='panzerfaust':
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
 
     z.world_builder_identity='crate'
     # set world coords if they weren't already set
@@ -917,6 +924,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='blood_splatter'
         z.rotation_angle=float(random.randint(0,359))  
+
+    elif OBJECT_TYPE=='small_blood':
+        z=WorldObject(WORLD,['small_blood'],AINone)
+        z.render_level=2
+        z.name='small_blood'
+        z.rotation_angle=float(random.randint(0,359)) 
            
     elif OBJECT_TYPE=='dirt':
         z=WorldObject(WORLD,['dirt'],AINone)

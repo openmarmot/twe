@@ -127,7 +127,10 @@ class AIGun(AIBase):
                 # spawn brass 
                 engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
 
-        
+    #---------------------------------------------------------------------------
+    def get_ammo_count(self):
+        ''' get ammo count. should return int'''
+        return self.magazine + (self.mag_capacity*self.magazine_count)      
 
 
     #---------------------------------------------------------------------------

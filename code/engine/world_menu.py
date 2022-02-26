@@ -77,29 +77,32 @@ class World_Menu(object):
 
     def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
-        # clear any current menu
-        self.deactivate_menu()
-        self.selected_object=SELECTED_OBJECT
 
-        if SELECTED_OBJECT.is_vehicle: 
-            self.active_menu='vehicle'
-            self.vehicle_menu(None)
-        elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
-            self.active_menu='gun'
-            self.gun_menu(None)
-        elif SELECTED_OBJECT.is_container:
-            self.active_menu='storage'
-            self.storage_menu(None)
-        elif SELECTED_OBJECT.is_human:
-            self.active_menu='human'
-            self.human_menu(None)
-        elif SELECTED_OBJECT.is_airplane:
-            self.active_menu='airplane'
-            self.airplane_menu(None)
-        else :
-            # just dump everything else in here for now
-            self.active_menu='generic'
-            self.generic_item_menu(None)
+        # this is necessary to prevent the player from accidentally exiting the death menu
+        if self.active_menu !="death":
+            # clear any current menu
+            self.deactivate_menu()
+            self.selected_object=SELECTED_OBJECT
+
+            if SELECTED_OBJECT.is_vehicle: 
+                self.active_menu='vehicle'
+                self.vehicle_menu(None)
+            elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
+                self.active_menu='gun'
+                self.gun_menu(None)
+            elif SELECTED_OBJECT.is_container:
+                self.active_menu='storage'
+                self.storage_menu(None)
+            elif SELECTED_OBJECT.is_human:
+                self.active_menu='human'
+                self.human_menu(None)
+            elif SELECTED_OBJECT.is_airplane:
+                self.active_menu='airplane'
+                self.airplane_menu(None)
+            else :
+                # just dump everything else in here for now
+                self.active_menu='generic'
+                self.generic_item_menu(None)
 
     def airplane_menu(self, Key):
         if self.menu_state=='none':
@@ -170,11 +173,14 @@ class World_Menu(object):
 
         if self.menu_state=='base':
             if Key=='1':
+                Key=None
                 self.menu_state='list'
             if Key=='2':
+                Key=None
                 pass
                 #self.menu_state='add'
             if Key=='3':
+                Key=None
                 self.menu_state='remove'
 
         if self.menu_state=='list':
@@ -327,15 +333,20 @@ class World_Menu(object):
                 d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.world_coords)
             else:
                 d2=0
-            self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
+
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
-            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
-            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+            if self.selected_object.ai.primary_weapon != None:
+                self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
+                self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+                self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str(self.selected_object.ai.primary_weapon.ai.get_ammo_count()))
             self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            if self.selected_object.ai.primary_weapon != None:
-                self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name + ' Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+            self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
+            self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
+            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
+            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+
+
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
             self.world.graphic_engine.menu_text_queue.append('3 - Manage Inventory')

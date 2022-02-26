@@ -2,6 +2,29 @@ TWE Project : Change Log
 
 
 ---------------------------------
+Feb 26 2022
+- update to world_menu to prevent player from accidentally clicking away from the death menu 
+- added panzerfaust crate 
+- expanded the area where the beginning item drops will spawn as they aren't really needed for testing anymore 
+- fixed a world_menu bug where going into the storage remove menu would auto remove the first item 
+- update to personal enemies - they will now only be engaged if they are within weapon range 
+    - they will be forgotten if out of range. this will help keep the personal_enemies list from getting out of control 
+    - also makes it less likely the civilians will follow you across the map to shoot you 
+- some refactoring in ai_human. hard to tell the effect as the code is getting absurdly complicated
+- made max distance from squad a squad variable so the squad can adjust it
+    - default is 300, civilians will get 1000 so they don't move in a group as obviously
+- added a couple catches to prevent the ai from going on long trips when they have personal enemies 
+- added a smaller blood sprite for blood trails 
+- added a ammo count to the human menu and a function to ai_weapon to return ammo count 
+- added some logic to human_ai to prevent collisions on a already dead bot from counting as a kill 
+
+while play testing i ran across a german bot with a mg34 who has 8 confirmed kills and 2 probables. 
+That is the highest kill count that i've seen yet.
+
+I'm noticing a lot of firing before getting into range. may have been a accidental consequence of 
+todays code changes, or may have already been there. 
+
+---------------------------------
 Feb 23 2022
 - squad creation changes 
     - added 'pistols' category 
