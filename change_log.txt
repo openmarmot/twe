@@ -12,6 +12,8 @@ Feb 26 2022 v2
 
 i really need to come up with a name generator.
 
+"Reginald Thimblebottom out of ammo for ppk Rounds fired 63"
+I wonder what he was firing at. He would have had to get more ammo three times.
 ---------------------------------
 Feb 26 2022
 - update to world_menu to prevent player from accidentally clicking away from the death menu 
