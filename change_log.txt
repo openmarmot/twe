@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+Feb 26 2022 v2
+- fixed a crash/bug in ai_human.think_engage_far
+- added min and max zoom at the engine limitations 
+- added a description of the last collision to the human ai menu 
+- added death descriptions to console output
+    - this has been useful to get a better picture of the overall action 
+
+i really need to come up with a name generator.
+
 ---------------------------------
 Feb 26 2022
 - update to world_menu to prevent player from accidentally clicking away from the death menu 

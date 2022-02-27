@@ -117,12 +117,12 @@ class AIGun(AIBase):
                 self.rounds_fired+=1
                 spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
                 if self.equipper.is_player:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],True,self.equipper,self.flight_time,self.projectile_type)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],True,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
                 elif self.equipper.is_soldier:
                     # squad gets added to make immune to friendly fire
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,self.equipper.ai.squad.members,False,self.equipper,self.flight_time,self.projectile_type)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,self.equipper.ai.squad.members,False,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
                 else:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False,self.equipper,self.flight_time,self.projectile_type)
+                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
 
                 # spawn brass 
                 engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)

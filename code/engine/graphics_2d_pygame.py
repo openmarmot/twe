@@ -118,15 +118,21 @@ class Graphics_2D_Pygame(object):
                 if event.key==96:
                     self.world.world_menu.handle_input("tilde")
                 elif event.key==91: # [
-                    self.scale-=0.1
-                    self.view_adjust+=500
-                    print('scale down')
-                    self.reset_all()
+                    if self.scale>0.2:
+                        self.scale-=0.1
+                        self.view_adjust+=500
+                        print('zoom out',self.scale)
+                        self.reset_all()
+                    else:
+                        print('max zoom out reached')
                 elif event.key==93: # ]
-                    self.scale+=0.1
-                    self.view_adjust-=500
-                    print('scale up')
-                    self.reset_all()
+                    if self.scale<1.1:
+                        self.scale+=0.1
+                        self.view_adjust-=500
+                        print('zoom in',self.scale)
+                        self.reset_all()
+                    else:
+                        print('max zoom in reached')
                 elif event.key==48:
                     self.world.world_menu.handle_input("0")
                 elif event.key==49:

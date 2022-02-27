@@ -39,6 +39,9 @@ class AIHuman(AIBase):
         self.confirmed_kills=0
         self.probable_kills=0
 
+        # a description of whatever collided with this object last. 
+        self.last_collision_description=''
+
         # what the ai is actually doing (an action)
         self.ai_state='none'
         # what the ai is trying to accomplish
@@ -102,7 +105,9 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
+        self.last_collision_description=''
         if EVENT_DATA.is_projectile:
+            self.last_collision_description='hit by a projectile '
             starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
@@ -115,6 +120,7 @@ class AIHuman(AIBase):
             # add the shooter of the bullet to the personal enemies list
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
+                self.last_collision_description+=('from '+EVENT_DATA.ai.shooter.name)
                 # this creates a lot of friendly fire - but its interesting 
                 self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
@@ -137,6 +143,9 @@ class AIHuman(AIBase):
                                 EVENT_DATA.ai.shooter.ai.probable_kills+=1
                         else:
                             print('collision on a dead human ai detected')
+
+                    if EVENT_DATA.ai.shooter.ai.primary_weapon!=None:
+                        self.last_collision_description+=("'s "+EVENT_DATA.ai.weapon_name)
             else:
                 print('Error - projectile shooter is none')
 
@@ -237,6 +246,13 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_death(self):
+        dm=''
+        dm+=(self.owner.name+' died.')
+        dm+=('\n  - faction: '+self.squad.faction)
+        dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
+        dm+=('\n  - killed by : '+self.last_collision_description)
+        print(dm)
+
         # drop inventory 
         for b in self.inventory:
             b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
@@ -247,7 +263,7 @@ class AIHuman(AIBase):
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
             else: 
-                # this happens and I do not know why
+                # haven't had this happen in awhile. must be fixed
 
                 print('!! Error : '+self.owner.name+' not in squad somehow')
                 print('Squad list')
@@ -461,7 +477,7 @@ class AIHuman(AIBase):
                 action=True
             # we have a primary weapon
             # check if we are out of ammo
-            elif self.primary_weapon.ai.get_ammo_count<1:
+            elif self.primary_weapon.ai.get_ammo_count()<1:
                 # we are out of ammo
                 # get more ammo 
                 self.target_object=self.owner.world.get_closest_ammo_source(self.owner)

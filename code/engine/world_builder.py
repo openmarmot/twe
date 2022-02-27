@@ -961,7 +961,7 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     # MAX_TIME - max flight time around 3.5 seconds is default
@@ -975,6 +975,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
     z.ai.shooter=SHOOTER
     z.ai.projectile_type=PROJECTILE_TYPE
+    z.ai.weapon_name=WEAPON_NAME
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
@@ -991,7 +992,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
-def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR):
+def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR,WEAPON_NAME):
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
@@ -1008,15 +1009,16 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     # increase the collision radius to make sure we get hits
     z.collision_radius=10
     z.ai.shooter=ORIGINATOR
+    z.ai.weapon_name=WEAPON_NAME
     z.wo_start()
 
 #------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR):
+def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR):

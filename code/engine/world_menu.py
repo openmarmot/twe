@@ -248,6 +248,7 @@ class World_Menu(object):
             self.world.is_paused=True
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('You Died')
+            self.world.graphic_engine.menu_text_queue.append(self.world.player.ai.last_collision_description)
             self.world.graphic_engine.menu_text_queue.append('1 - respawn as random existing bot')
             #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
             #self.world.graphic_engine.menu_text_queue.append('3 - pick up')
@@ -341,6 +342,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str(self.selected_object.ai.primary_weapon.ai.get_ammo_count()))
             self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+            self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
             self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
             self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
