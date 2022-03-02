@@ -81,7 +81,7 @@ class AIGrenade(AIBase):
     def explode(self):
         # kablooey!
         # add the shrapnel
-        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count,self.equipper)
+        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count,self.equipper,self.owner.name)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

@@ -29,6 +29,9 @@ class AISquad(object):
         # not sure what a good speed is
         self.speed=25
 
+        # how far the ai will stray from the group before coming back
+        self.max_distance=300
+
         # ai in the group will try to stay close to the group world coords
         # moves towards destination
         self.world_coords=[0.,0.]
@@ -60,6 +63,10 @@ class AISquad(object):
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
         '''spawns the squad on the map at the squads world coords '''
+
+        if self.faction=='civilian':
+            print('setting max_distance for civ squad')
+            self.max_distance=1000
 
         for b in self.members :
             # set the squad - i don't think this is set anywhere else

@@ -33,9 +33,12 @@ class AIProjectile(AIBase):
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
 
+        self.is_shrapnel=False # not used at the moment
+        self.is_bullet=False # not used at the moment
 
+        # the weapon that created this
+        self.weapon_name=''
         # the equipper of the gun that fired the projectile
-        # not used yet 
         self.shooter=None
 
     #---------------------------------------------------------------------------

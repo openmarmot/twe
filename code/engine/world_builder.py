@@ -62,6 +62,7 @@ def create_squads(WORLD,HUMANS,FACTION):
     semiauto_rifles=[]
     subguns=[]
     machineguns=[]
+    pistols=[]
     antitank=[]
     unidentified_human=[]
     unarmed_human=[]
@@ -88,15 +89,21 @@ def create_squads(WORLD,HUMANS,FACTION):
             subguns.append(b)
         elif b.ai.primary_weapon.name=='dp28':
             machineguns.append(b)
+        elif b.ai.primary_weapon.name=='1911':
+            pistols.append(b)
+        elif b.ai.primary_weapon.name=='ppk':
+            pistols.append(b)
+        elif b.ai.primary_weapon.name=='tt33':
+            pistols.append(b)
         else:
-            print('error: unknown primary weapon in squad creation')
+            print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
 
     squad_list=[]
 
     buildsquads=True 
 
     while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+unarmed_human)<1:
+        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human)<1:
             buildsquads=False
         else :
             s=AISquad(WORLD)
@@ -117,11 +124,13 @@ def create_squads(WORLD,HUMANS,FACTION):
                 if len(machineguns)>0:
                     s.members.append(machineguns.pop())
 
-                # squad lead subgun or assault rifle
+                # squad lead 
                 if len(subguns)>0:
                     s.members.append(subguns.pop())
                 elif len(assault_rifles)>0:
                     s.members.append(assault_rifles.pop())
+                elif len(pistols)>0:
+                    s.members.append(pistols.pop())
             # -- assault squad --
             elif len(assault_rifles)>4 :
                 s.members.append(assault_rifles.pop())
@@ -145,6 +154,11 @@ def create_squads(WORLD,HUMANS,FACTION):
                     s.members.append(antitank.pop())
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+
 
                 # lets do it again
 
@@ -162,6 +176,30 @@ def create_squads(WORLD,HUMANS,FACTION):
                     s.members.append(antitank.pop())
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+
+                # and maybe one more time
+                if len(rifles)>0:
+                    s.members.append(rifles.pop())
+                if len(semiauto_rifles)>0:
+                    s.members.append(semiauto_rifles.pop())
+                if len(subguns)>0:
+                    s.members.append(subguns.pop())
+                if len(assault_rifles)>0:
+                    s.members.append(assault_rifles.pop())
+                if len(machineguns)>0:
+                    s.members.append(machineguns.pop())
+                if len(antitank)>0:
+                    s.members.append(antitank.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())
+                if len(pistols)>0:
+                    s.members.append(pistols.pop())
+                if len(unarmed_human)>0:
+                    s.members.append(unarmed_human.pop())               
 
             squad_list.append(s)
 
@@ -277,6 +315,7 @@ def load_images(world):
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
+    world.graphic_engine.loadImage('small_blood','images/sprites/small_blood.png')
     world.graphic_engine.loadImage('brass','images/sprites/brass.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
@@ -301,10 +340,10 @@ def load_test_environment(world):
 
 
     # add a couple weapons 
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'mp40',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,200)),float(random.randint(-200,200))],'model24',True)
+    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
+    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
+    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-1200,1200))],'model24',True)
 
 
     # add ju88
@@ -319,10 +358,10 @@ def load_test_environment(world):
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
     #cheese 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'karwendel-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'adler-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'camembert-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'champignon-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'karwendel-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'adler-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'camembert-cheese',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'champignon-cheese',True)
 
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
@@ -348,9 +387,10 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"mp40")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"mp40")
+    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"panzerfaust")
 
 
     # add ze germans
@@ -539,6 +579,11 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=='panzerfaust':
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
 
     z.world_builder_identity='crate'
     # set world coords if they weren't already set
@@ -879,6 +924,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='blood_splatter'
         z.rotation_angle=float(random.randint(0,359))  
+
+    elif OBJECT_TYPE=='small_blood':
+        z=WorldObject(WORLD,['small_blood'],AINone)
+        z.render_level=2
+        z.name='small_blood'
+        z.rotation_angle=float(random.randint(0,359)) 
            
     elif OBJECT_TYPE=='dirt':
         z=WorldObject(WORLD,['dirt'],AINone)
@@ -910,7 +961,7 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     # MAX_TIME - max flight time around 3.5 seconds is default
@@ -924,6 +975,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.ai.ignore_list=copy.copy(IGNORE_LIST)
     z.ai.shooter=SHOOTER
     z.ai.projectile_type=PROJECTILE_TYPE
+    z.ai.weapon_name=WEAPON_NAME
 
     if MOUSE_AIM :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
@@ -940,7 +992,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
-def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR):
+def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR,WEAPON_NAME):
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
@@ -957,15 +1009,16 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     # increase the collision radius to make sure we get hits
     z.collision_radius=10
     z.ai.shooter=ORIGINATOR
+    z.ai.weapon_name=WEAPON_NAME
     z.wo_start()
 
 #------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR):
+def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR):
