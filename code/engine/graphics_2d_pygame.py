@@ -77,7 +77,6 @@ class Graphics_2D_Pygame(object):
         self.menu_text_queue=[]
 
         # debug info queue
-        self.debug_mode=True
         self.debug_text_queue=[]
 
         # vehicle text 
@@ -266,7 +265,7 @@ class Graphics_2D_Pygame(object):
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
 
-        if(self.debug_mode):
+        if(self.world.debug_mode):
             self.h=0
             for b in self.debug_text_queue:
                 self.h+=15
@@ -293,7 +292,7 @@ class Graphics_2D_Pygame(object):
         '''
         self.handleInput()
 
-        if(self.debug_mode):
+        if(self.world.debug_mode):
             self.update_debug_info()
 
 

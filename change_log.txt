@@ -3,6 +3,15 @@ TWE Project : Change Log
 
 
 ---------------------------------
+March 03 2022
+-moved debug_mode bool from graphics_2d_pygame to world 
+- made more text dependent on the debug_mode and made it False by default 
+- renamed player to 'player' from 'klaus' to distinguish from the generic german_soldier name 
+- fixed a bug with panzerfaust explosions that caused a crash due to a missing parameter 
+
+thinking about making the human names more generic instead of having custom names 
+
+---------------------------------
 Feb 26 2022 v2
 - fixed a crash/bug in ai_human.think_engage_far
 - added min and max zoom at the engine limitations 

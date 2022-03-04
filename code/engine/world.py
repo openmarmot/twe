@@ -79,6 +79,9 @@ class World(object):
         # a way to pause the action
         self.is_paused=False
 
+        # debug text and other stuff checks this condition
+        self.debug_mode=False
+
         #bool
         self.map_enabled=False
 
