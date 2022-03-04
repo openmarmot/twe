@@ -873,9 +873,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel=2900
         z.is_airplane=True 
 
+    # probably remove this in the future. should spawn a specific soldier or civie instead
     elif OBJECT_TYPE=='player':
         z=WorldObject(WORLD,['man'],AIHuman)
-        z.name='Klaus Hammer'
+        z.name='player'
         z.speed=50.
         z.is_player=True
         z.render_level=3
@@ -1021,12 +1022,12 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
 
 #------------------------------------------------------------------------------
-def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR):
+def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     ''' creates a cone/line of shrapnel. used for panzerfaust'''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-5,5))+TARGET_COORDS[0],float(random.randint(-5,5))+TARGET_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR,WEAPON_NAME)
 
 
 #------------------------------------------------------------------------------

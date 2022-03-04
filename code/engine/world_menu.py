@@ -34,6 +34,7 @@ class World_Menu(object):
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
 
+
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
         # Key is a string corresponding to the actual key being pressed
@@ -267,7 +268,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
-            self.world.graphic_engine.menu_text_queue.append('2 - toggle debug text')
+            self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
             self.menu_state='base'
@@ -276,10 +277,10 @@ class World_Menu(object):
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                if self.world.graphic_engine.debug_mode==True:
-                    self.world.graphic_engine.debug_mode=False
+                if self.world.debug_mode==True:
+                    self.world.debug_mode=False
                 else:
-                    self.world.graphic_engine.debug_mode=True
+                    self.world.debug_mode=True
             elif Key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='4':
@@ -289,8 +290,9 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
+            if self.world.debug_mode==True:
+                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
             self.world.graphic_engine.menu_text_queue.append('3 - pick up')
@@ -329,11 +331,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-            if self.selected_object.is_soldier:
-                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.world_coords)
-            else:
-                d2=0
+
 
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             if self.selected_object.ai.primary_weapon != None:
@@ -343,10 +341,17 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
             self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
-            self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
-            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
-            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+
+            if self.world.debug_mode==True:
+                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+                if self.selected_object.is_soldier:
+                    d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.world_coords)
+                else:
+                    d2=0
+                self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
+                self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
+                self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
+                self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
 
 
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')

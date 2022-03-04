@@ -68,7 +68,7 @@ class AIPanzerfaust(AIBase):
         # kablooey!
         # add the shrapnel
         target_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,2)
-        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count,self.equipper)
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count,self.equipper,self.owner.name)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else
