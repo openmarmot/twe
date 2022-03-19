@@ -38,6 +38,7 @@ class AISquad(object):
 
         # destination - this is set by the faction tactical ai
         self.destination=[0.,0.]
+        
         # people in the squad 
         # ai_human will remove itself on death 
         self.members=[] 

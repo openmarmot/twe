@@ -379,7 +379,7 @@ class World_Menu(object):
 
     def start_menu(self, Key):
         if self.menu_state=='none':
-            self.world.is_paused=True
+            self.world.is_paused=False
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
             self.world.graphic_engine.menu_text_queue.append('TWE')
@@ -402,6 +402,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.american_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                self.world.american_ai.spawn_squads([s])
                 print('Spawning as American')
             elif Key=='2':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
@@ -413,6 +414,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.german_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                self.world.german_ai.spawn_squads([s])
                 print('Spawning as German')
             elif Key=='3':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
@@ -424,6 +426,7 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.soviet_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                self.world.soviet_ai.spawn_squads([s])
                 print('Spawning as Soviet')
             elif Key=='4':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
@@ -434,13 +437,14 @@ class World_Menu(object):
                 s.members.append(self.world.player)
                 self.world.civilian_ai.squads.append(s)
                 self.world.player.ai.squad=s
+                self.world.civilian_ai.spawn_squads([s])
                 print('Spawning as Civilian')
             
             if Key=='1' or Key=='2' or Key=='3' or Key=='4':
                 # eventually load other menus
                 self.world.is_paused=False
                 self.deactivate_menu()
-                engine.world_builder.load_test_environment(self.world)
+                
 
 
     def vehicle_menu(self, Key):

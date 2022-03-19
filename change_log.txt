@@ -3,6 +3,21 @@ TWE Project : Change Log
 
 
 ---------------------------------
+March 19 2022
+- changed a lot about spawning at the beginning of the game
+    - most noticeably the game is now running when you are in the start menu 
+- added blue map pointer that points towards your squad world coords 
+- added orange map pointer that points toward your squad destination 
+
+the new map pointers don't work very well. I probably need to add map pointer 'modes' so they 
+can have some update logic 
+
+note the player starts out in a squad by themselves. when they die they will take over a random bot who 
+is probably in a bigger squad.
+
+thinking about adding squad modes to add some different behaviors 
+
+---------------------------------
 March 03 2022
 -moved debug_mode bool from graphics_2d_pygame to world 
 - made more text dependent on the debug_mode and made it False by default 

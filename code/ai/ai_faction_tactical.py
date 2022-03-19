@@ -49,11 +49,19 @@ class AIFactionTactical(object):
         # faction - german/soviet/american/civilian
         self.faction=FACTION
 
-    # called by worldbuilder at the moment
-    def spawn_on_map(self,WORLD_COORDS):
-        for b in self.squads:
-            b.world_coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            b.destination=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
+        # world_coords of the spawn point for this faction
+        # in the future should support multiple spawn points
+        self.spawn_point=None
+
+    # spawn all squads. used at the start of the game
+    def spawn_all(self):
+        self.spawn_squads(self.squads)
+
+    # spawns a list of squads
+    def spawn_squads(self,SQUADS):
+        for b in SQUADS:
+            b.world_coords=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
+            b.destination=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
             
             b.spawn_on_map()
 

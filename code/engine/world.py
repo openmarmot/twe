@@ -331,9 +331,13 @@ class World(object):
                 self.remove_object(b)
         else:
             self.map_enabled=True
+            print('map enabled :','green= world area','blue= squad','green= squad destination')
 
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
+
+            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
+            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
     #---------------------------------------------------------------------------
     def load_map(self):
