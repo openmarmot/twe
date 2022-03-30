@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
+---------------------------------
+March 29 2022
+- randomized squad enemy list refresh rate 
+- added a 'ai think' function for squad 
+- added 'add_to_squad' function that i really need to rewrite some of the spawning to use
+- added some squad ai modes, only default and player work at the moment.
 
+I think squad ai will evolve in a similar way as ai_human. 
+The original idea for squad_ai was that it was dumb, it was only really a 
+collection of human_ai that had a shared world_coordinate, but im starting to see 
+the need for more logic in squad rather than just dumbly moving the world_coord 
+towards a destination. 
+
+didn't playtest / bug test this yet as it got too late in the evening
+squads needs more work anyways 
 
 ---------------------------------
 March 19 2022

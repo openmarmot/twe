@@ -50,6 +50,29 @@ class AISquad(object):
         self.faction='none'
 
         self.time_since_enemy_update=0.
+        self.enemy_update_rate=0
+
+        self.time_since_ai_think=0
+        self.ai_think_rate=0
+
+        # determines broadly how the ai behaves
+        # normal - moves towards a destination
+        # guard - follows a world_object
+        # player - same as guard? only guarding the player?
+        self.ai_mode='normal'
+
+    #---------------------------------------------------------------------------
+    def add_to_squad(self, WORLD_OBJECT):
+        ''' add a world_object to the squad. DOES NOT SPAWN AT THE MOMENT'''
+        if WORLD_OBJECT.is_human==False:
+            print('error: attempting to add a non human to squad')
+        
+        if WORLD_OBJECT.is_player:
+            self.ai_mode='player'
+
+        WORLD_OBJECT.ai.squad=self
+
+        # not sure what else we need to do
 
     #---------------------------------------------------------------------------
     def get_enemy(self):
@@ -61,6 +84,18 @@ class AISquad(object):
         else:
             return None
     
+    #---------------------------------------------------------------------------
+    def handle_ai_think(self):
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        if self.ai_mode=='normal':
+            self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)
+        elif self.ai_mode=='guard':
+            # if object to guard is stationary maybe walk a pattern around it
+            # if object is human or vehicle maybe just stay close to it
+            pass
+        elif self.ai_mode=='player':
+            self.world_coords=copy.copy(self.world.player.world_coords)
+
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
         '''spawns the squad on the map at the squads world coords '''
@@ -80,18 +115,19 @@ class AISquad(object):
         if len(self.members)>0:
             time_passed=self.world.graphic_engine.time_passed_seconds
             self.time_since_enemy_update+=time_passed
+            self.time_since_ai_think+=time_passed
             
-            # update enemy list every 5 seconds or so
-            if self.time_since_enemy_update>5:
+            # update enemy list on a random interval
+            if self.time_since_enemy_update>self.enemy_update_rate:
+                self.enemy_update_rate=random.uniform(0.3,3.5)
                 self.time_since_enemy_update=0
                 self.update_near_enemy_list()
 
-            if self.members[0].is_player:
-                # if the squad is player controlled then keep the squad following the player
-                self.world_coords=self.members[0].world_coords
-            else:
-                # else slowly move the squad in the direction of the target the AI has assigned
-                self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)           
+            if self.time_since_ai_think>self.ai_think_rate:
+                self.ai_think_rate=random.uniform(1.2,4.5)
+                self.time_since_ai_think=0
+                self.handle_ai_think
+          
 
 
     #---------------------------------------------------------------------------
