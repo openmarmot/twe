@@ -9,16 +9,13 @@ notes : AI that controls all a factions squads on the tactical map
 
 
 #import built in modules
-import random 
+import random
+import copy 
 
 #import custom packages
 import engine.math_2d
 import copy
-
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 02 2021' #date of last update
-
+from ai.ai_squad import AISquad
 
 #global variables
 
@@ -53,10 +50,32 @@ class AIFactionTactical(object):
         # in the future should support multiple spawn points
         self.spawn_point=None
 
+    #---------------------------------------------------------------------------
+    def create_and_spawn_squad(self,MEMBERS):
+        ''' creates a new squad and spawns it at the spawn point'''
+        if self.spawn_point==None:
+            print('error : faction spawn point not set before squad spawn')
+        
+        s=AISquad(self.world)
+        s.faction=self.faction
+
+        for b in MEMBERS:
+            s.members.append(b)
+            b.ai.squad=s
+
+            # should set the is_german is_soviet here but hmmm is that different from faction??
+
+        self.squads.append(s)
+
+        self.spawn_squads([s])
+
+
+    #---------------------------------------------------------------------------
     # spawn all squads. used at the start of the game
     def spawn_all(self):
         self.spawn_squads(self.squads)
 
+    #---------------------------------------------------------------------------
     # spawns a list of squads
     def spawn_squads(self,SQUADS):
         for b in SQUADS:
@@ -65,6 +84,7 @@ class AIFactionTactical(object):
             
             b.spawn_on_map()
 
+    #---------------------------------------------------------------------------
     def update(self):
         time_passed=self.world.graphic_engine.time_passed_seconds
         self.time_since_update+=time_passed
@@ -77,6 +97,7 @@ class AIFactionTactical(object):
             if len(self.squads)>0:
                 self.tactical_order()
 
+    #---------------------------------------------------------------------------
     def tactical_order(self):
         attack_queue=[] # areas that are owned by the enemy
         defend_queue=[] # areas that are neutral

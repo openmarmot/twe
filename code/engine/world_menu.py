@@ -11,14 +11,12 @@ instantiated by the world class
 
 #import built in modules
 import random
-from ai.ai_squad import AISquad
+
 
 #import custom packages
 import engine.world_builder 
 import engine.math_2d
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='July 16 2021' #date of last update
+from ai.ai_squad import AISquad
 
 #global variables
 
@@ -396,48 +394,25 @@ class World_Menu(object):
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'1911',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_american=True
-                self.world.wo_objects_american.append(self.world.player)
-                s=AISquad(self.world)
-                s.faction='american'
-                s.members.append(self.world.player)
-                self.world.american_ai.squads.append(s)
-                self.world.player.ai.squad=s
-                self.world.american_ai.spawn_squads([s])
+                self.world.american_ai.create_and_spawn_squad([self.world.player])
                 print('Spawning as American')
             elif Key=='2':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_german=True
-                self.world.wo_objects_german.append(self.world.player)
-                s=AISquad(self.world)
-                s.faction='german'
-                s.members.append(self.world.player)
-                self.world.german_ai.squads.append(s)
-                self.world.player.ai.squad=s
-                self.world.german_ai.spawn_squads([s])
+                self.world.german_ai.create_and_spawn_squad([self.world.player])
                 print('Spawning as German')
             elif Key=='3':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_soviet=True
-                self.world.wo_objects_soviet.append(self.world.player)
-                s=AISquad(self.world)
-                s.faction='soviet'
-                s.members.append(self.world.player)
-                self.world.soviet_ai.squads.append(s)
-                self.world.player.ai.squad=s
-                self.world.soviet_ai.spawn_squads([s])
+                self.world.soviet_ai.create_and_spawn_squad([self.world.player])
                 print('Spawning as Soviet')
             elif Key=='4':
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
                 self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
                 self.world.player.is_civilian=True
-                s=AISquad(self.world)
-                s.faction='civilian'
-                s.members.append(self.world.player)
-                self.world.civilian_ai.squads.append(s)
-                self.world.player.ai.squad=s
-                self.world.civilian_ai.spawn_squads([s])
+                self.world.civilian_ai.create_and_spawn_squad([self.world.player])
                 print('Spawning as Civilian')
             
             if Key=='1' or Key=='2' or Key=='3' or Key=='4':

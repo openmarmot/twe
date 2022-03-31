@@ -86,15 +86,11 @@ class AISquad(object):
     
     #---------------------------------------------------------------------------
     def handle_ai_think(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        if self.ai_mode=='normal':
-            self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)
-        elif self.ai_mode=='guard':
-            # if object to guard is stationary maybe walk a pattern around it
-            # if object is human or vehicle maybe just stay close to it
-            pass
-        elif self.ai_mode=='player':
-            self.world_coords=copy.copy(self.world.player.world_coords)
+        ''' squad think. '''
+        time_passed=self.world.graphic_engine.time_passed_seconds
+
+        # think about the current mode. validate it and change as necessary 
+        
 
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
@@ -126,7 +122,19 @@ class AISquad(object):
             if self.time_since_ai_think>self.ai_think_rate:
                 self.ai_think_rate=random.uniform(1.2,4.5)
                 self.time_since_ai_think=0
-                self.handle_ai_think
+                self.handle_ai_think()
+
+        # -- handle squad movement --
+        if self.ai_mode=='normal':
+            self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)
+        elif self.ai_mode=='guard':
+            # if object to guard is stationary maybe walk a pattern around it
+            # if object is human or vehicle maybe just stay close to it
+            pass
+        elif self.ai_mode=='player':
+            self.world_coords=copy.copy(self.world.player.world_coords)
+        else:
+            print('error ai mode not recognized',self.ai_mode)
           
 
 
