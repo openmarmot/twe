@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+---------------------------------
+March 30 2022
+- rewrote the inital player spawn from the world_menu, shifting most of the 
+    code to the faction and squad classes 
+- fixed some squad behavior bugs that i introduced in the last update 
+    squad behavior should be more or less how it was now 
+
 ---------------------------------
 March 29 2022
 - randomized squad enemy list refresh rate 
