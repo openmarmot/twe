@@ -56,9 +56,9 @@ class AISquad(object):
         self.ai_think_rate=0
 
         # determines broadly how the ai behaves
-        # normal - moves towards a destination
-        # guard - follows a world_object
-        # player - same as guard? only guarding the player?
+        # normal - moves towards a destination set by ai_faction_tactical
+        # guard - follows a world_object. possibly patrols around object
+        # player - follows player
         self.ai_mode='normal'
 
     #---------------------------------------------------------------------------
@@ -90,7 +90,14 @@ class AISquad(object):
         time_passed=self.world.graphic_engine.time_passed_seconds
 
         # think about the current mode. validate it and change as necessary 
-        
+        has_player=False
+        for b in self.members:
+            if b.is_player:
+                has_player=True
+        if has_player:
+            self.ai_mode='player'
+        else:
+            self.ai_mode='normal'
 
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
@@ -124,17 +131,17 @@ class AISquad(object):
                 self.time_since_ai_think=0
                 self.handle_ai_think()
 
-        # -- handle squad movement --
-        if self.ai_mode=='normal':
-            self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)
-        elif self.ai_mode=='guard':
-            # if object to guard is stationary maybe walk a pattern around it
-            # if object is human or vehicle maybe just stay close to it
-            pass
-        elif self.ai_mode=='player':
-            self.world_coords=copy.copy(self.world.player.world_coords)
-        else:
-            print('error ai mode not recognized',self.ai_mode)
+            # -- handle squad movement --
+            if self.ai_mode=='normal':
+                self.world_coords=engine.math_2d.moveTowardsTarget(self.speed,self.world_coords,self.destination,time_passed)
+            elif self.ai_mode=='guard':
+                # if object to guard is stationary maybe walk a pattern around it
+                # if object is human or vehicle maybe just stay close to it
+                pass
+            elif self.ai_mode=='player':
+                self.world_coords=copy.copy(self.world.player.world_coords)
+            else:
+                print('error ai mode not recognized',self.ai_mode)
           
 
 

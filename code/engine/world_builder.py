@@ -681,15 +681,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
         z.name='panzerfaust'
         z.render_level=2
-        z.speed=250
+        z.speed=300
         z.is_handheld_antitank=True
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
         z.is_grenade=True
-        z.speed=180.
-        z.ai.maxTime=1.5
+        z.speed=200.
+        z.ai.maxTime=1.3
         z.render_level=2
 
     elif OBJECT_TYPE=='mp40':

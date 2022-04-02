@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ---------------------------------
+April 02 2022
+- some changes to squad ai so they will detect if the player is in or not 
+    in the squad and activate the correct ai mode 
+- fixed a new bug where ai_faction could crash if a squad hits zero members 
+- increased grenade and panzerfaust speed
+
+now that the squad ai follows around the player when they are in a squad there 
+isn't much of a point to the new squad map pointers, so i'll have to use them for 
+something else.
+
+---------------------------------
 March 30 2022
 - rewrote the inital player spawn from the world_menu, shifting most of the 
     code to the faction and squad classes 
