@@ -40,12 +40,18 @@ def run():
     #  so it needs to be created
     # player will get spawned into the world by its squad
     p=engine.world_builder.spawn_object(world, [50.,50.],'player',False)
+    # load the test environment 
+    engine.world_builder.load_test_environment(world)
 
+    #-- start the player faction selection menu
     world.world_menu.active_menu='start'
     world.world_menu.menu_state='none'
     # fake input to get the text added
     world.world_menu.handle_input('none')
 
+
+
+    # main game loop
     while world.graphic_engine.quit==False:
 
         world.update()

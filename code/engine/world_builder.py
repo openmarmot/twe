@@ -498,10 +498,16 @@ def load_test_environment(world):
     spawn_object(world,world.spawn_west,'panzerfaust',True)
     spawn_object(world,world.spawn_west,'panzerfaust',True)
 
-    world.german_ai.spawn_on_map(world.spawn_west)
-    world.soviet_ai.spawn_on_map(world.spawn_east)
-    world.american_ai.spawn_on_map(world.spawn_north)
-    world.civilian_ai.spawn_on_map(world.spawn_center)
+    # setup spawn points 
+    world.german_ai.spawn_point=world.spawn_west
+    world.soviet_ai.spawn_point=world.spawn_east
+    world.american_ai.spawn_point=world.spawn_north
+    world.civilian_ai.spawn_point=world.spawn_center    
+
+    world.german_ai.spawn_all()
+    world.soviet_ai.spawn_all()
+    world.american_ai.spawn_all()
+    world.civilian_ai.spawn_all()
 
     # add some world areas
     generate_world_area(world,[-2000,2000],'town','Alfa')
@@ -675,15 +681,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
         z.name='panzerfaust'
         z.render_level=2
-        z.speed=250
+        z.speed=300
         z.is_handheld_antitank=True
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
         z.is_grenade=True
-        z.speed=180.
-        z.ai.maxTime=1.5
+        z.speed=200.
+        z.ai.maxTime=1.3
         z.render_level=2
 
     elif OBJECT_TYPE=='mp40':
@@ -955,6 +961,18 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
     if TYPE=='normal':
         z=WorldObject(WORLD,['map_pointer_green'],AIMapPointer)
+        z.ai.target_coords=TARGET_COORDS
+        z.render_level=4
+        z.is_map_pointer=True
+        z.wo_start()
+    if TYPE=='blue':
+        z=WorldObject(WORLD,['map_pointer_blue'],AIMapPointer)
+        z.ai.target_coords=TARGET_COORDS
+        z.render_level=4
+        z.is_map_pointer=True
+        z.wo_start()
+    if TYPE=='orange':
+        z=WorldObject(WORLD,['map_pointer_orange'],AIMapPointer)
         z.ai.target_coords=TARGET_COORDS
         z.render_level=4
         z.is_map_pointer=True

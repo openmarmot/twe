@@ -1,6 +1,64 @@
 TWE Project : Change Log
 
+---------------------------------
+April 06 2022
+- some changes to ai_squad mostly around specific following distances for 
+    certain modes 
+- adjusted human_menu distance from squad to always show a value now 
+    this used to be soldiers only (note you have to turn on debug mode)
 
+realized that with the current human_ai the squad max_distance basically causes 
+a rubber band effect where the ai will get out to the max distance and then close to 
+whatever the set min is. I think I need a squad min_distance and also some more ai 
+code to handle that. 
+---------------------------------
+April 02 2022
+- some changes to squad ai so they will detect if the player is in or not 
+    in the squad and activate the correct ai mode 
+- fixed a new bug where ai_faction could crash if a squad hits zero members 
+- increased grenade and panzerfaust speed
+
+now that the squad ai follows around the player when they are in a squad there 
+isn't much of a point to the new squad map pointers, so i'll have to use them for 
+something else.
+
+---------------------------------
+March 30 2022
+- rewrote the inital player spawn from the world_menu, shifting most of the 
+    code to the faction and squad classes 
+- fixed some squad behavior bugs that i introduced in the last update 
+    squad behavior should be more or less how it was now 
+
+---------------------------------
+March 29 2022
+- randomized squad enemy list refresh rate 
+- added a 'ai think' function for squad 
+- added 'add_to_squad' function that i really need to rewrite some of the spawning to use
+- added some squad ai modes, only default and player work at the moment.
+
+I think squad ai will evolve in a similar way as ai_human. 
+The original idea for squad_ai was that it was dumb, it was only really a 
+collection of human_ai that had a shared world_coordinate, but im starting to see 
+the need for more logic in squad rather than just dumbly moving the world_coord 
+towards a destination. 
+
+didn't playtest / bug test this yet as it got too late in the evening
+squads needs more work anyways 
+
+---------------------------------
+March 19 2022
+- changed a lot about spawning at the beginning of the game
+    - most noticeably the game is now running when you are in the start menu 
+- added blue map pointer that points towards your squad world coords 
+- added orange map pointer that points toward your squad destination 
+
+the new map pointers don't work very well. I probably need to add map pointer 'modes' so they 
+can have some update logic 
+
+note the player starts out in a squad by themselves. when they die they will take over a random bot who 
+is probably in a bigger squad.
+
+thinking about adding squad modes to add some different behaviors 
 
 ---------------------------------
 March 03 2022
