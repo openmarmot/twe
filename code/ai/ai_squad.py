@@ -97,7 +97,27 @@ class AISquad(object):
         if has_player:
             self.ai_mode='player'
         else:
-            self.ai_mode='normal'
+            # if in player mode reset to normal, otherwise do nothing
+            if self.ai_mode=='player':
+                self.ai_mode='normal'
+
+    #----------------------------------------------------------------------------
+    def set_ai_mode(self,MODE):
+        if MODE=='normal':
+            self.ai_mode=MODE
+            if self.faction=='civilian':
+                print('setting max_distance for civ squad')
+                self.max_distance=1000
+            else:
+                self.max_distance=300
+        elif MODE=='player':
+            self.ai_mode=MODE
+            self.max_distance=100
+        elif MODE=='guard':
+            self.ai_mode=MODE
+            self.max_distance=100
+        else:
+            print('Error : AI Mode not recognized: ',MODE)
 
     #---------------------------------------------------------------------------
     def spawn_on_map(self):

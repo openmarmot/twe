@@ -342,10 +342,8 @@ class World_Menu(object):
 
             if self.world.debug_mode==True:
                 d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-                if self.selected_object.is_soldier:
-                    d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.world_coords)
-                else:
-                    d2=0
+                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.world_coords)
+
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))

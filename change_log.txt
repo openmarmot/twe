@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
+---------------------------------
+April 06 2022
+- some changes to ai_squad mostly around specific following distances for 
+    certain modes 
+- adjusted human_menu distance from squad to always show a value now 
+    this used to be soldiers only (note you have to turn on debug mode)
 
+realized that with the current human_ai the squad max_distance basically causes 
+a rubber band effect where the ai will get out to the max distance and then close to 
+whatever the set min is. I think I need a squad min_distance and also some more ai 
+code to handle that. 
 ---------------------------------
 April 02 2022
 - some changes to squad ai so they will detect if the player is in or not 
