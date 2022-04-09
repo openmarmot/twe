@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+
+---------------------------------
+April 09 2022
+- some adjustment to min/max distance for civilian squad 
+- added a minimum distance of 150 for the world menus to pop up 
+
+---------------------------------
+April 07 2022
+- added squad min_distance and the ai_human code to handle it 
+
 ---------------------------------
 April 06 2022
 - some changes to ai_squad mostly around specific following distances for 

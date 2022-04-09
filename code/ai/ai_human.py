@@ -727,6 +727,9 @@ class AIHuman(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
+        elif self.ai_goal=='close_with_group':
+            if DISTANCE<self.squad.min_distance:
+                self.ai_state='sleeping'
         else:
             # catchall for random moving related goals:
             if DISTANCE<3:

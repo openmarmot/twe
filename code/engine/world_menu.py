@@ -81,27 +81,34 @@ class World_Menu(object):
         if self.active_menu !="death":
             # clear any current menu
             self.deactivate_menu()
-            self.selected_object=SELECTED_OBJECT
 
-            if SELECTED_OBJECT.is_vehicle: 
-                self.active_menu='vehicle'
-                self.vehicle_menu(None)
-            elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
-                self.active_menu='gun'
-                self.gun_menu(None)
-            elif SELECTED_OBJECT.is_container:
-                self.active_menu='storage'
-                self.storage_menu(None)
-            elif SELECTED_OBJECT.is_human:
-                self.active_menu='human'
-                self.human_menu(None)
-            elif SELECTED_OBJECT.is_airplane:
-                self.active_menu='airplane'
-                self.airplane_menu(None)
-            else :
-                # just dump everything else in here for now
-                self.active_menu='generic'
-                self.generic_item_menu(None)
+            d=engine.math_2d.get_distance(self.world.player.world_coords,SELECTED_OBJECT.world_coords)
+
+            # minimum distance for a context menu to pop up
+            if d<150:
+                self.selected_object=SELECTED_OBJECT
+
+                if SELECTED_OBJECT.is_vehicle: 
+                    self.active_menu='vehicle'
+                    self.vehicle_menu(None)
+                elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
+                    self.active_menu='gun'
+                    self.gun_menu(None)
+                elif SELECTED_OBJECT.is_container:
+                    self.active_menu='storage'
+                    self.storage_menu(None)
+                elif SELECTED_OBJECT.is_human:
+                    self.active_menu='human'
+                    self.human_menu(None)
+                elif SELECTED_OBJECT.is_airplane:
+                    self.active_menu='airplane'
+                    self.airplane_menu(None)
+                else :
+                    # just dump everything else in here for now
+                    self.active_menu='generic'
+                    self.generic_item_menu(None)
+            else:
+                print('Get closer to the object ',d)
 
     def airplane_menu(self, Key):
         if self.menu_state=='none':

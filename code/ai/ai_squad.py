@@ -32,6 +32,9 @@ class AISquad(object):
         # how far the ai will stray from the group before coming back
         self.max_distance=300
 
+        # how close to the group a bot has to get before it can stop 'closing with group'
+        self.min_distance=50
+
         # ai in the group will try to stay close to the group world coords
         # moves towards destination
         self.world_coords=[0.,0.]
@@ -107,15 +110,19 @@ class AISquad(object):
             self.ai_mode=MODE
             if self.faction=='civilian':
                 print('setting max_distance for civ squad')
-                self.max_distance=1000
+                self.max_distance=3500
+                self.min_distance=600
             else:
                 self.max_distance=300
+                self.min_distance=50
         elif MODE=='player':
             self.ai_mode=MODE
             self.max_distance=100
+            self.min_distance=30
         elif MODE=='guard':
             self.ai_mode=MODE
             self.max_distance=100
+            self.min_distance=30
         else:
             print('Error : AI Mode not recognized: ',MODE)
 
