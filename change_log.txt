@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ---------------------------------
+April 15 2022
+- some small changes to world menu 
+    - when you get a human menu it will say if the bot is in your squad 
+- added a speak function to ai_human 
+    only works if in earshot of the player 
+- bumped up the max distance for a menu to appear a bit 
+
+
+---------------------------------
 April 09 2022
 - some adjustment to min/max distance for civilian squad 
 - added a minimum distance of 150 for the world menus to pop up 

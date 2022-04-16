@@ -31,6 +31,7 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
+        self.max_menu_distance=300
 
 
     def handle_input(self,Key):
@@ -85,7 +86,7 @@ class World_Menu(object):
             d=engine.math_2d.get_distance(self.world.player.world_coords,SELECTED_OBJECT.world_coords)
 
             # minimum distance for a context menu to pop up
-            if d<150:
+            if d<self.max_menu_distance:
                 self.selected_object=SELECTED_OBJECT
 
                 if SELECTED_OBJECT.is_vehicle: 
@@ -337,6 +338,8 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
 
+            if self.selected_object.ai.squad==self.world.player.ai.squad:
+                self.world.graphic_engine.menu_text_queue.append('[in your squad]')
 
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             if self.selected_object.ai.primary_weapon != None:
@@ -363,7 +366,7 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                print('nothing much')
+                self.selected_object.ai.speak('status')
             elif Key=='2':
                 # remove from old squad
                 if self.selected_object.ai.squad!=None:

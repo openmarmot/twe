@@ -392,7 +392,8 @@ class AIHuman(AIBase):
         if(self.owner.world.graphic_engine.keyPressed('b')):
             if self.bleeding:
                 self.bleeding=False
-                self.owner.world.graphic_engine.text_queue.insert(0,'You apply a bandage')
+                self.speak('bandage')
+
 
 
     #---------------------------------------------------------------------------
@@ -404,7 +405,22 @@ class AIHuman(AIBase):
             self.inventory.remove(self.antitank)
             self.antitank=None
 
-    
+
+    #---------------------------------------------------------------------------
+    def speak(self,WHAT):
+        ''' say something the ai is close to the player '''
+        distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
+        if distance<400:
+            s='['+self.owner.name+'] '
+
+            if WHAT=='status':
+                s+=' '+self.ai_state+' '+self.ai_goal
+            elif WHAT=='bandage':
+                s+=' applying bandage'
+            else:
+                s+=' ehhh?'
+
+            self.owner.world.graphic_engine.add_text(s)
     #-----------------------------------------------------------------------
     def think_engage(self):
         ''' think about the current engagement'''
