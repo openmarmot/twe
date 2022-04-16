@@ -86,7 +86,7 @@ class World_Menu(object):
             d=engine.math_2d.get_distance(self.world.player.world_coords,SELECTED_OBJECT.world_coords)
 
             # minimum distance for a context menu to pop up
-            if d<self.max_menu_distance:
+            if d<self.max_menu_distance or self.world.debug_mode==True:
                 self.selected_object=SELECTED_OBJECT
 
                 if SELECTED_OBJECT.is_vehicle: 
@@ -338,8 +338,14 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
 
-            if self.selected_object.ai.squad==self.world.player.ai.squad:
-                self.world.graphic_engine.menu_text_queue.append('[in your squad]')
+            if self.selected_object==self.world.player:
+                self.world.graphic_engine.menu_text_queue.append('[player]')
+            else:
+                if self.selected_object.ai.squad==self.world.player.ai.squad:
+                    self.world.graphic_engine.menu_text_queue.append('[in your squad]')
+
+            self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
+
 
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             if self.selected_object.ai.primary_weapon != None:
@@ -368,14 +374,8 @@ class World_Menu(object):
             if Key=='1':
                 self.selected_object.ai.speak('status')
             elif Key=='2':
-                # remove from old squad
-                if self.selected_object.ai.squad!=None:
-                    self.selected_object.ai.squad.members.remove(self.selected_object)
-
-                # add to player squad 
-                self.selected_object.ai.squad=self.world.player.ai.squad
-                self.selected_object.ai.squad.members.append(self.selected_object)
-
+                # ask the ai to join the squad
+                self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
                 
             elif Key=='3':

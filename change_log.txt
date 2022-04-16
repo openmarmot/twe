@@ -2,13 +2,29 @@ TWE Project : Change Log
 
 
 ---------------------------------
+April 16 2022
+- added squad count to menu 
+- added text identifying the player when you click on yourself 
+- made it a little more likely that friendly ai will shoot back if the 
+player shoots them 
+- changed some misc squad functionality - hard to tell what all was affected 
+- squad min/max will actually be applied now
+- added a human_ai function to react to being asked to join a squad 
+- removed min menu distance when debug mode is enabled 
+
+Note that the menu option to ask bots to join your squad more or less 
+works now. For now they have to be a member of your faction. They don't 
+do a great job of following you but they will generally be around, and 
+they may attack other bots that have shot you do to the squad enemies 
+mechanism. This will probably get better in the future. 
+
+---------------------------------
 April 15 2022
 - some small changes to world menu 
     - when you get a human menu it will say if the bot is in your squad 
 - added a speak function to ai_human 
     only works if in earshot of the player 
 - bumped up the max distance for a menu to appear a bit 
-
 
 ---------------------------------
 April 09 2022

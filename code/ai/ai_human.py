@@ -128,7 +128,7 @@ class AIHuman(AIBase):
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
 
                 if EVENT_DATA.ai.shooter.ai.squad != None:
-                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
+                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
                         self.squad.near_enemies.append(self.personal_enemies[0])
 
                 # kill tracking
@@ -417,10 +417,25 @@ class AIHuman(AIBase):
                 s+=' '+self.ai_state+' '+self.ai_goal
             elif WHAT=='bandage':
                 s+=' applying bandage'
+            elif WHAT=='joined squad':
+                s+=' joined squad'
             else:
-                s+=' ehhh?'
+                s+=' ehhh? '+WHAT
 
             self.owner.world.graphic_engine.add_text(s)
+
+    #-----------------------------------------------------------------------
+    def react_asked_to_join_squad(self,SQUAD):
+        if SQUAD==self.squad:
+            self.speak("I'm already in that squad")
+        else:
+            if SQUAD.faction==self.squad.faction:
+                # yes - lets join this squad 
+
+                SQUAD.add_to_squad(self.owner)
+                self.speak('joined squad')
+            else:
+                self.speak('no')
     #-----------------------------------------------------------------------
     def think_engage(self):
         ''' think about the current engagement'''
