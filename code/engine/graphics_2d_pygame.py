@@ -328,6 +328,8 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
         self.debug_text_queue.append('Civilians: '+ str(len(self.world.wo_objects_civilian)))
         self.debug_text_queue.append('Player World Coords: '+str(self.world.player.world_coords))
+        self.debug_text_queue.append('Player Fatigue: '+str(self.world.player.ai.fatigue))
+        self.debug_text_queue.append('Player Speed: '+str(self.world.player.ai.get_calculated_speed()))
 
         # world area data
         for b in self.world.world_areas:

@@ -59,6 +59,13 @@ class AIHuman(AIBase):
         self.target_object=None
         self.destination=None
 
+        # fatigue is used as a modifier for a bunch of stuff
+        # doing things adds fatigue, it slowly drains away when you aren't moving
+        self.fatigue=0
+        self.fatigue_add_rate=1
+        self.fatigue_remove_rate=0.75
+
+
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
@@ -244,6 +251,23 @@ class AIHuman(AIBase):
         if self.primary_weapon!=None:
             self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
 
+
+    #---------------------------------------------------------------------------
+    def get_calculated_speed(self):
+        calc_speed=self.owner.speed
+        if self.fatigue<3:
+            calc_speed*=1.5
+        if self.fatigue>5:
+            calc_speed*=0.95
+        if self.fatigue>10:
+            calc_speed*=0.9
+        if self.fatigue>20:
+            calc_speed*=0.9
+        if self.fatigue>30:
+            calc_speed*=0.9
+        
+        return calc_speed
+    
     #---------------------------------------------------------------------------
     def handle_death(self):
         dm=''
@@ -342,11 +366,11 @@ class AIHuman(AIBase):
 
             if self.ai_state=='moving':
                 # move towards target
-                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed)           
+                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
+                self.fatigue+=self.fatigue_add_rate*time_passed           
             elif self.ai_state=='engaging':
                 self.fire(self.target_object.world_coords)
-            elif self.ai_state=='sleeping':
-                pass
+                self.fatigue+=self.fatigue_add_rate*time_passed
             elif self.ai_state=='start_moving':
                 # this kicks off movement
                 # maybe change into moving animation image?
@@ -358,41 +382,59 @@ class AIHuman(AIBase):
                 # transition to moving
                 self.time_since_ai_transition=0
                 self.ai_state='moving'
+            else:
+                # sleeping or whatever 
+                self.fatigue-=self.fatigue_remove_rate*time_passed
 
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
+        action=False
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if(self.owner.world.graphic_engine.keyPressed('w')):
             self.owner.world_coords[1]-=self.owner.speed*time_passed
             self.owner.rotation_angle=0
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('s')):
             self.owner.world_coords[1]+=self.owner.speed*time_passed
             self.owner.rotation_angle=180
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.world_coords[0]-=self.owner.speed*time_passed
             self.owner.rotation_angle=90
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.world_coords[0]+=self.owner.speed*time_passed
             self.owner.rotation_angle=270
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             self.throw([]) 
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('t')):
             # launch anti tank
             self.launch_antitank([])
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('b')):
             if self.bleeding:
                 self.bleeding=False
                 self.speak('bandage')
+                action=True
+        
+        if action:
+            self.fatigue+=self.fatigue_add_rate*time_passed
+        else:
+            if self.fatigue>0:
+                self.fatigue-=self.fatigue_remove_rate*time_passed
 
 
 

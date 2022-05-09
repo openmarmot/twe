@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ---------------------------------
+May 08 2022
+- added calculated_speed for human ai 
+    - based on fatigue level. cumulative effect 
+turn on debug data to see your speed and fatigue 
+
+---------------------------------
+April 25 2022
+- added fatigue system 
+
+---------------------------------
 April 16 2022
 - added squad count to menu 
 - added text identifying the player when you click on yourself 
