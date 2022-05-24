@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+---------------------------------
+May 23 2022
+- jerry can artwork
+- jerry can placeholder code 
+
+jerry can artwork sucks. needs to be redone 
 
 ---------------------------------
 May 08 2022

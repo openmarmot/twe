@@ -312,6 +312,7 @@ def load_images(world):
     #containers
     world.graphic_engine.loadImage('crate','images/containers/crate.png')
     world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
+    world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -385,6 +386,9 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
+
+    # spawn some fuel cans 
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
 
     # spawn some crates
     spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
@@ -668,6 +672,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
+    elif OBJECT_TYPE=='german_fuel_can':
+        z=WorldObject(WORLD,['german_fuel_can'],AIContainer)
+        z.is_container=True
+        z.render_level=2
+        z.name='german_fuel_can'
+        z.world_builder_identity='german_fuel_can'
 
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
