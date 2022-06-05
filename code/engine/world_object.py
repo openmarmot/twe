@@ -87,6 +87,9 @@ class WorldObject(object):
         self.is_grenade=False
         self.is_handheld_antitank=False
         self.is_melee=False # melee close combat weapon like a dagger 
+        # these are non weapon pickups that are can be carried but are large.
+        # only one can be carried at a time.
+        self.is_large_human_pickup=False
         self.is_gun_mag_carrier=False
         self.is_container=False
         self.is_projectile=False
@@ -94,10 +97,14 @@ class WorldObject(object):
         self.is_german=False
         self.is_soviet=False
         self.is_american=False
-        self.is_gas=False
-        self.is_diesel=False
+        self.is_liquid_container=False # water/gas/diesel/??
+        self.is_ammo_container=False # contains ammo 
         self.is_building=False
         self.is_map_pointer=False
+
+        # stuff that i don't think is used at the moment
+        self.is_gas=False
+        self.is_diesel=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in

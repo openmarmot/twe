@@ -31,6 +31,8 @@ class AIHuman(AIBase):
         self.throwable=None
         self.antitank=None
         self.melee=None
+        # objects that are large_human_pickup. only one at a time
+        self.large_pickup=None
         self.health=100
         self.bleeding=False
         self.time_since_bleed=0
@@ -241,6 +243,23 @@ class AIHuman(AIBase):
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_large_human_pickup :
+            if self.large_pickup==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
+                self.large_pickup=EVENT_DATA
+                #EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.large_pickup.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.large_pickup)
+                self.inventory.remove(self.large_pickup)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
+                self.large_pickup=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+
+
 
 
 

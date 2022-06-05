@@ -674,7 +674,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AIContainer)
-        z.is_container=True
+        z.is_container=False # going to be something special
+        z.is_liquid_container=True
+        z.is_large_human_pickup=True
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
@@ -682,7 +684,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
-        z.is_container=True
+        z.is_container=False # going to be something special
+        z.is_ammo_container=True
+        z.is_large_human_pickup=True
         z.render_level=2
         z.name='german_mg_ammo_can'
         z.world_builder_identity='german_mg_ammo_can'
@@ -873,6 +877,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.acceleration=100
         z.collision_radius=50
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",True))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 

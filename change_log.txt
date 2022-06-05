@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+
+---------------------------------
+June 04 2022
+- added jerry can to kubelwagen spawns 
+- added 'is_large_human_pickup' to world_object 
+    - these will be large awkard objects that you will only be able to carry one of
+        - like a ammo can or gas can 
+- added liquid_container and ammo_container classifiers 
+
+
 ---------------------------------
 May 23 2022
 - jerry can artwork
