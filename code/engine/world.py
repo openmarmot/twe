@@ -308,10 +308,15 @@ class World(object):
         mouse=self.graphic_engine.get_mouse_screen_coords()
         possible_objects=[]
 
+        # not sure if this is a good way to do this or not. we could also use 
+        # the curated object lists that world keeps. 
+        # plus side to renderLists is its only what is more or less visible on screen
+
         for b in self.graphic_engine.renderlists:
             for c in b:
                 # could check is_gun, is_human etc here to narrow down
-                if c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank or c.is_grenade or c.is_airplane:
+                if (c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank or c.is_grenade or c.is_airplane
+                or c.is_liquid_container or c.is_ammo_container):
                     possible_objects.append(c)
 
         

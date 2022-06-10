@@ -79,7 +79,7 @@ class World_Menu(object):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
 
         # this is necessary to prevent the player from accidentally exiting the death menu
-        if self.active_menu !="death":
+        if self.active_menu !="death" and self.active_menu!='start':
             # clear any current menu
             self.deactivate_menu()
 
