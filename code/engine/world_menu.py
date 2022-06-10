@@ -31,6 +31,7 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
+        self.max_menu_distance=300
 
 
     def handle_input(self,Key):
@@ -78,30 +79,37 @@ class World_Menu(object):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
 
         # this is necessary to prevent the player from accidentally exiting the death menu
-        if self.active_menu !="death":
+        if self.active_menu !="death" and self.active_menu!='start':
             # clear any current menu
             self.deactivate_menu()
-            self.selected_object=SELECTED_OBJECT
 
-            if SELECTED_OBJECT.is_vehicle: 
-                self.active_menu='vehicle'
-                self.vehicle_menu(None)
-            elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
-                self.active_menu='gun'
-                self.gun_menu(None)
-            elif SELECTED_OBJECT.is_container:
-                self.active_menu='storage'
-                self.storage_menu(None)
-            elif SELECTED_OBJECT.is_human:
-                self.active_menu='human'
-                self.human_menu(None)
-            elif SELECTED_OBJECT.is_airplane:
-                self.active_menu='airplane'
-                self.airplane_menu(None)
-            else :
-                # just dump everything else in here for now
-                self.active_menu='generic'
-                self.generic_item_menu(None)
+            d=engine.math_2d.get_distance(self.world.player.world_coords,SELECTED_OBJECT.world_coords)
+
+            # minimum distance for a context menu to pop up
+            if d<self.max_menu_distance or self.world.debug_mode==True:
+                self.selected_object=SELECTED_OBJECT
+
+                if SELECTED_OBJECT.is_vehicle: 
+                    self.active_menu='vehicle'
+                    self.vehicle_menu(None)
+                elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
+                    self.active_menu='gun'
+                    self.gun_menu(None)
+                elif SELECTED_OBJECT.is_container:
+                    self.active_menu='storage'
+                    self.storage_menu(None)
+                elif SELECTED_OBJECT.is_human:
+                    self.active_menu='human'
+                    self.human_menu(None)
+                elif SELECTED_OBJECT.is_airplane:
+                    self.active_menu='airplane'
+                    self.airplane_menu(None)
+                else :
+                    # just dump everything else in here for now
+                    self.active_menu='generic'
+                    self.generic_item_menu(None)
+            else:
+                print('Get closer to the object ',d)
 
     def airplane_menu(self, Key):
         if self.menu_state=='none':
@@ -330,6 +338,14 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
 
+            if self.selected_object==self.world.player:
+                self.world.graphic_engine.menu_text_queue.append('[player]')
+            else:
+                if self.selected_object.ai.squad==self.world.player.ai.squad:
+                    self.world.graphic_engine.menu_text_queue.append('[in your squad]')
+
+            self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
+
 
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
             if self.selected_object.ai.primary_weapon != None:
@@ -356,16 +372,10 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                print('nothing much')
+                self.selected_object.ai.speak('status')
             elif Key=='2':
-                # remove from old squad
-                if self.selected_object.ai.squad!=None:
-                    self.selected_object.ai.squad.members.remove(self.selected_object)
-
-                # add to player squad 
-                self.selected_object.ai.squad=self.world.player.ai.squad
-                self.selected_object.ai.squad.members.append(self.selected_object)
-
+                # ask the ai to join the squad
+                self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
                 
             elif Key=='3':

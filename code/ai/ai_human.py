@@ -31,6 +31,8 @@ class AIHuman(AIBase):
         self.throwable=None
         self.antitank=None
         self.melee=None
+        # objects that are large_human_pickup. only one at a time
+        self.large_pickup=None
         self.health=100
         self.bleeding=False
         self.time_since_bleed=0
@@ -58,6 +60,13 @@ class AIHuman(AIBase):
         self.squad=None
         self.target_object=None
         self.destination=None
+
+        # fatigue is used as a modifier for a bunch of stuff
+        # doing things adds fatigue, it slowly drains away when you aren't moving
+        self.fatigue=0
+        self.fatigue_add_rate=1
+        self.fatigue_remove_rate=0.75
+
 
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
@@ -128,7 +137,7 @@ class AIHuman(AIBase):
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
 
                 if EVENT_DATA.ai.shooter.ai.squad != None:
-                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction:
+                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
                         self.squad.near_enemies.append(self.personal_enemies[0])
 
                 # kill tracking
@@ -234,6 +243,23 @@ class AIHuman(AIBase):
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
+        elif EVENT_DATA.is_large_human_pickup :
+            if self.large_pickup==None:
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
+                self.large_pickup=EVENT_DATA
+                #EVENT_DATA.ai.equipper=self.owner
+            else:
+                # drop the current weapon and pick up the new one
+                self.large_pickup.world_coords=copy.copy(self.owner.world_coords)
+                self.owner.world.add_object(self.large_pickup)
+                self.inventory.remove(self.large_pickup)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
+                self.large_pickup=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
+
+
 
 
 
@@ -244,6 +270,23 @@ class AIHuman(AIBase):
         if self.primary_weapon!=None:
             self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
 
+
+    #---------------------------------------------------------------------------
+    def get_calculated_speed(self):
+        calc_speed=self.owner.speed
+        if self.fatigue<3:
+            calc_speed*=1.5
+        if self.fatigue>5:
+            calc_speed*=0.95
+        if self.fatigue>10:
+            calc_speed*=0.9
+        if self.fatigue>20:
+            calc_speed*=0.9
+        if self.fatigue>30:
+            calc_speed*=0.9
+        
+        return calc_speed
+    
     #---------------------------------------------------------------------------
     def handle_death(self):
         dm=''
@@ -342,11 +385,11 @@ class AIHuman(AIBase):
 
             if self.ai_state=='moving':
                 # move towards target
-                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed)           
+                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
+                self.fatigue+=self.fatigue_add_rate*time_passed           
             elif self.ai_state=='engaging':
                 self.fire(self.target_object.world_coords)
-            elif self.ai_state=='sleeping':
-                pass
+                self.fatigue+=self.fatigue_add_rate*time_passed
             elif self.ai_state=='start_moving':
                 # this kicks off movement
                 # maybe change into moving animation image?
@@ -358,41 +401,60 @@ class AIHuman(AIBase):
                 # transition to moving
                 self.time_since_ai_transition=0
                 self.ai_state='moving'
+            else:
+                # sleeping or whatever 
+                self.fatigue-=self.fatigue_remove_rate*time_passed
 
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
+        action=False
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if(self.owner.world.graphic_engine.keyPressed('w')):
             self.owner.world_coords[1]-=self.owner.speed*time_passed
             self.owner.rotation_angle=0
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('s')):
             self.owner.world_coords[1]+=self.owner.speed*time_passed
             self.owner.rotation_angle=180
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('a')):
             self.owner.world_coords[0]-=self.owner.speed*time_passed
             self.owner.rotation_angle=90
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('d')):
             self.owner.world_coords[0]+=self.owner.speed*time_passed
             self.owner.rotation_angle=270
             self.owner.reset_image=True
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('f')):
             # fire the gun
             self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('g')):
             # throw throwable object
             self.throw([]) 
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('t')):
             # launch anti tank
             self.launch_antitank([])
+            action=True
         if(self.owner.world.graphic_engine.keyPressed('b')):
             if self.bleeding:
                 self.bleeding=False
-                self.owner.world.graphic_engine.text_queue.insert(0,'You apply a bandage')
+                self.speak('bandage')
+                action=True
+        
+        if action:
+            self.fatigue+=self.fatigue_add_rate*time_passed
+        else:
+            if self.fatigue>0:
+                self.fatigue-=self.fatigue_remove_rate*time_passed
+
 
 
     #---------------------------------------------------------------------------
@@ -404,7 +466,37 @@ class AIHuman(AIBase):
             self.inventory.remove(self.antitank)
             self.antitank=None
 
-    
+
+    #---------------------------------------------------------------------------
+    def speak(self,WHAT):
+        ''' say something the ai is close to the player '''
+        distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
+        if distance<400:
+            s='['+self.owner.name+'] '
+
+            if WHAT=='status':
+                s+=' '+self.ai_state+' '+self.ai_goal
+            elif WHAT=='bandage':
+                s+=' applying bandage'
+            elif WHAT=='joined squad':
+                s+=' joined squad'
+            else:
+                s+=' ehhh? '+WHAT
+
+            self.owner.world.graphic_engine.add_text(s)
+
+    #-----------------------------------------------------------------------
+    def react_asked_to_join_squad(self,SQUAD):
+        if SQUAD==self.squad:
+            self.speak("I'm already in that squad")
+        else:
+            if SQUAD.faction==self.squad.faction:
+                # yes - lets join this squad 
+
+                SQUAD.add_to_squad(self.owner)
+                self.speak('joined squad')
+            else:
+                self.speak('no')
     #-----------------------------------------------------------------------
     def think_engage(self):
         ''' think about the current engagement'''
@@ -727,6 +819,9 @@ class AIHuman(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
+        elif self.ai_goal=='close_with_group':
+            if DISTANCE<self.squad.min_distance:
+                self.ai_state='sleeping'
         else:
             # catchall for random moving related goals:
             if DISTANCE<3:

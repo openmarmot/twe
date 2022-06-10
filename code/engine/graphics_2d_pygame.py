@@ -69,9 +69,11 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        # used for temporary text. max 3 lines displayed
-        # used like this : self.text_queue.insert(0,('player world coords : '+str(self.world.player.world_coords)))
+        # used for temporary text. call add_text to add 
         self.text_queue=[]
+        self.text_queue_clear_rate=4
+        self.text_queue_display_size=5
+        self.time_since_last_text_clear=0
 
         # used for the menu system. no limits enforced by this class
         self.menu_text_queue=[]
@@ -98,6 +100,14 @@ class Graphics_2D_Pygame(object):
 
         # adjustment to viewing area
         self.view_adjust=0
+#------------------------------------------------------------------------------
+    def add_text(self,TEXT):
+        ''' add text to the text queue'''
+        self.text_queue.append(TEXT)
+        if len(self.text_queue)<4:
+            self.time_since_last_text_clear=-1
+
+
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -256,7 +266,7 @@ class Graphics_2D_Pygame(object):
 
         # text stuff 
         self.h=0
-        for b in islice(self.text_queue,3):
+        for b in islice(self.text_queue,self.text_queue_display_size):
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
 
@@ -300,6 +310,13 @@ class Graphics_2D_Pygame(object):
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
+        # cycle the text queue
+        self.time_since_last_text_clear+=self.time_passed_seconds
+        if self.time_since_last_text_clear>self.text_queue_clear_rate:
+            self.time_since_last_text_clear=0
+            if len(self.text_queue)>0:
+                self.text_queue.pop(0)
+
 #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
@@ -311,6 +328,8 @@ class Graphics_2D_Pygame(object):
         self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
         self.debug_text_queue.append('Civilians: '+ str(len(self.world.wo_objects_civilian)))
         self.debug_text_queue.append('Player World Coords: '+str(self.world.player.world_coords))
+        self.debug_text_queue.append('Player Fatigue: '+str(self.world.player.ai.fatigue))
+        self.debug_text_queue.append('Player Speed: '+str(self.world.player.ai.get_calculated_speed()))
 
         # world area data
         for b in self.world.world_areas:

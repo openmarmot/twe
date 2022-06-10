@@ -32,6 +32,9 @@ class AISquad(object):
         # how far the ai will stray from the group before coming back
         self.max_distance=300
 
+        # how close to the group a bot has to get before it can stop 'closing with group'
+        self.min_distance=50
+
         # ai in the group will try to stay close to the group world coords
         # moves towards destination
         self.world_coords=[0.,0.]
@@ -70,6 +73,14 @@ class AISquad(object):
         if WORLD_OBJECT.is_player:
             self.ai_mode='player'
 
+        # remmove from the old squad
+        if WORLD_OBJECT.ai.squad!=None:
+            WORLD_OBJECT.ai.squad.members.remove(WORLD_OBJECT)    
+
+        # add to this squad
+        self.members.append(WORLD_OBJECT)
+
+        # set squad var in ai
         WORLD_OBJECT.ai.squad=self
 
         # not sure what else we need to do
@@ -90,6 +101,12 @@ class AISquad(object):
         time_passed=self.world.graphic_engine.time_passed_seconds
 
         # think about the current mode. validate it and change as necessary 
+        self.think_ai_mode()
+
+    #----------------------------------------------------------------------------
+    def think_ai_mode(self):
+
+        # check if the player is in the squad
         has_player=False
         for b in self.members:
             if b.is_player:
@@ -101,31 +118,25 @@ class AISquad(object):
             if self.ai_mode=='player':
                 self.ai_mode='normal'
 
-    #----------------------------------------------------------------------------
-    def set_ai_mode(self,MODE):
-        if MODE=='normal':
-            self.ai_mode=MODE
+
+        # reset min/max distances
+        if self.ai_mode=='normal':
             if self.faction=='civilian':
-                print('setting max_distance for civ squad')
-                self.max_distance=1000
+                self.max_distance=3500
+                self.min_distance=600
             else:
                 self.max_distance=300
-        elif MODE=='player':
-            self.ai_mode=MODE
+                self.min_distance=50
+        elif self.ai_mode=='player':
+            self.max_distance=80
+            self.min_distance=30
+        elif self.ai_mode=='guard':
             self.max_distance=100
-        elif MODE=='guard':
-            self.ai_mode=MODE
-            self.max_distance=100
-        else:
-            print('Error : AI Mode not recognized: ',MODE)
+            self.min_distance=30
 
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
         '''spawns the squad on the map at the squads world coords '''
-
-        if self.faction=='civilian':
-            print('setting max_distance for civ squad')
-            self.max_distance=1000
 
         for b in self.members :
             # set the squad - i don't think this is set anywhere else

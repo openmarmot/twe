@@ -1,5 +1,70 @@
 TWE Project : Change Log
 
+
+---------------------------------
+June 09 2022
+- added a fix so you can't accidentally click out of the start menu 
+- added mouse select for ammo containers and liquid containers
+
+---------------------------------
+June 04 2022
+- added jerry can to kubelwagen spawns 
+- added 'is_large_human_pickup' to world_object 
+    - these will be large awkard objects that you will only be able to carry one of
+        - like a ammo can or gas can 
+- added liquid_container and ammo_container classifiers 
+
+---------------------------------
+May 23 2022
+- jerry can artwork
+- jerry can placeholder code 
+
+jerry can artwork sucks. needs to be redone 
+
+---------------------------------
+May 08 2022
+- added calculated_speed for human ai 
+    - based on fatigue level. cumulative effect 
+turn on debug data to see your speed and fatigue 
+
+---------------------------------
+April 25 2022
+- added fatigue system 
+
+---------------------------------
+April 16 2022
+- added squad count to menu 
+- added text identifying the player when you click on yourself 
+- made it a little more likely that friendly ai will shoot back if the 
+player shoots them 
+- changed some misc squad functionality - hard to tell what all was affected 
+- squad min/max will actually be applied now
+- added a human_ai function to react to being asked to join a squad 
+- removed min menu distance when debug mode is enabled 
+
+Note that the menu option to ask bots to join your squad more or less 
+works now. For now they have to be a member of your faction. They don't 
+do a great job of following you but they will generally be around, and 
+they may attack other bots that have shot you do to the squad enemies 
+mechanism. This will probably get better in the future. 
+
+---------------------------------
+April 15 2022
+- some small changes to world menu 
+    - when you get a human menu it will say if the bot is in your squad 
+- added a speak function to ai_human 
+    only works if in earshot of the player 
+- bumped up the max distance for a menu to appear a bit 
+
+---------------------------------
+April 09 2022
+- some adjustment to min/max distance for civilian squad 
+- added a minimum distance of 150 for the world menus to pop up 
+
+---------------------------------
+April 07 2022
+- added squad min_distance and the ai_human code to handle it 
+
 ---------------------------------
 April 06 2022
 - some changes to ai_squad mostly around specific following distances for 
