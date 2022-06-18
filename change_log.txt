@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 
+
+---------------------------------
+June 17 2022
+- found that the fuel can in the kubelwagen also spawned in the world. fixed
+- noticed that using the storage menu on yourself is pretty broken as it removes 
+    inventory from yourself, and then adds it to yourself 
+
+storage menu is generally broken. needs to be rewritten. 
+
+probably need to add a event_inventory_removal to handle all the oddball 
+special case inventory 
+
 ---------------------------------
 June 09 2022
 - added a fix so you can't accidentally click out of the start menu 
