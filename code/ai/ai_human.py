@@ -189,12 +189,11 @@ class AIHuman(AIBase):
             self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
             self.ai_state='start_moving'
 
-            
-
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-
+        ''' add object to inventory'''
+        # in this case EVENT_DATA is a world_object
         # add item to inventory no matter what
         self.inventory.append(EVENT_DATA)
 
@@ -260,8 +259,30 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
 
 
+    #---------------------------------------------------------------------------
+    def event_remove_inventory(self,EVENT_DATA):
+        ''' remove object from inventory '''
 
+        if EVENT_DATA in self.inventory:
 
+            # make sure the obj world_coords reflect the obj that had it in inventory
+            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
+
+            self.inventory.remove(EVENT_DATA)
+
+            if self.primary_weapon==EVENT_DATA:
+                self.primary_weapon=None
+            elif self.throwable==EVENT_DATA:
+                self.throwable=None
+            elif self.antitank==EVENT_DATA:
+                self.antitank=None
+            elif self.large_pickup==EVENT_DATA:
+                self.large_pickup=None
+
+            # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
+
+        else:
+            print('removal error - object not in inventory',EVENT_DATA.name)
 
 
     #---------------------------------------------------------------------------
@@ -333,6 +354,10 @@ class AIHuman(AIBase):
             self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+        elif EVENT=='remove_inventory':
+            self.event_remove_inventory(EVENT_DATA)
+        else:
+            print('Error - event not recognized',EVENT)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):

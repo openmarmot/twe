@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
+---------------------------------
+June 22 2022
+- added remove inventory event to ai_human to handle special inventory handling 
+- added a couple bits of error handling here and there 
+- rewrote world_menu storage menu to use remove_inventory. 
+    - for now objects will just be dropped on the ground 
+- small changes to ai_vehicle add and remove inventory events 
+- added inventory events to container ai 
 
+storage menu is still a terrible hack. just a slightly better terrible hack.
+I kind of like dropping items instead of auto transferring them to the player inventory
+
+stuff dropped from the vehicle menu is covered up by the vehicle - needs an offset 
+
+note - the bots are thieves. awful thieving thieves. 
 
 ---------------------------------
 June 17 2022
