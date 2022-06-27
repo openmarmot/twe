@@ -11,7 +11,8 @@ It should not have any specific graphic engine code (pygame, etc)
 
 #import built in modules
 import random
-import copy 
+import copy
+from unittest import result 
 
 
 #import custom packages
@@ -308,19 +309,29 @@ class World(object):
         mouse=self.graphic_engine.get_mouse_screen_coords()
         possible_objects=[]
 
-        # not sure if this is a good way to do this or not. we could also use 
-        # the curated object lists that world keeps. 
-        # plus side to renderLists is its only what is more or less visible on screen
+        # this has been reworked to favor selecting items over humans/vehicles/storage
+
+        temp=None
 
         for b in self.graphic_engine.renderlists:
             for c in b:
-                # could check is_gun, is_human etc here to narrow down
-                if (c.is_human or c.is_container or c.is_gun or c.is_consumable or c.is_vehicle or c.is_handheld_antitank or c.is_grenade or c.is_airplane
-                or c.is_liquid_container or c.is_ammo_container):
+                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_grenade):
                     possible_objects.append(c)
 
+        if len(possible_objects)>0:
+            temp=engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
+
+        # if there were no guns/consumables/etc or there were but they weren't under the mouse..
+        if temp==None:
+            for b in self.graphic_engine.renderlists:
+                for c in b:
+                    if (c.is_human or c.is_container or c.is_vehicle or c.is_airplane
+                    or c.is_liquid_container or c.is_ammo_container):
+                        possible_objects.append(c)
+            if len(possible_objects)>0:
+                temp=engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
         
-        return engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
+        return temp
 
     #---------------------------------------------------------------------------
     def toggle_map(self):

@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 24 2022
+
+- rewrote mouse selection algo to favor selecting objects over human/vehicle/storage 
+    - this is a work around for when bigger objects cover up objects you want to pick up 
+
+did some play testing. noted that for germans, the kar98k soldiers 
+often had a kill, whereas the mp40 soldiers often had shot a ton of 
+rounds without any kills. 
+
+I think this suggests that the range calculation might be wrong for mp40s 
+-- however - when i playtest it the 700 range seems to be dead on. hmmm. not 
+    sure what is going on here.
+
+---------------------------------
 June 22 2022
 - added remove inventory event to ai_human to handle special inventory handling 
 - added a couple bits of error handling here and there 
