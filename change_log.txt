@@ -1,5 +1,20 @@
 TWE Project : Change Log
 
+
+---------------------------------
+July 02 2022
+- made some changes to ai_vehicle and kubelwagen spawn code so that 
+    the inventory showed up correctly 
+- updated ai_airplane inventory code to match ai_vehicle (not that airplanes are very functional anyways)
+- added control [tab] : activates context menu for player or vehicle if you are in one 
+
+realized its a total pain to click on the vehicle you are currently in to bring up a context menu. 
+If the menus are going to used to do more stuff than using tab to bring up the current menu is the way 
+to go. i forget if i was saving tab for something else - maybe make your weapon safe?
+
+messed around with the ju88 a bit. its hard to get into because the current mouse select has a fixed selection area.
+i wonder if i will ever get around to making the plane more of a actual plane. currently its just a bad car 
+
 ---------------------------------
 June 24 2022
 

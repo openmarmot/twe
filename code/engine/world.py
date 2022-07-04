@@ -87,6 +87,21 @@ class World(object):
         self.map_enabled=False
 
     #---------------------------------------------------------------------------
+    def activate_context_menu(self):
+        '''called when player hits tab, activates a menu based on the context'''
+        in_vehicle=None
+        vlist=self.wo_objects_vehicle+self.wo_objects_airplane
+        for b in vlist:
+            if self.player in b.ai.passengers:
+                in_vehicle=b
+        
+        if in_vehicle==None:
+            self.world_menu.activate_menu(self.player)
+        else:
+            self.world_menu.activate_menu(in_vehicle)
+
+
+    #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
 
         # reset the image so that the graphics engine can make sure it matches the current view scale

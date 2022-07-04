@@ -96,8 +96,6 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        # !!! Note this neeeds to be rewritten. a lot of this doesn't make sense
-        # for a vehicle
 
         if EVENT_DATA.is_human:
             if EVENT_DATA.is_player:
@@ -133,7 +131,9 @@ class AIVehicle(AIBase):
                 if self.fuel_type=='diesel':
                     print('filling up')
                 else : 
-                    pass 
+                    pass
+            else:
+                self.inventory.append(EVENT_DATA) 
 
 
     #---------------------------------------------------------------------------

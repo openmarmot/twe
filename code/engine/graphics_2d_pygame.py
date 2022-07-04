@@ -119,7 +119,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                #print(str(event.key))
+                #print('pygame keydown',str(event.key))
                 # send number events to world_menu for ingame menus 
                 # translate to a string corresponding to the actual key to simplify the code
                 # on the other end
@@ -164,7 +164,8 @@ class Graphics_2D_Pygame(object):
                     self.world.world_menu.handle_input("9")
                 elif event.key==27:
                     self.world.world_menu.handle_input("esc")
-                    
+                elif event.key==9: #tab
+                    self.world.activate_context_menu()
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
