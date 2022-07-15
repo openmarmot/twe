@@ -122,6 +122,8 @@ class AIHuman(AIBase):
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
+            self.speak('react to being shot')
+
             if self.owner.is_player:
                 self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
 
@@ -389,6 +391,7 @@ class AIHuman(AIBase):
                     self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
                     self.ai_state='start_moving'
                     self.ai_goal='panic'
+                    self.speak('scream')
 
                     
     #-----------------------------------------------------------------------
@@ -505,6 +508,10 @@ class AIHuman(AIBase):
                 s+=' applying bandage'
             elif WHAT=='joined squad':
                 s+=' joined squad'
+            elif WHAT=='react to being shot':
+                s+=" Aagh! I'm hit !!"
+            elif WHAT=='scream':
+                s+='Aaaaaaaaaaaah!!!'
             else:
                 s+=' ehhh? '+WHAT
 
@@ -571,6 +578,7 @@ class AIHuman(AIBase):
             self.ai_goal='fleeing'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-1300,1300)),self.owner.world_coords[1]+float(random.randint(-1300,1300))]
             self.ai_state='start_moving'
+            self.speak('scream')
 
 
     #-----------------------------------------------------------------------
@@ -730,6 +738,7 @@ class AIHuman(AIBase):
             self.ai_goal='booored'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
             self.ai_state='start_moving'
+            
 
 
     #-----------------------------------------------------------------------

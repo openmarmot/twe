@@ -380,6 +380,7 @@ class World_Menu(object):
 
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
+                self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(self.selected_object.ai.fatigue))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
                 self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
 

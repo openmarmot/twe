@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ---------------------------------
+July 14 2022
+- added some speak triggers for ai_human 
+    - they can now scream. because that is important
+- added fatigue stat to human menu when debug is on 
+
+the bots really need to be able to aim ahead of things that are moving. 
+they dump silly  amounts of ammo at moving targets without hitting a thing 
+
+I think the AI tends to get super fatigued because they almost never sit still 
+- i need to add a idle mechanic where they stay in one place 
+
+---------------------------------
 July 02 2022
 - made some changes to ai_vehicle and kubelwagen spawn code so that 
     the inventory showed up correctly 
