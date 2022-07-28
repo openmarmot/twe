@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+---------------------------------
+July 27 2022
+- changed up ai_human idle options a bit so that they sometimes just sit around 
+    - this will allow them to regain stamina and make them less zip around less 
 
 ---------------------------------
 July 14 2022

@@ -729,15 +729,29 @@ class AIHuman(AIBase):
         # no enemies
         # health is fine
         # close to group
-
-        # check if we can upgrade gear
-        if self.think_upgrade_gear()==False:
-            # we didn't upgrade gear. what should we do ?
-            # hunt for cheese??
-            # nah lets just wander around a bit
+        temp=random.randint(0,10)
+        action=False
+        # upgrade gear
+        if temp==0:
+            # true if it finds something to upgrade
+            action=self.think_upgrade_gear()
+        # take a hike 
+        elif temp==1:
             self.ai_goal='booored'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
             self.ai_state='start_moving'
+            action=True
+        # much shorter hike
+        elif temp==2:
+            self.ai_goal='booored'
+            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+            self.ai_state='start_moving'
+            action=True
+
+        # catchall if nothing ends up happening 
+        if action==False:
+            self.ai_goal='waiting'
+            self.ai_state='waiting'
             
 
 
