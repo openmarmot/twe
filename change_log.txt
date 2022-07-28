@@ -1,5 +1,76 @@
 TWE Project : Change Log
 
+---------------------------------
+July 27 2022
+- changed up ai_human idle options a bit so that they sometimes just sit around 
+    - this will allow them to regain stamina and make them less zip around less 
+
+---------------------------------
+July 14 2022
+- added some speak triggers for ai_human 
+    - they can now scream. because that is important
+- added fatigue stat to human menu when debug is on 
+
+the bots really need to be able to aim ahead of things that are moving. 
+they dump silly  amounts of ammo at moving targets without hitting a thing 
+
+I think the AI tends to get super fatigued because they almost never sit still 
+- i need to add a idle mechanic where they stay in one place 
+
+---------------------------------
+July 02 2022
+- made some changes to ai_vehicle and kubelwagen spawn code so that 
+    the inventory showed up correctly 
+- updated ai_airplane inventory code to match ai_vehicle (not that airplanes are very functional anyways)
+- added control [tab] : activates context menu for player or vehicle if you are in one 
+
+realized its a total pain to click on the vehicle you are currently in to bring up a context menu. 
+If the menus are going to used to do more stuff than using tab to bring up the current menu is the way 
+to go. i forget if i was saving tab for something else - maybe make your weapon safe?
+
+messed around with the ju88 a bit. its hard to get into because the current mouse select has a fixed selection area.
+i wonder if i will ever get around to making the plane more of a actual plane. currently its just a bad car 
+
+---------------------------------
+June 24 2022
+
+- rewrote mouse selection algo to favor selecting objects over human/vehicle/storage 
+    - this is a work around for when bigger objects cover up objects you want to pick up 
+
+did some play testing. noted that for germans, the kar98k soldiers 
+often had a kill, whereas the mp40 soldiers often had shot a ton of 
+rounds without any kills. 
+
+I think this suggests that the range calculation might be wrong for mp40s 
+-- however - when i playtest it the 700 range seems to be dead on. hmmm. not 
+    sure what is going on here.
+
+---------------------------------
+June 22 2022
+- added remove inventory event to ai_human to handle special inventory handling 
+- added a couple bits of error handling here and there 
+- rewrote world_menu storage menu to use remove_inventory. 
+    - for now objects will just be dropped on the ground 
+- small changes to ai_vehicle add and remove inventory events 
+- added inventory events to container ai 
+
+storage menu is still a terrible hack. just a slightly better terrible hack.
+I kind of like dropping items instead of auto transferring them to the player inventory
+
+stuff dropped from the vehicle menu is covered up by the vehicle - needs an offset 
+
+note - the bots are thieves. awful thieving thieves. 
+
+---------------------------------
+June 17 2022
+- found that the fuel can in the kubelwagen also spawned in the world. fixed
+- noticed that using the storage menu on yourself is pretty broken as it removes 
+    inventory from yourself, and then adds it to yourself 
+
+storage menu is generally broken. needs to be rewritten. 
+
+probably need to add a event_inventory_removal to handle all the oddball 
+special case inventory 
 
 ---------------------------------
 June 09 2022

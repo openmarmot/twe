@@ -96,32 +96,8 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        if EVENT_DATA.is_gun :
-            if self.primary_weapon==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current weapon and pick up the new one
-                self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.primary_weapon)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-        elif EVENT_DATA.is_gas :
-            if self.fuel_type=='gas':
-                print('filling up')
-            else :
-                # put in inventory?
-                pass 
-        elif EVENT_DATA.is_diesel :
-            if self.fuel_type=='diesel':
-                print('filling up')
-            else : 
-                pass 
-        elif EVENT_DATA.is_human :
+
+        if EVENT_DATA.is_human:
             if EVENT_DATA.is_player:
                 self.owner.is_player=True
                 # passengers[0] controls the vehicle so put player there
@@ -129,14 +105,54 @@ class AIVehicle(AIBase):
             else:
                 # don't care about NPCs, place them anywhere
                 self.passengers.append(EVENT_DATA)
+        else:
+            if EVENT_DATA.is_gun :
+                if self.primary_weapon==None:
+                    self.inventory.append(EVENT_DATA)
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.primary_weapon=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+                else:
+                    # drop the current weapon and pick up the new one
+                    self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
+                    self.owner.world.add_object(self.primary_weapon)
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.primary_weapon=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+            elif EVENT_DATA.is_gas :
+                if self.fuel_type=='gas':
+                    print('filling up')
+                else :
+                    # put in inventory?
+                    pass 
+            elif EVENT_DATA.is_diesel :
+                if self.fuel_type=='diesel':
+                    print('filling up')
+                else : 
+                    pass
+            else:
+                self.inventory.append(EVENT_DATA) 
+
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA.is_human:
+            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
             self.passengers.remove(EVENT_DATA)
             if EVENT_DATA.is_player:
                 self.owner.is_player=False
+        else:
+            if EVENT_DATA in self.inventory:
 
+                # make sure the obj world_coords reflect the obj that had it in inventory
+                EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
+
+                self.inventory.remove(EVENT_DATA)
+
+                if self.primary_weapon==EVENT_DATA:
+                    self.primary_weapon=None
 
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):

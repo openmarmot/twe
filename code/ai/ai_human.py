@@ -122,6 +122,8 @@ class AIHuman(AIBase):
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
+            self.speak('react to being shot')
+
             if self.owner.is_player:
                 self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
 
@@ -189,12 +191,11 @@ class AIHuman(AIBase):
             self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
             self.ai_state='start_moving'
 
-            
-
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-
+        ''' add object to inventory'''
+        # in this case EVENT_DATA is a world_object
         # add item to inventory no matter what
         self.inventory.append(EVENT_DATA)
 
@@ -260,8 +261,30 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
 
 
+    #---------------------------------------------------------------------------
+    def event_remove_inventory(self,EVENT_DATA):
+        ''' remove object from inventory '''
 
+        if EVENT_DATA in self.inventory:
 
+            # make sure the obj world_coords reflect the obj that had it in inventory
+            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
+
+            self.inventory.remove(EVENT_DATA)
+
+            if self.primary_weapon==EVENT_DATA:
+                self.primary_weapon=None
+            elif self.throwable==EVENT_DATA:
+                self.throwable=None
+            elif self.antitank==EVENT_DATA:
+                self.antitank=None
+            elif self.large_pickup==EVENT_DATA:
+                self.large_pickup=None
+
+            # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
+
+        else:
+            print('removal error - object not in inventory',EVENT_DATA.name)
 
 
     #---------------------------------------------------------------------------
@@ -333,6 +356,10 @@ class AIHuman(AIBase):
             self.event_add_inventory(EVENT_DATA)
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+        elif EVENT=='remove_inventory':
+            self.event_remove_inventory(EVENT_DATA)
+        else:
+            print('Error - event not recognized',EVENT)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):
@@ -364,6 +391,7 @@ class AIHuman(AIBase):
                     self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
                     self.ai_state='start_moving'
                     self.ai_goal='panic'
+                    self.speak('scream')
 
                     
     #-----------------------------------------------------------------------
@@ -480,6 +508,10 @@ class AIHuman(AIBase):
                 s+=' applying bandage'
             elif WHAT=='joined squad':
                 s+=' joined squad'
+            elif WHAT=='react to being shot':
+                s+=" Aagh! I'm hit !!"
+            elif WHAT=='scream':
+                s+='Aaaaaaaaaaaah!!!'
             else:
                 s+=' ehhh? '+WHAT
 
@@ -546,6 +578,7 @@ class AIHuman(AIBase):
             self.ai_goal='fleeing'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-1300,1300)),self.owner.world_coords[1]+float(random.randint(-1300,1300))]
             self.ai_state='start_moving'
+            self.speak('scream')
 
 
     #-----------------------------------------------------------------------
@@ -696,15 +729,30 @@ class AIHuman(AIBase):
         # no enemies
         # health is fine
         # close to group
-
-        # check if we can upgrade gear
-        if self.think_upgrade_gear()==False:
-            # we didn't upgrade gear. what should we do ?
-            # hunt for cheese??
-            # nah lets just wander around a bit
+        temp=random.randint(0,10)
+        action=False
+        # upgrade gear
+        if temp==0:
+            # true if it finds something to upgrade
+            action=self.think_upgrade_gear()
+        # take a hike 
+        elif temp==1:
             self.ai_goal='booored'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-300,300)),self.owner.world_coords[1]+float(random.randint(-300,300))]
             self.ai_state='start_moving'
+            action=True
+        # much shorter hike
+        elif temp==2:
+            self.ai_goal='booored'
+            self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+            self.ai_state='start_moving'
+            action=True
+
+        # catchall if nothing ends up happening 
+        if action==False:
+            self.ai_goal='waiting'
+            self.ai_state='waiting'
+            
 
 
     #-----------------------------------------------------------------------
