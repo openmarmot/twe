@@ -529,6 +529,16 @@ class AIHuman(AIBase):
                 self.speak('joined squad')
             else:
                 self.speak('no')
+
+    #-----------------------------------------------------------------------
+    def react_asked_to_upgrade_gear(self):
+        status = self.think_upgrade_gear()
+        if status :
+            self.speak('going to upgrade my gear')
+        else:
+            print(status)
+            self.speak('nothing better than what i got')
+
     #-----------------------------------------------------------------------
     def think_engage(self):
         ''' think about the current engagement'''
@@ -651,6 +661,7 @@ class AIHuman(AIBase):
             if len(self.personal_enemies)>0 :
 
                 # check personal enemy list for a live enemy
+                # if this list is getting big we might make this a one check per turn instead of a loop
                 c=True
                 while c:
                     if len(self.personal_enemies)>0:
@@ -659,7 +670,7 @@ class AIHuman(AIBase):
                         else:
                             # check distance. pad weapon range a bit as its a rough estimate
                             distance=engine.math_2d.get_distance(self.owner.world_coords,self.personal_enemies[0].world_coords)
-                            if distance < (self.primary_weapon.ai.range+20) :
+                            if distance > (self.primary_weapon.ai.range+20) :
                                 # might as well forget them and check another one
                                 self.personal_enemies.pop(0)
                             else:
