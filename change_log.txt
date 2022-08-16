@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+
+---------------------------------
+August 15 2022
+- added some handle_event error handling 
+- new ai_liquid_container for gas/diesel/whatever cans 
+
+
 ---------------------------------
 August 08 2022
 - changed human menus to make it context sensitive based on whether you have
@@ -17,7 +24,6 @@ August 08 2022
 - added concept of very_near, near, and far enemies to squad enemy list 
 - made some squad ai changes so it resets its virtual position and speed
     to match the squad lead on a regular interval  
-
 
 ---------------------------------
 July 27 2022

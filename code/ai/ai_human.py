@@ -359,7 +359,7 @@ class AIHuman(AIBase):
         elif EVENT=='remove_inventory':
             self.event_remove_inventory(EVENT_DATA)
         else:
-            print('Error - event not recognized',EVENT)
+            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):

@@ -46,10 +46,11 @@ from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
 from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
+from ai.ai_liquid_container import AILiquidContainer
 
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='August 02 2021' #date of last update
+module_last_update_date='August 15 2022' #date of last update
 
 #global variables
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
@@ -673,7 +674,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='german_fuel_can':
-        z=WorldObject(WORLD,['german_fuel_can'],AIContainer)
+        z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
         z.is_container=False # going to be something special
         z.is_liquid_container=True
         z.is_large_human_pickup=True

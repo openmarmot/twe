@@ -59,3 +59,5 @@ class AIContainer(AIBase):
         #    self.event_collision(EVENT_DATA)
         elif EVENT=='remove_inventory':
             self.event_remove_inventory(EVENT_DATA)
+        else:
+            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
