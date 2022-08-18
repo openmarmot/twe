@@ -47,6 +47,7 @@ from ai.ai_panzerfaust import AIPanzerfaust
 from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
+from ai.ai_consumable import AIConsumable
 
 # module specific variables
 module_version='0.0' #module software version
@@ -579,6 +580,7 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
     z.render_level=2
     z.name='crate'
     z.world_builder_identity='crate'
+    z.rotation_angle=float(random.randint(0,359))
 
     if CRATE_TYPE=='mp40':
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
@@ -625,49 +627,49 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_building=True
 
     elif OBJECT_TYPE=='green_apple':
-        z=WorldObject(WORLD,['green_apple'],AINone)
+        z=WorldObject(WORLD,['green_apple'],AIConsumable)
         z.render_level=2
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='potato':
-        z=WorldObject(WORLD,['potato'],AINone)
+        z=WorldObject(WORLD,['potato'],AIConsumable)
         z.render_level=2
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='turnip':
-        z=WorldObject(WORLD,['turnip'],AINone)
+        z=WorldObject(WORLD,['turnip'],AIConsumable)
         z.render_level=2
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='adler-cheese':
-        z=WorldObject(WORLD,['adler-cheese'],AINone)
+        z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
         z.render_level=2
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='camembert-cheese':
-        z=WorldObject(WORLD,['camembert-cheese'],AINone)
+        z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
         z.render_level=2
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='champignon-cheese':
-        z=WorldObject(WORLD,['champignon-cheese'],AINone)
+        z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
         z.render_level=2
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True 
 
     elif OBJECT_TYPE=='karwendel-cheese':
-        z=WorldObject(WORLD,['karwendel-cheese'],AINone)
+        z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
         z.render_level=2
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
@@ -681,6 +683,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
+        z.rotation_angle=float(random.randint(0,359))
 
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
@@ -691,6 +694,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german_mg_ammo_can'
         z.world_builder_identity='german_mg_ammo_can'
+        z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':
         z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
@@ -698,6 +702,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.speed=300
         z.is_handheld_antitank=True
+        z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIGrenade)
@@ -706,6 +711,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.speed=200.
         z.ai.maxTime=1.3
         z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mp40':
         z=WorldObject(WORLD,['mp40'],AIGun)
@@ -881,6 +887,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
         z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
@@ -894,6 +901,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_capacity=2900
         z.ai.fuel=2900
         z.is_airplane=True 
+        z.rotation_angle=float(random.randint(0,359))
 
     # probably remove this in the future. should spawn a specific soldier or civie instead
     elif OBJECT_TYPE=='player':

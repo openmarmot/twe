@@ -130,7 +130,7 @@ class Graphics_2D_Pygame(object):
                     if self.scale>0.2:
                         self.scale-=0.1
                         self.view_adjust+=500
-                        print('zoom out',self.scale)
+                        #print('zoom out',self.scale)
                         self.reset_all()
                     else:
                         print('max zoom out reached')
@@ -138,7 +138,7 @@ class Graphics_2D_Pygame(object):
                     if self.scale<1.1:
                         self.scale+=0.1
                         self.view_adjust-=500
-                        print('zoom in',self.scale)
+                        #print('zoom in',self.scale)
                         self.reset_all()
                     else:
                         print('max zoom in reached')

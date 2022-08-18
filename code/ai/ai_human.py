@@ -67,6 +67,10 @@ class AIHuman(AIBase):
         self.fatigue_add_rate=1
         self.fatigue_remove_rate=0.75
 
+        self.hunger=0
+        self.hunger_rate=1
+        self.thirst=0
+        self.thirst_rate=1
 
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
@@ -104,6 +108,11 @@ class AIHuman(AIBase):
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
                 self.primary_weapon.update()
+
+
+            # hunger/thirst stuff
+            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
 
             if self.owner.is_player:
                 self.handle_player_update()

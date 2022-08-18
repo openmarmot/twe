@@ -2,10 +2,23 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 17 2022
+- added hunger and thirst attributes to human ai 
+- added hunger and thirst to human context menu 
+- added some rounding to the human context menu 
+- added new ai_consumable class to give food some unique attributes
+- added random rotation to a handful of spawns that didn't have it
+- disabled zoom in/zoom out debug messages 
+
+some todo items 
+- add specific attributes for food types 
+- add food consumption code 
+- add menu for food object interaction 
+
+---------------------------------
 August 15 2022
 - added some handle_event error handling 
 - new ai_liquid_container for gas/diesel/whatever cans 
-
 
 ---------------------------------
 August 08 2022

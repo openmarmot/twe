@@ -371,7 +371,10 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
 
 
-            self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
+            self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+            self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
+            self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
+            self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
                 self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
@@ -386,7 +389,6 @@ class World_Menu(object):
 
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
-                self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(self.selected_object.ai.fatigue))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
                 self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
 
