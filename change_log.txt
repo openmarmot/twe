@@ -1,9 +1,47 @@
 TWE Project : Change Log
 
+
+---------------------------------
+August 17 2022
+- added hunger and thirst attributes to human ai 
+- added hunger and thirst to human context menu 
+- added some rounding to the human context menu 
+- added new ai_consumable class to give food some unique attributes
+- added random rotation to a handful of spawns that didn't have it
+- disabled zoom in/zoom out debug messages 
+
+some todo items 
+- add specific attributes for food types 
+- add food consumption code 
+- add menu for food object interaction 
+
+---------------------------------
+August 15 2022
+- added some handle_event error handling 
+- new ai_liquid_container for gas/diesel/whatever cans 
+
+---------------------------------
+August 08 2022
+- changed human menus to make it context sensitive based on whether you have
+    the player, a squad mate, or a non squad mate selected. some menu options 
+    have changed because of this. 
+- squad members can now be asked to upgrade their gear 
+    - among other things this will trigger civilans to pick up nearby guns 
+    - at the moment this is fairly likely to happen automatically anyways if 
+        the ai is bored. 
+- found a huge bug in the ai engagement code where < was supposed to be > 
+    - it was dropping personal enemies that are close, when it was supposed to be 
+        dropping personal enemies that are far 
+    - this might explain the long standing bug where the AI will occasionally fire 
+    at out of range targets 
+- added concept of very_near, near, and far enemies to squad enemy list 
+- made some squad ai changes so it resets its virtual position and speed
+    to match the squad lead on a regular interval  
+
 ---------------------------------
 July 27 2022
 - changed up ai_human idle options a bit so that they sometimes just sit around 
-    - this will allow them to regain stamina and make them less zip around less 
+    - this will allow them to regain stamina and make the zip around less 
 
 ---------------------------------
 July 14 2022

@@ -47,7 +47,9 @@ class AISquad(object):
         self.members=[] 
 
         # near enemies
+        self.very_near_enemies=[]
         self.near_enemies=[]
+        self.far_enemies=[]
 
         # faction - german/soviet/american/civilian
         self.faction='none'
@@ -88,10 +90,14 @@ class AISquad(object):
     #---------------------------------------------------------------------------
     def get_enemy(self):
         ''' return a enemy if one exists '''
-
-        if len(self.near_enemies)>0:
+        if len(self.very_near_enemies)>0:
+            return self.very_near_enemies.pop()
+        elif len(self.near_enemies)>0:
             # return last item in the list (and remove it from the list)
             return self.near_enemies.pop()
+        elif len(self.far_enemies)>0:
+            # return last item in the list (and remove it from the list)
+            return self.far_enemies.pop()
         else:
             return None
     
@@ -102,6 +108,9 @@ class AISquad(object):
 
         # think about the current mode. validate it and change as necessary 
         self.think_ai_mode()
+
+        # check if squad position is wrong 
+        self.think_position()
 
     #----------------------------------------------------------------------------
     def think_ai_mode(self):
@@ -125,7 +134,7 @@ class AISquad(object):
                 self.max_distance=3500
                 self.min_distance=600
             else:
-                self.max_distance=300
+                self.max_distance=100
                 self.min_distance=50
         elif self.ai_mode=='player':
             self.max_distance=80
@@ -133,6 +142,27 @@ class AISquad(object):
         elif self.ai_mode=='guard':
             self.max_distance=100
             self.min_distance=30
+
+
+    #----------------------------------------------------------------------------
+    def think_position(self):
+        # if we reset this too often the squads just kind of mill around
+        # so better to make it distance based
+
+        # note this interacts with max_distance in odd ways. if the bots are 
+        # always within max distance then they will never move toward squad objectives
+        # reseting the squad world_coords can make this worse
+
+
+        d=engine.math_2d.get_distance(self.world_coords,self.members[0].world_coords)
+        if d>(self.max_distance*2.75):
+            # reset position to where the defacto squad lead is
+            self.world_coords=copy.copy(self.members[0].world_coords)
+
+            # reset speed to squad lead calculated speed + a bit so it doesn't get bogged down
+            self.speed=self.members[0].ai.get_calculated_speed()*1.25
+        
+
 
     #---------------------------------------------------------------------------
     def spawn_on_map(self):
@@ -180,6 +210,8 @@ class AISquad(object):
     def update_near_enemy_list(self):
         enemylist=[]
         self.near_enemies=[]
+        self.very_near_enemies=[]
+        self.far_enemies=[]
         if self.faction=='german':
             enemylist=self.world.wo_objects_soviet+self.world.wo_objects_american
         elif self.faction=='american':
@@ -193,10 +225,16 @@ class AISquad(object):
         
         for b in enemylist:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
-            if d<1200:
+
+            if d<500:
+                self.very_near_enemies.append(b)
+            elif d<850:
                 self.near_enemies.append(b)
-                if d<800:
-                    # enemies are close, stop movement for now 
-                    if len(self.members)>0:
-                        self.destination=copy.copy(self.members[0].world_coords)
-                        self.world_coords=copy.copy(self.destination)
+            elif d<1300:
+                self.far_enemies.append(b)
+
+            # enemies are close, stop movement for now 
+            if len(self.members)>0 and (len(self.near_enemies)+len(self.very_near_enemies))>0:
+                self.destination=copy.copy(self.members[0].world_coords)
+                self.world_coords=copy.copy(self.destination)
+                self.speed=0 # this will get reset on the next position update

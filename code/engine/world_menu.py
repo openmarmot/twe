@@ -356,16 +356,25 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
 
+            # -- determine what the next menu will be
             if self.selected_object==self.world.player:
                 self.world.graphic_engine.menu_text_queue.append('[player]')
+                self.menu_state = 'player_menu'
             else:
                 if self.selected_object.ai.squad==self.world.player.ai.squad:
                     self.world.graphic_engine.menu_text_queue.append('[in your squad]')
+                    self.menu_state = 'squad_member_menu'
+                else:
+                    self.menu_state = 'non_squad_member_menu'
+
 
             self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
 
 
-            self.world.graphic_engine.menu_text_queue.append('Health: '+str(self.selected_object.ai.health))
+            self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+            self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
+            self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
+            self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             if self.selected_object.ai.primary_weapon != None:
                 self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
                 self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
@@ -380,27 +389,39 @@ class World_Menu(object):
 
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
-                self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(self.selected_object.ai.fatigue))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
                 self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
 
+            if self.menu_state == 'player_menu':
+                self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
+            elif self.menu_state == 'squad_member_menu':
+                self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
+                self.world.graphic_engine.menu_text_queue.append('2 - Manage Inventory')
+                self.world.graphic_engine.menu_text_queue.append('3 - [Speak] Can you upgrade your gear?')
+            elif self.menu_state == 'non_squad_member_menu':
+                self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
+                self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
 
-            self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
-            self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
-            self.world.graphic_engine.menu_text_queue.append('3 - Manage Inventory')
-            self.menu_state='base'
-        if self.menu_state=='base':
+        if self.menu_state=='player_menu':
+            if Key=='1':
+                # pull up the storage/container menu
+                self.change_menu('storage')
+        elif self.menu_state == 'squad_member_menu':
+            if Key=='1':
+                self.selected_object.ai.speak('status')
+            if Key=='2':
+                # pull up the storage/container menu
+                self.change_menu('storage')
+            if Key=='3':
+                self.selected_object.ai.react_asked_to_upgrade_gear()
+            pass
+        elif self.menu_state == 'non_squad_member_menu':
             if Key=='1':
                 self.selected_object.ai.speak('status')
             elif Key=='2':
                 # ask the ai to join the squad
                 self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
-                
-            elif Key=='3':
-                # pull up the storage/container menu
-                self.change_menu('storage')
-
 
     def start_menu(self, Key):
         if self.menu_state=='none':

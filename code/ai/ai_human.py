@@ -67,6 +67,10 @@ class AIHuman(AIBase):
         self.fatigue_add_rate=1
         self.fatigue_remove_rate=0.75
 
+        self.hunger=0
+        self.hunger_rate=1
+        self.thirst=0
+        self.thirst_rate=1
 
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
@@ -104,6 +108,11 @@ class AIHuman(AIBase):
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
                 self.primary_weapon.update()
+
+
+            # hunger/thirst stuff
+            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
 
             if self.owner.is_player:
                 self.handle_player_update()
@@ -359,7 +368,7 @@ class AIHuman(AIBase):
         elif EVENT=='remove_inventory':
             self.event_remove_inventory(EVENT_DATA)
         else:
-            print('Error - event not recognized',EVENT)
+            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):
@@ -529,6 +538,16 @@ class AIHuman(AIBase):
                 self.speak('joined squad')
             else:
                 self.speak('no')
+
+    #-----------------------------------------------------------------------
+    def react_asked_to_upgrade_gear(self):
+        status = self.think_upgrade_gear()
+        if status :
+            self.speak('going to upgrade my gear')
+        else:
+            print(status)
+            self.speak('nothing better than what i got')
+
     #-----------------------------------------------------------------------
     def think_engage(self):
         ''' think about the current engagement'''
@@ -651,6 +670,7 @@ class AIHuman(AIBase):
             if len(self.personal_enemies)>0 :
 
                 # check personal enemy list for a live enemy
+                # if this list is getting big we might make this a one check per turn instead of a loop
                 c=True
                 while c:
                     if len(self.personal_enemies)>0:
@@ -659,7 +679,7 @@ class AIHuman(AIBase):
                         else:
                             # check distance. pad weapon range a bit as its a rough estimate
                             distance=engine.math_2d.get_distance(self.owner.world_coords,self.personal_enemies[0].world_coords)
-                            if distance < (self.primary_weapon.ai.range+20) :
+                            if distance > (self.primary_weapon.ai.range+20) :
                                 # might as well forget them and check another one
                                 self.personal_enemies.pop(0)
                             else:
