@@ -631,49 +631,77 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-50
+        z.thirst_effect=-5
+        z.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='potato':
         z=WorldObject(WORLD,['potato'],AIConsumable)
         z.render_level=2
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-70
+        z.thirst_effect=-5
+        z.fatigue_effect=-20  
 
     elif OBJECT_TYPE=='turnip':
         z=WorldObject(WORLD,['turnip'],AIConsumable)
         z.render_level=2
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-60
+        z.thirst_effect=-8
+        z.fatigue_effect=-10  
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
         z.render_level=2
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-200
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='camembert-cheese':
         z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
         z.render_level=2
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-250
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='champignon-cheese':
         z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
         z.render_level=2
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-300
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='karwendel-cheese':
         z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
         z.render_level=2
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-500
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)

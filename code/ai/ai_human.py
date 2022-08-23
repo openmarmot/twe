@@ -5,6 +5,8 @@ version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
 notes :
+event - something that could happen to the ai, possibly caused by external forces
+handle_SOMETHING - something that the AI decides to do
 '''
 
 
@@ -68,9 +70,9 @@ class AIHuman(AIBase):
         self.fatigue_remove_rate=0.75
 
         self.hunger=0
-        self.hunger_rate=1
+        self.hunger_rate=0.1
         self.thirst=0
-        self.thirst_rate=1
+        self.thirst_rate=0.1
 
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
@@ -354,9 +356,21 @@ class AIHuman(AIBase):
             # fake input to get the text added
             self.owner.world.world_menu.handle_input('none')
 
+
+    #---------------------------------------------------------------------------
+    def handle_eat(self,CONSUMABLE):
+        # eat the consumable object. or part of it anyway
+        self.health+=CONSUMABLE.ai.health_effect
+        self.hunger+=CONSUMABLE.ai.hunger_effect
+        self.thirst_rate+=CONSUMABLE.ai.thirst_effect
+        self.fatigue+=CONSUMABLE.ai.fatigue_effect
+
+        self.event_remove_inventory(CONSUMABLE)
+
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
+        # this is supposed to be the main interface that the outside world uses to interact with the ai
         # EVENT - text describing event
         # EVENT_DATA - most likely a world_object but could be anything
 
@@ -492,7 +506,15 @@ class AIHuman(AIBase):
             if self.fatigue>0:
                 self.fatigue-=self.fatigue_remove_rate*time_passed
 
+    #-----------------------------------------------------------------------
+    def handle_use_medical_object(self,MEDICAL):
+        # MEDICAL - list of is_medical World Object(s)
 
+        # should eventually handle bandages, morphine, etc etc
+        # probably need attributes similar to consumables
+
+        self.health+=50
+        self.event_remove_inventory(MEDICAL[0])
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):
@@ -522,7 +544,7 @@ class AIHuman(AIBase):
             elif WHAT=='scream':
                 s+='Aaaaaaaaaaaah!!!'
             else:
-                s+=' ehhh? '+WHAT
+                s+=WHAT
 
             self.owner.world.graphic_engine.add_text(s)
 
@@ -547,6 +569,35 @@ class AIHuman(AIBase):
         else:
             print(status)
             self.speak('nothing better than what i got')
+
+    #-----------------------------------------------------------------------
+    def think_eat(self):
+        '''evaluate food options return bool as to whether action is taken'''
+        status=False
+
+        if self.hunger>75 or self.thirst>50:
+            # 1 check if we have anything in inventory
+            item=None
+            for b in self.inventory:
+                if b.is_consumable:
+                    item=b
+                    break
+            if item!=None:
+                # consume item. maybe there should be a function for this?
+                self.speak('eating '+item.name)
+                self.handle_eat(item)
+                status=True
+
+            # 2 else check if anything is nearby
+            if status==False:
+                o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+                if o != None:
+                    self.target_object=o
+                    self.ai_goal='pickup'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'
+                    status=True
+        return status
 
     #-----------------------------------------------------------------------
     def think_engage(self):
@@ -719,22 +770,19 @@ class AIHuman(AIBase):
         '''evaluate health options return bool as to whether action is taken'''
         status=False
         # 1 check if we have anything in inventory
-        item=None
+        items=[]
         for b in self.inventory:
-            if b.is_consumable:
-                item=b
+            if b.is_medical:
+                items.append(b)
                 break
-        if item!=None:
-            # consume item. maybe there should be a function for this?
-            print('nom nom nom')
-            self.inventory.remove(item)
-            self.bleeding=False
-            self.health+=50
+        if len(items)>0:
+            # pass the whole list and let the function determine the best one to use
+            self.handle_use_medical_object(items)
             status=True
 
         # 2 else check if anything is nearby
         if status==False:
-            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_medical)
             if o != None:
                 self.target_object=o
                 self.ai_goal='pickup'
@@ -767,6 +815,9 @@ class AIHuman(AIBase):
             self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
             self.ai_state='start_moving'
             action=True
+        # eat something  ?
+        elif temp==3:
+            action=self.think_eat()
 
         # catchall if nothing ends up happening 
         if action==False:

@@ -2,6 +2,24 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 22 2022
+- added some effects to the consumable spawns
+- added is_medical to the list of world_object attributes 
+- added simple functions for eating and medical obj usage to ai_human
+    - eating and medical are now different. among other things this 
+    means that eating no longer has a strong health effect 
+
+no medical objects at the moment although the engine supports them now. 
+
+I will have to whip up some art for some stimulants, bandages, etc 
+
+consumable effects are going to take some balancing. 
+currently the cheese has quite a large hunger reduction compared to the other items 
+
+currently hunger/thirst don't have any real effect. 
+maybe extreme hunger will decrease health ??
+
+---------------------------------
 August 17 2022
 - added hunger and thirst attributes to human ai 
 - added hunger and thirst to human context menu 

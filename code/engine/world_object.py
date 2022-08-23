@@ -94,6 +94,7 @@ class WorldObject(object):
         self.is_container=False
         self.is_projectile=False
         self.is_consumable=False
+        self.is_medical=False # general medical objects. bandage / pain pills / etc
         self.is_german=False
         self.is_soviet=False
         self.is_american=False
