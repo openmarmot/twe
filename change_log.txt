@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ---------------------------------
+August 30 2022
+- added scho-ka-kola (german caffeine chocolate)
+- added schokakola and wine to the consumables list so it will show up in random loot 
+
+initially meant for schokakola to be in the medical (stimulant) category,
+but will probably just be a consumable 
+
+schokakola art was goodish at 20x20 but rather poor at 10x10, however it is a smaller item 
+so needed to be 10x10. may redo at some point but not a huge priority.
+
+---------------------------------
+August 25 2022
+- added wine bottle art and wine object 
+
+---------------------------------
 August 22 2022
 - added some effects to the consumable spawns
 - added is_medical to the list of world_object attributes 

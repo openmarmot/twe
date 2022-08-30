@@ -55,7 +55,7 @@ module_last_update_date='August 15 2022' #date of last update
 
 #global variables
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
-,'champignon-cheese','karwendel-cheese']
+,'champignon-cheese','karwendel-cheese','wine','schokakola']
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
@@ -331,6 +331,8 @@ def load_images(world):
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
+    world.graphic_engine.loadImage('wine_bottle','images/consumables/wine_bottle.png')
+    world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
@@ -382,6 +384,15 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+
+    #wine 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
 
 
     # spawn some ammo cans 
@@ -702,6 +713,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.hunger_effect=-500
         z.thirst_effect=-5
         z.fatigue_effect=-50  
+
+    elif OBJECT_TYPE=='wine':
+        z=WorldObject(WORLD,['wine_bottle'],AIConsumable)
+        z.render_level=2
+        z.name='wine'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-50
+        z.thirst_effect=-500
+        z.fatigue_effect=50  
+
+    elif OBJECT_TYPE=='schokakola':
+        z=WorldObject(WORLD,['schokakola'],AIConsumable)
+        z.render_level=2
+        z.name='scho-ka-kola'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.health_effect=15
+        z.hunger_effect=-50
+        z.thirst_effect=10
+        z.fatigue_effect=-250 
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
