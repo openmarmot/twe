@@ -48,6 +48,7 @@ from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
+from ai.ai_medical import AIMedical
 
 # module specific variables
 module_version='0.0' #module software version
@@ -56,6 +57,8 @@ module_last_update_date='August 15 2022' #date of last update
 #global variables
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
+
+
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
@@ -338,6 +341,10 @@ def load_images(world):
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
     world.graphic_engine.loadImage('map_pointer_blue','images/map/map_pointer_blue.png')
     world.graphic_engine.loadImage('map_pointer_orange','images/map/map_pointer_orange.png')
+
+    # medical 
+    world.graphic_engine.loadImage('bandage','images/medical/bandage.png')
+    world.graphic_engine.loadImage('german_officer_first_aid_kit','images/medical/german_officer_first_aid_kit.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -735,6 +742,26 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.hunger_effect=-50
         z.thirst_effect=10
         z.fatigue_effect=-250 
+    elif OBJECT_TYPE=='bandage':
+        z=WorldObject(WORLD,['bandage'],AIMedical)
+        z.render_level=2
+        z.name='bandage'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_medical=True
+        z.health_effect=50
+        z.hunger_effect=0
+        z.thirst_effect=0
+        z.fatigue_effect=0
+    elif OBJECT_TYPE=='german_officer_first_aid_kit':
+        z=WorldObject(WORLD,['german_officer_first_aid_kit'],AIMedical)
+        z.render_level=2
+        z.name='German Officer First Aid Kit'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_medical=True
+        z.health_effect=150
+        z.hunger_effect=0
+        z.thirst_effect=0
+        z.fatigue_effect=-300  
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)

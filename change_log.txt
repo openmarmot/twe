@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+ 
+ ---------------------------------
+September 03 2022
+- resized fuel can image which was not square (causes occasional crashes)
+    - also modified the image a bit. still pretty bad though
+- added art and basic object code for bandage and german officer medical kit 
 
 ---------------------------------
 August 30 2022
