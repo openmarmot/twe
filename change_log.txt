@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+----------------------------------
+September 05 2022
+- added a bandage to the inventory of all soldier types 
+- minor changes to medical item usage so that attributes are applied correctly 
+
+noticed there is still a lot of out of range firing. i thought this was fixed 
+but i guess not. 
+
+watched a german soldier walk past a soviet soldier to pick up a wine bottle. 
+the german picked up the wine bottle and then turned around and shot the soviet dead. 
+the soviet never reacted. yup - the ai still needs a lot of work. 
  
  ---------------------------------
 September 03 2022

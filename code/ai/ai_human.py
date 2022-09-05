@@ -513,8 +513,17 @@ class AIHuman(AIBase):
         # should eventually handle bandages, morphine, etc etc
         # probably need attributes similar to consumables
 
-        self.health+=50
-        self.event_remove_inventory(MEDICAL[0])
+        # should select the correct medical item to fix whatever the issue is
+        selected = MEDICAL[0]
+
+        self.speak('Using medical '+selected.name)
+
+        self.health+=selected.ai.health_effect
+        self.hunger+=selected.ai.hunger_effect
+        self.thirst_rate+=selected.ai.thirst_effect
+        self.fatigue+=selected.ai.fatigue_effect
+
+        self.event_remove_inventory(selected)
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):
@@ -583,7 +592,6 @@ class AIHuman(AIBase):
                     item=b
                     break
             if item!=None:
-                # consume item. maybe there should be a function for this?
                 self.speak('eating '+item.name)
                 self.handle_eat(item)
                 status=True
