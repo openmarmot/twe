@@ -40,7 +40,7 @@ class AIAirplane(AIBase):
         self.destination=None
 
         # current fuel type options : gas / diesel
-        self.fuel_type='gas'
+        self.fuel_type='av_gas'
         # max fuel load in liters
         self.fuel_capacity=0
         # current fuel amount
@@ -92,15 +92,7 @@ class AIAirplane(AIBase):
             for b in self.passengers:
                 b.world_coords=copy.copy(self.owner.world_coords)
 
-        # update text
-        self.owner.world.graphic_engine.vehicle_text_queue=[]
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Fuel: '+str(self.fuel)+' liters')
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Rudder: '+str(self.rudder))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Elevator: '+str(self.elevator))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Flaps: '+str(self.flaps))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Landing Gear: '+str(self.landing_gear))
+
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -328,6 +320,16 @@ class AIAirplane(AIBase):
         elif self.owner.rotation_angle<0:
             self.owner.rotation_angle=360
 
+        
+        # update text
+        self.owner.world.graphic_engine.vehicle_text_queue=[]
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Fuel: '+str(self.fuel)+' liters')
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Rudder: '+str(self.rudder))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Elevator: '+str(self.elevator))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Flaps: '+str(self.flaps))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(self.vehicle_speed))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Landing Gear: '+str(self.landing_gear))
 
 
 

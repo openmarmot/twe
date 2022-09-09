@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+
+----------------------------------
+September 08 2022
+- minor changes to vehicle information display
+    - speed now shows correctly when in the kubelwagen 
+
+----------------------------------
+September 06 2022
+
+- using a medical object stops bleeding now 
+
 ----------------------------------
 September 05 2022
 - added a bandage to the inventory of all soldier types 

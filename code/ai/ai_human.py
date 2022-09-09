@@ -518,6 +518,8 @@ class AIHuman(AIBase):
 
         self.speak('Using medical '+selected.name)
 
+        self.bleeding=False
+
         self.health+=selected.ai.health_effect
         self.hunger+=selected.ai.hunger_effect
         self.thirst_rate+=selected.ai.thirst_effect
