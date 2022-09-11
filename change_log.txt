@@ -2,6 +2,25 @@ TWE Project : Change Log
 
 
 ----------------------------------
+September 10 2022
+- added max_distance to world.get_closest_object
+    - this simplifies some code that would have otherwise re-checked distance 
+    - also may reign in some of the crazier behavior where distance wasn't considered
+- made chance of panic from no medical in think generic 1 in 25 instead of 1 in 5
+    - this needs to be rethought in general as it is happening a lot
+- added a chance to stop bleeding with a makeshift bandage (not requiring a medical object) 
+- remove some unneeded debug messages 
+
+a unintended consequence of the introduction of medical objects is that bots can no longer 
+easily heal wounds and are very prone to panicking. this is compounded by medical objects being 
+generally unavailable to pick up 
+
+i should add a bullet spread modifier based on fatigue 
+
+need some way to have the bots fire bursts - maybe shot counter and after 10 or so 
+go to sleep mode and reset counter ?
+
+----------------------------------
 September 08 2022
 - minor changes to vehicle information display
     - speed now shows correctly when in the kubelwagen 

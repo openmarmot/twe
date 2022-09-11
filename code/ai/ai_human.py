@@ -578,7 +578,6 @@ class AIHuman(AIBase):
         if status :
             self.speak('going to upgrade my gear')
         else:
-            print(status)
             self.speak('nothing better than what i got')
 
     #-----------------------------------------------------------------------
@@ -600,7 +599,7 @@ class AIHuman(AIBase):
 
             # 2 else check if anything is nearby
             if status==False:
-                o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable)
+                o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_consumable,500)
                 if o != None:
                     self.target_object=o
                     self.ai_goal='pickup'
@@ -638,7 +637,7 @@ class AIHuman(AIBase):
                action=True
         if action==False:
             if self.primary_weapon==None:
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,800)
                 if b != None:
                     d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
                     # make sure its close - we don't want to wander far from the group
@@ -698,7 +697,6 @@ class AIHuman(AIBase):
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
-                    #print('closing with target')
                     action=True
 
     #-----------------------------------------------------------------------
@@ -710,17 +708,19 @@ class AIHuman(AIBase):
         action=False
 
         # 1. are we low on health? 
-        if self.health<50:
+        if self.health<50 or self.bleeding:
  
             if self.think_healing_options()==False :
                 # no health to be had! (probably impossible with the amount of consumables)
                 # roll to see if we panic
-                if random.randint(1,5)==1:
+                if random.randint(1,25)==1:
                     self.destination=[self.owner.world_coords[0]+float(random.randint(-2300,2300)),self.owner.world_coords[1]+float(random.randint(-2300,2300))]
                     self.ai_state='start_moving'
                     self.ai_goal='panic'
+                    print('bot panicking from think_generic')
                     action=True 
             else:
+                # bot is doing whatever the healing option was
                 # this is needed in case the health option is to go pickup health
                 action=True
 
@@ -792,12 +792,23 @@ class AIHuman(AIBase):
 
         # 2 else check if anything is nearby
         if status==False:
-            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_medical)
+            o=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_medical,800)
             if o != None:
                 self.target_object=o
                 self.ai_goal='pickup'
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
+                status=True
+
+        # 3 (kind of)
+        if self.bleeding:
+            if random.randint(1,15)==1:
+                self.speak('applying bandage')
+                # bleeding stopped through make shift bandage
+                self.bleeding=False
+                self.health+=5
+                self.fatigue+=10
+                # i guess this counts as an action
                 status=True
         return status
 
@@ -852,32 +863,20 @@ class AIHuman(AIBase):
                 self.think_generic()
             else:
                 # fine lets go treking across the map
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle)
+                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle,2000)
                 if b!=None:
-                    v_distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
-                    # only bother with a vehicle if it will be faster
-                    if v_distance<distance:
+                    # head towards the vehicle
+                    # should check if the vehicle is hostile
 
-                        # head towards the vehicle
-                        # should check if the vehicle is hostile
+                    self.ai_vehicle_goal='travel'
+                    self.ai_vehicle_destination=copy.copy(self.destination)
 
-                        self.ai_vehicle_goal='travel'
-                        self.ai_vehicle_destination=copy.copy(self.destination)
-
-                        self.target_object=b
-                        self.ai_goal='enter object'
-                        # not using copy here because vehicle may move
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving'
-
-                        print(self.owner.name + ' heading towards '+b.name+' distance: '+str(distance))
-                    else :
-                        # guess we might as well walk
-                        # this might be a logic trap because nothing else is considered after this. 
-                        # might have to pay attention to how often this happens
-                        pass
-
+                    self.target_object=b
+                    self.ai_goal='enter object'
+                    # not using copy here because vehicle may move
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'
                 else:
                     # no vehicles ?
                     pass
@@ -935,7 +934,6 @@ class AIHuman(AIBase):
                 self.ai_goal='none'
                 self.target_object=None
             elif DISTANCE<self.primary_weapon.ai.range:
-                #print('in range of target')
                 self.ai_state='engaging'
                 self.ai_goal='none'
             else:
@@ -961,61 +959,48 @@ class AIHuman(AIBase):
         status=False
         # grab another grenade?
         if self.throwable == None:
-            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade)
+            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_grenade,500)
             if b != None:
-                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                # make sure its close - we don't want to wander far from the group
-                if d<400:
-                    status=True
-                    self.target_object=b
-                    self.ai_goal='pickup'
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving' 
+                status=True
+                self.target_object=b
+                self.ai_goal='pickup'
+                self.destination=self.target_object.world_coords
+                self.ai_state='start_moving' 
 
         # upgrade weapon?
         if status==False:
             if self.primary_weapon!=None:
                 if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
-                    b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                    b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,500)
                     if b != None:
                         # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
                         # be picked up
                         if b.ai.type=='submachine gun' or b.ai.type=='assault rifle':
-                            d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                            # make sure its close - we don't want to wander far from the group
-                            if d<500:
-                                status=True
-                                self.target_object=b
-                                self.ai_goal='pickup'
-                                self.destination=self.target_object.world_coords
-                                self.ai_state='start_moving' 
-                                print('swapping '+self.primary_weapon.name + 'for '+b.name)
+                            status=True
+                            self.target_object=b
+                            self.ai_goal='pickup'
+                            self.destination=self.target_object.world_coords
+                            self.ai_state='start_moving' 
 
             else:
                 # pickup any gun that is close
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns)
+                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,500)
                 if b != None:
-                    d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                    # make sure its close - we don't want to wander far from the group
-                    if d<500:
-                        status=True
-                        self.target_object=b
-                        self.ai_goal='pickup'
-                        self.destination=self.target_object.world_coords
-                        self.ai_state='start_moving' 
-
-        # grab anti-tank 
-        if status==False and self.antitank==None:
-            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_handheld_antitank)
-            if b != None:
-                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                # make sure its close - we don't want to wander far from the group
-                if d<500:
                     status=True
                     self.target_object=b
                     self.ai_goal='pickup'
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving' 
+
+        # grab anti-tank 
+        if status==False and self.antitank==None:
+            b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_handheld_antitank,500)
+            if b != None:
+                status=True
+                self.target_object=b
+                self.ai_goal='pickup'
+                self.destination=self.target_object.world_coords
+                self.ai_state='start_moving' 
 
         # upgrade clothes / armor
 
