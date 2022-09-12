@@ -41,6 +41,10 @@ class AIVehicle(AIBase):
 
         # current fuel type options : gas / diesel
         self.fuel_type='gas'
+        # max fuel load in liters
+        self.fuel_capacity=0
+        # current fuel amount
+        self.fuel=0
 
         # passengers[0] determines how the AI is controlled
         self.passengers=[]
@@ -324,6 +328,12 @@ class AIVehicle(AIBase):
 
         elif self.owner.rotation_angle<0:
             self.owner.rotation_angle=360
+
+        # update text
+        self.owner.world.graphic_engine.vehicle_text_queue=[]
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(round(self.vehicle_speed,2)))
+        self.owner.world.graphic_engine.vehicle_text_queue.append('Fuel: '+str(round(self.fuel,2))+' liters')
+
 
 
 

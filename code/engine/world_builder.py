@@ -48,6 +48,7 @@ from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
+from ai.ai_medical import AIMedical
 
 # module specific variables
 module_version='0.0' #module software version
@@ -55,7 +56,9 @@ module_last_update_date='August 15 2022' #date of last update
 
 #global variables
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
-,'champignon-cheese','karwendel-cheese']
+,'champignon-cheese','karwendel-cheese','wine','schokakola']
+
+
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
@@ -331,11 +334,17 @@ def load_images(world):
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
+    world.graphic_engine.loadImage('wine_bottle','images/consumables/wine_bottle.png')
+    world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
     world.graphic_engine.loadImage('map_pointer_blue','images/map/map_pointer_blue.png')
     world.graphic_engine.loadImage('map_pointer_orange','images/map/map_pointer_orange.png')
+
+    # medical 
+    world.graphic_engine.loadImage('bandage','images/medical/bandage.png')
+    world.graphic_engine.loadImage('german_officer_first_aid_kit','images/medical/german_officer_first_aid_kit.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
@@ -382,6 +391,15 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
+
+    #wine 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
 
 
     # spawn some ammo cans 
@@ -631,49 +649,119 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-50
+        z.thirst_effect=-5
+        z.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='potato':
         z=WorldObject(WORLD,['potato'],AIConsumable)
         z.render_level=2
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-70
+        z.thirst_effect=-5
+        z.fatigue_effect=-20  
 
     elif OBJECT_TYPE=='turnip':
         z=WorldObject(WORLD,['turnip'],AIConsumable)
         z.render_level=2
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-60
+        z.thirst_effect=-8
+        z.fatigue_effect=-10  
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
         z.render_level=2
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-200
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='camembert-cheese':
         z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
         z.render_level=2
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-250
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='champignon-cheese':
         z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
         z.render_level=2
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-300
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='karwendel-cheese':
         z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
         z.render_level=2
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
-        z.is_consumable=True 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-500
+        z.thirst_effect=-5
+        z.fatigue_effect=-50  
+
+    elif OBJECT_TYPE=='wine':
+        z=WorldObject(WORLD,['wine_bottle'],AIConsumable)
+        z.render_level=2
+        z.name='wine'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.health_effect=5
+        z.hunger_effect=-50
+        z.thirst_effect=-500
+        z.fatigue_effect=50  
+
+    elif OBJECT_TYPE=='schokakola':
+        z=WorldObject(WORLD,['schokakola'],AIConsumable)
+        z.render_level=2
+        z.name='scho-ka-kola'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.health_effect=15
+        z.hunger_effect=-50
+        z.thirst_effect=10
+        z.fatigue_effect=-250 
+    elif OBJECT_TYPE=='bandage':
+        z=WorldObject(WORLD,['bandage'],AIMedical)
+        z.render_level=2
+        z.name='bandage'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_medical=True
+        z.health_effect=50
+        z.hunger_effect=0
+        z.thirst_effect=0
+        z.fatigue_effect=0
+    elif OBJECT_TYPE=='german_officer_first_aid_kit':
+        z=WorldObject(WORLD,['german_officer_first_aid_kit'],AIMedical)
+        z.render_level=2
+        z.name='German Officer First Aid Kit'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_medical=True
+        z.health_effect=150
+        z.hunger_effect=0
+        z.thirst_effect=0
+        z.fatigue_effect=-300  
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
@@ -1081,24 +1169,29 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.world_builder_identity='german_kar98k'
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+
         return z
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mp40'
         z.add_inventory(spawn_object(WORLD,[0,0],'mp40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z
     if SOLDIER_TYPE=='german_mg34':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mg34'
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z
     if SOLDIER_TYPE=='german_stg44':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_stg44'
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z
 
     # --------- soviet types ----------------------------------------
@@ -1107,22 +1200,26 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.world_builder_identity='soviet_mosin_nagant'
         z.add_inventory(spawn_object(WORLD,[0,0],'mosin_nagant',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z
     if SOLDIER_TYPE=='soviet_ppsh43':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_ppsh43'
         z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z 
     if SOLDIER_TYPE=='soviet_dp28':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_dp28'
         z.add_inventory(spawn_object(WORLD,[0,0],'dp28',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z 
     if SOLDIER_TYPE=='soviet_tt33':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_tt33'
         z.add_inventory(spawn_object(WORLD,[0,0],'tt33',False))
-        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False)) 
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False)) 
         return z   

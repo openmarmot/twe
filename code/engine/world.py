@@ -59,6 +59,7 @@ class World(object):
         self.wo_objects_handheld_antitank=[]
         self.wo_objects_melee=[]
         self.wo_objects_airplane=[]
+        self.wo_objects_medical=[]
 
         #world areas
         self.world_areas=[]
@@ -139,6 +140,8 @@ class World(object):
             self.wo_objects_civilian.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_melee:
             self.wo_objects_melee.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_medical:
+            self.wo_objects_medical.append(WORLD_OBJECT)
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -205,7 +208,7 @@ class World(object):
         best_squad_mate=None 
         if WORLD_OBJECT.ai.squad != None:
             if len(WORLD_OBJECT.ai.squad.members)>0:
-                best_squad_mate=self.get_closest_object(WORLD_OBJECT.world_coords,WORLD_OBJECT.ai.squad.members)
+                best_squad_mate=self.get_closest_object(WORLD_OBJECT.world_coords,WORLD_OBJECT.ai.squad.members,500)
 
         if best_squad_mate != None:
             return best_squad_mate
@@ -213,7 +216,7 @@ class World(object):
             # no squad mates for whatever reason
             # just go to a building for now - eventually replace with ammo crate 
             if len(self.wo_objects_building)>0:
-                best_building=self.get_closest_object(WORLD_OBJECT.world_coords,self.wo_objects_building)
+                best_building=self.get_closest_object(WORLD_OBJECT.world_coords,self.wo_objects_building,1000)
                 return best_building
             else:
                 print("Error: no suitable ammo sources")
@@ -223,7 +226,7 @@ class World(object):
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):
         ''' returns the closest gun. spawns one if there are none '''
-        best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns)
+        best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns,5000)
         if best_object==None:
             # spawn a new gun and return it
 
@@ -242,9 +245,9 @@ class World(object):
             return best_object
 
     #---------------------------------------------------------------------------
-    def get_closest_object(self, WORLD_COORDS,OBJECT_LIST):
+    def get_closest_object(self, WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
         ''' can be used on its own or referenced like get_closest_gun() does'''
-        best_distance=100000
+        best_distance=MAX_DISTANCE
         best_object=None
         for b in OBJECT_LIST:
             d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
@@ -307,6 +310,8 @@ class World(object):
             self.wo_objects_civilian.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_melee:
             self.wo_objects_melee.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_medical:
+            self.wo_objects_medical.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):

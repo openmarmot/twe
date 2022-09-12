@@ -1,6 +1,86 @@
 TWE Project : Change Log
 
 
+----------------------------------
+September 10 2022
+- added max_distance to world.get_closest_object
+    - this simplifies some code that would have otherwise re-checked distance 
+    - also may reign in some of the crazier behavior where distance wasn't considered
+- made chance of panic from no medical in think generic 1 in 25 instead of 1 in 5
+    - this needs to be rethought in general as it is happening a lot
+- added a chance to stop bleeding with a makeshift bandage (not requiring a medical object) 
+- remove some unneeded debug messages 
+
+a unintended consequence of the introduction of medical objects is that bots can no longer 
+easily heal wounds and are very prone to panicking. this is compounded by medical objects being 
+generally unavailable to pick up 
+
+i should add a bullet spread modifier based on fatigue 
+
+need some way to have the bots fire bursts - maybe shot counter and after 10 or so 
+go to sleep mode and reset counter ?
+
+----------------------------------
+September 08 2022
+- minor changes to vehicle information display
+    - speed now shows correctly when in the kubelwagen 
+
+----------------------------------
+September 06 2022
+
+- using a medical object stops bleeding now 
+
+----------------------------------
+September 05 2022
+- added a bandage to the inventory of all soldier types 
+- minor changes to medical item usage so that attributes are applied correctly 
+
+noticed there is still a lot of out of range firing. i thought this was fixed 
+but i guess not. 
+
+watched a german soldier walk past a soviet soldier to pick up a wine bottle. 
+the german picked up the wine bottle and then turned around and shot the soviet dead. 
+the soviet never reacted. yup - the ai still needs a lot of work. 
+ 
+ ---------------------------------
+September 03 2022
+- resized fuel can image which was not square (causes occasional crashes)
+    - also modified the image a bit. still pretty bad though
+- added art and basic object code for bandage and german officer medical kit 
+
+---------------------------------
+August 30 2022
+- added scho-ka-kola (german caffeine chocolate)
+- added schokakola and wine to the consumables list so it will show up in random loot 
+
+initially meant for schokakola to be in the medical (stimulant) category,
+but will probably just be a consumable 
+
+schokakola art was goodish at 20x20 but rather poor at 10x10, however it is a smaller item 
+so needed to be 10x10. may redo at some point but not a huge priority.
+
+---------------------------------
+August 25 2022
+- added wine bottle art and wine object 
+
+---------------------------------
+August 22 2022
+- added some effects to the consumable spawns
+- added is_medical to the list of world_object attributes 
+- added simple functions for eating and medical obj usage to ai_human
+    - eating and medical are now different. among other things this 
+    means that eating no longer has a strong health effect 
+
+no medical objects at the moment although the engine supports them now. 
+
+I will have to whip up some art for some stimulants, bandages, etc 
+
+consumable effects are going to take some balancing. 
+currently the cheese has quite a large hunger reduction compared to the other items 
+
+currently hunger/thirst don't have any real effect. 
+maybe extreme hunger will decrease health ??
+
 ---------------------------------
 August 17 2022
 - added hunger and thirst attributes to human ai 
