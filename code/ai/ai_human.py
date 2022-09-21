@@ -9,7 +9,6 @@ event - something that could happen to the ai, possibly caused by external force
 handle_SOMETHING - something that the AI decides to do
 '''
 
-
 #import built in modules
 import random
 import copy
@@ -74,6 +73,10 @@ class AIHuman(AIBase):
         self.thirst=0
         self.thirst_rate=0.1
 
+        # burst control keeps ai from shooting continuous streams
+        self.current_burst=0 # int number of bullets shot in current burst
+        self.max_burst=10
+
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
@@ -106,11 +109,9 @@ class AIHuman(AIBase):
                     self.time_since_bleed=0
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
 
-
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
                 self.primary_weapon.update()
-
 
             # hunger/thirst stuff
             self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
@@ -120,8 +121,6 @@ class AIHuman(AIBase):
                 self.handle_player_update()
             else :
                 self.handle_normal_ai_update()
-
-
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -137,7 +136,6 @@ class AIHuman(AIBase):
 
             if self.owner.is_player:
                 self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
-
 
             # add the shooter of the bullet to the personal enemies list
             # bullets and shrapnel from grenades and panzerfausts track ownership
@@ -201,7 +199,6 @@ class AIHuman(AIBase):
             self.ai_goal='react to collision'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
             self.ai_state='start_moving'
-
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
@@ -271,7 +268,6 @@ class AIHuman(AIBase):
                 self.large_pickup=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
 
-
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
         ''' remove object from inventory '''
@@ -297,13 +293,20 @@ class AIHuman(AIBase):
         else:
             print('removal error - object not in inventory',EVENT_DATA.name)
 
-
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
         if self.primary_weapon!=None:
-            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
+            # fire
+            if self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS):
+                self.current_burst+=1
 
+            if self.current_burst>self.max_burst:
+                # stop firing, give the ai a chance to rethink and re-engage
+                self.current_burst=0
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                self.target_object=None
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
@@ -355,7 +358,6 @@ class AIHuman(AIBase):
             self.owner.world.world_menu.menu_state='none'
             # fake input to get the text added
             self.owner.world.world_menu.handle_input('none')
-
 
     #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
@@ -415,8 +417,7 @@ class AIHuman(AIBase):
                     self.ai_state='start_moving'
                     self.ai_goal='panic'
                     self.speak('scream')
-
-                    
+  
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
         ''' handle code for civilians and soldiers '''

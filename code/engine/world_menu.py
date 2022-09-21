@@ -8,7 +8,6 @@ this class contains code for the world in game menu
 instantiated by the world class
 '''
 
-
 #import built in modules
 import random
 
@@ -73,7 +72,10 @@ class World_Menu(object):
             self.airplane_menu(Key)
         elif self.active_menu=='death':
             self.death_menu(Key)
-        
+        elif self.active_menu=='liquid_container':
+            self.liquid_container_menu(Key)
+        else:
+            print('Error : active menu not recognized ',self.active_menu)
 
     def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
@@ -104,6 +106,9 @@ class World_Menu(object):
                 elif SELECTED_OBJECT.is_airplane:
                     self.active_menu='airplane'
                     self.airplane_menu(None)
+                elif SELECTED_OBJECT.is_liquid_container:
+                    self.active_menu='liquid_container'
+                    self.liquid_container_menu(None)
                 else :
                     # just dump everything else in here for now
                     self.active_menu='generic'
@@ -167,99 +172,6 @@ class World_Menu(object):
         self.world.graphic_engine.menu_text_queue=[]
         self.active_menu=menu_name
         self.handle_input(None)
-
-
-    def storage_menu(self, Key):
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Storage Menu --')
-            self.world.graphic_engine.menu_text_queue.append('1 - List')
-            self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('3 - Remove ')
-            self.menu_state='base'
-
-        if self.menu_state=='base':
-            if Key=='1':
-                Key=None
-                self.menu_state='list'
-            if Key=='2':
-                Key=None
-                pass
-                #self.menu_state='add'
-            if Key=='3':
-                Key=None
-                self.menu_state='remove'
-
-        if self.menu_state=='list':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- List Inventory Menu --')
-            for b in self.selected_object.ai.inventory:
-                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
-
-        if self.menu_state=='remove':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
-            selection_key=1
-            for b in self.selected_object.ai.inventory:
-                if selection_key<10:
-                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
-                    selection_key+=1
-
-            if Key=='1':
-                if len(self.selected_object.ai.inventory)>0:
-                    temp=self.selected_object.ai.inventory[0]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='2':
-                if len(self.selected_object.ai.inventory)>1:
-                    temp=self.selected_object.ai.inventory[1]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='3':
-                if len(self.selected_object.ai.inventory)>2:
-                    temp=self.selected_object.ai.inventory[2]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='4':
-                if len(self.selected_object.ai.inventory)>3:
-                    temp=self.selected_object.ai.inventory[3]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='5':
-                if len(self.selected_object.ai.inventory)>4:
-                    temp=self.selected_object.ai.inventory[4]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='6':
-                if len(self.selected_object.ai.inventory)>5:
-                    temp=self.selected_object.ai.inventory[5]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='7':
-                if len(self.selected_object.ai.inventory)>6:
-                    temp=self.selected_object.ai.inventory[6]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='8':
-                if len(self.selected_object.ai.inventory)>7:
-                    temp=self.selected_object.ai.inventory[7]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-            if Key=='9':
-                if len(self.selected_object.ai.inventory)>8:
-                    temp=self.selected_object.ai.inventory[8]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
-
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
-            selection_key=1
-            for b in self.selected_object.ai.inventory:
-                if selection_key<10:
-                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
-                    selection_key+=1
-
-                    
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -367,9 +279,7 @@ class World_Menu(object):
                 else:
                     self.menu_state = 'non_squad_member_menu'
 
-
             self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
-
 
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
             self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
@@ -422,6 +332,31 @@ class World_Menu(object):
                 # ask the ai to join the squad
                 self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
+    
+    def liquid_container_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            if self.world.debug_mode==True:
+                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
+            self.world.graphic_engine.menu_text_queue.append('Contents : '+self.selected_object.ai.liquid_type)
+            self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.used_volume)+' liters')
+            if self.selected_object.ai.contaminated:
+                self.world.graphic_engine.menu_text_queue.append('Liquid is contaminated')
+            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
+            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                pass
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                self.world.player.add_inventory(self.selected_object)
+                self.world.remove_object(self.selected_object)
+                self.deactivate_menu()
 
     def start_menu(self, Key):
         if self.menu_state=='none':
@@ -468,7 +403,95 @@ class World_Menu(object):
                 self.world.is_paused=False
                 self.deactivate_menu()
                 
+    def storage_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- Storage Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - List')
+            self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Remove ')
+            self.menu_state='base'
 
+        if self.menu_state=='base':
+            if Key=='1':
+                Key=None
+                self.menu_state='list'
+            if Key=='2':
+                Key=None
+                pass
+                #self.menu_state='add'
+            if Key=='3':
+                Key=None
+                self.menu_state='remove'
+
+        if self.menu_state=='list':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- List Inventory Menu --')
+            for b in self.selected_object.ai.inventory:
+                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
+
+        if self.menu_state=='remove':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
+            selection_key=1
+            for b in self.selected_object.ai.inventory:
+                if selection_key<10:
+                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                    selection_key+=1
+
+            if Key=='1':
+                if len(self.selected_object.ai.inventory)>0:
+                    temp=self.selected_object.ai.inventory[0]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='2':
+                if len(self.selected_object.ai.inventory)>1:
+                    temp=self.selected_object.ai.inventory[1]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='3':
+                if len(self.selected_object.ai.inventory)>2:
+                    temp=self.selected_object.ai.inventory[2]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='4':
+                if len(self.selected_object.ai.inventory)>3:
+                    temp=self.selected_object.ai.inventory[3]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='5':
+                if len(self.selected_object.ai.inventory)>4:
+                    temp=self.selected_object.ai.inventory[4]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='6':
+                if len(self.selected_object.ai.inventory)>5:
+                    temp=self.selected_object.ai.inventory[5]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='7':
+                if len(self.selected_object.ai.inventory)>6:
+                    temp=self.selected_object.ai.inventory[6]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='8':
+                if len(self.selected_object.ai.inventory)>7:
+                    temp=self.selected_object.ai.inventory[7]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+            if Key=='9':
+                if len(self.selected_object.ai.inventory)>8:
+                    temp=self.selected_object.ai.inventory[8]
+                    self.selected_object.remove_inventory(temp)
+                    self.world.add_object(temp)
+
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
+            selection_key=1
+            for b in self.selected_object.ai.inventory:
+                if selection_key<10:
+                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                    selection_key+=1
 
     def vehicle_menu(self, Key):
         if self.menu_state=='none':
@@ -521,8 +544,3 @@ class World_Menu(object):
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
-
-
-
-
-        

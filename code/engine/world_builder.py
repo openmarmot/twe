@@ -59,6 +59,9 @@ list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-chee
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
 
 
+
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
+
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
@@ -296,7 +299,6 @@ def load_images(world):
     world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
     world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
 
-
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
     world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
@@ -407,14 +409,17 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
-    # spawn some fuel cans 
+    # spawn some fuel cans
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True) 
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
 
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"mp40")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"panzerfaust")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
 
     # add ze germans
@@ -514,8 +519,6 @@ def load_test_environment(world):
     # create civilian squads 
     world.civilian_ai.squads+=create_squads(world,s,'civilian')
 
-
-
     # spawn
     # locations will eventually be determined by map control
 
@@ -610,11 +613,21 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=="random_guns":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
     elif CRATE_TYPE=='panzerfaust':
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+    elif CRATE_TYPE=='random_one_gun_type':
+        index=random.randint(0,len(list_guns)-1)
+        amount= random.randint(1,6)
+        for x in range(amount):
+             z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,list_guns[index],False))
 
     z.world_builder_identity='crate'
     # set world coords if they weren't already set
@@ -768,6 +781,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_container=False # going to be something special
         z.is_liquid_container=True
         z.is_large_human_pickup=True
+        z.ai.total_volume=20
+        z.ai.used_volume=20
+        z.ai.liquid_type='gas'
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
