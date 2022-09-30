@@ -360,6 +360,18 @@ class AIHuman(AIBase):
             self.owner.world.world_menu.handle_input('none')
 
     #---------------------------------------------------------------------------
+    def handle_drink(self,LIQUID_CONTAINER):
+        #LIQUID_CONTAINER world object with ai_liquid_container
+        if LIQUID_CONTAINER.ai.used_volume>0:
+            if LIQUID_CONTAINER.ai.used_volume>1:
+                LIQUID_CONTAINER.ai.used_volume-=1;
+            else:
+                # <1 liter left. just drink it all
+                LIQUID_CONTAINER.ai.used_volume=0
+
+            self.speak('drinking some '+LIQUID_CONTAINER.ai.liquid_type)
+
+    #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
         self.health+=CONSUMABLE.ai.health_effect
@@ -617,6 +629,7 @@ class AIHuman(AIBase):
             self.ai_state='sleeping'
             self.ai_goal='none'
             self.target_object=None
+            self.speak('Got him !!')
         else:
             #target is alive, determine the best way to engage
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
@@ -636,6 +649,7 @@ class AIHuman(AIBase):
             if self.throwable != None:
                self.throw(self.target_object.world_coords)
                action=True
+               self.speak('Throwing Grenade !!!!')
         if action==False:
             if self.primary_weapon==None:
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,800)
@@ -680,6 +694,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 action=True
+                self.speak('Enemies spotted, need to get a gun!')
             # we have a primary weapon
             # check if we are out of ammo
             elif self.primary_weapon.ai.get_ammo_count()<1:
@@ -690,6 +705,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 action=True
+                self.speak('Enemies spotted! I am out of ammo!!')
             else:
                 # we have ammo, target is alive
 
@@ -800,6 +816,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 status=True
+                self.speak('I am going to grab that '+o.name)
 
         # 3 (kind of)
         if self.bleeding:
