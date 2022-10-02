@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+October 01 2022
+- added a simple check to make sure the bot doesn't repeat speach 
+- added drink option to liquid_container menu 
+- added consumable menu 
+
+you can now drink gas 
+
+wine is currently a consumable - but maybe it should be a liquid container (wine_bottle instead?)
+
 ----------------------------------
 September 29 2022
 - added more dialog. eventually i want dialog to be a bit more 

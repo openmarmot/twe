@@ -74,6 +74,8 @@ class World_Menu(object):
             self.death_menu(Key)
         elif self.active_menu=='liquid_container':
             self.liquid_container_menu(Key)
+        elif self.active_menu=='consumable':
+            self.consumable_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -109,6 +111,9 @@ class World_Menu(object):
                 elif SELECTED_OBJECT.is_liquid_container:
                     self.active_menu='liquid_container'
                     self.liquid_container_menu(None)
+                elif SELECTED_OBJECT.is_consumable:
+                    self.active_menu='consumable'
+                    self.consumable_menu(None)
                 else :
                     # just dump everything else in here for now
                     self.active_menu='generic'
@@ -172,6 +177,26 @@ class World_Menu(object):
         self.world.graphic_engine.menu_text_queue=[]
         self.active_menu=menu_name
         self.handle_input(None)
+
+    def consumable_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            if self.world.debug_mode==True:
+                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
+            self.world.graphic_engine.menu_text_queue.append('1 - Eat')
+            self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                self.world.player.ai.handle_eat(self.selected_object)
+                self.world.remove_object(self.selected_object)
+                self.deactivate_menu()
+            elif Key=='2':
+                self.world.player.add_inventory(self.selected_object)
+                self.world.remove_object(self.selected_object)
+                self.deactivate_menu()
 
     def deactivate_menu(self):
         self.selected_object=None
@@ -344,16 +369,13 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.used_volume)+' liters')
             if self.selected_object.ai.contaminated:
                 self.world.graphic_engine.menu_text_queue.append('Liquid is contaminated')
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            self.world.graphic_engine.menu_text_queue.append('1 - Drink')
+            self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
+                self.world.player.ai.handle_drink(self.selected_object)
             elif Key=='2':
-                pass
-            elif Key=='3':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()

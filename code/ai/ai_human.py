@@ -90,6 +90,9 @@ class AIHuman(AIBase):
         # a mission takes priority over some other actions like following a squad
         # missions will be done in order, making it a sort of programming language for the bots
 
+        # used to prevent repeats
+        self.last_speak=''
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -552,25 +555,30 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def speak(self,WHAT):
-        ''' say something the ai is close to the player '''
-        distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
-        if distance<400:
-            s='['+self.owner.name+'] '
+        ''' say something if the ai is close to the player '''
 
-            if WHAT=='status':
-                s+=' '+self.ai_state+' '+self.ai_goal
-            elif WHAT=='bandage':
-                s+=' applying bandage'
-            elif WHAT=='joined squad':
-                s+=' joined squad'
-            elif WHAT=='react to being shot':
-                s+=" Aagh! I'm hit !!"
-            elif WHAT=='scream':
-                s+='Aaaaaaaaaaaah!!!'
-            else:
-                s+=WHAT
+        # simple way of preventing repeats
+        if WHAT !=self.last_speak:
+            self.last_speak=WHAT
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
+            if distance<400:
+                s='['+self.owner.name+'] '
 
-            self.owner.world.graphic_engine.add_text(s)
+                if WHAT=='status':
+                    s+=' '+self.ai_state+' '+self.ai_goal
+                elif WHAT=='bandage':
+                    s+=' applying bandage'
+                elif WHAT=='joined squad':
+                    s+=' joined squad'
+                elif WHAT=='react to being shot':
+                    s+=" Aagh! I'm hit !!"
+                elif WHAT=='scream':
+                    s+='Aaaaaaaaaaaah!!!'
+                else:
+                    s+=WHAT
+
+                self.owner.world.graphic_engine.add_text(s)
+
 
     #-----------------------------------------------------------------------
     def react_asked_to_join_squad(self,SQUAD):
