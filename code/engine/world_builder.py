@@ -663,10 +663,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-50
-        z.thirst_effect=-5
-        z.fatigue_effect=-10 
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='potato':
         z=WorldObject(WORLD,['potato'],AIConsumable)
@@ -674,10 +674,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-70
-        z.thirst_effect=-5
-        z.fatigue_effect=-20  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-70
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-20  
 
     elif OBJECT_TYPE=='turnip':
         z=WorldObject(WORLD,['turnip'],AIConsumable)
@@ -685,10 +685,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-60
-        z.thirst_effect=-8
-        z.fatigue_effect=-10  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10  
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
@@ -696,10 +696,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-200
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-200
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='camembert-cheese':
         z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
@@ -707,10 +707,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-250
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-250
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='champignon-cheese':
         z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
@@ -718,10 +718,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-300
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-300
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='karwendel-cheese':
         z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
@@ -729,10 +729,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-500
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-500
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='wine':
         z=WorldObject(WORLD,['wine_bottle'],AIConsumable)
@@ -740,10 +740,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='wine'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-50
-        z.thirst_effect=-500
-        z.fatigue_effect=50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-500
+        z.ai.fatigue_effect=50  
 
     elif OBJECT_TYPE=='schokakola':
         z=WorldObject(WORLD,['schokakola'],AIConsumable)
@@ -751,30 +751,30 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='scho-ka-kola'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=15
-        z.hunger_effect=-50
-        z.thirst_effect=10
-        z.fatigue_effect=-250 
+        z.ai.health_effect=15
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=10
+        z.ai.fatigue_effect=-250 
     elif OBJECT_TYPE=='bandage':
         z=WorldObject(WORLD,['bandage'],AIMedical)
         z.render_level=2
         z.name='bandage'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
-        z.health_effect=50
-        z.hunger_effect=0
-        z.thirst_effect=0
-        z.fatigue_effect=0
+        z.ai.health_effect=50
+        z.ai.hunger_effect=0
+        z.ai.thirst_effect=0
+        z.ai.fatigue_effect=0
     elif OBJECT_TYPE=='german_officer_first_aid_kit':
         z=WorldObject(WORLD,['german_officer_first_aid_kit'],AIMedical)
         z.render_level=2
         z.name='German Officer First Aid Kit'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
-        z.health_effect=150
-        z.hunger_effect=0
-        z.thirst_effect=0
-        z.fatigue_effect=-300  
+        z.ai.health_effect=150
+        z.ai.hunger_effect=0
+        z.ai.thirst_effect=0
+        z.ai.fatigue_effect=-300  
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
@@ -784,6 +784,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.total_volume=20
         z.ai.used_volume=20
         z.ai.liquid_type='gas'
+        z.ai.health_effect=-150
+        z.ai.hunger_effect=100
+        z.ai.thirst_effect=100
+        z.ai.fatigue_effect=500  
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'

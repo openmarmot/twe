@@ -372,14 +372,23 @@ class AIHuman(AIBase):
                 # <1 liter left. just drink it all
                 LIQUID_CONTAINER.ai.used_volume=0
 
+            self.health+=LIQUID_CONTAINER.ai.health_effect
+            self.hunger+=LIQUID_CONTAINER.ai.hunger_effect
+            self.thirst+=LIQUID_CONTAINER.ai.thirst_effect
+            self.fatigue+=LIQUID_CONTAINER.ai.fatigue_effect
+
             self.speak('drinking some '+LIQUID_CONTAINER.ai.liquid_type)
+
+            # somehow this killed us. add a death description
+            if self.health<1:
+                self.last_collision_description = 'over consumption of '+LIQUID_CONTAINER.ai.liquid_type
 
     #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
         self.health+=CONSUMABLE.ai.health_effect
         self.hunger+=CONSUMABLE.ai.hunger_effect
-        self.thirst_rate+=CONSUMABLE.ai.thirst_effect
+        self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
 
         self.event_remove_inventory(CONSUMABLE)

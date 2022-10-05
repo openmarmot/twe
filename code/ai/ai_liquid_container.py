@@ -36,6 +36,13 @@ class AILiquidContainer(AIBase):
         self.total_volume = 0
         self.used_volume = 0 # filled volume
 
+        # positive or negative. will be added to corresponding attribute
+        # this should be changed when the liquid_type changes
+        self.health_effect=0
+        self.hunger_effect=0
+        self.thirst_effect=0
+        self.fatigue_effect=0
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

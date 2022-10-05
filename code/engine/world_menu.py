@@ -375,6 +375,7 @@ class World_Menu(object):
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.ai.handle_drink(self.selected_object)
+                self.deactivate_menu()
             elif Key=='2':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
