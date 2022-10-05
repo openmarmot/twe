@@ -1,6 +1,71 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+October 01 2022
+- added a simple check to make sure the bot doesn't repeat speach 
+- added drink option to liquid_container menu 
+- added consumable menu 
+
+you can now drink gas 
+
+wine is currently a consumable - but maybe it should be a liquid container (wine_bottle instead?)
+
+----------------------------------
+September 29 2022
+- added more dialog. eventually i want dialog to be a bit more 
+random but this works for now 
+- added method to support drinking liquid 
+
+i think the new burst fire system has the unintended effect of 
+removing personal enemies if the inital burst doesn't kill them. 
+will have to think about that one. 
+
+the speak system gets overwhelmed really quick. need to do something 
+to speed it up when the queue gets too big (actually i think this is 
+already implemented? hmm)
+
+----------------------------------
+September 21 2022
+- finished initial work on liquid container menu 
+
+----------------------------------
+September 20 2022
+- small changes to german_fuel_can spawn properties to fill out 
+    some ai_liquid_container variables 
+- working on a liquid_container menu 
+
+once again reminded how much i hate the menu system 
+
+----------------------------------
+September 17 2022
+- added a gun crate that has a random amount of one random type of gun 
+    - more realistic than just a random mix of guns 
+
+----------------------------------
+September 14 2022
+- added random gun crate
+- minor code cleanup 
+
+i would really like to have some sort of loot table with a level of 
+rareness for each item (drop rate?)
+
+I really need to teach the AI how to use crates 
+
+----------------------------------
+September 13 2022
+- implemented a really basic burst fire system for the ai to 
+    keep bots from just dumping all their ammo at one target
+
+inital play test suggests the burst system works really well. 
+lethality seems to be up as the target info resets after each burst 
+allowing the ai to rethink and potentially choose a better target 
+
+----------------------------------
+September 12 2022
+- minor changes to ai_gun 
+
 ----------------------------------
 September 10 2022
 - added max_distance to world.get_closest_object

@@ -9,7 +9,6 @@ event - something that could happen to the ai, possibly caused by external force
 handle_SOMETHING - something that the AI decides to do
 '''
 
-
 #import built in modules
 import random
 import copy
@@ -74,6 +73,10 @@ class AIHuman(AIBase):
         self.thirst=0
         self.thirst_rate=0.1
 
+        # burst control keeps ai from shooting continuous streams
+        self.current_burst=0 # int number of bullets shot in current burst
+        self.max_burst=10
+
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
@@ -86,6 +89,9 @@ class AIHuman(AIBase):
         # target : either a coordinate or more often a world_object. dependent on the action
         # a mission takes priority over some other actions like following a squad
         # missions will be done in order, making it a sort of programming language for the bots
+
+        # used to prevent repeats
+        self.last_speak=''
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -106,11 +112,9 @@ class AIHuman(AIBase):
                     self.time_since_bleed=0
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
 
-
             if self.primary_weapon!=None:
                 # needs updates for time tracking and other stuff
                 self.primary_weapon.update()
-
 
             # hunger/thirst stuff
             self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
@@ -120,8 +124,6 @@ class AIHuman(AIBase):
                 self.handle_player_update()
             else :
                 self.handle_normal_ai_update()
-
-
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -137,7 +139,6 @@ class AIHuman(AIBase):
 
             if self.owner.is_player:
                 self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
-
 
             # add the shooter of the bullet to the personal enemies list
             # bullets and shrapnel from grenades and panzerfausts track ownership
@@ -201,7 +202,6 @@ class AIHuman(AIBase):
             self.ai_goal='react to collision'
             self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
             self.ai_state='start_moving'
-
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
@@ -271,7 +271,6 @@ class AIHuman(AIBase):
                 self.large_pickup=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
 
-
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
         ''' remove object from inventory '''
@@ -297,13 +296,20 @@ class AIHuman(AIBase):
         else:
             print('removal error - object not in inventory',EVENT_DATA.name)
 
-
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS):
         ''' fires the (primary?) weapon '''    
         if self.primary_weapon!=None:
-            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
+            # fire
+            if self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS):
+                self.current_burst+=1
 
+            if self.current_burst>self.max_burst:
+                # stop firing, give the ai a chance to rethink and re-engage
+                self.current_burst=0
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                self.target_object=None
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
@@ -356,13 +362,33 @@ class AIHuman(AIBase):
             # fake input to get the text added
             self.owner.world.world_menu.handle_input('none')
 
+    #---------------------------------------------------------------------------
+    def handle_drink(self,LIQUID_CONTAINER):
+        #LIQUID_CONTAINER world object with ai_liquid_container
+        if LIQUID_CONTAINER.ai.used_volume>0:
+            if LIQUID_CONTAINER.ai.used_volume>1:
+                LIQUID_CONTAINER.ai.used_volume-=1;
+            else:
+                # <1 liter left. just drink it all
+                LIQUID_CONTAINER.ai.used_volume=0
+
+            self.health+=LIQUID_CONTAINER.ai.health_effect
+            self.hunger+=LIQUID_CONTAINER.ai.hunger_effect
+            self.thirst+=LIQUID_CONTAINER.ai.thirst_effect
+            self.fatigue+=LIQUID_CONTAINER.ai.fatigue_effect
+
+            self.speak('drinking some '+LIQUID_CONTAINER.ai.liquid_type)
+
+            # somehow this killed us. add a death description
+            if self.health<1:
+                self.last_collision_description = 'over consumption of '+LIQUID_CONTAINER.ai.liquid_type
 
     #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
         self.health+=CONSUMABLE.ai.health_effect
         self.hunger+=CONSUMABLE.ai.hunger_effect
-        self.thirst_rate+=CONSUMABLE.ai.thirst_effect
+        self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
 
         self.event_remove_inventory(CONSUMABLE)
@@ -415,8 +441,7 @@ class AIHuman(AIBase):
                     self.ai_state='start_moving'
                     self.ai_goal='panic'
                     self.speak('scream')
-
-                    
+  
     #-----------------------------------------------------------------------
     def handle_normal_ai_update(self):
         ''' handle code for civilians and soldiers '''
@@ -539,25 +564,30 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def speak(self,WHAT):
-        ''' say something the ai is close to the player '''
-        distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
-        if distance<400:
-            s='['+self.owner.name+'] '
+        ''' say something if the ai is close to the player '''
 
-            if WHAT=='status':
-                s+=' '+self.ai_state+' '+self.ai_goal
-            elif WHAT=='bandage':
-                s+=' applying bandage'
-            elif WHAT=='joined squad':
-                s+=' joined squad'
-            elif WHAT=='react to being shot':
-                s+=" Aagh! I'm hit !!"
-            elif WHAT=='scream':
-                s+='Aaaaaaaaaaaah!!!'
-            else:
-                s+=WHAT
+        # simple way of preventing repeats
+        if WHAT !=self.last_speak:
+            self.last_speak=WHAT
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
+            if distance<400:
+                s='['+self.owner.name+'] '
 
-            self.owner.world.graphic_engine.add_text(s)
+                if WHAT=='status':
+                    s+=' '+self.ai_state+' '+self.ai_goal
+                elif WHAT=='bandage':
+                    s+=' applying bandage'
+                elif WHAT=='joined squad':
+                    s+=' joined squad'
+                elif WHAT=='react to being shot':
+                    s+=" Aagh! I'm hit !!"
+                elif WHAT=='scream':
+                    s+='Aaaaaaaaaaaah!!!'
+                else:
+                    s+=WHAT
+
+                self.owner.world.graphic_engine.add_text(s)
+
 
     #-----------------------------------------------------------------------
     def react_asked_to_join_squad(self,SQUAD):
@@ -616,6 +646,7 @@ class AIHuman(AIBase):
             self.ai_state='sleeping'
             self.ai_goal='none'
             self.target_object=None
+            self.speak('Got him !!')
         else:
             #target is alive, determine the best way to engage
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
@@ -635,6 +666,7 @@ class AIHuman(AIBase):
             if self.throwable != None:
                self.throw(self.target_object.world_coords)
                action=True
+               self.speak('Throwing Grenade !!!!')
         if action==False:
             if self.primary_weapon==None:
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,800)
@@ -679,6 +711,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 action=True
+                self.speak('Enemies spotted, need to get a gun!')
             # we have a primary weapon
             # check if we are out of ammo
             elif self.primary_weapon.ai.get_ammo_count()<1:
@@ -689,6 +722,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 action=True
+                self.speak('Enemies spotted! I am out of ammo!!')
             else:
                 # we have ammo, target is alive
 
@@ -799,6 +833,7 @@ class AIHuman(AIBase):
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
                 status=True
+                self.speak('I am going to grab that '+o.name)
 
         # 3 (kind of)
         if self.bleeding:

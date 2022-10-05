@@ -91,8 +91,8 @@ class AIGun(AIBase):
 
     #---------------------------------------------------------------------------
     def fire(self,WORLD_COORDS,TARGET_COORDS):
-        ''' fire the gun '''
-
+        ''' fire the gun. returns True/False as to whether the gun fired '''
+        fired=False
   
         # start with a time check
         if(self.fire_time_passed>self.rate_of_fire):
@@ -105,14 +105,9 @@ class AIGun(AIBase):
                 if self.magazine_count>0:
                     self.magazine_count-=1
                     self.magazine=self.mag_capacity
-                    if self.equipper.is_player:
-                        print(" Remaining magazines: "+str(self.magazine_count)+ '  Rounds fired '+str(self.rounds_fired))
-                else:
-                    print(self.equipper.name + ' out of ammo for ' + self.owner.name + ' Rounds fired '+str(self.rounds_fired))
 
-                    if self.equipper.is_player:
-                        print(' out of ammo for ' + self.owner.name + ' Rounds fired '+str(self.rounds_fired))
             else :
+                fired=True
                 self.magazine-=1
                 self.rounds_fired+=1
                 spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
@@ -126,6 +121,8 @@ class AIGun(AIBase):
 
                 # spawn brass 
                 engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+
+        return fired
 
     #---------------------------------------------------------------------------
     def get_ammo_count(self):

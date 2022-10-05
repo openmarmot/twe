@@ -59,6 +59,9 @@ list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-chee
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
 
 
+
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
+
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 def create_squads(WORLD,HUMANS,FACTION):
@@ -296,7 +299,6 @@ def load_images(world):
     world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
     world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
 
-
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
     world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
@@ -407,14 +409,17 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
 
-    # spawn some fuel cans 
+    # spawn some fuel cans
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True) 
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
 
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"mp40")
-    spawn_crate(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],"panzerfaust")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
+    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
 
     # add ze germans
@@ -514,8 +519,6 @@ def load_test_environment(world):
     # create civilian squads 
     world.civilian_ai.squads+=create_squads(world,s,'civilian')
 
-
-
     # spawn
     # locations will eventually be determined by map control
 
@@ -610,11 +613,21 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=="random_guns":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
     elif CRATE_TYPE=='panzerfaust':
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+    elif CRATE_TYPE=='random_one_gun_type':
+        index=random.randint(0,len(list_guns)-1)
+        amount= random.randint(1,6)
+        for x in range(amount):
+             z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,list_guns[index],False))
 
     z.world_builder_identity='crate'
     # set world coords if they weren't already set
@@ -650,10 +663,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-50
-        z.thirst_effect=-5
-        z.fatigue_effect=-10 
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='potato':
         z=WorldObject(WORLD,['potato'],AIConsumable)
@@ -661,10 +674,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-70
-        z.thirst_effect=-5
-        z.fatigue_effect=-20  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-70
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-20  
 
     elif OBJECT_TYPE=='turnip':
         z=WorldObject(WORLD,['turnip'],AIConsumable)
@@ -672,10 +685,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-60
-        z.thirst_effect=-8
-        z.fatigue_effect=-10  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10  
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
@@ -683,10 +696,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-200
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-200
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='camembert-cheese':
         z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
@@ -694,10 +707,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-250
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-250
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='champignon-cheese':
         z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
@@ -705,10 +718,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-300
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-300
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='karwendel-cheese':
         z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
@@ -716,10 +729,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-500
-        z.thirst_effect=-5
-        z.fatigue_effect=-50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-500
+        z.ai.thirst_effect=-5
+        z.ai.fatigue_effect=-50  
 
     elif OBJECT_TYPE=='wine':
         z=WorldObject(WORLD,['wine_bottle'],AIConsumable)
@@ -727,10 +740,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='wine'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=5
-        z.hunger_effect=-50
-        z.thirst_effect=-500
-        z.fatigue_effect=50  
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-500
+        z.ai.fatigue_effect=50  
 
     elif OBJECT_TYPE=='schokakola':
         z=WorldObject(WORLD,['schokakola'],AIConsumable)
@@ -738,36 +751,43 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='scho-ka-kola'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
-        z.health_effect=15
-        z.hunger_effect=-50
-        z.thirst_effect=10
-        z.fatigue_effect=-250 
+        z.ai.health_effect=15
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=10
+        z.ai.fatigue_effect=-250 
     elif OBJECT_TYPE=='bandage':
         z=WorldObject(WORLD,['bandage'],AIMedical)
         z.render_level=2
         z.name='bandage'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
-        z.health_effect=50
-        z.hunger_effect=0
-        z.thirst_effect=0
-        z.fatigue_effect=0
+        z.ai.health_effect=50
+        z.ai.hunger_effect=0
+        z.ai.thirst_effect=0
+        z.ai.fatigue_effect=0
     elif OBJECT_TYPE=='german_officer_first_aid_kit':
         z=WorldObject(WORLD,['german_officer_first_aid_kit'],AIMedical)
         z.render_level=2
         z.name='German Officer First Aid Kit'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
-        z.health_effect=150
-        z.hunger_effect=0
-        z.thirst_effect=0
-        z.fatigue_effect=-300  
+        z.ai.health_effect=150
+        z.ai.hunger_effect=0
+        z.ai.thirst_effect=0
+        z.ai.fatigue_effect=-300  
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
         z.is_container=False # going to be something special
         z.is_liquid_container=True
         z.is_large_human_pickup=True
+        z.ai.total_volume=20
+        z.ai.used_volume=20
+        z.ai.liquid_type='gas'
+        z.ai.health_effect=-150
+        z.ai.hunger_effect=100
+        z.ai.thirst_effect=100
+        z.ai.fatigue_effect=500  
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'

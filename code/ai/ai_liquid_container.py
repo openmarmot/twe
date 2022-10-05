@@ -16,7 +16,7 @@ import copy
 from ai.ai_base import AIBase
 # module specific variables
 module_version='0.0' #module software version
-module_last_update_date='August 15 2022' #date of last update
+module_last_update_date='September 20 2022' #date of last update
 
 # this is for objects that don't need AI
 
@@ -32,8 +32,16 @@ class AILiquidContainer(AIBase):
         # contaminated if liquid_type isn't the same as what is added
         self.contaminated = False
 
+        # these are in liters 
         self.total_volume = 0
         self.used_volume = 0 # filled volume
+
+        # positive or negative. will be added to corresponding attribute
+        # this should be changed when the liquid_type changes
+        self.health_effect=0
+        self.hunger_effect=0
+        self.thirst_effect=0
+        self.fatigue_effect=0
 
     #---------------------------------------------------------------------------
     def update(self):
