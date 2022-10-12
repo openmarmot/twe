@@ -93,6 +93,10 @@ class AIHuman(AIBase):
         # used to prevent repeats
         self.last_speak=''
 
+        # ai takes over if the player is afk
+        self.time_since_player_interact=0
+        self.time_before_afk=60
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -527,9 +531,14 @@ class AIHuman(AIBase):
         
         if action:
             self.fatigue+=self.fatigue_add_rate*time_passed
+            self.time_since_player_interact=0
         else:
             if self.fatigue>0:
                 self.fatigue-=self.fatigue_remove_rate*time_passed
+
+            self.time_since_player_interact+=time_passed
+            if self.time_since_player_interact>self.time_before_afk:
+                self.handle_normal_ai_update()
 
     #-----------------------------------------------------------------------
     def handle_use_medical_object(self,MEDICAL):

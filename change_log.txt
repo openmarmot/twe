@@ -1,12 +1,27 @@
 TWE Project : Change Log
 
 
+----------------------------------
+October 12 2022
+- the ai will now take over the player character if there is no input after awhile 
+
+tha ai does not do anything particularily interesting as the player. 
+this is probably because the players squad does not get orders.
+
+----------------------------------
+October 04 2022
+- minor changes to world_menu 
+- found that the health effects of consumables and medical were set incorrectly. fixed 
+- added health effects to liquid_container 
+- fixed bug where thirst rate not thirst was changed by eat/drink 
+
+pro tip : don't drink gasoline. you will die 
 
 ----------------------------------
 October 01 2022
 - added a simple check to make sure the bot doesn't repeat speach 
 - added drink option to liquid_container menu 
-- added consumable menu 
+- added consumable menu with eat option 
 
 you can now drink gas 
 
