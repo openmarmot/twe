@@ -998,7 +998,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
         z.speed=500
         z.rotation_speed=50

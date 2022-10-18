@@ -170,11 +170,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    b=self.world.select_with_mouse(10)
-                    if b!=None:
-                        print(b.name)
-                        # send it over to world menu to figure out
-                        self.world.world_menu.activate_menu(b)
+                    self.world.select_with_mouse(self.get_mouse_screen_coords())
                 # middle button click
                 if event.button==2:
                     pass

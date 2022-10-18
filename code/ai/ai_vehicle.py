@@ -7,7 +7,6 @@ email : andrew@openmarmot.com
 notes : a lot of this code came from ai_human but it has diverged a bit
 '''
 
-
 #import built in modules
 import random
 import copy
@@ -27,13 +26,9 @@ class AIVehicle(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
-        self.primary_weapon=None
-        self.throwable=None
+
         self.health=100
-        self.ai_state='none'
-        self.ai_goal='none'
-        self.time_since_ai_transition=0.
-        self.ai_think_rate=0
+
         # the ai group that this human is a part of 
         self.squad=None
         self.target_object=None
@@ -55,6 +50,12 @@ class AIVehicle(AIBase):
         # actual vehicle speed
         self.vehicle_speed=0.
         self.acceleration=0
+
+        # -- controls --
+        self.throttle=0
+
+
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -62,7 +63,7 @@ class AIVehicle(AIBase):
         # -- general stuff for all objects --
         if self.health<1:
             print(self.owner.name+' has died')
-            engine.world_builder.spawn_container('cat',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
+            engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
 
             # dump passengers
             for b in self.passengers:
@@ -71,22 +72,15 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-        if self.primary_weapon!=None:
-            # needs updates for time tracking and other stuff
-            self.primary_weapon.update()
 
 
         if len(self.passengers)>0:
-            if self.passengers[0].is_player:
-                self.handle_player_update()
-            else :
-                self.handle_normal_ai_update()
 
-            # update passenger coords 
-            # this fixes a lot of other weirdness 
             for b in self.passengers:
+                # update passenger coords. this fixes a lot of issues
                 b.world_coords=copy.copy(self.owner.world_coords)
 
+                # maybe run a normal ai.update here for each player
 
 
     #---------------------------------------------------------------------------
@@ -102,67 +96,17 @@ class AIVehicle(AIBase):
     def event_add_inventory(self,EVENT_DATA):
 
         if EVENT_DATA.is_human:
-            if EVENT_DATA.is_player:
-                self.owner.is_player=True
-                # passengers[0] controls the vehicle so put player there
-                self.passengers.insert(0,EVENT_DATA)
-            else:
-                # don't care about NPCs, place them anywhere
-                self.passengers.append(EVENT_DATA)
+            print('! Error - human added to vehicle inventory')
         else:
-            if EVENT_DATA.is_gun :
-                if self.primary_weapon==None:
-                    self.inventory.append(EVENT_DATA)
-                    if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.primary_weapon=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
-                else:
-                    # drop the current weapon and pick up the new one
-                    self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
-                    self.owner.world.add_object(self.primary_weapon)
-                    if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.primary_weapon=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
-            elif EVENT_DATA.is_gas :
-                if self.fuel_type=='gas':
-                    print('filling up')
-                else :
-                    # put in inventory?
-                    pass 
-            elif EVENT_DATA.is_diesel :
-                if self.fuel_type=='diesel':
-                    print('filling up')
-                else : 
-                    pass
-            else:
-                self.inventory.append(EVENT_DATA) 
+            self.inventory.append(EVENT_DATA) 
 
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
-        if EVENT_DATA.is_human:
+        if EVENT_DATA in self.inventory:
+
+            # make sure the obj world_coords reflect the obj that had it in inventory
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
-            self.passengers.remove(EVENT_DATA)
-            if EVENT_DATA.is_player:
-                self.owner.is_player=False
-        else:
-            if EVENT_DATA in self.inventory:
-
-                # make sure the obj world_coords reflect the obj that had it in inventory
-                EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
-
-                self.inventory.remove(EVENT_DATA)
-
-                if self.primary_weapon==EVENT_DATA:
-                    self.primary_weapon=None
-
-    #---------------------------------------------------------------------------
-    def fire(self,TARGET_COORDS):
-        ''' fires the (primary?) weapon '''    
-        if self.primary_weapon!=None:
-            self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS)
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -180,159 +124,39 @@ class AIVehicle(AIBase):
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
-    #-----------------------------------------------------------------------
-    def handle_normal_ai_think(self):
-        ''' normal AI thinking method '''
-        # this is basically a thinking state - check the current progress on whatever 
-        # the ai thinks it is doing
-
-        # reset transition to zero
-        self.time_since_ai_transition=0
-
-        # randomize time before we hit this method again
-        self.ai_think_rate=random.uniform(0.1,1.5)
-
-        if self.ai_state=='moving':
-            distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
-            #print('distance: '+str(distance))
-
-            if self.ai_goal=='drop off passenger':
-                if distance<30:
-                    print('dropping off passenger')
-
-                    b=self.passengers.pop(0)
-                    b.wo_start()
-                    print('dropped off '+b.name)
-                    self.ai_state='sleeping'
-            else:
-                # catchall for random moving related goals:
-                # distance fuzzyness should be higher because the vehicle is more inexact
-                if distance<20:
-                    self.ai_state='sleeping'
-        elif self.ai_state=='engaging':
-            # check if target is dead 
-            if self.target_object.ai.health<1:
-                self.ai_state='sleeping'
-                self.ai_goal='none'
-                self.target_object=None
-            else:
-                # check if target is too far 
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-                if distance >850. :
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                    print('closing with target')
-
-            # check if we are out of ammo
-
-        else :
-            # what should we be doing ??
-            # lets see what the passengers want to do
-
-            # would be better to sort passengers and drop off the closest
-            if self.passengers[0].ai.ai_vehicle_goal=='travel':
-                self.ai_goal='drop off passenger'
-                self.destination=copy.copy(self.passengers[0].ai.ai_vehicle_destination)
-                self.ai_state='start_moving'
-
-
-
-
-    #-----------------------------------------------------------------------
-    def handle_normal_ai_update(self):
-        ''' handle code for civilians and soldiers '''
-        # this is what the bot does when it isn't thinking 
-        # basically mindlessly carries on whatever task it is doing 
-        # if there is something that should be decided it goes in handle_normal_ai_think
-
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        self.time_since_ai_transition+=time_passed
-
-        if self.time_since_ai_transition>self.ai_think_rate :
-            # lets rethink what we are doing
-            self.handle_normal_ai_think()
-        else:
-            # lets not think, just act..
-            # if a state isn't in here the AI will basically sleep until the next think
-
-            if self.ai_state=='moving':
-                # move towards target
-                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.owner.speed,self.owner.world_coords,self.destination,time_passed)           
-            elif self.ai_state=='engaging':
-                self.fire(self.target_object.world_coords)
-            elif self.ai_state=='sleeping':
-                pass
-            elif self.ai_state=='start_moving':
-                # this kicks off movement
-                # maybe change into moving animation image?
-                # set the rotation angle for the image 
-                self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
-
-                # tell graphics engine to redo the image 
-                self.owner.reset_image=True
-                # transition to moving
-                self.time_since_ai_transition=0
-                self.ai_state='moving'
-
 
     #---------------------------------------------------------------------------
-    def handle_player_update(self):
-        ''' handle any player specific code'''
-
+    def update_physics(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        self.owner.world_coords=engine.math_2d.moveAlongVector(self.vehicle_speed,self.owner.world_coords,self.owner.heading,time_passed)
-        #print('speed: '+str(self.vehicle_speed))
 
-        if(self.owner.world.graphic_engine.keyPressed('w')):
-            if self.vehicle_speed<self.owner.speed:
-                self.vehicle_speed+=self.acceleration*time_passed
-                if self.vehicle_speed<10 and self.vehicle_speed>0:
-                    self.vehicle_speed=10
+        heading_changed = False
 
-        if(self.owner.world.graphic_engine.keyPressed('s')):
-            if self.vehicle_speed>self.owner.speed*-1:
-                self.vehicle_speed-=self.acceleration*time_passed
-                if self.vehicle_speed>-10 and self.vehicle_speed<0:
-                    self.vehicle_speed=-10
+        # check control input
 
-        if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
+        # update rotation angle
+        # left 
+        #self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
+        # right
+        #self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
+
+
+        # apply ground "rolling' friction  
+
+        # apply air drag
+        
+        #  reset image if heading has changed 
+        if heading_changed:
+            # normalize angles 
+            if self.owner.rotation_angle>360:
+                self.owner.rotation_angle=0
+            elif self.owner.rotation_angle<0:
+                self.owner.rotation_angle=360
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
             self.owner.reset_image=True
 
-        if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
-            self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-            self.owner.reset_image=True
 
-            # -- deceleration --
-        if self.vehicle_speed>5:
-            self.vehicle_speed-=5*time_passed
-        elif self.vehicle_speed<-5:
-            self.vehicle_speed+=5*time_passed
-        elif self.vehicle_speed<9 and self.vehicle_speed>-9:
-            self.vehicle_speed=0
-
-        if(self.owner.world.graphic_engine.keyPressed('f')):
-            # fire the gun
-            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
-        #if(self.owner.world.graphic_engine.keyPressed('g')):
-            # throw throwable object
-        #    self.throw([]) 
-
-
-        # -- normalize angles --
-        if self.owner.rotation_angle>360:
-            self.owner.rotation_angle=0
-
-        elif self.owner.rotation_angle<0:
-            self.owner.rotation_angle=360
-
-        # update text
-        self.owner.world.graphic_engine.vehicle_text_queue=[]
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Speed: '+str(round(self.vehicle_speed,2)))
-        self.owner.world.graphic_engine.vehicle_text_queue.append('Fuel: '+str(round(self.fuel,2))+' liters')
+        # move along vector
+        self.owner.world_coords=engine.math_2d.moveAlongVector(self.vehicle_speed,self.owner.world_coords,self.owner.heading,time_passed) 
 
 
 

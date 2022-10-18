@@ -37,7 +37,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - '~' opens/closes debug menu (spawn zombies!)
 - 'w/s/a/d' movement
 - left click on a object to open context menu
-- tab to open menu for the vehicle you are in, or the player if you are not in a vehicle
+- tab closes an open menu. If no menu is open it will instead open the menu for the player, or the vehicle you are in
 - 'esc' to exit menu
 - 1-0 number keys are used in menus
 - 'f' to fire weapon (if you have one)

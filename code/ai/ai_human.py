@@ -95,7 +95,7 @@ class AIHuman(AIBase):
 
         # ai takes over if the player is afk
         self.time_since_player_interact=0
-        self.time_before_afk=60
+        self.time_before_afk=180
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -489,6 +489,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
+        #print('time since player interact ',self.time_since_player_interact)
         action=False
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if(self.owner.world.graphic_engine.keyPressed('w')):
@@ -993,9 +994,18 @@ class AIHuman(AIBase):
         elif self.ai_goal=='close_with_group':
             if DISTANCE<self.squad.min_distance:
                 self.ai_state='sleeping'
+        elif self.ai_goal=='player_move':
+            # this is initiated from world.select_with_mouse when
+            # the selected object is too far away
+            if DISTANCE<35:
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                # basically disables the bot again. wait for player
+                # interaction or another timeout
+                self.time_since_player_interact=0
         else:
             # catchall for random moving related goals:
-            if DISTANCE<3:
+            if DISTANCE<5:
                 self.ai_state='sleeping'
     #-----------------------------------------------------------------------
     def think_upgrade_gear(self):

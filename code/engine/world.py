@@ -87,19 +87,27 @@ class World(object):
         #bool
         self.map_enabled=False
 
+        # max distance at which you can select something (open a context menu)
+        self.max_menu_distance=60
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
-        in_vehicle=None
-        vlist=self.wo_objects_vehicle+self.wo_objects_airplane
-        for b in vlist:
-            if self.player in b.ai.passengers:
-                in_vehicle=b
-        
-        if in_vehicle==None:
-            self.world_menu.activate_menu(self.player)
+
+        if self.world_menu.active_menu=='none':
+
+            in_vehicle=None
+            vlist=self.wo_objects_vehicle+self.wo_objects_airplane
+            for b in vlist:
+                if self.player in b.ai.passengers:
+                    in_vehicle=b
+            
+            if in_vehicle==None:
+                self.world_menu.activate_menu(self.player)
+            else:
+                self.world_menu.activate_menu(in_vehicle)
         else:
-            self.world_menu.activate_menu(in_vehicle)
+            self.world_menu.deactivate_menu()
 
 
     #---------------------------------------------------------------------------
@@ -319,14 +327,15 @@ class World(object):
 
 
     #---------------------------------------------------------------------------
-    def select_with_mouse(self, radius):
+    def select_with_mouse(self, mouse_screen_coords):
         '''
         return a object that is 'under' the mouse cursor
         radius of 10 or so seems fine
 
-        called by graphics_2d_pygame on mouse down event .. currently 
+        called by graphics_2d_pygame on mouse down event currently 
         '''
-        mouse=self.graphic_engine.get_mouse_screen_coords()
+        
+        radius=10
         possible_objects=[]
 
         # this has been reworked to favor selecting items over humans/vehicles/storage
@@ -339,7 +348,7 @@ class World(object):
                     possible_objects.append(c)
 
         if len(possible_objects)>0:
-            temp=engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
+            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
 
         # if there were no guns/consumables/etc or there were but they weren't under the mouse..
         if temp==None:
@@ -349,9 +358,21 @@ class World(object):
                     or c.is_liquid_container or c.is_ammo_container):
                         possible_objects.append(c)
             if len(possible_objects)>0:
-                temp=engine.math_2d.checkCollisionCircleMouse(mouse,radius,possible_objects)
+                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
         
-        return temp
+        if temp != None:
+            d=engine.math_2d.get_distance(self.player.world_coords,temp.world_coords)
+            if d<self.max_menu_distance or self.debug_mode:
+                self.world_menu.activate_menu(temp)
+            else:
+                print('too far!!')
+                print('distance is ',d)
+                self.player.ai.destination=copy.copy(temp.world_coords)
+                self.player.ai.ai_state='start_moving'
+                self.player.ai.ai_goal='player_move'
+                self.player.ai.time_since_player_interact+=self.player.ai.time_before_afk+60
+                self.player.ai.time_since_ai_transition=0
+
 
     #---------------------------------------------------------------------------
     def toggle_map(self):
