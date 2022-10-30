@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+October 18 2022
+more minor work on vehicle stuff
+
+----------------------------------
+October 18 2022
+some work on vehicle stuff
 
 ----------------------------------
 October 17 2022

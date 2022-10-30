@@ -44,7 +44,6 @@ from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
-from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable

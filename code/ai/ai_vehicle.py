@@ -104,7 +104,7 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA in self.inventory:
-
+            self.inventory.remove(EVENT_DATA)
             # make sure the obj world_coords reflect the obj that had it in inventory
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 

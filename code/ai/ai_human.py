@@ -50,6 +50,9 @@ class AIHuman(AIBase):
         # what the ai is trying to accomplish
         self.ai_goal='none'
 
+
+        self.in_vehicle=False
+
         # the reason the ai jumped in the vehicle
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
@@ -396,6 +399,20 @@ class AIHuman(AIBase):
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
 
         self.event_remove_inventory(CONSUMABLE)
+
+    #---------------------------------------------------------------------------
+    def handle_enter_vehicle(self,VEHICLE):
+        self.target_object.ai.passengers.append(self.owner)
+        self.owner.world.remove_object(self.owner)
+        self.in_vehicle=True
+        print('entered vehicle')
+
+    #---------------------------------------------------------------------------
+    def handle_exit_vehicle(self,VEHICLE):
+        self.in_vehicle=False
+        self.target_object.ai.passengers.remove(self.owner)
+        self.owner.world.add_object(self.owner)
+        print('exited vehicle')
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -918,7 +935,7 @@ class AIHuman(AIBase):
                     self.ai_vehicle_destination=copy.copy(self.destination)
 
                     self.target_object=b
-                    self.ai_goal='enter object'
+                    self.ai_goal='enter_vehicle'
                     # not using copy here because vehicle may move
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving'
@@ -948,7 +965,7 @@ class AIHuman(AIBase):
                     # hmm object is gone. someone else must have grabbed it
                     pass
                 self.ai_state='sleeping'
-        elif self.ai_goal=='enter object':
+        elif self.ai_goal=='enter_vehicle':
 
             # vehicles move around a lot so gotta check
             if self.destination!=self.target_object.world_coords:
@@ -957,9 +974,7 @@ class AIHuman(AIBase):
             else:
                 if DISTANCE<5:
                     if self.target_object in self.owner.world.wo_objects:
-                        self.target_object.add_inventory(self.owner)
-                        self.owner.world.remove_object(self.owner)
-                        print(self.owner.name+' entered '+ self.target_object.name)
+                        self.handle_enter_vehicle(self.target_object)
 
                     else:
                         # hmm object is gone. idk how that happened
