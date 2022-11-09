@@ -578,7 +578,7 @@ class World_Menu(object):
                 pass
             if Key=='2':
                 # exit the vehicle
-                self.world.player..ai.handle_exit_vehicle(self.selected_object)
+                self.world.player.ai.handle_exit_vehicle(self.selected_object)
                 self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()

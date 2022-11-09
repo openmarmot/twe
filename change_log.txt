@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 03 2022
+- bug fixes with vehicle ingress/egress
+
+----------------------------------
 October 18 2022
 more minor work on vehicle stuff
 

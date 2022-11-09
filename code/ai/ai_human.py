@@ -402,7 +402,7 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_enter_vehicle(self,VEHICLE):
-        self.target_object.ai.passengers.append(self.owner)
+        VEHICLE.ai.passengers.append(self.owner)
         self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
         print('entered vehicle')
@@ -410,7 +410,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self,VEHICLE):
         self.in_vehicle=False
-        self.target_object.ai.passengers.remove(self.owner)
+        VEHICLE.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
         print('exited vehicle')
 
