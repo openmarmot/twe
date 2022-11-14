@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 13 2022
+- added enough control code that vehicles work for the player again 
+
+vehicle control is back. everything works slightly different.
+I think it is perhaps a bit better. now there is a concept of throttle vs brake 
+
+no reverse yet
+
+might be awhile before the ai can control vehicles. nut sure 
+what happens currently if the ai gets in one. probably nothing
+
+----------------------------------
+Nov 12 2022
+- moved speed and rotation_speed out of base world_object and into ai_* 
+    where they are actually used 
+
+----------------------------------
 Nov 03 2022
 - bug fixes with vehicle ingress/egress
 

@@ -41,6 +41,23 @@ class AIVehicle(AIBase):
         # current fuel amount
         self.fuel=0
 
+        # ----- controls ------
+
+        # engine power. 0 is idle 1 is max
+        self.throttle=0
+
+        # brake_power 0 is none 1 is max
+        self.brake_power=0
+
+        # planes that have wheel steering, cars, etc
+        # 1 all the way left -1 all the way right. 0 neutral
+        self.wheel_steering=0
+
+        # ----- instruments ------
+
+        # distance between vehicle and ground
+        self.altimeter=0
+
         # passengers[0] determines how the AI is controlled
         self.passengers=[]
 
@@ -51,8 +68,10 @@ class AIVehicle(AIBase):
         self.vehicle_speed=0.
         self.acceleration=0
 
-        # -- controls --
-        self.throttle=0
+        self.speed=0
+        self.rotation_speed=0
+
+        
 
 
 
@@ -72,14 +91,14 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-
+        self.update_physics()
 
         if len(self.passengers)>0:
 
             for b in self.passengers:
                 # update passenger coords. this fixes a lot of issues
                 b.world_coords=copy.copy(self.owner.world_coords)
-
+                b.update()
                 # maybe run a normal ai.update here for each player
 
 
@@ -124,6 +143,17 @@ class AIVehicle(AIBase):
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
+    #---------------------------------------------------------------------------
+    def handle_steer_left(self):
+        ''' recieve left steering input '''
+        if self.altimeter<1:
+            self.wheel_steering=1
+    
+    #---------------------------------------------------------------------------
+    def handle_steer_right(self):
+        ''' recieve left steering input '''
+        if self.altimeter<1:
+            self.wheel_steering=-1
 
     #---------------------------------------------------------------------------
     def update_physics(self):
@@ -134,11 +164,51 @@ class AIVehicle(AIBase):
         # check control input
 
         # update rotation angle
+        rotation_change=(self.rotation_speed*self.wheel_steering)*time_passed
+        if rotation_change !=0 and self.vehicle_speed>0:
+            self.owner.rotation_angle+=rotation_change
+            heading_changed=True
+            
         # left 
         #self.owner.rotation_angle+=self.owner.rotation_speed*time_passed
         # right
         #self.owner.rotation_angle-=self.owner.rotation_speed*time_passed
 
+        # slowly zero out wheel steering. force to zero at low values to prevent dither
+        if self.wheel_steering>0:
+            self.wheel_steering-=1*time_passed
+            if self.wheel_steering<0.05:
+                self.wheel_steering=0
+        elif self.wheel_steering<0:
+            self.wheel_steering+=1*time_passed
+            if self.wheel_steering>-0.05:
+                self.wheel_steering=0
+
+
+        if self.throttle>0 :
+            if self.vehicle_speed<self.speed:
+                self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
+                if self.vehicle_speed<10:
+                    self.vehicle_speed=10
+
+            self.throttle-=1*time_passed
+            if self.throttle<0.05:
+                self.throttle=0
+
+        if self.brake_power>0:
+            self.vehicle_speed-=self.brake_power*self.acceleration*time_passed
+            if self.vehicle_speed<5:
+                self.vehicle_speed=0
+
+        
+
+        # deceleration 
+        if self.vehicle_speed>5:
+            self.vehicle_speed-=5*time_passed
+        elif self.vehicle_speed<-5:
+            self.vehicle_speed+=5*time_passed
+        elif self.vehicle_speed<9 and self.vehicle_speed>-9:
+            self.vehicle_speed=0
 
         # apply ground "rolling' friction  
 

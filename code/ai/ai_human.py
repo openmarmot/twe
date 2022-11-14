@@ -52,7 +52,8 @@ class AIHuman(AIBase):
 
 
         self.in_vehicle=False
-
+        # the vehicle the ai is in
+        self.vehicle=None
         # the reason the ai jumped in the vehicle
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
@@ -99,6 +100,9 @@ class AIHuman(AIBase):
         # ai takes over if the player is afk
         self.time_since_player_interact=0
         self.time_before_afk=180
+
+        self.speed = 0.
+        self.rotation_speed=0.
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -320,7 +324,7 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
-        calc_speed=self.owner.speed
+        calc_speed=self.speed
         if self.fatigue<3:
             calc_speed*=1.5
         if self.fatigue>5:
@@ -405,6 +409,7 @@ class AIHuman(AIBase):
         VEHICLE.ai.passengers.append(self.owner)
         self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
+        self.vehicle=VEHICLE
         print('entered vehicle')
 
     #---------------------------------------------------------------------------
@@ -412,6 +417,7 @@ class AIHuman(AIBase):
         self.in_vehicle=False
         VEHICLE.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
+        self.vehicle=None
         print('exited vehicle')
 
     #---------------------------------------------------------------------------
@@ -480,83 +486,104 @@ class AIHuman(AIBase):
             # lets not think, just act..
             # if a state isn't in here the AI will basically sleep until the next think
 
-            if self.ai_state=='moving':
-                # move towards target
-                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
-                self.fatigue+=self.fatigue_add_rate*time_passed           
-            elif self.ai_state=='engaging':
-                self.fire(self.target_object.world_coords)
-                self.fatigue+=self.fatigue_add_rate*time_passed
-            elif self.ai_state=='start_moving':
-                # this kicks off movement
-                # maybe change into moving animation image?
-                # set the rotation angle for the image 
-                self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
-
-                # tell graphics engine to redo the image 
-                self.owner.reset_image=True
-                # transition to moving
-                self.time_since_ai_transition=0
-                self.ai_state='moving'
+            if self.in_vehicle:
+                pass
             else:
-                # sleeping or whatever 
-                self.fatigue-=self.fatigue_remove_rate*time_passed
+                if self.ai_state=='moving':
+                    # move towards target
+                    self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
+                    self.fatigue+=self.fatigue_add_rate*time_passed           
+                elif self.ai_state=='engaging':
+                    self.fire(self.target_object.world_coords)
+                    self.fatigue+=self.fatigue_add_rate*time_passed
+                elif self.ai_state=='start_moving':
+                    # this kicks off movement
+                    # maybe change into moving animation image?
+                    # set the rotation angle for the image 
+                    self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+
+                    # tell graphics engine to redo the image 
+                    self.owner.reset_image=True
+                    # transition to moving
+                    self.time_since_ai_transition=0
+                    self.ai_state='moving'
+                else:
+                    # sleeping or whatever 
+                    self.fatigue-=self.fatigue_remove_rate*time_passed
 
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
         #print('time since player interact ',self.time_since_player_interact)
-        action=False
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=0
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=180
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=90
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=270
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('f')):
-            # fire the gun
-            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('g')):
-            # throw throwable object
-            self.throw([]) 
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('t')):
-            # launch anti tank
-            self.launch_antitank([])
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('b')):
-            if self.bleeding:
-                self.bleeding=False
-                self.speak('bandage')
-                action=True
-        
-        if action:
-            self.fatigue+=self.fatigue_add_rate*time_passed
-            self.time_since_player_interact=0
-        else:
-            if self.fatigue>0:
-                self.fatigue-=self.fatigue_remove_rate*time_passed
+        if self.in_vehicle:
+            if(self.owner.world.graphic_engine.keyPressed('w')):
+                self.vehicle.ai.throttle=1
+                self.vehicle.ai.brake_power=0
 
-            self.time_since_player_interact+=time_passed
-            if self.time_since_player_interact>self.time_before_afk:
-                self.handle_normal_ai_update()
+            if(self.owner.world.graphic_engine.keyPressed('s')):
+                self.vehicle.ai.brake_power=1
+                self.vehicle.ai.throttle=0
+
+            if(self.owner.world.graphic_engine.keyPressed('a')):
+                self.vehicle.ai.handle_steer_left()
+
+            if(self.owner.world.graphic_engine.keyPressed('d')):
+                self.vehicle.ai.handle_steer_right()
+
+            print(self.vehicle.ai.throttle,self.vehicle.ai.vehicle_speed)
+
+        else:
+            action=False
+            if(self.owner.world.graphic_engine.keyPressed('w')):
+                self.owner.world_coords[1]-=self.speed*time_passed
+                self.owner.rotation_angle=0
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('s')):
+                self.owner.world_coords[1]+=self.speed*time_passed
+                self.owner.rotation_angle=180
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('a')):
+                self.owner.world_coords[0]-=self.speed*time_passed
+                self.owner.rotation_angle=90
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('d')):
+                self.owner.world_coords[0]+=self.speed*time_passed
+                self.owner.rotation_angle=270
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('f')):
+                # fire the gun
+                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('g')):
+                # throw throwable object
+                self.throw([]) 
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('t')):
+                # launch anti tank
+                self.launch_antitank([])
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('b')):
+                if self.bleeding:
+                    self.bleeding=False
+                    self.speak('bandage')
+                    action=True
+            
+            if action:
+                self.fatigue+=self.fatigue_add_rate*time_passed
+                self.time_since_player_interact=0
+            else:
+                if self.fatigue>0:
+                    self.fatigue-=self.fatigue_remove_rate*time_passed
+
+                self.time_since_player_interact+=time_passed
+                if self.time_since_player_interact>self.time_before_afk:
+                    self.handle_normal_ai_update()
 
     #-----------------------------------------------------------------------
     def handle_use_medical_object(self,MEDICAL):

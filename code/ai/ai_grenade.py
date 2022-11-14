@@ -38,6 +38,8 @@ class AIGrenade(AIBase):
         # max flight time, basically the fuse length
         self.maxTime=5.
 
+        self.speed=0
+
         # amount of shrapnel (basically grenade power)
         self.shrapnel_count=40
 
@@ -59,14 +61,14 @@ class AIGrenade(AIBase):
             if(self.flightTime>self.maxTime):
                 self.explode()
             # move along path
-            self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
+            self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             
             if self.flightTime>0.1:
                 if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
                     # just stop the grenade. maybe some spin or reverse movement?
                     if self.redirected==False:
-                        self.owner.speed=-20
+                        self.speed=-20
                         self.maxTime-=self.flightTime
                         self.flightTime=0
                     else:
@@ -116,7 +118,7 @@ class AIGrenade(AIBase):
         self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
         self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
         self.collided=True
-        self.owner.speed=190
+        self.speed=190
         self.maxTime-=self.flightTime
         # subtract a little extra for the time it takes to pick it up
         self.maxTime-=0.5 
