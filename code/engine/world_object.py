@@ -55,8 +55,7 @@ class WorldObject(object):
         #   the object is renderable 
         self.screen_coords=[0.,0.]
 
-        self.speed = 0.
-        self.rotation_speed=0.
+
         # rotation_angle - mainly used to rotate the object sprite. in degrees
         self.rotation_angle=0.
         # heading is a direction vector used by some objects

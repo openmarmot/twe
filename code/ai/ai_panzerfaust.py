@@ -44,6 +44,8 @@ class AIPanzerfaust(AIBase):
         # set by ai_man.event_inventory
         self.equipper=None
 
+        self.speed=0
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -56,7 +58,7 @@ class AIPanzerfaust(AIBase):
             if(self.flightTime>self.maxTime):
                 self.explode()
             # move along path
-            self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
+            self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             
             if self.owner.world.check_collision_bool(self.owner,[self.equipper],True,False):
@@ -67,7 +69,7 @@ class AIPanzerfaust(AIBase):
     def explode(self):
         # kablooey!
         # add the shrapnel
-        target_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,2)
+        target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
         engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count,self.equipper,self.owner.name)
 
         # remove the grenade

@@ -30,8 +30,6 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
-        self.max_menu_distance=300
-
 
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
@@ -76,6 +74,8 @@ class World_Menu(object):
             self.liquid_container_menu(Key)
         elif self.active_menu=='consumable':
             self.consumable_menu(Key)
+        elif self.active_menu=='fuel':
+            self.fuel_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -86,40 +86,37 @@ class World_Menu(object):
         if self.active_menu !="death" and self.active_menu!='start':
             # clear any current menu
             self.deactivate_menu()
+            
+            self.selected_object=SELECTED_OBJECT
 
-            d=engine.math_2d.get_distance(self.world.player.world_coords,SELECTED_OBJECT.world_coords)
+            if SELECTED_OBJECT.is_vehicle: 
+                self.active_menu='vehicle'
+                self.vehicle_menu(None)
+            elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
+                self.active_menu='gun'
+                self.gun_menu(None)
+            elif SELECTED_OBJECT.is_container:
+                self.active_menu='storage'
+                self.storage_menu(None)
+            elif SELECTED_OBJECT.is_human:
+                self.active_menu='human'
+                self.human_menu(None)
+            elif SELECTED_OBJECT.is_airplane:
+                #self.active_menu='airplane'
+                #self.airplane_menu(None)
+                self.active_menu='vehicle'
+                self.vehicle_menu(None)
+            elif SELECTED_OBJECT.is_liquid_container:
+                self.active_menu='liquid_container'
+                self.liquid_container_menu(None)
+            elif SELECTED_OBJECT.is_consumable:
+                self.active_menu='consumable'
+                self.consumable_menu(None)
+            else :
+                # just dump everything else in here for now
+                self.active_menu='generic'
+                self.generic_item_menu(None)
 
-            # minimum distance for a context menu to pop up
-            if d<self.max_menu_distance or self.world.debug_mode==True:
-                self.selected_object=SELECTED_OBJECT
-
-                if SELECTED_OBJECT.is_vehicle: 
-                    self.active_menu='vehicle'
-                    self.vehicle_menu(None)
-                elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
-                    self.active_menu='gun'
-                    self.gun_menu(None)
-                elif SELECTED_OBJECT.is_container:
-                    self.active_menu='storage'
-                    self.storage_menu(None)
-                elif SELECTED_OBJECT.is_human:
-                    self.active_menu='human'
-                    self.human_menu(None)
-                elif SELECTED_OBJECT.is_airplane:
-                    self.active_menu='airplane'
-                    self.airplane_menu(None)
-                elif SELECTED_OBJECT.is_liquid_container:
-                    self.active_menu='liquid_container'
-                    self.liquid_container_menu(None)
-                elif SELECTED_OBJECT.is_consumable:
-                    self.active_menu='consumable'
-                    self.consumable_menu(None)
-                else :
-                    # just dump everything else in here for now
-                    self.active_menu='generic'
-                    self.generic_item_menu(None)
-            else:
-                print('Get closer to the object ',d)
 
     def airplane_menu(self, Key):
         if self.menu_state=='none':
@@ -140,9 +137,7 @@ class World_Menu(object):
                 pass
             if Key=='2':
                 # enter the vehicle 
-                self.selected_object.add_inventory(self.world.player)
-                # remove the player from the world so we don't have a ghost
-                self.world.remove_object(self.world.player)
+                self.world.player.ai.handle_enter_vehicle(self.selected_object)
 
                 self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
@@ -163,9 +158,7 @@ class World_Menu(object):
                 pass
             if Key=='4':
                 # exit the vehicle
-                p=self.selected_object.ai.passengers[0]
-                self.selected_object.remove_inventory(p)
-                self.world.add_object(p)
+                self.world.player.ai.handle_exit_vehicle(self.selected_object)
                 self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
@@ -246,6 +239,25 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
+
+    def fuel_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
+            self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
+            self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
+            self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
+            self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                self.selected_object.ai.fuel+=100
+                #self.deactivate_menu()
+            elif Key=='2':
+                self.selected_object.ai.fuel-=100
+                #self.deactivate_menu()
+            # update fuel load
+            self.world.graphic_engine.menu_text_queue[1]='Current Fuel Load : '+str(self.selected_object.ai.fuel)
 
     def generic_item_menu(self, Key):
         if self.menu_state=='none':
@@ -525,6 +537,11 @@ class World_Menu(object):
                 self.menu_state='external'
 
         if self.menu_state=='external':
+            fuel_option=False
+            if self.world.player.ai.large_pickup!=None:
+                if self.world.player.ai.large_pickup.is_liquid_container:
+                    fuel_option=True
+
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append(self.selected_object.name)
@@ -533,20 +550,21 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
             self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
             self.world.graphic_engine.menu_text_queue.append('3 - storage ')
+            if fuel_option:
+                self.world.graphic_engine.menu_text_queue.append('4 - fuel ')
             if Key=='1':
                 pass
             if Key=='2':
                 # enter the vehicle 
-                self.selected_object.add_inventory(self.world.player)
-                # remove the player from the world so we don't have a ghost
-                self.world.remove_object(self.world.player)
-
+                self.world.player.ai.handle_enter_vehicle(self.selected_object)
                 self.world.graphic_engine.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
                 # pull up the storage/container menu
                 self.change_menu('storage')
+            if Key=='4' and fuel_option:
+                self.change_menu('fuel')
 
 
         if self.menu_state=='internal':
@@ -560,9 +578,7 @@ class World_Menu(object):
                 pass
             if Key=='2':
                 # exit the vehicle
-                p=self.selected_object.ai.passengers[0]
-                self.selected_object.remove_inventory(p)
-                self.world.add_object(p)
+                self.world.player.ai.handle_exit_vehicle(self.selected_object)
                 self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()

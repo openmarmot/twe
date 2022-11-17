@@ -50,6 +50,10 @@ class AIHuman(AIBase):
         # what the ai is trying to accomplish
         self.ai_goal='none'
 
+
+        self.in_vehicle=False
+        # the vehicle the ai is in
+        self.vehicle=None
         # the reason the ai jumped in the vehicle
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
@@ -92,6 +96,13 @@ class AIHuman(AIBase):
 
         # used to prevent repeats
         self.last_speak=''
+
+        # ai takes over if the player is afk
+        self.time_since_player_interact=0
+        self.time_before_afk=180
+
+        self.speed = 0.
+        self.rotation_speed=0.
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -313,7 +324,7 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
-        calc_speed=self.owner.speed
+        calc_speed=self.speed
         if self.fatigue<3:
             calc_speed*=1.5
         if self.fatigue>5:
@@ -394,6 +405,30 @@ class AIHuman(AIBase):
         self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
+    def handle_enter_vehicle(self,VEHICLE):
+        VEHICLE.ai.passengers.append(self.owner)
+        self.owner.world.remove_object(self.owner)
+        self.in_vehicle=True
+        self.vehicle=VEHICLE
+
+        if self.owner.is_player:
+            self.vehicle.ai.driver=self.owner
+
+        print('entered vehicle')
+
+    #---------------------------------------------------------------------------
+    def handle_exit_vehicle(self,VEHICLE):
+        self.in_vehicle=False
+        VEHICLE.ai.passengers.remove(self.owner)
+        self.owner.world.add_object(self.owner)
+        if self.vehicle.ai.driver==self.owner:
+            self.vehicle.ai.drive=None
+        self.vehicle=None
+        self.ai_goal='none'
+        self.ai_state='none'
+        print('exited vehicle')
+
+    #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
         # this is supposed to be the main interface that the outside world uses to interact with the ai
@@ -422,7 +457,9 @@ class AIHuman(AIBase):
         # randomize time before we hit this method again
         self.ai_think_rate=random.uniform(0.1,1.5)
 
-        if self.ai_state=='moving':
+        if self.in_vehicle:
+            self.think_in_vehicle()
+        elif self.ai_state=='moving':
             self.think_move()
         elif self.ai_state=='engaging':
             self.think_engage()
@@ -477,6 +514,8 @@ class AIHuman(AIBase):
                 # transition to moving
                 self.time_since_ai_transition=0
                 self.ai_state='moving'
+            elif self.ai_state=='vehicle_drive':
+                pass
             else:
                 # sleeping or whatever 
                 self.fatigue-=self.fatigue_remove_rate*time_passed
@@ -485,51 +524,75 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
-        action=False
+        #print('time since player interact ',self.time_since_player_interact)
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
-        if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=0
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=180
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=self.owner.speed*time_passed
-            self.owner.rotation_angle=90
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=self.owner.speed*time_passed
-            self.owner.rotation_angle=270
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('f')):
-            # fire the gun
-            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('g')):
-            # throw throwable object
-            self.throw([]) 
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('t')):
-            # launch anti tank
-            self.launch_antitank([])
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('b')):
-            if self.bleeding:
-                self.bleeding=False
-                self.speak('bandage')
-                action=True
-        
-        if action:
-            self.fatigue+=self.fatigue_add_rate*time_passed
+        if self.in_vehicle:
+            if(self.owner.world.graphic_engine.keyPressed('w')):
+                self.vehicle.ai.throttle=1
+                self.vehicle.ai.brake_power=0
+
+            if(self.owner.world.graphic_engine.keyPressed('s')):
+                self.vehicle.ai.brake_power=1
+                self.vehicle.ai.throttle=0
+
+            if(self.owner.world.graphic_engine.keyPressed('a')):
+                self.vehicle.ai.handle_steer_left()
+
+            if(self.owner.world.graphic_engine.keyPressed('d')):
+                self.vehicle.ai.handle_steer_right()
+
+            print(self.vehicle.ai.throttle,self.vehicle.ai.vehicle_speed)
+
         else:
-            if self.fatigue>0:
-                self.fatigue-=self.fatigue_remove_rate*time_passed
+            action=False
+            if(self.owner.world.graphic_engine.keyPressed('w')):
+                self.owner.world_coords[1]-=self.speed*time_passed
+                self.owner.rotation_angle=0
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('s')):
+                self.owner.world_coords[1]+=self.speed*time_passed
+                self.owner.rotation_angle=180
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('a')):
+                self.owner.world_coords[0]-=self.speed*time_passed
+                self.owner.rotation_angle=90
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('d')):
+                self.owner.world_coords[0]+=self.speed*time_passed
+                self.owner.rotation_angle=270
+                self.owner.reset_image=True
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('f')):
+                # fire the gun
+                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('g')):
+                # throw throwable object
+                self.throw([]) 
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('t')):
+                # launch anti tank
+                self.launch_antitank([])
+                action=True
+            if(self.owner.world.graphic_engine.keyPressed('b')):
+                if self.bleeding:
+                    self.bleeding=False
+                    self.speak('bandage')
+                    action=True
+            
+            if action:
+                self.fatigue+=self.fatigue_add_rate*time_passed
+                self.time_since_player_interact=0
+            else:
+                if self.fatigue>0:
+                    self.fatigue-=self.fatigue_remove_rate*time_passed
+
+                self.time_since_player_interact+=time_passed
+                if self.time_since_player_interact>self.time_before_afk:
+                    self.handle_normal_ai_update()
 
     #-----------------------------------------------------------------------
     def handle_use_medical_object(self,MEDICAL):
@@ -880,6 +943,41 @@ class AIHuman(AIBase):
             self.ai_goal='waiting'
             self.ai_state='waiting'
             
+    #---------------------------------------------------------------------------
+    def think_in_vehicle(self):
+        ''' in a vehicle - what do we need to do'''
+
+        # the initial decision tree for in vehicle
+
+        # this shouldn't DO much more than change the ai_state
+        action=False
+        # check vehicle health, should we bail out ?
+        if self.vehicle.ai.health<10:
+            self.speak('Bailing Out!')
+            self.handle_exit_vehicle(self.vehicle)
+            # should probably let everyone else know
+            action=True
+        # check if we are close to our destination (if we have one)
+        elif self.ai_vehicle_goal=='travel':
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
+            if distance<50:
+                self.handle_exit_vehicle(self.vehicle)
+                action=True
+                # should probably let everyone else know as well
+
+        # should check if our current vehicle seating assigment still makes sense
+        #  are we the driver, is there no driver? etc
+
+        # basically if we haven't bailed out yet..
+        if action==False:
+
+            if self.ai_state=='vehicle_drive':
+                self.think_vehicle_drive()
+                action=True
+            elif self.vehicle.ai.driver==self.owner:
+                # if we are staying in the vehicle AND we are the driver, make steering corrections
+                self.ai_state='vehicle_drive'
+                action=True
 
 
     #-----------------------------------------------------------------------
@@ -908,7 +1006,7 @@ class AIHuman(AIBase):
                     self.ai_vehicle_destination=copy.copy(self.destination)
 
                     self.target_object=b
-                    self.ai_goal='enter object'
+                    self.ai_goal='enter_vehicle'
                     # not using copy here because vehicle may move
                     self.destination=self.target_object.world_coords
                     self.ai_state='start_moving'
@@ -938,7 +1036,7 @@ class AIHuman(AIBase):
                     # hmm object is gone. someone else must have grabbed it
                     pass
                 self.ai_state='sleeping'
-        elif self.ai_goal=='enter object':
+        elif self.ai_goal=='enter_vehicle':
 
             # vehicles move around a lot so gotta check
             if self.destination!=self.target_object.world_coords:
@@ -947,9 +1045,7 @@ class AIHuman(AIBase):
             else:
                 if DISTANCE<5:
                     if self.target_object in self.owner.world.wo_objects:
-                        self.target_object.add_inventory(self.owner)
-                        self.owner.world.remove_object(self.owner)
-                        print(self.owner.name+' entered '+ self.target_object.name)
+                        self.handle_enter_vehicle(self.target_object)
 
                     else:
                         # hmm object is gone. idk how that happened
@@ -984,10 +1080,20 @@ class AIHuman(AIBase):
         elif self.ai_goal=='close_with_group':
             if DISTANCE<self.squad.min_distance:
                 self.ai_state='sleeping'
+        elif self.ai_goal=='player_move':
+            # this is initiated from world.select_with_mouse when
+            # the selected object is too far away
+            if DISTANCE<35:
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                # basically disables the bot again. wait for player
+                # interaction or another timeout
+                self.time_since_player_interact=0
         else:
             # catchall for random moving related goals:
-            if DISTANCE<3:
+            if DISTANCE<5:
                 self.ai_state='sleeping'
+
     #-----------------------------------------------------------------------
     def think_upgrade_gear(self):
         '''think about upgrading gear. return True/False if upgrading'''
@@ -1042,6 +1148,32 @@ class AIHuman(AIBase):
         # top off ammo ?
 
         return status
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_drive(self):
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        # get the rotation to the destination 
+        r = engine.math_2d.get_rotation(self.owner.world_coords,self.ai_vehicle_destination)
+
+        # compare that with the current vehicle rotation.. somehow?
+        v = self.vehicle.rotation_angle
+
+        if r>v:
+            self.vehicle.rotation_angle+=1*time_passed
+        if r<v:
+            self.vehicle.rotation_angle-=1*time_passed
+        
+        # if its close just set it equal
+        if r>v-5 and r<v+5:
+            self.vehicle.rotation_angle=r
+
+        # remember this is costly
+        self.vehicle.reset_image=True
+
+        self.vehicle.ai.throttle=1
+        self.vehicle.ai.brake_power=0
+
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    

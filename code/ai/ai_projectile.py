@@ -41,6 +41,8 @@ class AIProjectile(AIBase):
         # the equipper of the gun that fired the projectile
         self.shooter=None
 
+        self.speed=0
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -53,7 +55,7 @@ class AIProjectile(AIBase):
         else:
 
             # move along path
-            self.owner.world_coords=engine.math_2d.moveAlongVector(self.owner.speed,self.owner.world_coords,self.owner.heading,time_passed)
+            self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
 
             # this is expensive, do we need to do it every update cycle? maybe put on a timer

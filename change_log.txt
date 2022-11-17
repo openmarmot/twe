@@ -1,12 +1,105 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 16 2022
+-  work on ai vehicle control code
 
+need a way to assign roles in a vehicle (driver, gunner?, passenger?)
+
+for now i think the human ai will still cheat and directly change vehicle rotation. 
+will probably have to learn to steer in the future though 
+
+----------------------------------
+Nov 13 2022
+- added enough control code that vehicles work for the player again 
+
+vehicle control is back. everything works slightly different.
+I think it is perhaps a bit better. now there is a concept of throttle vs brake 
+
+no reverse yet
+
+might be awhile before the ai can control vehicles. nut sure 
+what happens currently if the ai gets in one. probably nothing
+
+----------------------------------
+Nov 12 2022
+- moved speed and rotation_speed out of base world_object and into ai_* 
+    where they are actually used 
+
+----------------------------------
+Nov 03 2022
+- bug fixes with vehicle ingress/egress
+
+----------------------------------
+October 18 2022
+more minor work on vehicle stuff
+
+----------------------------------
+October 18 2022
+some work on vehicle stuff
+
+----------------------------------
+October 17 2022
+- deleted ai_airplane. all vehicles will now use ai_vehicle
+- removed most of the code from ai_vehicle. pending rewrite 
+
+breaking change - vehicles will be broken until they are rewritten.
+
+I'm going to go a different route with vehicle ai - something i've thought of before 
+but never really attempted. basically I want vehicles to be dumb with no real logic 
+other than possibly some physics code. 
+
+human ai will have to interact with vehicles with the exact same interface the player does 
+- by moving the throttle, wheel, etc 
+
+----------------------------------
+October 16 2022
+- [tab] now closes whatever menu is open 
+    if no menus are open it still opens a context menu for the player or vehicle 
+- moved some logic from world_menu and graphics_2d_pygame into world. ideally graphics_2d_pygame 
+    should have as little game logic as possible. same with world_menu to a lesser extent 
+- increased time before bot takes over from player (AFK) to 3 minutes 
+- decreased distance at which menu activates to 30 (pretty close)
+- if you are too far away from an object you clicked on the bot will take 
+    over and walk there. (this seems a bit buggy)
+- added the ability to fuel vehicles if you are carrying a gas can. (very basic at the moment)
+
+we probably need a different mouse selection radius for small objects and for large objects. 
+currently the plane is very hard to select as you have to know the middle of the sprite.
+
+i am wondering if vehicles and airplanes should share the same ai. otherwise there will be a 
+lot of duplicate code. 
+- to some degree i almost wonder if they could just use ai_human 
+
+thinking that instead of a int for fuel amount, vehicles might be better with a 
+liquid_container object to handle the math around adding and removing fuel.
+
+the distance at which you can use a menu should be variable depending on what the object is 
+- for example you can be further away from someone you are talking to compared to a 
+object that you are picking up.
+
+
+----------------------------------
+October 12 2022
+- the ai will now take over the player character if there is no input after awhile 
+
+tha ai does not do anything particularily interesting as the player. 
+this is probably because the players squad does not get orders.
+
+----------------------------------
+October 04 2022
+- minor changes to world_menu 
+- found that the health effects of consumables and medical were set incorrectly. fixed 
+- added health effects to liquid_container 
+- fixed bug where thirst rate not thirst was changed by eat/drink 
+
+pro tip : don't drink gasoline. you will die 
 
 ----------------------------------
 October 01 2022
 - added a simple check to make sure the bot doesn't repeat speach 
 - added drink option to liquid_container menu 
-- added consumable menu 
+- added consumable menu with eat option 
 
 you can now drink gas 
 

@@ -44,7 +44,6 @@ from ai.ai_grenade import AIGrenade
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
-from ai.ai_airplane import AIAirplane
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
@@ -644,7 +643,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     if OBJECT_TYPE=='warehouse':
         z=WorldObject(WORLD,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
-        z.speed=0
         z.render_level=1
         z.collision_radius=200
         z.is_building=True
@@ -652,7 +650,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='square_building':
         z=WorldObject(WORLD,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
-        z.speed=0
         z.render_level=1
         z.collision_radius=60
         z.is_building=True
@@ -808,7 +805,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
         z.name='panzerfaust'
         z.render_level=2
-        z.speed=300
+        z.ai.speed=300
         z.is_handheld_antitank=True
         z.rotation_angle=float(random.randint(0,359))
 
@@ -816,7 +813,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
         z.is_grenade=True
-        z.speed=200.
+        z.ai.speed=200.
         z.ai.maxTime=1.3
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -987,8 +984,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.render_level=3
-        z.speed=200
-        z.rotation_speed=40.
+        z.ai.speed=200
+        z.ai.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
@@ -998,10 +995,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AIAirplane)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
-        z.speed=500
-        z.rotation_speed=50
+        z.ai.speed=500
+        z.ai.rotation_speed=50
         z.ai.acceleration=100
         z.render_level=3
         z.collision_radius=200
@@ -1015,7 +1012,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='player':
         z=WorldObject(WORLD,['man'],AIHuman)
         z.name='player'
-        z.speed=50.
+        z.ai.speed=50.
         z.is_player=True
         z.render_level=3
         z.is_human=True
@@ -1024,7 +1021,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man'],AIHuman)
         z.name='Reginald Thimblebottom'
-        z.speed=float(random.randint(10,25))
+        z.ai.speed=float(random.randint(10,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -1033,7 +1030,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier'],AIHuman)
         z.name='Klaus Hammer'
-        z.speed=float(random.randint(20,25))
+        z.ai.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -1043,7 +1040,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
         z.name='Boris Volvakov'
-        z.speed=float(random.randint(20,25))
+        z.ai.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
         z.is_human=True
@@ -1119,7 +1116,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z=WorldObject(WORLD,['projectile'],AIProjectile)
     z.name='projectile'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=350.
+    z.ai.speed=350.
     z.ai.maxTime=MAX_TIME + random.uniform(0.01, 0.05)
     z.is_projectile=True
     z.render_level=3
@@ -1149,7 +1146,7 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
-    z.speed=300.
+    z.ai.speed=300.
     z.ai.maxTime=random.uniform(MIN_TIME, MAX_TIME)
     z.is_projectile=True
     z.render_level=3
