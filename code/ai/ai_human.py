@@ -410,6 +410,10 @@ class AIHuman(AIBase):
         self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
         self.vehicle=VEHICLE
+
+        if self.owner.is_player:
+            self.vehicle.ai.driver=self.owner
+
         print('entered vehicle')
 
     #---------------------------------------------------------------------------
@@ -417,7 +421,11 @@ class AIHuman(AIBase):
         self.in_vehicle=False
         VEHICLE.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
+        if self.vehicle.ai.driver==self.owner:
+            self.vehicle.ai.drive=None
         self.vehicle=None
+        self.ai_goal='none'
+        self.ai_state='none'
         print('exited vehicle')
 
     #---------------------------------------------------------------------------
@@ -449,7 +457,9 @@ class AIHuman(AIBase):
         # randomize time before we hit this method again
         self.ai_think_rate=random.uniform(0.1,1.5)
 
-        if self.ai_state=='moving':
+        if self.in_vehicle:
+            self.think_in_vehicle()
+        elif self.ai_state=='moving':
             self.think_move()
         elif self.ai_state=='engaging':
             self.think_engage()
@@ -486,30 +496,29 @@ class AIHuman(AIBase):
             # lets not think, just act..
             # if a state isn't in here the AI will basically sleep until the next think
 
-            if self.in_vehicle:
+            if self.ai_state=='moving':
+                # move towards target
+                self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
+                self.fatigue+=self.fatigue_add_rate*time_passed           
+            elif self.ai_state=='engaging':
+                self.fire(self.target_object.world_coords)
+                self.fatigue+=self.fatigue_add_rate*time_passed
+            elif self.ai_state=='start_moving':
+                # this kicks off movement
+                # maybe change into moving animation image?
+                # set the rotation angle for the image 
+                self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+
+                # tell graphics engine to redo the image 
+                self.owner.reset_image=True
+                # transition to moving
+                self.time_since_ai_transition=0
+                self.ai_state='moving'
+            elif self.ai_state=='vehicle_drive':
                 pass
             else:
-                if self.ai_state=='moving':
-                    # move towards target
-                    self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
-                    self.fatigue+=self.fatigue_add_rate*time_passed           
-                elif self.ai_state=='engaging':
-                    self.fire(self.target_object.world_coords)
-                    self.fatigue+=self.fatigue_add_rate*time_passed
-                elif self.ai_state=='start_moving':
-                    # this kicks off movement
-                    # maybe change into moving animation image?
-                    # set the rotation angle for the image 
-                    self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
-
-                    # tell graphics engine to redo the image 
-                    self.owner.reset_image=True
-                    # transition to moving
-                    self.time_since_ai_transition=0
-                    self.ai_state='moving'
-                else:
-                    # sleeping or whatever 
-                    self.fatigue-=self.fatigue_remove_rate*time_passed
+                # sleeping or whatever 
+                self.fatigue-=self.fatigue_remove_rate*time_passed
 
 
     #---------------------------------------------------------------------------
@@ -934,6 +943,41 @@ class AIHuman(AIBase):
             self.ai_goal='waiting'
             self.ai_state='waiting'
             
+    #---------------------------------------------------------------------------
+    def think_in_vehicle(self):
+        ''' in a vehicle - what do we need to do'''
+
+        # the initial decision tree for in vehicle
+
+        # this shouldn't DO much more than change the ai_state
+        action=False
+        # check vehicle health, should we bail out ?
+        if self.vehicle.ai.health<10:
+            self.speak('Bailing Out!')
+            self.handle_exit_vehicle(self.vehicle)
+            # should probably let everyone else know
+            action=True
+        # check if we are close to our destination (if we have one)
+        elif self.ai_vehicle_goal=='travel':
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
+            if distance<50:
+                self.handle_exit_vehicle(self.vehicle)
+                action=True
+                # should probably let everyone else know as well
+
+        # should check if our current vehicle seating assigment still makes sense
+        #  are we the driver, is there no driver? etc
+
+        # basically if we haven't bailed out yet..
+        if action==False:
+
+            if self.ai_state=='vehicle_drive':
+                self.think_vehicle_drive()
+                action=True
+            elif self.vehicle.ai.driver==self.owner:
+                # if we are staying in the vehicle AND we are the driver, make steering corrections
+                self.ai_state='vehicle_drive'
+                action=True
 
 
     #-----------------------------------------------------------------------
@@ -1049,6 +1093,7 @@ class AIHuman(AIBase):
             # catchall for random moving related goals:
             if DISTANCE<5:
                 self.ai_state='sleeping'
+
     #-----------------------------------------------------------------------
     def think_upgrade_gear(self):
         '''think about upgrading gear. return True/False if upgrading'''
@@ -1103,6 +1148,31 @@ class AIHuman(AIBase):
         # top off ammo ?
 
         return status
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_drive(self):
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        # get the rotation to the destination 
+        r = engine.math_2d.get_rotation(self.owner.world_coords,self.ai_vehicle_destination)
+
+        # compare that with the current vehicle rotation.. somehow?
+        v = self.vehicle.rotation_angle
+
+        if r>v:
+            v+=1*time_passed
+        if r<v:
+            v-=1*time_passed
+        
+        # if its close just set it equal
+        if r>v-5 and r<v+5:
+            self.vehicle.rotation_angle=r
+
+        self.vehicle.reset_image=True
+
+        self.vehicle.ai.throttle=1
+        self.vehicle.ai.brake_power=0
+
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man '''    

@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 16 2022
+-  work on ai vehicle control code
+
+need a way to assign roles in a vehicle (driver, gunner?, passenger?)
+
+for now i think the human ai will still cheat and directly change vehicle rotation. 
+will probably have to learn to steer in the future though 
+
+----------------------------------
 Nov 13 2022
 - added enough control code that vehicles work for the player again 
 

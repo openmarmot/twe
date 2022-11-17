@@ -26,13 +26,12 @@ class AIVehicle(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
-
+        # --- health stuff ----
         self.health=100
 
         # the ai group that this human is a part of 
         self.squad=None
-        self.target_object=None
-        self.destination=None
+
 
         # current fuel type options : gas / diesel
         self.fuel_type='gas'
@@ -58,8 +57,11 @@ class AIVehicle(AIBase):
         # distance between vehicle and ground
         self.altimeter=0
 
-        # passengers[0] determines how the AI is controlled
+        # passengers  
         self.passengers=[]
+
+        # set when a world_object claims the driver position. ai_human checks this to determine behavior
+        self.driver=None
 
         # 
         self.inventory=[]
@@ -68,8 +70,8 @@ class AIVehicle(AIBase):
         self.vehicle_speed=0.
         self.acceleration=0
 
-        self.speed=0
-        self.rotation_speed=0
+        self.speed=0 # this is max speed at the moment
+        self.rotation_speed=0 # max rotation speed
 
         
 
