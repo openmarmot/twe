@@ -1160,14 +1160,15 @@ class AIHuman(AIBase):
         v = self.vehicle.rotation_angle
 
         if r>v:
-            v+=1*time_passed
+            self.vehicle.rotation_angle+=1*time_passed
         if r<v:
-            v-=1*time_passed
+            self.vehicle.rotation_angle-=1*time_passed
         
         # if its close just set it equal
         if r>v-5 and r<v+5:
             self.vehicle.rotation_angle=r
 
+        # remember this is costly
         self.vehicle.reset_image=True
 
         self.vehicle.ai.throttle=1
