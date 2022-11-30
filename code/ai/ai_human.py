@@ -768,13 +768,18 @@ class AIHuman(AIBase):
 
         if action==False:
             if self.primary_weapon==None:
-                # engagement is far enough to risk going somewhere to get a gun ??? this needs to be re-thought
-                self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
-                self.ai_goal='pickup'
-                self.destination=self.target_object.world_coords
-                self.ai_state='start_moving'
-                action=True
-                self.speak('Enemies spotted, need to get a gun!')
+                # take an AT shot
+                if self.antitank!=None:
+                    self.launch_antitank(self.target_object.world_coords)
+                    action=True
+                else:
+                    # engagement is far enough to risk going somewhere to get a gun ??? this needs to be re-thought
+                    self.target_object=self.owner.world.get_closest_gun(self.owner.world_coords)
+                    self.ai_goal='pickup'
+                    self.destination=self.target_object.world_coords
+                    self.ai_state='start_moving'
+                    action=True
+                    self.speak('Enemies spotted, need to get a gun!')
             # we have a primary weapon
             # check if we are out of ammo
             elif self.primary_weapon.ai.get_ammo_count()<1:

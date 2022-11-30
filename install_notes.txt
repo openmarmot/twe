@@ -1,0 +1,7 @@
+
+# Windows 
+Install VS Code 
+Install Git 
+Install Python 
+Install pygame module (py -m pip install pygame --user)
+clone repo 

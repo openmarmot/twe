@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 29 2022
+
+- added a bit more data to the human menu when debug is on for troubleshooting 
+- added an option to take an AT shot at a target if there is no primary weapon
+ and if its a far engagement
+
+was not able to trigger a panzerfaust shot by the AI. pretty sure the code is good 
+but its a very specific set of circumstances that would result on it triggering 
+
+a bit of play testing. need to look at whatever mechanism causes enemies to be 
+forgotten do to bursts now. its fine for real enemies but personal enemies who 
+are close by shouldn't be forgotten 
 ----------------------------------
 Nov 16 2022
 -  work on ai vehicle control code

@@ -337,7 +337,9 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
-                self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+                self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_goal))
+                self.world.graphic_engine.menu_text_queue.append('Personal Enemies Count: '+str(len(self.selected_object.ai.personal_enemies)))
+                #self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
 
             if self.menu_state == 'player_menu':
                 self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
