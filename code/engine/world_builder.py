@@ -63,6 +63,7 @@ list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911',
 
 #------------------------------------------------------------------------------
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+# automatically adds the created squads to the correct faction tactical AI
 def create_squads(WORLD,HUMANS,FACTION):
     assault_rifles=[]
     rifles=[]

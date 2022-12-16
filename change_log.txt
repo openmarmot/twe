@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 16 2022
+- moved debug_info text queue to world class 
+    - this follows my plan to keep the graphics class to JUST the graphics engine 
+- added squad count to debug info 
+
+----------------------------------
+Dec 03 2022
+- added notes on fedora 37 install 
+
+----------------------------------
 Nov 29 2022
 
 - added a bit more data to the human menu when debug is on for troubleshooting 

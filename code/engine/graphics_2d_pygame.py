@@ -78,8 +78,6 @@ class Graphics_2D_Pygame(object):
         # used for the menu system. no limits enforced by this class
         self.menu_text_queue=[]
 
-        # debug info queue
-        self.debug_text_queue=[]
 
         # vehicle text 
         self.display_vehicle_text=False
@@ -274,7 +272,7 @@ class Graphics_2D_Pygame(object):
 
         if(self.world.debug_mode):
             self.h=0
-            for b in self.debug_text_queue:
+            for b in self.world.debug_text_queue:
                 self.h+=15
                 self.small_font.render_to(self.screen, (540, self.h), b, (255, 51, 51))
 
@@ -299,10 +297,6 @@ class Graphics_2D_Pygame(object):
         '''
         self.handleInput()
 
-        if(self.world.debug_mode):
-            self.update_debug_info()
-
-
         # update time
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
@@ -314,23 +308,7 @@ class Graphics_2D_Pygame(object):
             if len(self.text_queue)>0:
                 self.text_queue.pop(0)
 
-#------------------------------------------------------------------------------
-    def update_debug_info(self):
-        self.debug_text_queue=[]
-        self.debug_text_queue.append('FPS: '+str(int(self.clock.get_fps())))
-        self.debug_text_queue.append('World Objects: '+ str(len(self.world.wo_objects)))
-        self.debug_text_queue.append('Rendered Objects: '+ str(self.renderCount))
-        self.debug_text_queue.append('Germans: '+ str(len(self.world.wo_objects_german)))
-        self.debug_text_queue.append('Soviets: '+ str(len(self.world.wo_objects_soviet)))
-        self.debug_text_queue.append('Americans: '+ str(len(self.world.wo_objects_american)))
-        self.debug_text_queue.append('Civilians: '+ str(len(self.world.wo_objects_civilian)))
-        self.debug_text_queue.append('Player World Coords: '+str(self.world.player.world_coords))
-        self.debug_text_queue.append('Player Fatigue: '+str(self.world.player.ai.fatigue))
-        self.debug_text_queue.append('Player Speed: '+str(self.world.player.ai.get_calculated_speed()))
 
-        # world area data
-        for b in self.world.world_areas:
-            self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
 
 #------------------------------------------------------------------------------
     def update_render_info(self):

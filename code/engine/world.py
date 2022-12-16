@@ -84,6 +84,9 @@ class World(object):
         # debug text and other stuff checks this condition
         self.debug_mode=False
 
+        # debug info queue
+        self.debug_text_queue=[]
+
         #bool
         self.map_enabled=False
 
@@ -422,6 +425,27 @@ class World(object):
             self.soviet_ai.update()
             self.american_ai.update()
             self.civilian_ai.update()
+
+            if self.debug_mode:
+                self.update_debug_info()
+
+    #------------------------------------------------------------------------------
+    def update_debug_info(self):
+        self.debug_text_queue=[]
+        self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
+        self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
+        self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
+        self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.german_ai.squads))+']')
+        self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
+        self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')
+        self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
+        self.debug_text_queue.append('Player World Coords: '+str(self.player.world_coords))
+        self.debug_text_queue.append('Player Fatigue: '+str(self.player.ai.fatigue))
+        self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
+
+        # world area data
+        for b in self.world_areas:
+            self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
 
 
 
