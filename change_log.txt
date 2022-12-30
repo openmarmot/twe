@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+Dec 24 2022
+- minor update to world_area code to randomize timing of update code 
+to spread out the cpu load of the updates 
+
+looks like their may be issues with ai getting into vehicles now and 
+i confirmed they can't seem to drive. I saw a kubelwagen with 5 
+passengers but a civilian still drawn on top of it. 
+
+----------------------------------
+Dec 22 2022
+- minor code reorg in world_builder 
+
 ----------------------------------
 Dec 16 2022
 - moved debug_info text queue to world class 
@@ -24,6 +38,7 @@ but its a very specific set of circumstances that would result on it triggering
 a bit of play testing. need to look at whatever mechanism causes enemies to be 
 forgotten do to bursts now. its fine for real enemies but personal enemies who 
 are close by shouldn't be forgotten 
+
 ----------------------------------
 Nov 16 2022
 -  work on ai vehicle control code

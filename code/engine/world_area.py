@@ -45,6 +45,8 @@ class WorldArea(object):
 
         self.time_since_control_update=0
 
+        self.control_update_interval=0
+
     #---------------------------------------------------------------------------
     def update(self):
         time_passed=self.world.graphic_engine.time_passed_seconds
@@ -53,6 +55,7 @@ class WorldArea(object):
         if self.time_since_control_update>5:
             self.update_control()
             self.time_since_control_update=0
+            self.control_update_interval=random.randint(5,25)
         
 
     #---------------------------------------------------------------------------

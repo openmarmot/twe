@@ -211,7 +211,16 @@ def create_squads(WORLD,HUMANS,FACTION):
 
             squad_list.append(s)
 
-    return squad_list
+    if FACTION=='civilian':
+        WORLD.civilian_ai.squads+=squad_list
+    elif FACTION=='german':
+        WORLD.german_ai.squads+=squad_list
+    elif FACTION=='soviet':
+        WORLD.soviet_ai.squads+=squad_list
+    elif FACTION=='american':
+        WORLD.american_ai.squads+=squad_list
+    else:
+        print('ERROR ! : Faction not recognized in world_builder.create_squad()')
             
 
 #------------------------------------------------------------------------------
@@ -460,7 +469,7 @@ def load_test_environment(world):
 
     
     # create german squads
-    world.german_ai.squads+=create_squads(world,s,'german')
+    create_squads(world,s,'german')
 
     # add ze russians
     s=[]
@@ -498,7 +507,7 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'soviet_ppsh43'))
 
     # create soviet squads 
-    world.soviet_ai.squads+=create_squads(world,s,'soviet')
+    create_squads(world,s,'soviet')
 
     # add civilians
     s=[]
@@ -517,7 +526,7 @@ def load_test_environment(world):
 
 
     # create civilian squads 
-    world.civilian_ai.squads+=create_squads(world,s,'civilian')
+    create_squads(world,s,'civilian')
 
     # spawn
     # locations will eventually be determined by map control
