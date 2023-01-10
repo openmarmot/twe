@@ -61,10 +61,86 @@ list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-chee
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
 
-#------------------------------------------------------------------------------
+def add_standard_squad(WORLD,SQUAD_TYPE):
+    s=[]
+    if SQUAD_TYPE=='soviet 1943 rifle':
+        # ref : https://www.battleorder.org/ussr-rifle-co-1943
+        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst machine gunner
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        WORLD.soviet_ai.squads+=s
+    elif SQUAD_TYPE=='soviet 1944 rifle':
+        # ref : https://www.battleorder.org/ussr-rifle-co-1944
+        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
+        s.append(spawn_soldiers(world,'soviet_ppsh43')) # asst machine gunner
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
+        WORLD.soviet_ai.squads+=s
+    elif SQUAD_TYPE=='soviet 1944 submachine gun':
+        # ref : https://www.battleorder.org/ussr-rifle-co-1944
+        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
+        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
+        s.append(spawn_soldiers(world,'soviet_ppsh43')) # asst machine gunner
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        s.append(spawn_soldiers(world,'soviet_ppsh43'))
+        WORLD.soviet_ai.squads+=s
+    elif SQUAD_TYPE=='german 1944 rifle':
+        s.append(spawn_soldiers(world,'german_mp40'))
+        s.append(spawn_soldiers(world,'german_mp40'))
+        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
+        s.append(spawn_soldiers(world,'german_kar98k')) # asst machine gunner
+        s.append(spawn_soldiers(world,'german_kar98k'))
+        s.append(spawn_soldiers(world,'german_kar98k'))
+        s.append(spawn_soldiers(world,'german_kar98k'))
+        s.append(spawn_soldiers(world,'german_kar98k'))
+        s.append(spawn_soldiers(world,'german_kar98k'))
+        WORLD.german_ai.squads+=s
+    elif SQUAD_TYPE=='german 1944 volksgrenadier fire group':
+        # ref : https://www.battleorder.org/volksgrenadiers-1944
+        s.append(spawn_soldiers(world,'german_stg44')) #squad lead
+        s.append(spawn_soldiers(world,'german_stg44')) # deputy squad lead
+        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
+        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
+        s.append(spawn_soldiers(world,'german_stg44')) # asst machine gunner
+        s.append(spawn_soldiers(world,'german_stg44')) # asst machine gunner
+        s.append(spawn_soldiers(world,'german_stg44')) # ammo bearer
+        s.append(spawn_soldiers(world,'german_stg44')) # ammo bearer 
+        WORLD.german_ai.squads+=s
+    elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
+        # ref : https://www.battleorder.org/volksgrenadiers-1944
+        s.append(spawn_soldiers(world,'german_stg44')) #squad lead
+        s.append(spawn_soldiers(world,'german_stg44')) # deputy squad lead
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
+        WORLD.german_ai.squads+=s
+        
+        
+
+
+
+
 ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
 # automatically adds the created squads to the correct faction tactical AI
-def create_squads(WORLD,HUMANS,FACTION):
+def create_squads_from_human_list(WORLD,HUMANS,FACTION):
     assault_rifles=[]
     rifles=[]
     semiauto_rifles=[]
@@ -469,7 +545,7 @@ def load_test_environment(world):
 
     
     # create german squads
-    create_squads(world,s,'german')
+    create_squads_from_human_list(world,s,'german')
 
     # add ze russians
     s=[]
@@ -507,7 +583,7 @@ def load_test_environment(world):
     s.append(spawn_soldiers(world,'soviet_ppsh43'))
 
     # create soviet squads 
-    create_squads(world,s,'soviet')
+    create_squads_from_human_list(world,s,'soviet')
 
     # add civilians
     s=[]
@@ -526,7 +602,7 @@ def load_test_environment(world):
 
 
     # create civilian squads 
-    create_squads(world,s,'civilian')
+    create_squads_from_human_list(world,s,'civilian')
 
     # spawn
     # locations will eventually be determined by map control

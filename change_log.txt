@@ -3,6 +3,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 09 2023
+- started adding some standardized squad definitions
+
+----------------------------------
+Jan 03 2023
+- minor updates to install notes 
+- found that the game works fine on pop!_os. added to install notes 
+
+----------------------------------
 Dec 24 2022
 - minor update to world_area code to randomize timing of update code 
 to spread out the cpu load of the updates 
