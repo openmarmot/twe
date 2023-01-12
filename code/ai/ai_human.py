@@ -541,7 +541,7 @@ class AIHuman(AIBase):
             if(self.owner.world.graphic_engine.keyPressed('d')):
                 self.vehicle.ai.handle_steer_right()
 
-            print(self.vehicle.ai.throttle,self.vehicle.ai.vehicle_speed)
+            #print(self.vehicle.ai.throttle,self.vehicle.ai.vehicle_speed)
 
         else:
             action=False

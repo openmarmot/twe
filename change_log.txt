@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 
+----------------------------------
+Jan 11 2023
+- fixed some bugs in the new squad creation code 
+- moved squad creation in the test world over to the new code (except for civilians)
+
+play test hightlights 
+- in the first meeting engagement german mg34s wiped out the entire russian squad with no losses 
+- two germans were killed by civilians with ppks (this is fairly rare. they must have been hit by stray fire and returned fire)
+
+
+I need to either come up with a unique name generator, or ditch the names. 
+I think I like having names but i have no idea how to come up with unique names for infinite soldiers
 
 ----------------------------------
 Jan 09 2023

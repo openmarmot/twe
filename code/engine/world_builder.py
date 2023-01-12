@@ -62,76 +62,82 @@ list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-chee
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
 
 def add_standard_squad(WORLD,SQUAD_TYPE):
-    s=[]
+    s=AISquad(WORLD)
     if SQUAD_TYPE=='soviet 1943 rifle':
+        s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1943
-        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
-        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst machine gunner
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads+=s
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # squad lead 
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.members.append(spawn_soldiers(WORLD,'soviet_dp28')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        WORLD.soviet_ai.squads.append(s)
     elif SQUAD_TYPE=='soviet 1944 rifle':
+        s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
-        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
-        s.append(spawn_soldiers(world,'soviet_ppsh43')) # asst machine gunner
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads+=s
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # squad lead 
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.members.append(spawn_soldiers(WORLD,'soviet_dp28')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        WORLD.soviet_ai.squads.append(s)
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
+        s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.append(spawn_soldiers(world,'soviet_ppsh43')) # squad lead 
-        s.append(spawn_soldiers(world,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
-        s.append(spawn_soldiers(world,'soviet_dp28')) # machine gunner
-        s.append(spawn_soldiers(world,'soviet_ppsh43')) # asst machine gunner
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        s.append(spawn_soldiers(world,'soviet_ppsh43'))
-        WORLD.soviet_ai.squads+=s
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # squad lead 
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant')) # asst squad lead could hav svt_40
+        s.members.append(spawn_soldiers(WORLD,'soviet_dp28')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        WORLD.soviet_ai.squads.append(s)
     elif SQUAD_TYPE=='german 1944 rifle':
-        s.append(spawn_soldiers(world,'german_mp40'))
-        s.append(spawn_soldiers(world,'german_mp40'))
-        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
-        s.append(spawn_soldiers(world,'german_kar98k')) # asst machine gunner
-        s.append(spawn_soldiers(world,'german_kar98k'))
-        s.append(spawn_soldiers(world,'german_kar98k'))
-        s.append(spawn_soldiers(world,'german_kar98k'))
-        s.append(spawn_soldiers(world,'german_kar98k'))
-        s.append(spawn_soldiers(world,'german_kar98k'))
-        WORLD.german_ai.squads+=s
+        s.faction='german'
+        s.members.append(spawn_soldiers(WORLD,'german_mp40'))
+        s.members.append(spawn_soldiers(WORLD,'german_mp40'))
+        s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        WORLD.german_ai.squads.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier fire group':
+        s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.append(spawn_soldiers(world,'german_stg44')) #squad lead
-        s.append(spawn_soldiers(world,'german_stg44')) # deputy squad lead
-        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
-        s.append(spawn_soldiers(world,'german_mg34')) # machine gunner
-        s.append(spawn_soldiers(world,'german_stg44')) # asst machine gunner
-        s.append(spawn_soldiers(world,'german_stg44')) # asst machine gunner
-        s.append(spawn_soldiers(world,'german_stg44')) # ammo bearer
-        s.append(spawn_soldiers(world,'german_stg44')) # ammo bearer 
-        WORLD.german_ai.squads+=s
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #squad lead
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # deputy squad lead
+        s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer 
+        WORLD.german_ai.squads.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
+        s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.append(spawn_soldiers(world,'german_stg44')) #squad lead
-        s.append(spawn_soldiers(world,'german_stg44')) # deputy squad lead
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(world,'german_stg44')) #  rifle man
-        WORLD.german_ai.squads+=s
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #squad lead
+        s.append(spawn_soldiers(WORLD,'german_stg44')) # deputy squad lead
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        WORLD.german_ai.squads.append(s)
         
         
 
@@ -508,82 +514,18 @@ def load_test_environment(world):
 
 
     # add ze germans
-    s=[]
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_mp40'))
-    s.append(spawn_soldiers(world,'german_mp40'))
-    s.append(spawn_soldiers(world,'german_stg44'))
-    s.append(spawn_soldiers(world,'german_mg34'))
-    s.append(spawn_soldiers(world,'german_mg34'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_kar98k'))
-    s.append(spawn_soldiers(world,'german_mp40'))
-    s.append(spawn_soldiers(world,'german_mp40'))
-    s.append(spawn_soldiers(world,'german_stg44'))
-    s.append(spawn_soldiers(world,'german_mg34'))
-    s.append(spawn_soldiers(world,'german_mg34'))
-    s.append(spawn_soldiers(world,'german_stg44'))
-    s.append(spawn_soldiers(world,'german_stg44'))
-    
 
-    
-    # create german squads
-    create_squads_from_human_list(world,s,'german')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 volksgrenadier fire group')
 
     # add ze russians
-    s=[]
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_dp28'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_mosin_nagant'))
-    s.append(spawn_soldiers(world,'soviet_dp28'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
-    s.append(spawn_soldiers(world,'soviet_ppsh43'))
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
 
-    # create soviet squads 
-    create_squads_from_human_list(world,s,'soviet')
 
     # add civilians
     s=[]
