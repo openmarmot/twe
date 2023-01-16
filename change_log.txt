@@ -1,5 +1,65 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 11 2023
+- fixed some bugs in the new squad creation code 
+- moved squad creation in the test world over to the new code (except for civilians)
+
+play test hightlights 
+- in the first meeting engagement german mg34s wiped out the entire russian squad with no losses 
+- two germans were killed by civilians with ppks (this is fairly rare. they must have been hit by stray fire and returned fire)
+
+
+I need to either come up with a unique name generator, or ditch the names. 
+I think I like having names but i have no idea how to come up with unique names for infinite soldiers
+
+----------------------------------
+Jan 09 2023
+- started adding some standardized squad definitions
+
+----------------------------------
+Jan 03 2023
+- minor updates to install notes 
+- found that the game works fine on pop!_os. added to install notes 
+
+----------------------------------
+Dec 24 2022
+- minor update to world_area code to randomize timing of update code 
+to spread out the cpu load of the updates 
+
+looks like their may be issues with ai getting into vehicles now and 
+i confirmed they can't seem to drive. I saw a kubelwagen with 5 
+passengers but a civilian still drawn on top of it. 
+
+----------------------------------
+Dec 22 2022
+- minor code reorg in world_builder 
+
+----------------------------------
+Dec 16 2022
+- moved debug_info text queue to world class 
+    - this follows my plan to keep the graphics class to JUST the graphics engine 
+- added squad count to debug info 
+
+----------------------------------
+Dec 03 2022
+- added notes on fedora 37 install 
+
+----------------------------------
+Nov 29 2022
+
+- added a bit more data to the human menu when debug is on for troubleshooting 
+- added an option to take an AT shot at a target if there is no primary weapon
+ and if its a far engagement
+
+was not able to trigger a panzerfaust shot by the AI. pretty sure the code is good 
+but its a very specific set of circumstances that would result on it triggering 
+
+a bit of play testing. need to look at whatever mechanism causes enemies to be 
+forgotten do to bursts now. its fine for real enemies but personal enemies who 
+are close by shouldn't be forgotten 
+
 ----------------------------------
 Nov 16 2022
 -  work on ai vehicle control code

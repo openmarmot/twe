@@ -1,0 +1,58 @@
+
+
+
+
+# -- hardware notes ---
+This should run fine on pretty much any modern laptop. 
+I was even successful running it on a proxmox virtual machine with virtio at 30 FPS.
+
+
+# --- Windows --- 
+# Install VS Code 
+https://code.visualstudio.com/
+
+# Install Git
+https://git-scm.com/downloads
+
+# Install Python
+https://www.python.org/downloads/windows/
+
+# Install pygame module 
+py -m pip install pygame --user
+
+# git clone project 
+git clone https://github.com/openmarmot/twe.git
+
+# cd to directory and run 
+cd twe/code
+python twe.py
+
+# --- Fedora 37 ---
+
+# instal pip 
+sudo dnf install python3-pip
+
+# install pygame 
+# note at the time of writing python 3.11 requires --pre for pygame to work 
+pip install pygame --user --pre
+
+# git clone project 
+git clone https://github.com/openmarmot/twe.git
+
+# cd to directory and run 
+cd twe/code
+python twe.py
+
+
+# --- Pop!_OS (System76) ---
+
+# install pygame 
+# note at the time of writing python 3.11 requires --pre for pygame to work 
+pip install pygame --user --pre
+
+# git clone project 
+git clone https://github.com/openmarmot/twe.git
+
+# cd to directory and run 
+cd twe/code
+python3 twe.py
