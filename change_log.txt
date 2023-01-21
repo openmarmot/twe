@@ -3,6 +3,12 @@ TWE Project : Change Log
 
 ----------------------------------
 Jan 11 2023
+- updated squad spawning to make it more automatic 
+- very minor changes to worldbuilder test world creation code 
+
+
+----------------------------------
+Jan 11 2023
 - fixed some bugs in the new squad creation code 
 - moved squad creation in the test world over to the new code (except for civilians)
 

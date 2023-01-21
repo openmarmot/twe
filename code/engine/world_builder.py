@@ -75,7 +75,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='soviet 1944 rifle':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -88,7 +88,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -101,7 +101,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 rifle':
         s.faction='german'
         s.members.append(spawn_soldiers(WORLD,'german_mp40'))
@@ -113,7 +113,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier fire group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
@@ -125,7 +125,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer 
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
@@ -137,7 +137,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
         
         
 
@@ -294,13 +294,13 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
             squad_list.append(s)
 
     if FACTION=='civilian':
-        WORLD.civilian_ai.squads+=squad_list
+        WORLD.civilian_ai.squad_spawn_queue+=squad_list
     elif FACTION=='german':
-        WORLD.german_ai.squads+=squad_list
+        WORLD.german_ai.squad_spawn_queue+=squad_list
     elif FACTION=='soviet':
-        WORLD.soviet_ai.squads+=squad_list
+        WORLD.soviet_ai.squad_spawn_queue+=squad_list
     elif FACTION=='american':
-        WORLD.american_ai.squads+=squad_list
+        WORLD.american_ai.squad_spawn_queue+=squad_list
     else:
         print('ERROR ! : Faction not recognized in world_builder.create_squad()')
             
@@ -443,6 +443,30 @@ def load_images(world):
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
+    # setup spawn points 
+    world.german_ai.spawn_point=world.spawn_west
+    world.soviet_ai.spawn_point=world.spawn_east
+    world.american_ai.spawn_point=world.spawn_north
+    world.civilian_ai.spawn_point=world.spawn_center  
+
+    # add some world areas
+    generate_world_area(world,[-2000,2000],'town','Alfa')
+    generate_world_area(world,[2000,-2000],'town','Bravo')
+    generate_world_area(world,[2000,2000],'town','Charlie')
+
+    # add germans
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 volksgrenadier fire group')
+
+    # add soviets
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+
+    #---------misc stuff that should probably be auto generated ---------
 
     # add a couple weapons 
     spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
@@ -513,20 +537,6 @@ def load_test_environment(world):
     spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
 
-    # add ze germans
-
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 volksgrenadier fire group')
-
-    # add ze russians
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-
-
     # add civilians
     s=[]
     s.append(spawn_civilians(world,'default'))
@@ -542,7 +552,6 @@ def load_test_environment(world):
     s.append(spawn_civilians(world,'pistol'))
     s.append(spawn_civilians(world,'big_cheese'))
 
-
     # create civilian squads 
     create_squads_from_human_list(world,s,'civilian')
 
@@ -552,23 +561,8 @@ def load_test_environment(world):
     spawn_object(world,world.spawn_west,'panzerfaust',True)
     spawn_object(world,world.spawn_west,'panzerfaust',True)
 
-    # setup spawn points 
-    world.german_ai.spawn_point=world.spawn_west
-    world.soviet_ai.spawn_point=world.spawn_east
-    world.american_ai.spawn_point=world.spawn_north
-    world.civilian_ai.spawn_point=world.spawn_center    
+      
 
-    world.german_ai.spawn_all()
-    world.soviet_ai.spawn_all()
-    world.american_ai.spawn_all()
-    world.civilian_ai.spawn_all()
-
-    # add some world areas
-    generate_world_area(world,[-2000,2000],'town','Alfa')
-    generate_world_area(world,[2000,-2000],'town','Bravo')
-    generate_world_area(world,[2000,2000],'town','Charlie')
-
-   # generate_world_area(world,[0,0],'town','Danitza')
 
 #------------------------------------------------------------------------------
 def spawn_civilians(WORLD,CIVILIAN_TYPE):

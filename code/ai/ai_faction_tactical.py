@@ -22,6 +22,9 @@ from ai.ai_squad import AISquad
 class AIFactionTactical(object):
     def __init__(self,WORLD,FACTION):
 
+        # squads waiting to enter the map
+        self.squad_spawn_queue=[]
+
         # squads in the faction who are present on this map
         self.squads=[] 
 
@@ -51,6 +54,7 @@ class AIFactionTactical(object):
         self.spawn_point=None
 
     #---------------------------------------------------------------------------
+    # we should just get rid of this
     def create_and_spawn_squad(self,MEMBERS):
         ''' creates a new squad and spawns it at the spawn point'''
         if self.spawn_point==None:
@@ -65,29 +69,29 @@ class AIFactionTactical(object):
 
             # should set the is_german is_soviet here but hmmm is that different from faction??
 
-        self.squads.append(s)
-
-        self.spawn_squads([s])
+        self.squad_spawn_queue.append(s)
 
 
-    #---------------------------------------------------------------------------
-    # spawn all squads. used at the start of the game
-    def spawn_all(self):
-        self.spawn_squads(self.squads)
 
     #---------------------------------------------------------------------------
-    # spawns a list of squads
-    def spawn_squads(self,SQUADS):
-        for b in SQUADS:
+    # spawns squads in the spawn queue
+    def process_spawn_queue(self):
+        for b in self.squad_spawn_queue:
             b.world_coords=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
             b.destination=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
-            
             b.spawn_on_map()
+            self.squads.append(b)
+        self.squad_spawn_queue.clear()
 
     #---------------------------------------------------------------------------
     def update(self):
         time_passed=self.world.graphic_engine.time_passed_seconds
         self.time_since_update+=time_passed
+
+        # spawn any new squads
+        if len(self.squad_spawn_queue)>0:
+            self.process_spawn_queue()
+
         # run the update for each squad
         for b in self.squads:
             b.update()
