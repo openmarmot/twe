@@ -2,10 +2,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 29 2023
+- added 55 gallon (fuel) drum
+- made some small changes to the building spawn code but its still terrible 
+- added 'fuel dump' world area type 
+    - has a neat little bit of code to order the fuel drums 
+
+for now there is a fuel dump in the center of the map. in the future this will be more random 
+----------------------------------
 Jan 11 2023
 - updated squad spawning to make it more automatic 
 - very minor changes to worldbuilder test world creation code 
-
 
 ----------------------------------
 Jan 11 2023

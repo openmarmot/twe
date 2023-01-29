@@ -313,15 +313,29 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     if TYPE=='town':
         count=random.randint(1,5)
         for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
+            coords=[WORLD_COORDS[0]+float(random.randint(-500,500)),WORLD_COORDS[1]+float(random.randint(-500,500))]
             group.append(spawn_object(WORLD,coords,'warehouse',True))
         count=random.randint(2,15)
         for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
+            coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
             group.append(spawn_object(WORLD,coords,'square_building',True))
+        engine.math_2d.collision_sort(500,group)
+
+    elif TYPE=='fuel_dump':
+        count=random.randint(11,157)
+        last_coord=WORLD_COORDS
+        column_max=100
+        if count>36:
+            column_max*=2
+        for x in range(count):
+            
+            if last_coord[0]>WORLD_COORDS[0]+column_max:
+                last_coord[0]=WORLD_COORDS[0]
+                last_coord[1]+=20
+            last_coord=[last_coord[0]+20,last_coord[1]+0]
+            group.append(spawn_object(WORLD,last_coord,'55_gallon_drum',True))
+
     
-    # do some sorting 
-    engine.math_2d.collision_sort(600,group)
 
 
     # make the corresponding worldArea object
@@ -411,6 +425,7 @@ def load_images(world):
     world.graphic_engine.loadImage('crate','images/containers/crate.png')
     world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
     world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
+    world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -468,6 +483,10 @@ def load_test_environment(world):
 
     #---------misc stuff that should probably be auto generated ---------
 
+    #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
+
+    generate_world_area(world,[0,0],'fuel_dump','duuump')
+
     # add a couple weapons 
     spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
     spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
@@ -476,7 +495,7 @@ def load_test_environment(world):
 
 
     # add ju88
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
+    #spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
     # kubelwagens 
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
@@ -486,37 +505,7 @@ def load_test_environment(world):
     # add warehouse
     #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
 
-    #cheese 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'karwendel-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'adler-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'camembert-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'champignon-cheese',True)
 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-
-    #wine 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
 
 
     # spawn some ammo cans 
@@ -810,6 +799,21 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='55_gallon_drum':
+        z=WorldObject(WORLD,['55_gallon_drum'],AILiquidContainer)
+        z.is_liquid_container=True
+        z.ai.total_volume=208
+        z.ai.used_volume=208
+        z.ai.liquid_type='gas'
+        z.ai.health_effect=-150
+        z.ai.hunger_effect=100
+        z.ai.thirst_effect=100
+        z.ai.fatigue_effect=500  
+        z.render_level=2
+        z.name='55_gallon_drum'
+        z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
 
 
