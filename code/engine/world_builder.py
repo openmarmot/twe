@@ -312,30 +312,20 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     group=[]
     if TYPE=='town':
         count=random.randint(1,5)
-        for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-500,500)),WORLD_COORDS[1]+float(random.randint(-500,500))]
-            group.append(spawn_object(WORLD,coords,'warehouse',True))
+        grid_spawn(WORLD,WORLD_COORDS,'warehouse',1150,count)
+        # for x in range(count):
+        #     coords=[WORLD_COORDS[0]+float(random.randint(-500,500)),WORLD_COORDS[1]+float(random.randint(-500,500))]
+        #     group.append(spawn_object(WORLD,coords,'warehouse',True))
         count=random.randint(2,15)
-        for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
-            group.append(spawn_object(WORLD,coords,'square_building',True))
-        engine.math_2d.collision_sort(500,group)
+        grid_spawn(WORLD,WORLD_COORDS,'square_building',250,count)
+        # for x in range(count):
+        #     coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
+        #     group.append(spawn_object(WORLD,coords,'square_building',True))
+        # engine.math_2d.collision_sort(500,group)
 
     elif TYPE=='fuel_dump':
         count=random.randint(11,157)
-        last_coord=WORLD_COORDS
-        column_max=100
-        if count>36:
-            column_max*=2
-        for x in range(count):
-            
-            if last_coord[0]>WORLD_COORDS[0]+column_max:
-                last_coord[0]=WORLD_COORDS[0]
-                last_coord[1]+=20
-            last_coord=[last_coord[0]+20,last_coord[1]+0]
-            group.append(spawn_object(WORLD,last_coord,'55_gallon_drum',True))
-
-    
+        grid_spawn(WORLD,WORLD_COORDS,'55_gallon_drum',20,count)
 
 
     # make the corresponding worldArea object
@@ -355,6 +345,22 @@ def get_random_from_list(WORLD,WORLD_COORDS,OBJECT_LIST,SPAWN):
     index=random.randint(0,len(OBJECT_LIST)-1)
     return spawn_object(WORLD,WORLD_COORDS,OBJECT_LIST[index],SPAWN)
 
+
+
+#------------------------------------------------------------------------------
+def grid_spawn(WORLD,WORLD_COORDS,OBJECT_STRING,DIAMETER,COUNT):
+    ''' spawn in a grid pattern '''
+    last_coord=WORLD_COORDS
+    # this needs to be better
+    column_max=engine.math_2d.get_optimal_column_count(COUNT)*DIAMETER
+
+    for x in range(COUNT):
+        
+        if last_coord[0]>WORLD_COORDS[0]+column_max:
+            last_coord[0]=WORLD_COORDS[0]
+            last_coord[1]+=DIAMETER
+        last_coord=[last_coord[0]+DIAMETER,last_coord[1]+0]
+        spawn_object(WORLD,last_coord,OBJECT_STRING,True)
 
 #------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
@@ -487,12 +493,6 @@ def load_test_environment(world):
 
     generate_world_area(world,[0,0],'fuel_dump','duuump')
 
-    # add a couple weapons 
-    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
-    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-1200,1200))],'model24',True)
-
 
     # add ju88
     #spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
@@ -500,12 +500,6 @@ def load_test_environment(world):
     # kubelwagens 
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
-
-
-    # add warehouse
-    #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
-
-
 
 
     # spawn some ammo cans 

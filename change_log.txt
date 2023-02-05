@@ -2,13 +2,28 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 04 2023
+- turned the fuel drum spawn algo into a reusable grid sort function 
+- created a math function to determine an optimal number of columns 
+    for grid sorting 
+- enabled grid spawning for towns 
+
+amusingly I like the grid spawning for towns less than when it was random 
+with a broken collision sorter. 
+
+part of the issue is i have all of two models for the town at the moment, 
+and that really stands out when they are uniformly spaced. 
+
+Also need to add collision against other objects check for the grid spawning system.
+
+----------------------------------
 Jan 29 2023
 - added 55 gallon (fuel) drum
 - made some small changes to the building spawn code but its still terrible 
 - added 'fuel dump' world area type 
     - has a neat little bit of code to order the fuel drums 
 
-for now there is a fuel dump in the center of the map. in the future this will be more random 
+for now there is a fuel dump in the center of the map for testing. this will probably go away soon 
 ----------------------------------
 Jan 11 2023
 - updated squad spawning to make it more automatic 

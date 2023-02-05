@@ -109,6 +109,26 @@ def collision_sort(RUNS,WO_OBJECTS):
 # 							break
 # 	return collided
 
+
+#------------------------------------------------------------------------------
+def get_optimal_column_count(AMOUNT):
+	'''calculates an optimal column count that balances columns and rows'''
+
+	run=True
+	columns=10
+	while run :
+		rows=AMOUNT/columns
+		if rows>(columns+1):
+			columns+=1
+		elif rows<(columns-1):
+			columns-=1
+		else:
+			break
+	return columns
+		
+
+
+
 #------------------------------------------------------------------------------
 def get_vector_length(vec2):
 	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
