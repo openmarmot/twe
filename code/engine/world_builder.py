@@ -54,14 +54,28 @@ module_version='0.0' #module software version
 module_last_update_date='August 15 2022' #date of last update
 
 #global variables
+
+# ------ object rarity lists -----------------------------------
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
-
-
+list_consumables_common=['green_apple','potato','turnip']
+list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine']
+list_consumables_ultra_rare=['schokakola']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
+list_guns_common=['kar98k','mosin_nagant','ppsh43']
+list_guns_rare=['mp40','ppk','tt33']
+list_guns_ultra_rare=['stg44','mg34','dp28','1911']
 
+list_medical=['bandage','german_officer_first_aid_kit']
+list_medical_common=['bandage']
+list_medical_rare=['german_officer_first_aid_kit']
+list_medical_ultra_rare=[]
+#----------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 def add_standard_squad(WORLD,SQUAD_TYPE):
+    ''' adds a standardized squad to a factions spawn queue '''
     s=AISquad(WORLD)
     if SQUAD_TYPE=='soviet 1943 rifle':
         s.faction='soviet'
@@ -141,12 +155,10 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         
         
 
-
-
-
-''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
-# automatically adds the created squads to the correct faction tactical AI
+#------------------------------------------------------------------------------
 def create_squads_from_human_list(WORLD,HUMANS,FACTION):
+    ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+    # automatically adds the created squads to the correct faction tactical AI
     assault_rifles=[]
     rifles=[]
     semiauto_rifles=[]
@@ -306,6 +318,13 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
             
 
 #------------------------------------------------------------------------------
+def generate_clutter(WORLD):
+    '''generates and auto places small objects around the map'''
+
+
+
+
+#------------------------------------------------------------------------------
 def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # TYPE town, airport, bunkers, field_depot, train_depot 
@@ -332,6 +351,7 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     w=WorldArea(WORLD)
     w.world_coords=copy.copy(WORLD_COORDS)
     w.name=NAME
+    w.type=TYPE
 
     # register with world 
     WORLD.world_areas.append(w)

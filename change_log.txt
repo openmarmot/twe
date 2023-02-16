@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 11 2023
+- a little code cleanup in world_builder 
+- started working on loot tables
+    - currently have common,rare,ultra rare for some categories 
+- added a type for world_area 
+
+starting to think about world_areas 
+- there will probably be significant and less significant ones 
+
+----------------------------------
 Feb 04 2023
 - turned the fuel drum spawn algo into a reusable grid sort function 
 - created a math function to determine an optimal number of columns 
