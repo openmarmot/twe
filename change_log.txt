@@ -1,6 +1,29 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+Feb 17 2023
+- added a civilian generator
+    - basically random civilian squads for each building 
+    - adds a civilian spawn point for each building 
+- spawn_point is now spawn_points[]
+- modified squad spawning to take into account multiple spawn points 
+- had to write new code for the player spawn because i had accidentally 
+    deleted something it used. now the player takes control of a random 
+    bot of the faction of their choice. 
+
+at the moment only default civilians are spawning, and 'american' 
+is no longer a valid spawn option 
+
+multiple spawnpoints is a big improvement for civilian spawning. 
+it looks a lot better now 
+
+now that fuel drums and cans are in-game i should modify 
+vehicles to require fuel, and add a way to fuel them 
+
+I should also add an AI goal to explore near by crates 
+
 ----------------------------------
 Feb 11 2023
 - a little code cleanup in world_builder 

@@ -49,36 +49,18 @@ class AIFactionTactical(object):
         # faction - german/soviet/american/civilian
         self.faction=FACTION
 
-        # world_coords of the spawn point for this faction
-        # in the future should support multiple spawn points
-        self.spawn_point=None
-
-    #---------------------------------------------------------------------------
-    # we should just get rid of this
-    def create_and_spawn_squad(self,MEMBERS):
-        ''' creates a new squad and spawns it at the spawn point'''
-        if self.spawn_point==None:
-            print('error : faction spawn point not set before squad spawn')
-        
-        s=AISquad(self.world)
-        s.faction=self.faction
-
-        for b in MEMBERS:
-            s.members.append(b)
-            b.ai.squad=s
-
-            # should set the is_german is_soviet here but hmmm is that different from faction??
-
-        self.squad_spawn_queue.append(s)
-
-
+        # list of spawn point world_coords
+        self.spawn_points=[]
 
     #---------------------------------------------------------------------------
     # spawns squads in the spawn queue
     def process_spawn_queue(self):
         for b in self.squad_spawn_queue:
-            b.world_coords=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
-            b.destination=[self.spawn_point[0]+float(random.randint(-200,200)),self.spawn_point[1]+float(random.randint(-200,200))]
+            # get a random spawn point
+            coords=self.spawn_points[random.randint(0,len(self.spawn_points)-1)]
+            # add random offsets
+            b.world_coords=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
+            b.destination=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
             b.spawn_on_map()
             self.squads.append(b)
         self.squad_spawn_queue.clear()

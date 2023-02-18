@@ -320,7 +320,31 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
 #------------------------------------------------------------------------------
 def generate_clutter(WORLD):
     '''generates and auto places small objects around the map'''
+    # this should be called after buildings are placed
+    pass
 
+#------------------------------------------------------------------------------
+def generate_civilians_and_civilan_spawns(WORLD):
+    '''generates civilans and civilan spawn points'''
+    # this should be called after buildings are placed
+
+    for b in WORLD.wo_objects_building:
+        # add a random amount of civilians
+        amount=random.randint(0,3)
+        if amount>0:
+            s=AISquad(WORLD)
+            s.faction='civilian'
+            for c in range(amount):
+                s.members.append(spawn_civilians(WORLD,'default'))
+            WORLD.civilian_ai.squad_spawn_queue.append(s)
+
+        # add the spawn point
+        WORLD.civilian_ai.spawn_points.append(b.world_coords)
+
+    # special case if there are no buildings
+    if len(WORLD.wo_objects_building)==0:
+        print('WARN : No buildings, default civilian spawn added')
+        WORLD.civilian_ai.spawn_points.append([0,0])
 
 
 
@@ -341,10 +365,17 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
         #     coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
         #     group.append(spawn_object(WORLD,coords,'square_building',True))
         # engine.math_2d.collision_sort(500,group)
-
     elif TYPE=='fuel_dump':
         count=random.randint(11,157)
         grid_spawn(WORLD,WORLD_COORDS,'55_gallon_drum',20,count)
+    elif TYPE=='german_ammo_dump':
+        count=random.randint(11,45)
+        grid_spawn(WORLD,WORLD_COORDS,'german_mg_ammo_can',20,count)
+    elif TYPE=='german_fuel_can_dump':
+        count=random.randint(21,75)
+        grid_spawn(WORLD,WORLD_COORDS,'german_fuel_can',20,count)
+
+
 
 
     # make the corresponding worldArea object
@@ -485,15 +516,23 @@ def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
     # setup spawn points 
-    world.german_ai.spawn_point=world.spawn_west
-    world.soviet_ai.spawn_point=world.spawn_east
-    world.american_ai.spawn_point=world.spawn_north
-    world.civilian_ai.spawn_point=world.spawn_center  
+    world.soviet_ai.spawn_points.append(world.spawn_east)
+    world.american_ai.spawn_points.append(world.spawn_north)
+    world.german_ai.spawn_points.append(world.spawn_west) 
+    # civilian spawn points are generated 
 
     # add some world areas
     generate_world_area(world,[-2000,2000],'town','Alfa')
     generate_world_area(world,[2000,-2000],'town','Bravo')
     generate_world_area(world,[2000,2000],'town','Charlie')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_ammo_dump','german ammo dump')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_fuel_can_dump','german fuel dump')
+
+    # generate clutter after world areas are created
+    generate_clutter(world)
+
+    # generate civilians and civilan spawns
+    generate_civilians_and_civilan_spawns(world)
 
     # add germans
     add_standard_squad(world,'german 1944 rifle')
@@ -511,27 +550,20 @@ def load_test_environment(world):
 
     #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
 
-    generate_world_area(world,[0,0],'fuel_dump','duuump')
+    
 
 
     # add ju88
-    #spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
+    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
     # kubelwagens 
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
 
 
-    # spawn some ammo cans 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
+    
 
-    # spawn some fuel cans
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True) 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
-
+    
     # spawn some crates
     spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
     spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
@@ -539,24 +571,6 @@ def load_test_environment(world):
     spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
     spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
-
-    # add civilians
-    s=[]
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'pistol'))
-    s.append(spawn_civilians(world,'pistol'))
-    s.append(spawn_civilians(world,'big_cheese'))
-
-    # create civilian squads 
-    create_squads_from_human_list(world,s,'civilian')
 
     # spawn
     # locations will eventually be determined by map control
