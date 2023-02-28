@@ -321,7 +321,19 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
 def generate_clutter(WORLD):
     '''generates and auto places small objects around the map'''
     # this should be called after buildings are placed
-    pass
+
+    # 1/5 chance of crate by a building
+    # need to smart position this in the future
+    for b in WORLD.wo_objects_building:
+        # add a random amount of civilians
+        chance=random.randint(0,4)
+        coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+        if chance==2:
+            spawn_crate(WORLD,coords,'random_consumables')
+
+
+
+
 
 #------------------------------------------------------------------------------
 def generate_civilians_and_civilan_spawns(WORLD):

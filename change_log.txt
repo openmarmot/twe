@@ -3,6 +3,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 27 2023
+- cobbled together some code to spawn crates 
+    near buildings. its not great 
+
+crates needed for upcoming 'crate interaction' ai 
+
+note - crates look super bad rotated. 
+need to 1. check crate png dimensions 
+2. make a right angle rotation code thingy. 
+
+----------------------------------
 Feb 17 2023
 - added a civilian generator
     - basically random civilian squads for each building 
