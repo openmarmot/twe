@@ -409,33 +409,34 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('4 - Civilian/Neutral')
             self.menu_state='base'
         if self.menu_state=='base':
+            spawned=False
             faction='none'
             if Key=='1':
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'1911',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
-                self.world.player.is_american=True
-                self.world.american_ai.create_and_spawn_squad([self.world.player])
-                print('Spawning as American')
+                if len(self.world.wo_objects_american)>0:
+                    self.world.spawn_player('american')
+                    spawned=True
+                else:
+                    print('No bots of this type available')
             elif Key=='2':
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'stg44',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
-                self.world.player.is_german=True
-                self.world.german_ai.create_and_spawn_squad([self.world.player])
-                print('Spawning as German')
+                if len(self.world.wo_objects_german)>0:
+                    self.world.spawn_player('german')
+                    spawned=True
+                else:
+                    print('No bots of this type available')
             elif Key=='3':
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppsh43',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
-                self.world.player.is_soviet=True
-                self.world.soviet_ai.create_and_spawn_squad([self.world.player])
-                print('Spawning as Soviet')
+                if len(self.world.wo_objects_soviet)>0:
+                    self.world.spawn_player('soviet')
+                    spawned=True
+                else:
+                    print('No bots of this type available')
             elif Key=='4':
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'ppk',False))
-                self.world.player.add_inventory(engine.world_builder.spawn_object(self.world,[0,0],'model24',False))
-                self.world.player.is_civilian=True
-                self.world.civilian_ai.create_and_spawn_squad([self.world.player])
-                print('Spawning as Civilian')
+                if len(self.world.wo_objects_civilian)>0:
+                    self.world.spawn_player('civilian')
+                    spawned=True
+                else:
+                    print('No bots of this type available')
             
-            if Key=='1' or Key=='2' or Key=='3' or Key=='4':
+            if spawned:
                 # eventually load other menus
                 self.world.is_paused=False
                 self.deactivate_menu()

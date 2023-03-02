@@ -23,6 +23,9 @@ module_last_update_date='June 02 2021' #date of last update
 class WorldArea(object):
     def __init__(self,WORLD):
 
+        # created by world_builder.generate_world_area
+
+        # should world area have a list of the objects in it ???
 
         self.name='none'
 
@@ -39,6 +42,10 @@ class WorldArea(object):
         # faction : german/soviet/american/none
         #  basically who is currently in control 
         self.faction='none'
+
+        # helps AI determine how to interact with it
+        # town / fuel_dump / 
+        self.type='none'
 
         # True if more than one faction is present
         self.is_contested=False

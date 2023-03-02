@@ -88,16 +88,16 @@ class WorldObject(object):
         self.is_melee=False # melee close combat weapon like a dagger 
         # these are non weapon pickups that are can be carried but are large.
         # only one can be carried at a time.
-        self.is_large_human_pickup=False
+        self.is_large_human_pickup=False # fills a large pickup slot
         self.is_gun_mag_carrier=False
-        self.is_container=False
+        self.is_container=False # really should be is_item_container.  a object that can store other world objects
         self.is_projectile=False
         self.is_consumable=False
         self.is_medical=False # general medical objects. bandage / pain pills / etc
         self.is_german=False
         self.is_soviet=False
         self.is_american=False
-        self.is_liquid_container=False # water/gas/diesel/??
+        self.is_liquid_container=False # water/gas/diesel/??  stores liquid NOT world_objects
         self.is_ammo_container=False # contains ammo 
         self.is_building=False
         self.is_map_pointer=False

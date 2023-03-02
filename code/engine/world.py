@@ -376,6 +376,36 @@ class World(object):
                 self.player.ai.time_since_player_interact+=self.player.ai.time_before_afk+60
                 self.player.ai.time_since_ai_transition=0
 
+    #---------------------------------------------------------------------------
+    def spawn_player(self, FACTION):
+        spawned=False
+        if FACTION=='german':
+            if len(self.wo_objects_german)>0:
+                b=random.randint(0,len(self.wo_objects_german)-1)
+                self.player=self.wo_objects_german[b]
+                spawned=True
+        elif FACTION=='soviet':
+            if len(self.wo_objects_soviet)>0:
+                b=random.randint(0,len(self.wo_objects_soviet)-1)
+                self.player=self.wo_objects_soviet[b]
+                spawned=True
+        elif FACTION=='american':
+            if len(self.wo_objects_american)>0:
+                b=random.randint(0,len(self.wo_objects_american)-1)
+                self.player=self.wo_objects_american[b]
+                spawned=True
+        elif FACTION=='civilian':
+            if len(self.wo_objects_civilian)>0:
+                b=random.randint(0,len(self.wo_objects_civilian)-1)
+                self.player=self.wo_objects_civilian[b]
+                spawned=True
+
+        if spawned:
+            self.player.is_player=True
+            print('You are now '+self.player.name)
+        else:
+            print('ERROR : player spawn failed')
+
 
     #---------------------------------------------------------------------------
     def toggle_map(self):

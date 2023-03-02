@@ -71,7 +71,17 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 				break
 	return collided
 
-
+#-----------------------------------------------------------------------------
+def collision_sort(RUNS,WO_OBJECTS):
+	''' moves around objects so they no longer collide'''
+	# RUNS - number of runs through the resort algo you want to do. probably >100
+	# WO_OBJECTS - list of objects to sort
+	for x in range(RUNS):
+		for a in WO_OBJECTS:
+			if checkCollisionCircleOneResult(a,WO_OBJECTS,[a]) !=None:
+                #collided. lets move the building in a super intelligent way
+				a.world_coords[0]+=float(random.randint(-100,100))
+				a.world_coords[1]+=float(random.randint(-100,100))
 
 # #------------------------------------------------------------------------------
 # def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
@@ -98,6 +108,26 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 # 							collided=b
 # 							break
 # 	return collided
+
+
+#------------------------------------------------------------------------------
+def get_optimal_column_count(AMOUNT):
+	'''calculates an optimal column count that balances columns and rows'''
+
+	run=True
+	columns=10
+	while run :
+		rows=AMOUNT/columns
+		if rows>(columns+1):
+			columns+=1
+		elif rows<(columns-1):
+			columns-=1
+		else:
+			break
+	return columns
+		
+
+
 
 #------------------------------------------------------------------------------
 def get_vector_length(vec2):
@@ -162,16 +192,6 @@ def moveTowardsTarget(speed,location,destination, time_passed):
 	return [location[0]+change[0],location[1]+change[1]]
 
 
-#-----------------------------------------------------------------------------
-def collision_sort(RUNS,WO_OBJECTS):
-	''' moves around objects so they no longer collide'''
-	# RUNS - number of runs through the resort algo you want to do. probably >100
-	# WO_OBJECTS - list of objects to sort
-	for x in range(RUNS):
-		for a in WO_OBJECTS:
-			if checkCollisionCircleOneResult(a,WO_OBJECTS,[a]) !=None:
-                #collided. lets move the building in a super intelligent way
-				a.world_coords[0]+=float(random.randint(-50,50))
-				a.world_coords[1]+=float(random.randint(-50,50))
+
 
 

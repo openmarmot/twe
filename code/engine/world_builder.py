@@ -54,14 +54,28 @@ module_version='0.0' #module software version
 module_last_update_date='August 15 2022' #date of last update
 
 #global variables
+
+# ------ object rarity lists -----------------------------------
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
-
-
+list_consumables_common=['green_apple','potato','turnip']
+list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine']
+list_consumables_ultra_rare=['schokakola']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
+list_guns_common=['kar98k','mosin_nagant','ppsh43']
+list_guns_rare=['mp40','ppk','tt33']
+list_guns_ultra_rare=['stg44','mg34','dp28','1911']
 
+list_medical=['bandage','german_officer_first_aid_kit']
+list_medical_common=['bandage']
+list_medical_rare=['german_officer_first_aid_kit']
+list_medical_ultra_rare=[]
+#----------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 def add_standard_squad(WORLD,SQUAD_TYPE):
+    ''' adds a standardized squad to a factions spawn queue '''
     s=AISquad(WORLD)
     if SQUAD_TYPE=='soviet 1943 rifle':
         s.faction='soviet'
@@ -75,7 +89,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='soviet 1944 rifle':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -88,7 +102,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -101,7 +115,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
         s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
-        WORLD.soviet_ai.squads.append(s)
+        WORLD.soviet_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 rifle':
         s.faction='german'
         s.members.append(spawn_soldiers(WORLD,'german_mp40'))
@@ -113,7 +127,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier fire group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
@@ -125,7 +139,7 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer 
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
     elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
@@ -137,16 +151,14 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        WORLD.german_ai.squads.append(s)
+        WORLD.german_ai.squad_spawn_queue.append(s)
         
         
 
-
-
-
-''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
-# automatically adds the created squads to the correct faction tactical AI
+#------------------------------------------------------------------------------
 def create_squads_from_human_list(WORLD,HUMANS,FACTION):
+    ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+    # automatically adds the created squads to the correct faction tactical AI
     assault_rifles=[]
     rifles=[]
     semiauto_rifles=[]
@@ -294,16 +306,63 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
             squad_list.append(s)
 
     if FACTION=='civilian':
-        WORLD.civilian_ai.squads+=squad_list
+        WORLD.civilian_ai.squad_spawn_queue+=squad_list
     elif FACTION=='german':
-        WORLD.german_ai.squads+=squad_list
+        WORLD.german_ai.squad_spawn_queue+=squad_list
     elif FACTION=='soviet':
-        WORLD.soviet_ai.squads+=squad_list
+        WORLD.soviet_ai.squad_spawn_queue+=squad_list
     elif FACTION=='american':
-        WORLD.american_ai.squads+=squad_list
+        WORLD.american_ai.squad_spawn_queue+=squad_list
     else:
         print('ERROR ! : Faction not recognized in world_builder.create_squad()')
             
+
+#------------------------------------------------------------------------------
+def generate_clutter(WORLD):
+    '''generates and auto places small objects around the map'''
+    # this should be called after buildings are placed
+
+    # chance of crate by a building
+    # need to smart position this in the future
+    for b in WORLD.wo_objects_building:
+        # add a random amount of civilians
+        chance=random.randint(0,6)
+        coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+        if chance==0 or chance==1:
+            spawn_crate(WORLD,coords,'random_consumables_common')
+        elif chance==2:
+            spawn_crate(WORLD,coords,'random_consumables_rare')
+        elif chance==3:
+            spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
+
+
+
+
+
+#------------------------------------------------------------------------------
+def generate_civilians_and_civilan_spawns(WORLD):
+    '''generates civilans and civilan spawn points'''
+    # this should be called after buildings are placed
+
+    for b in WORLD.wo_objects_building:
+        # add a random amount of civilians
+        amount=random.randint(0,3)
+        if amount>0:
+            s=AISquad(WORLD)
+            s.faction='civilian'
+            for c in range(amount):
+                s.members.append(spawn_civilians(WORLD,'default'))
+            WORLD.civilian_ai.squad_spawn_queue.append(s)
+
+        # add the spawn point
+        WORLD.civilian_ai.spawn_points.append(b.world_coords)
+
+    # special case if there are no buildings
+    if len(WORLD.wo_objects_building)==0:
+        print('WARN : No buildings, default civilian spawn added')
+        WORLD.civilian_ai.spawn_points.append([0,0])
+
+
 
 #------------------------------------------------------------------------------
 def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
@@ -312,22 +371,34 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     group=[]
     if TYPE=='town':
         count=random.randint(1,5)
-        for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            group.append(spawn_object(WORLD,coords,'warehouse',True))
+        grid_spawn(WORLD,WORLD_COORDS,'warehouse',1150,count)
+        # for x in range(count):
+        #     coords=[WORLD_COORDS[0]+float(random.randint(-500,500)),WORLD_COORDS[1]+float(random.randint(-500,500))]
+        #     group.append(spawn_object(WORLD,coords,'warehouse',True))
         count=random.randint(2,15)
-        for x in range(count):
-            coords=[WORLD_COORDS[0]+float(random.randint(-200,200)),WORLD_COORDS[1]+float(random.randint(-200,200))]
-            group.append(spawn_object(WORLD,coords,'square_building',True))
-    
-    # do some sorting 
-    engine.math_2d.collision_sort(600,group)
+        grid_spawn(WORLD,WORLD_COORDS,'square_building',250,count)
+        # for x in range(count):
+        #     coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
+        #     group.append(spawn_object(WORLD,coords,'square_building',True))
+        # engine.math_2d.collision_sort(500,group)
+    elif TYPE=='fuel_dump':
+        count=random.randint(11,157)
+        grid_spawn(WORLD,WORLD_COORDS,'55_gallon_drum',20,count)
+    elif TYPE=='german_ammo_dump':
+        count=random.randint(11,45)
+        grid_spawn(WORLD,WORLD_COORDS,'german_mg_ammo_can',30,count)
+    elif TYPE=='german_fuel_can_dump':
+        count=random.randint(21,75)
+        grid_spawn(WORLD,WORLD_COORDS,'german_fuel_can',20,count)
+
+
 
 
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
     w.world_coords=copy.copy(WORLD_COORDS)
     w.name=NAME
+    w.type=TYPE
 
     # register with world 
     WORLD.world_areas.append(w)
@@ -341,6 +412,22 @@ def get_random_from_list(WORLD,WORLD_COORDS,OBJECT_LIST,SPAWN):
     index=random.randint(0,len(OBJECT_LIST)-1)
     return spawn_object(WORLD,WORLD_COORDS,OBJECT_LIST[index],SPAWN)
 
+
+
+#------------------------------------------------------------------------------
+def grid_spawn(WORLD,WORLD_COORDS,OBJECT_STRING,DIAMETER,COUNT):
+    ''' spawn in a grid pattern '''
+    last_coord=WORLD_COORDS
+    # this needs to be better
+    column_max=engine.math_2d.get_optimal_column_count(COUNT)*DIAMETER
+
+    for x in range(COUNT):
+        
+        if last_coord[0]>WORLD_COORDS[0]+column_max:
+            last_coord[0]=WORLD_COORDS[0]
+            last_coord[1]+=DIAMETER
+        last_coord=[last_coord[0]+DIAMETER,last_coord[1]+0]
+        spawn_object(WORLD,last_coord,OBJECT_STRING,True)
 
 #------------------------------------------------------------------------------
 def initialize_world(SCREEN_SIZE):
@@ -411,6 +498,7 @@ def load_images(world):
     world.graphic_engine.loadImage('crate','images/containers/crate.png')
     world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
     world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
+    world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -443,12 +531,42 @@ def load_images(world):
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
+    # setup spawn points 
+    world.soviet_ai.spawn_points.append(world.spawn_east)
+    world.american_ai.spawn_points.append(world.spawn_north)
+    world.german_ai.spawn_points.append(world.spawn_west) 
+    # civilian spawn points are generated 
 
-    # add a couple weapons 
-    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-200,1200))],'mp40',True)
-    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-200,1200)),float(random.randint(-1200,200))],'panzerfaust',True)
-    spawn_object(world,[float(random.randint(-1200,200)),float(random.randint(-1200,1200))],'model24',True)
+    # add some world areas
+    generate_world_area(world,[-2000,2000],'town','Alfa')
+    generate_world_area(world,[2000,-2000],'town','Bravo')
+    generate_world_area(world,[2000,2000],'town','Charlie')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_ammo_dump','german ammo dump')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_fuel_can_dump','german fuel dump')
+
+    # generate clutter after world areas are created
+    generate_clutter(world)
+
+    # generate civilians and civilan spawns
+    generate_civilians_and_civilan_spawns(world)
+
+    # add germans
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 rifle')
+    add_standard_squad(world,'german 1944 volksgrenadier fire group')
+
+    # add soviets
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1943 rifle')
+
+    #---------misc stuff that should probably be auto generated ---------
+
+    #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
+
+    
 
 
     # add ju88
@@ -459,116 +577,25 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
 
 
-    # add warehouse
-    #spawn_warehouse(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))])
+    
 
-    #cheese 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'karwendel-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'adler-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'camembert-cheese',True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-1500,1500))],'champignon-cheese',True)
-
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'green_apple',True)
-
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'potato',True)
-
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'turnip',True)
-
-    #wine 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'wine',True)
-
-
-    # spawn some ammo cans 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_mg_ammo_can",True)
-
-    # spawn some fuel cans
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True) 
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],"german_fuel_can",True)
-
+    
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
-
-    # add ze germans
-
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 rifle')
-    add_standard_squad(world,'german 1944 volksgrenadier fire group')
-
-    # add ze russians
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
-
-
-    # add civilians
-    s=[]
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'default'))
-    s.append(spawn_civilians(world,'pistol'))
-    s.append(spawn_civilians(world,'pistol'))
-    s.append(spawn_civilians(world,'big_cheese'))
-
-
-    # create civilian squads 
-    create_squads_from_human_list(world,s,'civilian')
 
     # spawn
     # locations will eventually be determined by map control
 
-    spawn_object(world,world.spawn_west,'panzerfaust',True)
-    spawn_object(world,world.spawn_west,'panzerfaust',True)
+    #spawn_object(world,world.spawn_west,'panzerfaust',True)
+    #spawn_object(world,world.spawn_west,'panzerfaust',True)
 
-    # setup spawn points 
-    world.german_ai.spawn_point=world.spawn_west
-    world.soviet_ai.spawn_point=world.spawn_east
-    world.american_ai.spawn_point=world.spawn_north
-    world.civilian_ai.spawn_point=world.spawn_center    
+      
 
-    world.german_ai.spawn_all()
-    world.soviet_ai.spawn_all()
-    world.american_ai.spawn_all()
-    world.civilian_ai.spawn_all()
-
-    # add some world areas
-    generate_world_area(world,[-2000,2000],'town','Alfa')
-    generate_world_area(world,[2000,-2000],'town','Bravo')
-    generate_world_area(world,[2000,2000],'town','Charlie')
-
-   # generate_world_area(world,[0,0],'town','Danitza')
 
 #------------------------------------------------------------------------------
 def spawn_civilians(WORLD,CIVILIAN_TYPE):
@@ -640,6 +667,21 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=="random_consumables_common":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+    elif CRATE_TYPE=="random_consumables_rare":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_rare,False))
+    elif CRATE_TYPE=="random_consumables_ultra_rare":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_ultra_rare,False))
     elif CRATE_TYPE=="random_guns":
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
@@ -816,6 +858,21 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='55_gallon_drum':
+        z=WorldObject(WORLD,['55_gallon_drum'],AILiquidContainer)
+        z.is_liquid_container=True
+        z.ai.total_volume=208
+        z.ai.used_volume=208
+        z.ai.liquid_type='gas'
+        z.ai.health_effect=-150
+        z.ai.hunger_effect=100
+        z.ai.thirst_effect=100
+        z.ai.fatigue_effect=500  
+        z.render_level=2
+        z.name='55_gallon_drum'
+        z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
 
 
