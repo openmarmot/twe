@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 
+----------------------------------
+March 01 2023
+- bumped up spacing on ammo dump grid spawn to try and fix sprites 
+- added a couple new crate types to take advantage of the 
+consumable rarity list
+- adjusted crate spawning to use the new crate types 
+
+noticed that the german mg ammo can looks clipped rotated in 
+the grid spawn. i think this is the square edge of a rotated 
+image overlapping another image. it seems like in this case 
+the transparency does not work as expected and what is 
+under the overlapping image blocks the other image. 
+
+
 
 ----------------------------------
 Feb 27 2023

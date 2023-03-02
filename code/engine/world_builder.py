@@ -322,14 +322,18 @@ def generate_clutter(WORLD):
     '''generates and auto places small objects around the map'''
     # this should be called after buildings are placed
 
-    # 1/5 chance of crate by a building
+    # chance of crate by a building
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
         # add a random amount of civilians
-        chance=random.randint(0,4)
+        chance=random.randint(0,6)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-        if chance==2:
-            spawn_crate(WORLD,coords,'random_consumables')
+        if chance==0 or chance==1:
+            spawn_crate(WORLD,coords,'random_consumables_common')
+        elif chance==2:
+            spawn_crate(WORLD,coords,'random_consumables_rare')
+        elif chance==3:
+            spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
 
 
 
@@ -382,7 +386,7 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
         grid_spawn(WORLD,WORLD_COORDS,'55_gallon_drum',20,count)
     elif TYPE=='german_ammo_dump':
         count=random.randint(11,45)
-        grid_spawn(WORLD,WORLD_COORDS,'german_mg_ammo_can',20,count)
+        grid_spawn(WORLD,WORLD_COORDS,'german_mg_ammo_can',30,count)
     elif TYPE=='german_fuel_can_dump':
         count=random.randint(21,75)
         grid_spawn(WORLD,WORLD_COORDS,'german_fuel_can',20,count)
@@ -577,18 +581,18 @@ def load_test_environment(world):
 
     
     # spawn some crates
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
-    spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
+    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
 
 
     # spawn
     # locations will eventually be determined by map control
 
-    spawn_object(world,world.spawn_west,'panzerfaust',True)
-    spawn_object(world,world.spawn_west,'panzerfaust',True)
+    #spawn_object(world,world.spawn_west,'panzerfaust',True)
+    #spawn_object(world,world.spawn_west,'panzerfaust',True)
 
       
 
@@ -663,6 +667,21 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+    elif CRATE_TYPE=="random_consumables_common":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+    elif CRATE_TYPE=="random_consumables_rare":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_rare,False))
+    elif CRATE_TYPE=="random_consumables_ultra_rare":
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_ultra_rare,False))
     elif CRATE_TYPE=="random_guns":
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
         z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_guns,False))
