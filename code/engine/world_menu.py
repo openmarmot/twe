@@ -95,7 +95,7 @@ class World_Menu(object):
             elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
                 self.active_menu='gun'
                 self.gun_menu(None)
-            elif SELECTED_OBJECT.is_container:
+            elif SELECTED_OBJECT.is_object_container:
                 self.active_menu='storage'
                 self.storage_menu(None)
             elif SELECTED_OBJECT.is_human:

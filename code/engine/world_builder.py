@@ -638,7 +638,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
 # currently used to create 'wrecked' vehicles. could use a better name
 def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     z=WorldObject(WORLD,[IMAGE],AIContainer)
-    z.is_container=True
+    z.is_object_container=True
     z.render_level=2
     z.name=NAME
     z.world_coords=WORLD_COORDS
@@ -651,7 +651,7 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
 def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
     ''' generates different crate types with contents'''
     z=WorldObject(WORLD,['crate'],AIContainer)
-    z.is_container=True
+    z.is_object_container=True
     z.render_level=2
     z.name='crate'
     z.world_builder_identity='crate'
@@ -845,7 +845,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_fuel_can':
         z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
-        z.is_container=False # going to be something special
+        z.is_object_container=False # going to be something special
         z.is_liquid_container=True
         z.is_large_human_pickup=True
         z.ai.total_volume=20
@@ -878,7 +878,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
-        z.is_container=False # going to be something special
+        z.is_object_container=False # going to be something special
         z.is_ammo_container=True
         z.is_large_human_pickup=True
         z.render_level=2

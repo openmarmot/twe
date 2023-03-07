@@ -2,6 +2,33 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 06 2023
+- redefining types of container 
+    - renamed is_container to is_object_container
+    - added world lists for liquid,ammo,object containers
+- world.get_closest_ammo_source update 
+    - now it is aware of ammo cans and prioritizes them
+    - options are 1. ammo can, 2. team mate 
+    - fall back choice is get_closest_gun 
+    - building removed from choices 
+
+need to add some ai code to inspect the object when 
+it travels for getting ammo and treat if different 
+if its a soldier/ammo can / gun / ??
+
+realized the tactical ai is more screwed up than usual as 
+i added some new world areas and it doesn't have enough 
+squads to defend them all. I need to add in a concept of major/
+minor victory location priority 
+
+need to think more about ammo resupply mechanics 
+- should ammo cans supply any ammo, or only a specific ammo 
+- how do we keep track of what ammo is good for each gun 
+
+- I need to remove the kubelwagen from the factory inside image 
+    - it is confusing now that you can interact with kubelwagens 
+
+----------------------------------
 March 01 2023
 - bumped up spacing on ammo dump grid spawn to try and fix sprites 
 - added a couple new crate types to take advantage of the 
@@ -13,8 +40,6 @@ the grid spawn. i think this is the square edge of a rotated
 image overlapping another image. it seems like in this case 
 the transparency does not work as expected and what is 
 under the overlapping image blocks the other image. 
-
-
 
 ----------------------------------
 Feb 27 2023
