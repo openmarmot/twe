@@ -875,10 +875,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
 
-
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
-        z.is_object_container=False # going to be something special
         z.is_ammo_container=True
         z.is_large_human_pickup=True
         z.render_level=2

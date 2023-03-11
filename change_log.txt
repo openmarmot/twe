@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+March 10 2023
+-added 'take_action_*' functions to ai_human to 
+combine code for common actions 
+- rewrote logic around getting a gun 
+
+the fail safes in think_move that prevent movement 
+when the ai has personal enemies may be a mistake 
+- might be preventing the ai from getting a gun or 
+running away 
+- added a print statement to check how often this 
+happens 
+
+in my play testing i found a mob of civilians 
+following my kubelwagen around, no doubt intending 
+to steal it. I wonder where they were all going..
+they still can't drive (need to look into that)
+
+I also remembered that firing from a vehicle 
+needs to be re-implemented 
+
 ----------------------------------
 March 06 2023
 - redefining types of container 
