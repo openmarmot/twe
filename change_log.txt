@@ -3,6 +3,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 12 2023
+- small rewrite of the crate code 
+    - actual crate spawn now under spawn_object
+- added german_drop_canister
+    - modelled after a fallshirmjager parachute drop 
+    supply canister 
+- removed kubelwagen image from the inside of the 
+warehouse building. it was confusing because you 
+couldn't interact with it. 
+
+
+I think the supply canister came out pretty good, although 
+the spent parachute could use a rework. I think in the future 
+I might make this a two stage object with the first stage 
+being it coming down on the parachute 
+
+
+----------------------------------
 March 10 2023
 -added 'take_action_*' functions to ai_human to 
 combine code for common actions 

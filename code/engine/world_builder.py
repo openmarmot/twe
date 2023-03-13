@@ -66,6 +66,7 @@ list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911',
 list_guns_common=['kar98k','mosin_nagant','ppsh43']
 list_guns_rare=['mp40','ppk','tt33']
 list_guns_ultra_rare=['stg44','mg34','dp28','1911']
+list_german_guns=['kar98k','stg44','mp40','mg34','ppk']
 
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
@@ -499,6 +500,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
     world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
     world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
+    world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -566,7 +568,7 @@ def load_test_environment(world):
 
     #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
 
-    
+    spawn_drop_canister(world,[float(random.randint(-1500,1500)),float(random.randint(-2500,2500))],'mixed_supply')
 
 
     # add ju88
@@ -637,6 +639,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
 #------------------------------------------------------------------------------
 # currently used to create 'wrecked' vehicles. could use a better name
 def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
+    '''spawns a custom container'''
     z=WorldObject(WORLD,[IMAGE],AIContainer)
     z.is_object_container=True
     z.render_level=2
@@ -650,12 +653,9 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
 #------------------------------------------------------------------------------
 def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
     ''' generates different crate types with contents'''
-    z=WorldObject(WORLD,['crate'],AIContainer)
-    z.is_object_container=True
-    z.render_level=2
-    z.name='crate'
-    z.world_builder_identity='crate'
-    z.rotation_angle=float(random.randint(0,359))
+
+    z=spawn_object(WORLD,WORLD_COORDS,'crate',True)
+
 
     if CRATE_TYPE=='mp40':
         z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'mp40',False))
@@ -698,14 +698,25 @@ def spawn_crate(WORLD,WORLD_COORDS,CRATE_TYPE):
         for x in range(amount):
              z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,list_guns[index],False))
 
-    z.world_builder_identity='crate'
-    # set world coords if they weren't already set
-    if z.world_coords==None:
-        z.world_coords=copy.copy(WORLD_COORDS)
+#------------------------------------------------------------------------------
+def spawn_drop_canister(WORLD,WORLD_COORDS,CRATE_TYPE):
+    ''' generates different crate types with contents'''
 
-    z.wo_start()     
+    z=spawn_object(WORLD,WORLD_COORDS,'german_drop_canister',True)
 
 
+    if CRATE_TYPE=='mixed_supply':
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_german_guns,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_german_guns,False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(WORLD,WORLD_COORDS,'panzerfaust',False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables_common,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+
+
+  
 #------------------------------------------------------------------------------
 def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     '''returns new object. optionally spawns it in the world'''
@@ -882,6 +893,24 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german_mg_ammo_can'
         z.world_builder_identity='german_mg_ammo_can'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='german_drop_canister':
+        z=WorldObject(WORLD,['german_drop_canister'],AIContainer)
+        z.is_object_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='german drop canister'
+        z.world_builder_identity='german_drop_canister'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='crate':
+        z=WorldObject(WORLD,['crate'],AIContainer)
+        z.is_object_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='crate'
+        z.world_builder_identity='crate'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':
