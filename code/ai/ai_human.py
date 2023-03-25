@@ -706,6 +706,7 @@ class AIHuman(AIBase):
 
     #-----------------------------------------------------------------------
     def take_action_pickup_object(self,WORLD_OBJECT):
+        '''move to and pick up an object'''
         self.target_object=WORLD_OBJECT
         self.ai_goal='pickup'
         self.destination=self.target_object.world_coords
@@ -756,6 +757,8 @@ class AIHuman(AIBase):
 
         # basically if the ai_state doesn't change we will keep firing the next action cycle
 
+
+    #-----------------------------------------------------------------------
     def think_engage_close(self, DISTANCE):
         ''' engagements <301'''
         # if the ai_state isn't changed the gun will be fired on the next action cycle
@@ -953,6 +956,8 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def think_idle(self):
         ''' think about low priority actions to do '''
+
+        # should add some seperate things for civilian and military 
         # no enemies
         # health is fine
         # close to group

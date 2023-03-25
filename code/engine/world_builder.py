@@ -450,11 +450,21 @@ def load_images(world):
     # people
     world.graphic_engine.loadImage('man','images/humans/man.png')
     world.graphic_engine.loadImage('german_soldier','images/humans/german_soldier.png')
+    world.graphic_engine.loadImage('german_soldier_prone','images/humans/german_soldier_prone.png')
+    world.graphic_engine.loadImage('german_dead','images/humans/german_dead.png')
+
     world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
+    
     world.graphic_engine.loadImage('soviet_soldier','images/humans/russian_soldier.png')
+    world.graphic_engine.loadImage('soviet_soldier_prone','images/humans/russian_soldier_prone.png')
+    world.graphic_engine.loadImage('soviet_dead','images/humans/russian_dead.png')
+    
     # not used at the moment
     world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
+    
     world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
+    world.graphic_engine.loadImage('civilian_man_prone','images/humans/civilian_man_prone.png')
+    world.graphic_engine.loadImage('civilian_dead','images/humans/civilian_dead.png')
 
     # guns
     world.graphic_engine.loadImage('1911','images/weapons/1911.png')
