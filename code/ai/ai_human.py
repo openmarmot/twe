@@ -348,9 +348,15 @@ class AIHuman(AIBase):
         print(dm)
 
         # drop inventory 
-        for b in self.inventory:
-            b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-            self.owner.world.add_object(b)
+        #for b in self.inventory:
+         #   b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+         #   self.owner.world.add_object(b)
+
+        # drop primary weapon 
+        if self.primary_weapon!=None:
+            self.inventory.remove(self.primary_weapon)
+            self.primary_weapon.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
+            self.owner.world.add_object(self.primary_weapon)
 
         # remove from squad 
         if self.squad != None:
@@ -363,6 +369,11 @@ class AIHuman(AIBase):
                 print('Squad list')
                 for b in self.squad.members:
                     print(b.name)
+
+        
+
+        # spawn body
+        engine.world_builder.spawn_container('body',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
 
         self.owner.world.remove_object(self.owner)
 

@@ -38,6 +38,12 @@ https://pygame.readthedocs.io/en/latest/4_text/text.html
     - small items will be too small to render. will not exist in world map,
         only exist in inventories. 
         example : gun magazines.
+
+- on naming the sides.. -
+In world war 2 were soldiers from the soviet union referred to as russians or soviets?
+The Soviet Union was a multi-ethnic state, and its armed forces included both Russian
+ and other nationalities. So during World War II they would have been known collectively
+  as "Soviet" rather than just “Russian”.
         
 
 -- python profiling ------------------------------

@@ -16,9 +16,7 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='July 09 2021' #date of last update
+
 
 #global variables
 

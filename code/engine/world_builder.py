@@ -463,7 +463,7 @@ def load_images(world):
     world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
     
     world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
-    world.graphic_engine.loadImage('civilian_man_prone','images/humans/civilian_man_prone.png')
+    world.graphic_engine.loadImage('civilian_prone','images/humans/civilian_prone.png')
     world.graphic_engine.loadImage('civilian_dead','images/humans/civilian_dead.png')
 
     # guns
@@ -647,16 +647,17 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         return z
 
 #------------------------------------------------------------------------------
-# currently used to create 'wrecked' vehicles. could use a better name
+# currently used for wrecks and bodies
 def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     '''spawns a custom container'''
+
     z=WorldObject(WORLD,[IMAGE],AIContainer)
     z.is_object_container=True
     z.render_level=2
     z.name=NAME
     z.world_coords=WORLD_COORDS
     z.rotation_angle=ROTATION_ANGLE
-    z.inventory=INVENTORY
+    z.ai.inventory=INVENTORY
     z.world_builder_identity='skip'
     z.wo_start()
 
@@ -1130,9 +1131,10 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
 
-    # probably remove this in the future. should spawn a specific soldier or civie instead
+    # this is only used briefly until the player picks a spawn type
+    # this is required because a lot of stuff in the game references the player object.
     elif OBJECT_TYPE=='player':
-        z=WorldObject(WORLD,['man'],AIHuman)
+        z=WorldObject(WORLD,['man','civilian_prone','civilian_dead'],AIHuman)
         z.name='player'
         z.ai.speed=50.
         z.is_player=True
@@ -1141,7 +1143,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         WORLD.player=z
 
     elif OBJECT_TYPE=='civilian_man':
-        z=WorldObject(WORLD,['civilian_man'],AIHuman)
+        z=WorldObject(WORLD,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
         z.name='Reginald Thimblebottom'
         z.ai.speed=float(random.randint(10,25))
         z.render_level=3
@@ -1150,7 +1152,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_civilian=True
 
     elif OBJECT_TYPE=='german_soldier':
-        z=WorldObject(WORLD,['german_soldier'],AIHuman)
+        z=WorldObject(WORLD,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
         z.name='Klaus Hammer'
         z.ai.speed=float(random.randint(20,25))
         z.render_level=3
@@ -1160,7 +1162,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_german=True
 
     elif OBJECT_TYPE=='soviet_soldier':
-        z=WorldObject(WORLD,['soviet_soldier'],AIHuman)
+        z=WorldObject(WORLD,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
         z.name='Boris Volvakov'
         z.ai.speed=float(random.randint(20,25))
         z.render_level=3

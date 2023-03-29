@@ -1,6 +1,50 @@
 TWE Project : Change Log
 
+----------------------------------
+March 28 2023
+- bodies are integrated and used.
+    - weapons will still drop 
+    - everything else is in the body 'container'
+- prone art is integrated but not used yet 
+- fixed container inventory spawning (wrecks and bodies)
 
+uncovered a selection order issue where bodies are 
+covering anything you remove from them. need to make 
+containers a lower priority than everything else. 
+
+might just change remove to put the object in your inventory 
+and add another menu option for drop 
+
+bodies are kind of horrifying but they make the fights 
+seem a lot more serious. pretty happy with the artwork. 
+maybe a little big but .. shrugs.
+
+now that you can actually see where people died its kinda 
+crazy how many civies can get caught in the cross fire.
+
+new brown civilian clothes look great. that yellow was 
+awful.
+
+asked alpaca about the russian/soviet question.
+Q: In world war 2 were soldiers from the soviet union referred
+ to as russians or soviets?
+A: The Soviet Union was a multi-ethnic state, and its 
+armed forces included both Russian and other nationalities.
+So during World War II they would have been known 
+collectively as "Soviet" rather than just “Russian”.
+
+
+need to figure out what happens to the player object 
+after the player picks a spawn type 
+
+----------------------------------
+March 25 2023
+- added art for prone humans 
+- added art for dead humans 
+- civilian clothes got switched to a tan jumpsuit
+
+not sure if ww2 russians should be referred to as soviet 
+or russian. going to need to pick one as its getting confusing
 
 ----------------------------------
 March 12 2023
