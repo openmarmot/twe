@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 05 2023
+- working on adding ai code for container looting 
+- adding some ai_want_[thing] parameter to help retain mind state 
+- temporarily removed ai action to pickup food off ground 
+- temporarily removed ai action to pickup medical off ground 
+- centralized panic code and added more triggers 
+
+!! note - code is unfinished and probably not working with this commit 
+
+note that when the ai eats something the implication is that it 
+is from inventory, but obj menu allows you to eat something from 
+the world - therefore you get a warning text. this needs to be 
+fixed probably by an overhaul of the menu system so you can 
+eat an object from your inventory w/o dropping it first.
+
+----------------------------------
 March 28 2023
 - bodies are integrated and used.
     - weapons will still drop 
