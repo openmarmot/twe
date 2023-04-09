@@ -87,7 +87,7 @@ class AIGun(AIBase):
     #---------------------------------------------------------------------------
     def change_magazine(self):
         ''' change magazine. input is new magazine. output is old magazine'''
-        pass
+        print('error: ai_gun change_magazine is not implemented')
 
     #---------------------------------------------------------------------------
     def fire(self,WORLD_COORDS,TARGET_COORDS):
@@ -128,6 +128,11 @@ class AIGun(AIBase):
     def get_ammo_count(self):
         ''' get ammo count. should return int'''
         return self.magazine + (self.mag_capacity*self.magazine_count)      
+
+#---------------------------------------------------------------------------
+    def get_max_ammo_count(self):
+        ''' get max ammo count. should return int'''
+        return self.mag_capacity*self.max_magazines     
 
 
     #---------------------------------------------------------------------------

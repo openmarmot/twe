@@ -1,5 +1,47 @@
 TWE Project : Change Log
 
+
+----------------------------------
+April 07 2023
+- more ai_human refactor 
+- added back in food pickup 
+- added back in medical pickup 
+- updated grenade pickup code 
+- updated antitank pickup code 
+- rewrote ammo pickup code 
+- added ammo top off option when ammo is low 
+- finished container looting code 
+- caught and added code to handle error situation
+     where ai target is set to None but it is 
+     trying to move towards it. need to fine 
+     how it got into this state. 
+- added gameplay_instructions
+
+I had to look at ai_gun to do some ammo stuff and i'm not super 
+happy with the state of things. I am leaning towards thinking that 
+guns need to be overhauled and magazines need to actual wo_objects 
+
+the ai soft cheats on ammo in that it can refill ammo by going to a 
+squad mate or a ammo_can without actually removing any ammo from the object. 
+this may be changed once ammo is simulated in more detail 
+
+with the current engagement sizes and current gun code I don't think 
+ammo consumption has been a huge deal except for pistols (which by design are low ammo)
+
+-- 
+playtesting 
+watched an engagement. soviets were doing well for once. 
+
+all of a sudden a bot said it was going to 'check that body' .. !!
+I forgot that bodies are classified as object containers, so bots 
+will loot bodies with the new code. its a bit alarming but i'll 
+keep it in.
+
+the civ bots especially are really enthusiastic looters because 
+they don't tend to have anything better to do. this means a lot 
+of containers will end up stripped if you don't get there first.
+--
+
 ----------------------------------
 April 05 2023
 - working on adding ai code for container looting 
