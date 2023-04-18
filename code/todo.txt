@@ -8,8 +8,15 @@
 
 - need terrain tiling engine 
 
+
 ======== Tactical Mode Stuff =============================
 
+# ai behavior to add or fix 
+- driving vehicles 
+
+# items 
+- bicycle 
+- seats 
 
 
 

@@ -29,6 +29,7 @@ import copy
 #import custom packages
 from engine.world import World
 import engine.math_2d
+import engine.name_gen
 
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
@@ -1144,7 +1145,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
-        z.name='Reginald Thimblebottom'
+        z.name=engine.name_gen.generate('civilian')
         z.ai.speed=float(random.randint(10,25))
         z.render_level=3
         z.collision_radius=10
@@ -1153,7 +1154,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
-        z.name='Klaus Hammer'
+        z.name=engine.name_gen.generate('german')
         z.ai.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10
@@ -1163,7 +1164,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
-        z.name='Boris Volvakov'
+        z.name=engine.name_gen.generate('soviet')
         z.ai.speed=float(random.randint(20,25))
         z.render_level=3
         z.collision_radius=10

@@ -458,7 +458,7 @@ class AIHuman(AIBase):
         VEHICLE.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
         if self.vehicle.ai.driver==self.owner:
-            self.vehicle.ai.drive=None
+            self.vehicle.ai.driver=None
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
@@ -1171,20 +1171,21 @@ class AIHuman(AIBase):
                 self.handle_exit_vehicle(self.vehicle)
                 action=True
                 # should probably let everyone else know as well
+        else:
+            print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
 
-        # should check if our current vehicle seating assigment still makes sense
-        #  are we the driver, is there no driver? etc
 
         # basically if we haven't bailed out yet..
         if action==False:
 
-            if self.ai_state=='vehicle_drive':
+            if self.vehicle.ai.driver==None:
+                self.vehicle.ai.driver=self.owner
+
+            if self.vehicle.ai.driver==self.owner:
                 self.think_vehicle_drive()
                 action=True
-            elif self.vehicle.ai.driver==self.owner:
-                # if we are staying in the vehicle AND we are the driver, make steering corrections
-                self.ai_state='vehicle_drive'
-                action=True
+
+            # otherwise if we aren't driving, do we need to do something?
 
     #-----------------------------------------------------------------------
     def think_loot_container(self,CONTAINER):
@@ -1428,11 +1429,13 @@ class AIHuman(AIBase):
         v = self.vehicle.rotation_angle
 
         if r>v:
-            self.vehicle.rotation_angle+=1*time_passed
-            self.vehicle.reset_image=True
+            #self.vehicle.rotation_angle+=1*time_passed
+            #self.vehicle.reset_image=True
+            self.vehicle.ai.handle_steer_left()
         if r<v:
-            self.vehicle.rotation_angle-=1*time_passed
-            self.vehicle.reset_image=True
+            #self.vehicle.rotation_angle-=1*time_passed
+            #self.vehicle.reset_image=True
+            self.vehicle.ai.handle_steer_right()
         
         # if its close just set it equal
         if r>v-5 and r<v+5:

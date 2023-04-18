@@ -555,6 +555,24 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('3 - storage ')
             if fuel_option:
                 self.world.graphic_engine.menu_text_queue.append('4 - fuel ')
+
+            # -- add debug info --
+            if self.world.debug_mode==True:
+                self.world.graphic_engine.menu_text_queue.append('--debug info --')
+                self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+                self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
+                self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
+                self.world.graphic_engine.menu_text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
+                self.world.graphic_engine.menu_text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
+                self.world.graphic_engine.menu_text_queue.append('vehicle speed: '+str(self.selected_object.ai.vehicle_speed))
+                self.world.graphic_engine.menu_text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
+                self.world.graphic_engine.menu_text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
+                if self.selected_object.ai.driver==None:
+                    self.world.graphic_engine.menu_text_queue.append('driver: None')
+                else:
+                    self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
+
             if Key=='1':
                 pass
             if Key=='2':
@@ -585,4 +603,8 @@ class World_Menu(object):
                 self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
+
+
+
+        # --
 

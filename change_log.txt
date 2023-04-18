@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+April 17 2023
+- added debug info to the vehicle menu (turn on debug mode first)
+- added a very simple name generator 
+    - civilians are now polish for no reason 
+- rewrote ai_human bot vehicle ai a bit 
+- fixed a bug where vehicles would not move until you turn the steering wheel
+    - this was amusingly working as theft protection against bots 
+
+
+in the future civilian names could be chosen based on whether the map 
+area is in germany/poland/soviet area/etc/etc
+
+ai now has some ability to use vehicles again (its been awhile)
+initial playtesting suggests that ai vehicle handling is worse than it used to be. 
+the ai tends to circle with the vehicles. I think this is a function of the 
+distance at which the ai would exit the vehicle being less than the vehicle's 
+turning circle. either that or the ai vehicle maneuvring is just bad 
+
 ----------------------------------
 April 07 2023
 - more ai_human refactor 

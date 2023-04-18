@@ -31,7 +31,7 @@ class AIVehicle(AIBase):
         self.squad=None
 
 
-        # current fuel type options : gas / diesel
+        # current fuel type options : gas / diesel / none
         self.fuel_type='gas'
         # max fuel load in liters
         self.fuel_capacity=0
@@ -57,6 +57,7 @@ class AIVehicle(AIBase):
 
         # passengers  
         self.passengers=[]
+        self.max_occupants=4 # max people that can be in the vehicle, including driver
 
         # set when a world_object claims the driver position. ai_human checks this to determine behavior
         self.driver=None
@@ -71,7 +72,8 @@ class AIVehicle(AIBase):
         self.speed=0 # this is max speed at the moment
         self.rotation_speed=0 # max rotation speed
 
-        
+        # update physics needs to know if its never been run before
+        self.first_update=True
 
 
 
@@ -88,6 +90,7 @@ class AIVehicle(AIBase):
             for b in self.passengers:
                 b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
                 self.owner.world.add_object(b)
+                self.driver=None
 
             self.owner.world.remove_object(self.owner)
 
@@ -160,6 +163,10 @@ class AIVehicle(AIBase):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
         heading_changed = False
+
+        if self.first_update:
+            self.first_update=False
+            heading_changed=True
 
         # check control input
 
