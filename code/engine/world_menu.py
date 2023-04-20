@@ -225,20 +225,24 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
+            self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
+            self.world.graphic_engine.menu_text_queue.append('6 - smooth display jitter')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
-                if self.world.debug_mode==True:
-                    self.world.debug_mode=False
-                else:
-                    self.world.debug_mode=True
+                self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
+            elif Key=='5':
+                self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
+            elif Key=='6':
+                self.world.graphic_engine.smooth_jitter = not self.world.graphic_engine.smooth_jitter
+                print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
 
     def fuel_menu(self, Key):
         if self.menu_state=='none':

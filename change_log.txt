@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 
+----------------------------------
+April 19 2023
+- added small_crate 
+    - used for crate spawns of smaller objects 
+- added a debug menu option to display collision circles 
+- added a debug menu option to smooth_jitter
+    - basically converts screen coords to a int. not sure it helps
+- added collision radius to a couple items. probably doesn't matter  
+
+small crate was a lazy chop in half of the regular crate 
+
+noticed that most objects don't have a collision radius and are just 
+using the default of 5. i think this value isn't used  a ton for things 
+that bullets don't collide with at the moment 
+
+
+explored some different options for rotating/resizing images but 
+wasn't able to get anything else working. 
+I found out that the current implementation is responsible for 
+the corner clipping that i occasionally see 
 
 ----------------------------------
 April 17 2023
