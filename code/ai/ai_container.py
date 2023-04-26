@@ -5,7 +5,7 @@ version : see module_version variable
 Language : Python 3.x
 author : andrew christ
 email : andrew@openmarmot.com
-notes :
+notes : not sure this is needed 
 '''
 
 
@@ -14,9 +14,7 @@ import copy
 
 #import custom packages
 from ai.ai_base import AIBase
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='November 13 2021' #date of last update
+
 
 # this is for objects that don't need AI
 

@@ -1,0 +1,81 @@
+Gameplay Instructions / Tips / Notes 
+
+------- Controls --------------------------
+
+-human-
+w - move north 
+s - move south 
+a - move west 
+d - move east 
+
+mouse cursor - where your gun is aiming, also used for selection 
+mouse left
+ - select object (will open a menu if object is selectable and)
+ - object has to be near to you in most cases 
+
+f - fire primary weapon (if you have one)
+g - throw grenade (if you have one)
+t - fire anti tank (if you have one)
+b - bandage (use if you are bleeding)
+
+-vehicle-
+w - gas 
+s - brake 
+a - steer left 
+d - steer right 
+
+
+[ - zoom in 
+] - zoom out 
+
+tab - bring up a context menu or exit the current menu 
+esc - exit the current menu 
+
+~ - tilde brings up the debug menu. 
+    - turning on debug mode adds a info read out that can be interesting
+    - debug mode also lets you select objects at any range instead of having 
+        to be close.
+
+
+------- General Tips --------------------
+
+# identifying the player 
+- the player is always in the center of the screen 
+
+# you can click on yourself or hit tab to pull up a context menu
+- this is how you access your inventory 
+
+# gun aim 
+- having your cursor closer to your target is generally more accurate 
+- guns have a bit of spray 
+
+# grenade stuff 
+- grenades are very dangerous !!
+- grenades can bounce off objects 
+- grenades can be thrown back 
+
+# squad stuff 
+- you can click on a bot and ask it to join your squad 
+    - it will then follow you when it doesn't have more important tasks 
+
+# autoplay 
+- if you don't touch any controls for awhile the ai takes over. 
+- this will stop as soon as you hit a key 
+
+# to interact with an object you have to drop it from your inventory first 
+- this will probably be changing 
+
+# communication 
+- if you are near bots you will occasionally see things they are 
+    saying in the upper left corner of the screen 
+
+
+--------- Getting Started ----------------
+
+I recommend choosing 'civilian' as a start. 
+- wander around a bit 
+- try to find a vehicle as walking is tedious 
+- investigate crates for items 
+- click on a couple other civilians and ask them to join you 
+- head to the middle of the map and watch the main factions fight 
+- grab a weapon off a dead body 

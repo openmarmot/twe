@@ -60,6 +60,9 @@ class World(object):
         self.wo_objects_melee=[]
         self.wo_objects_airplane=[]
         self.wo_objects_medical=[]
+        self.wo_objects_ammo_container=[]
+        self.wo_objects_liquid_container=[]
+        self.wo_objects_object_container=[]
 
         #world areas
         self.world_areas=[]
@@ -153,6 +156,13 @@ class World(object):
             self.wo_objects_melee.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_medical:
             self.wo_objects_medical.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_object_container:
+            self.wo_objects_object_container.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_liquid_container:
+            self.wo_objects_liquid_container.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_ammo_container:
+            self.wo_objects_ammo_container.append(WORLD_OBJECT)
+        
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
         ''' collision check. returns bool as to whether there was a collision.'''
@@ -206,33 +216,6 @@ class World(object):
 
         return collided
 
-    #---------------------------------------------------------------------------
-    def get_closest_ammo_source(self, WORLD_OBJECT):
-        ''' returns the world object that is the closest ammo source '''
-        # WORLD_OBJECT - the object that needs ammo 
-
-        # sources of ammo are : 
-        # 1 - your squad mates
-        # 2 - vehicles 
-        # 3 - ?? (non squad but same side?)
-
-        best_squad_mate=None 
-        if WORLD_OBJECT.ai.squad != None:
-            if len(WORLD_OBJECT.ai.squad.members)>0:
-                best_squad_mate=self.get_closest_object(WORLD_OBJECT.world_coords,WORLD_OBJECT.ai.squad.members,500)
-
-        if best_squad_mate != None:
-            return best_squad_mate
-        else:
-            # no squad mates for whatever reason
-            # just go to a building for now - eventually replace with ammo crate 
-            if len(self.wo_objects_building)>0:
-                best_building=self.get_closest_object(WORLD_OBJECT.world_coords,self.wo_objects_building,1000)
-                return best_building
-            else:
-                print("Error: no suitable ammo sources")
-                # ehh just return a gun or whatever 
-                return self.get_closest_gun(WORLD_OBJECT.world_coords)
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):
@@ -323,6 +306,12 @@ class World(object):
             self.wo_objects_melee.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_medical:
             self.wo_objects_medical.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_object_container:
+            self.wo_objects_object_container.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_liquid_container:
+            self.wo_objects_liquid_container.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_ammo_container:
+            self.wo_objects_ammo_container.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -357,7 +346,7 @@ class World(object):
         if temp==None:
             for b in self.graphic_engine.renderlists:
                 for c in b:
-                    if (c.is_human or c.is_container or c.is_vehicle or c.is_airplane
+                    if (c.is_human or c.is_object_container or c.is_vehicle or c.is_airplane
                     or c.is_liquid_container or c.is_ammo_container):
                         possible_objects.append(c)
             if len(possible_objects)>0:

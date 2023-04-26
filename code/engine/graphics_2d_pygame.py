@@ -86,6 +86,9 @@ class Graphics_2D_Pygame(object):
         # draw collision circles
         self.draw_collision=False
 
+        # converts things to int to try and smooth jitter 
+        self.smooth_jitter=False
+
         # will cause everything to exit
         self.quit=False
 
@@ -251,6 +254,7 @@ class Graphics_2D_Pygame(object):
                     c.image_size=self.images[c.image_list[c.image_index]].get_size()
                     c.image_size=[int(c.image_size[0]*self.scale),int(c.image_size[1]*self.scale)]
                     c.image=self.get_rotated_scaled_image(self.images[c.image_list[c.image_index]],c.image_size,c.rotation_angle)
+                    #c.image=self.get_rotated_scaled_image_v2(self.images[c.image_list[c.image_index]],self.scale,c.rotation_angle)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
 
                 c.render_pass_2()
@@ -349,6 +353,10 @@ class Graphics_2D_Pygame(object):
                     b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
                     b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
 
+                    # honestly can't tell if this is better or not
+                    if self.smooth_jitter:
+                        b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
+
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
         x,y=pygame.mouse.get_pos()
@@ -376,6 +384,10 @@ class Graphics_2D_Pygame(object):
         adapted from : http://pygame.org/wiki/RotateCenter?parent=
 
         new : also scale image
+
+        note : this method can cause the corners of images to be clipped
+         this is a result of using subsurface
+
         """
         # not sure if i should rotate or resize first
 
@@ -386,7 +398,25 @@ class Graphics_2D_Pygame(object):
         rot_image = rot_image.subsurface(rot_rect).copy()
         resize_image=pygame.transform.scale(rot_image,IMAGE_SIZE)
         return resize_image
+    
+#------------------------------------------------------------------------------
+    def get_rotated_scaled_image_v2(self, image, scale, angle):
+        """
+        this doesn't work but should. the image grows and shrinks as it rotates
+        """
+        padding = max(image.get_width(), image.get_height())
+        padded_surface = pygame.Surface((padding*2, padding*2), pygame.SRCALPHA)
 
+        # Blit the original surface onto the padded surface with an offset
+        offset = ((padding*2 - image.get_width()) // 2, (padding*2 - image.get_height()) // 2)
+        padded_surface.blit(image, offset)
+
+        # Rotate the padded surface
+        rotated_surface = pygame.transform.rotate(padded_surface, angle)
+
+        # Scale the image
+        scaled_image = pygame.transform.scale(rotated_surface, (int(image.get_width() * scale), int(image.get_height() * scale)))
+        return scaled_image
 #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''

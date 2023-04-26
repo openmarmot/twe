@@ -2,6 +2,243 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 25 2023
+- hacking in some weapon code into the vehicle ai 
+- added world_menu for changing vehicle role (seat)
+- misc updates to vehicle menu 
+- minor updates to ai_human enter/exit vehicle code to handle 
+    gunner role 
+
+thinking about vehicle seating. 
+
+I think eventually it is going to need to be a class 
+with a ton of attributes. 
+
+for now i think there will just be a couple static roles 
+driver - drives 
+gunner - controls all vehicle weapons 
+
+ai_human probably needs to keep track of current vehicle role and update it 
+occasionally so it doesn't have to check it every update. 
+
+ai_human needs code updates to handle firing
+- if no primary maybe use a personal weapon if possible? 
+
+while working in world_menu i realized that i have a whole fuel menu 
+coded up that I never tested. 
+- trigger by picking up a fuel can and then clicking on a vehicle 
+- it needs work 
+
+----------------------------------
+April 19 2023
+- added small_crate 
+    - used for crate spawns of smaller objects 
+- added a debug menu option to display collision circles 
+- added a debug menu option to smooth_jitter
+    - basically converts screen coords to a int. not sure it helps
+- added collision radius to a couple items. probably doesn't matter  
+
+small crate was a lazy chop in half of the regular crate 
+
+noticed that most objects don't have a collision radius and are just 
+using the default of 5. i think this value isn't used  a ton for things 
+that bullets don't collide with at the moment 
+
+
+explored some different options for rotating/resizing images but 
+wasn't able to get anything else working. 
+I found out that the current implementation is responsible for 
+the corner clipping that i occasionally see 
+
+----------------------------------
+April 17 2023
+- added debug info to the vehicle menu (turn on debug mode first)
+- added a very simple name generator 
+    - civilians are now polish for no reason 
+- rewrote ai_human bot vehicle ai a bit 
+- fixed a bug where vehicles would not move until you turn the steering wheel
+    - this was amusingly working as theft protection against bots 
+
+
+in the future civilian names could be chosen based on whether the map 
+area is in germany/poland/soviet area/etc/etc
+
+ai now has some ability to use vehicles again (its been awhile)
+initial playtesting suggests that ai vehicle handling is worse than it used to be. 
+the ai tends to circle with the vehicles. I think this is a function of the 
+distance at which the ai would exit the vehicle being less than the vehicle's 
+turning circle. either that or the ai vehicle maneuvring is just bad 
+
+----------------------------------
+April 07 2023
+- more ai_human refactor 
+- added back in food pickup 
+- added back in medical pickup 
+- updated grenade pickup code 
+- updated antitank pickup code 
+- rewrote ammo pickup code 
+- added ammo top off option when ammo is low 
+- finished container looting code 
+- caught and added code to handle error situation
+     where ai target is set to None but it is 
+     trying to move towards it. need to fine 
+     how it got into this state. 
+- added gameplay_instructions
+
+I had to look at ai_gun to do some ammo stuff and i'm not super 
+happy with the state of things. I am leaning towards thinking that 
+guns need to be overhauled and magazines need to actual wo_objects 
+
+the ai soft cheats on ammo in that it can refill ammo by going to a 
+squad mate or a ammo_can without actually removing any ammo from the object. 
+this may be changed once ammo is simulated in more detail 
+
+with the current engagement sizes and current gun code I don't think 
+ammo consumption has been a huge deal except for pistols (which by design are low ammo)
+
+-- 
+playtesting 
+watched an engagement. soviets were doing well for once. 
+
+all of a sudden a bot said it was going to 'check that body' .. !!
+I forgot that bodies are classified as object containers, so bots 
+will loot bodies with the new code. its a bit alarming but i'll 
+keep it in.
+
+the civ bots especially are really enthusiastic looters because 
+they don't tend to have anything better to do. this means a lot 
+of containers will end up stripped if you don't get there first.
+--
+
+----------------------------------
+April 05 2023
+- working on adding ai code for container looting 
+- adding some ai_want_[thing] parameter to help retain mind state 
+- temporarily removed ai action to pickup food off ground 
+- temporarily removed ai action to pickup medical off ground 
+- centralized panic code and added more triggers 
+
+!! note - code is unfinished and probably not working with this commit 
+
+note that when the ai eats something the implication is that it 
+is from inventory, but obj menu allows you to eat something from 
+the world - therefore you get a warning text. this needs to be 
+fixed probably by an overhaul of the menu system so you can 
+eat an object from your inventory w/o dropping it first.
+
+----------------------------------
+March 28 2023
+- bodies are integrated and used.
+    - weapons will still drop 
+    - everything else is in the body 'container'
+- prone art is integrated but not used yet 
+- fixed container inventory spawning (wrecks and bodies)
+
+uncovered a selection order issue where bodies are 
+covering anything you remove from them. need to make 
+containers a lower priority than everything else. 
+
+might just change remove to put the object in your inventory 
+and add another menu option for drop 
+
+bodies are kind of horrifying but they make the fights 
+seem a lot more serious. pretty happy with the artwork. 
+maybe a little big but .. shrugs.
+
+now that you can actually see where people died its kinda 
+crazy how many civies can get caught in the cross fire.
+
+new brown civilian clothes look great. that yellow was 
+awful.
+
+asked alpaca about the russian/soviet question.
+Q: In world war 2 were soldiers from the soviet union referred
+ to as russians or soviets?
+A: The Soviet Union was a multi-ethnic state, and its 
+armed forces included both Russian and other nationalities.
+So during World War II they would have been known 
+collectively as "Soviet" rather than just “Russian”.
+
+
+need to figure out what happens to the player object 
+after the player picks a spawn type 
+
+----------------------------------
+March 25 2023
+- added art for prone humans 
+- added art for dead humans 
+- civilian clothes got switched to a tan jumpsuit
+
+not sure if ww2 russians should be referred to as soviet 
+or russian. going to need to pick one as its getting confusing
+
+----------------------------------
+March 12 2023
+- small rewrite of the crate code 
+    - actual crate spawn now under spawn_object
+- added german_drop_canister
+    - modelled after a fallshirmjager parachute drop 
+    supply canister 
+- removed kubelwagen image from the inside of the 
+warehouse building. it was confusing because you 
+couldn't interact with it. 
+
+
+I think the supply canister came out pretty good, although 
+the spent parachute could use a rework. I think in the future 
+I might make this a two stage object with the first stage 
+being it coming down on the parachute 
+
+
+----------------------------------
+March 10 2023
+-added 'take_action_*' functions to ai_human to 
+combine code for common actions 
+- rewrote logic around getting a gun 
+
+the fail safes in think_move that prevent movement 
+when the ai has personal enemies may be a mistake 
+- might be preventing the ai from getting a gun or 
+running away 
+- added a print statement to check how often this 
+happens 
+
+in my play testing i found a mob of civilians 
+following my kubelwagen around, no doubt intending 
+to steal it. I wonder where they were all going..
+they still can't drive (need to look into that)
+
+I also remembered that firing from a vehicle 
+needs to be re-implemented 
+
+----------------------------------
+March 06 2023
+- redefining types of container 
+    - renamed is_container to is_object_container
+    - added world lists for liquid,ammo,object containers
+- world.get_closest_ammo_source update 
+    - now it is aware of ammo cans and prioritizes them
+    - options are 1. ammo can, 2. team mate 
+    - fall back choice is get_closest_gun 
+    - building removed from choices 
+
+need to add some ai code to inspect the object when 
+it travels for getting ammo and treat if different 
+if its a soldier/ammo can / gun / ??
+
+realized the tactical ai is more screwed up than usual as 
+i added some new world areas and it doesn't have enough 
+squads to defend them all. I need to add in a concept of major/
+minor victory location priority 
+
+need to think more about ammo resupply mechanics 
+- should ammo cans supply any ammo, or only a specific ammo 
+- how do we keep track of what ammo is good for each gun 
+
+- I need to remove the kubelwagen from the factory inside image 
+    - it is confusing now that you can interact with kubelwagens 
+
+----------------------------------
 March 01 2023
 - bumped up spacing on ammo dump grid spawn to try and fix sprites 
 - added a couple new crate types to take advantage of the 
@@ -13,8 +250,6 @@ the grid spawn. i think this is the square edge of a rotated
 image overlapping another image. it seems like in this case 
 the transparency does not work as expected and what is 
 under the overlapping image blocks the other image. 
-
-
 
 ----------------------------------
 Feb 27 2023

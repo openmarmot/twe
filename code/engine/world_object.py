@@ -85,26 +85,28 @@ class WorldObject(object):
         self.is_gun=False
         self.is_grenade=False
         self.is_handheld_antitank=False
-        self.is_melee=False # melee close combat weapon like a dagger 
+        
         # these are non weapon pickups that are can be carried but are large.
         # only one can be carried at a time.
         self.is_large_human_pickup=False # fills a large pickup slot
-        self.is_gun_mag_carrier=False
-        self.is_container=False # really should be is_item_container.  a object that can store other world objects
+        
+        self.is_object_container=False # object that stores other objects
+        self.is_liquid_container=False # water/gas/diesel/??  stores liquid NOT world_objects
+        self.is_ammo_container=False # contains ammo 
         self.is_projectile=False
         self.is_consumable=False
         self.is_medical=False # general medical objects. bandage / pain pills / etc
         self.is_german=False
         self.is_soviet=False
         self.is_american=False
-        self.is_liquid_container=False # water/gas/diesel/??  stores liquid NOT world_objects
-        self.is_ammo_container=False # contains ammo 
         self.is_building=False
         self.is_map_pointer=False
 
         # stuff that i don't think is used at the moment
         self.is_gas=False
         self.is_diesel=False
+        self.is_melee=False # melee close combat weapon like a dagger 
+        self.is_gun_mag_carrier=False
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in
