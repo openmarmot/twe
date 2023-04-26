@@ -1131,7 +1131,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
-        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        mg=spawn_object(WORLD,[0,0],'mg34',False)
+        z.ai.primary_weapon=mg
+        z.add_inventory(mg)
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))

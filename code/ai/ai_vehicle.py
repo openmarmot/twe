@@ -62,6 +62,11 @@ class AIVehicle(AIBase):
         # set when a world_object claims the driver position. ai_human checks this to determine behavior
         self.driver=None
 
+        # set when a world_object claims the gunner position. ai_human checks this to determine behavior
+        self.gunner=None
+
+        self.primary_weapon=None
+
         # 
         self.inventory=[]
 

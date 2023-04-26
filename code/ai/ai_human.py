@@ -442,13 +442,19 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_enter_vehicle(self,VEHICLE):
+        # should maybe pick driver or gunner role here
+
         VEHICLE.ai.passengers.append(self.owner)
         self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
         self.vehicle=VEHICLE
 
-        if self.owner.is_player:
+        if self.owner.is_player or self.vehicle.ai.driver==None:
             self.vehicle.ai.driver=self.owner
+        else:
+            # not driver, how about gunner?
+            if self.vehicle.ai.gunner==None:
+                self.vehicle.ai.gunner=self.owner
 
         print('entered vehicle')
 
@@ -459,6 +465,9 @@ class AIHuman(AIBase):
         self.owner.world.add_object(self.owner)
         if self.vehicle.ai.driver==self.owner:
             self.vehicle.ai.driver=None
+
+        if self.vehicle.ai.gunner==self.owner:
+            self.vehicle.ai.gunner=None
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'

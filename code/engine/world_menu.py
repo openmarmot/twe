@@ -76,6 +76,8 @@ class World_Menu(object):
             self.consumable_menu(Key)
         elif self.active_menu=='fuel':
             self.fuel_menu(Key)
+        elif self.active_menu=='change_vehicle_role':
+            self.change_vehicle_role_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -170,6 +172,47 @@ class World_Menu(object):
         self.world.graphic_engine.menu_text_queue=[]
         self.active_menu=menu_name
         self.handle_input(None)
+
+    def change_vehicle_role_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- Change Vehicle Role --')
+            currentRole='None'
+            primaryWeapon='None'
+            if self.selected_object.ai.driver==self.world.player:
+                currentRole='Driver'
+            if self.selected_object.ai.gunner==self.world.player:
+                currentRole='Gunner'
+            if self.selected_object.ai.primary_weapon!=None:
+                primaryWeapon=self.selected_object.ai.primary_weapon.name
+
+            self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
+            self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
+            self.world.graphic_engine.menu_text_queue.append('1 - Driver')
+            self.world.graphic_engine.menu_text_queue.append('2 - Gunner')
+            self.world.graphic_engine.menu_text_queue.append('3 - Passenger')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                # driver
+                self.selected_object.ai.driver=self.world.player
+                if self.selected_object.ai.gunner==self.world.player:
+                    self.selected_object.ai.gunner=None
+                self.deactivate_menu()
+            elif Key=='2':
+                # gunner
+                self.selected_object.ai.gunner=self.world.player
+                if self.selected_object.ai.driver==self.world.player:
+                    self.selected_object.ai.driver=None
+                self.deactivate_menu()
+            elif Key=='3':
+                # passenger selected, so just remove other specializations
+                if self.selected_object.ai.gunner==self.world.player:
+                    self.selected_object.ai.gunner=None
+                if self.selected_object.ai.driver==self.world.player:
+                    self.selected_object.ai.driver=None
+                self.deactivate_menu()
 
     def consumable_menu(self, Key):
         if self.menu_state=='none':
@@ -548,10 +591,13 @@ class World_Menu(object):
             if self.world.player.ai.large_pickup!=None:
                 if self.world.player.ai.large_pickup.is_liquid_container:
                     fuel_option=True
-
+            primaryWeapon='None'
+            if self.selected_object.ai.primary_weapon!=None:
+                primaryWeapon=self.selected_object.ai.primary_weapon.name
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu --')
-            self.world.graphic_engine.menu_text_queue.append(self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
@@ -593,14 +639,25 @@ class World_Menu(object):
 
 
         if self.menu_state=='internal':
+            currentRole='None'
+            primaryWeapon='None'
+            if self.selected_object.ai.driver==self.world.player:
+                currentRole='Driver'
+            if self.selected_object.ai.gunner==self.world.player:
+                currentRole='Gunner'
+            if self.selected_object.ai.primary_weapon!=None:
+                primaryWeapon=self.selected_object.ai.primary_weapon.name
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
+            self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
+            self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
+            self.world.graphic_engine.menu_text_queue.append('1 - change role')
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             if Key=='1':
-                pass
+                self.change_menu('change_vehicle_role')
             if Key=='2':
                 # exit the vehicle
                 self.world.player.ai.handle_exit_vehicle(self.selected_object)

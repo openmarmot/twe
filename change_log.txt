@@ -2,6 +2,34 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 25 2023
+- hacking in some weapon code into the vehicle ai 
+- added world_menu for changing vehicle role (seat)
+- misc updates to vehicle menu 
+- minor updates to ai_human enter/exit vehicle code to handle 
+    gunner role 
+
+thinking about vehicle seating. 
+
+I think eventually it is going to need to be a class 
+with a ton of attributes. 
+
+for now i think there will just be a couple static roles 
+driver - drives 
+gunner - controls all vehicle weapons 
+
+ai_human probably needs to keep track of current vehicle role and update it 
+occasionally so it doesn't have to check it every update. 
+
+ai_human needs code updates to handle firing
+- if no primary maybe use a personal weapon if possible? 
+
+while working in world_menu i realized that i have a whole fuel menu 
+coded up that I never tested. 
+- trigger by picking up a fuel can and then clicking on a vehicle 
+- it needs work 
+
+----------------------------------
 April 19 2023
 - added small_crate 
     - used for crate spawns of smaller objects 
