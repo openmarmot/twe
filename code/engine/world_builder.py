@@ -1255,7 +1255,7 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     # MAX_TIME - max flight time around 3.5 seconds is default
@@ -1271,7 +1271,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.ai.projectile_type=PROJECTILE_TYPE
     z.ai.weapon_name=WEAPON_NAME
 
-    if MOUSE_AIM :
+    if SHOOTER.is_player :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
         dst=WORLD.graphic_engine.get_mouse_screen_coords()
         dst=[dst[0]+SPREAD[0],dst[1]+SPREAD[1]]

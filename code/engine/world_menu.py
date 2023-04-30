@@ -6,6 +6,10 @@ email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu
 instantiated by the world class
+
+this should mostly call methods from other classes. I don't want 
+a lot of game logic here
+
 '''
 
 #import built in modules
@@ -195,23 +199,13 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                # driver
-                self.selected_object.ai.driver=self.world.player
-                if self.selected_object.ai.gunner==self.world.player:
-                    self.selected_object.ai.gunner=None
+                self.world.player.ai.handle_change_vehicle_role('driver')
                 self.deactivate_menu()
             elif Key=='2':
-                # gunner
-                self.selected_object.ai.gunner=self.world.player
-                if self.selected_object.ai.driver==self.world.player:
-                    self.selected_object.ai.driver=None
+                self.world.player.ai.handle_change_vehicle_role('gunner')
                 self.deactivate_menu()
             elif Key=='3':
-                # passenger selected, so just remove other specializations
-                if self.selected_object.ai.gunner==self.world.player:
-                    self.selected_object.ai.gunner=None
-                if self.selected_object.ai.driver==self.world.player:
-                    self.selected_object.ai.driver=None
+                self.world.player.ai.handle_change_vehicle_role('passenger')
                 self.deactivate_menu()
 
     def consumable_menu(self, Key):
@@ -660,7 +654,7 @@ class World_Menu(object):
                 self.change_menu('change_vehicle_role')
             if Key=='2':
                 # exit the vehicle
-                self.world.player.ai.handle_exit_vehicle(self.selected_object)
+                self.world.player.ai.handle_exit_vehicle()
                 self.world.graphic_engine.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()

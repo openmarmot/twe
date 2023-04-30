@@ -2,6 +2,22 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 30 2023
+- added a function to handle switching vehicle roles 
+    - removed similar code from world_menu 
+- added in code to handle firing vehicle weapons
+- fixed vehicle update so it now updates the primary weapon 
+- small updates to a lot of the human - vehicle interaction code 
+- you can now fire the kubelwagen mg34 if you are in the gunner position
+- rewrote some projectile handling to take vehicles as a source into account  
+
+now that you can fire the gun, vehicle interaction is more or less back 
+to where it was before i ripped out vehicle ai. 
+
+the bots still can't fire vehicle weapons but that should be easier to add 
+at this point. 
+
+----------------------------------
 April 25 2023
 - hacking in some weapon code into the vehicle ai 
 - added world_menu for changing vehicle role (seat)

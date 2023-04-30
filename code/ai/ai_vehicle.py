@@ -4,7 +4,9 @@ module : ai_vehicle.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
-notes : a lot of this code came from ai_human but it has diverged a bit
+notes : the vehicle isn't really meant to have AI. 
+the only thing that should be here is physics and hardware stuff.
+any AI would be handled by ai_human
 '''
 
 #import built in modules
@@ -91,15 +93,15 @@ class AIVehicle(AIBase):
             print(self.owner.name+' has died')
             engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
 
-            # dump passengers
-            for b in self.passengers:
-                b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-                self.owner.world.add_object(b)
-                self.driver=None
+            # human ai will figure out for itself that it needs to leave
 
             self.owner.world.remove_object(self.owner)
 
         self.update_physics()
+
+        if self.primary_weapon!=None:
+            # needs updates for time tracking and other stuff
+            self.primary_weapon.update()
 
         if len(self.passengers)>0:
 
