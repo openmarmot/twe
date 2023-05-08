@@ -79,10 +79,6 @@ class Graphics_2D_Pygame(object):
         self.menu_text_queue=[]
 
 
-        # vehicle text 
-        self.display_vehicle_text=False
-        self.vehicle_text_queue=[]
-
         # draw collision circles
         self.draw_collision=False
 
@@ -278,13 +274,13 @@ class Graphics_2D_Pygame(object):
             self.h=0
             for b in self.world.debug_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (540, self.h), b, (255, 51, 51))
+                self.small_font.render_to(self.screen, (650, self.h), b, (255, 51, 51))
 
-        if(self.display_vehicle_text):
+        if(self.world.display_vehicle_text):
             self.h=0
-            for b in self.vehicle_text_queue:
+            for b in self.world.vehicle_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (300, self.h), b, (255, 51, 51))
+                self.small_font.render_to(self.screen, (500, self.h), b, (255, 51, 51))
 
         pygame.display.update()
 

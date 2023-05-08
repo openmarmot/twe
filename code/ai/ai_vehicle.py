@@ -40,6 +40,9 @@ class AIVehicle(AIBase):
         # current fuel amount
         self.fuel=0
 
+        # bool. is the engine on or off ?
+        self.engine_on=False
+
         # ----- controls ------
 
         # engine power. 0 is idle 1 is max
@@ -199,7 +202,7 @@ class AIVehicle(AIBase):
                 self.wheel_steering=0
 
 
-        if self.throttle>0 :
+        if self.throttle>0 and self.engine_on:
             if self.vehicle_speed<self.speed:
                 self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
                 if self.vehicle_speed<10:
@@ -208,6 +211,10 @@ class AIVehicle(AIBase):
             self.throttle-=1*time_passed
             if self.throttle<0.05:
                 self.throttle=0
+        else:
+            # throttle is negative for some reason or engine is off
+            # either way zero out the throttle
+            self.throttle=0
 
         if self.brake_power>0:
             self.vehicle_speed-=self.brake_power*self.acceleration*time_passed

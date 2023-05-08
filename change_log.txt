@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 07 2023
+- added engine_on bool for vehicles 
+- added vehicle internal menu for toggling the engine 
+- made some changes to the vehicle text menu and re-enabled it 
+
+
+
+----------------------------------
 April 30 2023
 - added a function to handle switching vehicle roles 
     - removed similar code from world_menu 
