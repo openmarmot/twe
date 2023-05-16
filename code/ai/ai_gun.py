@@ -98,7 +98,6 @@ class AIGun(AIBase):
             self.fire_time_passed=0.
             # start by ruling out empty mag 
             if self.magazine<1:
-                print('magazine empty')
                 # auto reload ?
                 if self.equipper.is_player:
                     print("magazine empty")
@@ -114,11 +113,22 @@ class AIGun(AIBase):
                 spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
 
                 ignore_list=[self.equipper]
+
+                if self.owner.world.friendly_fire==False:
+                    if self.equipper.is_german:
+                            ignore_list+=self.owner.world.wo_objects_german
+                    elif self.equipper.is_soviet:
+                        ignore_list+=self.owner.world.wo_objects_soviet
+                    elif self.equipper.is_american:
+                        ignore_list+=self.owner.world.wo_objects_american
+                elif self.owner.world.friendly_fire_squad==False:
+                    # just add the squad
+                    ignore_list+=self.equipper.ai.squad.members
+
                 if self.equipper.is_player:
                     pass
                 elif self.equipper.is_soldier:
-                    # squad gets added to make immune to friendly fire
-                    ignore_list.append(self.equipper.ai.squad.members)
+                    pass
                 if self.equipper.ai.in_vehicle:
                     # add the vehicle otherwise it tends to get hit
                     ignore_list.append(self.equipper.ai.vehicle)

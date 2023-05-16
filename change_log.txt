@@ -2,12 +2,29 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 15 2023
+- vehice engine will now turn off if it doesn't have fuel 
+- added fuel data to internal vehicle menu 
+- added world.friend_fire which is set to false currently 
+- added friendly fire code to shrapnel and projectiles 
+- also added world.friendly_fire_squad which is squad level only 
+    but this is superceded by firendly_fire 
+- added a ref back to faction_tactical for each squad 
+    - didn't end up using it yet but maybe soon 
+
+note - the existing squad level friendly fire code probably did 
+not work. it has been rewritten. however as the bots can't really 
+avoid shooting each other i think a wide ranging friendly fire 
+check is better at the moment.
+
+note in regards to fuel - you can pick up a fuel can and 
+use it to fuel the kubelwagen 
+
+----------------------------------
 May 07 2023
 - added engine_on bool for vehicles 
 - added vehicle internal menu for toggling the engine 
 - made some changes to the vehicle text menu and re-enabled it 
-
-
 
 ----------------------------------
 April 30 2023

@@ -100,6 +100,10 @@ class World(object):
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=60
 
+        # checked by ai_gun.fire() 
+        self.friendly_fire=False # complete friendly fire
+        self.friendly_fire_squad=False # only at the squad level
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''

@@ -100,6 +100,11 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
+        if self.engine_on and self.fuel<1:
+            # engine runs out of fuel
+            # this would be a good place to put out a little smoke cloud or something
+            self.engine_on=False
+
         self.update_physics()
 
         if self.primary_weapon!=None:

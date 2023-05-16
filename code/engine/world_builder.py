@@ -1310,9 +1310,21 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+    ignore_list=[]
+    if WORLD.friendly_fire==False:
+        if ORIGINATOR.is_german:
+                ignore_list+=WORLD.wo_objects_german
+        elif ORIGINATOR.is_soviet:
+            ignore_list+=WORLD.wo_objects_soviet
+        elif ORIGINATOR.is_american:
+            ignore_list+=WORLD.wo_objects_american
+    elif WORLD.friendly_fire_squad==False:
+        # just add the squad
+        ignore_list+=ORIGINATOR.ai.squad.members
+
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,ignore_list,'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):

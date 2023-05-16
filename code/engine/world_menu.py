@@ -644,6 +644,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+            self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
             self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
             self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engine_on))
