@@ -6,6 +6,10 @@ email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu
 instantiated by the world class
+
+this should mostly call methods from other classes. I don't want 
+a lot of game logic here
+
 '''
 
 #import built in modules
@@ -141,7 +145,7 @@ class World_Menu(object):
                 # enter the vehicle 
                 self.world.player.ai.handle_enter_vehicle(self.selected_object)
 
-                self.world.graphic_engine.display_vehicle_text=True
+                self.world.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
@@ -161,7 +165,7 @@ class World_Menu(object):
             if Key=='4':
                 # exit the vehicle
                 self.world.player.ai.handle_exit_vehicle(self.selected_object)
-                self.world.graphic_engine.display_vehicle_text=False
+                self.world.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
@@ -195,23 +199,13 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                # driver
-                self.selected_object.ai.driver=self.world.player
-                if self.selected_object.ai.gunner==self.world.player:
-                    self.selected_object.ai.gunner=None
+                self.world.player.ai.handle_change_vehicle_role('driver')
                 self.deactivate_menu()
             elif Key=='2':
-                # gunner
-                self.selected_object.ai.gunner=self.world.player
-                if self.selected_object.ai.driver==self.world.player:
-                    self.selected_object.ai.driver=None
+                self.world.player.ai.handle_change_vehicle_role('gunner')
                 self.deactivate_menu()
             elif Key=='3':
-                # passenger selected, so just remove other specializations
-                if self.selected_object.ai.gunner==self.world.player:
-                    self.selected_object.ai.gunner=None
-                if self.selected_object.ai.driver==self.world.player:
-                    self.selected_object.ai.driver=None
+                self.world.player.ai.handle_change_vehicle_role('passenger')
                 self.deactivate_menu()
 
     def consumable_menu(self, Key):
@@ -628,7 +622,7 @@ class World_Menu(object):
             if Key=='2':
                 # enter the vehicle 
                 self.world.player.ai.handle_enter_vehicle(self.selected_object)
-                self.world.graphic_engine.display_vehicle_text=True
+                self.world.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
@@ -650,20 +644,34 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+            self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
             self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
+            self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engine_on))
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - change role')
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.world.graphic_engine.menu_text_queue.append('3 - start/stop engine')
+            self.world.graphic_engine.menu_text_queue.append('4 - toggle HUD')
             if Key=='1':
                 self.change_menu('change_vehicle_role')
             if Key=='2':
                 # exit the vehicle
-                self.world.player.ai.handle_exit_vehicle(self.selected_object)
-                self.world.graphic_engine.display_vehicle_text=False
+                self.world.player.ai.handle_exit_vehicle()
+                self.world.display_vehicle_text=False
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
+            if Key=='3':
+                #flip the bool
+                self.selected_object.ai.engine_on=not self.selected_object.ai.engine_on
+                #refresh the text
+                self.vehicle_menu('none')
+            if Key=='4':
+                #flip the bool
+                self.world.display_vehicle_text=not self.world.display_vehicle_text
+                #refresh the text
+                self.vehicle_menu('none')
 
 
 

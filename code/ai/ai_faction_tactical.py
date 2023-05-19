@@ -62,6 +62,7 @@ class AIFactionTactical(object):
             b.world_coords=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
             b.destination=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
             b.spawn_on_map()
+            b.faction_tactical=self # give the squad a ref back to hq..
             self.squads.append(b)
         self.squad_spawn_queue.clear()
 

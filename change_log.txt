@@ -1,5 +1,80 @@
 TWE Project : Change Log
 
+----------------------------------
+May 18 2023
+- added world.friendly_fire_explosive and friendly_fire_explosive_squad 
+    - this is getting complicated quickly 
+- small change to ai_human personal enemies will now only be created if they 
+are NOT in your squad (this probably needs a rethink/reorg)
+- fixed a bug where the first personal enemy got added to the squad near enemy list , 
+not necessarily the personal enemy that was relevant in the context 
+
+want to note an issue where you a bot can get hit by shrapnel 
+which creates a personal enemy that is immune do to friendly_fire settings 
+
+I spent some time in ai_human trying to figure out how to sort out 
+potential logic issues with the new friendly_fire settings but did 
+not figure out a good approach. will have to revist this. I think the 
+answer is it needs a new function to think about adding personal enemies 
+
+current friendly_fire settings should mimic how the game was prior 
+to the previous update (although squad level may not have worked previously) : 
+
+        # True== get hurt, False== don't get hurt
+        self.friendly_fire=True # complete friendly fire
+        self.friendly_fire_squad=False # only at the squad level
+        self.friendly_fire_explosive=True # grenade shrap clouds
+        self.friendly_fire_explosive_squad=True # only at the squad level
+
+friendly fire off on bullets is easier to swallow than friendly fire 
+off on grenades. I may just have to add some code to make the bots 
+more careful about throwing grenades - although they don't currently 
+know the position of every bot on their team - so hmm that would be 
+a costly calculation 
+
+There is a strong chance that squad level alerting of near dangerous 
+enemies works quite a bit better now. 
+
+----------------------------------
+May 15 2023
+- vehice engine will now turn off if it doesn't have fuel 
+- added fuel data to internal vehicle menu 
+- added world.friend_fire which is set to false currently 
+- added friendly fire code to shrapnel and projectiles 
+- also added world.friendly_fire_squad which is squad level only 
+    but this is superceded by firendly_fire 
+- added a ref back to faction_tactical for each squad 
+    - didn't end up using it yet but maybe soon 
+
+note - the existing squad level friendly fire code probably did 
+not work. it has been rewritten. however as the bots can't really 
+avoid shooting each other i think a wide ranging friendly fire 
+check is better at the moment.
+
+note in regards to fuel - you can pick up a fuel can and 
+use it to fuel the kubelwagen 
+
+----------------------------------
+May 07 2023
+- added engine_on bool for vehicles 
+- added vehicle internal menu for toggling the engine 
+- made some changes to the vehicle text menu and re-enabled it 
+
+----------------------------------
+April 30 2023
+- added a function to handle switching vehicle roles 
+    - removed similar code from world_menu 
+- added in code to handle firing vehicle weapons
+- fixed vehicle update so it now updates the primary weapon 
+- small updates to a lot of the human - vehicle interaction code 
+- you can now fire the kubelwagen mg34 if you are in the gunner position
+- rewrote some projectile handling to take vehicles as a source into account  
+
+now that you can fire the gun, vehicle interaction is more or less back 
+to where it was before i ripped out vehicle ai. 
+
+the bots still can't fire vehicle weapons but that should be easier to add 
+at this point. 
 
 ----------------------------------
 April 25 2023

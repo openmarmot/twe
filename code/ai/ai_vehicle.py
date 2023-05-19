@@ -4,7 +4,9 @@ module : ai_vehicle.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
-notes : a lot of this code came from ai_human but it has diverged a bit
+notes : the vehicle isn't really meant to have AI. 
+the only thing that should be here is physics and hardware stuff.
+any AI would be handled by ai_human
 '''
 
 #import built in modules
@@ -37,6 +39,9 @@ class AIVehicle(AIBase):
         self.fuel_capacity=0
         # current fuel amount
         self.fuel=0
+
+        # bool. is the engine on or off ?
+        self.engine_on=False
 
         # ----- controls ------
 
@@ -91,15 +96,20 @@ class AIVehicle(AIBase):
             print(self.owner.name+' has died')
             engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
 
-            # dump passengers
-            for b in self.passengers:
-                b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-                self.owner.world.add_object(b)
-                self.driver=None
+            # human ai will figure out for itself that it needs to leave
 
             self.owner.world.remove_object(self.owner)
 
+        if self.engine_on and self.fuel<1:
+            # engine runs out of fuel
+            # this would be a good place to put out a little smoke cloud or something
+            self.engine_on=False
+
         self.update_physics()
+
+        if self.primary_weapon!=None:
+            # needs updates for time tracking and other stuff
+            self.primary_weapon.update()
 
         if len(self.passengers)>0:
 
@@ -197,7 +207,7 @@ class AIVehicle(AIBase):
                 self.wheel_steering=0
 
 
-        if self.throttle>0 :
+        if self.throttle>0 and self.engine_on:
             if self.vehicle_speed<self.speed:
                 self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
                 if self.vehicle_speed<10:
@@ -206,6 +216,10 @@ class AIVehicle(AIBase):
             self.throttle-=1*time_passed
             if self.throttle<0.05:
                 self.throttle=0
+        else:
+            # throttle is negative for some reason or engine is off
+            # either way zero out the throttle
+            self.throttle=0
 
         if self.brake_power>0:
             self.vehicle_speed-=self.brake_power*self.acceleration*time_passed

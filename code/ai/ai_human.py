@@ -127,6 +127,11 @@ class AIHuman(AIBase):
         if self.health<1:
             self.handle_death()
         else :
+
+            if self.in_vehicle:
+                if self.vehicle.ai.health<1:
+                    #this needs to be here as there will exactly one update cycle if a vehicle dies
+                    self.handle_vehicle_died()
             
             if self.bleeding:
                 
@@ -155,7 +160,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         self.last_collision_description=''
         if EVENT_DATA.is_projectile:
-            self.last_collision_description='hit by a projectile '
+            self.last_collision_description='hit by  '+EVENT_DATA.name
             starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
@@ -170,15 +175,18 @@ class AIHuman(AIBase):
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=('from '+EVENT_DATA.ai.shooter.name)
-                # this creates a lot of friendly fire - but its interesting 
-                self.personal_enemies.append(EVENT_DATA.ai.shooter)
+
+
+
+                
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
-
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
-                        self.squad.near_enemies.append(self.personal_enemies[0])
+                        self.squad.near_enemies.append(EVENT_DATA.ai.shooter)
+                        # this creates a lot of friendly fire - but its interesting 
+                        self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
                 # kill tracking
                 # just focus on humans for now
@@ -196,7 +204,10 @@ class AIHuman(AIBase):
                     if EVENT_DATA.ai.shooter.ai.primary_weapon!=None:
                         self.last_collision_description+=("'s "+EVENT_DATA.ai.weapon_name)
             else:
-                print('Error - projectile shooter is none')
+                if EVENT_DATA.ai.shooter==None:
+                    print('Error - projectile shooter is none')
+                # other way to get here is if its not a projectile
+                print('or its not a projectile')
 
             if self.owner.is_civilian:
                 # civilian runs further
@@ -333,19 +344,18 @@ class AIHuman(AIBase):
             print('removal error - object not in inventory',EVENT_DATA.name)
 
     #---------------------------------------------------------------------------
-    def fire(self,TARGET_COORDS):
-        ''' fires the (primary?) weapon '''    
-        if self.primary_weapon!=None:
-            # fire
-            if self.primary_weapon.ai.fire(self.owner.world_coords,TARGET_COORDS):
-                self.current_burst+=1
+    def fire(self,TARGET_COORDS,WEAPON):
+        ''' fires a weapon '''    
 
-            if self.current_burst>self.max_burst:
-                # stop firing, give the ai a chance to rethink and re-engage
-                self.current_burst=0
-                self.ai_state='sleeping'
-                self.ai_goal='none'
-                self.target_object=None
+        if WEAPON.ai.fire(self.owner.world_coords,TARGET_COORDS):
+            self.current_burst+=1
+
+        if self.current_burst>self.max_burst:
+            # stop firing, give the ai a chance to rethink and re-engage
+            self.current_burst=0
+            self.ai_state='sleeping'
+            self.ai_goal='none'
+            self.target_object=None
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
@@ -363,6 +373,42 @@ class AIHuman(AIBase):
         
         return calc_speed
     
+    #---------------------------------------------------------------------------
+    def handle_change_vehicle_role(self,ROLE):
+        ''' change your role on the vehicle crew'''
+        # ROLE : driver , gunner, passenger, none
+        if self.in_vehicle:
+
+            # remove from existing roles
+            if self.vehicle.ai.gunner==self.owner:
+                self.vehicle.ai.gunner=None
+                if self.vehicle.ai.primary_weapon!=None:
+                    self.vehicle.ai.primary_weapon.ai.equipper=None
+            if self.vehicle.ai.driver==self.owner:
+                self.vehicle.ai.driver=None
+
+            if ROLE=='driver':
+                if self.vehicle.ai.driver!=self.owner.world.player:
+                    self.vehicle.ai.driver=self.owner
+                    self.speak("Taking over driving")
+                    
+            elif ROLE=='gunner':
+                if self.vehicle.ai.gunner!=self.owner.world.player:
+                    self.vehicle.ai.gunner=self.owner
+
+                    if self.vehicle.ai.primary_weapon!=None:
+                        self.vehicle.ai.primary_weapon.ai.equipper=self.owner
+
+                    self.speak("Taking over gunner position")
+
+            elif ROLE=='passenger':
+                # nothing to do here, roles already removed
+                pass
+
+        else: 
+            print('error: attempting to change vehicle role when not in vehicle')
+
+
     #---------------------------------------------------------------------------
     def handle_death(self):
         dm=''
@@ -450,28 +496,25 @@ class AIHuman(AIBase):
         self.vehicle=VEHICLE
 
         if self.owner.is_player or self.vehicle.ai.driver==None:
-            self.vehicle.ai.driver=self.owner
+            self.handle_change_vehicle_role('driver')
         else:
             # not driver, how about gunner?
             if self.vehicle.ai.gunner==None:
-                self.vehicle.ai.gunner=self.owner
+                self.handle_change_vehicle_role('gunner')
 
-        print('entered vehicle')
 
     #---------------------------------------------------------------------------
-    def handle_exit_vehicle(self,VEHICLE):
+    def handle_exit_vehicle(self):
         self.in_vehicle=False
-        VEHICLE.ai.passengers.remove(self.owner)
+        self.vehicle.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
-        if self.vehicle.ai.driver==self.owner:
-            self.vehicle.ai.driver=None
-
-        if self.vehicle.ai.gunner==self.owner:
-            self.vehicle.ai.gunner=None
+        # remove self from any vehicle roles
+        self.handle_change_vehicle_role('none')
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
-        print('exited vehicle')
+        
+        self.speak('Jumping out')
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -487,6 +530,7 @@ class AIHuman(AIBase):
             self.event_collision(EVENT_DATA)
         elif EVENT=='remove_inventory':
             self.event_remove_inventory(EVENT_DATA)
+
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
@@ -543,7 +587,11 @@ class AIHuman(AIBase):
                 self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),self.owner.world_coords,self.destination,time_passed)
                 self.fatigue+=self.fatigue_add_rate*time_passed           
             elif self.ai_state=='engaging':
-                self.fire(self.target_object.world_coords)
+                # wondering if we can remove this if statement
+                if self.primary_weapon!=None:
+                    self.fire(self.target_object.world_coords,self.primary_weapon)
+                else:
+                    print('warning: attempt to fire with no primary weapon')
                 self.fatigue+=self.fatigue_add_rate*time_passed
             elif self.ai_state=='start_moving':
                 # this kicks off movement
@@ -569,6 +617,8 @@ class AIHuman(AIBase):
         #print('time since player interact ',self.time_since_player_interact)
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
+
+
             if(self.owner.world.graphic_engine.keyPressed('w')):
                 self.vehicle.ai.throttle=1
                 self.vehicle.ai.brake_power=0
@@ -583,7 +633,22 @@ class AIHuman(AIBase):
             if(self.owner.world.graphic_engine.keyPressed('d')):
                 self.vehicle.ai.handle_steer_right()
 
-            #print(self.vehicle.ai.throttle,self.vehicle.ai.vehicle_speed)
+            if(self.owner.world.graphic_engine.keyPressed('f')):
+                #print('pew!')
+                # fire the gun
+                if self.vehicle.ai.gunner==self.owner:
+                    if self.vehicle.ai.primary_weapon!=None:
+                        self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
+                    else:
+                        print('no vehicle weapon')
+                        # fire our own weapon
+                        if self.primary_weapon!=None:
+                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
+                        else:
+                            print('no vehicle gun, no personal gun')
+                else:
+                    print('you arent the gunner!')
+
 
         else:
             action=False
@@ -609,7 +674,8 @@ class AIHuman(AIBase):
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('f')):
                 # fire the gun
-                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords())
+                if self.primary_weapon!=None:
+                    self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('g')):
                 # throw throwable object
@@ -635,6 +701,14 @@ class AIHuman(AIBase):
                 self.time_since_player_interact+=time_passed
                 if self.time_since_player_interact>self.time_before_afk:
                     self.handle_normal_ai_update()
+
+    #-----------------------------------------------------------------------
+    def handle_vehicle_died(self):
+        if self.in_vehicle:
+            self.handle_exit_vehicle()
+            self.take_action_move_short_random_distance()
+        else:
+            print('error: handle vehicle died, but ai not in vehicle')
 
     #-----------------------------------------------------------------------
     def handle_use_medical_object(self,MEDICAL):
@@ -830,6 +904,13 @@ class AIHuman(AIBase):
             self.speak("I'm going to check that "+item.name)
             return True
         
+
+    #-----------------------------------------------------------------------
+    def take_action_move_short_random_distance(self):
+        distance=random.randint(50,200)
+        self.destination=[self.owner.world_coords[0]+float(random.randint(-distance,distance)),self.owner.world_coords[1]+float(random.randint(-distance,distance))]
+        self.ai_state='start_moving'
+        self.ai_goal='short move'  
 
     #-----------------------------------------------------------------------
     def take_action_panic(self):
@@ -1170,14 +1251,14 @@ class AIHuman(AIBase):
         # check vehicle health, should we bail out ?
         if self.vehicle.ai.health<10:
             self.speak('Bailing Out!')
-            self.handle_exit_vehicle(self.vehicle)
+            self.handle_vehicle_died()
             # should probably let everyone else know
             action=True
         # check if we are close to our destination (if we have one)
         elif self.ai_vehicle_goal=='travel':
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
             if distance<50:
-                self.handle_exit_vehicle(self.vehicle)
+                self.handle_exit_vehicle()
                 action=True
                 # should probably let everyone else know as well
         else:

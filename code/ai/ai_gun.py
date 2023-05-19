@@ -93,7 +93,6 @@ class AIGun(AIBase):
     def fire(self,WORLD_COORDS,TARGET_COORDS):
         ''' fire the gun. returns True/False as to whether the gun fired '''
         fired=False
-  
         # start with a time check
         if(self.fire_time_passed>self.rate_of_fire):
             self.fire_time_passed=0.
@@ -105,19 +104,36 @@ class AIGun(AIBase):
                 if self.magazine_count>0:
                     self.magazine_count-=1
                     self.magazine=self.mag_capacity
+                    print('reloading')
 
             else :
                 fired=True
                 self.magazine-=1
                 self.rounds_fired+=1
                 spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
+
+                ignore_list=[self.equipper]
+
+                if self.owner.world.friendly_fire==False:
+                    if self.equipper.is_german:
+                            ignore_list+=self.owner.world.wo_objects_german
+                    elif self.equipper.is_soviet:
+                        ignore_list+=self.owner.world.wo_objects_soviet
+                    elif self.equipper.is_american:
+                        ignore_list+=self.owner.world.wo_objects_american
+                elif self.owner.world.friendly_fire_squad==False:
+                    # just add the squad
+                    ignore_list+=self.equipper.ai.squad.members
+
                 if self.equipper.is_player:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],True,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
+                    pass
                 elif self.equipper.is_soldier:
-                    # squad gets added to make immune to friendly fire
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,self.equipper.ai.squad.members,False,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
-                else:
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,[self.equipper],False,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
+                    pass
+                if self.equipper.ai.in_vehicle:
+                    # add the vehicle otherwise it tends to get hit
+                    ignore_list.append(self.equipper.ai.vehicle)
+
+                engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,ignore_list,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
 
                 # spawn brass 
                 engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)

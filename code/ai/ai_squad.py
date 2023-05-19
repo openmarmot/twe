@@ -54,6 +54,11 @@ class AISquad(object):
         # faction - german/soviet/american/civilian
         self.faction='none'
 
+        # a link back to the parent faction tactical
+        # set in ai_faction_tactical.process_spawn_queue()
+        # not used yet
+        self.faction_tactical=None
+
         self.time_since_enemy_update=0.
         self.enemy_update_rate=0
 

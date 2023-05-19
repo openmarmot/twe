@@ -87,6 +87,10 @@ class World(object):
         # debug text and other stuff checks this condition
         self.debug_mode=False
 
+        # display vehicle text. set by world menu
+        self.display_vehicle_text=False
+        self.vehicle_text_queue=[]
+
         # debug info queue
         self.debug_text_queue=[]
 
@@ -95,6 +99,13 @@ class World(object):
 
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=60
+
+        # checked by ai_gun.fire() and world_builder.spawn_shrapnel_cloud
+        # True== get hurt, False== don't get hurt
+        self.friendly_fire=True # complete friendly fire
+        self.friendly_fire_squad=False # only at the squad level
+        self.friendly_fire_explosive=True # grenade shrap clouds
+        self.friendly_fire_explosive_squad=True # only at the squad level
 
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
@@ -448,6 +459,9 @@ class World(object):
             if self.debug_mode:
                 self.update_debug_info()
 
+            if self.display_vehicle_text:
+                self.update_vehicle_text()
+
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
@@ -465,6 +479,21 @@ class World(object):
         # world area data
         for b in self.world_areas:
             self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
+
+    #------------------------------------------------------------------------------
+    def update_vehicle_text(self):
+        self.vehicle_text_queue=[]
+
+        if self.player.ai.in_vehicle:
+            self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
+            self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engine_on))
+            self.vehicle_text_queue.append('speed: '+str(self.player.ai.vehicle.ai.vehicle_speed))
+            self.vehicle_text_queue.append('acceleration: '+str(self.player.ai.vehicle.ai.acceleration))
+            self.vehicle_text_queue.append('throttle: '+str(self.player.ai.vehicle.ai.throttle))
+            self.vehicle_text_queue.append('brake: '+str(self.player.ai.vehicle.ai.brake_power))
+            self.vehicle_text_queue.append('fuel: '+str(self.player.ai.vehicle.ai.fuel))
+
+
 
 
 

@@ -1255,7 +1255,7 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
 
 
 #------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_AIM,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
+def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
     # MAX_TIME - max flight time around 3.5 seconds is default
@@ -1271,7 +1271,7 @@ def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,MOUSE_A
     z.ai.projectile_type=PROJECTILE_TYPE
     z.ai.weapon_name=WEAPON_NAME
 
-    if MOUSE_AIM :
+    if SHOOTER.is_player :
         # do computations based off of where the mouse is. TARGET_COORDS is ignored
         dst=WORLD.graphic_engine.get_mouse_screen_coords()
         dst=[dst[0]+SPREAD[0],dst[1]+SPREAD[1]]
@@ -1310,9 +1310,21 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
 def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+    ignore_list=[]
+    if WORLD.friendly_fire_explosive==False:
+        if ORIGINATOR.is_german:
+                ignore_list+=WORLD.wo_objects_german
+        elif ORIGINATOR.is_soviet:
+            ignore_list+=WORLD.wo_objects_soviet
+        elif ORIGINATOR.is_american:
+            ignore_list+=WORLD.wo_objects_american
+    elif WORLD.friendly_fire_explosive_squad==False:
+        # just add the squad
+        ignore_list+=ORIGINATOR.ai.squad.members
+
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
-        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,[],'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
+        spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,ignore_list,'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
