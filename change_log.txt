@@ -1,5 +1,39 @@
 TWE Project : Change Log
 
+----------------------------------
+May 18 2023
+- added world.friendly_fire_explosive and friendly_fire_explosive_squad 
+    - this is getting complicated quickly 
+- small change to ai_human personal enemies will now only be created if they 
+are NOT in your squad (this probably needs a rethink/reorg)
+- fixed a bug where the first personal enemy got added to the squad near enemy list , 
+not necessarily the personal enemy that was relevant in the context 
+
+want to note an issue where you a bot can get hit by shrapnel 
+which creates a personal enemy that is immune do to friendly_fire settings 
+
+I spent some time in ai_human trying to figure out how to sort out 
+potential logic issues with the new friendly_fire settings but did 
+not figure out a good approach. will have to revist this. I think the 
+answer is it needs a new function to think about adding personal enemies 
+
+current friendly_fire settings should mimic how the game was prior 
+to the previous update (although squad level may not have worked previously) : 
+
+        # True== get hurt, False== don't get hurt
+        self.friendly_fire=True # complete friendly fire
+        self.friendly_fire_squad=False # only at the squad level
+        self.friendly_fire_explosive=True # grenade shrap clouds
+        self.friendly_fire_explosive_squad=True # only at the squad level
+
+friendly fire off on bullets is easier to swallow than friendly fire 
+off on grenades. I may just have to add some code to make the bots 
+more careful about throwing grenades - although they don't currently 
+know the position of every bot on their team - so hmm that would be 
+a costly calculation 
+
+There is a strong chance that squad level alerting of near dangerous 
+enemies works quite a bit better now. 
 
 ----------------------------------
 May 15 2023

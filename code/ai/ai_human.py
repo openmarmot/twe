@@ -160,7 +160,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         self.last_collision_description=''
         if EVENT_DATA.is_projectile:
-            self.last_collision_description='hit by a projectile '
+            self.last_collision_description='hit by  '+EVENT_DATA.name
             starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
@@ -175,15 +175,18 @@ class AIHuman(AIBase):
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=('from '+EVENT_DATA.ai.shooter.name)
-                # this creates a lot of friendly fire - but its interesting 
-                self.personal_enemies.append(EVENT_DATA.ai.shooter)
+
+
+
+                
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
-
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
-                        self.squad.near_enemies.append(self.personal_enemies[0])
+                        self.squad.near_enemies.append(EVENT_DATA.ai.shooter)
+                        # this creates a lot of friendly fire - but its interesting 
+                        self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
                 # kill tracking
                 # just focus on humans for now
@@ -201,7 +204,10 @@ class AIHuman(AIBase):
                     if EVENT_DATA.ai.shooter.ai.primary_weapon!=None:
                         self.last_collision_description+=("'s "+EVENT_DATA.ai.weapon_name)
             else:
-                print('Error - projectile shooter is none')
+                if EVENT_DATA.ai.shooter==None:
+                    print('Error - projectile shooter is none')
+                # other way to get here is if its not a projectile
+                print('or its not a projectile')
 
             if self.owner.is_civilian:
                 # civilian runs further
