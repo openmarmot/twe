@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+
+----------------------------------
+May 18 2023
+- randomized fuel load on the 2 kubelwagens that spawn at the start
+- set the kubelwagen from the debug menu to max fuel 
+- added fuel consumption to vehicles (doubles when throttle is pressed)
+- rounded (in the display) some vehicle menu floats that get silly
+- bumped max distance to interact with something from 60 to 90 
+- added option to ask squad member to enter your vehicle if you are in one 
+
+
 ----------------------------------
 May 18 2023
 - added world.friendly_fire_explosive and friendly_fire_explosive_squad 

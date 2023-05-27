@@ -587,9 +587,10 @@ def load_test_environment(world):
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
     # kubelwagens 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
-
+    k1=spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+    k1.ai.fuel=random.randint(0,k1.ai.fuel_capacity)
+    k2=spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
+    k2.ai.fuel=random.randint(0,k2.ai.fuel_capacity)
 
     
 
@@ -1130,6 +1131,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=200
         z.ai.rotation_speed=40.
         z.ai.acceleration=100
+        z.ai.fuel_capacity=20
+        z.ai.fuel=0 # this can be updated after spawn for starting fuel load
+        z.ai.fuel_consumption=0.0033
         z.collision_radius=50
         mg=spawn_object(WORLD,[0,0],'mg34',False)
         z.ai.primary_weapon=mg

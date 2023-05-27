@@ -40,6 +40,9 @@ class AIVehicle(AIBase):
         # current fuel amount
         self.fuel=0
 
+        # fuel consumptuion as liters per second
+        self.fuel_consumption=0
+
         # bool. is the engine on or off ?
         self.engine_on=False
 
@@ -100,10 +103,17 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-        if self.engine_on and self.fuel<1:
-            # engine runs out of fuel
-            # this would be a good place to put out a little smoke cloud or something
-            self.engine_on=False
+        if self.engine_on:
+            self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
+
+            if self.throttle>0.5:
+                #essentially double fuel consumption
+                self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
+
+            if self.fuel<1:
+                # engine runs out of fuel
+                # this would be a good place to put out a little smoke cloud or something
+                self.engine_on=False
 
         self.update_physics()
 
