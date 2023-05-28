@@ -13,7 +13,7 @@ May 28 2023
 - changed kubelwagen spawn so now its a 1/3 chance to get the mg
     - if you get the mg you also get a ammo can 
 - kubelwagen now spawns with a medical item instead of food 
-- fixed bug 
+- fixed bug when driver position isn't cleared when exiting vehicle 
 
 guns need a stat for reload time as that is the main thing that 
 will seperate the g41 (fixed mag) from the g43 (removable mag)

@@ -505,11 +505,11 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
+        # remove self from any vehicle roles
+        self.handle_change_vehicle_role('none')
         self.in_vehicle=False
         self.vehicle.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
-        # remove self from any vehicle roles
-        self.handle_change_vehicle_role('none')
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
