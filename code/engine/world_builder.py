@@ -63,11 +63,11 @@ list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine']
 list_consumables_ultra_rare=['schokakola']
 
-list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33']
-list_guns_common=['kar98k','mosin_nagant','ppsh43']
-list_guns_rare=['mp40','ppk','tt33']
-list_guns_ultra_rare=['stg44','mg34','dp28','1911']
-list_german_guns=['kar98k','stg44','mp40','mg34','ppk']
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43']
+list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33']
+list_guns_rare=['mp40','ppk','stg44','mg34','dp28','1911','k43','g41w']
+list_guns_ultra_rare=['fg42-type1','fg42-type2']
+list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
 
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
@@ -145,15 +145,25 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
     elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #squad lead
-        s.append(spawn_soldiers(WORLD,'german_stg44')) # deputy squad lead
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #squad lead
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # deputy squad lead
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         WORLD.german_ai.squad_spawn_queue.append(s)
+    elif SQUAD_TYPE=='civilian small random':
+        s.faction='civilian'
+        amount=random.randint(1,3)
+        for c in range(amount):
+            s.members.append(spawn_civilians(WORLD,'default'))
+        WORLD.civilian_ai.squad_spawn_queue.append(s)
+    elif SQUAD_TYPE=='big cheese':
+        s.faction='civilian'
+        s.members.append(spawn_civilians(WORLD,'big cheese'))
+        WORLD.civilian_ai.squad_spawn_queue.append(s)
         
         
 
@@ -327,7 +337,6 @@ def generate_clutter(WORLD):
     # chance of crate by a building
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
-        # add a random amount of civilians
         chance=random.randint(0,6)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
         if chance==0 or chance==1:
@@ -336,8 +345,6 @@ def generate_clutter(WORLD):
             spawn_crate(WORLD,coords,'random_consumables_rare')
         elif chance==3:
             spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
-
-
 
 
 
@@ -350,11 +357,7 @@ def generate_civilians_and_civilan_spawns(WORLD):
         # add a random amount of civilians
         amount=random.randint(0,3)
         if amount>0:
-            s=AISquad(WORLD)
-            s.faction='civilian'
-            for c in range(amount):
-                s.members.append(spawn_civilians(WORLD,'default'))
-            WORLD.civilian_ai.squad_spawn_queue.append(s)
+            add_standard_squad(WORLD,'civilian small random')
 
         # add the spawn point
         WORLD.civilian_ai.spawn_points.append(b.world_coords)
@@ -364,6 +367,9 @@ def generate_civilians_and_civilan_spawns(WORLD):
         print('WARN : No buildings, default civilian spawn added')
         WORLD.civilian_ai.spawn_points.append([0,0])
 
+    if random.randint(0,10)==10:
+        print('big cheese!!')
+        add_standard_squad(WORLD,'big cheese')
 
 
 #------------------------------------------------------------------------------
@@ -413,8 +419,6 @@ def get_random_from_list(WORLD,WORLD_COORDS,OBJECT_LIST,SPAWN):
     # spawn_object function
     index=random.randint(0,len(OBJECT_LIST)-1)
     return spawn_object(WORLD,WORLD_COORDS,OBJECT_LIST[index],SPAWN)
-
-
 
 #------------------------------------------------------------------------------
 def grid_spawn(WORLD,WORLD_COORDS,OBJECT_STRING,DIAMETER,COUNT):
@@ -478,6 +482,11 @@ def load_images(world):
     world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
     world.graphic_engine.loadImage('mosin_nagant','images/weapons/mosin_nagant.png')
     world.graphic_engine.loadImage('ppsh43','images/weapons/ppsh43.png')
+    world.graphic_engine.loadImage('k43','images/weapons/k43.png')
+    world.graphic_engine.loadImage('g41w','images/weapons/g41-walther.png')
+    world.graphic_engine.loadImage('fg42-type1','images/weapons/fg42-type1.png')
+    world.graphic_engine.loadImage('fg42-type2','images/weapons/fg42-type2.png')
+    
 
     # airplanes
     world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
@@ -627,7 +636,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
         return z
-    if CIVILIAN_TYPE=='big_cheese':
+    if CIVILIAN_TYPE=='big cheese':
         '''goofy unique civilain. don't mess with big cheese'''
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.ai.health*=2
@@ -646,6 +655,8 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'camembert-cheese',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
         return z
 
@@ -1107,6 +1118,70 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='g41w':
+        z=WorldObject(WORLD,['g41w'],AIGun)
+        z.name='g41w'
+        z.is_gun=True
+        z.ai.magazine=10
+        z.ai.mag_capacity=10
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
+        z.ai.rate_of_fire=0.8
+        z.ai.flight_time=3
+        z.ai.range=800
+        z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='k43':
+        z=WorldObject(WORLD,['k43'],AIGun)
+        z.name='k43'
+        z.is_gun=True
+        z.ai.magazine=10
+        z.ai.mag_capacity=10
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
+        z.ai.rate_of_fire=0.8
+        z.ai.flight_time=3
+        z.ai.range=800
+        z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='fg42-type1':
+        z=WorldObject(WORLD,['fg42-type1'],AIGun)
+        z.name='fg42-type1'
+        z.is_gun=True
+        z.ai.magazine=20
+        z.ai.mag_capacity=20
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
+        z.ai.rate_of_fire=0.06
+        z.ai.flight_time=3
+        z.ai.range=800
+        z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='fg42-type2':
+        z=WorldObject(WORLD,['fg42-type1'],AIGun)
+        z.name='fg42-type1'
+        z.is_gun=True
+        z.ai.magazine=20
+        z.ai.mag_capacity=20
+        z.ai.magazine_count=8
+        z.ai.max_magazines=8
+        z.ai.rate_of_fire=0.08
+        z.ai.flight_time=3
+        z.ai.range=800
+        z.ai.type='rifle'
+        z.ai.projectile_type='7.92x57_SME'
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='mosin_nagant':
         z=WorldObject(WORLD,['mosin_nagant'],AIGun)
         z.name='mosin_nagant'
@@ -1135,12 +1210,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel=0 # this can be updated after spawn for starting fuel load
         z.ai.fuel_consumption=0.0033
         z.collision_radius=50
-        mg=spawn_object(WORLD,[0,0],'mg34',False)
-        z.ai.primary_weapon=mg
-        z.add_inventory(mg)
+        
+        if random.randint(0,3)==1:
+            mg=spawn_object(WORLD,[0,0],'mg34',False)
+            z.ai.primary_weapon=mg
+            z.add_inventory(mg)
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
-        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
-        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
@@ -1349,7 +1426,20 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
-
+        return z
+    if SOLDIER_TYPE=='german_k43':
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_k43'
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        return z
+    if SOLDIER_TYPE=='german_g41w':
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_g41w'
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         return z
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)

@@ -160,7 +160,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         self.last_collision_description=''
         if EVENT_DATA.is_projectile:
-            self.last_collision_description='hit by  '+EVENT_DATA.name
+            self.last_collision_description='hit by '+EVENT_DATA.name
             starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
@@ -174,7 +174,7 @@ class AIHuman(AIBase):
             # add the shooter of the bullet to the personal enemies list
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
-                self.last_collision_description+=('from '+EVENT_DATA.ai.shooter.name)
+                self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
 
 
 
