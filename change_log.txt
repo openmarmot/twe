@@ -1,5 +1,23 @@
 TWE Project : Change Log
 
+
+----------------------------------
+June 06 2023
+- added svt40 
+- added svt40-sniper
+- added fallshirmjager squad 
+- changed one of the soviet 43 squads to a soviet 44 
+    squad in the test environment (more firepower)
+
+the svt40 got added to a couple russian squads so it 
+will show up in game.
+
+realized that soviet rifles and mg are set to use german bullets. 
+i need to add some soviet bullet types 
+
+I need some ways to differentiate some of the different groups better, 
+probably need more uniforms 
+
 ----------------------------------
 May 28 2023
 - fixed word spacing in death notes
