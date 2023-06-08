@@ -42,7 +42,7 @@ class AIGun(AIBase):
         #time since last fired
         self.fire_time_passed=0. 
 
-        # fire rate in seconds?
+        # 60/rate of fire
         self.rate_of_fire=0.
 
         # caliber

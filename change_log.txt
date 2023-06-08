@@ -1,5 +1,54 @@
 TWE Project : Change Log
 
+
+----------------------------------
+June 06 2023
+- added svt40 
+- added svt40-sniper
+- added fallshirmjager squad 
+- changed one of the soviet 43 squads to a soviet 44 
+    squad in the test environment (more firepower)
+
+the svt40 got added to a couple russian squads so it 
+will show up in game.
+
+realized that soviet rifles and mg are set to use german bullets. 
+i need to add some soviet bullet types 
+
+I need some ways to differentiate some of the different groups better, 
+probably need more uniforms 
+
+----------------------------------
+May 28 2023
+- fixed word spacing in death notes
+- added g41 (walther variant)
+- added k43 (g43 was renamed to k43 after being introduced)
+- added FG42 type 1 and 2
+- modified gun loot tables a bit 
+- fixed a bug on a unused german squad type
+- standardized civilian squad spawn 
+- 10% chance of unique civilian bot 'big cheese' spawning 
+- changed kubelwagen spawn so now its a 1/3 chance to get the mg
+    - if you get the mg you also get a ammo can 
+- kubelwagen now spawns with a medical item instead of food 
+- fixed bug when driver position isn't cleared when exiting vehicle 
+
+guns need a stat for reload time as that is the main thing that 
+will seperate the g41 (fixed mag) from the g43 (removable mag)
+
+I'm not sure how to deploy the new weapons yet. g41/43 are considered 
+uncommon but ~400k of each was still made. only about 7k fg42 were made 
+so those will probably only show up in random loot 
+
+----------------------------------
+May 26 2023
+- randomized fuel load on the 2 kubelwagens that spawn at the start
+- set the kubelwagen from the debug menu to max fuel 
+- added fuel consumption to vehicles (doubles when throttle is pressed)
+- rounded (in the display) some vehicle menu floats that get silly
+- bumped max distance to interact with something from 60 to 90 
+- added option to ask squad member to enter your vehicle if you are in one 
+
 ----------------------------------
 May 18 2023
 - added world.friendly_fire_explosive and friendly_fire_explosive_squad 

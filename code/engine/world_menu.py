@@ -272,7 +272,8 @@ class World_Menu(object):
             elif Key=='2':
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                k1=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                k1.ai.fuel=k1.ai.fuel_capacity
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
             elif Key=='5':
@@ -388,6 +389,8 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
                 self.world.graphic_engine.menu_text_queue.append('2 - Manage Inventory')
                 self.world.graphic_engine.menu_text_queue.append('3 - [Speak] Can you upgrade your gear?')
+                if self.world.player.ai.in_vehicle:
+                    self.world.graphic_engine.menu_text_queue.append('4 - [Speak] Climb aboard!')
             elif self.menu_state == 'non_squad_member_menu':
                 self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
                 self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
@@ -404,7 +407,8 @@ class World_Menu(object):
                 self.change_menu('storage')
             if Key=='3':
                 self.selected_object.ai.react_asked_to_upgrade_gear()
-            pass
+            if Key=='4' and self.world.player.ai.in_vehicle:
+                self.selected_object.ai.react_asked_to_enter_vehicle(self.world.player.ai.vehicle)
         elif self.menu_state == 'non_squad_member_menu':
             if Key=='1':
                 self.selected_object.ai.speak('status')

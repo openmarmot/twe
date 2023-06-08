@@ -98,7 +98,7 @@ class World(object):
         self.map_enabled=False
 
         # max distance at which you can select something (open a context menu)
-        self.max_menu_distance=60
+        self.max_menu_distance=90
 
         # checked by ai_gun.fire() and world_builder.spawn_shrapnel_cloud
         # True== get hurt, False== don't get hurt
@@ -487,11 +487,11 @@ class World(object):
         if self.player.ai.in_vehicle:
             self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
             self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engine_on))
-            self.vehicle_text_queue.append('speed: '+str(self.player.ai.vehicle.ai.vehicle_speed))
-            self.vehicle_text_queue.append('acceleration: '+str(self.player.ai.vehicle.ai.acceleration))
-            self.vehicle_text_queue.append('throttle: '+str(self.player.ai.vehicle.ai.throttle))
-            self.vehicle_text_queue.append('brake: '+str(self.player.ai.vehicle.ai.brake_power))
-            self.vehicle_text_queue.append('fuel: '+str(self.player.ai.vehicle.ai.fuel))
+            self.vehicle_text_queue.append('speed: '+str(round(self.player.ai.vehicle.ai.vehicle_speed,1)))
+            self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
+            self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
+            self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
+            self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel,2)))
 
 
 

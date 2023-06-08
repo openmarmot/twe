@@ -160,7 +160,7 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         self.last_collision_description=''
         if EVENT_DATA.is_projectile:
-            self.last_collision_description='hit by  '+EVENT_DATA.name
+            self.last_collision_description='hit by '+EVENT_DATA.name
             starting_health=self.health
             self.health-=random.randint(25,75)
             self.bleeding=True
@@ -174,7 +174,7 @@ class AIHuman(AIBase):
             # add the shooter of the bullet to the personal enemies list
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
-                self.last_collision_description+=('from '+EVENT_DATA.ai.shooter.name)
+                self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
 
 
 
@@ -505,11 +505,11 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
+        # remove self from any vehicle roles
+        self.handle_change_vehicle_role('none')
         self.in_vehicle=False
         self.vehicle.ai.passengers.remove(self.owner)
         self.owner.world.add_object(self.owner)
-        # remove self from any vehicle roles
-        self.handle_change_vehicle_role('none')
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
@@ -768,6 +768,15 @@ class AIHuman(AIBase):
 
 
     #-----------------------------------------------------------------------
+    def react_asked_to_enter_vehicle(self,VEHICLE):
+        '''react to the player asking the ai to enter the players vehicle'''
+        if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
+            self.speak('There is no where to sit!')
+        else:
+            self.take_action_enter_vehicle(VEHICLE)
+            self.speak('Climbing onboard')      
+
+    #-----------------------------------------------------------------------
     def react_asked_to_join_squad(self,SQUAD):
         if SQUAD==self.squad:
             self.speak("I'm already in that squad")
@@ -788,6 +797,20 @@ class AIHuman(AIBase):
         else:
             self.speak('nothing better than what i got')
 
+    #-----------------------------------------------------------------------
+    def take_action_enter_vehicle(self,VEHICLE):
+        '''move to and enter vehicle'''
+        # head towards the vehicle
+        # should check if the vehicle is hostile
+
+        self.ai_vehicle_goal='travel'
+        self.ai_vehicle_destination=copy.copy(self.destination)
+
+        self.target_object=VEHICLE
+        self.ai_goal='enter_vehicle'
+        # not using copy here because vehicle may move
+        self.destination=self.target_object.world_coords
+        self.ai_state='start_moving'
 
     #-----------------------------------------------------------------------
     def take_action_get_ammo(self,NEAR):
@@ -1363,18 +1386,10 @@ class AIHuman(AIBase):
                 # fine lets go treking across the map
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle,2000)
                 if b!=None:
+                    # should we check if its hostile??
 
-                    # head towards the vehicle
-                    # should check if the vehicle is hostile
+                    self.take_action_enter_vehicle(b)
 
-                    self.ai_vehicle_goal='travel'
-                    self.ai_vehicle_destination=copy.copy(self.destination)
-
-                    self.target_object=b
-                    self.ai_goal='enter_vehicle'
-                    # not using copy here because vehicle may move
-                    self.destination=self.target_object.world_coords
-                    self.ai_state='start_moving'
                 else:
                     # no vehicles ?
                     pass
