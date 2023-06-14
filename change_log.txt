@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+June 10 2023
+- started working on code for transferring liquids between 
+two objects 
 
+need to fix adding/removing gas from cars but its a bit more complicated 
+of a problem than i first thought.
 ----------------------------------
 June 06 2023
 - added svt40 

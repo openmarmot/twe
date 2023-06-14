@@ -702,6 +702,11 @@ class AIHuman(AIBase):
                 if self.time_since_player_interact>self.time_before_afk:
                     self.handle_normal_ai_update()
 
+    #---------------------------------------------------------------------------
+    def handle_transfer_liquid(self,FROM_OBJECT,TO_OBJECT):
+        '''transfer liquid from one object to another'''
+        pass
+
     #-----------------------------------------------------------------------
     def handle_vehicle_died(self):
         if self.in_vehicle:
