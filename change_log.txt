@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 14 2023
+- resorted some of the functions in math_2d 
+- added function to math_2d to calculate numbers for transfering amounts of things 
+- added handle_transfer function to ai_human to feed data into the math_2d function 
+- updated fuel menu to use new transfer calculator 
+
+once again i remember how much of a mess world_menu is 
+----------------------------------
 June 10 2023
 - started working on code for transferring liquids between 
 two objects 

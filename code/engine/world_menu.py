@@ -283,23 +283,24 @@ class World_Menu(object):
                 print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
 
     def fuel_menu(self, Key):
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
-            self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
-            self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
-            self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
-            self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
-            self.menu_state='base'
-        if self.menu_state=='base':
-            if Key=='1':
-                self.selected_object.ai.fuel+=100
-                #self.deactivate_menu()
-            elif Key=='2':
-                self.selected_object.ai.fuel-=100
-                #self.deactivate_menu()
-            # update fuel load
-            self.world.graphic_engine.menu_text_queue[1]='Current Fuel Load : '+str(self.selected_object.ai.fuel)
+        # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
+        # no need for a menu state
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
+        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+str(self.world.player.ai.large_pickup.ai.used_volume)+self.world.player.ai.large_pickup.ai.liquid_type)
+        self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
+        self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
+        self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
+        self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
+        if Key=='1':
+            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            # update text
+            self.fuel_menu('')
+        elif Key=='2':
+            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            # update text
+            self.fuel_menu('')
 
     def generic_item_menu(self, Key):
         if self.menu_state=='none':
