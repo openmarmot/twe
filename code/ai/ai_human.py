@@ -712,7 +712,8 @@ class AIHuman(AIBase):
             destination_amount=TO_OBJECT.ai.fuel
             destination_maximum=TO_OBJECT.ai.fuel_capacity
             source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
-            print('transfer results',source_result,destination_result)
+            FROM_OBJECT.ai.used_volume=source_result
+            TO_OBJECT.ai.fuel=destination_result
         else:
             print('handle_transfer error: src/dest not recognized!')
 

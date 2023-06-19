@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 19 2023
+- fixed/finished code for adding fuel 
+
+currently only fuel can -> kubelwagen is supported. 
+other flow directions/options can be added but there 
+is no need at the moment. 
+
+----------------------------------
 June 14 2023
 - resorted some of the functions in math_2d 
 - added function to math_2d to calculate numbers for transfering amounts of things 
