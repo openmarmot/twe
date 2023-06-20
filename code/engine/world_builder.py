@@ -1259,6 +1259,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.acceleration=100
         z.ai.fuel_capacity=20
         z.ai.fuel=0 # this can be updated after spawn for starting fuel load
+        # z.ai.fuel=random.randint(0,z.ai.fuel_capacity)
         z.ai.fuel_consumption=0.0033
         z.collision_radius=50
         

@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
+----------------------------------
+June 19 2023
+- fixed/finished code for adding fuel 
 
+currently only fuel can -> kubelwagen is supported. 
+other flow directions/options can be added but there 
+is no need at the moment. 
+
+----------------------------------
+June 14 2023
+- resorted some of the functions in math_2d 
+- added function to math_2d to calculate numbers for transfering amounts of things 
+- added handle_transfer function to ai_human to feed data into the math_2d function 
+- updated fuel menu to use new transfer calculator 
+
+once again i remember how much of a mess world_menu is 
+----------------------------------
+June 10 2023
+- started working on code for transferring liquids between 
+two objects 
+
+need to fix adding/removing gas from cars but its a bit more complicated 
+of a problem than i first thought.
 ----------------------------------
 June 06 2023
 - added svt40 

@@ -7,7 +7,8 @@ email : andrew@openmarmot.com
 notes : 
 
 static module consisting of math functions.
-import as needed
+
+this started out as just 2d graphics math but it grew to have other functions.
 
 I'm pretty sure something is fundamentally wrong with my math in this game 
 some of these functions are the opposite of what they should be
@@ -26,9 +27,6 @@ import math
 import random
 #import custom packages
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='may23 2021' #date of last update
 
 #global variables
 
@@ -109,36 +107,6 @@ def collision_sort(RUNS,WO_OBJECTS):
 # 							break
 # 	return collided
 
-
-#------------------------------------------------------------------------------
-def get_optimal_column_count(AMOUNT):
-	'''calculates an optimal column count that balances columns and rows'''
-
-	run=True
-	columns=10
-	while run :
-		rows=AMOUNT/columns
-		if rows>(columns+1):
-			columns+=1
-		elif rows<(columns-1):
-			columns-=1
-		else:
-			break
-	return columns
-		
-
-
-
-#------------------------------------------------------------------------------
-def get_vector_length(vec2):
-	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
-
-#------------------------------------------------------------------------------
-def get_rotation(coords, target_coords):
-	delta_x=coords[0]-target_coords[0]
-	delta_y=coords[1]-target_coords[1]
-	return math.atan2(delta_x,delta_y) *180 / math.pi
-
 #------------------------------------------------------------------------------
 def get_distance(coords1, coords2):
 	x=coords1[0]-coords2[0]
@@ -170,7 +138,46 @@ def get_normalized(vec2):
 		b=[vec2[0]/l,vec2[1]/l]
 	except ZeroDivisionError:
 		pass
-	return b 
+	return b
+ 
+#------------------------------------------------------------------------------
+def get_optimal_column_count(AMOUNT):
+	'''calculates an optimal column count that balances columns and rows'''
+
+	run=True
+	columns=10
+	while run :
+		rows=AMOUNT/columns
+		if rows>(columns+1):
+			columns+=1
+		elif rows<(columns-1):
+			columns-=1
+		else:
+			break
+	return columns
+		
+#------------------------------------------------------------------------------
+def get_rotation(coords, target_coords):
+	delta_x=coords[0]-target_coords[0]
+	delta_y=coords[1]-target_coords[1]
+	return math.atan2(delta_x,delta_y) *180 / math.pi
+
+#------------------------------------------------------------------------------
+def get_transfer_results(source_amount, destination_amount, destination_maximum):
+	'''get resulting numbers from transfering an amount of something somewhere else'''
+
+	# Calculate the amount that can be transferred without going over the maximum
+	transferable_amount = min(source_amount, destination_maximum - destination_amount)
+
+	# Update the source and destination amounts
+	source_amount -= transferable_amount
+	destination_amount += transferable_amount
+
+	return source_amount, destination_amount
+
+#------------------------------------------------------------------------------
+def get_vector_length(vec2):
+	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
 
 
 #------------------------------------------------------------------------------

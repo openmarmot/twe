@@ -6,7 +6,7 @@ Language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
-handle_SOMETHING - something that the AI decides to do
+handle_SOMETHING - something that the AI decides to do that requires some code to make happen
 take_action_ - something that sets ai_state and ai_goal to start an action
 think_ - something that requires logic code
 '''
@@ -701,6 +701,21 @@ class AIHuman(AIBase):
                 self.time_since_player_interact+=time_passed
                 if self.time_since_player_interact>self.time_before_afk:
                     self.handle_normal_ai_update()
+
+    #---------------------------------------------------------------------------
+    def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
+        '''transfer liquid/ammo/??? from one object to another'''
+        
+        # liquid container to vehicle 
+        if FROM_OBJECT.is_liquid_container and TO_OBJECT.is_vehicle:
+            source_amount=FROM_OBJECT.ai.used_volume
+            destination_amount=TO_OBJECT.ai.fuel
+            destination_maximum=TO_OBJECT.ai.fuel_capacity
+            source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
+            FROM_OBJECT.ai.used_volume=source_result
+            TO_OBJECT.ai.fuel=destination_result
+        else:
+            print('handle_transfer error: src/dest not recognized!')
 
     #-----------------------------------------------------------------------
     def handle_vehicle_died(self):
