@@ -5,6 +5,7 @@ version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
 notes : AI that makes decisions for groups 
+squad removes itself from ai_faction_tactical when members go to zero
 '''
 
 
@@ -56,7 +57,6 @@ class AISquad(object):
 
         # a link back to the parent faction tactical
         # set in ai_faction_tactical.process_spawn_queue()
-        # not used yet
         self.faction_tactical=None
 
         self.time_since_enemy_update=0.
@@ -208,6 +208,10 @@ class AISquad(object):
                 self.world_coords=copy.copy(self.world.player.world_coords)
             else:
                 print('error ai mode not recognized',self.ai_mode)
+        else:
+            # no members. remove from faction tactical
+            self.faction_tactical.squads.remove(self)
+            print('removing squad')
           
 
 

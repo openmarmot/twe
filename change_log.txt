@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 24 2023
+- squads now self remove when members go to zero
+
+I thought squads already went away when all the members were 
+dead but i guess not. this will have an effect on faction_tactical 
+decision making as it considers squads, not individual members 
+
+realistically there aren't enough squads for how the AI works
+not sure what to do about that. either smalle squads or 
+spawn more men
+
+also confirmed that the ai still drives in circles 
+(it stole my car with the engine running)
+need to teach it to turn the engine on itself 
+----------------------------------
 June 19 2023
 - fixed/finished code for adding fuel 
 
