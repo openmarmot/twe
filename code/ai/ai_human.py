@@ -386,6 +386,8 @@ class AIHuman(AIBase):
                     self.vehicle.ai.primary_weapon.ai.equipper=None
             if self.vehicle.ai.driver==self.owner:
                 self.vehicle.ai.driver=None
+                # turn on the brakes to prevent roll away
+                self.vehicle.ai.brake_power=1
 
             if ROLE=='driver':
                 if self.vehicle.ai.driver!=self.owner.world.player:
@@ -404,6 +406,8 @@ class AIHuman(AIBase):
             elif ROLE=='passenger':
                 # nothing to do here, roles already removed
                 pass
+            else :
+                print('error: handle_change_vehicle_role - role not recognized ',ROLE)
 
         else: 
             print('error: attempting to change vehicle role when not in vehicle')
@@ -1307,7 +1311,7 @@ class AIHuman(AIBase):
         if action==False:
 
             if self.vehicle.ai.driver==None:
-                self.vehicle.ai.driver=self.owner
+                self.handle_change_vehicle_role('driver')
 
             if self.vehicle.ai.driver==self.owner:
                 self.think_vehicle_drive()
@@ -1542,29 +1546,44 @@ class AIHuman(AIBase):
     def think_vehicle_drive(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
+        # we want a tighter and more uniform time interval because we are 
+        # actually driving here
+        self.ai_think_rate=0.1
+
+        if self.vehicle.ai.engine_on==False:
+            self.vehicle.ai.engine_on=True
+
+        if self.vehicle.ai.fuel>0:
         # get the rotation to the destination 
-        r = engine.math_2d.get_rotation(self.owner.world_coords,self.ai_vehicle_destination)
+            r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
 
-        # compare that with the current vehicle rotation.. somehow?
-        v = self.vehicle.rotation_angle
+            # compare that with the current vehicle rotation.. somehow?
+            v = self.vehicle.rotation_angle
 
-        if r>v:
-            #self.vehicle.rotation_angle+=1*time_passed
-            #self.vehicle.reset_image=True
-            self.vehicle.ai.handle_steer_left()
-        if r<v:
-            #self.vehicle.rotation_angle-=1*time_passed
-            #self.vehicle.reset_image=True
-            self.vehicle.ai.handle_steer_right()
-        
-        # if its close just set it equal
-        if r>v-5 and r<v+5:
-            self.vehicle.rotation_angle=r
-            self.vehicle.reset_image=True
+            if r>v:
+                #self.vehicle.rotation_angle+=1*time_passed
+                #self.vehicle.reset_image=True
+                self.vehicle.ai.handle_steer_left()
+            if r<v:
+                #self.vehicle.rotation_angle-=1*time_passed
+                #self.vehicle.reset_image=True
+                self.vehicle.ai.handle_steer_right()
+            
+            # if its close just set it equal
+            if r>v-5 and r<v+5:
+                self.vehicle.rotation_angle=r
+                self.vehicle.reset_image=True
+                print('debug steering is close enough')
 
+            print('debug r: ',r,' v: ',v)
 
-        self.vehicle.ai.throttle=1
-        self.vehicle.ai.brake_power=0
+            self.vehicle.ai.throttle=1
+            self.vehicle.ai.brake_power=0
+        else:
+            self.vehicle.ai.brake_power=1
+            print('error: out of fuel, AI does not handle this')
+            # cheat for now as the AI doesn't handle complex tasks yet
+            self.vehicle.ai.fuel+=self.vehicle.ai.fuel_capacity
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
