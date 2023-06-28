@@ -620,6 +620,8 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append('driver: None')
                 else:
                     self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                    distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
+                    self.world.graphic_engine.menu_text_queue.append('distance to destination: '+str(distance))
                 self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
 
             if Key=='1':

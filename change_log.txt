@@ -1,6 +1,41 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 26 2023
+- minor cleanup/updates with ai vehicle handling 
+- ai can turn on vehicle engines now 
+- ai will now never run out of fuel. 
+    - will have to fix in the future 
+- ai now hits the brakes if it exits the driver position 
+- tightened up ai think interval when driving for 
+faster reaction speed 
+
+AI driving seems to work now. 
+I think the major issue was that the think update interval
+could be seconds so the steering would tend to over 
+steer and then over steer the other way. 
+
+i think im near a local maximum of what i can do with the current 
+ai structure. i really need to move to a list of actions so i can 
+string moves together. interesting i did add self.missions at one 
+point but never used it 
+
+----------------------------------
+June 24 2023
+- squads now self remove when members go to zero
+
+I thought squads already went away when all the members were 
+dead but i guess not. this will have an effect on faction_tactical 
+decision making as it considers squads, not individual members 
+
+realistically there aren't enough squads for how the AI works
+not sure what to do about that. either smalle squads or 
+spawn more men
+
+also confirmed that the ai still drives in circles 
+(it stole my car with the engine running)
+need to teach it to turn the engine on itself 
+----------------------------------
 June 19 2023
 - fixed/finished code for adding fuel 
 
