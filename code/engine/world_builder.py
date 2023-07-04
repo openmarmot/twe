@@ -1002,6 +1002,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=7
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
@@ -1018,6 +1019,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=7
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
@@ -1034,6 +1036,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
+        z.ai.reload_speed=7
         z.ai.flight_time=2.5
         z.ai.range=800
         z.ai.type='assault rifle'
@@ -1050,6 +1053,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=30
         z.ai.flight_time=3.5
         z.ai.range=800
         z.ai.type='machine gun'
@@ -1066,6 +1070,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1082,6 +1087,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1098,6 +1104,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1114,6 +1121,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
+        z.ai.reload_speed=13
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='machine gun'
@@ -1130,6 +1138,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=1.1
+        z.ai.reload_speed=10
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1146,6 +1155,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1162,6 +1172,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1178,6 +1189,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.06
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1194,6 +1206,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.08
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1210,6 +1223,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=1.1
+        z.ai.reload_speed=11
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1226,6 +1240,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1242,6 +1257,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=8
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='rifle'

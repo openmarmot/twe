@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 03 2023
+- added reload speed 
+
+reload speed will need tuning 
+current thought 
+- stripper clip bolt actions around 10-11
+- magazine fed guns around 7
+- pistols around 5ish
+- drum mg > bolt action slightly 
+- goofy soviet wheel drum >> because its huge and ridiculous 
+
+this will help differentiate the weapons
+----------------------------------
 June 26 2023
 - minor cleanup/updates with ai vehicle handling 
 - ai can turn on vehicle engines now 
