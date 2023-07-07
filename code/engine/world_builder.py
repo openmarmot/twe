@@ -354,7 +354,7 @@ def generate_clutter(WORLD):
     # chance of crate by a building
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
-        chance=random.randint(0,6)
+        chance=random.randint(0,8)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
         if chance==0 or chance==1:
             spawn_crate(WORLD,coords,'random_consumables_common')
@@ -362,6 +362,8 @@ def generate_clutter(WORLD):
             spawn_crate(WORLD,coords,'random_consumables_rare')
         elif chance==3:
             spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
+        elif chance==4:
+            spawn_object(WORLD,coords,'red_bicycle',True)
 
 
 
@@ -530,6 +532,7 @@ def load_images(world):
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
     world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
+    world.graphic_engine.loadImage('red_bicycle','images/vehicles/bicycle/red_bicycle.png')
 
     #terrain
     world.graphic_engine.loadImage('catgrass','images/catgrass.png')
@@ -620,7 +623,11 @@ def load_test_environment(world):
     k2=spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
     k2.ai.fuel=random.randint(0,k2.ai.fuel_capacity)
 
-    
+    # bikes 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
 
     
     # spawn some crates
@@ -1002,6 +1009,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=7
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
@@ -1018,6 +1026,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=7
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
@@ -1034,6 +1043,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
+        z.ai.reload_speed=7
         z.ai.flight_time=2.5
         z.ai.range=800
         z.ai.type='assault rifle'
@@ -1050,6 +1060,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=30
         z.ai.flight_time=3.5
         z.ai.range=800
         z.ai.type='machine gun'
@@ -1066,6 +1077,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1082,6 +1094,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1098,6 +1111,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=2
         z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
@@ -1114,6 +1128,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=4
         z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
+        z.ai.reload_speed=13
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='machine gun'
@@ -1130,6 +1145,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=1.1
+        z.ai.reload_speed=10
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1146,6 +1162,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1162,6 +1179,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1178,6 +1196,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.06
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1194,6 +1213,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=8
         z.ai.max_magazines=8
         z.ai.rate_of_fire=0.08
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1210,6 +1230,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=1.1
+        z.ai.reload_speed=11
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1226,6 +1247,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
@@ -1242,6 +1264,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.magazine_count=6
         z.ai.max_magazines=6
         z.ai.rate_of_fire=0.8
+        z.ai.reload_speed=8
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='rifle'
@@ -1261,6 +1284,31 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel=0 # this can be updated after spawn for starting fuel load
         # z.ai.fuel=random.randint(0,z.ai.fuel_capacity)
         z.ai.fuel_consumption=0.0033
+        z.collision_radius=50
+        
+        if random.randint(0,3)==1:
+            mg=spawn_object(WORLD,[0,0],'mg34',False)
+            z.ai.primary_weapon=mg
+            z.add_inventory(mg)
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='red_bicycle':
+        # note second image is used for the wreck..
+        z=WorldObject(WORLD,['red_bicycle','red_bicycle'],AIVehicle)
+        z.name='red_bicycle'
+        z.is_vehicle=True
+        z.render_level=3
+        z.ai.speed=150
+        z.ai.rotation_speed=50.
+        z.ai.acceleration=100
+        z.ai.fuel_capacity=0
+        z.ai.fuel=0
+        z.ai.fuel_consumption=0
+        z.ai.has_engine=False
+        z.ai.max_occupants=1
         z.collision_radius=50
         
         if random.randint(0,3)==1:

@@ -32,6 +32,8 @@ class AIVehicle(AIBase):
         # the ai group that this human is a part of 
         self.squad=None
 
+        # false for bike
+        self.has_engine=True
 
         # current fuel type options : gas / diesel / none
         self.fuel_type='gas'
@@ -103,7 +105,7 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-        if self.engine_on:
+        if self.engine_on and self.has_engine:
             self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
 
             if self.throttle>0.5:
@@ -217,18 +219,22 @@ class AIVehicle(AIBase):
                 self.wheel_steering=0
 
 
-        if self.throttle>0 and self.engine_on:
-            if self.vehicle_speed<self.speed:
-                self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
-                if self.vehicle_speed<10:
-                    self.vehicle_speed=10
+        if self.throttle>0:
 
-            self.throttle-=1*time_passed
-            if self.throttle<0.05:
+            if self.engine_on or self.has_engine==False:
+                if self.vehicle_speed<self.speed:
+                    self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
+                    if self.vehicle_speed<10:
+                        self.vehicle_speed=10
+
+                self.throttle-=1*time_passed
+                if self.throttle<0.05:
+                    self.throttle=0
+            else:
+                # gotta catch situations where it has an engine but the engine is off
                 self.throttle=0
         else:
-            # throttle is negative for some reason or engine is off
-            # either way zero out the throttle
+            # throttle is negative for some reason, zero it out
             self.throttle=0
 
         if self.brake_power>0:

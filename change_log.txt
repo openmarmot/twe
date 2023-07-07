@@ -1,5 +1,43 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 06 2023
+- added a bike 
+- rewrote vehicle code a bit to handle vehicles without engines 
+
+i've been wanting to add a bike because gas vehicles should 
+be somewhat rare. although germany is credited with inventing 
+lightning war it wasn't motorized to the degree people think.
+
+guess i should really add horses. hmmm 
+
+bike is hacked in for now. will refine later 
+
+also the art is hilariously bad. won't fix. probably 
+I do need some sort of bike + passenger drawing but the code doesn't 
+currently support that 
+
+--
+saw what seemed to be a successful vehicle ride by an ai followed 
+by circling behavior from another. hmm i wonder if the circling is just turning 
+around a spot without ever getting close enough to exit??
+
+-- 
+i exited a vehicle and it drove off! turns out i must have had a stowaway 
+----------------------------------
+July 03 2023
+- added reload speed 
+
+reload speed will need tuning 
+current thought 
+- stripper clip bolt actions around 10-11
+- magazine fed guns around 7
+- pistols around 5ish
+- drum mg > bolt action slightly 
+- goofy soviet wheel drum >> because its huge and ridiculous 
+
+this will help differentiate the weapons
 ----------------------------------
 June 26 2023
 - minor cleanup/updates with ai vehicle handling 
