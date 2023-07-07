@@ -1553,7 +1553,7 @@ class AIHuman(AIBase):
         if self.vehicle.ai.engine_on==False:
             self.vehicle.ai.engine_on=True
 
-        if self.vehicle.ai.fuel>0:
+        if self.vehicle.ai.fuel>0 or self.vehicle.ai.has_engine==False:
         # get the rotation to the destination 
             r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
 
