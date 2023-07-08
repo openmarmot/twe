@@ -3,6 +3,16 @@ TWE Project : Change Log
 
 ----------------------------------
 July 06 2023
+- minor readme.md updates
+- minor ai_human refactors 
+- bumped a distance check slightly form 200-300 when determining 
+    whether to keep moving when a bot also has personal enemies 
+    (this is overal a fairly broken area of code)
+
+
+
+----------------------------------
+July 06 2023
 - added a bike 
 - rewrote vehicle code a bit to handle vehicles without engines 
 

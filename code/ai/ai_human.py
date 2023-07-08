@@ -63,9 +63,6 @@ class AIHuman(AIBase):
         self.ai_want_medical=False
         self.ai_want_cover=False
 
-
-
-
         self.in_vehicle=False
         # the vehicle the ai is in
         self.vehicle=None
@@ -118,6 +115,9 @@ class AIHuman(AIBase):
 
         self.speed = 0.
         self.rotation_speed=0.
+
+        # max distance that is walkable before deciding a vehicle is better 
+        self.max_walk_distance=2000
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -175,10 +175,6 @@ class AIHuman(AIBase):
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
-
-
-
-                
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
@@ -422,11 +418,6 @@ class AIHuman(AIBase):
         dm+=('\n  - killed by : '+self.last_collision_description)
         print(dm)
 
-        # drop inventory 
-        #for b in self.inventory:
-         #   b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-         #   self.owner.world.add_object(b)
-
         # drop primary weapon 
         if self.primary_weapon!=None:
             self.inventory.remove(self.primary_weapon)
@@ -438,14 +429,8 @@ class AIHuman(AIBase):
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
             else: 
-                # haven't had this happen in awhile. must be fixed
-
+                # note this just in case but the bug causing this was fixed.
                 print('!! Error : '+self.owner.name+' not in squad somehow')
-                print('Squad list')
-                for b in self.squad.members:
-                    print(b.name)
-
-        
 
         # spawn body
         engine.world_builder.spawn_container('body',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
@@ -1299,7 +1284,7 @@ class AIHuman(AIBase):
         # check if we are close to our destination (if we have one)
         elif self.ai_vehicle_goal=='travel':
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
-            if distance<50:
+            if distance<150:
                 self.handle_exit_vehicle()
                 action=True
                 # should probably let everyone else know as well
@@ -1396,7 +1381,7 @@ class AIHuman(AIBase):
         distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
 
         # should we get a vehicle instead of hoofing it to wherever we are going?
-        if distance>2000:
+        if distance>self.max_walk_distance:
             
             # failsafe. we don't want to be going on long trips when we have personal enemies (who are generally close)
             if len(self.personal_enemies)>0:
@@ -1414,7 +1399,7 @@ class AIHuman(AIBase):
                     pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
-            if distance >200 and len(self.personal_enemies)>0:
+            if distance >300 and len(self.personal_enemies)>0:
                 self.think_generic()
                 print('error ! blocked from movement by close enemy')
             else:
