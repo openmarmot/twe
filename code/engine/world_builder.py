@@ -1309,6 +1309,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_consumption=0
         z.ai.has_engine=False
         z.ai.max_occupants=1
+        z.ai.open_top=True
         z.collision_radius=50
         
         if random.randint(0,3)==1:

@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 11 2023
+- added open_top variable to ai_vehicle for bikes and other 
+open top vehicles  
+
+realized to add riders to the bike i need to 
+solve the turret rotation/position problem. I didn't get 
+far but did decide on the concept - the human_ai will NOT 
+remove itself from the world if its entering a open top 
+vehicle 
+
+----------------------------------
 July 06 2023
 - minor readme.md updates
 - minor ai_human refactors 
