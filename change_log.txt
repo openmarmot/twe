@@ -1,5 +1,60 @@
 TWE Project : Change Log
 
+----------------------------------
+July 15 2023
+- big change to how passengers are handled in vehicles 
+    they are no longer removed from the world 
+- added another render level and bumped humans a level above 
+    vehicles so they can be seen in open top vehicles 
+- minor code reshuffling in ai_human 
+- graphics_2d_pygame.renderlevels now supports dynamic expansion 
+- graphics_2d_pygame now obeys world_object.render bool 
+- passengers now render if the vehicle is open top (just bikes at the moment)
+
+this change probably breaks/changes a lot of things. 
+It is going to take some time to get back to normal 
+
+passengers do not rotate with the vehicle or assume a position relative to a 
+vehicle seat - will have to add that stuff in the future
+
+note: need to be careful about copy.copy and copy.deepcopy 
+copy.copy is still a linked copy if there are any mutable objects.
+I briefly used copy.copy to reset the render lists and this created a 
+exponential expansion as it created accidentally permanent internal lists.
+I looked through the rest of the code and I didn't spot anywhere else where 
+I think this will be an issue 
+
+mouse object selection needs a rewrite. I probably need to make it 
+more of a intelligent select. Also it needs to understand object 
+collision circles 
+
+render levels probably need to be more dynamic. its a challenge to 
+place everything at the right level - perhaps objects should dynamically 
+change their level ???
+
+I should possibly add a optional sanity checker that i can turn on and off.
+it would comb through the game objects and maker sure all parameters are within 
+expected sizes and levels
+
+----------------------------------
+July 11 2023
+- added open_top variable to ai_vehicle for bikes and other 
+open top vehicles  
+
+realized to add riders to the bike i need to 
+solve the turret rotation/position problem. I didn't get 
+far but did decide on the concept - the human_ai will NOT 
+remove itself from the world if its entering a open top 
+vehicle 
+
+----------------------------------
+July 06(?) 2023
+- minor readme.md updates
+- minor ai_human refactors 
+- bumped a distance check slightly form 200-300 when determining 
+    whether to keep moving when a bot also has personal enemies 
+    (this is overal a fairly broken area of code)
+- bumped 'arrived at destination' distance from 50 to 150 for bots in vehicles 
 
 ----------------------------------
 July 06 2023

@@ -63,9 +63,6 @@ class AIHuman(AIBase):
         self.ai_want_medical=False
         self.ai_want_cover=False
 
-
-
-
         self.in_vehicle=False
         # the vehicle the ai is in
         self.vehicle=None
@@ -119,42 +116,10 @@ class AIHuman(AIBase):
         self.speed = 0.
         self.rotation_speed=0.
 
-    #---------------------------------------------------------------------------
-    def update(self):
-        ''' overrides base update '''
+        # max distance that is walkable before deciding a vehicle is better 
+        self.max_walk_distance=2000
 
-        # -- general stuff for all objects --
-        if self.health<1:
-            self.handle_death()
-        else :
 
-            if self.in_vehicle:
-                if self.vehicle.ai.health<1:
-                    #this needs to be here as there will exactly one update cycle if a vehicle dies
-                    self.handle_vehicle_died()
-            
-            if self.bleeding:
-                
-                self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
-                if self.time_since_bleed>self.bleed_interval:
-                    # make this a bit random 
-                    self.bleed_interval=0.5+random.randint(0,20)
-                    self.health-=1+random.randint(0,10)
-                    self.time_since_bleed=0
-                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
-
-            if self.primary_weapon!=None:
-                # needs updates for time tracking and other stuff
-                self.primary_weapon.update()
-
-            # hunger/thirst stuff
-            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
-            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
-
-            if self.owner.is_player:
-                self.handle_player_update()
-            else :
-                self.handle_normal_ai_update()
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -175,10 +140,6 @@ class AIHuman(AIBase):
             # bullets and shrapnel from grenades and panzerfausts track ownership
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
-
-
-
-                
 
                 # let the squad know (this is only until the enemy list is rebuilt)
                 # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
@@ -422,11 +383,6 @@ class AIHuman(AIBase):
         dm+=('\n  - killed by : '+self.last_collision_description)
         print(dm)
 
-        # drop inventory 
-        #for b in self.inventory:
-         #   b.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-         #   self.owner.world.add_object(b)
-
         # drop primary weapon 
         if self.primary_weapon!=None:
             self.inventory.remove(self.primary_weapon)
@@ -438,14 +394,8 @@ class AIHuman(AIBase):
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
             else: 
-                # haven't had this happen in awhile. must be fixed
-
+                # note this just in case but the bug causing this was fixed.
                 print('!! Error : '+self.owner.name+' not in squad somehow')
-                print('Squad list')
-                for b in self.squad.members:
-                    print(b.name)
-
-        
 
         # spawn body
         engine.world_builder.spawn_container('body',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
@@ -495,9 +445,12 @@ class AIHuman(AIBase):
         # should maybe pick driver or gunner role here
 
         VEHICLE.ai.passengers.append(self.owner)
-        self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
         self.vehicle=VEHICLE
+        
+        if self.vehicle.ai.open_top==False:
+            # human is hidden by top of vehicle so don't render
+            self.owner.render=False
 
         if self.owner.is_player or self.vehicle.ai.driver==None:
             self.handle_change_vehicle_role('driver')
@@ -513,10 +466,12 @@ class AIHuman(AIBase):
         self.handle_change_vehicle_role('none')
         self.in_vehicle=False
         self.vehicle.ai.passengers.remove(self.owner)
-        self.owner.world.add_object(self.owner)
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
+
+        # make sure we are visible again
+        self.owner.render=True
         
         self.speak('Jumping out')
 
@@ -1299,7 +1254,7 @@ class AIHuman(AIBase):
         # check if we are close to our destination (if we have one)
         elif self.ai_vehicle_goal=='travel':
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
-            if distance<50:
+            if distance<150:
                 self.handle_exit_vehicle()
                 action=True
                 # should probably let everyone else know as well
@@ -1396,7 +1351,7 @@ class AIHuman(AIBase):
         distance=engine.math_2d.get_distance(self.owner.world_coords,self.destination)
 
         # should we get a vehicle instead of hoofing it to wherever we are going?
-        if distance>2000:
+        if distance>self.max_walk_distance:
             
             # failsafe. we don't want to be going on long trips when we have personal enemies (who are generally close)
             if len(self.personal_enemies)>0:
@@ -1414,7 +1369,7 @@ class AIHuman(AIBase):
                     pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
-            if distance >200 and len(self.personal_enemies)>0:
+            if distance >300 and len(self.personal_enemies)>0:
                 self.think_generic()
                 print('error ! blocked from movement by close enemy')
             else:
@@ -1593,3 +1548,52 @@ class AIHuman(AIBase):
             self.owner.world.add_object(self.throwable)
             self.inventory.remove(self.throwable)
             self.throwable=None
+
+    #---------------------------------------------------------------------------
+    def update(self):
+        ''' overrides base update '''
+
+        # -- general stuff for all objects --
+        if self.health<1:
+            self.handle_death()
+        else :
+
+            # some unique vehicle stuff that needs to be applied to the player AND the AI
+            if self.in_vehicle:
+                if self.vehicle.ai.health<1:
+                    #this needs to be here as there will exactly one update cycle if a vehicle dies
+                    self.handle_vehicle_died()
+                self.update_human_vehicle_position()
+                
+            
+            if self.bleeding:
+                
+                self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
+                if self.time_since_bleed>self.bleed_interval:
+                    # make this a bit random 
+                    self.bleed_interval=0.5+random.randint(0,20)
+                    self.health-=1+random.randint(0,10)
+                    self.time_since_bleed=0
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
+
+            if self.primary_weapon!=None:
+                # needs updates for time tracking and other stuff
+                self.primary_weapon.update()
+
+            # hunger/thirst stuff
+            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
+
+            if self.owner.is_player:
+                self.handle_player_update()
+            else :
+                self.handle_normal_ai_update()
+
+    #---------------------------------------------------------------------------
+    def update_human_vehicle_position(self):
+        '''update the humans position relative to the vehicle'''
+
+        # 
+        self.owner.world_coords=copy.copy(self.vehicle.world_coords)
+
+        # rotation??

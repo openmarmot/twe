@@ -35,6 +35,9 @@ class AIVehicle(AIBase):
         # false for bike
         self.has_engine=True
 
+        # open top aka passengers are viewable
+        self.open_top=False
+
         # current fuel type options : gas / diesel / none
         self.fuel_type='gas'
         # max fuel load in liters
@@ -122,14 +125,6 @@ class AIVehicle(AIBase):
         if self.primary_weapon!=None:
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
-
-        if len(self.passengers)>0:
-
-            for b in self.passengers:
-                # update passenger coords. this fixes a lot of issues
-                b.world_coords=copy.copy(self.owner.world_coords)
-                b.update()
-                # maybe run a normal ai.update here for each player
 
 
     #---------------------------------------------------------------------------

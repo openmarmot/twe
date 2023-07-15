@@ -20,12 +20,13 @@ I am developing this game by just randomly working on whatever I feel like on a 
 ### Things to do
 - spawn different objects with the debug menu
 - spawn as a german or russian and follow your squad into combat
-- try not to die as the AI gets in large fire fights around you
-- take a leisurly drive in your new Kubelwagen 
+- spawn as a civilian and try to survive the cross fire
+- borrow a kubelwagen and take a relaxing drive
+- find and loot the parachute supply drop
 - find and eat all four types of cheese (gives a health bonus as in real life)
 
 
-### Check the changelog on the Dev branch to see what I've been working on.
+### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details.
   
 ### To Play 
 - install python3 and pygame
@@ -34,7 +35,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - python3 twe.py (windows would be: py twe.py)
 
 ### Controls
-- '~' opens/closes debug menu (spawn zombies!)
+- '~' opens/closes debug menu 
 - 'w/s/a/d' movement
 - left click on a object to open context menu
 - tab closes an open menu. If no menu is open it will instead open the menu for the player, or the vehicle you are in
@@ -51,7 +52,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 ### License / Whatever
 - I want to do this project completely by myself to improve my python skills and just as a fun hobby. 
 - However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks! 
-- On this project it is rare that I copy code from the internet, almost most of it is from scratch (that is why the math is so bad) - 
+- On this project it is rare that I copy code from the internet, almost all of it is from scratch (that is why the math is so bad) - 
 but when I have copied code I will try to include references from where I got it
 
 ![screenshot](/screenshots/twe_battle_feb_03_2022.png "TWE screenshot")
