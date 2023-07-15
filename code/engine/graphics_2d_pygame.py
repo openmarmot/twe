@@ -49,9 +49,12 @@ class Graphics_2D_Pygame(object):
         # 0 - ground cover
         # 1 - man made ground cover (cement, building insides)
         # 2 - objects laying on the ground (weapons,etc)
-        # 3 - objects walking on the ground (humans, animals, vehicles)
-        # 4 - objects above ground (birds, planes, clouds, etc)
-        self.renderlists=[[],[],[],[],[]]
+        # 3 - objects slightly elevated above ground (vehicles, animals??)
+        # 4 - objects that are slightly above object level 3 (humans who can ride in vehicles, vehicle turrets)
+        # 5 - objects above ground (birds, planes, clouds, etc)
+        
+        self.render_level_count=6
+        self.renderlists=[[] for _ in range(self.render_level_count)]
 
         # count of rendered objects
         self.renderCount=0
@@ -320,8 +323,6 @@ class Graphics_2D_Pygame(object):
         # note - i wonder if computing this is slower than just rendering everything
         # should add an ability to toggle this once i get a FPS count setup
 
-        # note - this does not check world_object.render bool but maybe it should
-
         viewrange_x=((self.world.player.world_coords[0]+
             self.screen_size[0]+self.view_adjust), (self.world.player.world_coords[0]-
             self.screen_size[0]-self.view_adjust))
@@ -330,28 +331,31 @@ class Graphics_2D_Pygame(object):
             self.screen_size[1])-self.view_adjust)
 
         #clear out the render levels
-        self.renderlists=[[],[],[],[],[]]
+        self.renderlists=[[] for _ in range(self.render_level_count)]
+
         translation=self.get_translation()
 
         self.renderCount=0
         for b in self.world.wo_objects:
-            #determine whether object 'b' world_coords are within
-            #the viewport bounding box
-            if(b.world_coords[0]<viewrange_x[0] and
-                b.world_coords[0]>viewrange_x[1]):
-                if(b.world_coords[1]<viewrange_y[0] and
-                    b.world_coords[1]>viewrange_y[1]):
-                    #object is within the viewport, add it to the render list
-                    self.renderlists[b.render_level].append(b)
-                    self.renderCount+=1
-                    #apply transform to generate screen coords
 
-                    b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
-                    b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
+            if b.render:
+                #determine whether object 'b' world_coords are within
+                #the viewport bounding box
+                if(b.world_coords[0]<viewrange_x[0] and
+                    b.world_coords[0]>viewrange_x[1]):
+                    if(b.world_coords[1]<viewrange_y[0] and
+                        b.world_coords[1]>viewrange_y[1]):
+                        #object is within the viewport, add it to the render list
+                        self.renderlists[b.render_level].append(b)
+                        self.renderCount+=1
+                        #apply transform to generate screen coords
 
-                    # honestly can't tell if this is better or not
-                    if self.smooth_jitter:
-                        b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
+                        b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
+                        b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
+
+                        # honestly can't tell if this is better or not
+                        if self.smooth_jitter:
+                            b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
 
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):

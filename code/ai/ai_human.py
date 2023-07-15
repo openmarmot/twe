@@ -119,42 +119,7 @@ class AIHuman(AIBase):
         # max distance that is walkable before deciding a vehicle is better 
         self.max_walk_distance=2000
 
-    #---------------------------------------------------------------------------
-    def update(self):
-        ''' overrides base update '''
 
-        # -- general stuff for all objects --
-        if self.health<1:
-            self.handle_death()
-        else :
-
-            if self.in_vehicle:
-                if self.vehicle.ai.health<1:
-                    #this needs to be here as there will exactly one update cycle if a vehicle dies
-                    self.handle_vehicle_died()
-            
-            if self.bleeding:
-                
-                self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
-                if self.time_since_bleed>self.bleed_interval:
-                    # make this a bit random 
-                    self.bleed_interval=0.5+random.randint(0,20)
-                    self.health-=1+random.randint(0,10)
-                    self.time_since_bleed=0
-                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
-
-            if self.primary_weapon!=None:
-                # needs updates for time tracking and other stuff
-                self.primary_weapon.update()
-
-            # hunger/thirst stuff
-            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
-            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
-
-            if self.owner.is_player:
-                self.handle_player_update()
-            else :
-                self.handle_normal_ai_update()
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -480,9 +445,12 @@ class AIHuman(AIBase):
         # should maybe pick driver or gunner role here
 
         VEHICLE.ai.passengers.append(self.owner)
-        self.owner.world.remove_object(self.owner)
         self.in_vehicle=True
         self.vehicle=VEHICLE
+        
+        if self.vehicle.ai.open_top==False:
+            # human is hidden by top of vehicle so don't render
+            self.owner.render=False
 
         if self.owner.is_player or self.vehicle.ai.driver==None:
             self.handle_change_vehicle_role('driver')
@@ -498,10 +466,12 @@ class AIHuman(AIBase):
         self.handle_change_vehicle_role('none')
         self.in_vehicle=False
         self.vehicle.ai.passengers.remove(self.owner)
-        self.owner.world.add_object(self.owner)
         self.vehicle=None
         self.ai_goal='none'
         self.ai_state='none'
+
+        # make sure we are visible again
+        self.owner.render=True
         
         self.speak('Jumping out')
 
@@ -1578,3 +1548,52 @@ class AIHuman(AIBase):
             self.owner.world.add_object(self.throwable)
             self.inventory.remove(self.throwable)
             self.throwable=None
+
+    #---------------------------------------------------------------------------
+    def update(self):
+        ''' overrides base update '''
+
+        # -- general stuff for all objects --
+        if self.health<1:
+            self.handle_death()
+        else :
+
+            # some unique vehicle stuff that needs to be applied to the player AND the AI
+            if self.in_vehicle:
+                if self.vehicle.ai.health<1:
+                    #this needs to be here as there will exactly one update cycle if a vehicle dies
+                    self.handle_vehicle_died()
+                self.update_human_vehicle_position()
+                
+            
+            if self.bleeding:
+                
+                self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
+                if self.time_since_bleed>self.bleed_interval:
+                    # make this a bit random 
+                    self.bleed_interval=0.5+random.randint(0,20)
+                    self.health-=1+random.randint(0,10)
+                    self.time_since_bleed=0
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
+
+            if self.primary_weapon!=None:
+                # needs updates for time tracking and other stuff
+                self.primary_weapon.update()
+
+            # hunger/thirst stuff
+            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
+
+            if self.owner.is_player:
+                self.handle_player_update()
+            else :
+                self.handle_normal_ai_update()
+
+    #---------------------------------------------------------------------------
+    def update_human_vehicle_position(self):
+        '''update the humans position relative to the vehicle'''
+
+        # 
+        self.owner.world_coords=copy.copy(self.vehicle.world_coords)
+
+        # rotation??

@@ -69,6 +69,10 @@ esc - exit the current menu
 - if you are near bots you will occasionally see things they are 
     saying in the upper left corner of the screen 
 
+# vehicles 
+- if you are in a vehicle you can bring up the vehicle menu with tab 
+    - this is sometimes easier than selecting it due to multiple objects overlapping 
+
 
 --------- Getting Started ----------------
 

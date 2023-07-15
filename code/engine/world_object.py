@@ -63,14 +63,11 @@ class WorldObject(object):
         self.heading=[0,0]
 
         # render level kind of a 'z' layer
-        # 0 - ground cover
-        # 1 - man made ground cover (cement, building insides)
-        # 2 - objects laying on the ground (weapons,etc)
-        # 3 - objects walking on the ground (humans, animals, vehicles)
-        # 4 - objects above ground (birds, planes, clouds, etc)
+        # see graphics_2d_pygame for the current list of levels
         self.render_level=1
 
-        # not sure this is used at the moment
+        # checked by graphics_2d_pygame.update_render_info 
+        # to determine whether to render the object or not
         self.render=True
 
 

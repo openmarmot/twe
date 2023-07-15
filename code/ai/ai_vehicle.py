@@ -126,14 +126,6 @@ class AIVehicle(AIBase):
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
 
-        if len(self.passengers)>0:
-
-            for b in self.passengers:
-                # update passenger coords. this fixes a lot of issues
-                b.world_coords=copy.copy(self.owner.world_coords)
-                b.update()
-                # maybe run a normal ai.update here for each player
-
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
