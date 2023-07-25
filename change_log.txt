@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 25 2023
+- added rotation to passengers when riding in open top vehicles 
+
+
 ----------------------------------
 July 15 2023
 - big change to how passengers are handled in vehicles 

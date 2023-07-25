@@ -1559,6 +1559,7 @@ class AIHuman(AIBase):
         else :
 
             # some unique vehicle stuff that needs to be applied to the player AND the AI
+            # if this gets bigger it should get its own function
             if self.in_vehicle:
                 if self.vehicle.ai.health<1:
                     #this needs to be here as there will exactly one update cycle if a vehicle dies
@@ -1596,4 +1597,8 @@ class AIHuman(AIBase):
         # 
         self.owner.world_coords=copy.copy(self.vehicle.world_coords)
 
-        # rotation??
+        # rotate to match vehicle heading
+        if self.vehicle.ai.open_top:
+            if self.owner.rotation_angle!=self.vehicle.rotation_angle:
+                self.owner.rotation_angle=self.vehicle.rotation_angle
+                self.owner.reset_image=True
