@@ -50,9 +50,6 @@ from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='August 15 2022' #date of last update
 
 #global variables
 
@@ -1301,12 +1298,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='red_bicycle'
         z.is_vehicle=True
         z.render_level=3
-        z.ai.speed=150
+        z.ai.speed=100
         z.ai.rotation_speed=50.
-        z.ai.acceleration=100
+        z.ai.acceleration=80
         z.ai.fuel_capacity=0
         z.ai.fuel=0
         z.ai.fuel_consumption=0
+        z.ai.fuel_type='none' # this needs to be a string
         z.ai.has_engine=False
         z.ai.max_occupants=1
         z.ai.open_top=True

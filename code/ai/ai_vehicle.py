@@ -38,7 +38,7 @@ class AIVehicle(AIBase):
         # open top aka passengers are viewable
         self.open_top=False
 
-        # current fuel type options : gas / diesel / none
+        # current fuel type options : gas / diesel / none. note that this needs to be a string, not None type
         self.fuel_type='gas'
         # max fuel load in liters
         self.fuel_capacity=0

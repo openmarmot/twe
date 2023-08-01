@@ -1528,9 +1528,7 @@ class AIHuman(AIBase):
             if r>v-5 and r<v+5:
                 self.vehicle.rotation_angle=r
                 self.vehicle.reset_image=True
-                print('debug steering is close enough')
 
-            print('debug r: ',r,' v: ',v)
 
             self.vehicle.ai.throttle=1
             self.vehicle.ai.brake_power=0

@@ -24,10 +24,6 @@ import pygame.freetype
 from itertools import islice
 #import custom packages
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='July 16 2021' #date of last update
-
 #global variables
 
 

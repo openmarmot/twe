@@ -2,9 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 31 2023
+- tuning bike performance characteristics 
+- removing some unneeded debug statements 
+- small amount of misc cleanup 
+
+----------------------------------
 July 25 2023
 - added rotation to passengers when riding in open top vehicles 
-
 
 ----------------------------------
 July 15 2023
