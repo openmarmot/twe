@@ -20,12 +20,17 @@ class Penetration_Calculator(object):
     def __init__(self):
         # this object is created by world init 
         # velocity is in feet per second
+
+        # note velocity doesn't make sense here - it should be per weapon per projectile type
+
         self.projectile_data={}
         self.projectile_data['9mm_124']={'material':'lead','grain_weight':124,'velocity':1050,'notes':'standard german early war fmj 9mm'}
         self.projectile_data['9mm_115']={'material':'lead','grain_weight':115,'velocity':1200,'notes':'standard us/commonwealth fmj 9mm'}
         self.projectile_data['9mm_ME']={'material':'mild_steel','grain_weight':94,'velocity':1500,'notes':'standard german issue late war iron core'}
         self.projectile_data['45acp']={'material':'lead','grain_weight':230,'velocity':800,'notes':'standard issue 45 ACP'}
-        self.projectile_data['7.62x25']={'material':'lead','grain_weight':90,'velocity':1450,'notes':'standar tokarev ammo, probably light ap'}
+        self.projectile_data['7.62x25']={'material':'lead','grain_weight':90,'velocity':1450,'notes':'standard tokarev ammo, probably light ap'}
+        self.projectile_data['7.62x54_L']={'material':'lead','grain_weight':147,'velocity':2838,'notes':'standard soviet light ball'}
+        self.projectile_data['7.62x54_D']={'material':'mild_steel','grain_weight':185,'velocity':2600,'notes':'heavy ball, light ap'}
         self.projectile_data['7.92x57_SSP']={'material':'lead','grain_weight':197.53,'velocity':2493,'notes':'german early war/sniper ss patrone '}
         self.projectile_data['7.92x57_SME']={'material':'mild_steel','grain_weight':178.2,'velocity':2592,'notes':'standard issue german iron core '}
         self.projectile_data['7.92x57_SMK']={'material':'hard_steel','grain_weight':182.9,'velocity':2575,'notes':'german standard ap '}
