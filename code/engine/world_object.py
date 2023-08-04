@@ -12,10 +12,6 @@ notes :
 
 #import custom packages
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='March 27 2021' #date of last update
-
 #global variables
 
 

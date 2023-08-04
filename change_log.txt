@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 03 2023
+- added two 7.62x54mm bullet types 
+- updated soviet weapons to use 7.62x54 as appropriate
+
+long overdue on adding 7.62x54mm although this is currently 
+doesn't make much of a difference to the player. 
+
+I think in the near future ammo storage really needs to be by bullet type 
+instead of being generic. This would generate a real burden once ammo runs 
+out though. 
+
+----------------------------------
+July 31 2023
+- tuning bike performance characteristics 
+- removing some unneeded debug statements 
+- small amount of misc cleanup 
+
+----------------------------------
+July 25 2023
+- added rotation to passengers when riding in open top vehicles 
+
+----------------------------------
 July 15 2023
 - big change to how passengers are handled in vehicles 
     they are no longer removed from the world 
