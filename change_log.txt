@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 12 2023
+- reconfiguring how the ai interacts with buildings 
+
+
+
+----------------------------------
 August 03 2023
 - added two 7.62x54mm bullet types 
 - updated soviet weapons to use 7.62x54 as appropriate

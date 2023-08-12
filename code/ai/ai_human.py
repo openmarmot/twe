@@ -20,9 +20,6 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 24 2021' #date of last update
 
 #global variables
 
@@ -70,6 +67,11 @@ class AIHuman(AIBase):
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
         self.ai_vehicle_destination=None
+
+        self.in_building=False
+        self.bulding_list=[] # list of buildings the ai is overlapping spatially
+        self.time_since_building_check=0
+        self.building_check_rate=1
 
         self.time_since_ai_transition=0.
         self.ai_think_rate=0
@@ -573,7 +575,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
-        #print('time since player interact ',self.time_since_player_interact)
+        
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
@@ -1565,6 +1567,12 @@ class AIHuman(AIBase):
                 self.update_human_vehicle_position()
                 
             
+            # building awareness stuff. ai and human need this 
+            self.time_since_building_check+=self.owner.world.graphic_engine.time_passed_seconds
+            if self.time_since_building_check>self.building_check_rate:
+                self.handle_building_check()
+
+
             if self.bleeding:
                 
                 self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds
