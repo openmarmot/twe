@@ -3,8 +3,12 @@ TWE Project : Change Log
 ----------------------------------
 August 12 2023
 - reconfiguring how the ai interacts with buildings 
+    - added new in_building bool and related detection code 
+- minor menu updates
+- very minor misc clean up 
 
-
+I've switched development work to a apple m2 mac. the game feels the same.
+I'm pleased to see that pygame is very cross platform. No issues with the ARM M2 processor. 
 
 ----------------------------------
 August 03 2023

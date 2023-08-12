@@ -337,6 +337,23 @@ class AIHuman(AIBase):
         return calc_speed
     
     #---------------------------------------------------------------------------
+    def handle_building_check(self):
+
+        # reset transition to zero
+        self.time_since_building_check=0
+
+        # randomize time before we hit this method again
+        self.building_check_rate=random.uniform(0.1,1.5)
+        # clear building list and in_building bool
+        self.bulding_list=[]
+        self.in_building=False
+        # check to see if we are colliding with any of the buildings
+        for b in self.owner.world.wo_objects_building:
+            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
+                self.bulding_list.append(b)
+                self.in_building=True
+
+    #---------------------------------------------------------------------------
     def handle_change_vehicle_role(self,ROLE):
         ''' change your role on the vehicle crew'''
         # ROLE : driver , gunner, passenger, none

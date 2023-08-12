@@ -12,7 +12,7 @@ It should not have any specific graphic engine code (pygame, etc)
 #import built in modules
 import random
 import copy
-from unittest import result 
+#from unittest import result  # no idea why this was here. disabled 8/2023
 
 
 #import custom packages
@@ -23,9 +23,6 @@ import engine.math_2d
 import engine.world_builder
 from ai.ai_faction_tactical import AIFactionTactical
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 17 2021' #date of last update
 
 #global variables
 
