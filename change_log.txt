@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 14 2023
+- buildings you are in now get added to the ignore list for bullets you fire 
+
+not sure the building bullet collision avoidance is working. shooting from 
+inside a building seemed intermittent like it was still getting blocked. 
+
+also hilariously saw a bot biking in a circle - probably around his destination
+might need to bump bikes to 100 - or better write some code to detect conditions 
+where reaching a destination is impossible
+----------------------------------
 August 12 2023
 - reconfiguring how the ai interacts with buildings 
     - added new in_building bool and related detection code 
