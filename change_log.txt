@@ -1,6 +1,33 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 15 2023
+- fixed spelling error preventing building awareness from working 
+- added additional debug text to various menus - especially driving 
+- fixed bug that causes cars to circle (hopefully)
+- lots of bot driving code changes 
+    - most of this was troubleshooting but it should be smoother now 
+
+while play testing I jumped on a bike. 
+- i was suprised to find the bike had a mg34 
+- i was suprised to find i could drive and fire when i switched to gunner position 
+
+i drove around on my bike machine gunning troops until Yuri popped me 
+with a mosin nagant. 
+
+I was able to confirm that vehicle hits are passing through 
+to occupants - i need to review this and maybe tweak 
+
+bots driving vehicles in circles ended up being caused by the get_rotation function 
+from math_2d occasionally returning a negative number. this wasn't an issue in the rest 
+of the code (apparently??) but the driving code could only make positive angles.
+
+I fixed that and also introduced a neutral steering for when the bot neither wnnts to 
+steer left or right. I also increased the speed of driving decisions significantly 
+
+From what I can tell driving is probably the best it has ever been now. 
+
+----------------------------------
 August 14 2023
 - buildings you are in now get added to the ignore list for bullets you fire 
 

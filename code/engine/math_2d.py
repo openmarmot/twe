@@ -158,9 +158,18 @@ def get_optimal_column_count(AMOUNT):
 		
 #------------------------------------------------------------------------------
 def get_rotation(coords, target_coords):
-	delta_x=coords[0]-target_coords[0]
-	delta_y=coords[1]-target_coords[1]
-	return math.atan2(delta_x,delta_y) *180 / math.pi
+    delta_x = coords[0] - target_coords[0]
+    delta_y = coords[1] - target_coords[1]
+    
+    # Calculate the angle in radians
+    angle_rad = math.atan2(delta_x, delta_y)
+    
+    # Convert the angle to degrees and ensure it's positive
+    angle_deg = math.degrees(angle_rad)
+    if angle_deg < 0:
+        angle_deg += 360
+        
+    return angle_deg
 
 #------------------------------------------------------------------------------
 def get_transfer_results(source_amount, destination_amount, destination_maximum):

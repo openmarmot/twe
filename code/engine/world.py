@@ -472,6 +472,8 @@ class World(object):
         self.debug_text_queue.append('Player World Coords: '+str(self.player.world_coords))
         self.debug_text_queue.append('Player Fatigue: '+str(self.player.ai.fatigue))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
+        self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
+
 
         # world area data
         for b in self.world_areas:
