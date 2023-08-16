@@ -155,6 +155,11 @@ class AIGun(AIBase):
                         # add the vehicle otherwise it tends to get hit
                         ignore_list.append(self.equipper.ai.vehicle)
 
+                    if self.equipper.ai.in_building:
+                        # add possible buildings the equipper is in.
+                        # assuming they are shooting out windows so should not hit the building
+                        ignore_list+=self.equipper.ai.building_list
+
                     engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,ignore_list,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
 
                     # spawn brass 

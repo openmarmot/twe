@@ -181,6 +181,11 @@ class AIVehicle(AIBase):
             self.wheel_steering=-1
 
     #---------------------------------------------------------------------------
+    def handle_steer_neutral(self):
+        '''reset steerign to zero'''
+        self.wheel_steering=0
+
+    #---------------------------------------------------------------------------
     def update_physics(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 

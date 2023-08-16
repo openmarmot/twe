@@ -20,9 +20,6 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 24 2021' #date of last update
 
 #global variables
 
@@ -70,6 +67,11 @@ class AIHuman(AIBase):
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
         self.ai_vehicle_destination=None
+
+        self.in_building=False
+        self.building_list=[] # list of buildings the ai is overlapping spatially
+        self.time_since_building_check=0
+        self.building_check_rate=1
 
         self.time_since_ai_transition=0.
         self.ai_think_rate=0
@@ -335,6 +337,23 @@ class AIHuman(AIBase):
         return calc_speed
     
     #---------------------------------------------------------------------------
+    def handle_building_check(self):
+
+        # reset transition to zero
+        self.time_since_building_check=0
+
+        # randomize time before we hit this method again
+        self.building_check_rate=random.uniform(0.1,1.5)
+        # clear building list and in_building bool
+        self.building_list=[]
+        self.in_building=False
+        # check to see if we are colliding with any of the buildings
+        for b in self.owner.world.wo_objects_building:
+            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
+                self.building_list.append(b)
+                self.in_building=True
+
+    #---------------------------------------------------------------------------
     def handle_change_vehicle_role(self,ROLE):
         ''' change your role on the vehicle crew'''
         # ROLE : driver , gunner, passenger, none
@@ -447,6 +466,8 @@ class AIHuman(AIBase):
         VEHICLE.ai.passengers.append(self.owner)
         self.in_vehicle=True
         self.vehicle=VEHICLE
+        self.ai_goal='in_vehicle'
+        self.ai_state='in_vehicle'
         
         if self.vehicle.ai.open_top==False:
             # human is hidden by top of vehicle so don't render
@@ -517,7 +538,11 @@ class AIHuman(AIBase):
             self.think_generic()
 
         # this should be last to over ride the other things we were going to do
-        if self.health<10: 
+        if self.health<10:
+            if self.in_vehicle:
+                # maybe need more nuance to this. is there a good reason to be in a vehicle if you are almost dead?
+                self.handle_exit_vehicle()
+
             if self.think_healing_options()==False :
                 # no health to be had! (probably impossible with the amount of consumables)
                 # roll to see if we panic
@@ -573,7 +598,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_player_update(self):
         ''' handle any player specific code'''
-        #print('time since player interact ',self.time_since_player_interact)
+        
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
@@ -1243,7 +1268,6 @@ class AIHuman(AIBase):
 
         # the initial decision tree for in vehicle
 
-        # this shouldn't DO much more than change the ai_state
         action=False
         # check vehicle health, should we bail out ?
         if self.vehicle.ai.health<10:
@@ -1400,7 +1424,6 @@ class AIHuman(AIBase):
                     # hmm object is gone. someone else must have grabbed it
                     # this is especially odd because it is a container
                     print('error: container is unexpectedly missing')
-                    pass
                 self.ai_state='sleeping'
         elif self.ai_goal=='enter_vehicle':
 
@@ -1412,12 +1435,11 @@ class AIHuman(AIBase):
                 if DISTANCE<5:
                     if self.target_object in self.owner.world.wo_objects:
                         self.handle_enter_vehicle(self.target_object)
-
                     else:
                         # hmm object is gone. idk how that happened
-                        print('object I was going to enter disappeared')
-                        pass
-                    self.ai_state='sleeping'
+                        print('error: vehicle bot was going to enter no longer exists')
+                        self.ai_state='sleeping'
+
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
                 print('replenishing ammo ')
@@ -1519,14 +1541,18 @@ class AIHuman(AIBase):
                 #self.vehicle.rotation_angle+=1*time_passed
                 #self.vehicle.reset_image=True
                 self.vehicle.ai.handle_steer_left()
+                self.ai_think_rate=0.01
             if r<v:
                 #self.vehicle.rotation_angle-=1*time_passed
                 #self.vehicle.reset_image=True
                 self.vehicle.ai.handle_steer_right()
+                self.ai_think_rate=0.01
             
             # if its close just set it equal
-            if r>v-5 and r<v+5:
-                self.vehicle.rotation_angle=r
+            if r>v-1 and r<v+1:
+                # neutral out steering 
+                self.vehicle.ai.handle_steer_neutral()
+                #self.vehicle.rotation_angle=r
                 self.vehicle.reset_image=True
 
 
@@ -1565,6 +1591,12 @@ class AIHuman(AIBase):
                 self.update_human_vehicle_position()
                 
             
+            # building awareness stuff. ai and human need this 
+            self.time_since_building_check+=self.owner.world.graphic_engine.time_passed_seconds
+            if self.time_since_building_check>self.building_check_rate:
+                self.handle_building_check()
+
+
             if self.bleeding:
                 
                 self.time_since_bleed+=self.owner.world.graphic_engine.time_passed_seconds

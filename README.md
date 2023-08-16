@@ -33,6 +33,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - download code
 - change directory to the code directory
 - python3 twe.py (windows would be: py twe.py)
+- tested on Windows 10, Linux, Apple (M2)
 
 ### Controls
 - '~' opens/closes debug menu 

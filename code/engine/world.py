@@ -12,7 +12,7 @@ It should not have any specific graphic engine code (pygame, etc)
 #import built in modules
 import random
 import copy
-from unittest import result 
+#from unittest import result  # no idea why this was here. disabled 8/2023
 
 
 #import custom packages
@@ -23,9 +23,6 @@ import engine.math_2d
 import engine.world_builder
 from ai.ai_faction_tactical import AIFactionTactical
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 17 2021' #date of last update
 
 #global variables
 
@@ -475,6 +472,8 @@ class World(object):
         self.debug_text_queue.append('Player World Coords: '+str(self.player.world_coords))
         self.debug_text_queue.append('Player Fatigue: '+str(self.player.ai.fatigue))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
+        self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
+
 
         # world area data
         for b in self.world_areas:

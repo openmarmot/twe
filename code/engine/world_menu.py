@@ -380,9 +380,9 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
                 self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
                 self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
-                self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_goal))
+                self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
                 self.world.graphic_engine.menu_text_queue.append('Personal Enemies Count: '+str(len(self.selected_object.ai.personal_enemies)))
-                #self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+                self.world.graphic_engine.menu_text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
 
             if self.menu_state == 'player_menu':
                 self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
@@ -619,9 +619,18 @@ class World_Menu(object):
                 if self.selected_object.ai.driver==None:
                     self.world.graphic_engine.menu_text_queue.append('driver: None')
                 else:
+                    self.world.graphic_engine.menu_text_queue.append('---- driver info -------------------')
                     self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                    self.world.graphic_engine.menu_text_queue.append('in_vehicle: '+str(self.selected_object.ai.driver.ai.in_vehicle))
                     distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
                     self.world.graphic_engine.menu_text_queue.append('distance to destination: '+str(distance))
+                    r = engine.math_2d.get_rotation(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
+                    self.world.graphic_engine.menu_text_queue.append('rotation to destination: '+str(r))
+                    self.world.graphic_engine.menu_text_queue.append('vehicle rotation: '+str(self.selected_object.rotation_angle))
+                    self.world.graphic_engine.menu_text_queue.append('driver ai_state: '+self.selected_object.ai.driver.ai.ai_state)
+                    self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
+                    self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+
                 self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
 
             if Key=='1':
