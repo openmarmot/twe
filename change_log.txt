@@ -1,4 +1,16 @@
 TWE Project : Change Log
+----------------------------------
+August 17 2023
+- temporarily removed the distance check when you click something 
+    - it will return later 
+- added faction to the human menu so you can tell who is who 
+
+I'd like the menus to display more data/options when you are up close vs far away
+this functionality should be in world_menu (distance check used to be in world)
+
+It is pretty hard to tell the germans apart from the russians. I'm not sure if that will change 
+the colors of their uniforms are not THAT different. To get around this when you click on them 
+it will say their faction now. 
 
 ----------------------------------
 August 15 2023

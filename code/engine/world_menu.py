@@ -34,6 +34,8 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
+        # max distance at which you can select something (open a context menu)
+        self.max_menu_distance=90
 
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
@@ -347,6 +349,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            self.world.graphic_engine.menu_text_queue.append('Faction: '+self.selected_object.ai.squad.faction)
 
             # -- determine what the next menu will be
             if self.selected_object==self.world.player:
