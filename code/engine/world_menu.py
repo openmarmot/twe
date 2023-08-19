@@ -34,6 +34,8 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
+        # max distance at which you can select something (open a context menu)
+        self.max_menu_distance=90
 
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
@@ -309,16 +311,11 @@ class World_Menu(object):
             if self.world.debug_mode==True:
                 d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
                 self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
-            elif Key=='2':
-                pass
-            elif Key=='3':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
@@ -329,49 +326,63 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? (not implemented)?')
-            self.world.graphic_engine.menu_text_queue.append('3 - pick up')
+            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+    
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                pass
-            elif Key=='2':
-                pass
-            elif Key=='3':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
     def human_menu(self, Key):
+        # get distance
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+
         if self.menu_state=='none':
             # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+            name=''
+            faction=''
+            if distance<500:
+                name=self.selected_object.name
+                faction=self.selected_object.ai.squad.faction
+            elif distance<2500:
+                name='unknown'
+                faction=self.selected_object.ai.squad.faction
+
+            else:
+                name='unknown'
+                faction='unknown'
+
+            self.world.graphic_engine.menu_text_queue.append('-- Human --')
+            self.world.graphic_engine.menu_text_queue.append('Name: '+name)
+            self.world.graphic_engine.menu_text_queue.append('Faction: '+faction)
 
             # -- determine what the next menu will be
             if self.selected_object==self.world.player:
                 self.world.graphic_engine.menu_text_queue.append('[player]')
                 self.menu_state = 'player_menu'
             else:
-                if self.selected_object.ai.squad==self.world.player.ai.squad:
-                    self.world.graphic_engine.menu_text_queue.append('[in your squad]')
-                    self.menu_state = 'squad_member_menu'
-                else:
-                    self.menu_state = 'non_squad_member_menu'
+                if distance<150:
+                    if self.selected_object.ai.squad==self.world.player.ai.squad:
+                        self.world.graphic_engine.menu_text_queue.append('[in your squad]')
+                        self.menu_state = 'squad_member_menu'
+                    else:
+                        self.menu_state = 'non_squad_member_menu'
 
-            self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
-
-            self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
-            self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
-            self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
-            self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
-            if self.selected_object.ai.primary_weapon != None:
-                self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
-                self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
-                self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str(self.selected_object.ai.primary_weapon.ai.get_ammo_count()))
-            self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
-            self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
+            if distance<500:
+                self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
+                self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+                self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
+                self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
+                self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
+                if self.selected_object.ai.primary_weapon != None:
+                    self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
+                    self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+                    self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str(self.selected_object.ai.primary_weapon.ai.get_ammo_count()))
+                self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
+                self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+                self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
 
             if self.world.debug_mode==True:
                 d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
@@ -446,7 +457,7 @@ class World_Menu(object):
             self.world.is_paused=False
             # print out the basic menu
             # eventually 'spawn' should get its own submenu
-            self.world.graphic_engine.menu_text_queue.append('TWE')
+            self.world.graphic_engine.menu_text_queue.append('TWE: To Whatever End')
             self.world.graphic_engine.menu_text_queue.append('---------------')
             self.world.graphic_engine.menu_text_queue.append('Pick a Faction')
             self.world.graphic_engine.menu_text_queue.append('1 - American')
@@ -490,10 +501,10 @@ class World_Menu(object):
     def storage_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- Storage Menu --')
+            self.world.graphic_engine.menu_text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
             self.world.graphic_engine.menu_text_queue.append('1 - List')
             self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('3 - Remove ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Remove Items ')
             self.menu_state='base'
 
         if self.menu_state=='base':
@@ -522,52 +533,44 @@ class World_Menu(object):
                 if selection_key<10:
                     self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
                     selection_key+=1
-
+            temp=None
             if Key=='1':
                 if len(self.selected_object.ai.inventory)>0:
                     temp=self.selected_object.ai.inventory[0]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='2':
                 if len(self.selected_object.ai.inventory)>1:
                     temp=self.selected_object.ai.inventory[1]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='3':
                 if len(self.selected_object.ai.inventory)>2:
                     temp=self.selected_object.ai.inventory[2]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='4':
                 if len(self.selected_object.ai.inventory)>3:
                     temp=self.selected_object.ai.inventory[3]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='5':
                 if len(self.selected_object.ai.inventory)>4:
                     temp=self.selected_object.ai.inventory[4]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='6':
                 if len(self.selected_object.ai.inventory)>5:
                     temp=self.selected_object.ai.inventory[5]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='7':
                 if len(self.selected_object.ai.inventory)>6:
                     temp=self.selected_object.ai.inventory[6]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='8':
                 if len(self.selected_object.ai.inventory)>7:
                     temp=self.selected_object.ai.inventory[7]
-                    self.selected_object.remove_inventory(temp)
-                    self.world.add_object(temp)
             if Key=='9':
                 if len(self.selected_object.ai.inventory)>8:
                     temp=self.selected_object.ai.inventory[8]
-                    self.selected_object.remove_inventory(temp)
+
+            if temp !=None:
+                self.selected_object.remove_inventory(temp)
+                if self.selected_object.is_player:
+                    #player is looking at their own storage, so dump anything they remove on the ground
                     self.world.add_object(temp)
+                else:
+                    # player is grabbing objects from some other object so put in players inventory
+                    self.world.player.add_inventory(temp)
+
 
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
@@ -594,7 +597,7 @@ class World_Menu(object):
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name
             self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu --')
+            self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
             self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))

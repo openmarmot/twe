@@ -94,9 +94,6 @@ class World(object):
         #bool
         self.map_enabled=False
 
-        # max distance at which you can select something (open a context menu)
-        self.max_menu_distance=90
-
         # checked by ai_gun.fire() and world_builder.spawn_shrapnel_cloud
         # True== get hurt, False== don't get hurt
         self.friendly_fire=True # complete friendly fire
@@ -361,17 +358,7 @@ class World(object):
                 temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
         
         if temp != None:
-            d=engine.math_2d.get_distance(self.player.world_coords,temp.world_coords)
-            if d<self.max_menu_distance or self.debug_mode:
-                self.world_menu.activate_menu(temp)
-            else:
-                print('too far!!')
-                print('distance is ',d)
-                self.player.ai.destination=copy.copy(temp.world_coords)
-                self.player.ai.ai_state='start_moving'
-                self.player.ai.ai_goal='player_move'
-                self.player.ai.time_since_player_interact+=self.player.ai.time_before_afk+60
-                self.player.ai.time_since_ai_transition=0
+            self.world_menu.activate_menu(temp)
 
     #---------------------------------------------------------------------------
     def spawn_player(self, FACTION):

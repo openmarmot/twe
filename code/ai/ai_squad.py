@@ -15,10 +15,6 @@ import copy
 
 #import custom packages
 import engine.math_2d
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='May 17 2021' #date of last update
-
 
 #global variables
 
