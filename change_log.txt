@@ -1,4 +1,26 @@
 TWE Project : Change Log
+
+----------------------------------
+August 18 2023
+- added in some distance requirements for human menu 
+- removing objects from storage now puts them into player invetory 
+    instead of dropping them on the ground. exception is when player is 
+    looking at their own inventory
+- misc menu improvements 
+- fixed bicycle inventory so it no longer has a mg34 
+
+menus still need a lot more distance based modifications and other stuff 
+
+in play testing i did catch one bot making figure 8s with a bike. 
+rotation to destination was 358 - so i think it was always overshooting that (rotation wraps to 0 )
+will have to think how to deal with those situations. maybe slow down rotation speed when you get 
+near the upper angles ?
+
+the vast majority of vehicle usage seems to be working 
+
+I did see a horde of ~30 civilians chasing after a bike - decision logic around trying 
+to grab a vehicle needs to be tweaked. especially when it starts moving away 
+
 ----------------------------------
 August 17 2023
 - temporarily removed the distance check when you click something 

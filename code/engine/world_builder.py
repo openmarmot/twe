@@ -1311,12 +1311,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=50
         
         if random.randint(0,3)==1:
-            mg=spawn_object(WORLD,[0,0],'mg34',False)
-            z.ai.primary_weapon=mg
-            z.add_inventory(mg)
-            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
-        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
-        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+            z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
