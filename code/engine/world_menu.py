@@ -27,6 +27,7 @@ from ai.ai_squad import AISquad
 class World_Menu(object):
     ''' in game menu '''
 
+    #---------------------------------------------------------------------------
     def __init__(self,World):
         # called/created by world.__init__
 
@@ -34,12 +35,21 @@ class World_Menu(object):
         self.selected_object=None
         self.active_menu='none' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
+        
+        # variables that handle when a menu should be cleared from the screen
+        self.time_since_input=0
+        self.max_menu_idle_time=5 # how long a menu should be up before its closed/cleared
+        
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=90
 
+    #---------------------------------------------------------------------------
     def handle_input(self,Key):
         # called by graphics_2d_pygame when there is a suitable key press
         # Key is a string corresponding to the actual key being pressed
+        
+        # reset timer
+        self.time_since_input=0
 
         # '~' is used to activate/deactivate the debug menu
         if Key=='tilde':
@@ -87,8 +97,11 @@ class World_Menu(object):
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
+    #---------------------------------------------------------------------------
     def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
+
+        self.time_since_input=0
 
         # this is necessary to prevent the player from accidentally exiting the death menu
         if self.active_menu !="death" and self.active_menu!='start':
@@ -125,7 +138,7 @@ class World_Menu(object):
                 self.active_menu='generic'
                 self.generic_item_menu(None)
 
-
+    #---------------------------------------------------------------------------
     def airplane_menu(self, Key):
         if self.menu_state=='none':
 
@@ -171,6 +184,7 @@ class World_Menu(object):
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def change_menu(self,menu_name):
         '''change the menu to the specified menu'''
         self.menu_state='none'
@@ -179,6 +193,7 @@ class World_Menu(object):
         self.active_menu=menu_name
         self.handle_input(None)
 
+    #---------------------------------------------------------------------------
     def change_vehicle_role_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
@@ -210,16 +225,20 @@ class World_Menu(object):
                 self.world.player.ai.handle_change_vehicle_role('passenger')
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def consumable_menu(self, Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
             if self.world.debug_mode==True:
                 d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
                 self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('1 - Eat')
-            self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
-            self.menu_state='base'
+
+            if distance<self.max_menu_distance:    
+                self.world.graphic_engine.menu_text_queue.append('1 - Eat')
+                self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
+                self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.ai.handle_eat(self.selected_object)
@@ -230,12 +249,14 @@ class World_Menu(object):
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def deactivate_menu(self):
         self.selected_object=None
         self.active_menu='none'
         self.menu_state='none'
         self.world.graphic_engine.menu_text_queue=[]
 
+    #---------------------------------------------------------------------------
     def death_menu(self,Key):
         ''' menu options for when player dies '''
         if self.menu_state=='none':
@@ -254,6 +275,7 @@ class World_Menu(object):
                 self.world.is_paused=False
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def debug_menu(self, Key):
         if self.menu_state=='none':
             # print out the basic menu
@@ -284,6 +306,7 @@ class World_Menu(object):
                 self.world.graphic_engine.smooth_jitter = not self.world.graphic_engine.smooth_jitter
                 print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
 
+    #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
         # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
         # no need for a menu state
@@ -304,37 +327,43 @@ class World_Menu(object):
             # update text
             self.fuel_menu('')
 
+    #---------------------------------------------------------------------------
     def generic_item_menu(self, Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
             if self.world.debug_mode==True:
-                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
 
-            self.menu_state='base'
+            if distance<self.max_menu_distance:  
+                self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+                self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def gun_menu(self, Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
-    
-            self.menu_state='base'
+            if self.world.debug_mode==True:
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
+            
+            if distance<self.max_menu_distance: 
+                self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+                self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.add_inventory(self.selected_object)
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def human_menu(self, Key):
         # get distance
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
@@ -429,20 +458,22 @@ class World_Menu(object):
                 self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
     
+    #---------------------------------------------------------------------------
     def liquid_container_menu(self, Key):
         if self.menu_state=='none':
+            distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
             if self.world.debug_mode==True:
-                d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(d))
-            self.world.graphic_engine.menu_text_queue.append('Contents : '+self.selected_object.ai.liquid_type)
-            self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.used_volume)+' liters')
-            if self.selected_object.ai.contaminated:
-                self.world.graphic_engine.menu_text_queue.append('Liquid is contaminated')
-            self.world.graphic_engine.menu_text_queue.append('1 - Drink')
-            self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
-            self.menu_state='base'
+                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
+            if distance<self.max_menu_distance:  
+                self.world.graphic_engine.menu_text_queue.append('Contents : '+self.selected_object.ai.liquid_type)
+                self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.used_volume)+' liters')
+                if self.selected_object.ai.contaminated:
+                    self.world.graphic_engine.menu_text_queue.append('Liquid is contaminated')
+                self.world.graphic_engine.menu_text_queue.append('1 - Drink')
+                self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
+                self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.ai.handle_drink(self.selected_object)
@@ -452,6 +483,7 @@ class World_Menu(object):
                 self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
+    #---------------------------------------------------------------------------
     def start_menu(self, Key):
         if self.menu_state=='none':
             self.world.is_paused=False
@@ -498,26 +530,28 @@ class World_Menu(object):
                 self.world.is_paused=False
                 self.deactivate_menu()
                 
+    #---------------------------------------------------------------------------            
     def storage_menu(self, Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
-            self.world.graphic_engine.menu_text_queue.append('1 - List')
-            self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('3 - Remove Items ')
-            self.menu_state='base'
 
-        if self.menu_state=='base':
-            if Key=='1':
-                Key=None
-                self.menu_state='list'
-            if Key=='2':
-                Key=None
-                pass
-                #self.menu_state='add'
-            if Key=='3':
-                Key=None
-                self.menu_state='remove'
+            if distance<self.max_menu_distance:  
+                self.world.graphic_engine.menu_text_queue.append('1 - List')
+                self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
+                self.world.graphic_engine.menu_text_queue.append('3 - Remove Items ')
+
+                if Key=='1':
+                    Key=None
+                    self.menu_state='list'
+                if Key=='2':
+                    Key=None
+                    pass
+                    #self.menu_state='add'
+                if Key=='3':
+                    Key=None
+                    self.menu_state='remove'
 
         if self.menu_state=='list':
             self.world.graphic_engine.menu_text_queue=[]
@@ -580,6 +614,7 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
                     selection_key+=1
 
+    #---------------------------------------------------------------------------
     def vehicle_menu(self, Key):
         if self.menu_state=='none':
 
@@ -641,7 +676,8 @@ class World_Menu(object):
             if Key=='2':
                 # enter the vehicle 
                 self.world.player.ai.handle_enter_vehicle(self.selected_object)
-                self.world.display_vehicle_text=True
+                # honestly this menu is kinda ugly. maybe better to leave it off
+                #self.world.display_vehicle_text=True
                 self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
@@ -692,7 +728,12 @@ class World_Menu(object):
                 #refresh the text
                 self.vehicle_menu('none')
 
+    #---------------------------------------------------------------------------
+    def update(self):
 
-
-        # --
+        # should maybe check if a menu is active first. no need for this to be constantly running
+        # make the menu auto close after a period of time
+        self.time_since_input+=self.world.graphic_engine.time_passed_seconds
+        if self.time_since_input>self.max_menu_idle_time:
+            self.deactivate_menu()
 

@@ -1,5 +1,18 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 22 2023
+- even more distance based menu changes 
+- come cleanup and style updates in the menu code
+- menus now auto-close after 5 seconds of no activity 
+- vehicle ui text is now OFF by default (you can turn it on via the internal vehicle menu)
+
+
+----------------------------------
+August 19 2023
+- more distance based menu changes 
+
 ----------------------------------
 August 18 2023
 - added in some distance requirements for human menu 

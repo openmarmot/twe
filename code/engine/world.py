@@ -440,6 +440,9 @@ class World(object):
             self.american_ai.update()
             self.civilian_ai.update()
 
+            # update world menu -
+            self.world_menu.update()
+
             if self.debug_mode:
                 self.update_debug_info()
 
