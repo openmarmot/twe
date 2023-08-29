@@ -184,6 +184,9 @@ def add_standard_squad(WORLD,SQUAD_TYPE):
 #------------------------------------------------------------------------------
 def create_squads_from_human_list(WORLD,HUMANS,FACTION):
     ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+
+    # note - i think this isn't used anymore - but its a good bit of code so will keep for future use
+
     # automatically adds the created squads to the correct faction tactical AI
     assault_rifles=[]
     rifles=[]
@@ -348,7 +351,7 @@ def generate_clutter(WORLD):
     '''generates and auto places small objects around the map'''
     # this should be called after buildings are placed
 
-    # chance of crate by a building
+    # building related clutter
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
         chance=random.randint(0,8)
@@ -361,7 +364,29 @@ def generate_clutter(WORLD):
             spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
         elif chance==4:
             spawn_object(WORLD,coords,'red_bicycle',True)
+        elif chance==5 or chance==6 or chance==7:
+            spawn_object(WORLD,coords,'brown_chair',True)
 
+    # supply drop 
+    chance=random.randint(0,10)
+    if chance==0:
+        print('supply drop spawned')
+        spawn_drop_canister(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'mixed_supply')
+
+    # weapon crates 
+    chance=random.randint(0,10)
+    if chance==0:
+        spawn_crate(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
+    if chance==1:
+        spawn_crate(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+
+    # kubelwagens
+    chance=random.randint(0,10)
+    if chance==0:
+        k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
+        k1.ai.fuel=random.randint(0,k1.ai.fuel_capacity)
+        k2=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
+        k2.ai.fuel=random.randint(0,k2.ai.fuel_capacity)
 
 
 #------------------------------------------------------------------------------
@@ -396,15 +421,8 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
     if TYPE=='town':
         count=random.randint(1,5)
         grid_spawn(WORLD,WORLD_COORDS,'warehouse',1150,count)
-        # for x in range(count):
-        #     coords=[WORLD_COORDS[0]+float(random.randint(-500,500)),WORLD_COORDS[1]+float(random.randint(-500,500))]
-        #     group.append(spawn_object(WORLD,coords,'warehouse',True))
         count=random.randint(2,15)
         grid_spawn(WORLD,WORLD_COORDS,'square_building',250,count)
-        # for x in range(count):
-        #     coords=[WORLD_COORDS[0]+float(random.randint(-250,250)),WORLD_COORDS[1]+float(random.randint(-250,250))]
-        #     group.append(spawn_object(WORLD,coords,'square_building',True))
-        # engine.math_2d.collision_sort(500,group)
     elif TYPE=='fuel_dump':
         count=random.randint(11,157)
         grid_spawn(WORLD,WORLD_COORDS,'55_gallon_drum',20,count)
@@ -415,9 +433,6 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
         count=random.randint(21,75)
         grid_spawn(WORLD,WORLD_COORDS,'german_fuel_can',20,count)
 
-
-
-
     # make the corresponding worldArea object
     w=WorldArea(WORLD)
     w.world_coords=copy.copy(WORLD_COORDS)
@@ -426,7 +441,6 @@ def generate_world_area(WORLD,WORLD_COORDS,TYPE,NAME):
 
     # register with world 
     WORLD.world_areas.append(w)
-
 
 #------------------------------------------------------------------------------
 def get_random_from_list(WORLD,WORLD_COORDS,OBJECT_LIST,SPAWN):
@@ -569,6 +583,9 @@ def load_images(world):
     world.graphic_engine.loadImage('bandage','images/medical/bandage.png')
     world.graphic_engine.loadImage('german_officer_first_aid_kit','images/medical/german_officer_first_aid_kit.png')
 
+    # furniture 
+    world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
+
 #------------------------------------------------------------------------------
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
@@ -583,8 +600,8 @@ def load_test_environment(world):
     generate_world_area(world,[-2000,2000],'town','Alfa')
     generate_world_area(world,[2000,-2000],'town','Bravo')
     generate_world_area(world,[2000,2000],'town','Charlie')
-    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_ammo_dump','german ammo dump')
-    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-1500,1500))],'german_fuel_can_dump','german fuel dump')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
+    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
 
     # generate clutter after world areas are created
     generate_clutter(world)
@@ -601,48 +618,22 @@ def load_test_environment(world):
     # add soviets
     add_standard_squad(world,'soviet 1943 rifle')
     add_standard_squad(world,'soviet 1943 rifle')
-    add_standard_squad(world,'soviet 1943 rifle')
+    add_standard_squad(world,'soviet 1944 submachine gun')
     add_standard_squad(world,'soviet 1944 rifle')
 
-    #---------misc stuff that should probably be auto generated ---------
+    #---------misc stuff for testing ---------
 
     #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
-
-    spawn_drop_canister(world,[float(random.randint(-1500,1500)),float(random.randint(-2500,2500))],'mixed_supply')
 
 
     # add ju88
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
-    # kubelwagens 
-    k1=spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
-    k1.ai.fuel=random.randint(0,k1.ai.fuel_capacity)
-    k2=spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'kubelwagen',True)
-    k2.ai.fuel=random.randint(0,k2.ai.fuel_capacity)
+    
 
     # bikes 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-
-    
-    # spawn some crates
-    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_consumables")
-    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
-    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
-    #spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
-
-
-    # spawn
-    # locations will eventually be determined by map control
-
-    #spawn_object(world,world.spawn_west,'panzerfaust',True)
-    #spawn_object(world,world.spawn_west,'panzerfaust',True)
-
-      
-
+    #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+  
 
 #------------------------------------------------------------------------------
 def spawn_civilians(WORLD,CIVILIAN_TYPE):
@@ -663,6 +654,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         '''goofy unique civilain. don't mess with big cheese'''
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.ai.health*=2
+        z.name='big cheese'
         z.world_builder_identity='civilian_default'
         z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
@@ -681,6 +673,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'panzerfaust',False))
         return z
 
 #------------------------------------------------------------------------------
@@ -1393,6 +1386,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))
+    
+    elif OBJECT_TYPE=='brown_chair':
+        z=WorldObject(WORLD,['brown_chair'],AINone)
+        z.render_level=2
+        z.name='brown_chair'
+        z.is_furniture=True
+        z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359)) 
+
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
 

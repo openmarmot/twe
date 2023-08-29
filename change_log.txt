@@ -1,5 +1,29 @@
 TWE Project : Change Log
 
+----------------------------------
+August 28 2023
+- added 'furniture' as a concept 
+- added brown_chair 
+- some updates to the 'big cheese' unique spawn 
+- switched one of the soviet rifle groups for a submachine gun group in the test map 
+- moved several items that were always spanned to the clutter method with a chance to spawn 
+    - this will reduce interesting stuff on the map for now 
+- human will now exit a vehicle on death 
+    - maybe fixing a null error when you die in a live vehicle 
+- upped menu timeout to 15 seconds from 5. 5 was too short and annoying 
+
+some thoughts of things to add in the near future 
+- prone 
+- backup/secondary weapons (when primary is out of ammo consider switching)
+- ai behavior seeking out chairs to sit on 
+- flavor text to tell the player when they are hit / reloading / etc etc 
+- vehicle gunner ai 
+- make large pickups stay in the world and just get 'moved' with the player instead of 
+being an inventory item 
+
+while play testing I saw a german soldier get shot off a bicycle by a soviet squad. 
+the bike continued forward in a straight path riderless for a bit. it was a pretty
+good unintentonal emergent scenario. 
 
 ----------------------------------
 August 22 2023
@@ -7,7 +31,6 @@ August 22 2023
 - come cleanup and style updates in the menu code
 - menus now auto-close after 5 seconds of no activity 
 - vehicle ui text is now OFF by default (you can turn it on via the internal vehicle menu)
-
 
 ----------------------------------
 August 19 2023

@@ -38,7 +38,7 @@ class World_Menu(object):
         
         # variables that handle when a menu should be cleared from the screen
         self.time_since_input=0
-        self.max_menu_idle_time=5 # how long a menu should be up before its closed/cleared
+        self.max_menu_idle_time=15 # how long a menu should be up before its closed/cleared
         
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=90

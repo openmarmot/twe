@@ -402,6 +402,10 @@ class AIHuman(AIBase):
         dm+=('\n  - killed by : '+self.last_collision_description)
         print(dm)
 
+        # exit vehicle 
+        if self.in_vehicle:
+            self.handle_exit_vehicle()
+
         # drop primary weapon 
         if self.primary_weapon!=None:
             self.inventory.remove(self.primary_weapon)
