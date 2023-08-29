@@ -60,6 +60,7 @@ class World(object):
         self.wo_objects_ammo_container=[]
         self.wo_objects_liquid_container=[]
         self.wo_objects_object_container=[]
+        self.wo_objects_furniture=[]
 
         #world areas
         self.world_areas=[]
@@ -167,6 +168,8 @@ class World(object):
             self.wo_objects_liquid_container.append(WORLD_OBJECT)
         if WORLD_OBJECT.is_ammo_container:
             self.wo_objects_ammo_container.append(WORLD_OBJECT)
+        if WORLD_OBJECT.is_furniture:
+            self.wo_objects_furniture.append(WORLD_OBJECT)
         
     #---------------------------------------------------------------------------
     def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
@@ -317,6 +320,8 @@ class World(object):
             self.wo_objects_liquid_container.remove(WORLD_OBJECT)
         if WORLD_OBJECT.is_ammo_container:
             self.wo_objects_ammo_container.remove(WORLD_OBJECT)
+        if WORLD_OBJECT.is_furniture:
+            self.wo_objects_furniture.remove(WORLD_OBJECT)
 
     #---------------------------------------------------------------------------
     def render(self):
@@ -439,6 +444,9 @@ class World(object):
             self.soviet_ai.update()
             self.american_ai.update()
             self.civilian_ai.update()
+
+            # update world menu -
+            self.world_menu.update()
 
             if self.debug_mode:
                 self.update_debug_info()

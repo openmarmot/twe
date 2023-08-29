@@ -94,6 +94,7 @@ class WorldObject(object):
         self.is_american=False
         self.is_building=False
         self.is_map_pointer=False
+        self.is_furniture=False
 
         # stuff that i don't think is used at the moment
         self.is_gas=False
