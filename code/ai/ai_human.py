@@ -208,6 +208,7 @@ class AIHuman(AIBase):
         ''' add object to inventory'''
         # in this case EVENT_DATA is a world_object
         # add item to inventory no matter what
+        self.owner.world.remove_object(EVENT_DATA)
         self.inventory.append(EVENT_DATA)
 
         if EVENT_DATA.is_gun :
@@ -217,14 +218,9 @@ class AIHuman(AIBase):
                 self.primary_weapon=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.primary_weapon)
-                self.inventory.remove(self.primary_weapon)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.event_remove_inventory(EVENT_DATA)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_gun=False
         elif EVENT_DATA.is_grenade :
             if self.throwable==None:
@@ -233,14 +229,9 @@ class AIHuman(AIBase):
                 self.throwable=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.throwable.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.throwable)
-                self.inventory.remove(self.throwable)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.throwable=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.event_remove_inventory(EVENT_DATA)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_grenade=False
         elif EVENT_DATA.is_handheld_antitank :
             if self.antitank==None:
@@ -249,30 +240,12 @@ class AIHuman(AIBase):
                 self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.antitank.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.antitank)
-                self.inventory.remove(self.antitank)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.antitank=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.event_remove_inventory(EVENT_DATA)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_antitank=False
         elif EVENT_DATA.is_large_human_pickup :
-            if self.large_pickup==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
-                self.large_pickup=EVENT_DATA
-                #EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current weapon and pick up the new one
-                self.large_pickup.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.large_pickup)
-                self.inventory.remove(self.large_pickup)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
-                self.large_pickup=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+            print('ERROR - large pickup should not go through inventory functions')
         elif EVENT_DATA.is_consumable:
             self.ai_want_food=False
         elif EVENT_DATA.is_liquid_container:
@@ -291,15 +264,19 @@ class AIHuman(AIBase):
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
             self.inventory.remove(EVENT_DATA)
+            self.owner.world.add_object(EVENT_DATA)
 
             if self.primary_weapon==EVENT_DATA:
                 self.primary_weapon=None
+                EVENT_DATA.ai.equipper=None
             elif self.throwable==EVENT_DATA:
                 self.throwable=None
+                EVENT_DATA.ai.equipper=None
             elif self.antitank==EVENT_DATA:
                 self.antitank=None
+                EVENT_DATA.ai.equipper=None
             elif self.large_pickup==EVENT_DATA:
-                self.large_pickup=None
+                print('ERROR - large pickup should not go through inventory functions')
 
             # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
 
@@ -408,9 +385,8 @@ class AIHuman(AIBase):
 
         # drop primary weapon 
         if self.primary_weapon!=None:
-            self.inventory.remove(self.primary_weapon)
-            self.primary_weapon.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-            self.owner.world.add_object(self.primary_weapon)
+            self.event_remove_inventory(self.primary_weapon)
+
 
         # remove from squad 
         if self.squad != None:
@@ -738,9 +714,7 @@ class AIHuman(AIBase):
         ''' throw like you know the thing. cmon man ''' 
         if self.antitank!=None:
             self.antitank.ai.launch(TARGET_COORDS)
-            self.owner.world.add_object(self.antitank)
-            self.inventory.remove(self.antitank)
-            self.antitank=None
+            self.event_remove_inventory(self.antitank)
 
 
     #---------------------------------------------------------------------------
@@ -1413,8 +1387,10 @@ class AIHuman(AIBase):
         if self.ai_goal=='pickup':
             if DISTANCE<5:
                 if self.target_object in self.owner.world.wo_objects:
-                    self.owner.add_inventory(self.target_object)
-                    self.owner.world.remove_object(self.target_object)
+                    if self.target_object.is_large_human_pickup:
+                        self.large_pickup=self.target_object
+                    else:
+                        self.owner.add_inventory(self.target_object)
                 else:
                     # hmm object is gone. someone else must have grabbed it
                     pass
@@ -1573,9 +1549,7 @@ class AIHuman(AIBase):
         ''' throw like you know the thing. cmon man '''    
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
-            self.owner.world.add_object(self.throwable)
-            self.inventory.remove(self.throwable)
-            self.throwable=None
+            self.event_remove_inventory(self.throwable)
 
     #---------------------------------------------------------------------------
     def update(self):

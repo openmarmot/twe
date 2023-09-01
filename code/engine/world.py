@@ -280,48 +280,49 @@ class World(object):
     def remove_object(self, WORLD_OBJECT):
         if WORLD_OBJECT in self.wo_objects:
             self.wo_objects.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
+                self.wo_objects_collision.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_human:
+                self.wo_objects_human.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_gun:
+                self.wo_objects_guns.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_german:
+                self.wo_objects_german.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_soviet:
+                self.wo_objects_soviet.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_american:
+                self.wo_objects_american.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_vehicle:
+                self.wo_objects_vehicle.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_grenade:
+                self.wo_objects_grenade.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_consumable:
+                self.wo_objects_consumable.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_building:
+                self.wo_objects_building.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_map_pointer:
+                self.wo_objects_map_pointer.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_handheld_antitank:
+                self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_airplane:
+                self.wo_objects_airplane.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_civilian:
+                self.wo_objects_civilian.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_melee:
+                self.wo_objects_melee.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_medical:
+                self.wo_objects_medical.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_object_container:
+                self.wo_objects_object_container.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_liquid_container:
+                self.wo_objects_liquid_container.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_ammo_container:
+                self.wo_objects_ammo_container.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_furniture:
+                self.wo_objects_furniture.remove(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
-        if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
-            self.wo_objects_collision.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_human:
-            self.wo_objects_human.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_gun:
-            self.wo_objects_guns.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_german:
-            self.wo_objects_german.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_soviet:
-            self.wo_objects_soviet.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_american:
-            self.wo_objects_american.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_vehicle:
-            self.wo_objects_vehicle.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_grenade:
-            self.wo_objects_grenade.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_consumable:
-            self.wo_objects_consumable.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_building:
-            self.wo_objects_building.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_map_pointer:
-            self.wo_objects_map_pointer.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_handheld_antitank:
-            self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_airplane:
-            self.wo_objects_airplane.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_civilian:
-            self.wo_objects_civilian.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_melee:
-            self.wo_objects_melee.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_medical:
-            self.wo_objects_medical.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_object_container:
-            self.wo_objects_object_container.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_liquid_container:
-            self.wo_objects_liquid_container.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_ammo_container:
-            self.wo_objects_ammo_container.remove(WORLD_OBJECT)
-        if WORLD_OBJECT.is_furniture:
-            self.wo_objects_furniture.remove(WORLD_OBJECT)
+        
 
     #---------------------------------------------------------------------------
     def render(self):

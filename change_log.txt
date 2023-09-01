@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 31 2023
+- rewrote some code that handles large_human_pickup items 
+- redesigned inventory flow (large change)
+    - add_inventory now removes the obj from the world 
+    - remove_inventory now adds the obj to the world 
+    - this cleans up a bunch of other places where this is done
+- world.remove_object error handling is a bit better 
+
+thought - instead of dissapearing from existence, should projectiles 
+get added to inventory when you are hit?
+
+more work on large_human_pickup tbd 
+
+note - this probably breaks some stuff 
+
 ----------------------------------
 August 28 2023
 - added 'furniture' as a concept 

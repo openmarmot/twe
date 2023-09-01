@@ -241,12 +241,11 @@ class World_Menu(object):
                 self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
+                self.world.player.add_inventory(self.selected_object)
                 self.world.player.ai.handle_eat(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
             elif Key=='2':
                 self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -342,7 +341,6 @@ class World_Menu(object):
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -360,7 +358,6 @@ class World_Menu(object):
         if self.menu_state=='base':
             if Key=='1':
                 self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -476,11 +473,11 @@ class World_Menu(object):
                 self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
+                self.world.player.add_inventory(self.selected_object)
                 self.world.player.ai.handle_drink(self.selected_object)
                 self.deactivate_menu()
             elif Key=='2':
                 self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -600,10 +597,10 @@ class World_Menu(object):
                 self.selected_object.remove_inventory(temp)
                 if self.selected_object.is_player:
                     #player is looking at their own storage, so dump anything they remove on the ground
-                    self.world.add_object(temp)
+                    print('boop')
                 else:
                     # player is grabbing objects from some other object so put in players inventory
-                    self.world.player.add_inventory(temp)
+                    print('boop')
 
 
             self.world.graphic_engine.menu_text_queue=[]
