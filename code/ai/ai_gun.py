@@ -100,8 +100,9 @@ class AIGun(AIBase):
             if self.reload_time_passed>self.reload_speed:
                 self.reloading=False
                 self.reload_time_passed=0
-                if self.equipper.is_player:
-                    print("reloading complete")
+                if self.equipper!=None:
+                    if self.equipper.is_player:
+                        self.equipper.ai.speak('[Reloading done. '+str(self.magazine_count)+' magazines left]')
 
     #---------------------------------------------------------------------------
 
@@ -122,7 +123,9 @@ class AIGun(AIBase):
                 if self.magazine<1:
                     # auto reload ?
                     if self.equipper.is_player:
-                        print("magazine empty")
+                        self.equipper.ai.speak('[Reloading !!]')
+                    elif self.equipper.is_human:
+                        self.equipper.ai.speak('Reloading !!')
                     if self.magazine_count>0:
                         self.magazine_count-=1
                         self.magazine=self.mag_capacity

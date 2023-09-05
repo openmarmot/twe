@@ -33,6 +33,10 @@ class AIHuman(AIBase):
         self.melee=None
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
+
+        # vector offset for when you are carrying a object
+        self.carrying_offset=[10,10]
+
         self.health=100
         self.bleeding=False
         self.time_since_bleed=0
@@ -205,10 +209,8 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        ''' add object to inventory'''
-        # in this case EVENT_DATA is a world_object
-        # add item to inventory no matter what
-        self.owner.world.remove_object(EVENT_DATA)
+        ''' add object to inventory. does not remove obj from world'''
+
         self.inventory.append(EVENT_DATA)
 
         if EVENT_DATA.is_gun :
@@ -219,7 +221,7 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
             else:
                 # drop the current obj and pick up the new one
-                self.event_remove_inventory(EVENT_DATA)
+                self.handle_drop_object(self.primary_weapon)
                 self.event_add_inventory(EVENT_DATA)
             self.ai_want_gun=False
         elif EVENT_DATA.is_grenade :
@@ -230,7 +232,7 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
             else:
                 # drop the current obj and pick up the new one
-                self.event_remove_inventory(EVENT_DATA)
+                self.handle_drop_object(self.throwable)
                 self.event_add_inventory(EVENT_DATA)
             self.ai_want_grenade=False
         elif EVENT_DATA.is_handheld_antitank :
@@ -241,7 +243,7 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=self.owner
             else:
                 # drop the current obj and pick up the new one
-                self.event_remove_inventory(EVENT_DATA)
+                self.handle_drop_object(self.antitank)
                 self.event_add_inventory(EVENT_DATA)
             self.ai_want_antitank=False
         elif EVENT_DATA.is_large_human_pickup :
@@ -256,12 +258,9 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
-        ''' remove object from inventory '''
+        ''' remove object from inventory. does not add to world '''
 
         if EVENT_DATA in self.inventory:
-
-            # make sure the obj world_coords reflect the obj that had it in inventory
-            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
             self.inventory.remove(EVENT_DATA)
             self.owner.world.add_object(EVENT_DATA)
@@ -271,7 +270,9 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=None
             elif self.throwable==EVENT_DATA:
                 self.throwable=None
-                EVENT_DATA.ai.equipper=None
+                # equipper is used to figure out who threw the grenade
+                # need a better way to handle this in the future
+                #EVENT_DATA.ai.equipper=None
             elif self.antitank==EVENT_DATA:
                 self.antitank=None
                 EVENT_DATA.ai.equipper=None
@@ -376,6 +377,7 @@ class AIHuman(AIBase):
         dm+=(self.owner.name+' died.')
         dm+=('\n  - faction: '+self.squad.faction)
         dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
+        dm+=('\n  - probable kills: '+str(self.probable_kills))
         dm+=('\n  - killed by : '+self.last_collision_description)
         print(dm)
 
@@ -385,8 +387,10 @@ class AIHuman(AIBase):
 
         # drop primary weapon 
         if self.primary_weapon!=None:
-            self.event_remove_inventory(self.primary_weapon)
+            self.handle_drop_object(self.primary_weapon)
 
+        if self.large_pickup!=None:
+            self.handle_drop_object(self.large_pickup)
 
         # remove from squad 
         if self.squad != None:
@@ -397,7 +401,7 @@ class AIHuman(AIBase):
                 print('!! Error : '+self.owner.name+' not in squad somehow')
 
         # spawn body
-        engine.world_builder.spawn_container('body',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
+        engine.world_builder.spawn_container('body: '+self.owner.name,self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
 
         self.owner.world.remove_object(self.owner)
 
@@ -430,6 +434,22 @@ class AIHuman(AIBase):
                 self.last_collision_description = 'over consumption of '+LIQUID_CONTAINER.ai.liquid_type
 
     #---------------------------------------------------------------------------
+    def handle_drop_object(self,OBJECT_TO_DROP):
+        ''' drop object into the world '''
+        # any distance calculation would be made before this function is called
+        if OBJECT_TO_DROP.is_large_human_pickup:
+            self.large_pickup=None
+        else:
+            self.event_remove_inventory(OBJECT_TO_DROP)
+            # make sure the obj world_coords reflect the obj that had it in inventory
+            OBJECT_TO_DROP.world_coords=copy.copy(self.owner.world_coords)
+            
+            # grenades get 'dropped' when they are thrown and are special
+            if OBJECT_TO_DROP.is_grenade==False:
+                engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
+            self.owner.world.add_object(OBJECT_TO_DROP)
+
+    #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
         self.health+=CONSUMABLE.ai.health_effect
@@ -437,6 +457,7 @@ class AIHuman(AIBase):
         self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
 
+        # this should remove the object from the game because it is not added to world
         self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
@@ -667,6 +688,16 @@ class AIHuman(AIBase):
                     self.handle_normal_ai_update()
 
     #---------------------------------------------------------------------------
+    def handle_pickup_object(self,OBJECT_TO_PICKUP):
+        ''' pickup object from the world '''
+        # any distance calculation would be made before this function is called
+        if OBJECT_TO_PICKUP.is_large_human_pickup:
+            self.large_pickup=OBJECT_TO_PICKUP
+        else:
+            self.event_add_inventory(OBJECT_TO_PICKUP)
+            self.owner.world.remove_object(OBJECT_TO_PICKUP)
+
+    #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
         
@@ -707,6 +738,7 @@ class AIHuman(AIBase):
         self.thirst_rate+=selected.ai.thirst_effect
         self.fatigue+=selected.ai.fatigue_effect
 
+        # calling this by itself should remove all references to the object
         self.event_remove_inventory(selected)
 
     #---------------------------------------------------------------------------
@@ -714,8 +746,9 @@ class AIHuman(AIBase):
         ''' throw like you know the thing. cmon man ''' 
         if self.antitank!=None:
             self.antitank.ai.launch(TARGET_COORDS)
-            self.event_remove_inventory(self.antitank)
 
+            # drop the tube now that it is empty
+            self.handle_drop_object(self.antitank)
 
     #---------------------------------------------------------------------------
     def speak(self,WHAT):
@@ -1340,10 +1373,7 @@ class AIHuman(AIBase):
             CONTAINER.remove_inventory(c)
             self.event_add_inventory(c)
             self.speak('Grabbed a '+c.name)
-            # console log this for now
-            #print('bot grabbed '+c.name+' from container '+CONTAINER.name)
-
-
+            
     #-----------------------------------------------------------------------
     def think_move(self):
         ''' think about the current movement'''
@@ -1387,13 +1417,11 @@ class AIHuman(AIBase):
         if self.ai_goal=='pickup':
             if DISTANCE<5:
                 if self.target_object in self.owner.world.wo_objects:
-                    if self.target_object.is_large_human_pickup:
-                        self.large_pickup=self.target_object
-                    else:
-                        self.owner.add_inventory(self.target_object)
+                    self.handle_pickup_object(self.target_object)
                 else:
                     # hmm object is gone. someone else must have grabbed it
                     pass
+                self.target_object=None
                 self.ai_state='sleeping'
         if self.ai_goal=='loot_container':
             if DISTANCE<5:
@@ -1549,7 +1577,7 @@ class AIHuman(AIBase):
         ''' throw like you know the thing. cmon man '''    
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
-            self.event_remove_inventory(self.throwable)
+            self.handle_drop_object(self.throwable)
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -1566,8 +1594,12 @@ class AIHuman(AIBase):
                 if self.vehicle.ai.health<1:
                     #this needs to be here as there will exactly one update cycle if a vehicle dies
                     self.handle_vehicle_died()
-                self.update_human_vehicle_position()
-                
+                else:
+                    self.update_human_vehicle_position()
+
+            # might be faster to have a bool we could check
+            if self.large_pickup!=None:
+                self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
             
             # building awareness stuff. ai and human need this 
             self.time_since_building_check+=self.owner.world.graphic_engine.time_passed_seconds

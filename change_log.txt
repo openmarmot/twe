@@ -1,5 +1,30 @@
 TWE Project : Change Log
 
+----------------------------------
+September 04 2023
+- changed my mind on add/remove inventory 
+    - added custom methods for picking up and dropping objects from the world 
+    - misc rewrites from this 
+- added some rotation and position randomization when objects are dropped 
+- added some in game text for reloading and reloading complete 
+- possibly fixed a bug where you get an error if your vehicle dies before you do 
+- large pickups are now dragged along with you and never leave the 'world'
+- some menu changes for large pickups 
+- added probable kills to the death message in the console 
+- removed the second screenshot from the readme as it was excessively violent 
+    for a public page. 
+- slowed down the hand grenade a bit. it was crazy fast 
+- bumped the max fps to 60 from 40.
+    - this seems to have smoothed things out immensely. not sure what all it 
+        will affect 
+
+I don't remember why max FPS was set to 40. I think it has been that way forever. 
+It might date back to the original book or tutorial that I read on pygame. AI thinking 
+is generally time based so FPS won't affect it, but it may have some other effects.
+
+while i was playtesting i saw 9 death messages of troops killed by a mg34 gunner 
+but when the gunner died he had zero kills. I'm not sure if this is because his 
+bullets were in flight when he was killed or what. 
 
 ----------------------------------
 August 31 2023

@@ -19,11 +19,9 @@ I am developing this game by just randomly working on whatever I feel like on a 
 
 ### Things to do
 - spawn different objects with the debug menu
-- spawn as a german or russian and follow your squad into combat
+- spawn as a german or russian and lead your squad into combat
 - spawn as a civilian and try to survive the cross fire
-- borrow a kubelwagen and take a relaxing drive
-- find and loot the parachute supply drop
-- find and eat all four types of cheese (gives a health bonus as in real life)
+- explore in a kubelwagen or a bicycle
 
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details.
@@ -39,7 +37,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - '~' opens/closes debug menu 
 - 'w/s/a/d' movement
 - left click on a object to open context menu
-- tab closes an open menu. If no menu is open it will instead open the menu for the player, or the vehicle you are in
+- tab close the active menu or open a player context menu
 - 'esc' to exit menu
 - 1-0 number keys are used in menus
 - 'f' to fire weapon (if you have one)
@@ -55,5 +53,3 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks! 
 - On this project it is rare that I copy code from the internet, almost all of it is from scratch (that is why the math is so bad) - 
 but when I have copied code I will try to include references from where I got it
-
-![screenshot](/screenshots/twe_battle_feb_03_2022.png "TWE screenshot")

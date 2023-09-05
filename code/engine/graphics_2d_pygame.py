@@ -89,7 +89,7 @@ class Graphics_2D_Pygame(object):
 
 
         # max_fps max frames for every second.
-        self.max_fps=40
+        self.max_fps=60
 
         # scale. normal is 1
         self.scale=1

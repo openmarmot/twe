@@ -184,6 +184,13 @@ def get_transfer_results(source_amount, destination_amount, destination_maximum)
 
 	return source_amount, destination_amount
 
+
+#------------------------------------------------------------------------------
+def get_vector_addition(first_vec,second_vec):
+	'''add together two vector 2s'''
+	result=[first_vec[0]+second_vec[0],first_vec[1]+second_vec[1]]
+	return result
+
 #------------------------------------------------------------------------------
 def get_vector_length(vec2):
 	return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
@@ -206,6 +213,15 @@ def moveTowardsTarget(speed,location,destination, time_passed):
 	travel_distance=min(distance,time_passed*speed)
 	change=[heading[0]*travel_distance,heading[1]*travel_distance]
 	return [location[0]+change[0],location[1]+change[1]]
+
+#------------------------------------------------------------------------------
+def randomize_position_and_rotation(worldobj,amount=15,):
+	''' takes a world object and randomizes the rotation and position'''
+	w=worldobj.world_coords
+	worldobj.world_coords=[w[0]+float(random.randint(-amount,amount)),w[1]+float(random.randint(-amount,amount))]
+	worldobj.rotation_angle=float(random.randint(0,359))
+	worldobj.reset_image=True
+	
 
 
 
