@@ -241,12 +241,11 @@ class World_Menu(object):
                 self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
+                self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.world.player.ai.handle_eat(self.selected_object)
-                self.world.remove_object(self.selected_object)
                 self.deactivate_menu()
             elif Key=='2':
-                self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
+                self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -341,8 +340,7 @@ class World_Menu(object):
                 self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
+                self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -359,8 +357,7 @@ class World_Menu(object):
                 self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
+                self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -426,6 +423,8 @@ class World_Menu(object):
 
             if self.menu_state == 'player_menu':
                 self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
+                if self.selected_object.ai.large_pickup!=None:
+                    self.world.graphic_engine.menu_text_queue.append('2 - Drop '+self.selected_object.ai.large_pickup.name)
             elif self.menu_state == 'squad_member_menu':
                 self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
                 self.world.graphic_engine.menu_text_queue.append('2 - Manage Inventory')
@@ -440,6 +439,9 @@ class World_Menu(object):
             if Key=='1':
                 # pull up the storage/container menu
                 self.change_menu('storage')
+            if Key=='2':
+                self.selected_object.ai.handle_drop_object(self.selected_object.ai.large_pickup)
+                self.deactivate_menu()
         elif self.menu_state == 'squad_member_menu':
             if Key=='1':
                 self.selected_object.ai.speak('status')
@@ -479,8 +481,7 @@ class World_Menu(object):
                 self.world.player.ai.handle_drink(self.selected_object)
                 self.deactivate_menu()
             elif Key=='2':
-                self.world.player.add_inventory(self.selected_object)
-                self.world.remove_object(self.selected_object)
+                self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.deactivate_menu()
 
     #---------------------------------------------------------------------------
@@ -597,14 +598,15 @@ class World_Menu(object):
                     temp=self.selected_object.ai.inventory[8]
 
             if temp !=None:
-                self.selected_object.remove_inventory(temp)
                 if self.selected_object.is_player:
                     #player is looking at their own storage, so dump anything they remove on the ground
-                    self.world.add_object(temp)
+                    self.world.player.ai.handle_drop_object(temp)
                 else:
                     # player is grabbing objects from some other object so put in players inventory
+                    # remove from the other object
+                    self.selected_object.remove_inventory(temp)
+                    # add to the player
                     self.world.player.add_inventory(temp)
-
 
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')

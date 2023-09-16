@@ -984,7 +984,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['model24'],AIGrenade)
         z.name='model24'
         z.is_grenade=True
-        z.ai.speed=200.
+        z.ai.speed=150.
         z.ai.maxTime=1.3
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))

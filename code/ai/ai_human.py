@@ -9,6 +9,8 @@ event - something that could happen to the ai, possibly caused by external force
 handle_SOMETHING - something that the AI decides to do that requires some code to make happen
 take_action_ - something that sets ai_state and ai_goal to start an action
 think_ - something that requires logic code
+
+for humans the current owner.image_list is [normal,prone,dead]
 '''
 
 #import built in modules
@@ -33,10 +35,16 @@ class AIHuman(AIBase):
         self.melee=None
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
+
+        # vector offset for when you are carrying a object
+        self.carrying_offset=[10,10]
+
         self.health=100
         self.bleeding=False
         self.time_since_bleed=0
         self.bleed_interval=0.5
+
+        self.prone=False
 
         self.confirmed_kills=0
         self.probable_kills=0
@@ -205,9 +213,8 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        ''' add object to inventory'''
-        # in this case EVENT_DATA is a world_object
-        # add item to inventory no matter what
+        ''' add object to inventory. does not remove obj from world'''
+
         self.inventory.append(EVENT_DATA)
 
         if EVENT_DATA.is_gun :
@@ -217,14 +224,9 @@ class AIHuman(AIBase):
                 self.primary_weapon=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.primary_weapon.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.primary_weapon)
-                self.inventory.remove(self.primary_weapon)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.handle_drop_object(self.primary_weapon)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_gun=False
         elif EVENT_DATA.is_grenade :
             if self.throwable==None:
@@ -233,14 +235,9 @@ class AIHuman(AIBase):
                 self.throwable=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.throwable.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.throwable)
-                self.inventory.remove(self.throwable)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.throwable=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.handle_drop_object(self.throwable)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_grenade=False
         elif EVENT_DATA.is_handheld_antitank :
             if self.antitank==None:
@@ -249,30 +246,12 @@ class AIHuman(AIBase):
                 self.antitank=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
             else:
-                # drop the current weapon and pick up the new one
-                self.antitank.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.antitank)
-                self.inventory.remove(self.antitank)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.antitank=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+                # drop the current obj and pick up the new one
+                self.handle_drop_object(self.antitank)
+                self.event_add_inventory(EVENT_DATA)
             self.ai_want_antitank=False
         elif EVENT_DATA.is_large_human_pickup :
-            if self.large_pickup==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
-                self.large_pickup=EVENT_DATA
-                #EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current weapon and pick up the new one
-                self.large_pickup.world_coords=copy.copy(self.owner.world_coords)
-                self.owner.world.add_object(self.large_pickup)
-                self.inventory.remove(self.large_pickup)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' picked up ]')
-                self.large_pickup=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
+            print('ERROR - large pickup should not go through inventory functions')
         elif EVENT_DATA.is_consumable:
             self.ai_want_food=False
         elif EVENT_DATA.is_liquid_container:
@@ -283,23 +262,26 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
-        ''' remove object from inventory '''
+        ''' remove object from inventory. does not add to world '''
 
         if EVENT_DATA in self.inventory:
 
-            # make sure the obj world_coords reflect the obj that had it in inventory
-            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
-
             self.inventory.remove(EVENT_DATA)
+            self.owner.world.add_object(EVENT_DATA)
 
             if self.primary_weapon==EVENT_DATA:
                 self.primary_weapon=None
+                EVENT_DATA.ai.equipper=None
             elif self.throwable==EVENT_DATA:
                 self.throwable=None
+                # equipper is used to figure out who threw the grenade
+                # need a better way to handle this in the future
+                #EVENT_DATA.ai.equipper=None
             elif self.antitank==EVENT_DATA:
                 self.antitank=None
+                EVENT_DATA.ai.equipper=None
             elif self.large_pickup==EVENT_DATA:
-                self.large_pickup=None
+                print('ERROR - large pickup should not go through inventory functions')
 
             # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
 
@@ -333,6 +315,8 @@ class AIHuman(AIBase):
             calc_speed*=0.9
         if self.fatigue>30:
             calc_speed*=0.9
+        if self.prone:
+            calc_speed*=0.5
         
         return calc_speed
     
@@ -399,6 +383,7 @@ class AIHuman(AIBase):
         dm+=(self.owner.name+' died.')
         dm+=('\n  - faction: '+self.squad.faction)
         dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
+        dm+=('\n  - probable kills: '+str(self.probable_kills))
         dm+=('\n  - killed by : '+self.last_collision_description)
         print(dm)
 
@@ -408,9 +393,10 @@ class AIHuman(AIBase):
 
         # drop primary weapon 
         if self.primary_weapon!=None:
-            self.inventory.remove(self.primary_weapon)
-            self.primary_weapon.world_coords=[self.owner.world_coords[0]+float(random.randint(-15,15)),self.owner.world_coords[1]+float(random.randint(-15,15))]
-            self.owner.world.add_object(self.primary_weapon)
+            self.handle_drop_object(self.primary_weapon)
+
+        if self.large_pickup!=None:
+            self.handle_drop_object(self.large_pickup)
 
         # remove from squad 
         if self.squad != None:
@@ -421,7 +407,7 @@ class AIHuman(AIBase):
                 print('!! Error : '+self.owner.name+' not in squad somehow')
 
         # spawn body
-        engine.world_builder.spawn_container('body',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
+        engine.world_builder.spawn_container('body: '+self.owner.name,self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
 
         self.owner.world.remove_object(self.owner)
 
@@ -454,6 +440,22 @@ class AIHuman(AIBase):
                 self.last_collision_description = 'over consumption of '+LIQUID_CONTAINER.ai.liquid_type
 
     #---------------------------------------------------------------------------
+    def handle_drop_object(self,OBJECT_TO_DROP):
+        ''' drop object into the world '''
+        # any distance calculation would be made before this function is called
+        if OBJECT_TO_DROP.is_large_human_pickup:
+            self.large_pickup=None
+        else:
+            self.event_remove_inventory(OBJECT_TO_DROP)
+            # make sure the obj world_coords reflect the obj that had it in inventory
+            OBJECT_TO_DROP.world_coords=copy.copy(self.owner.world_coords)
+            
+            # grenades get 'dropped' when they are thrown and are special
+            if OBJECT_TO_DROP.is_grenade==False:
+                engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
+            self.owner.world.add_object(OBJECT_TO_DROP)
+
+    #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
         self.health+=CONSUMABLE.ai.health_effect
@@ -461,6 +463,7 @@ class AIHuman(AIBase):
         self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
 
+        # this should remove the object from the game because it is not added to world
         self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
@@ -603,6 +606,10 @@ class AIHuman(AIBase):
     def handle_player_update(self):
         ''' handle any player specific code'''
         
+        # graphic_engine.keyPressed works for keys that need to be held down
+        # keys that should trigger an event only when they keydown (once) are handled 
+        # by world.handle_keydown()
+
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
@@ -640,23 +647,24 @@ class AIHuman(AIBase):
 
         else:
             action=False
+            speed=self.get_calculated_speed()
             if(self.owner.world.graphic_engine.keyPressed('w')):
-                self.owner.world_coords[1]-=self.speed*time_passed
+                self.owner.world_coords[1]-=speed*time_passed
                 self.owner.rotation_angle=0
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('s')):
-                self.owner.world_coords[1]+=self.speed*time_passed
+                self.owner.world_coords[1]+=speed*time_passed
                 self.owner.rotation_angle=180
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('a')):
-                self.owner.world_coords[0]-=self.speed*time_passed
+                self.owner.world_coords[0]-=speed*time_passed
                 self.owner.rotation_angle=90
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('d')):
-                self.owner.world_coords[0]+=self.speed*time_passed
+                self.owner.world_coords[0]+=speed*time_passed
                 self.owner.rotation_angle=270
                 self.owner.reset_image=True
                 action=True
@@ -665,20 +673,7 @@ class AIHuman(AIBase):
                 if self.primary_weapon!=None:
                     self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
                 action=True
-            if(self.owner.world.graphic_engine.keyPressed('g')):
-                # throw throwable object
-                self.throw([]) 
-                action=True
-            if(self.owner.world.graphic_engine.keyPressed('t')):
-                # launch anti tank
-                self.launch_antitank([])
-                action=True
-            if(self.owner.world.graphic_engine.keyPressed('b')):
-                if self.bleeding:
-                    self.bleeding=False
-                    self.speak('bandage')
-                    action=True
-            
+
             if action:
                 self.fatigue+=self.fatigue_add_rate*time_passed
                 self.time_since_player_interact=0
@@ -689,6 +684,34 @@ class AIHuman(AIBase):
                 self.time_since_player_interact+=time_passed
                 if self.time_since_player_interact>self.time_before_afk:
                     self.handle_normal_ai_update()
+
+    #---------------------------------------------------------------------------
+    def handle_pickup_object(self,OBJECT_TO_PICKUP):
+        ''' pickup object from the world '''
+        # any distance calculation would be made before this function is called
+        if OBJECT_TO_PICKUP.is_large_human_pickup:
+            self.large_pickup=OBJECT_TO_PICKUP
+        else:
+            self.event_add_inventory(OBJECT_TO_PICKUP)
+            self.owner.world.remove_object(OBJECT_TO_PICKUP)
+
+    #---------------------------------------------------------------------------
+    def handle_prone_state_change(self):
+        '''if prone, stand up. If standing, go prone'''
+
+        # reverse state
+        self.prone=not self.prone
+
+        if self.prone:
+            self.owner.image_index=1
+        else: 
+            self.owner.image_index=0
+
+        # good to do this as it changed
+        self.owner.reset_image=True
+
+        # add some fatigue, not sure how much
+        self.fatigue+=15
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
@@ -731,17 +754,22 @@ class AIHuman(AIBase):
         self.thirst_rate+=selected.ai.thirst_effect
         self.fatigue+=selected.ai.fatigue_effect
 
+        # calling this by itself should remove all references to the object
         self.event_remove_inventory(selected)
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man ''' 
+
+        # standup. kneel would be better if it becomes an option later
+        if self.prone:
+            self.handle_prone_state_change()
+
         if self.antitank!=None:
             self.antitank.ai.launch(TARGET_COORDS)
-            self.owner.world.add_object(self.antitank)
-            self.inventory.remove(self.antitank)
-            self.antitank=None
 
+            # drop the tube now that it is empty
+            self.handle_drop_object(self.antitank)
 
     #---------------------------------------------------------------------------
     def speak(self,WHAT):
@@ -803,6 +831,10 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_enter_vehicle(self,VEHICLE):
         '''move to and enter vehicle'''
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         # head towards the vehicle
         # should check if the vehicle is hostile
 
@@ -818,6 +850,8 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_get_ammo(self,NEAR):
         '''attempts to get ammo. returns True/False if it is successful'''
+        if self.prone:
+            self.handle_prone_state_change()
 
         # preference for ammo
         # 1 - ammo can
@@ -923,6 +957,8 @@ class AIHuman(AIBase):
         if item==None:
             return False
         else:
+            if self.prone:
+                self.handle_prone_state_change()
             self.target_object=item
             self.ai_goal='loot_container'
             self.destination=self.target_object.world_coords
@@ -934,12 +970,21 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_move_short_random_distance(self):
         distance=random.randint(50,200)
+
+        if distance>70:
+            if self.prone:
+                self.handle_prone_state_change()
+
         self.destination=[self.owner.world_coords[0]+float(random.randint(-distance,distance)),self.owner.world_coords[1]+float(random.randint(-distance,distance))]
         self.ai_state='start_moving'
         self.ai_goal='short move'  
 
     #-----------------------------------------------------------------------
     def take_action_panic(self):
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         # adrenaline effect. should allow the bot to run for a bit
         self.fatigue-=50
 
@@ -951,6 +996,10 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_pickup_object(self,WORLD_OBJECT):
         '''move to and pick up an object'''
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         self.target_object=WORLD_OBJECT
         self.ai_goal='pickup'
         self.destination=self.target_object.world_coords
@@ -1040,6 +1089,10 @@ class AIHuman(AIBase):
         ''' engagements >301. assumes target is alive'''
         # if no state changes are made the ai will attempt to fire the weapon on the next cycle
 
+        # should always go prone to make a smaller target for longer engagements
+        if not self.prone:
+            self.handle_prone_state_change()
+
         action=False # used locally to help with decision tree
         if self.target_object.is_vehicle:
             if self.antitank!=None:
@@ -1071,6 +1124,8 @@ class AIHuman(AIBase):
 
                 # check if target is too far 
                 if DISTANCE >self.primary_weapon.ai.range :
+                    if self.prone:
+                        self.handle_prone_state_change()
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
@@ -1176,6 +1231,8 @@ class AIHuman(AIBase):
                 # distance from group 
                 distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
                 if distance_group >self.squad.max_distance :
+                    if self.prone:
+                        self.handle_prone_state_change()
                     self.ai_goal='close_with_group'
                     self.destination=copy.copy(self.squad.world_coords)
                     self.time_since_ai_transition=0
@@ -1366,10 +1423,7 @@ class AIHuman(AIBase):
             CONTAINER.remove_inventory(c)
             self.event_add_inventory(c)
             self.speak('Grabbed a '+c.name)
-            # console log this for now
-            #print('bot grabbed '+c.name+' from container '+CONTAINER.name)
-
-
+            
     #-----------------------------------------------------------------------
     def think_move(self):
         ''' think about the current movement'''
@@ -1413,11 +1467,11 @@ class AIHuman(AIBase):
         if self.ai_goal=='pickup':
             if DISTANCE<5:
                 if self.target_object in self.owner.world.wo_objects:
-                    self.owner.add_inventory(self.target_object)
-                    self.owner.world.remove_object(self.target_object)
+                    self.handle_pickup_object(self.target_object)
                 else:
                     # hmm object is gone. someone else must have grabbed it
                     pass
+                self.target_object=None
                 self.ai_state='sleeping'
         if self.ai_goal=='loot_container':
             if DISTANCE<5:
@@ -1570,12 +1624,13 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
-        ''' throw like you know the thing. cmon man '''    
+        ''' throw like you know the thing. cmon man '''   
+        # stand up
+        if self.prone:
+            self.handle_prone_state_change() 
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
-            self.owner.world.add_object(self.throwable)
-            self.inventory.remove(self.throwable)
-            self.throwable=None
+            self.handle_drop_object(self.throwable)
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -1592,8 +1647,12 @@ class AIHuman(AIBase):
                 if self.vehicle.ai.health<1:
                     #this needs to be here as there will exactly one update cycle if a vehicle dies
                     self.handle_vehicle_died()
-                self.update_human_vehicle_position()
-                
+                else:
+                    self.update_human_vehicle_position()
+
+            # might be faster to have a bool we could check
+            if self.large_pickup!=None:
+                self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
             
             # building awareness stuff. ai and human need this 
             self.time_since_building_check+=self.owner.world.graphic_engine.time_passed_seconds

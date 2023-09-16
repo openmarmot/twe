@@ -59,7 +59,7 @@ class AIProjectile(AIBase):
 
 
             # this is expensive, do we need to do it every update cycle? maybe put on a timer
-            collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False)
+            collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
             if collide_obj !=None:
                 if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
                     # add the collided object to ignore list so we don't hit it again

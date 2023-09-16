@@ -17,6 +17,7 @@ f - fire primary weapon (if you have one)
 g - throw grenade (if you have one)
 t - fire anti tank (if you have one)
 b - bandage (use if you are bleeding)
+p - toggle prone 
 
 -vehicle-
 w - gas 
