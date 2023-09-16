@@ -199,28 +199,33 @@ class World(object):
 
 
     #---------------------------------------------------------------------------
-    def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
+    def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN,CONSIDER_PRONE=False):
         ''' collision check. returns colliding object or None'''
         # COLLIDER - worldobject doing the colliding
         # IGNORE LIST - list of objects to ignore
-        collided=None
 
+        # NOTE - this function sucks - should be replaced. maybe better somewhere else
+
+        collided=None
+        objects=[]
         if CHECK_ALL :
             # in this case all is humans+vehicles+buidings
             objects=self.wo_objects_human+self.wo_objects_building+self.wo_objects_vehicle
-            #temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,objects,IGNORE_LIST)
-            temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,objects,IGNORE_LIST)
+        elif CHECK_HUMAN:
+            objects=self.wo_objects_human
+
+        temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,objects,IGNORE_LIST)
+        if temp !=None:
+            if CONSIDER_PRONE and temp.is_human:
+                if temp.ai.prone:
+                    chance=random.randint(0,1)
+                    if chance==1:
+                        temp=None
+                        print('debug - bullet missed due to prone')
+            # need to check again
             if temp !=None:
-                #print('Collision with '+temp.name )
                 temp.ai.handle_event("collision",COLLIDER)
                 collided=temp
-        else :
-            if CHECK_HUMAN :
-                temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
-                if temp !=None:
-                    #print('Collision with '+temp.name )
-                    temp.ai.handle_event("collision",COLLIDER)
-                    collided=temp
 
         return collided
 
@@ -265,6 +270,50 @@ class World(object):
         i=random.randint(0,len(OBJECT_LIST)-1)
         return OBJECT_LIST[i]
 
+    #---------------------------------------------------------------------------
+    def handle_keydown(self,KEY):
+        '''handle keydown events. called by graphics engine'''
+        # these are for one off (not repeating) key presses
+        #KEY is a key number
+        print('key ',KEY)
+        if KEY==96:
+            self.world_menu.handle_input("tilde")
+        elif KEY==91: # [
+            self.graphic_engine.zoom_out()
+        elif KEY==93: # ]
+            self.graphic_engine.zoom_in()
+        elif KEY==48:
+            self.world_menu.handle_input("0")
+        elif KEY==49:
+            self.world_menu.handle_input("1")
+        elif KEY==50:
+            self.world_menu.handle_input("2")
+        elif KEY==51:
+            self.world_menu.handle_input("3")
+        elif KEY==52:
+            self.world_menu.handle_input("4")
+        elif KEY==53:
+            self.world_menu.handle_input("5")
+        elif KEY==54:
+            self.world_menu.handle_input("6")
+        elif KEY==55:
+            self.world_menu.handle_input("7")
+        elif KEY==56:
+            self.world_menu.handle_input("8")
+        elif KEY==57:
+            self.world_menu.handle_input("9")
+        elif KEY==27:
+            self.world_menu.handle_input("esc")
+        elif KEY==9: #tab
+            self.activate_context_menu()
+        elif KEY==112: #p
+            self.player.ai.handle_prone_state_change()
+        elif KEY==116: #t
+            self.player.ai.launch_antitank([])
+        elif KEY==103: #g
+            self.player.ai.throw([])
+        elif KEY==98: #b
+            self.player.ai.bleeding=False
     #---------------------------------------------------------------------------
     def random_player_spawn(self):
         if len(self.wo_objects_human)>0:

@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 16 2023
+- added code to human ai to handle going prone and standing up 
+- being prone gives a 50% chance of projectiles missing you 
+- reorganized input handling, moving more of it out to the world class from graphics_2d_pygame
+- realized player wasn't using calculated speed (takes into account a lot of stuff).. fixed
+- hit 'p' to go prone as the player character 
+
+50% bullet misses while prone is probably excessive. 
+----------------------------------
 September 04 2023
 - changed my mind on add/remove inventory 
     - added custom methods for picking up and dropping objects from the world 

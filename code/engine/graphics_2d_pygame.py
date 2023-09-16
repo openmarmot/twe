@@ -115,53 +115,8 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                #print('pygame keydown',str(event.key))
-                # send number events to world_menu for ingame menus 
-                # translate to a string corresponding to the actual key to simplify the code
-                # on the other end
-                # tilde
-                if event.key==96:
-                    self.world.world_menu.handle_input("tilde")
-                elif event.key==91: # [
-                    if self.scale>0.2:
-                        self.scale-=0.1
-                        self.view_adjust+=500
-                        #print('zoom out',self.scale)
-                        self.reset_all()
-                    else:
-                        print('max zoom out reached')
-                elif event.key==93: # ]
-                    if self.scale<1.1:
-                        self.scale+=0.1
-                        self.view_adjust-=500
-                        #print('zoom in',self.scale)
-                        self.reset_all()
-                    else:
-                        print('max zoom in reached')
-                elif event.key==48:
-                    self.world.world_menu.handle_input("0")
-                elif event.key==49:
-                    self.world.world_menu.handle_input("1")
-                elif event.key==50:
-                    self.world.world_menu.handle_input("2")
-                elif event.key==51:
-                    self.world.world_menu.handle_input("3")
-                elif event.key==52:
-                    self.world.world_menu.handle_input("4")
-                elif event.key==53:
-                    self.world.world_menu.handle_input("5")
-                elif event.key==54:
-                    self.world.world_menu.handle_input("6")
-                elif event.key==55:
-                    self.world.world_menu.handle_input("7")
-                elif event.key==56:
-                    self.world.world_menu.handle_input("8")
-                elif event.key==57:
-                    self.world.world_menu.handle_input("9")
-                elif event.key==27:
-                    self.world.world_menu.handle_input("esc")
-                elif event.key==9: #tab
-                    self.world.activate_context_menu()
+                # logic for handling these keys has been shifted to world
+                self.world.handle_keydown(event.key)
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -229,13 +184,17 @@ class Graphics_2D_Pygame(object):
                 return True
             else:
                 return False
+        elif KEY=='p':
+            if keys[pygame.K_p]:
+                return True
+            else:
+                return False
         else:
             return False
 
 #------------------------------------------------------------------------------
     def loadImage(self,imageName,imageURL):
         self.images[imageName]=pygame.image.load(imageURL).convert_alpha()
-
 
 #------------------------------------------------------------------------------
     def render(self):
@@ -422,6 +381,22 @@ class Graphics_2D_Pygame(object):
         player_y=self.world.player.world_coords[1]*self.scale
         translate=[center_x-player_x,center_y-player_y]
         return translate
+
 #------------------------------------------------------------------------------
+    def zoom_out(self):
+        '''zoom out'''
+        if self.scale>0.2:
+            self.scale-=0.1
+            self.view_adjust+=500
+            #print('zoom out',self.scale)
+            self.reset_all()
+#------------------------------------------------------------------------------
+    def zoom_in(self):
+        ''' zoom in'''
+        if self.scale<1.1:
+            self.scale+=0.1
+            self.view_adjust-=500
+            #print('zoom in',self.scale)
+            self.reset_all()
 
 

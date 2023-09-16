@@ -9,6 +9,8 @@ event - something that could happen to the ai, possibly caused by external force
 handle_SOMETHING - something that the AI decides to do that requires some code to make happen
 take_action_ - something that sets ai_state and ai_goal to start an action
 think_ - something that requires logic code
+
+for humans the current owner.image_list is [normal,prone,dead]
 '''
 
 #import built in modules
@@ -41,6 +43,8 @@ class AIHuman(AIBase):
         self.bleeding=False
         self.time_since_bleed=0
         self.bleed_interval=0.5
+
+        self.prone=False
 
         self.confirmed_kills=0
         self.probable_kills=0
@@ -311,6 +315,8 @@ class AIHuman(AIBase):
             calc_speed*=0.9
         if self.fatigue>30:
             calc_speed*=0.9
+        if self.prone:
+            calc_speed*=0.5
         
         return calc_speed
     
@@ -600,6 +606,10 @@ class AIHuman(AIBase):
     def handle_player_update(self):
         ''' handle any player specific code'''
         
+        # graphic_engine.keyPressed works for keys that need to be held down
+        # keys that should trigger an event only when they keydown (once) are handled 
+        # by world.handle_keydown()
+
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
@@ -637,23 +647,24 @@ class AIHuman(AIBase):
 
         else:
             action=False
+            speed=self.get_calculated_speed()
             if(self.owner.world.graphic_engine.keyPressed('w')):
-                self.owner.world_coords[1]-=self.speed*time_passed
+                self.owner.world_coords[1]-=speed*time_passed
                 self.owner.rotation_angle=0
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('s')):
-                self.owner.world_coords[1]+=self.speed*time_passed
+                self.owner.world_coords[1]+=speed*time_passed
                 self.owner.rotation_angle=180
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('a')):
-                self.owner.world_coords[0]-=self.speed*time_passed
+                self.owner.world_coords[0]-=speed*time_passed
                 self.owner.rotation_angle=90
                 self.owner.reset_image=True
                 action=True
             if(self.owner.world.graphic_engine.keyPressed('d')):
-                self.owner.world_coords[0]+=self.speed*time_passed
+                self.owner.world_coords[0]+=speed*time_passed
                 self.owner.rotation_angle=270
                 self.owner.reset_image=True
                 action=True
@@ -662,20 +673,7 @@ class AIHuman(AIBase):
                 if self.primary_weapon!=None:
                     self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
                 action=True
-            if(self.owner.world.graphic_engine.keyPressed('g')):
-                # throw throwable object
-                self.throw([]) 
-                action=True
-            if(self.owner.world.graphic_engine.keyPressed('t')):
-                # launch anti tank
-                self.launch_antitank([])
-                action=True
-            if(self.owner.world.graphic_engine.keyPressed('b')):
-                if self.bleeding:
-                    self.bleeding=False
-                    self.speak('bandage')
-                    action=True
-            
+
             if action:
                 self.fatigue+=self.fatigue_add_rate*time_passed
                 self.time_since_player_interact=0
@@ -696,6 +694,24 @@ class AIHuman(AIBase):
         else:
             self.event_add_inventory(OBJECT_TO_PICKUP)
             self.owner.world.remove_object(OBJECT_TO_PICKUP)
+
+    #---------------------------------------------------------------------------
+    def handle_prone_state_change(self):
+        '''if prone, stand up. If standing, go prone'''
+
+        # reverse state
+        self.prone=not self.prone
+
+        if self.prone:
+            self.owner.image_index=1
+        else: 
+            self.owner.image_index=0
+
+        # good to do this as it changed
+        self.owner.reset_image=True
+
+        # add some fatigue, not sure how much
+        self.fatigue+=15
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
@@ -744,6 +760,11 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def launch_antitank(self,TARGET_COORDS):
         ''' throw like you know the thing. cmon man ''' 
+
+        # standup. kneel would be better if it becomes an option later
+        if self.prone:
+            self.handle_prone_state_change()
+
         if self.antitank!=None:
             self.antitank.ai.launch(TARGET_COORDS)
 
@@ -810,6 +831,10 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_enter_vehicle(self,VEHICLE):
         '''move to and enter vehicle'''
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         # head towards the vehicle
         # should check if the vehicle is hostile
 
@@ -825,6 +850,8 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_get_ammo(self,NEAR):
         '''attempts to get ammo. returns True/False if it is successful'''
+        if self.prone:
+            self.handle_prone_state_change()
 
         # preference for ammo
         # 1 - ammo can
@@ -930,6 +957,8 @@ class AIHuman(AIBase):
         if item==None:
             return False
         else:
+            if self.prone:
+                self.handle_prone_state_change()
             self.target_object=item
             self.ai_goal='loot_container'
             self.destination=self.target_object.world_coords
@@ -941,12 +970,21 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_move_short_random_distance(self):
         distance=random.randint(50,200)
+
+        if distance>70:
+            if self.prone:
+                self.handle_prone_state_change()
+
         self.destination=[self.owner.world_coords[0]+float(random.randint(-distance,distance)),self.owner.world_coords[1]+float(random.randint(-distance,distance))]
         self.ai_state='start_moving'
         self.ai_goal='short move'  
 
     #-----------------------------------------------------------------------
     def take_action_panic(self):
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         # adrenaline effect. should allow the bot to run for a bit
         self.fatigue-=50
 
@@ -958,6 +996,10 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def take_action_pickup_object(self,WORLD_OBJECT):
         '''move to and pick up an object'''
+
+        if self.prone:
+            self.handle_prone_state_change()
+
         self.target_object=WORLD_OBJECT
         self.ai_goal='pickup'
         self.destination=self.target_object.world_coords
@@ -1047,6 +1089,10 @@ class AIHuman(AIBase):
         ''' engagements >301. assumes target is alive'''
         # if no state changes are made the ai will attempt to fire the weapon on the next cycle
 
+        # should always go prone to make a smaller target for longer engagements
+        if not self.prone:
+            self.handle_prone_state_change()
+
         action=False # used locally to help with decision tree
         if self.target_object.is_vehicle:
             if self.antitank!=None:
@@ -1078,6 +1124,8 @@ class AIHuman(AIBase):
 
                 # check if target is too far 
                 if DISTANCE >self.primary_weapon.ai.range :
+                    if self.prone:
+                        self.handle_prone_state_change()
                     self.ai_goal='close_with_target'
                     self.destination=copy.copy(self.target_object.world_coords)
                     self.ai_state='start_moving'
@@ -1183,6 +1231,8 @@ class AIHuman(AIBase):
                 # distance from group 
                 distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
                 if distance_group >self.squad.max_distance :
+                    if self.prone:
+                        self.handle_prone_state_change()
                     self.ai_goal='close_with_group'
                     self.destination=copy.copy(self.squad.world_coords)
                     self.time_since_ai_transition=0
@@ -1574,7 +1624,10 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
-        ''' throw like you know the thing. cmon man '''    
+        ''' throw like you know the thing. cmon man '''   
+        # stand up
+        if self.prone:
+            self.handle_prone_state_change() 
         if self.throwable!=None:
             self.throwable.ai.throw(TARGET_COORDS)
             self.handle_drop_object(self.throwable)
