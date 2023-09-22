@@ -518,6 +518,10 @@ def load_images(world):
     world.graphic_engine.loadImage('fg42-type2','images/weapons/fg42-type2.png')
     world.graphic_engine.loadImage('svt40','images/weapons/svt40.png')
     world.graphic_engine.loadImage('svt40','images/weapons/svt40-sniper.png')
+
+    # shovels 
+    world.graphic_engine.loadImage('german_folding_shovel','images/shovels/german_folding_shovel.png')
+    world.graphic_engine.loadImage('german_field_shovel','images/shovels/german_field_shovel.png')
     
 
     # airplanes
@@ -1393,6 +1397,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='brown_chair'
         z.is_furniture=True
         z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='german_field_shovel':
+        z=WorldObject(WORLD,['german_field_shovel'],AINone)
+        z.render_level=2
+        z.name='german field shovel'
+        z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='german_folding_shovel':
+        z=WorldObject(WORLD,['german_folding_shovel'],AINone)
+        z.render_level=2
+        z.name='german folding shovel'
         z.rotation_angle=float(random.randint(0,359)) 
 
     else:

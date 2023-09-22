@@ -70,6 +70,3 @@ class AIProjectile(AIBase):
                     self.owner.world.remove_object(self.owner) 
 
 
-
-
-    #---------------------------------------------------------------------------

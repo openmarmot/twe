@@ -16,9 +16,6 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='July 16 2021' #date of last update
 
 #global variables
 
@@ -61,7 +58,7 @@ class AIPanzerfaust(AIBase):
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
             
-            if self.owner.world.check_collision_bool(self.owner,[self.equipper],True,False):
+            if self.owner.world.check_collision_return_object(self.owner,[self.equipper],True,False) !=None:
                 self.explode()
     #---------------------------------------------------------------------------
 

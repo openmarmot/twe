@@ -1,6 +1,33 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 21 2023
+- moved the throw code from grenade to ai_human
+- removed world.check_collision_bool too similar to the other collision function 
+- minor cleanup 
+
+I think what I need to get to here is anything should be capable of being thrown. 
+The current state is grenades have a lot of special code to handle that 
+
+currently everything that moves has custom code - but we might need a universal physics for every object.
+maybe a update_physics as a world_object base class function.
+
+the trick here is instead of say bullets traveling for a defined length of time i would instead 
+have to model air density slowing them down. that would be a lot harder 
+
+----------------------------------
+September 18 2023
+- added german field shovel art
+- added german folding shovel art
+
+shovels are going to be melee among other things - but i want 
+most things to be melee. need to figure out the mechanics first 
+
+i think the best thing about making a 2d low art quality game 
+is how much random goofy stuff i can add, like multiple types 
+of shovel 
+
+----------------------------------
 September 16 2023
 - added code to human ai to handle going prone and standing up 
 - being prone gives a 50% chance of projectiles missing you 

@@ -1629,7 +1629,19 @@ class AIHuman(AIBase):
         if self.prone:
             self.handle_prone_state_change() 
         if self.throwable!=None:
-            self.throwable.ai.throw(TARGET_COORDS)
+            #self.throwable.ai.throw(TARGET_COORDS)
+
+            self.throwable.ai.thrown=True
+
+            # set rotation and heading
+            if self.owner.is_player :
+                # do computations based off of where the mouse is. TARGET_COORDS is ignored
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+            else :
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
+
             self.handle_drop_object(self.throwable)
 
     #---------------------------------------------------------------------------
