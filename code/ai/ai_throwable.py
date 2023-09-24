@@ -1,6 +1,6 @@
 
 '''
-module : ai_grenade.py
+module : ai_throwable.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
@@ -20,7 +20,7 @@ import engine.world_builder
 
 #global variables
 
-class AIGrenade(AIBase):
+class AIThrowable(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
@@ -35,8 +35,14 @@ class AIGrenade(AIBase):
         # max flight time, basically the fuse length
         self.maxTime=5.
 
+        # default speed
+        self.max_speed=0
+
+        # current speed
         self.speed=0
 
+        # does this object explode?
+        self.explosive=False
         # amount of shrapnel (basically grenade power)
         self.shrapnel_count=40
 
@@ -56,7 +62,13 @@ class AIGrenade(AIBase):
         if self.thrown:
             self.flightTime+=time_passed
             if(self.flightTime>self.maxTime):
-                self.explode()
+                if self.explosive:
+                    self.explode()
+                else:
+                    # reset. should stop movement
+                    self.thrown=False
+                    self.flightTime=0
+                    self.speed=self.max_speed
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
@@ -66,14 +78,10 @@ class AIGrenade(AIBase):
                     # just stop the grenade. maybe some spin or reverse movement?
                     if self.redirected==False:
                         self.speed=-20
-                        self.maxTime-=self.flightTime
-                        self.flightTime=0
+                        self.flightTime=self.maxTime-1
                     else:
                         # basically give it another chance to collide
                         self.redirected=False
-                        self.maxTime-=self.flightTime
-                        self.flightTime=0
-
 
     #---------------------------------------------------------------------------
     def explode(self):

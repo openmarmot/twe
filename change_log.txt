@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 23 2023
+- added is_throwable attribute 
+- event_add_inventory now checks for is_throwable instead of is_grenade 
+- fixed a add_inventory bug that could have resulted in double items (i think?)
+- picking up a grenade while holding a grenade will no longer cause you to drop one 
+- changed ai_grenade into ai_throwable and made it more generic 
+- slowed grenades down a bit again. not sure why they feel so fast all of a sudden 
+
+did upping the frame rate do something to grenades in flight ?
+
+so shovels are throwable. not much else to do with them at the moment. 
+They also don't do damage at the moment. 
+
+i found a bug where objects are sometimes not picked up but are still in your inventory. 
+so you see them on the ground but when you throw them they disappear or move as they should 
+
+thrown objects seem super goofy. at times they seem way faster than they should be. i'm not 
+sure what is going on there 
+
+----------------------------------
 September 21 2023
 - moved the throw code from grenade to ai_human
 - removed world.check_collision_bool too similar to the other collision function 

@@ -78,6 +78,7 @@ class WorldObject(object):
         self.is_gun=False
         self.is_grenade=False
         self.is_handheld_antitank=False
+        self.is_throwable=False #something that can be thrown 
         
         # these are non weapon pickups that are can be carried but are large.
         # only one can be carried at a time.

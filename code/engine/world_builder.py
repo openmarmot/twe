@@ -41,7 +41,7 @@ from ai.ai_gun import AIGun
 from ai.ai_none import AINone
 from ai.ai_building import AIBuilding
 from ai.ai_projectile import AIProjectile
-from ai.ai_grenade import AIGrenade
+from ai.ai_throwable import AIThrowable
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_panzerfaust import AIPanzerfaust
@@ -985,10 +985,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='model24':
-        z=WorldObject(WORLD,['model24'],AIGrenade)
+        z=WorldObject(WORLD,['model24'],AIThrowable)
         z.name='model24'
         z.is_grenade=True
-        z.ai.speed=150.
+        z.is_throwable=True
+        z.ai.explosive=True
+        z.ai.speed=110
+        z.ai.max_speed=110
         z.ai.maxTime=1.3
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -1399,14 +1402,22 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_field_shovel':
-        z=WorldObject(WORLD,['german_field_shovel'],AINone)
+        z=WorldObject(WORLD,['german_field_shovel'],AIThrowable)
         z.render_level=2
         z.name='german field shovel'
+        z.is_throwable=True
+        z.ai.speed=90.
+        z.ai.max_speed=90
+        z.ai.maxTime=3
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_folding_shovel':
-        z=WorldObject(WORLD,['german_folding_shovel'],AINone)
+        z=WorldObject(WORLD,['german_folding_shovel'],AIThrowable)
         z.render_level=2
         z.name='german folding shovel'
+        z.is_throwable=True
+        z.ai.speed=90.
+        z.ai.max_speed=90
+        z.ai.maxTime=3
         z.rotation_angle=float(random.randint(0,359)) 
 
     else:

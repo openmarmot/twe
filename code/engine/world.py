@@ -369,7 +369,7 @@ class World(object):
 
         for b in self.graphic_engine.renderlists:
             for c in b:
-                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_grenade):
+                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_throwable):
                     possible_objects.append(c)
 
         if len(possible_objects)>0:
