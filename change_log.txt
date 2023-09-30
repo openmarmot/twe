@@ -1,5 +1,67 @@
 TWE Project : Change Log
 
+
+----------------------------------
+September 29 2023
+- created a new german_military_equipment list 
+    - only the two shovels for now, need some other stuff 
+- kubelwagen gets a random german_military_equipment
+
+I definitely need more 'stuff' modeled. just random stuff to fill out the game a bit
+- however i think stuff should have some use. I remember when I played Oblivion there 
+was a ton of junk that had no purpose.
+
+I need to rewrite projectiles to not check collision every loop - its excessive.
+It occurs to me that may be why projectiles/grenades got weird with the frame rate 
+increase 
+
+----------------------------------
+September 23 2023
+- added is_throwable attribute 
+- event_add_inventory now checks for is_throwable instead of is_grenade 
+- fixed a add_inventory bug that could have resulted in double items (i think?)
+- picking up a grenade while holding a grenade will no longer cause you to drop one 
+- changed ai_grenade into ai_throwable and made it more generic 
+- slowed grenades down a bit again. not sure why they feel so fast all of a sudden 
+
+did upping the frame rate do something to grenades in flight ?
+
+so shovels are throwable. not much else to do with them at the moment. 
+They also don't do damage at the moment. 
+
+i found a bug where objects are sometimes not picked up but are still in your inventory. 
+so you see them on the ground but when you throw them they disappear or move as they should 
+
+thrown objects seem super goofy. at times they seem way faster than they should be. i'm not 
+sure what is going on there 
+
+----------------------------------
+September 21 2023
+- moved the throw code from grenade to ai_human
+- removed world.check_collision_bool too similar to the other collision function 
+- minor cleanup 
+
+I think what I need to get to here is anything should be capable of being thrown. 
+The current state is grenades have a lot of special code to handle that 
+
+currently everything that moves has custom code - but we might need a universal physics for every object.
+maybe a update_physics as a world_object base class function.
+
+the trick here is instead of say bullets traveling for a defined length of time i would instead 
+have to model air density slowing them down. that would be a lot harder 
+
+----------------------------------
+September 18 2023
+- added german field shovel art
+- added german folding shovel art
+
+shovels are going to be melee among other things - but i want 
+most things to be melee. need to figure out the mechanics first 
+
+i think the best thing about making a 2d low art quality game 
+is how much random goofy stuff i can add, like multiple types 
+of shovel 
+
 ----------------------------------
 September 16 2023
 - added code to human ai to handle going prone and standing up 

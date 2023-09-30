@@ -284,7 +284,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
-            self.world.graphic_engine.menu_text_queue.append('4 - spawn a building')
+            self.world.graphic_engine.menu_text_queue.append('4 - spawn a shovel')
             self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
             self.world.graphic_engine.menu_text_queue.append('6 - smooth display jitter')
             self.menu_state='base'
@@ -298,7 +298,7 @@ class World_Menu(object):
                 k1=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
                 k1.ai.fuel=k1.ai.fuel_capacity
             elif Key=='4':
-                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'square_building',True)
+                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'german_field_shovel',True)
             elif Key=='5':
                 self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
             elif Key=='6':

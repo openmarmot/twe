@@ -172,33 +172,6 @@ class World(object):
             self.wo_objects_furniture.append(WORLD_OBJECT)
         
     #---------------------------------------------------------------------------
-    def check_collision_bool(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN):
-        ''' collision check. returns bool as to whether there was a collision.'''
-        # COLLIDER - worldobject doing the colliding
-        # IGNORE LIST - list of objects to ignore
-        collided=False
-
-        if CHECK_ALL :
-            # in this case all is humans+vehicles+buidings
-            objects=self.wo_objects_human+self.wo_objects_building+self.wo_objects_vehicle
-            #temp=engine.math_2d.checkCollisionSquareOneResult(COLLIDER,objects,IGNORE_LIST)
-            temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,objects,IGNORE_LIST)
-            if temp !=None:
-                #print('Collision with '+temp.name )
-                temp.ai.handle_event("collision",COLLIDER)
-                collided=True
-        else :
-            if CHECK_HUMAN :
-                temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,self.wo_objects_human,IGNORE_LIST)
-                if temp !=None:
-                    #print('Collision with '+temp.name )
-                    temp.ai.handle_event("collision",COLLIDER)
-                    collided=True
-
-        return collided
-
-
-    #---------------------------------------------------------------------------
     def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN,CONSIDER_PRONE=False):
         ''' collision check. returns colliding object or None'''
         # COLLIDER - worldobject doing the colliding
@@ -396,7 +369,7 @@ class World(object):
 
         for b in self.graphic_engine.renderlists:
             for c in b:
-                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_grenade):
+                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_throwable):
                     possible_objects.append(c)
 
         if len(possible_objects)>0:

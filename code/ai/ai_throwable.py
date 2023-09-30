@@ -1,9 +1,8 @@
 
 '''
-module : ai_grenade.py
+module : ai_throwable.py
 version : see module_version variable
 Language : Python 3.x
-author : andrew christ
 email : andrew@openmarmot.com
 notes :
 '''
@@ -17,13 +16,11 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='Oct 22 2021' #date of last update
+
 
 #global variables
 
-class AIGrenade(AIBase):
+class AIThrowable(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
@@ -38,8 +35,14 @@ class AIGrenade(AIBase):
         # max flight time, basically the fuse length
         self.maxTime=5.
 
+        # default speed
+        self.max_speed=0
+
+        # current speed
         self.speed=0
 
+        # does this object explode?
+        self.explosive=False
         # amount of shrapnel (basically grenade power)
         self.shrapnel_count=40
 
@@ -59,25 +62,26 @@ class AIGrenade(AIBase):
         if self.thrown:
             self.flightTime+=time_passed
             if(self.flightTime>self.maxTime):
-                self.explode()
+                if self.explosive:
+                    self.explode()
+                else:
+                    # reset. should stop movement
+                    self.thrown=False
+                    self.flightTime=0
+                    self.speed=self.max_speed
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
-            
+            # give it a little time to get away from the thrower 
             if self.flightTime>0.1:
-                if self.owner.world.check_collision_bool(self.owner,[self.equipper],False,True):
+                if self.owner.world.check_collision_return_object(self.owner,[self.equipper],False,True) !=None:
                     # just stop the grenade. maybe some spin or reverse movement?
                     if self.redirected==False:
                         self.speed=-20
-                        self.maxTime-=self.flightTime
-                        self.flightTime=0
+                        self.flightTime=self.maxTime-1
                     else:
                         # basically give it another chance to collide
                         self.redirected=False
-                        self.maxTime-=self.flightTime
-                        self.flightTime=0
-
-    #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
     def explode(self):
@@ -88,24 +92,6 @@ class AIGrenade(AIBase):
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else
         self.owner.world.remove_object(self.owner)
-
-    #---------------------------------------------------------------------------
-    def throw(self,TARGET_COORDS):
-
-        # whatever is calling this should add the grenade to the world map (if it isn't there)
-
-        # MOUSE_AIM bool as to whether you want to throw it at the mouse
-        self.thrown=True
-
-        # reset coords 
-        self.owner.world_coords=copy.copy(self.equipper.world_coords)
-        if self.equipper.is_player :
-            # do computations based off of where the mouse is. TARGET_COORDS is ignored
-            self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
-            self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
-        else :
-            self.owner.rotation_angle=engine.math_2d.get_rotation(self.equipper.world_coords,TARGET_COORDS)
-            self.owner.heading=engine.math_2d.get_heading_vector(self.equipper.world_coords,TARGET_COORDS)
 
     #---------------------------------------------------------------------------
     def redirect(self,TARGET_COORDS):

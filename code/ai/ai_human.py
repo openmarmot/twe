@@ -201,6 +201,11 @@ class AIHuman(AIBase):
                 self.ai_goal='react to collision'
                 self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
                 self.ai_state='start_moving'
+        elif EVENT_DATA.is_throwable:
+            #throwable but not a grenade 
+            self.speak('Oww!')
+            # temp do something else later
+            self.take_action_panic()
 
         else:
             print('unidentified collision')
@@ -214,8 +219,8 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
         ''' add object to inventory. does not remove obj from world'''
-
-        self.inventory.append(EVENT_DATA)
+        if EVENT_DATA not in self.inventory:
+            self.inventory.append(EVENT_DATA)
 
         if EVENT_DATA.is_gun :
             if self.primary_weapon==None:
@@ -228,17 +233,14 @@ class AIHuman(AIBase):
                 self.handle_drop_object(self.primary_weapon)
                 self.event_add_inventory(EVENT_DATA)
             self.ai_want_gun=False
-        elif EVENT_DATA.is_grenade :
+        elif EVENT_DATA.is_throwable :
             if self.throwable==None:
                 if self.owner.is_player :
                     self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
                 self.throwable=EVENT_DATA
                 EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current obj and pick up the new one
-                self.handle_drop_object(self.throwable)
-                self.event_add_inventory(EVENT_DATA)
-            self.ai_want_grenade=False
+            if EVENT_DATA.is_grenade:
+                self.ai_want_grenade=False
         elif EVENT_DATA.is_handheld_antitank :
             if self.antitank==None:
                 if self.owner.is_player :
@@ -1629,7 +1631,19 @@ class AIHuman(AIBase):
         if self.prone:
             self.handle_prone_state_change() 
         if self.throwable!=None:
-            self.throwable.ai.throw(TARGET_COORDS)
+            #self.throwable.ai.throw(TARGET_COORDS)
+
+            self.throwable.ai.thrown=True
+
+            # set rotation and heading
+            if self.owner.is_player :
+                # do computations based off of where the mouse is. TARGET_COORDS is ignored
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+            else :
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
+
             self.handle_drop_object(self.throwable)
 
     #---------------------------------------------------------------------------
