@@ -1,5 +1,20 @@
 TWE Project : Change Log
 
+
+----------------------------------
+September 29 2023
+- created a new german_military_equipment list 
+    - only the two shovels for now, need some other stuff 
+- kubelwagen gets a random german_military_equipment
+
+I definitely need more 'stuff' modeled. just random stuff to fill out the game a bit
+- however i think stuff should have some use. I remember when I played Oblivion there 
+was a ton of junk that had no purpose.
+
+I need to rewrite projectiles to not check collision every loop - its excessive.
+It occurs to me that may be why projectiles/grenades got weird with the frame rate 
+increase 
+
 ----------------------------------
 September 23 2023
 - added is_throwable attribute 

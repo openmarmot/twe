@@ -66,6 +66,8 @@ list_guns_rare=['mp40','ppk','stg44','mg34','dp28','1911','k43','g41w']
 list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
 
+list_german_military_equipment=['german_folding_shovel','german_field_shovel']
+
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
 list_medical_rare=['german_officer_first_aid_kit']
@@ -1290,6 +1292,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
             z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_german_military_equipment,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='red_bicycle':
