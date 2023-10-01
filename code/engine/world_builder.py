@@ -994,7 +994,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.explosive=True
         z.ai.speed=110
         z.ai.max_speed=110
-        z.ai.maxTime=1.3
+        z.ai.maxTime=3.3
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 

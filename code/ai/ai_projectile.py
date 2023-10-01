@@ -30,6 +30,10 @@ class AIProjectile(AIBase):
         self.maxTime=5.
         self.ignore_list=[]
 
+        # variables for collision checks
+        self.last_collision_check=0
+        self.collision_check_interval=0.1
+
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
 
@@ -57,16 +61,17 @@ class AIProjectile(AIBase):
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
 
-
-            # this is expensive, do we need to do it every update cycle? maybe put on a timer
-            collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
-            if collide_obj !=None:
-                if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
-                    # add the collided object to ignore list so we don't hit it again
-                    # this is mostly to deal with buildings where we would hit it a ton of times
-                    self.ignore_list.append(collide_obj)
-                else:
-                    # bullet stuck in something. remove bullet from world
-                    self.owner.world.remove_object(self.owner) 
+            # check collision 
+            if self.flightTime>self.last_collision_check+self.collision_check_interval:
+                self.last_collision_check=self.flightTime
+                collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
+                if collide_obj !=None:
+                    if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                        # add the collided object to ignore list so we don't hit it again
+                        # this is mostly to deal with buildings where we would hit it a ton of times
+                        self.ignore_list.append(collide_obj)
+                    else:
+                        # bullet stuck in something. remove bullet from world
+                        self.owner.world.remove_object(self.owner) 
 
 

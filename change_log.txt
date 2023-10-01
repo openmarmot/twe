@@ -1,5 +1,33 @@
 TWE Project : Change Log
 
+----------------------------------
+October 1 2023
+- modified projectiles so they check collision about every 0.1 seconds instead of every loop  
+    - this did not seem to matter 
+- increase air time for grenade a bit as it was exploding a bit early 
+- add more error code to prevent objects from being added to various lists twice 
+- removed code that self-erased squads if they had no members. this caused a rare 
+crash where a gun was fired by someone not in a squad (were they dead?? ) causing the 
+squad to be none which caused the friendly fire code to crash 
+- human ai remove inventory was still adding objects to the world. I forget where I landed 
+    on that question, I think I did NOT want this. removing it (it may have been causing duplicaates)
+- removed the error text for changing vehicle roles as 'none' as this is used to clear out of all roles 
+    and is not an error 
+
+I think I fixed a lot of issues by removing the world add from inventory removal. 
+I think this was resulting in double object references, which meant double physics updates 
+among other things. As a result thrown object are probably back to normal speeds and will 
+need a readjust. 
+
+
+the squad code in general needs a revisit. ai_faction_tactial should ignore 0 member squads 
+and maybe react when they are wiped out 
+
+I think its clear that eventually I need to pivot to a universal physics model for every object 
+but I'm not ready to tackle that.. 
+
+Short term I may switch to airplane stuff for awhile. I'd like this to be a game where you can 
+have fun flying planes and not really do any of the other stuff if you don't want to. 
 
 ----------------------------------
 September 29 2023
