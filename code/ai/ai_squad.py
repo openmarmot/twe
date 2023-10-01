@@ -205,9 +205,9 @@ class AISquad(object):
             else:
                 print('error ai mode not recognized',self.ai_mode)
         else:
-            # no members. remove from faction tactical
-            self.faction_tactical.squads.remove(self)
-            print('removing squad')
+            # we should keep the squad around for records even if there are no members
+            # also in flight bullets may need it
+            pass
           
 
 

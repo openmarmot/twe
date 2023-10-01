@@ -222,54 +222,57 @@ class AIHuman(AIBase):
         if EVENT_DATA not in self.inventory:
             self.inventory.append(EVENT_DATA)
 
-        if EVENT_DATA.is_gun :
-            if self.primary_weapon==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current obj and pick up the new one
-                self.handle_drop_object(self.primary_weapon)
-                self.event_add_inventory(EVENT_DATA)
-            self.ai_want_gun=False
-        elif EVENT_DATA.is_throwable :
-            if self.throwable==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.throwable=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-            if EVENT_DATA.is_grenade:
-                self.ai_want_grenade=False
-        elif EVENT_DATA.is_handheld_antitank :
-            if self.antitank==None:
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.antitank=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-            else:
-                # drop the current obj and pick up the new one
-                self.handle_drop_object(self.antitank)
-                self.event_add_inventory(EVENT_DATA)
-            self.ai_want_antitank=False
-        elif EVENT_DATA.is_large_human_pickup :
-            print('ERROR - large pickup should not go through inventory functions')
-        elif EVENT_DATA.is_consumable:
-            self.ai_want_food=False
-        elif EVENT_DATA.is_liquid_container:
-            # this is terrible as this could be non consumable
-            self.ai_want_drink=False
-        elif EVENT_DATA.is_medical:
-            self.ai_want_medical=False
+            if EVENT_DATA.is_gun :
+                if self.primary_weapon==None:
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.primary_weapon=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+                else:
+                    # drop the current obj and pick up the new one
+                    self.handle_drop_object(self.primary_weapon)
+                    self.event_add_inventory(EVENT_DATA)
+                self.ai_want_gun=False
+            elif EVENT_DATA.is_throwable :
+                if self.throwable==None:
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.throwable=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+                if EVENT_DATA.is_grenade:
+                    self.ai_want_grenade=False
+            elif EVENT_DATA.is_handheld_antitank :
+                if self.antitank==None:
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.antitank=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+                else:
+                    # drop the current obj and pick up the new one
+                    self.handle_drop_object(self.antitank)
+                    self.event_add_inventory(EVENT_DATA)
+                self.ai_want_antitank=False
+            elif EVENT_DATA.is_large_human_pickup :
+                print('ERROR - large pickup should not go through inventory functions')
+            elif EVENT_DATA.is_consumable:
+                self.ai_want_food=False
+            elif EVENT_DATA.is_liquid_container:
+                # this is terrible as this could be non consumable
+                self.ai_want_drink=False
+            elif EVENT_DATA.is_medical:
+                self.ai_want_medical=False
+        else:
+            print('ERROR - object '+EVENT_DATA.name+' is already in inventory')
+
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
-        ''' remove object from inventory. does not add to world '''
+        ''' remove object from inventory. does NOT add to world '''
 
         if EVENT_DATA in self.inventory:
 
             self.inventory.remove(EVENT_DATA)
-            self.owner.world.add_object(EVENT_DATA)
+            # NOTE - if this object is meant to be added to the world it should be done by whatever calls this
 
             if self.primary_weapon==EVENT_DATA:
                 self.primary_weapon=None
@@ -373,7 +376,9 @@ class AIHuman(AIBase):
                 # nothing to do here, roles already removed
                 pass
             else :
-                print('error: handle_change_vehicle_role - role not recognized ',ROLE)
+                # 'none' is used to remove all roles
+                if ROLE!='none':
+                    print('error: handle_change_vehicle_role - role not recognized ',ROLE)
 
         else: 
             print('error: attempting to change vehicle role when not in vehicle')

@@ -128,48 +128,50 @@ class World(object):
         # reset the image so that the graphics engine can make sure it matches the current view scale
         WORLD_OBJECT.reset_image=True
 
-        #maybe should check if the object is already in there to prevent duplicates
-        self.wo_objects.append(WORLD_OBJECT)
-        if WORLD_OBJECT.collision:
-            self.wo_objects_collision.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_human:
-            self.wo_objects_human.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_gun:
-            self.wo_objects_guns.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_german:
-            self.wo_objects_german.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_soviet:
-            self.wo_objects_soviet.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_american:
-            self.wo_objects_american.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_vehicle:
-            self.wo_objects_vehicle.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_grenade:
-            self.wo_objects_grenade.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_consumable:
-            self.wo_objects_consumable.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_building:
-            self.wo_objects_building.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_map_pointer:
-            self.wo_objects_map_pointer.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_handheld_antitank:
-            self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_airplane:
-            self.wo_objects_airplane.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_civilian:
-            self.wo_objects_civilian.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_melee:
-            self.wo_objects_melee.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_medical:
-            self.wo_objects_medical.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_object_container:
-            self.wo_objects_object_container.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_liquid_container:
-            self.wo_objects_liquid_container.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_ammo_container:
-            self.wo_objects_ammo_container.append(WORLD_OBJECT)
-        if WORLD_OBJECT.is_furniture:
-            self.wo_objects_furniture.append(WORLD_OBJECT)
+        if WORLD_OBJECT not in self.wo_objects:
+            self.wo_objects.append(WORLD_OBJECT)
+            if WORLD_OBJECT.collision:
+                self.wo_objects_collision.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_human:
+                self.wo_objects_human.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_gun:
+                self.wo_objects_guns.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_german:
+                self.wo_objects_german.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_soviet:
+                self.wo_objects_soviet.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_american:
+                self.wo_objects_american.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_vehicle:
+                self.wo_objects_vehicle.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_grenade:
+                self.wo_objects_grenade.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_consumable:
+                self.wo_objects_consumable.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_building:
+                self.wo_objects_building.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_map_pointer:
+                self.wo_objects_map_pointer.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_handheld_antitank:
+                self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_airplane:
+                self.wo_objects_airplane.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_civilian:
+                self.wo_objects_civilian.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_melee:
+                self.wo_objects_melee.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_medical:
+                self.wo_objects_medical.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_object_container:
+                self.wo_objects_object_container.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_liquid_container:
+                self.wo_objects_liquid_container.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_ammo_container:
+                self.wo_objects_ammo_container.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_furniture:
+                self.wo_objects_furniture.append(WORLD_OBJECT)
+        else:
+            print('Error!! '+ WORLD_OBJECT.name+' already in world.wo_objects. Add fails !!')
         
     #---------------------------------------------------------------------------
     def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN,CONSIDER_PRONE=False):
@@ -248,7 +250,7 @@ class World(object):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
         #KEY is a key number
-        print('key ',KEY)
+        #print('key ',KEY)
         if KEY==96:
             self.world_menu.handle_input("tilde")
         elif KEY==91: # [
