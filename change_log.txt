@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 5 2023
+- created art for volkswagen type 82 engine 
+
+decided I am modeling engines. engines are cool.
+
+they are going to be full world objects. 
+
+----------------------------------
 October 1 2023
 - modified projectiles so they check collision about every 0.1 seconds instead of every loop  
     - this did not seem to matter 
