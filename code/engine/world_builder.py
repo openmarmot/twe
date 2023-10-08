@@ -49,6 +49,7 @@ from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
+from ai.ai_engine import AIEngine
 
 
 #global variables
@@ -591,6 +592,9 @@ def load_images(world):
 
     # furniture 
     world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
+
+    # engines 
+    world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 7 2023
+- started work on ai_engine framework
+- started work on engine object creation 
+
+----------------------------------
 October 5 2023
 - created art for volkswagen type 82 engine 
 
