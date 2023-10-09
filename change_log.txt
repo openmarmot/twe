@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 8 2023
+- a bit more work around engine integration 
+- decided to add fuel tanks as well 
+
+note ! vehicles are going to be broken for a bit 
+
+----------------------------------
 October 7 2023
 - started work on ai_engine framework
 - started work on engine object creation 

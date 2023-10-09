@@ -35,21 +35,14 @@ class AIVehicle(AIBase):
         # false for bike
         self.has_engine=True
 
+        # array of engine objects
+        self.engines=[]
+
+        self.fuel_tanks=[]
+
         # open top aka passengers are viewable
         self.open_top=False
-
-        # current fuel type options : gas / diesel / none. note that this needs to be a string, not None type
-        self.fuel_type='gas'
-        # max fuel load in liters
-        self.fuel_capacity=0
-        # current fuel amount
-        self.fuel=0
-
-        # fuel consumptuion as liters per second
-        self.fuel_consumption=0
-
-        # bool. is the engine on or off ?
-        self.engine_on=False
+ 
 
         # ----- controls ------
 
@@ -108,17 +101,12 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-        if self.engine_on and self.has_engine:
-            self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
+        
 
-            if self.throttle>0.5:
-                #essentially double fuel consumption
-                self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
-
-            if self.fuel<1:
-                # engine runs out of fuel
-                # this would be a good place to put out a little smoke cloud or something
-                self.engine_on=False
+        
+        # update engines
+        for b in self.engines:
+            b.update()
 
         self.update_physics()
 

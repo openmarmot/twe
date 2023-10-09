@@ -1283,11 +1283,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=200
         z.ai.rotation_speed=40.
         z.ai.acceleration=100
+        z.ai.fuel_tanks.append(spawn_object)
         z.ai.fuel_capacity=20
         z.ai.fuel=0 # this can be updated after spawn for starting fuel load
         # z.ai.fuel=random.randint(0,z.ai.fuel_capacity)
-        z.ai.fuel_consumption=0.0033
+        
         z.collision_radius=50
+        # add engine
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
         if random.randint(0,3)==1:
             mg=spawn_object(WORLD,[0,0],'mg34',False)
@@ -1308,10 +1311,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=100
         z.ai.rotation_speed=50.
         z.ai.acceleration=80
-        z.ai.fuel_capacity=0
-        z.ai.fuel=0
-        z.ai.fuel_consumption=0
-        z.ai.fuel_type='none' # this needs to be a string
         z.ai.has_engine=False
         z.ai.max_occupants=1
         z.ai.open_top=True
@@ -1330,8 +1329,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=3
         z.collision_radius=200
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
-        z.ai.fuel_capacity=2900
-        z.ai.fuel=2900
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1426,6 +1423,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_speed=90
         z.ai.maxTime=3
         z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='volkswagen_type_82_engine':
+        z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
+        z.render_level=2
+        z.name='Volkswagen Type 82 Engine'
+        z.ai.fuel_type='gas'
+        z.ai.fuel_consumption=0.0033
+        z.rotation_angle=float(random.randint(0,359)) 
+
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  

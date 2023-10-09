@@ -19,6 +19,29 @@ from ai.ai_base import AIBase
 class AIEngine(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
+        
+        # gas / diesel / jet fuel?
+        self.fuel_type = None
+
+        # fuel consumptuion as liters per second
+        self.fuel_consumption=0
+
+        # bool. is the engine on or off ?
+        self.engine_on=False
+
+        self.installed_in_vehicle=False
+
+        # vehicle that the engine is installed in 
+        self.vehicle=None
+
+    #---------------------------------------------------------------------------
+    def consume_fuel(self):
+        if self.engine_on:
+            self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
+
+            if self.throttle>0.5:
+                #essentially double fuel consumption
+                self.fuel-=self.fuel_consumption*self.owner.world.graphic_engine.time_passed_seconds
 
     #---------------------------------------------------------------------------
     def update(self):
