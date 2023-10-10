@@ -101,11 +101,12 @@ class AIVehicle(AIBase):
 
             self.owner.world.remove_object(self.owner)
 
-        
-
-        
         # update engines
         for b in self.engines:
+            b.update()
+
+        # update fuel tanks
+        for b in self.fuel_tanks:
             b.update()
 
         self.update_physics()

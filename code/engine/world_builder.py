@@ -596,6 +596,9 @@ def load_images(world):
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
 
+    # fuel tanks 
+    world.graphic_engine.loadImage('vehicle_fuel_tank','images/engines/fuel_tanks/vehicle_fuel_tank.png')
+
 #------------------------------------------------------------------------------
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
@@ -1283,13 +1286,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=200
         z.ai.rotation_speed=40.
         z.ai.acceleration=100
-        z.ai.fuel_tanks.append(spawn_object)
-        z.ai.fuel_capacity=20
-        z.ai.fuel=0 # this can be updated after spawn for starting fuel load
-        # z.ai.fuel=random.randint(0,z.ai.fuel_capacity)
-        
         z.collision_radius=50
-        # add engine
+        
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
         if random.randint(0,3)==1:
@@ -1430,7 +1429,20 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_type='gas'
         z.ai.fuel_consumption=0.0033
         z.rotation_angle=float(random.randint(0,359)) 
-
+    elif OBJECT_TYPE=='vehicle_fuel_tank':
+        z=WorldObject(WORLD,['vehicle_fuel_tank'],AILiquidContainer)
+        z.is_liquid_container=True
+        z.ai.total_volume=20
+        z.ai.used_volume=20
+        z.ai.liquid_type='gas'
+        z.ai.health_effect=-150
+        z.ai.hunger_effect=100
+        z.ai.thirst_effect=100
+        z.ai.fatigue_effect=500  
+        z.render_level=2
+        z.name='vehicle_fuel_tank'
+        z.world_builder_identity='vehicle_fuel_tank'
+        z.rotation_angle=float(random.randint(0,359))
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
