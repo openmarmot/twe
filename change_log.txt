@@ -2,6 +2,9 @@ TWE Project : Change Log
 
 
 ----------------------------------
+October 13 2023
+- work on integrating vehicles with engines and fuel tanks 
+----------------------------------
 October 9 2023
 - added vehicle_fuel_tank art and object 
 - added some stuff to ai_liquid_container, which is re-used for fuel tanks 

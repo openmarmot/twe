@@ -54,6 +54,7 @@ class AILiquidContainer(AIBase):
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+        pass
 
     #---------------------------------------------------------------------------
     def event_add_liquid(self,EVENT_DATA):

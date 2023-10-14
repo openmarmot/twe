@@ -78,6 +78,7 @@ class AIVehicle(AIBase):
 
         # actual vehicle speed
         self.vehicle_speed=0.
+        
         self.acceleration=0
 
         self.speed=0 # this is max speed at the moment
@@ -108,6 +109,8 @@ class AIVehicle(AIBase):
         # update fuel tanks
         for b in self.fuel_tanks:
             b.update()
+
+        self.update_fuel_system()
 
         self.update_physics()
 
@@ -175,6 +178,23 @@ class AIVehicle(AIBase):
         self.wheel_steering=0
 
     #---------------------------------------------------------------------------
+    def update_fuel_system(self):
+
+        for b in self.engines:
+            if b.ai.fuel_consumed>0:
+                fuel=0
+                for b in self.fuel_tanks:
+                    if fuel<b.ai.fuel_consumed:
+                        b.ai.used_volume,fuel=engine.math_2d.get_transfer_results(b.ai.used_volume,fuel,b.ai.fuel_consumed)
+
+                # give the fuel we got from the tanks to the engine
+                # if the engine doesn't get enough fuel it will eventuall shut off
+                b.ai.fuel_consumed-=fuel
+
+        
+    
+
+    #---------------------------------------------------------------------------
     def update_physics(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
@@ -210,17 +230,14 @@ class AIVehicle(AIBase):
 
         if self.throttle>0:
 
-            if self.engine_on or self.has_engine==False:
-                if self.vehicle_speed<self.speed:
-                    self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
-                    if self.vehicle_speed<10:
-                        self.vehicle_speed=10
+            if self.vehicle_speed<self.speed:
+                self.vehicle_speed+=(self.acceleration*self.throttle)*time_passed
+                # not sure what this was for
+                if self.vehicle_speed<10:
+                    self.vehicle_speed=10
 
-                self.throttle-=1*time_passed
-                if self.throttle<0.05:
-                    self.throttle=0
-            else:
-                # gotta catch situations where it has an engine but the engine is off
+            self.throttle-=1*time_passed
+            if self.throttle<0.05:
                 self.throttle=0
         else:
             # throttle is negative for some reason, zero it out
