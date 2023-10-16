@@ -27,6 +27,28 @@ git clone https://github.com/openmarmot/twe.git
 cd twe/code
 python twe.py
 
+
+# --- Apple Mac OS 13 ---
+# i forget why i need this. git maybe?
+install xcode from app store
+
+# install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# search for python3 3
+brew search python
+
+brew install [whatever]
+
+pip3 install pygame --user
+
+# git clone project 
+git clone https://github.com/openmarmot/twe.git
+
+# cd to directory and run 
+cd twe/code
+python3 twe.py
+
 # --- Fedora 37 ---
 
 # instal pip 

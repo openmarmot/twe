@@ -1,5 +1,52 @@
 TWE Project : Change Log
 
+
+----------------------------------
+October 15 2023
+- fix a bad path in image loading 
+- misc small hacks to get the game playable with the new vehicle code 
+- added some (bad) apple install instructions from my (bad) notes on what i did 
+
+some bugs 
+- engine on is not consuming fuel as far as i can tell 
+- maybe an issue with civilian coordinates not updating when exiting vehicles 
+- bots should maybe not chase vehicles that are in motion 
+- possible funkyness with engine on/off from menu 
+
+game is back to working..ish so this will get merged into main 
+
+----------------------------------
+October 13 2023
+- work on integrating vehicles with engines and fuel tanks 
+----------------------------------
+October 9 2023
+- added vehicle_fuel_tank art and object 
+- added some stuff to ai_liquid_container, which is re-used for fuel tanks 
+- fuel tank vehicle integration (somewhat)
+
+hmm is seperately simulating the fuel tanks going too far?
+where does the madness end? haha 
+
+----------------------------------
+October 8 2023
+- a bit more work around engine integration 
+- decided to add fuel tanks as well 
+
+note ! vehicles are going to be broken for a bit 
+
+----------------------------------
+October 7 2023
+- started work on ai_engine framework
+- started work on engine object creation 
+
+----------------------------------
+October 5 2023
+- created art for volkswagen type 82 engine 
+
+decided I am modeling engines. engines are cool.
+
+they are going to be full world objects. 
+
 ----------------------------------
 October 1 2023
 - modified projectiles so they check collision about every 0.1 seconds instead of every loop  

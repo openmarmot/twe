@@ -1592,42 +1592,38 @@ class AIHuman(AIBase):
         # actually driving here
         self.ai_think_rate=0.1
 
-        if self.vehicle.ai.engine_on==False:
-            self.vehicle.ai.engine_on=True
+        if len(self.vehicle.ai.engines)>0:
+            self.vehicle.ai.engines[0].ai.engine_on=True
 
-        if self.vehicle.ai.fuel>0 or self.vehicle.ai.has_engine==False:
+
         # get the rotation to the destination 
-            r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
+        r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
 
-            # compare that with the current vehicle rotation.. somehow?
-            v = self.vehicle.rotation_angle
+        # compare that with the current vehicle rotation.. somehow?
+        v = self.vehicle.rotation_angle
 
-            if r>v:
-                #self.vehicle.rotation_angle+=1*time_passed
-                #self.vehicle.reset_image=True
-                self.vehicle.ai.handle_steer_left()
-                self.ai_think_rate=0.01
-            if r<v:
-                #self.vehicle.rotation_angle-=1*time_passed
-                #self.vehicle.reset_image=True
-                self.vehicle.ai.handle_steer_right()
-                self.ai_think_rate=0.01
-            
-            # if its close just set it equal
-            if r>v-1 and r<v+1:
-                # neutral out steering 
-                self.vehicle.ai.handle_steer_neutral()
-                #self.vehicle.rotation_angle=r
-                self.vehicle.reset_image=True
+        if r>v:
+            #self.vehicle.rotation_angle+=1*time_passed
+            #self.vehicle.reset_image=True
+            self.vehicle.ai.handle_steer_left()
+            self.ai_think_rate=0.01
+        if r<v:
+            #self.vehicle.rotation_angle-=1*time_passed
+            #self.vehicle.reset_image=True
+            self.vehicle.ai.handle_steer_right()
+            self.ai_think_rate=0.01
+        
+        # if its close just set it equal
+        if r>v-1 and r<v+1:
+            # neutral out steering 
+            self.vehicle.ai.handle_steer_neutral()
+            #self.vehicle.rotation_angle=r
+            self.vehicle.reset_image=True
 
 
-            self.vehicle.ai.throttle=1
-            self.vehicle.ai.brake_power=0
-        else:
-            self.vehicle.ai.brake_power=1
-            print('error: out of fuel, AI does not handle this')
-            # cheat for now as the AI doesn't handle complex tasks yet
-            self.vehicle.ai.fuel+=self.vehicle.ai.fuel_capacity
+        self.vehicle.ai.throttle=1
+        self.vehicle.ai.brake_power=0
+
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS):
