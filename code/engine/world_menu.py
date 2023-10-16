@@ -296,7 +296,6 @@ class World_Menu(object):
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
                 k1=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
-                k1.ai.fuel=k1.ai.fuel_capacity
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'german_field_shovel',True)
             elif Key=='5':
@@ -701,11 +700,14 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
-            self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
+            if len(self.selected_object.ai.fuel_tanks)>0:
+                # this is a bit of a hack and should be re-done. fuel type should be from engine. vol should be sum of tanks
+                self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_tanks[0].ai.liquid_type)
+                self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel_tanks[0].ai.used_volume))
             self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
-            self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engine_on))
+            if len(self.selected_object.ai.engines)>0:
+                self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - change role')
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
@@ -721,7 +723,8 @@ class World_Menu(object):
                 self.deactivate_menu()
             if Key=='3':
                 #flip the bool
-                self.selected_object.ai.engine_on=not self.selected_object.ai.engine_on
+                if len(self.selected_object.ai.engines)>0:
+                    self.selected_object.ai.engines[0].ai.engine_on=not self.selected_object.ai.engines[0].ai.engine_on
                 #refresh the text
                 self.vehicle_menu('none')
             if Key=='4':

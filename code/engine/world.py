@@ -505,12 +505,14 @@ class World(object):
 
         if self.player.ai.in_vehicle:
             self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
-            self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engine_on))
+            if len(self.player.ai.vehicle.ai.engines)>0:
+                self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engines[0].ai.engine_on))
             self.vehicle_text_queue.append('speed: '+str(round(self.player.ai.vehicle.ai.vehicle_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
-            self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel,2)))
+            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
+                self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.used_volume,2)))
 
 
 

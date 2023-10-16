@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ----------------------------------
+October 15 2023
+- fix a bad path in image loading 
+- misc small hacks to get the game playable with the new vehicle code 
+- added some (bad) apple install instructions from my (bad) notes on what i did 
+
+some bugs 
+- engine on is not consuming fuel as far as i can tell 
+- maybe an issue with civilian coordinates not updating when exiting vehicles 
+- bots should maybe not chase vehicles that are in motion 
+- possible funkyness with engine on/off from menu 
+
+game is back to working..ish so this will get merged into main 
+
+----------------------------------
 October 13 2023
 - work on integrating vehicles with engines and fuel tanks 
 ----------------------------------

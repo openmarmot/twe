@@ -387,9 +387,9 @@ def generate_clutter(WORLD):
     chance=random.randint(0,10)
     if chance==0:
         k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k1.ai.fuel=random.randint(0,k1.ai.fuel_capacity)
-        k2=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k2.ai.fuel=random.randint(0,k2.ai.fuel_capacity)
+        k1.ai.fuel_tanks[0].ai.used_volume=random.randint(0,k1.ai.fuel_tanks[0].ai.total_volume)
+        k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
+        k1.ai.fuel_tanks[0].ai.used_volume=random.randint(0,k1.ai.fuel_tanks[0].ai.total_volume)
 
 
 #------------------------------------------------------------------------------
@@ -597,7 +597,7 @@ def load_images(world):
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
 
     # fuel tanks 
-    world.graphic_engine.loadImage('vehicle_fuel_tank','images/engines/fuel_tanks/vehicle_fuel_tank.png')
+    world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world):
