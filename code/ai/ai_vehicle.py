@@ -47,6 +47,7 @@ class AIVehicle(AIBase):
         # ----- controls ------
 
         # engine power. 0 is idle 1 is max
+        # note - this needs to be propagated to the engines throttle_control variable
         self.throttle=0
 
         # brake_power 0 is none 1 is max
@@ -183,9 +184,9 @@ class AIVehicle(AIBase):
         for b in self.engines:
             if b.ai.fuel_consumed>0:
                 fuel=0
-                for b in self.fuel_tanks:
+                for c in self.fuel_tanks:
                     if fuel<b.ai.fuel_consumed:
-                        b.ai.used_volume,fuel=engine.math_2d.get_transfer_results(b.ai.used_volume,fuel,b.ai.fuel_consumed)
+                        c.ai.used_volume,fuel=engine.math_2d.get_transfer_results(c.ai.used_volume,fuel,b.ai.fuel_consumed)
 
                 # give the fuel we got from the tanks to the engine
                 # if the engine doesn't get enough fuel it will eventuall shut off

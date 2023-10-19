@@ -42,7 +42,9 @@ class AIEngine(AIBase):
         self.installed_in_vehicle=False
 
         # basically controls rpm and fuel flow 0=no power 1= max power
-        self.throttle_control=0
+        # once the mechanism is in place to control this it should start at 0.
+        # if its at 0 and the engine is on, the engine should choke and die
+        self.throttle_control=1
 
     #---------------------------------------------------------------------------
     def consume_fuel(self):
@@ -53,9 +55,6 @@ class AIEngine(AIBase):
                 # we are now out of fuel
                 self.engine_on=False
 
-            
-
-
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -63,6 +62,6 @@ class AIEngine(AIBase):
         
         # probably excessive to run this every update. could add up fuel usage
         # and run it randomly instead
-        self.consume_fuel
+        self.consume_fuel()
 
     #---------------------------------------------------------------------------

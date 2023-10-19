@@ -1427,7 +1427,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='Volkswagen Type 82 Engine'
         z.ai.fuel_type='gas'
-        z.ai.fuel_consumption=0.0033
+        z.ai.fuel_consumption_rate=0.0033
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='vehicle_fuel_tank':
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AILiquidContainer)

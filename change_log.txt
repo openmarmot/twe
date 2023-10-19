@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+October 18 2023
+- fixed fuel consumption so that it works again (kinda)
+
+after play testing a bit i think ai vehicle exiting is ok. 
+- ideally they should bring the vehicle to a stop before bailing though..
+
+I need to write a vehicle function to propogate throttle adjustments to the engines throttle_control
+also need a engine function to kill the engine at throttle_control zero 
+
+----------------------------------
 October 15 2023
 - fix a bad path in image loading 
 - misc small hacks to get the game playable with the new vehicle code 
