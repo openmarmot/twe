@@ -32,9 +32,6 @@ class AIVehicle(AIBase):
         # the ai group that this human is a part of 
         self.squad=None
 
-        # false for bike
-        self.has_engine=True
-
         # array of engine objects
         self.engines=[]
 
@@ -245,7 +242,7 @@ class AIVehicle(AIBase):
             self.throttle=0
 
         if self.brake_power>0:
-            self.vehicle_speed-=self.brake_power*self.acceleration*time_passed
+            self.vehicle_speed-=self.brake_power*time_passed
             if self.vehicle_speed<5:
                 self.vehicle_speed=0
 

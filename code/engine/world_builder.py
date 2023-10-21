@@ -595,6 +595,7 @@ def load_images(world):
 
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
+    world.graphic_engine.loadImage('bicycle_pedals','images/engines/bicycle_pedals.png')
 
     # fuel tanks 
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
@@ -1314,6 +1315,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_occupants=1
         z.ai.open_top=True
         z.collision_radius=50
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"bicycle_pedals",False))
         
         if random.randint(0,3)==1:
             z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
@@ -1442,6 +1444,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='vehicle_fuel_tank'
         z.world_builder_identity='vehicle_fuel_tank'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='bicycle_pedals':
+        z=WorldObject(WORLD,['bicycle_pedals'],AIEngine)
+        z.render_level=2
+        z.name='bicycle pedals'
+        z.ai.fuel_type='none'
+        z.ai.fuel_consumption_rate=0
+        z.ai.engine_on=True
         z.rotation_angle=float(random.randint(0,359))
 
     else:

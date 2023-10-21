@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+October 20 2023
+- decided that all vehicles will have a engine if they want to move 
+- therefore added uh.. bicycle_pedals 
+
+having to handle vehicles that could move without an engine added 
+excessive complexity. easier to add a 'engine' to the bike 
 
 ----------------------------------
 October 18 2023
