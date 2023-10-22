@@ -1284,7 +1284,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.render_level=3
-        z.ai.speed=200
+        z.ai.max_speed=200
         z.ai.rotation_speed=40.
         z.ai.acceleration=100
         z.collision_radius=50
@@ -1308,10 +1308,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='red_bicycle'
         z.is_vehicle=True
         z.render_level=3
-        z.ai.speed=100
+        z.ai.max_speed=100
         z.ai.rotation_speed=50.
         z.ai.acceleration=80
-        z.ai.has_engine=False
         z.ai.max_occupants=1
         z.ai.open_top=True
         z.collision_radius=50
@@ -1324,7 +1323,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='ju88':
         z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
-        z.ai.speed=500
+        z.ai.max_speed=500
         z.ai.rotation_speed=50
         z.ai.acceleration=100
         z.render_level=3

@@ -102,6 +102,12 @@ class World(object):
         self.friendly_fire_explosive=True # grenade shrap clouds
         self.friendly_fire_explosive_squad=True # only at the squad level
 
+
+        # physics stuff 
+
+        # air density in kg/m^3
+        self.air_density=1.225
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''

@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 21 2023
+- added parts and variables for a physics engine 
+
+vehicles keep getting more complicated. hopefully this doesn't hurt performance 
+
+----------------------------------
 October 20 2023
 - decided that all vehicles will have a engine if they want to move 
 - therefore added uh.. bicycle_pedals 
