@@ -1286,8 +1286,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=3
         z.ai.max_speed=200
         z.ai.rotation_speed=40.
-        z.ai.acceleration=100
+        #z.ai.acceleration=100
         z.collision_radius=50
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+
         
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
@@ -1315,13 +1320,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.open_top=True
         z.collision_radius=50
         z.ai.engines.append(spawn_object(WORLD,[0,0],"bicycle_pedals",False))
-        
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+
         if random.randint(0,3)==1:
             z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AINone)
         z.name='Junkers Ju88'
         z.ai.max_speed=500
         z.ai.rotation_speed=50

@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 24 2023
+- additional work on new vehicle physics 
+
+not super enthusiastic about working on vehicle code at the moment 
+so this is probably going to be broken for a bit
+
+----------------------------------
 October 21 2023
 - added parts and variables for a physics engine 
 

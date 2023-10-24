@@ -178,6 +178,8 @@ class AIVehicle(AIBase):
 
         self.update_fuel_system()
 
+        self.update_acceleration_calculation()
+
         self.update_physics()
 
         if self.primary_weapon!=None:
@@ -191,8 +193,8 @@ class AIVehicle(AIBase):
         # calculate total current engine force
         total_engine_force=0
         for b in self.engines:
-            if b.engine_on:
-                total_engine_force+=b.max_engine_force*b.throttle_control
+            if b.ai.engine_on:
+                total_engine_force+=b.ai.max_engine_force*b.ai.throttle_control
 
         self.acceleration=engine.math_2d.calculate_acceleration(
             total_engine_force,self.owner.rolling_resistance,

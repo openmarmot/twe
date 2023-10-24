@@ -105,7 +105,7 @@ class World(object):
 
         # physics stuff 
 
-        # air density in kg/m^3
+        # air density in kg/m^3. good default is 1.225
         self.air_density=1.225
 
     #---------------------------------------------------------------------------

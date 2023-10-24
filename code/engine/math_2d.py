@@ -32,7 +32,7 @@ import random
 
 
 #------------------------------------------------------------------------------
-def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density=1.225,frontal_area,weight):
+def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
 	'''calculate acceleration'''
 	# force - force in watts
 	# rolling_resistance : maybe 0.015 for a jeep (1.5% of the vehicle weight)
