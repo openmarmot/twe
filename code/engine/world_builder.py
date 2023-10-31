@@ -1286,14 +1286,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=3
         z.ai.max_speed=200
         z.ai.rotation_speed=40.
-        #z.ai.acceleration=100
         z.collision_radius=50
         z.weight=800
         z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
-
-        
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
@@ -1315,12 +1312,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=3
         z.ai.max_speed=100
         z.ai.rotation_speed=50.
-        z.ai.acceleration=80
         z.ai.max_occupants=1
         z.ai.open_top=True
         z.collision_radius=50
         z.ai.engines.append(spawn_object(WORLD,[0,0],"bicycle_pedals",False))
-        z.weight=800
+        z.weight=13
         z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
@@ -1330,7 +1326,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AINone)
+        z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
         z.ai.max_speed=500
         z.ai.rotation_speed=50
@@ -1340,6 +1336,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
 
     # this is only used briefly until the player picks a spawn type
     # this is required because a lot of stuff in the game references the player object.
@@ -1438,6 +1440,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Volkswagen Type 82 Engine'
         z.ai.fuel_type='gas'
         z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=25277.9
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='vehicle_fuel_tank':
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AILiquidContainer)
@@ -1459,6 +1462,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='bicycle pedals'
         z.ai.fuel_type='none'
         z.ai.fuel_consumption_rate=0
+        z.ai.max_engine_force=131.44
         z.ai.engine_on=True
         z.rotation_angle=float(random.randint(0,359))
 

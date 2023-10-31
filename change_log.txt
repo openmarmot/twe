@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 30 2023
+- removing invalid vehicle menu variables 
+- updates to vehicle hud 
+- added some variables to ju88 so it didn't crash 
+- misc updated to vehicle physics code to work with the new acceleration calculation 
+- small updates to kubelwagen and bicycle variables so they work 
+
+I was shocked to find out that the new acceleration calculation basically worked 
+out of the box with no tuning. this is clear evidence that we live in a simulation. 
+
+kubelwagen and bicycle basically work now. I bet there are a lot of misc bugs though so 
+I need to do some more play testing 
+
+apparently getting into vehicles doesn't have a distance check anymore. odd.
+need to fix that. 
+
+watched two ai bike rides and a ai kubelwagen drive that all seemed to work correctly - so 
+I guess that is still good. 
+
+there are probably some lingering issues but i think this is worth a merge. 
+
+----------------------------------
 October 24 2023
 - additional work on new vehicle physics 
 
