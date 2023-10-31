@@ -595,6 +595,7 @@ def load_images(world):
 
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
+    world.graphic_engine.loadImage('bicycle_pedals','images/engines/bicycle_pedals.png')
 
     # fuel tanks 
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
@@ -1283,11 +1284,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.render_level=3
-        z.ai.speed=200
+        z.ai.max_speed=200
         z.ai.rotation_speed=40.
-        z.ai.acceleration=100
         z.collision_radius=50
-        
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
@@ -1307,14 +1310,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='red_bicycle'
         z.is_vehicle=True
         z.render_level=3
-        z.ai.speed=100
+        z.ai.max_speed=100
         z.ai.rotation_speed=50.
-        z.ai.acceleration=80
-        z.ai.has_engine=False
         z.ai.max_occupants=1
         z.ai.open_top=True
         z.collision_radius=50
-        
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"bicycle_pedals",False))
+        z.weight=13
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+
         if random.randint(0,3)==1:
             z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
@@ -1322,7 +1328,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='ju88':
         z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
-        z.ai.speed=500
+        z.ai.max_speed=500
         z.ai.rotation_speed=50
         z.ai.acceleration=100
         z.render_level=3
@@ -1330,6 +1336,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
 
     # this is only used briefly until the player picks a spawn type
     # this is required because a lot of stuff in the game references the player object.
@@ -1427,7 +1439,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='Volkswagen Type 82 Engine'
         z.ai.fuel_type='gas'
-        z.ai.fuel_consumption=0.0033
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=25277.9
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='vehicle_fuel_tank':
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AILiquidContainer)
@@ -1442,6 +1455,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='vehicle_fuel_tank'
         z.world_builder_identity='vehicle_fuel_tank'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='bicycle_pedals':
+        z=WorldObject(WORLD,['bicycle_pedals'],AIEngine)
+        z.render_level=2
+        z.name='bicycle pedals'
+        z.ai.fuel_type='none'
+        z.ai.fuel_consumption_rate=0
+        z.ai.max_engine_force=131.44
+        z.ai.engine_on=True
         z.rotation_angle=float(random.randint(0,359))
 
     else:

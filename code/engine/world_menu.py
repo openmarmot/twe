@@ -647,8 +647,8 @@ class World_Menu(object):
             # -- add debug info --
             if self.world.debug_mode==True:
                 self.world.graphic_engine.menu_text_queue.append('--debug info --')
-                self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
-                self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
+                #self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+                #self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
                 self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
                 self.world.graphic_engine.menu_text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
                 self.world.graphic_engine.menu_text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))

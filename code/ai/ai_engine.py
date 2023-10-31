@@ -27,6 +27,9 @@ class AIEngine(AIBase):
         # fuel consumptuion as liters per second
         self.fuel_consumption_rate=0
 
+        # idle fuel consumption rate when throttle is at zero
+        self.idle_fuel_consumption_rate=0.001
+
         # amount of fuel the engine has consumed
         # vehicle uses this to pull fuel from the fuel tanks
         # vehicle will zero out when it pulls fuel
@@ -39,22 +42,27 @@ class AIEngine(AIBase):
         # bool. is the engine on or off ?
         self.engine_on=False
 
-        self.installed_in_vehicle=False
+        # engine force in watts 
+        # engine_force = (horsepower * 745.7) / 0.7375
+        # 1 hp = 745.7 Watts
+        self.max_engine_force=0
 
         # basically controls rpm and fuel flow 0=no power 1= max power
-        self.throttle_control=0
+        # once the mechanism is in place to control this it should start at 0.
+        # if its at 0 and the engine is on, the engine should choke and die
+        self.throttle_control=1
 
     #---------------------------------------------------------------------------
     def consume_fuel(self):
         if self.engine_on:
-            self.fuel_consumed+=self.fuel_consumption_rate*self.throttle_control*self.owner.world.graphic_engine.time_passed_seconds
+            if self.throttle_control>0:
+                self.fuel_consumed+=self.fuel_consumption_rate*self.throttle_control*self.owner.world.graphic_engine.time_passed_seconds
+            else:
+                self.fuel_consumed+=self.idle_fuel_consumption_rate*self.owner.world.graphic_engine.time_passed_seconds
 
             if self.fuel_consumed>self.fuel_reservoir:
                 # we are now out of fuel
                 self.engine_on=False
-
-            
-
 
 
     #---------------------------------------------------------------------------
@@ -63,6 +71,6 @@ class AIEngine(AIBase):
         
         # probably excessive to run this every update. could add up fuel usage
         # and run it randomly instead
-        self.consume_fuel
+        self.consume_fuel()
 
     #---------------------------------------------------------------------------

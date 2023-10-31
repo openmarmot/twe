@@ -102,6 +102,12 @@ class World(object):
         self.friendly_fire_explosive=True # grenade shrap clouds
         self.friendly_fire_explosive_squad=True # only at the squad level
 
+
+        # physics stuff 
+
+        # air density in kg/m^3. good default is 1.225
+        self.air_density=1.225
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -507,7 +513,8 @@ class World(object):
             self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
             if len(self.player.ai.vehicle.ai.engines)>0:
                 self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engines[0].ai.engine_on))
-            self.vehicle_text_queue.append('speed: '+str(round(self.player.ai.vehicle.ai.vehicle_speed,1)))
+            self.vehicle_text_queue.append('max speed / current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
+                ' / '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))

@@ -115,6 +115,11 @@ class WorldObject(object):
         self.collision_radius=5
         
 
+        # - physics stuff -
+        self.weight=0 #kilograms
+        self.rolling_resistance=0.015
+        self.drag_coefficient=0.8
+        self.frontal_area=0 # square meters
 
         # is this used? pretty sure its not 
         self.id = 0

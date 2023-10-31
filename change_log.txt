@@ -1,5 +1,57 @@
 TWE Project : Change Log
 
+----------------------------------
+October 30 2023
+- removing invalid vehicle menu variables 
+- updates to vehicle hud 
+- added some variables to ju88 so it didn't crash 
+- misc updated to vehicle physics code to work with the new acceleration calculation 
+- small updates to kubelwagen and bicycle variables so they work 
+
+I was shocked to find out that the new acceleration calculation basically worked 
+out of the box with no tuning. this is clear evidence that we live in a simulation. 
+
+kubelwagen and bicycle basically work now. I bet there are a lot of misc bugs though so 
+I need to do some more play testing 
+
+apparently getting into vehicles doesn't have a distance check anymore. odd.
+need to fix that. 
+
+watched two ai bike rides and a ai kubelwagen drive that all seemed to work correctly - so 
+I guess that is still good. 
+
+there are probably some lingering issues but i think this is worth a merge. 
+
+----------------------------------
+October 24 2023
+- additional work on new vehicle physics 
+
+not super enthusiastic about working on vehicle code at the moment 
+so this is probably going to be broken for a bit
+
+----------------------------------
+October 21 2023
+- added parts and variables for a physics engine 
+
+vehicles keep getting more complicated. hopefully this doesn't hurt performance 
+
+----------------------------------
+October 20 2023
+- decided that all vehicles will have a engine if they want to move 
+- therefore added uh.. bicycle_pedals 
+
+having to handle vehicles that could move without an engine added 
+excessive complexity. easier to add a 'engine' to the bike 
+
+----------------------------------
+October 18 2023
+- fixed fuel consumption so that it works again (kinda)
+
+after play testing a bit i think ai vehicle exiting is ok. 
+- ideally they should bring the vehicle to a stop before bailing though..
+
+I need to write a vehicle function to propogate throttle adjustments to the engines throttle_control
+also need a engine function to kill the engine at throttle_control zero 
 
 ----------------------------------
 October 15 2023
