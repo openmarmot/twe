@@ -44,8 +44,6 @@ class AIContainer(AIBase):
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
             self.inventory.remove(EVENT_DATA)
-            self.owner.world.add_object(EVENT_DATA)
-
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):

@@ -89,10 +89,10 @@ class AILiquidContainer(AIBase):
         # EVENT_DATA - most likely a world_object but could be anything
 
         if EVENT=='add_liquid':
-            self.event_add_inventory(EVENT_DATA)
+            self.event_add_liquid(EVENT_DATA)
         #elif EVENT=='collision':
         #    self.event_collision(EVENT_DATA)
         elif EVENT=='remove_liquid':
-            self.event_remove_inventory(EVENT_DATA)
+            self.event_remove_liquid(EVENT_DATA)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)

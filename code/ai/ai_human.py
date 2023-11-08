@@ -263,6 +263,9 @@ class AIHuman(AIBase):
                 self.ai_want_medical=False
         else:
             print('ERROR - object '+EVENT_DATA.name+' is already in inventory')
+            print('inventory list:')
+            for b in self.inventory:
+                print(' - ',b.name)
 
 
     #---------------------------------------------------------------------------

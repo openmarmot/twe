@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+November 7 2023
+- added distance check to vehicle external menu 
+- fixed event handling in liquid container ai 
+- ai_container no longer adds removed objects to the world 
+
+liquid container ai had the wrong function names in its event handler. 
+kinda odd that i didn't notice this before -- bears further review/testing 
+
+inconsistencies with inventory management between ai implementations continues to be an 
+issue. part of the problem is i have changed my mind several times on whether the object that 
+owns the inventory should add the removed object back to the world or not (currently no)
+
+bike riding feels oddly good. a bit slower before but more like i think it should be 
+
+grrr menu code so bad. 
+
+----------------------------------
 October 30 2023
 - removing invalid vehicle menu variables 
 - updates to vehicle hud 

@@ -617,6 +617,7 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------
     def vehicle_menu(self, Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
 
             if self.world.player in self.selected_object.ai.passengers:
@@ -635,14 +636,31 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
-            self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
-            self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - storage ')
-            if fuel_option:
-                self.world.graphic_engine.menu_text_queue.append('4 - fuel ')
+
+            if distance<self.max_menu_distance:
+                self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
+                self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
+                self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
+                self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
+                self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
+                self.world.graphic_engine.menu_text_queue.append('3 - storage ')
+                if fuel_option:
+                    self.world.graphic_engine.menu_text_queue.append('4 - fuel ')
+
+                if Key=='1':
+                    pass
+                if Key=='2':
+                    # enter the vehicle 
+                    self.world.player.ai.handle_enter_vehicle(self.selected_object)
+                    # honestly this menu is kinda ugly. maybe better to leave it off
+                    #self.world.display_vehicle_text=True
+                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                    self.deactivate_menu()
+                if Key=='3':
+                    # pull up the storage/container menu
+                    self.change_menu('storage')
+                if Key=='4' and fuel_option:
+                    self.change_menu('fuel')
 
             # -- add debug info --
             if self.world.debug_mode==True:
@@ -672,20 +690,7 @@ class World_Menu(object):
 
                 self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
 
-            if Key=='1':
-                pass
-            if Key=='2':
-                # enter the vehicle 
-                self.world.player.ai.handle_enter_vehicle(self.selected_object)
-                # honestly this menu is kinda ugly. maybe better to leave it off
-                #self.world.display_vehicle_text=True
-                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
-                self.deactivate_menu()
-            if Key=='3':
-                # pull up the storage/container menu
-                self.change_menu('storage')
-            if Key=='4' and fuel_option:
-                self.change_menu('fuel')
+            
 
 
         if self.menu_state=='internal':
