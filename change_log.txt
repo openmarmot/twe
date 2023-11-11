@@ -1,10 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+November 11 2023
+- added spawn menu under debug menu (hit ~)
+- minor menu changes/fixes 
+- fg42 type 2 was using the wrong image. fixed
+- added pygame double buffering. on by default. 
+
+something is very broken with panzerfausts 
+
+review of the bot item grabbing code suggests that it should still be good
+
+double buffering seems to really clear up the ghosting and choppiness. Not seeing a 
+performance impact but i'm on a apple m2 air which is very vast hardware compared
+to previous dev machines 
+----------------------------------
 November 7 2023
 - added distance check to vehicle external menu 
 - fixed event handling in liquid container ai 
 - ai_container no longer adds removed objects to the world 
+
+note - need to review how ai grabs objects from storage next
 
 liquid container ai had the wrong function names in its event handler. 
 kinda odd that i didn't notice this before -- bears further review/testing 

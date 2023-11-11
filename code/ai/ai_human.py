@@ -924,7 +924,7 @@ class AIHuman(AIBase):
         else:
             if UPGRADE_ONLY and self.primary_weapon!=None:
                 if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
-                    # the thought here being that riles are undesirable, and a mg is crew served and unlikely to 
+                    # the thought here being that rifles are undesirable, and a mg is crew served and unlikely to 
                     # be picked up
                     if gun.ai.type=='submachine gun' or gun.ai.type=='assault rifle':
                         self.take_action_pickup_object(gun)

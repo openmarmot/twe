@@ -283,19 +283,28 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('--Debug Menu (~ to exit) --')
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
-            self.world.graphic_engine.menu_text_queue.append('3 - spawn a kubelwagen')
+            self.world.graphic_engine.menu_text_queue.append('3 - spawn menu')
             self.world.graphic_engine.menu_text_queue.append('4 - spawn a shovel')
             self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
             self.world.graphic_engine.menu_text_queue.append('6 - smooth display jitter')
             self.menu_state='base'
-        if self.menu_state=='base':
+        elif self.menu_state=='base':
             if Key=='1':
                 self.world.toggle_map()
                 #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
-                k1=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                self.menu_state='spawn'
+                self.world.graphic_engine.menu_text_queue=[]
+                self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu --')
+                self.world.graphic_engine.menu_text_queue.append('1 - KubelWagen ')
+                self.world.graphic_engine.menu_text_queue.append('2 - fg42-type2 ')
+                self.world.graphic_engine.menu_text_queue.append('3 - panzerfaust ')
+                self.world.graphic_engine.menu_text_queue.append('4 - brown_chair ')
+                self.world.graphic_engine.menu_text_queue.append('5 - ')
+                self.world.graphic_engine.menu_text_queue.append('6 - ')
+                
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'german_field_shovel',True)
             elif Key=='5':
@@ -303,6 +312,25 @@ class World_Menu(object):
             elif Key=='6':
                 self.world.graphic_engine.smooth_jitter = not self.world.graphic_engine.smooth_jitter
                 print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
+        elif self.menu_state=='spawn':
+            if Key=='1':
+                #kubelwagen
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+            elif Key=='2':
+                #fg42-type2
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42-type2',True)
+            elif Key=='3':
+                #panzerfaust
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
+            elif Key=='4':
+                #brown_chair
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'brown_chair',True)
+            elif Key=='5':
+                pass
+                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+            elif Key=='6':
+                pass
+                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
 
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
@@ -637,6 +665,32 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
 
+            # -- add debug info --
+            if self.world.debug_mode==True:
+                self.world.graphic_engine.menu_text_queue.append('--debug info --')
+                #self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+                #self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
+                self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
+                self.world.graphic_engine.menu_text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
+                self.world.graphic_engine.menu_text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
+                self.world.graphic_engine.menu_text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
+                self.world.graphic_engine.menu_text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
+                self.world.graphic_engine.menu_text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
+                if self.selected_object.ai.driver==None:
+                    self.world.graphic_engine.menu_text_queue.append('driver: None')
+                else:
+                    self.world.graphic_engine.menu_text_queue.append('---- driver info -------------------')
+                    self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                    self.world.graphic_engine.menu_text_queue.append('in_vehicle: '+str(self.selected_object.ai.driver.ai.in_vehicle))
+                    distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
+                    self.world.graphic_engine.menu_text_queue.append('distance to destination: '+str(distance))
+                    r = engine.math_2d.get_rotation(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
+                    self.world.graphic_engine.menu_text_queue.append('rotation to destination: '+str(r))
+                    self.world.graphic_engine.menu_text_queue.append('vehicle rotation: '+str(self.selected_object.rotation_angle))
+                    self.world.graphic_engine.menu_text_queue.append('driver ai_state: '+self.selected_object.ai.driver.ai.ai_state)
+                    self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
+                    self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+
             if distance<self.max_menu_distance:
                 self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
                 self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
@@ -662,33 +716,9 @@ class World_Menu(object):
                 if Key=='4' and fuel_option:
                     self.change_menu('fuel')
 
-            # -- add debug info --
-            if self.world.debug_mode==True:
-                self.world.graphic_engine.menu_text_queue.append('--debug info --')
-                #self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
-                #self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
-                self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
-                self.world.graphic_engine.menu_text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
-                self.world.graphic_engine.menu_text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
-                self.world.graphic_engine.menu_text_queue.append('vehicle speed: '+str(self.selected_object.ai.vehicle_speed))
-                self.world.graphic_engine.menu_text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
-                self.world.graphic_engine.menu_text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
-                if self.selected_object.ai.driver==None:
-                    self.world.graphic_engine.menu_text_queue.append('driver: None')
-                else:
-                    self.world.graphic_engine.menu_text_queue.append('---- driver info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
-                    self.world.graphic_engine.menu_text_queue.append('in_vehicle: '+str(self.selected_object.ai.driver.ai.in_vehicle))
-                    distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
-                    self.world.graphic_engine.menu_text_queue.append('distance to destination: '+str(distance))
-                    r = engine.math_2d.get_rotation(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
-                    self.world.graphic_engine.menu_text_queue.append('rotation to destination: '+str(r))
-                    self.world.graphic_engine.menu_text_queue.append('vehicle rotation: '+str(self.selected_object.rotation_angle))
-                    self.world.graphic_engine.menu_text_queue.append('driver ai_state: '+self.selected_object.ai.driver.ai.ai_state)
-                    self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
-                    self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+            
 
-                self.world.graphic_engine.menu_text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
+                
 
             
 
