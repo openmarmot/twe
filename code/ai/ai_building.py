@@ -50,7 +50,6 @@ class AIBuilding(AIBase):
                 self.owner.image_index=0
                 self.owner.reset_image=True
             
-    #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -73,3 +72,5 @@ class AIBuilding(AIBase):
             pass
         elif EVENT=='collision':
             self.event_collision(EVENT_DATA)
+        else:
+            print('Error: '+self.owner.name+' cannot handle event '+EVENT)

@@ -1212,8 +1212,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='fg42-type2':
-        z=WorldObject(WORLD,['fg42-type1'],AIGun)
-        z.name='fg42-type1'
+        z=WorldObject(WORLD,['fg42-type2'],AIGun)
+        z.name='fg42-type2'
         z.is_gun=True
         z.ai.magazine=20
         z.ai.mag_capacity=20

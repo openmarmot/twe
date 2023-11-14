@@ -375,6 +375,7 @@ class World(object):
 
         temp=None
 
+        # first pass - filter for desirable objects
         for b in self.graphic_engine.renderlists:
             for c in b:
                 if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_throwable):
@@ -383,12 +384,12 @@ class World(object):
         if len(possible_objects)>0:
             temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
 
-        # if there were no guns/consumables/etc or there were but they weren't under the mouse..
+        # second pass - check for less desirable objects
         if temp==None:
             for b in self.graphic_engine.renderlists:
                 for c in b:
                     if (c.is_human or c.is_object_container or c.is_vehicle or c.is_airplane
-                    or c.is_liquid_container or c.is_ammo_container):
+                    or c.is_liquid_container or c.is_ammo_container or c.is_furniture):
                         possible_objects.append(c)
             if len(possible_objects)>0:
                 temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)

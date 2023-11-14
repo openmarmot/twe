@@ -36,7 +36,13 @@ class Graphics_2D_Pygame(object):
         self.images=dict()
         self.screen_size=Screen_size
         pygame.init()
-        self.screen=pygame.display.set_mode(self.screen_size,0,32)
+
+        # this seems to significantly improve visual quality when on 
+        self.double_buffering=True
+        if self.double_buffering:
+            self.screen = pygame.display.set_mode(self.screen_size, pygame.DOUBLEBUF, 32)
+        else:
+            self.screen=pygame.display.set_mode(self.screen_size,0,32)
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
@@ -240,7 +246,10 @@ class Graphics_2D_Pygame(object):
                 self.h+=15
                 self.small_font.render_to(self.screen, (500, self.h), b, (255, 51, 51))
 
-        pygame.display.update()
+        if self.double_buffering:
+            pygame.display.flip()
+        else:
+            pygame.display.update()
 
 #------------------------------------------------------------------------------
     def reset_all(self):
