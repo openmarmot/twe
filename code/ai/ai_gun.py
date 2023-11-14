@@ -25,18 +25,10 @@ module_last_update_date='June 22 2021' #date of last update
 class AIGun(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-        #int representing round count in current mag 
-        self.magazine=0
 
-        # the ammo capacity of a magazine for this weapon
-        # for example a mp40 would be 32
-        self.mag_capacity=0
-        
-        # how many full mags you have
-        self.magazine_count=0
+        # array of magazine objects
+        self.magazines=[]
 
-        # max full mags you can have 
-        self.max_magazines=0
         
         #
         #time since last fired
@@ -54,13 +46,10 @@ class AIGun(AIBase):
         # bool
         self.reloading=False
 
-        # caliber
 
-        # bullet diameter in mm
+        # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
         
-        # bullet weight
-        self.bullet_weight=0
 
         # muzzle velocity (not used)
         self.muzzle_velocity=0
@@ -84,8 +73,7 @@ class AIGun(AIBase):
         # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun
         self.type=''
 
-        # matches up with the projectile_data dict in penetration_calculator.py
-        self.projectile_type=None
+        
 
     #---------------------------------------------------------------------------
     def update(self):

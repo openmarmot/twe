@@ -40,6 +40,9 @@ class AIProjectile(AIBase):
         self.is_shrapnel=False # not used at the moment
         self.is_bullet=False # not used at the moment
 
+        self.is_explosive=False
+        self.shrapnel_count=0
+
         # the weapon that created this
         self.weapon_name=''
         # the equipper of the gun that fired the projectile
@@ -48,14 +51,28 @@ class AIProjectile(AIBase):
         self.speed=0
 
     #---------------------------------------------------------------------------
+    def explode(self):
+        # kablooey!
+        # add the shrapnel
+        target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count,self.equipper,self.owner.name)
+
+        # remove the grenade
+        # this also stops code execution for this object as its not anywhere else
+        self.owner.world.remove_object(self.owner)
+
+    #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
         self.flightTime+=time_passed
         if(self.flightTime>self.maxTime):
-            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
-            self.owner.world.remove_object(self.owner)
+            if self.is_explosive:
+                self.explode()
+            else:
+                engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
+                self.owner.world.remove_object(self.owner)
         else:
 
             # move along path
@@ -66,12 +83,15 @@ class AIProjectile(AIBase):
                 self.last_collision_check=self.flightTime
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
                 if collide_obj !=None:
-                    if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
-                        # add the collided object to ignore list so we don't hit it again
-                        # this is mostly to deal with buildings where we would hit it a ton of times
-                        self.ignore_list.append(collide_obj)
+                    if self.is_explosive:
+                        self.explode()
                     else:
-                        # bullet stuck in something. remove bullet from world
-                        self.owner.world.remove_object(self.owner) 
+                        if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                            # add the collided object to ignore list so we don't hit it again
+                            # this is mostly to deal with buildings where we would hit it a ton of times
+                            self.ignore_list.append(collide_obj)
+                        else:
+                            # bullet stuck in something. remove bullet from world
+                            self.owner.world.remove_object(self.owner) 
 
 
