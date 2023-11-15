@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+November 14 2023
+- moved ignore list creation from ai_gun to world so it can be re-used 
+- general work on the gun rewrite 
+
+guns no longer auto reload. will need to add in code to ai_human for the reload sequence 
+
 ----------------------------------
 November 13 2023
 - fixed a odd tabs/spacing alignment issue in math_2d 

@@ -1465,6 +1465,13 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_engine_force=131.44
         z.ai.engine_on=True
         z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='projectile':
+        z=WorldObject(WORLD,['projectile'],AIProjectile)
+        z.name='projectile'
+        z.ai.speed=350.
+        z.is_projectile=True
+        z.render_level=3
+        #z.ai.projectile_type=PROJECTILE_TYPE
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
@@ -1502,35 +1509,6 @@ def spawn_map_pointer(WORLD,TARGET_COORDS,TYPE):
         z.wo_start()
 
 
-#------------------------------------------------------------------------------
-def spawn_projectile(WORLD,WORLD_COORDS,TARGET_COORDS,SPREAD,IGNORE_LIST,SHOOTER,MAX_TIME,PROJECTILE_TYPE,WEAPON_NAME):
-    # MOUSE_AIM bool as to whether to use mouse aim for calculations
-    # SHOOTER - the world_object that actually pulled the trigger (a human or vehicle, not a gun)
-    # MAX_TIME - max flight time around 3.5 seconds is default
-    z=WorldObject(WORLD,['projectile'],AIProjectile)
-    z.name='projectile'
-    z.world_coords=copy.copy(WORLD_COORDS)
-    z.ai.speed=350.
-    z.ai.maxTime=MAX_TIME + random.uniform(0.01, 0.05)
-    z.is_projectile=True
-    z.render_level=3
-    z.ai.ignore_list=copy.copy(IGNORE_LIST)
-    z.ai.shooter=SHOOTER
-    z.ai.projectile_type=PROJECTILE_TYPE
-    z.ai.weapon_name=WEAPON_NAME
-
-    if SHOOTER.is_player :
-        # do computations based off of where the mouse is. TARGET_COORDS is ignored
-        dst=WORLD.graphic_engine.get_mouse_screen_coords()
-        dst=[dst[0]+SPREAD[0],dst[1]+SPREAD[1]]
-        z.rotation_angle=engine.math_2d.get_rotation(WORLD.graphic_engine.get_player_screen_coords(),dst)
-        z.heading=engine.math_2d.get_heading_vector(WORLD.graphic_engine.get_player_screen_coords(),dst)
-    else :
-        dst=[TARGET_COORDS[0]+SPREAD[0],TARGET_COORDS[1]+SPREAD[1]]
-        z.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,dst)
-        z.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
-
-    z.wo_start()
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
