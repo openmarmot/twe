@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+November 16 2023
+- minor gun rewrite work 
+- added image for stg44 magazine 
+
+I wonder if I will get to a point where inefficient sprite (image) loading is an issue. 
+I believe in professional games sprites are generally loaded as one image with each sprite being a small 
+section of it. This isn't something I've ever looked into much, but the number of images has really 
+started to explode -- however they are all pretty tiny. 
+
+----------------------------------
 November 14 2023
 - moved ignore list creation from ai_gun to world so it can be re-used 
 - general work on the gun rewrite 

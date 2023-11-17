@@ -522,6 +522,9 @@ def load_images(world):
     world.graphic_engine.loadImage('svt40','images/weapons/svt40.png')
     world.graphic_engine.loadImage('svt40','images/weapons/svt40-sniper.png')
 
+    # weapon magazines
+    world.graphic_engine.loadImage('stg44-magazine','images/weapons/magazines/stg44-magazine')
+
     # shovels 
     world.graphic_engine.loadImage('german_folding_shovel','images/shovels/german_folding_shovel.png')
     world.graphic_engine.loadImage('german_field_shovel','images/shovels/german_field_shovel.png')
