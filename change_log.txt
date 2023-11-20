@@ -1,5 +1,8 @@
 TWE Project : Change Log
 
+----------------------------------
+November 19 2023
+- work on the new magazine objects
 
 ----------------------------------
 November 16 2023

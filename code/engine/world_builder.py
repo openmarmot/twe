@@ -38,13 +38,13 @@ from engine.world_area import WorldArea
 # load AI 
 from ai.ai_human import AIHuman
 from ai.ai_gun import AIGun
+from ai.ai_magazine import AIMagazine
 from ai.ai_none import AINone
 from ai.ai_building import AIBuilding
 from ai.ai_projectile import AIProjectile
 from ai.ai_throwable import AIThrowable
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
-from ai.ai_panzerfaust import AIPanzerfaust
 from ai.ai_container import AIContainer
 from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
@@ -604,6 +604,17 @@ def load_images(world):
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
 
 #------------------------------------------------------------------------------
+def load_magazine(world,magazine):
+    '''loads a magazine with bullets'''
+    count=0
+    while count<magazine.ai.capacity:
+        z=spawn_object(world,[0,0],'projectile',False)
+        z.ai.projectile_type=magazine.ai.compatible_projectiles[0]
+        magazine.ai.projectiles.append(z)
+
+        count+=1
+
+#------------------------------------------------------------------------------
 def load_test_environment(world):
     ''' test environment. not a normal map load '''
 
@@ -990,7 +1001,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':
-        z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIPanzerfaust)
+        z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIGun)
         z.name='panzerfaust'
         z.render_level=2
         z.ai.speed=300
@@ -1048,10 +1059,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['stg44'],AIGun)
         z.name='stg44'
         z.is_gun=True
-        z.ai.magazine=30
+        z.ai.magazine=spawn_object(WORLD,[0,0],'stg44-magazine',False)
         z.ai.mag_capacity=30
-        z.ai.magazine_count=6
-        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.1
         z.ai.reload_speed=7
         z.ai.flight_time=2.5
@@ -1060,6 +1069,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.projectile_type='7.92x33_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+    
+    elif OBJECT_TYPE=='stg44-magazine':
+        z=WorldObject(WORLD,['stg44-magazine'],AIMagazine)
+        z.ai.compatible_guns=['stg44']
+        z.ai.compatible_projectiles=['7.92x33_SME']
+        z.ai.capacity=30
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='dp28':
         z=WorldObject(WORLD,['dp28'],AIGun)

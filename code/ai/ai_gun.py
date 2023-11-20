@@ -29,8 +29,6 @@ class AIGun(AIBase):
         # The magazine that is loaded in the gun
         self.magazine=None
 
-        
-        #
         #time since last fired
         self.fire_time_passed=0. 
 
@@ -40,14 +38,11 @@ class AIGun(AIBase):
         # reload speed in seconds
         self.reload_speed=10
 
-
         # bool
         self.reloading=False
 
-
         # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
-        
 
         # muzzle velocity (not used)
         self.muzzle_velocity=0
