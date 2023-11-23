@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+November 22 2023
+- more work on magazine/gun rewrite
+
+note - need to add a bullet type for the ppk (32 acp?)
+
+----------------------------------
 November 19 2023
 - work on the new magazine objects
 
