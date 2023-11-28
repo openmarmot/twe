@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+
+----------------------------------
+November 27 2023
+- more work on magazine/gun rewrite
+
+----------------------------------
+November 25 2023
+- updated Fedora 37 install notes -> Fedora 39
+
 ----------------------------------
 November 22 2023
 - more work on magazine/gun rewrite

@@ -49,14 +49,14 @@ git clone https://github.com/openmarmot/twe.git
 cd twe/code
 python3 twe.py
 
-# --- Fedora 37 ---
+# --- Fedora 39 ---
 
 # instal pip 
 sudo dnf install python3-pip
 
 # install pygame 
 # note at the time of writing python 3.11 requires --pre for pygame to work 
-pip install pygame --user --pre
+pip install pygame --user
 
 # git clone project 
 git clone https://github.com/openmarmot/twe.git

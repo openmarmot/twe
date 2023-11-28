@@ -1165,145 +1165,197 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='1911'
         z.is_gun=True
         z.ai.magazine=7
-        z.ai.mag_capacity=7
-        z.ai.magazine_count=2
-        z.ai.max_magazines=2
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=5
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
-        z.ai.projectile_type='45acp'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+    
+    elif OBJECT_TYPE=='1911_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='1911_magazine'
+        z.ai.compatible_guns=['1911']
+        z.ai.compatible_projectiles=['45acp']
+        z.ai.capacity=7
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
+
 
     elif OBJECT_TYPE=='mg34':
         z=WorldObject(WORLD,['mg34'],AIGun)
         z.name='mg34'
         z.is_gun=True
         z.ai.magazine=75
-        z.ai.mag_capacity=75
-        z.ai.magazine_count=4
-        z.ai.max_magazines=4
         z.ai.rate_of_fire=0.05
         z.ai.reload_speed=13
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='machine gun'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='mg34_drum_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='mg34_drum_magazine'
+        z.ai.compatible_guns=['mg34']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=75
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='kar98k':
         z=WorldObject(WORLD,['kar98k'],AIGun)
         z.name='kar98k'
         z.is_gun=True
         z.ai.magazine=5
-        z.ai.mag_capacity=5
-        z.ai.magazine_count=8
-        z.ai.max_magazines=8
         z.ai.rate_of_fire=1.1
         z.ai.reload_speed=10
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='kar98k_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='kar98k_magazine'
+        z.ai.compatible_guns=['kar98k']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=5
+        z.ai.removable=False
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='g41w':
         z=WorldObject(WORLD,['g41w'],AIGun)
         z.name='g41w'
         z.is_gun=True
         z.ai.magazine=10
-        z.ai.mag_capacity=10
-        z.ai.magazine_count=8
-        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='g41w_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='g41w_magazine'
+        z.ai.compatible_guns=['g41w']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=10
+        z.ai.removable=True
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='k43':
         z=WorldObject(WORLD,['k43'],AIGun)
         z.name='k43'
         z.is_gun=True
         z.ai.magazine=10
-        z.ai.mag_capacity=10
-        z.ai.magazine_count=8
-        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='k43_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='k43_magazine'
+        z.ai.compatible_guns=['k43']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=10
+        z.ai.removable=True
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='fg42-type1':
         z=WorldObject(WORLD,['fg42-type1'],AIGun)
         z.name='fg42-type1'
         z.is_gun=True
         z.ai.magazine=20
-        z.ai.mag_capacity=20
-        z.ai.magazine_count=8
-        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.06
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='fg42_type1_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='fg42_type1_magazine'
+        z.ai.compatible_guns=['fg42-type1']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=20
+        z.ai.removable=True
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='fg42-type2':
         z=WorldObject(WORLD,['fg42-type2'],AIGun)
         z.name='fg42-type2'
         z.is_gun=True
         z.ai.magazine=20
-        z.ai.mag_capacity=20
-        z.ai.magazine_count=8
-        z.ai.max_magazines=8
         z.ai.rate_of_fire=0.08
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.92x57_SME'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='fg42_type2_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='fg42_type2_magazine'
+        z.ai.compatible_guns=['fg42-type2']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=20
+        z.ai.removable=True
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='mosin_nagant':
         z=WorldObject(WORLD,['mosin_nagant'],AIGun)
         z.name='mosin_nagant'
         z.is_gun=True
         z.ai.magazine=5
-        z.ai.mag_capacity=5
-        z.ai.magazine_count=6
-        z.ai.max_magazines=6
         z.ai.rate_of_fire=1.1
         z.ai.reload_speed=11
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='mosin_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='mosin_magazine'
+        z.ai.compatible_guns=['mosin_nagant']
+        z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
+        z.ai.capacity=5
+        z.ai.removable=False
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
     
     elif OBJECT_TYPE=='svt40':
         z=WorldObject(WORLD,['svt40'],AIGun)
         z.name='svt40'
         z.is_gun=True
         z.ai.magazine=5
-        z.ai.mag_capacity=10
-        z.ai.magazine_count=6
-        z.ai.max_magazines=6
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1312,6 +1364,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='svt40_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='svt40_magazine'
+        z.ai.compatible_guns=['svt40','svt40-sniper']
+        z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
+        z.ai.capacity=10
+        z.ai.removable=True
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
 
     elif OBJECT_TYPE=='svt40-sniper':
         z=WorldObject(WORLD,['svt40-sniper'],AIGun)
