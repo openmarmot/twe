@@ -386,6 +386,26 @@ class AIHuman(AIBase):
         else: 
             print('error: attempting to change vehicle role when not in vehicle')
 
+    #---------------------------------------------------------------------------
+    def handle_check_ammo(self,gun,check_inventory):
+        '''check ammo'''
+        # gun - a world object with ai_gun
+        # check_inventory - bool. if true also check inventory
+        # return [ammo in gun, ammo in inventory]
+        ammo_gun=0
+        if gun.ai.magazine!=None:
+            ammo_gun=len(gun.ai.magazine.ai.projectiles)
+
+        ammo_inventory=0
+        if check_inventory:
+            for b in self.inventory:
+                if b.is_gun_magazine:
+                    if gun.name in b.ai.compatible_guns:
+                        ammo_inventory+=len(b.ai.projectiles)
+
+
+        return [ammo_gun,ammo_inventory]        
+
 
     #---------------------------------------------------------------------------
     def handle_death(self):
@@ -722,6 +742,37 @@ class AIHuman(AIBase):
 
         # add some fatigue, not sure how much
         self.fatigue+=15
+
+    #-----------------------------------------------------------------------
+    def handle_reload(self,weapon):
+        '''reload weapon'''
+        if weapon.is_gun:
+            # first get the current magazine
+            old_magazine=None
+            if weapon.ai.magazine!=None:
+                if weapon.ai.magazine.ai.removable:
+                    old_magazine=weapon.ai.magazine
+
+            # find a new magazine, sorting by size
+            new_magazine=None
+            biggest=0
+            for b in self.inventory:
+                if b.is_gun_magazine:
+                    if weapon.name in b.ai.compatible_guns:
+                        if len(b.ai.projectiles)>biggest:
+                            new_magazine=b
+                            biggest=len(b.ai.projectiles)
+
+            # perform the swap 
+            if old_magazine!=None:
+                self.event_add_inventory(old_magazine)
+                weapon.ai.magazine=None
+            if new_magazine!=None:
+                self.event_remove_inventory(new_magazine)
+                weapon.ai.magazine=new_magazine
+
+        # at this point we should do a ai_mode change with a timer to simulate the 
+        # reload time
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
@@ -1078,13 +1129,16 @@ class AIHuman(AIBase):
                         action=True
                         self.take_action_pickup_object(b)
             else:
-                if self.primary_weapon.ai.get_ammo_count()>1:
+                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                if ammo[0]>0:
                     # we can fire. this will be done automatically
                     action=True
                 else:
-                    # we are out of ammo
-                    # should melee or flee
-                    pass 
+                    if ammo[1]>0:
+                        self.handle_reload(self.primary_weapon)
+                    else:
+                        print('out of ammo. need to handle this better')
+                        pass
 
         if action==False:
             # no way to engage, best to run awaay 
@@ -1123,23 +1177,27 @@ class AIHuman(AIBase):
                     action=self.take_action_get_gun(False,False)
                     self.speak('Enemies spotted, need to get a gun!')
             # we have a primary weapon
-            # check if we are out of ammo
-            elif self.primary_weapon.ai.get_ammo_count()<1:
-                # we are out of ammo
-                self.ai_want_ammo=True
-                self.ai_want_gun=True
-
             else:
-                # we have ammo, target is alive
+                # check ammo (this is duplicated from think close. should be combined)
+                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                if ammo[0]>0:
+                    # we can fire. this will be done automatically
+                    # check if target is too far 
+                    if DISTANCE >self.primary_weapon.ai.range :
+                        if self.prone:
+                            self.handle_prone_state_change()
+                        self.ai_goal='close_with_target'
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                        action=True
+                else:
+                    if ammo[1]>0:
+                        self.handle_reload(self.primary_weapon)
+                    else:
+                        print('out of ammo. need to handle this better')
+                        pass
 
-                # check if target is too far 
-                if DISTANCE >self.primary_weapon.ai.range :
-                    if self.prone:
-                        self.handle_prone_state_change()
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                    action=True
+                
 
     #-----------------------------------------------------------------------
     def think_generic(self):
@@ -1579,9 +1637,9 @@ class AIHuman(AIBase):
 
         # top off ammo ?
         if status==False and self.primary_weapon!=None:
-            if self.primary_weapon.ai.get_ammo_count()<(self.primary_weapon.ai.get_max_ammo_count()*.5):
-                # ammo half out or less
-                # top off near ammo if possible
+            ammo=self.handle_check_ammo(self.primary_weapon,True)
+            if ammo[1]<(ammo[0]*1.5):
+                # basically if we have less ammo in our inventory than in our gun
                 status=self.take_action_get_ammo(True)
 
 

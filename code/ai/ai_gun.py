@@ -126,13 +126,5 @@ class AIGun(AIBase):
 
         return fired
 
-    #---------------------------------------------------------------------------
-    def get_ammo_count(self):
-        ''' get ammo count. should return int'''
-        return len(self.magazine)     
 
-    #---------------------------------------------------------------------------
-    def get_max_ammo_count(self):
-        ''' get max ammo count. should return int'''
-        return self.mag_capacity*self.max_magazines     
 

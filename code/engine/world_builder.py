@@ -523,7 +523,7 @@ def load_images(world):
     world.graphic_engine.loadImage('svt40','images/weapons/svt40-sniper.png')
 
     # weapon magazines
-    world.graphic_engine.loadImage('stg44_magazine','images/weapons/magazines/stg44_magazine')
+    world.graphic_engine.loadImage('stg44_magazine','images/weapons/magazines/stg44_magazine.png')
 
     # shovels 
     world.graphic_engine.loadImage('german_folding_shovel','images/shovels/german_folding_shovel.png')
@@ -1025,7 +1025,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='mp40'
         z.world_builder_identity='gun_mp40'
         z.is_gun=True
-        z.ai.magazine=32
+        z.ai.magazine=spawn_object(WORLD,[0,0],'mp40_magazine',False)
         z.ai.rate_of_fire=0.12
         z.ai.reload_speed=7
         z.ai.flight_time=2
@@ -1037,6 +1037,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='mp40_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='mp40_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['mp40']
         z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
         z.ai.capacity=32
@@ -1048,7 +1049,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['ppsh43'],AIGun)
         z.name='ppsh43'
         z.is_gun=True
-        z.ai.magazine=35
+        z.ai.magazine=spawn_object(WORLD,[0,0],'ppsh43_magazine',False)
         z.ai.rate_of_fire=0.12
         z.ai.reload_speed=7
         z.ai.flight_time=2
@@ -1060,6 +1061,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='ppsh43_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='ppsh43_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['ppsh43']
         z.ai.compatible_projectiles=['7.62x25']
         z.ai.capacity=35
@@ -1083,6 +1085,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='stg44_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='stg44_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['stg44']
         z.ai.compatible_projectiles=['7.92x33_SME']
         z.ai.capacity=30
@@ -1094,7 +1097,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['dp28'],AIGun)
         z.name='dp28'
         z.is_gun=True
-        z.ai.magazine=47
+        z.ai.magazine=spawn_object(WORLD,[0,0],'dp28_magazine',False)
         z.ai.rate_of_fire=0.12
         z.ai.reload_speed=30
         z.ai.flight_time=3.5
@@ -1106,6 +1109,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='dp28_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='dp28_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['dp28']
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=47
@@ -1117,7 +1121,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['ppk'],AIGun)
         z.name='ppk'
         z.is_gun=True
-        z.ai.magazine=7
+        z.ai.magazine=spawn_object(WORLD,[0,0],'ppk_magazine',False)
         z.ai.rate_of_fire=0.7
         z.ai.reload_speed=5
         z.ai.flight_time=1
@@ -1130,6 +1134,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='ppk_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='ppk_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['ppk']
         z.ai.compatible_projectiles=['9mm_ME']
         z.ai.capacity=8
@@ -1141,7 +1146,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['tt33'],AIGun)
         z.name='tt33'
         z.is_gun=True
-        z.ai.magazine=8
+        z.ai.magazine=spawn_object(WORLD,[0,0],'tt33_magazine',False)
         z.ai.rate_of_fire=0.9
         z.ai.reload_speed=5
         z.ai.flight_time=1
@@ -1153,6 +1158,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='tt33_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='tt33_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['tt33']
         z.ai.compatible_projectiles=['7.62x25']
         z.ai.capacity=8
@@ -1164,7 +1170,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['1911'],AIGun)
         z.name='1911'
         z.is_gun=True
-        z.ai.magazine=7
+        z.ai.magazine=spawn_object(WORLD,[0,0],'1911_magazine',False)
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=5
         z.ai.flight_time=1
@@ -1176,6 +1182,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='1911_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='1911_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['1911']
         z.ai.compatible_projectiles=['45acp']
         z.ai.capacity=7
@@ -1188,7 +1195,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['mg34'],AIGun)
         z.name='mg34'
         z.is_gun=True
-        z.ai.magazine=75
+        z.ai.magazine=spawn_object(WORLD,[0,0],'mg34_drum_magazine',False)
         z.ai.rate_of_fire=0.05
         z.ai.reload_speed=13
         z.ai.flight_time=3.5
@@ -1200,6 +1207,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='mg34_drum_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='mg34_drum_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['mg34']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=75
@@ -1211,7 +1219,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['kar98k'],AIGun)
         z.name='kar98k'
         z.is_gun=True
-        z.ai.magazine=5
+        z.ai.magazine=spawn_object(WORLD,[0,0],'kar98k_magazine',False)
         z.ai.rate_of_fire=1.1
         z.ai.reload_speed=10
         z.ai.flight_time=3
@@ -1223,6 +1231,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='kar98k_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='kar98k_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['kar98k']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=5
@@ -1235,7 +1244,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['g41w'],AIGun)
         z.name='g41w'
         z.is_gun=True
-        z.ai.magazine=10
+        z.ai.magazine=spawn_object(WORLD,[0,0],'g41w_magazine',False)
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1247,6 +1256,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='g41w_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='g41w_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['g41w']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=10
@@ -1259,7 +1269,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['k43'],AIGun)
         z.name='k43'
         z.is_gun=True
-        z.ai.magazine=10
+        z.ai.magazine=spawn_object(WORLD,[0,0],'k43_magazine',False)
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1271,6 +1281,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='k43_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='k43_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['k43']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=10
@@ -1283,7 +1294,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['fg42-type1'],AIGun)
         z.name='fg42-type1'
         z.is_gun=True
-        z.ai.magazine=20
+        z.ai.magazine=spawn_object(WORLD,[0,0],'fg42_type1_magazine',False)
         z.ai.rate_of_fire=0.06
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1295,6 +1306,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='fg42_type1_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='fg42_type1_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['fg42-type1']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=20
@@ -1307,7 +1319,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['fg42-type2'],AIGun)
         z.name='fg42-type2'
         z.is_gun=True
-        z.ai.magazine=20
+        z.ai.magazine=spawn_object(WORLD,[0,0],'fg42_type2_magazine',False)
         z.ai.rate_of_fire=0.08
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1319,6 +1331,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='fg42_type2_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='fg42_type2_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['fg42-type2']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=20
@@ -1331,7 +1344,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['mosin_nagant'],AIGun)
         z.name='mosin_nagant'
         z.is_gun=True
-        z.ai.magazine=5
+        z.ai.magazine=spawn_object(WORLD,[0,0],'mosin_magazine',False)
         z.ai.rate_of_fire=1.1
         z.ai.reload_speed=11
         z.ai.flight_time=3
@@ -1343,6 +1356,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='mosin_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='mosin_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['mosin_nagant']
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=5
@@ -1355,7 +1369,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['svt40'],AIGun)
         z.name='svt40'
         z.is_gun=True
-        z.ai.magazine=5
+        z.ai.magazine=spawn_object(WORLD,[0,0],'svt40_magazine',False)
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=7
         z.ai.flight_time=3
@@ -1368,6 +1382,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='svt40_magazine':
         z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
         z.name='svt40_magazine'
+        z.is_gun_magazine=True
         z.ai.compatible_guns=['svt40','svt40-sniper']
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=10
@@ -1380,7 +1395,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['svt40-sniper'],AIGun)
         z.name='svt40-sniper'
         z.is_gun=True
-        z.ai.magazine=5
+        z.ai.magazine=spawn_object(WORLD,[0,0],'svt40_magazine',False)
         z.ai.mag_capacity=10
         z.ai.magazine_count=6
         z.ai.max_magazines=6

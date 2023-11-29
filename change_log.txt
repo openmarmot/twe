@@ -2,6 +2,19 @@ TWE Project : Change Log
 
 
 ----------------------------------
+November 28 2023
+- more work on magazine/gun rewrite
+- added is_gun_magazine because the ai needs to understand them now 
+- some basic code for handling reloading 
+- new ai_human code for checking ammo in gun and in inventory 
+
+wrapped up most of the init code for the new magazine objects.
+now working through all the new bugs / code changes to handle the new 
+magazines 
+
+need to remember that panzerfaust still needs to be rewritten to use ai_gun 
+
+----------------------------------
 November 27 2023
 - more work on magazine/gun rewrite
 

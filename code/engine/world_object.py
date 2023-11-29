@@ -66,11 +66,12 @@ class WorldObject(object):
         # to determine whether to render the object or not
         self.render=True
 
+        # ---- descriptor bools ----------------------------
 
         # these are used by other objects to determine how this object can be interacted with
         # might just make this a string or something but bools are fast and easy to use 
         self.is_player=False
-        self.is_human=False
+        self.is_human=False # something that has ai_human
         self.is_civilian=False
         self.is_soldier=False
         self.is_vehicle=False
@@ -79,9 +80,8 @@ class WorldObject(object):
         self.is_grenade=False
         self.is_handheld_antitank=False
         self.is_throwable=False #something that can be thrown 
-        
-        # these are non weapon pickups that are can be carried but are large.
-        # only one can be carried at a time.
+        self.is_gun_magazine=False # something that has ai_magazine        
+
         self.is_large_human_pickup=False # fills a large pickup slot
         
         self.is_object_container=False # object that stores other objects
@@ -102,6 +102,8 @@ class WorldObject(object):
         self.is_diesel=False
         self.is_melee=False # melee close combat weapon like a dagger 
         self.is_gun_mag_carrier=False
+
+        # ---- \ descriptor bools ----------------------------
 
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in
