@@ -2,6 +2,29 @@ TWE Project : Change Log
 
 
 ----------------------------------
+November 29 2023
+- work on magazine/gun rewrite code integration 
+- bug fixes 
+
+found a bunch of errors in ai_human.take_action_get_ammo.
+This means this function was never triggered before - at 
+least since whenever it was rewritten. very interesting..
+one possibility is i unknowningly fixed a logic error that was 
+preventing this code from ever running. Another possibility is 
+a bot has never run out of ammo - this is possible- engagements 
+tend to be short, but the bots are heavy on the trigger. hmmmmm
+
+todo 
+- i need to add a function to reload existing magazines/weapons 
+from ammo cans/stashes/whatever.
+- humans need a reload button (this used to be automatic)
+- rewrite panzerfaust 
+
+this seems stable enough, so i'm going to merge it into main. 
+- there are likely still some bugs 
+- there are some regressions (reloading, others?)
+
+----------------------------------
 November 28 2023
 - more work on magazine/gun rewrite
 - added is_gun_magazine because the ai needs to understand them now 

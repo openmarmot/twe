@@ -96,14 +96,14 @@ class AIGun(AIBase):
                 # start by ruling out empty mag 
                 
                 # if we have bullets left
-                if len(self.magazine)>0:
+                if len(self.magazine.ai.projectiles)>0:
                     fired=True
-                    projectile=self.magazine.pop()
+                    projectile=self.magazine.ai.projectiles.pop()
                     self.rounds_fired+=1
                     spread=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
 
                     projectile.ai.weapon_name=self.owner.name
-                    projectile.ai.shooter=self.equipper.name
+                    projectile.ai.shooter=self.equipper
                     projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
                     projectile.world_coords=self.equipper.world_coords
                     projectile.ai.maxTime=self.flight_time + random.uniform(0.01, 0.05)

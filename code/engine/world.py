@@ -218,12 +218,12 @@ class World(object):
         ignore_list=[OBJ]
         if self.friendly_fire==False:
             if OBJ.is_german:
-                    ignore_list+=self.owner.world.wo_objects_german
+                    ignore_list+=self.wo_objects_german
             elif OBJ.is_soviet:
                 ignore_list+=self.wo_objects_soviet
             elif OBJ.is_american:
                 ignore_list+=self.wo_objects_american
-        elif self.owner.world.friendly_fire_squad==False:
+        elif self.friendly_fire_squad==False:
             # just add the squad
             ignore_list+=OBJ.ai.squad.members
 

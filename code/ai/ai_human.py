@@ -924,7 +924,7 @@ class AIHuman(AIBase):
         if NEAR:
             distance=500
         
-        best_ammo_can=self.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_ammo_container,distance)
+        best_ammo_can=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_ammo_container,distance)
         
         if best_ammo_can!=None:
             self.target_object=best_ammo_can
@@ -937,10 +937,10 @@ class AIHuman(AIBase):
             best_squad_mate=None 
             if self.squad != None:
                 if len(self.squad.members)>0:
-                    best_squad_mate=self.get_closest_object(self.owner.world_coords,self.squad.members,distance)
+                    best_squad_mate=self.owner.world.get_closest_object(self.owner.world_coords,self.squad.members,distance)
 
             if best_squad_mate != None:
-                self.target_object=best_ammo_can
+                self.target_object=best_squad_mate
                 self.ai_goal='get_ammo'
                 self.destination=self.target_object.world_coords
                 self.ai_state='start_moving'
@@ -1570,7 +1570,7 @@ class AIHuman(AIBase):
             if DISTANCE<5:
                 print('replenishing ammo ')
                 # get max count of fully loaded magazines
-                self.primary_weapon.ai.magazine_count=self.primary_weapon.ai.max_magazines
+                print('!!  DEBUG - we need a function to reload weapons')
                 self.ai_state='sleeping'
         elif self.ai_goal=='close_with_target':
             if self.target_object==None:
@@ -1640,6 +1640,7 @@ class AIHuman(AIBase):
             ammo=self.handle_check_ammo(self.primary_weapon,True)
             if ammo[1]<(ammo[0]*1.5):
                 # basically if we have less ammo in our inventory than in our gun
+                print('debug : getting ammo')
                 status=self.take_action_get_ammo(True)
 
 

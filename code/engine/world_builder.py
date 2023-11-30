@@ -1700,6 +1700,11 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
         return z
     if SOLDIER_TYPE=='german_k43':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1707,6 +1712,11 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'k43',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'k43_magazine',False))
         return z
     if SOLDIER_TYPE=='german_g41w':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1714,6 +1724,11 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'g41w',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'g41w_magazine',False))
         return z
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1721,6 +1736,12 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'mp40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mp40_magazine',False))
         return z
     if SOLDIER_TYPE=='german_mg34':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1728,6 +1749,9 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34_drum_magazine',False))
         return z
     if SOLDIER_TYPE=='german_stg44':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1735,6 +1759,12 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
         return z
     if SOLDIER_TYPE=='german_fg42-type2':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
@@ -1742,6 +1772,12 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'fg42-type2',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'fg42_type2_magazine',False))
         return z
 
     # --------- soviet types ----------------------------------------
@@ -1751,6 +1787,11 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'mosin_nagant',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mosin_magazine',False))
         return z
     if SOLDIER_TYPE=='soviet_svt40':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
@@ -1758,6 +1799,11 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'svt40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'svt40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'svt40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'svt40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'svt40_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'svt40_magazine',False))
         return z
     if SOLDIER_TYPE=='soviet_ppsh43':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
@@ -1765,6 +1811,12 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43_magazine',False))
         return z 
     if SOLDIER_TYPE=='soviet_dp28':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
@@ -1772,11 +1824,15 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'dp28',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'dp28_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'dp28_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'dp28_magazine',False))
         return z 
     if SOLDIER_TYPE=='soviet_tt33':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_tt33'
         z.add_inventory(spawn_object(WORLD,[0,0],'tt33',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
-        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False)) 
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'tt33_magazine',False)) 
         return z   
