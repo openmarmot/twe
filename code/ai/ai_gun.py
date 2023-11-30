@@ -25,20 +25,10 @@ module_last_update_date='June 22 2021' #date of last update
 class AIGun(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-        #int representing round count in current mag 
-        self.magazine=0
 
-        # the ammo capacity of a magazine for this weapon
-        # for example a mp40 would be 32
-        self.mag_capacity=0
-        
-        # how many full mags you have
-        self.magazine_count=0
+        # The magazine that is loaded in the gun
+        self.magazine=None
 
-        # max full mags you can have 
-        self.max_magazines=0
-        
-        #
         #time since last fired
         self.fire_time_passed=0. 
 
@@ -48,19 +38,11 @@ class AIGun(AIBase):
         # reload speed in seconds
         self.reload_speed=10
 
-        # time since reload started
-        self.reload_time_passed=0
-
         # bool
         self.reloading=False
 
-        # caliber
-
-        # bullet diameter in mm
+        # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
-        
-        # bullet weight
-        self.bullet_weight=0
 
         # muzzle velocity (not used)
         self.muzzle_velocity=0
@@ -84,8 +66,7 @@ class AIGun(AIBase):
         # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun
         self.type=''
 
-        # matches up with the projectile_data dict in penetration_calculator.py
-        self.projectile_type=None
+        
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -95,14 +76,6 @@ class AIGun(AIBase):
 
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
 
-        if self.reloading:
-            self.reload_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
-            if self.reload_time_passed>self.reload_speed:
-                self.reloading=False
-                self.reload_time_passed=0
-                if self.equipper!=None:
-                    if self.equipper.is_player:
-                        self.equipper.ai.speak('[Reloading done. '+str(self.magazine_count)+' magazines left]')
 
     #---------------------------------------------------------------------------
 
@@ -115,73 +88,43 @@ class AIGun(AIBase):
     def fire(self,WORLD_COORDS,TARGET_COORDS):
         ''' fire the gun. returns True/False as to whether the gun fired '''
         fired=False
-        # start with a time check
-        if self.reloading==False:
+        # check that we have a magazine loaded
+        if self.magazine!=None:
+            # check fire rate hasn't been exceeded
             if(self.fire_time_passed>self.rate_of_fire):
                 self.fire_time_passed=0.
                 # start by ruling out empty mag 
-                if self.magazine<1:
-                    # auto reload ?
-                    if self.equipper.is_player:
-                        self.equipper.ai.speak('[Reloading !!]')
-                    elif self.equipper.is_human:
-                        self.equipper.ai.speak('Reloading !!')
-                    if self.magazine_count>0:
-                        self.magazine_count-=1
-                        self.magazine=self.mag_capacity
-                        self.reloading=True
-
-                else :
+                
+                # if we have bullets left
+                if len(self.magazine.ai.projectiles)>0:
                     fired=True
-                    self.magazine-=1
+                    projectile=self.magazine.ai.projectiles.pop()
                     self.rounds_fired+=1
-                    spr=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
+                    spread=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
 
-                    ignore_list=[self.equipper]
+                    projectile.ai.weapon_name=self.owner.name
+                    projectile.ai.shooter=self.equipper
+                    projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
+                    projectile.world_coords=self.equipper.world_coords
+                    projectile.ai.maxTime=self.flight_time + random.uniform(0.01, 0.05)
+                    
+                    if self.equipper.is_player :
+                        # do computations based off of where the mouse is. TARGET_COORDS is ignored
+                        dst=self.owner.world.graphic_engine.get_mouse_screen_coords()
+                        dst=[dst[0]+spread[0],dst[1]+spread[1]]
+                        projectile.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
+                        projectile.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
+                    else :
+                        dst=[TARGET_COORDS[0]+spread[0],TARGET_COORDS[1]+spread[1]]
+                        projectile.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,dst)
+                        projectile.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
 
-                    if self.owner.world.friendly_fire==False:
-                        if self.equipper.is_german:
-                                ignore_list+=self.owner.world.wo_objects_german
-                        elif self.equipper.is_soviet:
-                            ignore_list+=self.owner.world.wo_objects_soviet
-                        elif self.equipper.is_american:
-                            ignore_list+=self.owner.world.wo_objects_american
-                    elif self.owner.world.friendly_fire_squad==False:
-                        # just add the squad
-                        ignore_list+=self.equipper.ai.squad.members
-
-                    if self.equipper.is_player:
-                        pass
-                    elif self.equipper.is_soldier:
-                        pass
-                    if self.equipper.ai.in_vehicle:
-                        # add the vehicle otherwise it tends to get hit
-                        ignore_list.append(self.equipper.ai.vehicle)
-
-                    if self.equipper.ai.in_building:
-                        # add possible buildings the equipper is in.
-                        # assuming they are shooting out windows so should not hit the building
-                        ignore_list+=self.equipper.ai.building_list
-
-                    engine.world_builder.spawn_projectile(self.owner.world,WORLD_COORDS,TARGET_COORDS,spr,ignore_list,self.equipper,self.flight_time,self.projectile_type,self.owner.name)
+                    self.owner.world.add_object(projectile)
 
                     # spawn brass 
                     engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
 
         return fired
 
-    #---------------------------------------------------------------------------
-    def get_ammo_count(self):
-        ''' get ammo count. should return int'''
-        return self.magazine + (self.mag_capacity*self.magazine_count)      
-
-#---------------------------------------------------------------------------
-    def get_max_ammo_count(self):
-        ''' get max ammo count. should return int'''
-        return self.mag_capacity*self.max_magazines     
 
 
-    #---------------------------------------------------------------------------
-    def reload_current_mag(self):
-        ''' reload the current magazine'''
-        pass

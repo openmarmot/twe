@@ -210,6 +210,37 @@ class World(object):
 
         return collided
 
+    #---------------------------------------------------------------------------
+    def generate_ignore_list(self,OBJ):
+        ''' generates a ignore list for collision checking'''
+        # OBJ - the world object that needs the ignore list
+        # this is for objects that use ai_human
+        ignore_list=[OBJ]
+        if self.friendly_fire==False:
+            if OBJ.is_german:
+                    ignore_list+=self.wo_objects_german
+            elif OBJ.is_soviet:
+                ignore_list+=self.wo_objects_soviet
+            elif OBJ.is_american:
+                ignore_list+=self.wo_objects_american
+        elif self.friendly_fire_squad==False:
+            # just add the squad
+            ignore_list+=OBJ.ai.squad.members
+
+        if OBJ.is_player:
+            pass
+        elif OBJ.is_soldier:
+            pass
+        if OBJ.ai.in_vehicle:
+            # add the vehicle otherwise it tends to get hit
+            ignore_list.append(OBJ.ai.vehicle)
+
+        if OBJ.ai.in_building:
+            # add possible buildings the equipper is in.
+            # assuming they are shooting out windows so should not hit the building
+            ignore_list+=OBJ.ai.building_list
+
+        return ignore_list
 
     #---------------------------------------------------------------------------
     def get_closest_gun(self, WORLD_COORDS):

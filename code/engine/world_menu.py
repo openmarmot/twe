@@ -432,7 +432,7 @@ class World_Menu(object):
                 if self.selected_object.ai.primary_weapon != None:
                     self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
                     self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
-                    self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str(self.selected_object.ai.primary_weapon.ai.get_ammo_count()))
+                    #self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str())
                 self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
                 self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
                 self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))

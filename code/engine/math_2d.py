@@ -40,14 +40,14 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
 	# air_density is the air density in kg/m^3 (typically around 1.225 kg/m^3 at sea level)
 	# frontal_area is the objects frontal cross-sectional area in square meters
 	# weight : kilograms
-	
+
 	# adjustment to game units 
 	adjustment=1
-    
-    # Calculate net force
+
+	# Calculate net force
 	net_force = force - (rolling_resistance * weight) - (0.5 * air_density * frontal_area * drag_coefficient)
-    
-    # Calculate acceleration in m/s^2
+
+	# Calculate acceleration in m/s^2
 	acceleration = net_force / weight
 
 	# adjust to game units 

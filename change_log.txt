@@ -1,5 +1,98 @@
 TWE Project : Change Log
 
+
+----------------------------------
+November 29 2023
+- work on magazine/gun rewrite code integration 
+- bug fixes 
+
+found a bunch of errors in ai_human.take_action_get_ammo.
+This means this function was never triggered before - at 
+least since whenever it was rewritten. very interesting..
+one possibility is i unknowningly fixed a logic error that was 
+preventing this code from ever running. Another possibility is 
+a bot has never run out of ammo - this is possible- engagements 
+tend to be short, but the bots are heavy on the trigger. hmmmmm
+
+todo 
+- i need to add a function to reload existing magazines/weapons 
+from ammo cans/stashes/whatever.
+- humans need a reload button (this used to be automatic)
+- rewrite panzerfaust 
+
+this seems stable enough, so i'm going to merge it into main. 
+- there are likely still some bugs 
+- there are some regressions (reloading, others?)
+
+----------------------------------
+November 28 2023
+- more work on magazine/gun rewrite
+- added is_gun_magazine because the ai needs to understand them now 
+- some basic code for handling reloading 
+- new ai_human code for checking ammo in gun and in inventory 
+
+wrapped up most of the init code for the new magazine objects.
+now working through all the new bugs / code changes to handle the new 
+magazines 
+
+need to remember that panzerfaust still needs to be rewritten to use ai_gun 
+
+----------------------------------
+November 27 2023
+- more work on magazine/gun rewrite
+
+----------------------------------
+November 25 2023
+- updated Fedora 37 install notes -> Fedora 39
+
+----------------------------------
+November 22 2023
+- more work on magazine/gun rewrite
+
+note - need to add a bullet type for the ppk (32 acp?)
+
+----------------------------------
+November 19 2023
+- work on the new magazine objects
+
+----------------------------------
+November 16 2023
+- minor gun rewrite work 
+- added image for stg44 magazine 
+
+I wonder if I will get to a point where inefficient sprite (image) loading is an issue. 
+I believe in professional games sprites are generally loaded as one image with each sprite being a small 
+section of it. This isn't something I've ever looked into much, but the number of images has really 
+started to explode -- however they are all pretty tiny. 
+
+----------------------------------
+November 14 2023
+- moved ignore list creation from ai_gun to world so it can be re-used 
+- general work on the gun rewrite 
+
+guns no longer auto reload. will need to add in code to ai_human for the reload sequence 
+
+----------------------------------
+November 13 2023
+- fixed a odd tabs/spacing alignment issue in math_2d 
+- started work on gun and projectile overhaul 
+- created ai_magazine 
+- ai_projectile can now explode
+- ai_panzerfaust deleted. functionality will be split between ai_gun and ai_projectile
+
+note - code is unfinished. breaking change.
+Every gun init needs to be rewritten 
+
+panzerfaust is broken so i spent some time looking over the code. 
+At first I decided I want to rewrite it in two parts with a ai_rocket_launcher and a ai_rocket_projectile 
+but the more i thought about what ai_rocket_launcher would be the more i thought that it is very similar to 
+ai gun, and at the moment ai_rocket_projectile could be the existing ai_projectile with some small changes 
+
+the next logical thought was that it is really time to model magazines as arrays of 
+projectile objects instead of just being integers modeling a number of projectiles.
+
+note - ammo containers should probably be ai_magazine instead of whatever they are now 
+
 ----------------------------------
 November 11 2023
 - added spawn menu under debug menu (hit ~)
