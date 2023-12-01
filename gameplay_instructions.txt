@@ -18,6 +18,7 @@ g - throw grenade (if you have one)
 t - fire anti tank (if you have one)
 b - bandage (use if you are bleeding)
 p - toggle prone 
+r - reload your equipped weapon if you have a compatible magazine in inventory
 
 -vehicle-
 w - gas 
