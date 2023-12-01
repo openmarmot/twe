@@ -726,6 +726,12 @@ class AIHuman(AIBase):
             self.owner.world.remove_object(OBJECT_TO_PICKUP)
 
     #---------------------------------------------------------------------------
+    def handle_player_reload(self):
+        ''' player reload. called by world when you press 'r' '''
+        if self.primary_weapon!=None:
+            self.handle_reload(self.primary_weapon)
+
+    #---------------------------------------------------------------------------
     def handle_prone_state_change(self):
         '''if prone, stand up. If standing, go prone'''
 
@@ -773,6 +779,8 @@ class AIHuman(AIBase):
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
+        
+        self.speak('reloading!')
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):

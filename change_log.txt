@@ -2,6 +2,19 @@ TWE Project : Change Log
 
 
 ----------------------------------
+November 30 2023
+- added player reload (hit r)
+
+player reload may need some tweaks. for now it is 
+the same as bot reload where it should theoretically pick 
+the mag with the most bullets
+
+note that magazines and bullets are fully simulated. 
+This isn't a mainstream video game where reloading just tops up 
+your mag from a bullet pool. If you shoot half a mag and 
+reload the half full mag goes into your inventory
+
+----------------------------------
 November 29 2023
 - work on magazine/gun rewrite code integration 
 - bug fixes 
