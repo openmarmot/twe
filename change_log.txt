@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+----------------------------------
+December 1 2023
+- minor polish changes 
+- projectile data gets 'contact_effect' and 'shrapnel_count'
+- projectile data added for panzerfaust_60
+- projectile code enhanced to handle HEAT jets on contact 
+
+I think grenades will eventually just be a projectile instead of 
+their own unique thing 
+
+panzerfausts are working again (that change took a month!) so 
+this will get a merge. note - when you fire the panzerfaust you 
+drop the empty - but currently it does not look empty
+
+note - in the play log i saw a 'already in inventory' pickup 
+error. odd as i thought I had that resolved. 
 
 ----------------------------------
 November 30 2023
