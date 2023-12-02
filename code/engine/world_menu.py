@@ -319,6 +319,9 @@ class World_Menu(object):
             elif Key=='2':
                 #fg42-type2
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42-type2',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
             elif Key=='3':
                 #panzerfaust
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
@@ -774,6 +777,6 @@ class World_Menu(object):
         # should maybe check if a menu is active first. no need for this to be constantly running
         # make the menu auto close after a period of time
         self.time_since_input+=self.world.graphic_engine.time_passed_seconds
-        if self.time_since_input>self.max_menu_idle_time:
+        if self.time_since_input>self.max_menu_idle_time and self.active_menu!='start':
             self.deactivate_menu()
 

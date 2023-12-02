@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 2 2023
+- added some magazines to the fg42 spawn from the debug menu 
+- added a check to stop the start menu from timing out 
+
+I think I need to add magazine carriers and ww2 style web gear 
+mostly because magazines are really too small to spawn in the world 
+and be manipulated easily by humans.
+
+----------------------------------
 December 1 2023
 - minor polish changes 
 - projectile data gets 'contact_effect' and 'shrapnel_count'
