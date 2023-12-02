@@ -4,7 +4,7 @@ TWE Project : Change Log
 December 1 2023
 - minor polish changes 
 - projectile data gets 'contact_effect' and 'shrapnel_count'
-- HEAT jet projectile data changed to be panzerfaust_60
+- projectile data added for panzerfaust_60
 - projectile code enhanced to handle HEAT jets on contact 
 
 I think grenades will eventually just be a projectile instead of 
