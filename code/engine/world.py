@@ -287,7 +287,7 @@ class World(object):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
         #KEY is a key number
-        print('key ',KEY)
+        #print('key ',KEY)
         if KEY==96:
             self.world_menu.handle_input("tilde")
         elif KEY==91: # [

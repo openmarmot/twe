@@ -15,9 +15,6 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.penetration_calculator
 import engine.world_builder
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='june 16 2021' #date of last update
 
 #global variables
 
@@ -40,8 +37,6 @@ class AIProjectile(AIBase):
         self.is_shrapnel=False # not used at the moment
         self.is_bullet=False # not used at the moment
 
-        self.is_explosive=False
-        self.shrapnel_count=0
 
         # the weapon that created this
         self.weapon_name=''
@@ -51,15 +46,22 @@ class AIProjectile(AIBase):
         self.speed=0
 
     #---------------------------------------------------------------------------
-    def explode(self):
+    def contact_effect(self):
         # kablooey!
+        print('kablooey!')
         # add the shrapnel
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
-        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,self.shrapnel_count,self.equipper,self.owner.name)
+        shrapnel_count=self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']
+        contact_effect=self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
+        if contact_effect=='HEAT':
+            engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,self.shooter,self.owner.name)
+        else:
+            print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else
         self.owner.world.remove_object(self.owner)
+
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -68,8 +70,8 @@ class AIProjectile(AIBase):
 
         self.flightTime+=time_passed
         if(self.flightTime>self.maxTime):
-            if self.is_explosive:
-                self.explode()
+            if self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+                self.contact_effect()
             else:
                 engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
                 self.owner.world.remove_object(self.owner)
@@ -83,8 +85,8 @@ class AIProjectile(AIBase):
                 self.last_collision_check=self.flightTime
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
                 if collide_obj !=None:
-                    if self.is_explosive:
-                        self.explode()
+                    if self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+                        self.contact_effect()
                     else:
                         if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
                             # add the collided object to ignore list so we don't hit it again

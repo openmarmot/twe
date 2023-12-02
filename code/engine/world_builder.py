@@ -1001,12 +1001,35 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':
-        z=WorldObject(WORLD,['panzerfaust','panzerfaust_warhead'],AIGun)
+        z=WorldObject(WORLD,['panzerfaust'],AIGun)
         z.name='panzerfaust'
         z.render_level=2
         z.ai.speed=300
         z.is_handheld_antitank=True
+        z.ai.magazine=spawn_object(WORLD,[0,0],'panzerfaust_magazine',False)
+        z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=0
+        z.ai.flight_time=2
+        z.ai.range=700
+        z.ai.type='antitank launcher'
         z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='panzerfaust_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='panzerfaust_magazine'
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['panzerfaust']
+        z.ai.compatible_projectiles=['panzerfaust_60']
+        z.ai.capacity=1
+        z.ai.removable=False
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        p=spawn_object(WORLD,[0,0],'projectile',False)
+        p.image_list=['panzerfaust_warhead']
+        p.ai.projectile_type='panzerfaust_60'
+        z.ai.projectiles.append(p)
+
+
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIThrowable)

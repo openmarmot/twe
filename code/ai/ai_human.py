@@ -776,6 +776,8 @@ class AIHuman(AIBase):
             if new_magazine!=None:
                 self.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
+            else:
+                self.speak("I'm out of ammo!")
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
@@ -835,7 +837,7 @@ class AIHuman(AIBase):
             self.handle_prone_state_change()
 
         if self.antitank!=None:
-            self.antitank.ai.launch(TARGET_COORDS)
+            self.antitank.ai.fire(self.owner.world_coords,TARGET_COORDS)
 
             # drop the tube now that it is empty
             self.handle_drop_object(self.antitank)

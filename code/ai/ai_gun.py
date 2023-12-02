@@ -63,7 +63,7 @@ class AIGun(AIBase):
         # set by ai_man.event_inventory
         self.equipper=None
 
-        # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun
+        # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun/antitank launcher
         self.type=''
 
         
@@ -75,14 +75,6 @@ class AIGun(AIBase):
         # note - ai human calls update for its primary weapon
 
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
-
-
-    #---------------------------------------------------------------------------
-
-    #---------------------------------------------------------------------------
-    def change_magazine(self):
-        ''' change magazine. input is new magazine. output is old magazine'''
-        print('error: ai_gun change_magazine is not implemented')
 
     #---------------------------------------------------------------------------
     def fire(self,WORLD_COORDS,TARGET_COORDS):
