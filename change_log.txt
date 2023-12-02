@@ -3,6 +3,7 @@ TWE Project : Change Log
 ----------------------------------
 December 2 2023
 - added some magazines to the fg42 spawn from the debug menu 
+- added magazines to the list of things you can mouse select
 - added a check to stop the start menu from timing out 
 
 I think I need to add magazine carriers and ww2 style web gear 
