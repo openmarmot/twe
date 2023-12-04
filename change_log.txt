@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 3 2023
+- added ammo count for primary weapon back to human menu 
+
+----------------------------------
 December 2 2023
 - added some magazines to the fg42 spawn from the debug menu 
 - added magazines to the list of things you can mouse select
