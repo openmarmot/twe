@@ -1,5 +1,26 @@
 TWE Project : Change Log
 
+
+----------------------------------
+December 5 2023
+- added a check and warning if a large_pickup is already picked up by someone else  
+- some changes to the debug menu spawn options 
+- cut the size of the grenade in half because i realized it was ridiculously huge 
+- made some tweaks to grenade and uh 'throwing shovels' speed and distance. 
+    - still don't feel right 
+
+weapons were all 20x20 but now i'm leaning more towards sizing them in a way that 
+makes a bit more sense. maybe long weapons  with be 20x20 and small ones will be 
+10x10 
+
+throwable ai code probably needs a re-write. 
+the shovels are amusing. I need to add collision damage and think of a better 
+ai reaction to that sort of event. 
+
+maybe a shovel should be its own equipment slot? It is fun having it be a 
+throwable, but realistically you would rather have a grenade.in that slot 
+
+
 ----------------------------------
 December 3 2023
 - added ammo count for primary weapon back to human menu 

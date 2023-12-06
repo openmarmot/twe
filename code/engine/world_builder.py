@@ -1037,9 +1037,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
-        z.ai.speed=110
-        z.ai.max_speed=110
-        z.ai.maxTime=3.3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=3.0
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1573,18 +1573,18 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german field shovel'
         z.is_throwable=True
-        z.ai.speed=90.
-        z.ai.max_speed=90
-        z.ai.maxTime=3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=2
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_folding_shovel':
         z=WorldObject(WORLD,['german_folding_shovel'],AIThrowable)
         z.render_level=2
         z.name='german folding shovel'
         z.is_throwable=True
-        z.ai.speed=90.
-        z.ai.max_speed=90
-        z.ai.maxTime=3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=2
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='volkswagen_type_82_engine':
         z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)

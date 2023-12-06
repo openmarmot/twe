@@ -720,7 +720,17 @@ class AIHuman(AIBase):
         ''' pickup object from the world '''
         # any distance calculation would be made before this function is called
         if OBJECT_TO_PICKUP.is_large_human_pickup:
-            self.large_pickup=OBJECT_TO_PICKUP
+
+            # need to make sure nobody else is already carrying it
+            in_use=False
+            for b in self.owner.world.wo_objects_human:
+                if b.ai.large_pickup==OBJECT_TO_PICKUP:
+                    in_use=True
+
+            if in_use:
+                print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
+            else:
+                self.large_pickup=OBJECT_TO_PICKUP
         else:
             self.event_add_inventory(OBJECT_TO_PICKUP)
             self.owner.world.remove_object(OBJECT_TO_PICKUP)

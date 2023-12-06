@@ -284,14 +284,13 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn menu')
-            self.world.graphic_engine.menu_text_queue.append('4 - spawn a shovel')
+            self.world.graphic_engine.menu_text_queue.append('4 - none')
             self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
-            self.world.graphic_engine.menu_text_queue.append('6 - smooth display jitter')
+            self.world.graphic_engine.menu_text_queue.append('6 - none')
             self.menu_state='base'
         elif self.menu_state=='base':
             if Key=='1':
                 self.world.toggle_map()
-                #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
@@ -302,16 +301,15 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('2 - fg42-type2 ')
                 self.world.graphic_engine.menu_text_queue.append('3 - panzerfaust ')
                 self.world.graphic_engine.menu_text_queue.append('4 - brown_chair ')
-                self.world.graphic_engine.menu_text_queue.append('5 - ')
-                self.world.graphic_engine.menu_text_queue.append('6 - ')
+                self.world.graphic_engine.menu_text_queue.append('5 - model 24 grenade')
+                self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
                 
             elif Key=='4':
-                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'german_field_shovel',True)
+                pass
             elif Key=='5':
                 self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
             elif Key=='6':
-                self.world.graphic_engine.smooth_jitter = not self.world.graphic_engine.smooth_jitter
-                print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
+                pass
         elif self.menu_state=='spawn':
             if Key=='1':
                 #kubelwagen
@@ -329,11 +327,11 @@ class World_Menu(object):
                 #brown_chair
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'brown_chair',True)
             elif Key=='5':
-                pass
-                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                # grenade
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
             elif Key=='6':
-                pass
-                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                # german field shovel
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_field_shovel',True)
 
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
