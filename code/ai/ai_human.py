@@ -7,8 +7,8 @@ email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
 handle_SOMETHING - something that the AI decides to do that requires some code to make happen
-take_action_ - something that sets ai_state and ai_goal to start an action
-think_ - something that requires logic code
+take_action_ - something simple that sets ai_state and ai_goal to start an action, but not a lot of logic
+think_ - something that requires a lot of logic code
 
 for humans the current owner.image_list is [normal,prone,dead]
 '''
@@ -794,6 +794,26 @@ class AIHuman(AIBase):
         
         self.speak('reloading!')
 
+    #-----------------------------------------------------------------------
+    def handle_replenish_ammo(self):
+        '''replenish ammo from a target object that we walked to'''
+        if self.target_object==None:
+            print('Error: replenish ammo from None target_object')
+        else:
+            if self.target_object.is_human:
+                pass
+            elif self.target_object.is_ammo_container:
+                pass
+            elif self.target_object.is_gun_magazine:
+                pass
+            elif self.target_object.is_object_container:
+                pass
+
+            # for now just cheat 
+            for b in self.inventory:
+                if b.is_gun_magazine:
+                    engine.world_builder.load_magazine(self.owner.world,b)
+
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
@@ -948,7 +968,7 @@ class AIHuman(AIBase):
         
         if best_ammo_can!=None:
             self.target_object=best_ammo_can
-            self.ai_goal='get ammo'
+            self.ai_goal='get_ammo'
             self.destination=self.target_object.world_coords
             self.ai_state='start_moving'
             return True
@@ -1218,7 +1238,6 @@ class AIHuman(AIBase):
                         pass
 
                 
-
     #-----------------------------------------------------------------------
     def think_generic(self):
         ''' when the ai_state doesn't have any specific think actions'''
@@ -1588,9 +1607,7 @@ class AIHuman(AIBase):
 
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
-                print('replenishing ammo ')
-                # get max count of fully loaded magazines
-                print('!!  DEBUG - we need a function to reload weapons')
+                self.handle_replenish_ammo()
                 self.ai_state='sleeping'
         elif self.ai_goal=='close_with_target':
             if self.target_object==None:
@@ -1656,6 +1673,7 @@ class AIHuman(AIBase):
         # upgrade clothes / armor
 
         # top off ammo ?
+        # note - if a bot doesn't have magazines for the gun then it will always trigger this
         if status==False and self.primary_weapon!=None:
             ammo=self.handle_check_ammo(self.primary_weapon,True)
             if ammo[1]<(ammo[0]*1.5):

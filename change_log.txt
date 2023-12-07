@@ -2,6 +2,22 @@ TWE Project : Change Log
 
 
 ----------------------------------
+December 6 2023
+- added handle_replenish_ammo  to ai_human 
+
+for now handle_replenish_ammo just fills the mags in the bots inventory 
+by spawning new bullets. this restores the previous functionality -- 
+basically the bots have infinite ammo but they have to walk somewhere and 
+pretend to get it. this function can be modified later to actually transfer 
+ammo from whatever ammo source they found 
+
+found there are circumstances where the bot is now stuck trying to get ammo forever.
+this is a consequence of the new magazine system.. a bot will pick up a new gun but 
+have no magazines - and thus the get ammo action will trigger as they have no ammo 
+for the gun -- but without magazines they cannot get more ammo 
+will have to solve this in the future..
+
+----------------------------------
 December 5 2023
 - added a check and warning if a large_pickup is already picked up by someone else  
 - some changes to the debug menu spawn options 
