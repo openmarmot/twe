@@ -2,6 +2,23 @@ TWE Project : Change Log
 
 
 ----------------------------------
+December 7 2023
+- modified handle_check_ammo so it also gets a magazine count from inventory 
+- some gun type changes 
+- semi auto rifles will now be preferred over rifles and pistols 
+- ai should now be willing to drop their gun for another if they are low on ammo 
+- ai will not attempt to refill ammo if they do not have magazines 
+
+several changes to how the ai handles getting a gun. still a lot of room for improvement here 
+
+I need to think about what the FG-42 should be classified as. I guess its a light machine gun , 
+but that is not currently a category that I recognize. This is important as the AI will generally 
+not pick up machine guns as they are considered too unwieldly and require special skills
+
+noticed that bots will pick up multiple weapons. they are meant to only have one - will have to 
+look into 
+
+----------------------------------
 December 6 2023
 - added handle_replenish_ammo  to ai_human 
 

@@ -1272,7 +1272,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1297,7 +1297,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1322,7 +1322,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1347,7 +1347,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1397,7 +1397,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -1426,7 +1426,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=8
         z.ai.flight_time=3.5
         z.ai.range=850
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))

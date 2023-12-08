@@ -387,8 +387,8 @@ class AIHuman(AIBase):
             print('error: attempting to change vehicle role when not in vehicle')
 
     #---------------------------------------------------------------------------
-    def handle_check_ammo(self,gun,check_inventory):
-        '''check ammo'''
+    def handle_check_ammo(self,gun):
+        '''check ammo and magazines for a gun'''
         # gun - a world object with ai_gun
         # check_inventory - bool. if true also check inventory
         # return [ammo in gun, ammo in inventory]
@@ -397,14 +397,15 @@ class AIHuman(AIBase):
             ammo_gun=len(gun.ai.magazine.ai.projectiles)
 
         ammo_inventory=0
-        if check_inventory:
-            for b in self.inventory:
-                if b.is_gun_magazine:
-                    if gun.name in b.ai.compatible_guns:
-                        ammo_inventory+=len(b.ai.projectiles)
+        magazine_count=0
+        for b in self.inventory:
+            if b.is_gun_magazine:
+                if gun.name in b.ai.compatible_guns:
+                    ammo_inventory+=len(b.ai.projectiles)
+                    magazine_count+=1
 
 
-        return [ammo_gun,ammo_inventory]        
+        return [ammo_gun,ammo_inventory,magazine_count]        
 
 
     #---------------------------------------------------------------------------
@@ -1001,6 +1002,9 @@ class AIHuman(AIBase):
 
         # NEAR : only look at guns in 500 range
         # UPGRADE_ONLY : only pickup a better gun (if you already have a gun)
+
+        get_gun=False
+
         gun=None
 
         # NEAR (bool) - keep distance to 500
@@ -1010,21 +1014,25 @@ class AIHuman(AIBase):
 
         gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
 
-        if gun==None:
-            return False
-        else:
+        if gun!=None:
             if UPGRADE_ONLY and self.primary_weapon!=None:
-                if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
+                ammo=self.handle_check_ammo(self.primary_weapon)
+
+                #if there is no ammo in inventory and gun ammo is very low, just take it
+                if ammo[1]==0 and ammo[0]<5:
+                    get_gun=True
+                elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
                     # the thought here being that rifles are undesirable, and a mg is crew served and unlikely to 
                     # be picked up
-                    if gun.ai.type=='submachine gun' or gun.ai.type=='assault rifle':
-                        self.take_action_pickup_object(gun)
-                        return True
-                    else:
-                        return False
+                    if gun.ai.type in ['submachine gun','assault rifle','semi auto rifle']:
+                        get_gun=True
             else:
-                self.take_action_pickup_object(gun)
-                return True
+                get_gun=True
+            
+        if get_gun:
+            self.take_action_pickup_object(gun)
+        
+        return get_gun
             
 #-----------------------------------------------------------------------
     def take_action_get_item(self,NEAR,WORLD_ITEM_LIST):
@@ -1169,7 +1177,7 @@ class AIHuman(AIBase):
                         action=True
                         self.take_action_pickup_object(b)
             else:
-                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                ammo=self.handle_check_ammo(self.primary_weapon)
                 if ammo[0]>0:
                     # we can fire. this will be done automatically
                     action=True
@@ -1177,7 +1185,8 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        print('out of ammo. need to handle this better')
+                        # could probably reload - but does that get caught elsewhere?
+                        print('Error : out of ammo. need to handle this better')
                         pass
 
         if action==False:
@@ -1219,7 +1228,7 @@ class AIHuman(AIBase):
             # we have a primary weapon
             else:
                 # check ammo (this is duplicated from think close. should be combined)
-                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                ammo=self.handle_check_ammo(self.primary_weapon)
                 if ammo[0]>0:
                     # we can fire. this will be done automatically
                     # check if target is too far 
@@ -1234,8 +1243,8 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        print('out of ammo. need to handle this better')
-                        pass
+                        print('Error: (think_engage_far) out of ammo. need to handle this better')
+                        
 
                 
     #-----------------------------------------------------------------------
@@ -1675,11 +1684,17 @@ class AIHuman(AIBase):
         # top off ammo ?
         # note - if a bot doesn't have magazines for the gun then it will always trigger this
         if status==False and self.primary_weapon!=None:
-            ammo=self.handle_check_ammo(self.primary_weapon,True)
-            if ammo[1]<(ammo[0]*1.5):
-                # basically if we have less ammo in our inventory than in our gun
-                print('debug : getting ammo')
-                status=self.take_action_get_ammo(True)
+            ammo=self.handle_check_ammo(self.primary_weapon)
+            # check if we have extra magazines in inventory
+            # - if we don't then it is somewhat pointless to get more ammo
+            if ammo[2]>0:
+                if ammo[1]<(ammo[0]*1.5):
+                    # basically if we have less ammo in our inventory than in our gun
+                    print('debug : getting ammo')
+                    status=self.take_action_get_ammo(True)
+            else:
+                # no magazines, should we get a new gun?
+                pass
 
 
         return status
