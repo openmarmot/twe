@@ -581,8 +581,11 @@ def load_images(world):
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
-    world.graphic_engine.loadImage('wine_bottle','images/consumables/wine_bottle.png')
     world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
+
+    # bottles 
+    world.graphic_engine.loadImage('wine_bottle','images/bottles/wine_bottle.png')
+    world.graphic_engine.loadImage('wine_bottle','images/bottles/green_bottle.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')

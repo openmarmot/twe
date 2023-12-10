@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+----------------------------------
+December 9 2023
+- added green_bottle which will be used for beer and possibly other things 
+
+going to introduce some beers. wine will also become specific wines instead of being generic 
+
+would like to use the actual beer names but a lot of these breweries are still in operation 
+so probably have to create some fictional names 
 
 ----------------------------------
 December 7 2023
