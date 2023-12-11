@@ -284,14 +284,13 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - toggle map ')
             self.world.graphic_engine.menu_text_queue.append('2 - toggle debug mode')
             self.world.graphic_engine.menu_text_queue.append('3 - spawn menu')
-            self.world.graphic_engine.menu_text_queue.append('4 - spawn a shovel')
+            self.world.graphic_engine.menu_text_queue.append('4 - none')
             self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
-            self.world.graphic_engine.menu_text_queue.append('6 - smooth display jitter')
+            self.world.graphic_engine.menu_text_queue.append('6 - none')
             self.menu_state='base'
         elif self.menu_state=='base':
             if Key=='1':
                 self.world.toggle_map()
-                #engine.world_builder.spawn_crate(self.world, self.world.player.world_coords,"crate o danitzas",True)
             elif Key=='2':
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
@@ -302,16 +301,16 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('2 - fg42-type2 ')
                 self.world.graphic_engine.menu_text_queue.append('3 - panzerfaust ')
                 self.world.graphic_engine.menu_text_queue.append('4 - brown_chair ')
-                self.world.graphic_engine.menu_text_queue.append('5 - ')
-                self.world.graphic_engine.menu_text_queue.append('6 - ')
+                self.world.graphic_engine.menu_text_queue.append('5 - model 24 grenade')
+                self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
+                self.world.graphic_engine.menu_text_queue.append('7 - beer ')
                 
             elif Key=='4':
-                engine.world_builder.spawn_object(self.world, self.world.player.world_coords,'german_field_shovel',True)
+                pass
             elif Key=='5':
                 self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
             elif Key=='6':
-                self.world.graphic_engine.smooth_jitter = not self.world.graphic_engine.smooth_jitter
-                print('Graphic Engine smooth_jitter: ',self.world.graphic_engine.smooth_jitter)
+                pass
         elif self.menu_state=='spawn':
             if Key=='1':
                 #kubelwagen
@@ -319,6 +318,9 @@ class World_Menu(object):
             elif Key=='2':
                 #fg42-type2
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42-type2',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
             elif Key=='3':
                 #panzerfaust
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
@@ -326,12 +328,14 @@ class World_Menu(object):
                 #brown_chair
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'brown_chair',True)
             elif Key=='5':
-                pass
-                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                # grenade
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
             elif Key=='6':
-                pass
-                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
-
+                # german field shovel
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_field_shovel',True)
+            elif Key=='7':
+                # german field shovel
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'beer',True)
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
         # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
@@ -432,7 +436,8 @@ class World_Menu(object):
                 if self.selected_object.ai.primary_weapon != None:
                     self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
                     self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
-                    #self.world.graphic_engine.menu_text_queue.append('  - Ammo : '+str())
+                    if self.selected_object.ai.primary_weapon.ai.magazine!=None:
+                        self.world.graphic_engine.menu_text_queue.append('  - Magazine : '+str(len(self.selected_object.ai.primary_weapon.ai.magazine.ai.projectiles)))
                 self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
                 self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
                 self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
@@ -774,6 +779,6 @@ class World_Menu(object):
         # should maybe check if a menu is active first. no need for this to be constantly running
         # make the menu auto close after a period of time
         self.time_since_input+=self.world.graphic_engine.time_passed_seconds
-        if self.time_since_input>self.max_menu_idle_time:
+        if self.time_since_input>self.max_menu_idle_time and self.active_menu!='start':
             self.deactivate_menu()
 

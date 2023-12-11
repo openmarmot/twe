@@ -1,6 +1,95 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 10 2023
+- added a generic beer
+- added beer to debug spawn for testing 
+
+beer/wine/beverages are due for a full rewrite. not sure if i will tackle 
+that soon or not.
+- i want to come up with some fictional brands (concerned about copyright/trademark)
+- maybe need bottle ai 
+- would be nice to have bottle upright and on its side art.
+- would like to have bottles self organize in a box 
+- how much do you drink when you drink? 1/5 of the bottle or so? (this will require more code)
+
+----------------------------------
+December 9 2023
+- added green_bottle which will be used for beer and possibly other things 
+
+going to introduce some beers. wine will also become specific wines instead of being generic 
+
+would like to use the actual beer names but a lot of these breweries are still in operation 
+so probably have to create some fictional names 
+
+----------------------------------
+December 7 2023
+- modified handle_check_ammo so it also gets a magazine count from inventory 
+- some gun type changes 
+- semi auto rifles will now be preferred over rifles and pistols 
+- ai should now be willing to drop their gun for another if they are low on ammo 
+- ai will not attempt to refill ammo if they do not have magazines 
+
+several changes to how the ai handles getting a gun. still a lot of room for improvement here 
+
+I need to think about what the FG-42 should be classified as. I guess its a light machine gun , 
+but that is not currently a category that I recognize. This is important as the AI will generally 
+not pick up machine guns as they are considered too unwieldly and require special skills
+
+noticed that bots will pick up multiple weapons. they are meant to only have one - will have to 
+look into 
+
+----------------------------------
+December 6 2023
+- added handle_replenish_ammo  to ai_human 
+
+for now handle_replenish_ammo just fills the mags in the bots inventory 
+by spawning new bullets. this restores the previous functionality -- 
+basically the bots have infinite ammo but they have to walk somewhere and 
+pretend to get it. this function can be modified later to actually transfer 
+ammo from whatever ammo source they found 
+
+found there are circumstances where the bot is now stuck trying to get ammo forever.
+this is a consequence of the new magazine system.. a bot will pick up a new gun but 
+have no magazines - and thus the get ammo action will trigger as they have no ammo 
+for the gun -- but without magazines they cannot get more ammo 
+will have to solve this in the future..
+
+----------------------------------
+December 5 2023
+- added a check and warning if a large_pickup is already picked up by someone else  
+- some changes to the debug menu spawn options 
+- cut the size of the grenade in half because i realized it was ridiculously huge 
+- made some tweaks to grenade and uh 'throwing shovels' speed and distance. 
+    - still don't feel right 
+
+weapons were all 20x20 but now i'm leaning more towards sizing them in a way that 
+makes a bit more sense. maybe long weapons  with be 20x20 and small ones will be 
+10x10 
+
+throwable ai code probably needs a re-write. 
+the shovels are amusing. I need to add collision damage and think of a better 
+ai reaction to that sort of event. 
+
+maybe a shovel should be its own equipment slot? It is fun having it be a 
+throwable, but realistically you would rather have a grenade.in that slot 
+
+
+----------------------------------
+December 3 2023
+- added ammo count for primary weapon back to human menu 
+
+----------------------------------
+December 2 2023
+- added some magazines to the fg42 spawn from the debug menu 
+- added magazines to the list of things you can mouse select
+- added a check to stop the start menu from timing out 
+
+I think I need to add magazine carriers and ww2 style web gear 
+mostly because magazines are really too small to spawn in the world 
+and be manipulated easily by humans.
+
+----------------------------------
 December 1 2023
 - minor polish changes 
 - projectile data gets 'contact_effect' and 'shrapnel_count'

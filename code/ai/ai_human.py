@@ -7,8 +7,8 @@ email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
 handle_SOMETHING - something that the AI decides to do that requires some code to make happen
-take_action_ - something that sets ai_state and ai_goal to start an action
-think_ - something that requires logic code
+take_action_ - something simple that sets ai_state and ai_goal to start an action, but not a lot of logic
+think_ - something that requires a lot of logic code
 
 for humans the current owner.image_list is [normal,prone,dead]
 '''
@@ -387,8 +387,8 @@ class AIHuman(AIBase):
             print('error: attempting to change vehicle role when not in vehicle')
 
     #---------------------------------------------------------------------------
-    def handle_check_ammo(self,gun,check_inventory):
-        '''check ammo'''
+    def handle_check_ammo(self,gun):
+        '''check ammo and magazines for a gun'''
         # gun - a world object with ai_gun
         # check_inventory - bool. if true also check inventory
         # return [ammo in gun, ammo in inventory]
@@ -397,14 +397,15 @@ class AIHuman(AIBase):
             ammo_gun=len(gun.ai.magazine.ai.projectiles)
 
         ammo_inventory=0
-        if check_inventory:
-            for b in self.inventory:
-                if b.is_gun_magazine:
-                    if gun.name in b.ai.compatible_guns:
-                        ammo_inventory+=len(b.ai.projectiles)
+        magazine_count=0
+        for b in self.inventory:
+            if b.is_gun_magazine:
+                if gun.name in b.ai.compatible_guns:
+                    ammo_inventory+=len(b.ai.projectiles)
+                    magazine_count+=1
 
 
-        return [ammo_gun,ammo_inventory]        
+        return [ammo_gun,ammo_inventory,magazine_count]        
 
 
     #---------------------------------------------------------------------------
@@ -720,7 +721,17 @@ class AIHuman(AIBase):
         ''' pickup object from the world '''
         # any distance calculation would be made before this function is called
         if OBJECT_TO_PICKUP.is_large_human_pickup:
-            self.large_pickup=OBJECT_TO_PICKUP
+
+            # need to make sure nobody else is already carrying it
+            in_use=False
+            for b in self.owner.world.wo_objects_human:
+                if b.ai.large_pickup==OBJECT_TO_PICKUP:
+                    in_use=True
+
+            if in_use:
+                print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
+            else:
+                self.large_pickup=OBJECT_TO_PICKUP
         else:
             self.event_add_inventory(OBJECT_TO_PICKUP)
             self.owner.world.remove_object(OBJECT_TO_PICKUP)
@@ -783,6 +794,26 @@ class AIHuman(AIBase):
         # reload time
         
         self.speak('reloading!')
+
+    #-----------------------------------------------------------------------
+    def handle_replenish_ammo(self):
+        '''replenish ammo from a target object that we walked to'''
+        if self.target_object==None:
+            print('Error: replenish ammo from None target_object')
+        else:
+            if self.target_object.is_human:
+                pass
+            elif self.target_object.is_ammo_container:
+                pass
+            elif self.target_object.is_gun_magazine:
+                pass
+            elif self.target_object.is_object_container:
+                pass
+
+            # for now just cheat 
+            for b in self.inventory:
+                if b.is_gun_magazine:
+                    engine.world_builder.load_magazine(self.owner.world,b)
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
@@ -938,7 +969,7 @@ class AIHuman(AIBase):
         
         if best_ammo_can!=None:
             self.target_object=best_ammo_can
-            self.ai_goal='get ammo'
+            self.ai_goal='get_ammo'
             self.destination=self.target_object.world_coords
             self.ai_state='start_moving'
             return True
@@ -971,6 +1002,9 @@ class AIHuman(AIBase):
 
         # NEAR : only look at guns in 500 range
         # UPGRADE_ONLY : only pickup a better gun (if you already have a gun)
+
+        get_gun=False
+
         gun=None
 
         # NEAR (bool) - keep distance to 500
@@ -980,21 +1014,25 @@ class AIHuman(AIBase):
 
         gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
 
-        if gun==None:
-            return False
-        else:
+        if gun!=None:
             if UPGRADE_ONLY and self.primary_weapon!=None:
-                if self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
+                ammo=self.handle_check_ammo(self.primary_weapon)
+
+                #if there is no ammo in inventory and gun ammo is very low, just take it
+                if ammo[1]==0 and ammo[0]<5:
+                    get_gun=True
+                elif self.primary_weapon.ai.type=='pistol' or self.primary_weapon.ai.type=='rifle':
                     # the thought here being that rifles are undesirable, and a mg is crew served and unlikely to 
                     # be picked up
-                    if gun.ai.type=='submachine gun' or gun.ai.type=='assault rifle':
-                        self.take_action_pickup_object(gun)
-                        return True
-                    else:
-                        return False
+                    if gun.ai.type in ['submachine gun','assault rifle','semi auto rifle']:
+                        get_gun=True
             else:
-                self.take_action_pickup_object(gun)
-                return True
+                get_gun=True
+            
+        if get_gun:
+            self.take_action_pickup_object(gun)
+        
+        return get_gun
             
 #-----------------------------------------------------------------------
     def take_action_get_item(self,NEAR,WORLD_ITEM_LIST):
@@ -1139,7 +1177,7 @@ class AIHuman(AIBase):
                         action=True
                         self.take_action_pickup_object(b)
             else:
-                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                ammo=self.handle_check_ammo(self.primary_weapon)
                 if ammo[0]>0:
                     # we can fire. this will be done automatically
                     action=True
@@ -1147,7 +1185,8 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        print('out of ammo. need to handle this better')
+                        # could probably reload - but does that get caught elsewhere?
+                        print('Error : out of ammo. need to handle this better')
                         pass
 
         if action==False:
@@ -1189,7 +1228,7 @@ class AIHuman(AIBase):
             # we have a primary weapon
             else:
                 # check ammo (this is duplicated from think close. should be combined)
-                ammo=self.handle_check_ammo(self.primary_weapon,True)
+                ammo=self.handle_check_ammo(self.primary_weapon)
                 if ammo[0]>0:
                     # we can fire. this will be done automatically
                     # check if target is too far 
@@ -1204,11 +1243,10 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        print('out of ammo. need to handle this better')
-                        pass
+                        print('Error: (think_engage_far) out of ammo. need to handle this better')
+                        
 
                 
-
     #-----------------------------------------------------------------------
     def think_generic(self):
         ''' when the ai_state doesn't have any specific think actions'''
@@ -1578,9 +1616,7 @@ class AIHuman(AIBase):
 
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
-                print('replenishing ammo ')
-                # get max count of fully loaded magazines
-                print('!!  DEBUG - we need a function to reload weapons')
+                self.handle_replenish_ammo()
                 self.ai_state='sleeping'
         elif self.ai_goal=='close_with_target':
             if self.target_object==None:
@@ -1646,12 +1682,19 @@ class AIHuman(AIBase):
         # upgrade clothes / armor
 
         # top off ammo ?
+        # note - if a bot doesn't have magazines for the gun then it will always trigger this
         if status==False and self.primary_weapon!=None:
-            ammo=self.handle_check_ammo(self.primary_weapon,True)
-            if ammo[1]<(ammo[0]*1.5):
-                # basically if we have less ammo in our inventory than in our gun
-                print('debug : getting ammo')
-                status=self.take_action_get_ammo(True)
+            ammo=self.handle_check_ammo(self.primary_weapon)
+            # check if we have extra magazines in inventory
+            # - if we don't then it is somewhat pointless to get more ammo
+            if ammo[2]>0:
+                if ammo[1]<(ammo[0]*1.5):
+                    # basically if we have less ammo in our inventory than in our gun
+                    print('debug : getting ammo')
+                    status=self.take_action_get_ammo(True)
+            else:
+                # no magazines, should we get a new gun?
+                pass
 
 
         return status

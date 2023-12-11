@@ -58,7 +58,7 @@ from ai.ai_engine import AIEngine
 list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
 list_consumables_common=['green_apple','potato','turnip']
-list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine']
+list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
@@ -581,8 +581,11 @@ def load_images(world):
     world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
-    world.graphic_engine.loadImage('wine_bottle','images/consumables/wine_bottle.png')
     world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
+
+    # bottles 
+    world.graphic_engine.loadImage('wine_bottle','images/bottles/wine_bottle.png')
+    world.graphic_engine.loadImage('green_bottle','images/bottles/green_bottle.png')
 
     # random 
     world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
@@ -895,7 +898,18 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.health_effect=5
         z.ai.hunger_effect=-50
         z.ai.thirst_effect=-500
-        z.ai.fatigue_effect=50  
+        z.ai.fatigue_effect=50
+
+    elif OBJECT_TYPE=='beer':
+        z=WorldObject(WORLD,['green_bottle'],AIConsumable)
+        z.render_level=2
+        z.name='beer'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-500
+        z.ai.fatigue_effect=50   
 
     elif OBJECT_TYPE=='schokakola':
         z=WorldObject(WORLD,['schokakola'],AIConsumable)
@@ -1037,9 +1051,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
-        z.ai.speed=110
-        z.ai.max_speed=110
-        z.ai.maxTime=3.3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=3.0
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1272,7 +1286,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1297,7 +1311,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1322,7 +1336,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1347,7 +1361,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='machine gun'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
@@ -1397,7 +1411,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.flight_time=3
         z.ai.range=800
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -1426,7 +1440,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=8
         z.ai.flight_time=3.5
         z.ai.range=850
-        z.ai.type='rifle'
+        z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -1573,18 +1587,18 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='german field shovel'
         z.is_throwable=True
-        z.ai.speed=90.
-        z.ai.max_speed=90
-        z.ai.maxTime=3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=2
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_folding_shovel':
         z=WorldObject(WORLD,['german_folding_shovel'],AIThrowable)
         z.render_level=2
         z.name='german folding shovel'
         z.is_throwable=True
-        z.ai.speed=90.
-        z.ai.max_speed=90
-        z.ai.maxTime=3
+        z.ai.speed=112
+        z.ai.max_speed=112
+        z.ai.maxTime=2
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='volkswagen_type_82_engine':
         z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
