@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 10 2023
+- added a generic beer
+- added beer to debug spawn for testing 
+
+beer/wine/beverages are due for a full rewrite. not sure if i will tackle 
+that soon or not.
+- i want to come up with some fictional brands (concerned about copyright/trademark)
+- maybe need bottle ai 
+- would be nice to have bottle upright and on its side art.
+- would like to have bottles self organize in a box 
+- how much do you drink when you drink? 1/5 of the bottle or so? (this will require more code)
+
+----------------------------------
 December 9 2023
 - added green_bottle which will be used for beer and possibly other things 
 
