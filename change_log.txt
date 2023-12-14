@@ -1,6 +1,27 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 11 2023
+- ai will now grab up to 2 compatible magazines when looting 
+containers. 
+- rewrote event_add_inventory for ai_human to fix a bug where 
+when picking up a gun when you have a gun you would drop your gun but not 
+pickup the new one (item duplication issue i mentioned in previous notes)
+
+remember a body is classified as a container, so the ai should 
+have a reasonable chance of grabbing magazines when they pick 
+up a gun now.
+
+perhaps they should search nearby containers when grabbing guns
+- this may require work on an ability to chain tasks 
+- and/or bots need a sort of short term memory 
+
+In play testing I saw a duplicate object warning when a bot tried to grab a magazine 
+- the bot also had a ton of other mags. 
+
+I need to add a bot routine to clear out its inventory of unused stuff 
+
+----------------------------------
 December 10 2023
 - added a generic beer
 - added beer to debug spawn for testing 

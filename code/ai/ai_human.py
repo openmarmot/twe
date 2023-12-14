@@ -223,15 +223,13 @@ class AIHuman(AIBase):
             self.inventory.append(EVENT_DATA)
 
             if EVENT_DATA.is_gun :
-                if self.primary_weapon==None:
-                    if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.primary_weapon=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
-                else:
+                if self.primary_weapon!=None:
                     # drop the current obj and pick up the new one
                     self.handle_drop_object(self.primary_weapon)
-                    self.event_add_inventory(EVENT_DATA)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.primary_weapon=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
                 self.ai_want_gun=False
             elif EVENT_DATA.is_throwable :
                 if self.throwable==None:
@@ -242,15 +240,13 @@ class AIHuman(AIBase):
                 if EVENT_DATA.is_grenade:
                     self.ai_want_grenade=False
             elif EVENT_DATA.is_handheld_antitank :
-                if self.antitank==None:
-                    if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.antitank=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
-                else:
+                if self.antitank!=None:
                     # drop the current obj and pick up the new one
                     self.handle_drop_object(self.antitank)
-                    self.event_add_inventory(EVENT_DATA)
+                if self.owner.is_player :
+                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                self.antitank=EVENT_DATA
+                EVENT_DATA.ai.equipper=self.owner
                 self.ai_want_antitank=False
             elif EVENT_DATA.is_large_human_pickup :
                 print('ERROR - large pickup should not go through inventory functions')
@@ -1489,6 +1485,7 @@ class AIHuman(AIBase):
         guns=[]
         grenades=[]
         anti_tank=[]
+        gun_magazine=[]
         
         # should handle liquids consumable + fuel
 
@@ -1506,6 +1503,8 @@ class AIHuman(AIBase):
                 grenades.append(b)
             elif b.is_handheld_antitank:
                 anti_tank.append(b)
+            elif b.is_gun_magazine:
+                gun_magazine.append(b)
 
         # grab stuff based on what we want
         take=[]
@@ -1530,9 +1529,30 @@ class AIHuman(AIBase):
             chance=random.randint(1,5)
             if chance==1 and len(CONTAINER.ai.inventory)>0:
                 take.append(CONTAINER.ai.inventory[0])
+        
+        # handle gun magazine decisions
+        if len(gun_magazine)>0:
+            gun=None
 
-        #print('inventory count: '+str(len(CONTAINER.ai.inventory)))
-        #print('loot item count: '+str(len(take)))
+            # check if we are grabbing a gun
+            for b in take:
+                if b.is_gun:
+                    gun=b
+
+            # if not, set it to the gun we have, if we have one
+            if gun==None:
+                if self.primary_weapon!=None:
+                    gun=self.primary_weapon
+
+            # if we have a gun now, grab compatible magazines
+            # only grab 2 magazines though
+            grabbed=0
+            if gun!=None:
+                for b in gun_magazine:
+                    if gun.name in b.ai.compatible_guns:
+                        if grabbed<2:
+                            take.append(b)
+                            grabbed+=1
 
         # take items!
         for c in take:
