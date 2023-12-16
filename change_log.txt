@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+
+----------------------------------
+December 15 2023
+- all objects now have altitude
+- all objects now have a scale modifier based on altitude
+- objects under a minimum visible scale will no longer be rendered 
+
+starting to work on changes to zoom that are necessary to flying. 
+this was a challenge as im adding a 3d element to what was a 2d world. 
+ended up deciding that each object will be capable of setting its own 
+scale modifier relative to the global scale that is set in graphics_engine 
+
+ran into the question of whether altitude should be in vehicle ai or world_object. 
+decided all objects will have altitude -- perhaps this should be the case with a 
+lot of vehicle variables. -- i think to some degree a lot of the physics stuff may 
+drift over to world_object 
+
 ----------------------------------
 December 11 2023
 - ai will now grab up to 2 compatible magazines when looting 

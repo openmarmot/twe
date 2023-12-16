@@ -59,7 +59,8 @@ class AIVehicle(AIBase):
         # ----- instruments ------
 
         # distance between vehicle and ground
-        self.altimeter=0
+        # for now this is replaced by altitude in world_object
+        #self.altimeter=0
 
         # passengers  
         self.passengers=[]
@@ -137,13 +138,13 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_steer_left(self):
         ''' recieve left steering input '''
-        if self.altimeter<1:
+        if self.owner.altitude<1:
             self.wheel_steering=1
     
     #---------------------------------------------------------------------------
     def handle_steer_right(self):
         ''' recieve left steering input '''
-        if self.altimeter<1:
+        if self.owner.altitude<1:
             self.wheel_steering=-1
 
     #---------------------------------------------------------------------------
@@ -185,6 +186,7 @@ class AIVehicle(AIBase):
         if self.primary_weapon!=None:
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
+
     
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
@@ -290,7 +292,10 @@ class AIVehicle(AIBase):
 
 
         # move along vector
-        self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed) 
+        self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+    
+
 
 
 
