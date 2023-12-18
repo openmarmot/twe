@@ -287,6 +287,10 @@ class World(object):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
         #KEY is a key number
+
+        # for now just figure out if we are routing it to 
+        # the menu or the player
+
         #print('key ',KEY)
         if KEY==96:
             self.world_menu.handle_input("tilde")
@@ -319,15 +323,15 @@ class World(object):
         elif KEY==9: #tab
             self.activate_context_menu()
         elif KEY==112: #p
-            self.player.ai.handle_prone_state_change()
+            self.player.ai.handle_keydown('p')
         elif KEY==116: #t
-            self.player.ai.launch_antitank([])
+            self.player.ai.handle_keydown('t')
         elif KEY==103: #g
-            self.player.ai.throw([])
+            self.player.ai.handle_keydown('g')
         elif KEY==98: #b
-            self.player.ai.bleeding=False
+            self.player.ai.handle_keydown('b')
         elif KEY==114: #r
-            self.player.ai.handle_player_reload()
+            self.player.ai.handle_keydown('r')
     #---------------------------------------------------------------------------
     def random_player_spawn(self):
         if len(self.wo_objects_human)>0:

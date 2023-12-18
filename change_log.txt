@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+December 17 2023
+- moved some specific key down handling from world to ai_human 
+- input handling rearrangement to differentiate between airplane/not airplane 
+- created empty functions in ai_vehicle for all the common control surfaces
+
+I bought a steam deck. I will test TWE on in it in the future 
 
 ----------------------------------
 December 15 2023

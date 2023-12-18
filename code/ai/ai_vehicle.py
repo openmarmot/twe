@@ -120,6 +120,22 @@ class AIVehicle(AIBase):
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
     #---------------------------------------------------------------------------
+    def handle_aileron_left(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_aileron_right(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_elevator_up(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_elevator_down(self):
+        pass
+
+    #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
         # EVENT - text describing event
@@ -134,6 +150,22 @@ class AIVehicle(AIBase):
             self.event_remove_inventory(EVENT_DATA)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
+
+    #---------------------------------------------------------------------------
+    def handle_flaps_down(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_flaps_up(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_rudder_left(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def handle_rudder_right(self):
+        pass
 
     #---------------------------------------------------------------------------
     def handle_steer_left(self):
