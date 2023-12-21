@@ -80,13 +80,19 @@ class AIVehicle(AIBase):
         # the current speed
         self.current_speed=0.
 
-        # max speed 
-        self.max_speed=0 # this is max speed at the moment
+        # max speed - this is in game terms and does not have a real world unit at the moment
+        self.max_speed=0 
 
 
         # this is computed. should not be set by anything else
         self.acceleration=0
 
+
+        # rate of climb in meters/second this is computed and can be positive or negative
+        self.rate_of_climb=0
+
+        # max rate of climb in meters/second. vehicle specific 
+        self.max_rate_of_climb=0
         
         self.rotation_speed=0 # max rotation speed
 

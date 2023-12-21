@@ -16,12 +16,6 @@ screen_coords=(x,y) : 0,0 is the upper left coords. centered on player object
 
 --Web Resources----------------------------
 
-# rotation
-http://thepythongamebook.com/en:pygame:step021
-http://stackoverflow.com/questions/7329837/2d-sprite-face-the-direction-its-moving-in-pygame
-
-# move an object in the direction its facing
-https://stackoverflow.com/questions/19355026/move-an-object-in-the-direction-its-facing-using-2d-html5canvas-and-ctx-rotate-f
 
 # font rendering
 https://stackoverflow.com/questions/20842801/how-to-display-text-in-pygame
@@ -30,20 +24,21 @@ https://pygame.readthedocs.io/en/latest/4_text/text.html
 
 
 --Install-----------------------------------
-
+see install_notes.txt
 
 --Design Notes-----------------------------
 
-- small items 
-    - small items will be too small to render. will not exist in world map,
-        only exist in inventories. 
-        example : gun magazines.
 
 - on naming the sides.. -
 In world war 2 were soldiers from the soviet union referred to as russians or soviets?
 The Soviet Union was a multi-ethnic state, and its armed forces included both Russian
  and other nationalities. So during World War II they would have been known collectively
   as "Soviet" rather than just “Russian”.
+
+Units 
+- for now I am using a square foot grid for drawing images 
+- in game units will be metric where possible 
+  - note currently a lot of variables do match real world units 
         
 
 -- python profiling ------------------------------

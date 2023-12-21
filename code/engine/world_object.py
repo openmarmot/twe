@@ -51,8 +51,14 @@ class WorldObject(object):
         # updated by the object AI
         self.world_coords=None
         
-        # considering this altitude (feet) above ground with zero being ground.
+        # altitude above ground in meters
         self.altitude=0
+
+        # - physics stuff -
+        self.weight=0 #kilograms
+        self.rolling_resistance=0.015
+        self.drag_coefficient=0.8
+        self.frontal_area=0 # square meters
 
         # updated automatically by the graphic engine when 
         #   the object is renderable 
@@ -60,6 +66,7 @@ class WorldObject(object):
 
         # rotation_angle - mainly used to rotate the object sprite. in degrees
         self.rotation_angle=0.
+
         # heading is a direction vector used by some objects
         # can be set with math_2d.get_heading_vector
         self.heading=[0,0]
@@ -123,11 +130,7 @@ class WorldObject(object):
         self.collision_radius=5
         
 
-        # - physics stuff -
-        self.weight=0 #kilograms
-        self.rolling_resistance=0.015
-        self.drag_coefficient=0.8
-        self.frontal_area=0 # square meters
+        
 
         # is this used? pretty sure its not 
         self.id = 0
