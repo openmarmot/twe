@@ -58,9 +58,6 @@ class AIVehicle(AIBase):
 
         # ----- instruments ------
 
-        # distance between vehicle and ground
-        # for now this is replaced by altitude in world_object
-        #self.altimeter=0
 
         # passengers  
         self.passengers=[]
@@ -286,7 +283,7 @@ class AIVehicle(AIBase):
             if self.wheel_steering>-0.05:
                 self.wheel_steering=0
 
-
+        # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
         if self.throttle>0:
 
             if self.current_speed<self.max_speed:
@@ -317,6 +314,9 @@ class AIVehicle(AIBase):
         # apply ground "rolling' friction  
 
         # apply air drag
+
+        # adjust altitude
+        self.owner.altitude+=self.rate_of_climb*time_passed
         
         #  reset image if heading has changed 
         if heading_changed:
