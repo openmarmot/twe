@@ -56,6 +56,19 @@ class AIVehicle(AIBase):
         # 1 all the way left -1 all the way right. 0 neutral
         self.wheel_steering=0
 
+
+        # - airplane controls -
+
+        # generally negative is left or down. zero is neutral
+        # except for flaps. flaps up is zero
+
+        self.ailerons=0
+        self.elevator=0
+        self.flaps=0
+        self.rudder=0
+
+
+
         # ----- instruments ------
 
 
@@ -124,19 +137,19 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_aileron_left(self):
-        pass
+        self.ailerons=-1
 
     #---------------------------------------------------------------------------
     def handle_aileron_right(self):
-        pass
+        self.ailerons=1
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
-        pass
+        self.elevator=1
 
     #---------------------------------------------------------------------------
     def handle_elevator_down(self):
-        pass
+        self.elevator=-1
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -156,19 +169,19 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_flaps_down(self):
-        pass
+        self.flaps=1
 
     #---------------------------------------------------------------------------
     def handle_flaps_up(self):
-        pass
+        self.flaps=0
 
     #---------------------------------------------------------------------------
     def handle_rudder_left(self):
-        pass
+        self.rudder=-1
 
     #---------------------------------------------------------------------------
     def handle_rudder_right(self):
-        pass
+        self.rudder=1
 
     #---------------------------------------------------------------------------
     def handle_steer_left(self):
@@ -186,6 +199,11 @@ class AIVehicle(AIBase):
     def handle_steer_neutral(self):
         '''reset steerign to zero'''
         self.wheel_steering=0
+
+    #---------------------------------------------------------------------------
+    def neutral_controls(self):
+        # controls should return to neutral over time 
+        pass
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -217,6 +235,9 @@ class AIVehicle(AIBase):
             self.acceleration=0
 
         self.update_physics()
+
+        # bring controls back to neutral slowly over time
+        self.neutral_controls()
 
         if self.primary_weapon!=None:
             # needs updates for time tracking and other stuff
