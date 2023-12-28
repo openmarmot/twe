@@ -203,7 +203,43 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def neutral_controls(self):
         # controls should return to neutral over time 
-        pass
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        # return wheel to neutral
+        if self.wheel_steering>0:
+            self.wheel_steering-=1*time_passed
+            if self.wheel_steering<0.05:
+                self.wheel_steering=0
+        elif self.wheel_steering<0:
+            self.wheel_steering+=1*time_passed
+            if self.wheel_steering>-0.05:
+                self.wheel_steering=0
+
+        
+        # is this wanted??
+        # return throttle to neutral
+        if self.throttle>0:
+            self.throttle-=1*time_passed
+            if self.throttle<0.05:
+                self.throttle=0
+
+         # aierlons 
+        if self.ailerons>0:
+            self.ailerons-=1*time_passed
+            if self.ailerons<0.05:
+                self.ailerons=0
+        elif self.ailerons<0:
+            self.ailerons+=1*time_passed
+            if self.ailerons>-0.05:
+                self.ailerons=0
+
+        # elevator
+
+
+
+        # rudder       
+
+
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -292,27 +328,12 @@ class AIVehicle(AIBase):
         if rotation_change !=0 and self.current_speed>0:
             self.owner.rotation_angle+=rotation_change
             heading_changed=True
-            
-
-        # slowly zero out wheel steering. force to zero at low values to prevent dither
-        if self.wheel_steering>0:
-            self.wheel_steering-=1*time_passed
-            if self.wheel_steering<0.05:
-                self.wheel_steering=0
-        elif self.wheel_steering<0:
-            self.wheel_steering+=1*time_passed
-            if self.wheel_steering>-0.05:
-                self.wheel_steering=0
-
+                   
         # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
         if self.throttle>0:
 
             if self.current_speed<self.max_speed:
                 self.current_speed+=(self.acceleration*self.throttle)*time_passed
-
-            self.throttle-=1*time_passed
-            if self.throttle<0.05:
-                self.throttle=0
         else:
             # just in case the throttle went negative
             self.throttle=0

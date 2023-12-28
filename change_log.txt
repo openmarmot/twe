@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+December 28 2023
+- some more vehicle code 
+
+----------------------------------
 December 24 2023
 - minor ai_vehicle changess that i forgot to commit last time 
 - added some aviation related variables 
