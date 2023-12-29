@@ -559,6 +559,16 @@ class World(object):
             if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
                 self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.used_volume,2)))
 
+            # airplane specific 
+            if self.player.ai.vehicle.is_airplane:
+                self.vehicle_text_queue.append('altitude: '+str(round(self.player.ai.vehicle.altitude,1)))
+                self.vehicle_text_queue.append('ailerons: '+str(round(self.player.ai.vehicle.ai.ailerons,1)))
+                self.vehicle_text_queue.append('elevator: '+str(round(self.player.ai.vehicle.ai.elevator,1)))
+                self.vehicle_text_queue.append('rudder: '+str(round(self.player.ai.vehicle.ai.rudder,1)))
+                self.vehicle_text_queue.append('flaps: '+str(round(self.player.ai.vehicle.ai.flaps,1)))
+
+
+
 
 
 

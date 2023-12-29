@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+December 29 2023
+- some more vehicle code 
+- added vehicle text readout for airplane controls 
+
 ----------------------------------
 December 28 2023
 - some more vehicle code 

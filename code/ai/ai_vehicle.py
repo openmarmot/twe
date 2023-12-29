@@ -202,43 +202,27 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):
+        ''' return controls to neutral over time'''
+
         # controls should return to neutral over time 
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
-        # return wheel to neutral
-        if self.wheel_steering>0:
-            self.wheel_steering-=1*time_passed
-            if self.wheel_steering<0.05:
-                self.wheel_steering=0
-        elif self.wheel_steering<0:
-            self.wheel_steering+=1*time_passed
-            if self.wheel_steering>-0.05:
-                self.wheel_steering=0
+        #return wheel to neutral
+        self.wheel_steering=engine.math_2d.regress_to_zero(self.wheel_steering,time_passed)
 
         
         # is this wanted??
         # return throttle to neutral
-        if self.throttle>0:
-            self.throttle-=1*time_passed
-            if self.throttle<0.05:
-                self.throttle=0
+        self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
 
          # aierlons 
-        if self.ailerons>0:
-            self.ailerons-=1*time_passed
-            if self.ailerons<0.05:
-                self.ailerons=0
-        elif self.ailerons<0:
-            self.ailerons+=1*time_passed
-            if self.ailerons>-0.05:
-                self.ailerons=0
+        self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)
 
         # elevator
-
-
+        self.elevator=engine.math_2d.regress_to_zero(self.elevator,time_passed)
 
         # rudder       
-
+        self.rudder=engine.math_2d.regress_to_zero(self.rudder,time_passed)
 
 
     #---------------------------------------------------------------------------

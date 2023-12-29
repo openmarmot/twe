@@ -247,6 +247,21 @@ def randomize_position_and_rotation(worldobj,amount=15,):
 	worldobj.world_coords=[w[0]+float(random.randint(-amount,amount)),w[1]+float(random.randint(-amount,amount))]
 	worldobj.rotation_angle=float(random.randint(0,359))
 	worldobj.reset_image=True
+
+
+#------------------------------------------------------------------------------
+def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
+	''' regress a variable to zero over time '''
+	if var>0:
+		var-=1*time_passed
+		if var<dead_zone:
+			var=0
+	elif var<0:
+		var+=1*time_passed
+		if var>-dead_zone:
+			var=0
+
+	return var
 	
 
 
