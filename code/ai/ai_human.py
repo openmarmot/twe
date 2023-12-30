@@ -675,9 +675,13 @@ class AIHuman(AIBase):
                 if(self.owner.world.graphic_engine.keyPressed('a')):
                     self.vehicle.ai.handle_aileron_left()
                     self.vehicle.ai.handle_rudder_left()
+                    if self.owner.altitude<1:
+                        self.vehicle.ai.handle_steer_left()
                 if(self.owner.world.graphic_engine.keyPressed('d')):
                     self.vehicle.ai.handle_aileron_right()
                     self.vehicle.ai.handle_rudder_right()
+                    if self.owner.altitude<1:
+                        self.vehicle.ai.handle_steer_right()
             else:
                 # ---- controls for ground vehicles ------------
 
