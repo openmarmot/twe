@@ -44,16 +44,29 @@ class WorldObject(object):
         # tell graphicsEngine to reset the image (need to rotate, etc)
         self.reset_image=True
 
+        # objects that fly set their own scale relative to their elevation and the global scale
+        # should probably never be negative unless if we start simulating uh holes in the ground
+        self.scale_modifier=0
+
         # updated by the object AI
         self.world_coords=None
+        
+        # altitude above ground in meters
+        self.altitude=0
+
+        # - physics stuff -
+        self.weight=0 #kilograms
+        self.rolling_resistance=0.015
+        self.drag_coefficient=0.8
+        self.frontal_area=0 # square meters
 
         # updated automatically by the graphic engine when 
         #   the object is renderable 
         self.screen_coords=[0.,0.]
 
-
         # rotation_angle - mainly used to rotate the object sprite. in degrees
         self.rotation_angle=0.
+
         # heading is a direction vector used by some objects
         # can be set with math_2d.get_heading_vector
         self.heading=[0,0]
@@ -117,11 +130,7 @@ class WorldObject(object):
         self.collision_radius=5
         
 
-        # - physics stuff -
-        self.weight=0 #kilograms
-        self.rolling_resistance=0.015
-        self.drag_coefficient=0.8
-        self.frontal_area=0 # square meters
+        
 
         # is this used? pretty sure its not 
         self.id = 0
@@ -142,7 +151,24 @@ class WorldObject(object):
 
     def update(self):
             self.ai.update()
+            self.update_scale()
 
     def render_pass_2(self):
         ''' only override if the object needs special additional rendering'''
         pass
+
+    #---------------------------------------------------------------------------
+    def update_scale(self):
+        '''update scale of object relative to world'''
+
+        if self.altitude==0:
+            self.scale_modifier=0
+        else:
+            new_modifier=round(0.001*self.owner.altitude,2)
+            if new_modifier!=self.owner.scale_modifier:
+                self.owner.scale_modifier=new_modifier
+                self.owner.reset_image=True
+
+                # if player or vehicle with player in it ..
+                # theoretically also change the global scale by the amount that it changed
+                # and reset every obj. otherwise the player relative scale will change

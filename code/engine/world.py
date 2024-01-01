@@ -287,6 +287,10 @@ class World(object):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
         #KEY is a key number
+
+        # for now just figure out if we are routing it to 
+        # the menu or the player
+
         #print('key ',KEY)
         if KEY==96:
             self.world_menu.handle_input("tilde")
@@ -319,15 +323,15 @@ class World(object):
         elif KEY==9: #tab
             self.activate_context_menu()
         elif KEY==112: #p
-            self.player.ai.handle_prone_state_change()
+            self.player.ai.handle_keydown('p')
         elif KEY==116: #t
-            self.player.ai.launch_antitank([])
+            self.player.ai.handle_keydown('t')
         elif KEY==103: #g
-            self.player.ai.throw([])
+            self.player.ai.handle_keydown('g')
         elif KEY==98: #b
-            self.player.ai.bleeding=False
+            self.player.ai.handle_keydown('b')
         elif KEY==114: #r
-            self.player.ai.handle_player_reload()
+            self.player.ai.handle_keydown('r')
     #---------------------------------------------------------------------------
     def random_player_spawn(self):
         if len(self.wo_objects_human)>0:
@@ -552,8 +556,19 @@ class World(object):
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
+            self.vehicle_text_queue.append('wheel steering: '+str(round(self.player.ai.vehicle.ai.wheel_steering,1)))
             if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
                 self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.used_volume,2)))
+
+            # airplane specific 
+            if self.player.ai.vehicle.is_airplane:
+                self.vehicle_text_queue.append('altitude: '+str(round(self.player.ai.vehicle.altitude,1)))
+                self.vehicle_text_queue.append('ailerons: '+str(round(self.player.ai.vehicle.ai.ailerons,1)))
+                self.vehicle_text_queue.append('elevator: '+str(round(self.player.ai.vehicle.ai.elevator,1)))
+                self.vehicle_text_queue.append('rudder: '+str(round(self.player.ai.vehicle.ai.rudder,1)))
+                self.vehicle_text_queue.append('flaps: '+str(round(self.player.ai.vehicle.ai.flaps,1)))
+
+
 
 
 

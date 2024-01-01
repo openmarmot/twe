@@ -26,6 +26,15 @@ s - brake
 a - steer left 
 d - steer right 
 
+-airplane-
+w - elevator 
+s - elevator 
+a - aileron roll left + rudder + wheel (if on ground)
+d - aileron roll right + rudder + wheel (if on ground)
+
+left arrow key - throttle down 
+right arrow key - throttle up 
+
 
 [ - zoom in 
 ] - zoom out 

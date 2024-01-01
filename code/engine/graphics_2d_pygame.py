@@ -97,8 +97,11 @@ class Graphics_2D_Pygame(object):
         # max_fps max frames for every second.
         self.max_fps=60
 
-        # scale. normal is 1
+        # scale. normal is 1. this is set by the player with []
         self.scale=1
+        # stuff under this doesn't get rendered
+        self.minimum_visible_scale=0.1 
+
 
         # adjustment to viewing area
         self.view_adjust=0
@@ -195,7 +198,28 @@ class Graphics_2D_Pygame(object):
                 return True
             else:
                 return False
+        elif KEY=='up':
+            if keys[pygame.K_UP]:
+                return True
+            else:
+                return False
+        elif KEY=='down':
+            if keys[pygame.K_DOWN]:
+                return True
+            else:
+                return False
+        elif KEY=='left':
+            if keys[pygame.K_LEFT]:
+                return True
+            else:
+                return False
+        elif KEY=='right':
+            if keys[pygame.K_RIGHT]:
+                return True
+            else:
+                return False
         else:
+            print('keydown error, key is not recognized: ',KEY)
             return False
 
 #------------------------------------------------------------------------------
@@ -211,8 +235,9 @@ class Graphics_2D_Pygame(object):
             for c in b:
                 if c.reset_image:
                     c.reset_image=False
+                    obj_scale=self.scale+c.scale_modifier
                     c.image_size=self.images[c.image_list[c.image_index]].get_size()
-                    c.image_size=[int(c.image_size[0]*self.scale),int(c.image_size[1]*self.scale)]
+                    c.image_size=[int(c.image_size[0]*obj_scale),int(c.image_size[1]*obj_scale)]
                     c.image=self.get_rotated_scaled_image(self.images[c.image_list[c.image_index]],c.image_size,c.rotation_angle)
                     #c.image=self.get_rotated_scaled_image_v2(self.images[c.image_list[c.image_index]],self.scale,c.rotation_angle)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
@@ -303,23 +328,27 @@ class Graphics_2D_Pygame(object):
         for b in self.world.wo_objects:
 
             if b.render:
-                #determine whether object 'b' world_coords are within
-                #the viewport bounding box
-                if(b.world_coords[0]<viewrange_x[0] and
-                    b.world_coords[0]>viewrange_x[1]):
-                    if(b.world_coords[1]<viewrange_y[0] and
-                        b.world_coords[1]>viewrange_y[1]):
-                        #object is within the viewport, add it to the render list
-                        self.renderlists[b.render_level].append(b)
-                        self.renderCount+=1
-                        #apply transform to generate screen coords
+                
+                # check if the relative scale of the object is enough to make it visible
+                if (self.scale+b.scale_modifier)>self.minimum_visible_scale:
 
-                        b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
-                        b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
+                    #determine whether object 'b' world_coords are within
+                    #the viewport bounding box
+                    if(b.world_coords[0]<viewrange_x[0] and
+                        b.world_coords[0]>viewrange_x[1]):
+                        if(b.world_coords[1]<viewrange_y[0] and
+                            b.world_coords[1]>viewrange_y[1]):
+                            #object is within the viewport, add it to the render list
+                            self.renderlists[b.render_level].append(b)
+                            self.renderCount+=1
+                            #apply transform to generate screen coords
 
-                        # honestly can't tell if this is better or not
-                        if self.smooth_jitter:
-                            b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
+                            b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
+                            b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
+
+                            # honestly can't tell if this is better or not
+                            if self.smooth_jitter:
+                                b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
 
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
@@ -388,6 +417,7 @@ class Graphics_2D_Pygame(object):
         center_y=self.screen_size[1]/2
         player_x=self.world.player.world_coords[0]*self.scale
         player_y=self.world.player.world_coords[1]*self.scale
+        
         translate=[center_x-player_x,center_y-player_y]
         return translate
 
@@ -397,7 +427,7 @@ class Graphics_2D_Pygame(object):
         if self.scale>0.2:
             self.scale-=0.1
             self.view_adjust+=500
-            #print('zoom out',self.scale)
+            print('zoom out',self.scale)
             self.reset_all()
 #------------------------------------------------------------------------------
     def zoom_in(self):
@@ -405,7 +435,7 @@ class Graphics_2D_Pygame(object):
         if self.scale<1.1:
             self.scale+=0.1
             self.view_adjust-=500
-            #print('zoom in',self.scale)
+            print('zoom in',self.scale)
             self.reset_all()
 
 

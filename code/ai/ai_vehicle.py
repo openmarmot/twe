@@ -47,6 +47,9 @@ class AIVehicle(AIBase):
         # note - this needs to be propagated to the engines throttle_control variable
         self.throttle=0
 
+        # if true throttle returns to zero slowly
+        self.throttle_zero=True
+
         # brake_power 0 is none 1 is max
         self.brake_power=0
 
@@ -56,10 +59,21 @@ class AIVehicle(AIBase):
         # 1 all the way left -1 all the way right. 0 neutral
         self.wheel_steering=0
 
+
+        # - airplane controls -
+
+        # generally negative is left or down. zero is neutral
+        # except for flaps. flaps up is zero
+
+        self.ailerons=0
+        self.elevator=0
+        self.flaps=0
+        self.rudder=0
+
+
+
         # ----- instruments ------
 
-        # distance between vehicle and ground
-        self.altimeter=0
 
         # passengers  
         self.passengers=[]
@@ -79,13 +93,19 @@ class AIVehicle(AIBase):
         # the current speed
         self.current_speed=0.
 
-        # max speed 
-        self.max_speed=0 # this is max speed at the moment
+        # max speed - this is in game terms and does not have a real world unit at the moment
+        self.max_speed=0 
 
 
         # this is computed. should not be set by anything else
         self.acceleration=0
 
+
+        # rate of climb in meters/second this is computed and can be positive or negative
+        self.rate_of_climb=0
+
+        # max rate of climb in meters/second. vehicle specific 
+        self.max_rate_of_climb=0
         
         self.rotation_speed=0 # max rotation speed
 
@@ -119,6 +139,22 @@ class AIVehicle(AIBase):
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
     #---------------------------------------------------------------------------
+    def handle_aileron_left(self):
+        self.ailerons=-1
+
+    #---------------------------------------------------------------------------
+    def handle_aileron_right(self):
+        self.ailerons=1
+
+    #---------------------------------------------------------------------------
+    def handle_elevator_up(self):
+        self.elevator=1
+
+    #---------------------------------------------------------------------------
+    def handle_elevator_down(self):
+        self.elevator=-1
+
+    #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
         # EVENT - text describing event
@@ -135,21 +171,77 @@ class AIVehicle(AIBase):
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
     #---------------------------------------------------------------------------
+    def handle_flaps_down(self):
+        self.flaps=1
+
+    #---------------------------------------------------------------------------
+    def handle_flaps_up(self):
+        self.flaps=0
+
+    #---------------------------------------------------------------------------
+    def handle_rudder_left(self):
+        self.rudder=-1
+
+    #---------------------------------------------------------------------------
+    def handle_rudder_right(self):
+        self.rudder=1
+
+    #---------------------------------------------------------------------------
     def handle_steer_left(self):
         ''' recieve left steering input '''
-        if self.altimeter<1:
+        if self.owner.altitude<1:
             self.wheel_steering=1
     
     #---------------------------------------------------------------------------
     def handle_steer_right(self):
         ''' recieve left steering input '''
-        if self.altimeter<1:
+        if self.owner.altitude<1:
             self.wheel_steering=-1
 
     #---------------------------------------------------------------------------
     def handle_steer_neutral(self):
         '''reset steerign to zero'''
         self.wheel_steering=0
+
+    #---------------------------------------------------------------------------
+    def handle_throttle_up(self):
+        '''adjust the throttle a bit over time'''
+        self.throttle+=1*self.owner.world.graphic_engine.time_passed_seconds
+        if self.throttle>1:
+            self.throttle=1
+
+    #---------------------------------------------------------------------------
+    def handle_throttle_down(self):
+        '''adjust the throttle a bit over time'''
+        self.throttle-=1*self.owner.world.graphic_engine.time_passed_seconds
+        if self.throttle<0:
+            self.throttle=0
+
+    #---------------------------------------------------------------------------
+    def neutral_controls(self):
+        ''' return controls to neutral over time'''
+
+        # controls should return to neutral over time 
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        #return wheel to neutral
+        self.wheel_steering=engine.math_2d.regress_to_zero(self.wheel_steering,time_passed)
+
+        
+        # is this wanted??
+        # return throttle to neutral
+        if self.throttle_zero:
+            self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
+
+         # aierlons 
+        self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)
+
+        # elevator
+        self.elevator=engine.math_2d.regress_to_zero(self.elevator,time_passed)
+
+        # rudder       
+        self.rudder=engine.math_2d.regress_to_zero(self.rudder,time_passed)
+
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -182,9 +274,13 @@ class AIVehicle(AIBase):
 
         self.update_physics()
 
+        # bring controls back to neutral slowly over time
+        self.neutral_controls()
+
         if self.primary_weapon!=None:
             # needs updates for time tracking and other stuff
             self.primary_weapon.update()
+
     
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
@@ -234,27 +330,12 @@ class AIVehicle(AIBase):
         if rotation_change !=0 and self.current_speed>0:
             self.owner.rotation_angle+=rotation_change
             heading_changed=True
-            
-
-        # slowly zero out wheel steering. force to zero at low values to prevent dither
-        if self.wheel_steering>0:
-            self.wheel_steering-=1*time_passed
-            if self.wheel_steering<0.05:
-                self.wheel_steering=0
-        elif self.wheel_steering<0:
-            self.wheel_steering+=1*time_passed
-            if self.wheel_steering>-0.05:
-                self.wheel_steering=0
-
-
+                   
+        # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
         if self.throttle>0:
 
             if self.current_speed<self.max_speed:
                 self.current_speed+=(self.acceleration*self.throttle)*time_passed
-
-            self.throttle-=1*time_passed
-            if self.throttle<0.05:
-                self.throttle=0
         else:
             # just in case the throttle went negative
             self.throttle=0
@@ -277,6 +358,9 @@ class AIVehicle(AIBase):
         # apply ground "rolling' friction  
 
         # apply air drag
+
+        # adjust altitude
+        self.owner.altitude+=self.rate_of_climb*time_passed
         
         #  reset image if heading has changed 
         if heading_changed:
@@ -290,7 +374,10 @@ class AIVehicle(AIBase):
 
 
         # move along vector
-        self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed) 
+        self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+    
+
 
 
 

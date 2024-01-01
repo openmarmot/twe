@@ -549,6 +549,32 @@ class AIHuman(AIBase):
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
     #-----------------------------------------------------------------------
+    def handle_keydown(self,key):
+        ''' handle keydown passed from world.handle_keydown'''
+        # this is a one off key press, not press and hold
+        # world.handle_keydown will pass the key as the actual keyboard letter
+
+        if self.in_vehicle:
+            if self.vehicle.is_airplane:
+                if key=='p':
+                    self.handle_exit_vehicle()
+                    self.speak('bailing out!')
+                    # note - physics needs to be udpdate to handle falling
+        else:
+            # controls for when you are walking about
+
+            if key=='b':
+                self.bleeding=False
+            elif key=='g':
+                self.throw([])
+            elif key=='p':
+                self.handle_prone_state_change()
+            elif key=='r':
+                self.handle_player_reload()
+            elif key=='t':
+                self.launch_antitank([])
+
+    #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):
         ''' normal AI thinking method '''
         # this is basically a thinking state - check the current progress on whatever 
@@ -640,39 +666,67 @@ class AIHuman(AIBase):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
+            if self.vehicle.is_airplane:
+                # ---- controls for airplanes ------------
+                if(self.owner.world.graphic_engine.keyPressed('w')):
+                    self.vehicle.ai.handle_elevator_up()
+                if(self.owner.world.graphic_engine.keyPressed('s')):
+                    self.vehicle.ai.handle_elevator_down()
+                if(self.owner.world.graphic_engine.keyPressed('a')):
+                    self.vehicle.ai.handle_aileron_left()
+                    self.vehicle.ai.handle_rudder_left()
+                    if self.owner.altitude<1:
+                        self.vehicle.ai.handle_steer_left()
+                if(self.owner.world.graphic_engine.keyPressed('d')):
+                    self.vehicle.ai.handle_aileron_right()
+                    self.vehicle.ai.handle_rudder_right()
+                    if self.owner.altitude<1:
+                        self.vehicle.ai.handle_steer_right()
+                if(self.owner.world.graphic_engine.keyPressed('up')):
+                    print('up')
+                if(self.owner.world.graphic_engine.keyPressed('down')):
+                    print('down')
+                if(self.owner.world.graphic_engine.keyPressed('left')):
+                    self.vehicle.ai.handle_throttle_down()
+                if(self.owner.world.graphic_engine.keyPressed('right')):
+                    self.vehicle.ai.handle_throttle_up()
+            else:
+                # ---- controls for ground vehicles ------------
 
-            if(self.owner.world.graphic_engine.keyPressed('w')):
-                self.vehicle.ai.throttle=1
-                self.vehicle.ai.brake_power=0
+                if(self.owner.world.graphic_engine.keyPressed('w')):
+                    self.vehicle.ai.throttle=1
+                    self.vehicle.ai.brake_power=0
 
-            if(self.owner.world.graphic_engine.keyPressed('s')):
-                self.vehicle.ai.brake_power=1
-                self.vehicle.ai.throttle=0
+                if(self.owner.world.graphic_engine.keyPressed('s')):
+                    self.vehicle.ai.brake_power=1
+                    self.vehicle.ai.throttle=0
 
-            if(self.owner.world.graphic_engine.keyPressed('a')):
-                self.vehicle.ai.handle_steer_left()
+                if(self.owner.world.graphic_engine.keyPressed('a')):
+                    self.vehicle.ai.handle_steer_left()
 
-            if(self.owner.world.graphic_engine.keyPressed('d')):
-                self.vehicle.ai.handle_steer_right()
+                if(self.owner.world.graphic_engine.keyPressed('d')):
+                    self.vehicle.ai.handle_steer_right()
 
-            if(self.owner.world.graphic_engine.keyPressed('f')):
-                #print('pew!')
-                # fire the gun
-                if self.vehicle.ai.gunner==self.owner:
-                    if self.vehicle.ai.primary_weapon!=None:
-                        self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
-                    else:
-                        print('no vehicle weapon')
-                        # fire our own weapon
-                        if self.primary_weapon!=None:
-                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
+                if(self.owner.world.graphic_engine.keyPressed('f')):
+                    #print('pew!')
+                    # fire the gun
+                    if self.vehicle.ai.gunner==self.owner:
+                        if self.vehicle.ai.primary_weapon!=None:
+                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
                         else:
-                            print('no vehicle gun, no personal gun')
-                else:
-                    print('you arent the gunner!')
-
+                            print('no vehicle weapon')
+                            # fire our own weapon
+                            if self.primary_weapon!=None:
+                                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
+                            else:
+                                print('no vehicle gun, no personal gun')
+                    else:
+                        print('you arent the gunner!')
 
         else:
+
+            # ---- controls for walking around ------------
+
             action=False
             speed=self.get_calculated_speed()
             if(self.owner.world.graphic_engine.keyPressed('w')):

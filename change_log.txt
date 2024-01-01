@@ -1,5 +1,70 @@
 TWE Project : Change Log
 
+
+----------------------------------
+December 31 2023
+- added arrow keys in as recognized keys 
+- airplane wheel steering on the ground with [a] [d]
+- airplane throttle [left arrow] [right arrow]
+
+----------------------------------
+December 29 2023
+- some more vehicle code 
+- added vehicle text readout for airplane controls 
+
+----------------------------------
+December 28 2023
+- some more vehicle code 
+
+----------------------------------
+December 24 2023
+- minor ai_vehicle changess that i forgot to commit last time 
+- added some aviation related variables 
+
+----------------------------------
+December 20 2023
+- added rate_of_climb (meters/second)
+- general fussing about with vehicle class 
+
+the general lack of units in this game is starting to be a challenge..
+i think my last game engine had some concept of the relationship between a square 
+meter and the game units that equaled it - but I don't remember any specifics 
+
+decided to use metric values going forward for units whenever possible. 
+this makes sense given the setting.
+
+some variables like speed and acceleration are not in real world units. 
+that will need to change at some point I imagine. 
+
+One interesting thing is that this game is currently 2d so altitude is going to be 
+made up in a different way from x/y changes. It kinda makes me think that this really 
+should have just been a 3d game engine with a top down perspective or something - but 
+that might have been odd looking 
+
+----------------------------------
+December 17 2023
+- moved some specific key down handling from world to ai_human 
+- input handling rearrangement to differentiate between airplane/not airplane 
+- created empty functions in ai_vehicle for all the common control surfaces
+
+I bought a steam deck. I will test TWE on in it in the future 
+
+----------------------------------
+December 15 2023
+- all objects now have altitude
+- all objects now have a scale modifier based on altitude
+- objects under a minimum visible scale will no longer be rendered 
+
+starting to work on changes to zoom that are necessary to flying. 
+this was a challenge as im adding a 3d element to what was a 2d world. 
+ended up deciding that each object will be capable of setting its own 
+scale modifier relative to the global scale that is set in graphics_engine 
+
+ran into the question of whether altitude should be in vehicle ai or world_object. 
+decided all objects will have altitude -- perhaps this should be the case with a 
+lot of vehicle variables. -- i think to some degree a lot of the physics stuff may 
+drift over to world_object 
+
 ----------------------------------
 December 11 2023
 - ai will now grab up to 2 compatible magazines when looting 
