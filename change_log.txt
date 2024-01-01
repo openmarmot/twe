@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ----------------------------------
+December 31 2023
+- added arrow keys in as recognized keys 
+- airplane wheel steering on the ground with [a] [d]
+- airplane throttle [left arrow] [right arrow]
+
+----------------------------------
 December 29 2023
 - some more vehicle code 
 - added vehicle text readout for airplane controls 

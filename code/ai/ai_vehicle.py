@@ -47,6 +47,9 @@ class AIVehicle(AIBase):
         # note - this needs to be propagated to the engines throttle_control variable
         self.throttle=0
 
+        # if true throttle returns to zero slowly
+        self.throttle_zero=True
+
         # brake_power 0 is none 1 is max
         self.brake_power=0
 
@@ -201,6 +204,20 @@ class AIVehicle(AIBase):
         self.wheel_steering=0
 
     #---------------------------------------------------------------------------
+    def handle_throttle_up(self):
+        '''adjust the throttle a bit over time'''
+        self.throttle+=1*self.owner.world.graphic_engine.time_passed_seconds
+        if self.throttle>1:
+            self.throttle=1
+
+    #---------------------------------------------------------------------------
+    def handle_throttle_down(self):
+        '''adjust the throttle a bit over time'''
+        self.throttle-=1*self.owner.world.graphic_engine.time_passed_seconds
+        if self.throttle<0:
+            self.throttle=0
+
+    #---------------------------------------------------------------------------
     def neutral_controls(self):
         ''' return controls to neutral over time'''
 
@@ -213,7 +230,8 @@ class AIVehicle(AIBase):
         
         # is this wanted??
         # return throttle to neutral
-        self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
+        if self.throttle_zero:
+            self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
 
          # aierlons 
         self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)

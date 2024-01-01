@@ -198,7 +198,28 @@ class Graphics_2D_Pygame(object):
                 return True
             else:
                 return False
+        elif KEY=='up':
+            if keys[pygame.K_UP]:
+                return True
+            else:
+                return False
+        elif KEY=='down':
+            if keys[pygame.K_DOWN]:
+                return True
+            else:
+                return False
+        elif KEY=='left':
+            if keys[pygame.K_LEFT]:
+                return True
+            else:
+                return False
+        elif KEY=='right':
+            if keys[pygame.K_RIGHT]:
+                return True
+            else:
+                return False
         else:
+            print('keydown error, key is not recognized: ',KEY)
             return False
 
 #------------------------------------------------------------------------------

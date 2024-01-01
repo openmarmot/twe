@@ -682,6 +682,14 @@ class AIHuman(AIBase):
                     self.vehicle.ai.handle_rudder_right()
                     if self.owner.altitude<1:
                         self.vehicle.ai.handle_steer_right()
+                if(self.owner.world.graphic_engine.keyPressed('up')):
+                    print('up')
+                if(self.owner.world.graphic_engine.keyPressed('down')):
+                    print('down')
+                if(self.owner.world.graphic_engine.keyPressed('left')):
+                    self.vehicle.ai.handle_throttle_down()
+                if(self.owner.world.graphic_engine.keyPressed('right')):
+                    self.vehicle.ai.handle_throttle_up()
             else:
                 # ---- controls for ground vehicles ------------
 
