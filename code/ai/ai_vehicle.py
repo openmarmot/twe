@@ -48,6 +48,7 @@ class AIVehicle(AIBase):
         self.throttle=0
 
         # if true throttle returns to zero slowly
+        # should generally be true for cars and false for planes
         self.throttle_zero=True
 
         # brake_power 0 is none 1 is max
@@ -210,12 +211,18 @@ class AIVehicle(AIBase):
         if self.throttle>1:
             self.throttle=1
 
+        if self.throttle_zero:
+            print('Warning - throttle_zero interferes with throttle up')
+
     #---------------------------------------------------------------------------
     def handle_throttle_down(self):
         '''adjust the throttle a bit over time'''
         self.throttle-=1*self.owner.world.graphic_engine.time_passed_seconds
         if self.throttle<0:
             self.throttle=0
+
+        if self.throttle_zero:
+            print('Warning - throttle_zero interferes with throttle up')
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):
