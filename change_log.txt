@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 01 2024 
+- added a warning if throttle_zero is enabled and a throttle_up/down function is used 
+
+controls going back to neutral over time is something interesting to think about. 
+I think in a car and to some degree a plane you expect controls to kind of go back to zero. 
+In a car the gas goes to zero and the brake goes to zero, but in a airplane you set the throttle 
+and expect it to stay. this will come up again when i program flight ai.
+
+vehicles coast for way too long when throttle is neutral. need to add more friction 
+
+----------------------------------
 December 31 2023
 - added arrow keys in as recognized keys 
 - airplane wheel steering on the ground with [a] [d]

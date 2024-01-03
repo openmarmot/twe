@@ -1497,6 +1497,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.max_speed=500
         z.ai.rotation_speed=50
         z.ai.acceleration=100
+        z.ai.throttle_zero=False
         z.render_level=3
         z.collision_radius=200
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
