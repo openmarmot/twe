@@ -367,8 +367,10 @@ def generate_clutter(WORLD):
             spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
         elif chance==4:
             spawn_object(WORLD,coords,'red_bicycle',True)
-        elif chance==5 or chance==6 or chance==7:
+        elif chance==5 or chance==6:
             spawn_object(WORLD,coords,'brown_chair',True)
+        elif chance==7 or chance==8:
+            spawn_object(WORLD,coords,'cupboard',True)
 
     # supply drop 
     chance=random.randint(0,10)
@@ -598,6 +600,7 @@ def load_images(world):
 
     # furniture 
     world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
+    world.graphic_engine.loadImage('brown_chair','images/furniture/cupboard.png')
 
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
@@ -1012,6 +1015,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='small_crate'
         z.collision_radius=20
         z.world_builder_identity='small_crate'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='cupboard':
+        z=WorldObject(WORLD,['cupboard'],AIContainer)
+        z.is_object_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='cupboard'
+        z.collision_radius=20
+        z.world_builder_identity='cupboard'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':

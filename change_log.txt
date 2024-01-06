@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 06 2024 
+- added cupboard
+- added blue coffee cup 
+
+I think liquid containers are going to have to change a bit. you should be able to put a solid in a liquid container if you want. 
+maybe regular containers get a volume and the code is merged with liquid container code 
 
 ----------------------------------
 Jan 01 2024 
