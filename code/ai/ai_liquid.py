@@ -1,10 +1,10 @@
 
 '''
-module : ai_none.py
+module : ai_liquid.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
-notes :
+notes : special characteristics for a liquid
 '''
 
 
@@ -21,6 +21,9 @@ from ai.ai_base import AIBase
 class AINone(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
+
+        # string set on creation. gas/diesel/water/etc 
+        self.liquid_type=None
 
     #---------------------------------------------------------------------------
     def update(self):

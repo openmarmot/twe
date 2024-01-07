@@ -61,6 +61,8 @@ list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
+list_household_items=['blue_coffee_cup']
+
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','1911','k43','g41w']
@@ -567,6 +569,8 @@ def load_images(world):
     world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
     world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
     world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
+    world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
+    world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -962,6 +966,23 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='german_fuel_can'
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='blue_coffee_cup':
+        z=WorldObject(WORLD,['blue_coffee_cup'],AILiquidContainer)
+        z.is_object_container=False # going to be something special
+        z.is_liquid_container=True
+        z.is_large_human_pickup=True
+        z.ai.total_volume=0.3
+        z.ai.used_volume=0
+        z.ai.liquid_type=None
+        z.ai.health_effect=0
+        z.ai.hunger_effect=0
+        z.ai.thirst_effect=0
+        z.ai.fatigue_effect=0  
+        z.render_level=2
+        z.name='blue_coffee_cup'
+        z.world_builder_identity='blue_coffee_cup'
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='55_gallon_drum':
         z=WorldObject(WORLD,['55_gallon_drum'],AILiquidContainer)
         z.is_liquid_container=True
@@ -1025,6 +1046,21 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='cupboard'
         z.collision_radius=20
         z.world_builder_identity='cupboard'
+        z.rotation_angle=float(random.randint(0,359))
+
+        if random.randint(0,1)==1:
+            z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
+            z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+
+
+    elif OBJECT_TYPE=='coffee_tin':
+        z=WorldObject(WORLD,['coffee_tin'],AIContainer)
+        z.is_object_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='coffee_tin'
+        z.collision_radius=20
+        z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':

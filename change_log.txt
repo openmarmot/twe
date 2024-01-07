@@ -1,9 +1,24 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 07 2024 
+- added coffee tin 
+- world_object gets volume
+- world_object gets state of matter (is_liquid/is_solid/is_gas)
+
+it made sense to move volume from liquid container to world object.
+Not sure how much it will be used at the moment but it adds flexibility 
+
+started rewrite merging liquid_container code into container 
+
+NOTE - this is a breaking change
+
 ----------------------------------
 Jan 06 2024 
 - added cupboard
 - added blue coffee cup 
+- added some random spawn to cupboard at 50% chance 
 
 I think liquid containers are going to have to change a bit. you should be able to put a solid in a liquid container if you want. 
 maybe regular containers get a volume and the code is merged with liquid container code 
