@@ -48,6 +48,25 @@ class AIContainer(AIBase):
         # check if leaking 
 
         # check if contaminated 
+        if not self.contaminated:
+            liquid=False
+            liquid_count=0
+            solid=False
+            for b in self.inventory:
+                if b.is_liquid:
+                    liquid=True
+                    liquid_count+=1
+                elif b.is_solid:
+                    solid=True
+            
+            if liquid_count>1:
+                self.contaminated=True
+            if liquid==True and solid==True:
+                self.contaminated=True
+
+            # apply contamination to inventory objects
+            if self.contaminated:
+                pass
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
