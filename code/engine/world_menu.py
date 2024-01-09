@@ -86,8 +86,6 @@ class World_Menu(object):
             self.airplane_menu(Key)
         elif self.active_menu=='death':
             self.death_menu(Key)
-        elif self.active_menu=='liquid_container':
-            self.liquid_container_menu(Key)
         elif self.active_menu=='consumable':
             self.consumable_menu(Key)
         elif self.active_menu=='fuel':
@@ -116,7 +114,7 @@ class World_Menu(object):
             elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
                 self.active_menu='gun'
                 self.gun_menu(None)
-            elif SELECTED_OBJECT.is_object_container:
+            elif SELECTED_OBJECT.is_container:
                 self.active_menu='storage'
                 self.storage_menu(None)
             elif SELECTED_OBJECT.is_human:
@@ -127,9 +125,6 @@ class World_Menu(object):
                 #self.airplane_menu(None)
                 self.active_menu='vehicle'
                 self.vehicle_menu(None)
-            elif SELECTED_OBJECT.is_liquid_container:
-                self.active_menu='liquid_container'
-                self.liquid_container_menu(None)
             elif SELECTED_OBJECT.is_consumable:
                 self.active_menu='consumable'
                 self.consumable_menu(None)
@@ -343,7 +338,7 @@ class World_Menu(object):
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
-        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+str(self.world.player.ai.large_pickup.ai.used_volume)+self.world.player.ai.large_pickup.ai.liquid_type)
+        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ "not implemented"
         self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
         self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
         self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
@@ -493,30 +488,6 @@ class World_Menu(object):
                 self.deactivate_menu()
     
     #---------------------------------------------------------------------------
-    def liquid_container_menu(self, Key):
-        if self.menu_state=='none':
-            distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            if self.world.debug_mode==True:
-                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
-            if distance<self.max_menu_distance:  
-                self.world.graphic_engine.menu_text_queue.append('Contents : '+self.selected_object.ai.liquid_type)
-                self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.used_volume)+' liters')
-                if self.selected_object.ai.contaminated:
-                    self.world.graphic_engine.menu_text_queue.append('Liquid is contaminated')
-                self.world.graphic_engine.menu_text_queue.append('1 - Drink')
-                self.world.graphic_engine.menu_text_queue.append('2 - Pick up')
-                self.menu_state='base'
-        if self.menu_state=='base':
-            if Key=='1':
-                self.world.player.ai.handle_drink(self.selected_object)
-                self.deactivate_menu()
-            elif Key=='2':
-                self.world.player.ai.handle_pickup_object(self.selected_object)
-                self.deactivate_menu()
-
-    #---------------------------------------------------------------------------
     def start_menu(self, Key):
         if self.menu_state=='none':
             self.world.is_paused=False
@@ -661,8 +632,8 @@ class World_Menu(object):
         if self.menu_state=='external':
             fuel_option=False
             if self.world.player.ai.large_pickup!=None:
-                if self.world.player.ai.large_pickup.is_liquid_container:
-                    fuel_option=True
+                # this is where it used to check if it was a fuel can with fuel
+                pass
             primaryWeapon='None'
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name
@@ -740,10 +711,6 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            if len(self.selected_object.ai.fuel_tanks)>0:
-                # this is a bit of a hack and should be re-done. fuel type should be from engine. vol should be sum of tanks
-                self.world.graphic_engine.menu_text_queue.append('fuel type: '+self.selected_object.ai.fuel_tanks[0].ai.liquid_type)
-                self.world.graphic_engine.menu_text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel_tanks[0].ai.used_volume))
             self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
             if len(self.selected_object.ai.engines)>0:

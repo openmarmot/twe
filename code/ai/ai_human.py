@@ -252,9 +252,6 @@ class AIHuman(AIBase):
                 print('ERROR - large pickup should not go through inventory functions')
             elif EVENT_DATA.is_consumable:
                 self.ai_want_food=False
-            elif EVENT_DATA.is_liquid_container:
-                # this is terrible as this could be non consumable
-                self.ai_want_drink=False
             elif EVENT_DATA.is_medical:
                 self.ai_want_medical=False
         else:
@@ -446,25 +443,8 @@ class AIHuman(AIBase):
             self.owner.world.world_menu.handle_input('none')
 
     #---------------------------------------------------------------------------
-    def handle_drink(self,LIQUID_CONTAINER):
-        #LIQUID_CONTAINER world object with ai_liquid_container
-        if LIQUID_CONTAINER.ai.used_volume>0:
-            if LIQUID_CONTAINER.ai.used_volume>1:
-                LIQUID_CONTAINER.ai.used_volume-=1;
-            else:
-                # <1 liter left. just drink it all
-                LIQUID_CONTAINER.ai.used_volume=0
-
-            self.health+=LIQUID_CONTAINER.ai.health_effect
-            self.hunger+=LIQUID_CONTAINER.ai.hunger_effect
-            self.thirst+=LIQUID_CONTAINER.ai.thirst_effect
-            self.fatigue+=LIQUID_CONTAINER.ai.fatigue_effect
-
-            self.speak('drinking some '+LIQUID_CONTAINER.ai.liquid_type)
-
-            # somehow this killed us. add a death description
-            if self.health<1:
-                self.last_collision_description = 'over consumption of '+LIQUID_CONTAINER.ai.liquid_type
+    def handle_drink(self,LIQUID):
+        print('drinking no longer implemented')
 
     #---------------------------------------------------------------------------
     def handle_drop_object(self,OBJECT_TO_DROP):
@@ -857,7 +837,7 @@ class AIHuman(AIBase):
                 pass
             elif self.target_object.is_gun_magazine:
                 pass
-            elif self.target_object.is_object_container:
+            elif self.target_object.is_container:
                 pass
 
             # for now just cheat 
@@ -869,16 +849,17 @@ class AIHuman(AIBase):
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
         
-        # liquid container to vehicle 
-        if FROM_OBJECT.is_liquid_container and TO_OBJECT.is_vehicle:
-            source_amount=FROM_OBJECT.ai.used_volume
-            destination_amount=TO_OBJECT.ai.fuel
-            destination_maximum=TO_OBJECT.ai.fuel_capacity
-            source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
-            FROM_OBJECT.ai.used_volume=source_result
-            TO_OBJECT.ai.fuel=destination_result
-        else:
-            print('handle_transfer error: src/dest not recognized!')
+        print('transfers not currently implemented')
+
+        #if FROM_OBJECT.is_liquid_container and TO_OBJECT.is_vehicle:
+        #    source_amount=FROM_OBJECT.ai.used_volume
+        #    destination_amount=TO_OBJECT.ai.fuel
+        #    destination_maximum=TO_OBJECT.ai.fuel_capacity
+        #    source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
+        #    FROM_OBJECT.ai.used_volume=source_result
+        #    TO_OBJECT.ai.fuel=destination_result
+        #else:
+        #    print('handle_transfer error: src/dest not recognized!')
 
     #-----------------------------------------------------------------------
     def handle_vehicle_died(self):
@@ -1111,7 +1092,7 @@ class AIHuman(AIBase):
         if NEAR:
             distance=500
 
-        item=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_object_container,distance) 
+        item=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_container,distance) 
 
         if item==None:
             return False

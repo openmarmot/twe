@@ -313,7 +313,8 @@ class AIVehicle(AIBase):
                 fuel=0
                 for c in self.fuel_tanks:
                     if fuel<b.ai.fuel_consumed:
-                        c.ai.used_volume,fuel=engine.math_2d.get_transfer_results(c.ai.used_volume,fuel,b.ai.fuel_consumed)
+                        print('booop')
+                        #c.ai.used_volume,fuel=engine.math_2d.get_transfer_results(c.ai.used_volume,fuel,b.ai.fuel_consumed)
 
                 # give the fuel we got from the tanks to the engine
                 # if the engine doesn't get enough fuel it will eventuall shut off

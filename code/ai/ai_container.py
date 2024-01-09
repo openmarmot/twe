@@ -37,9 +37,10 @@ class AIContainer(AIBase):
         # decimal percent. 0 is none, 1 is uh maximum puncture
         self.punctured_percent=0
 
+        # this is in the base object
         # these are in liters 
-        self.total_volume = 0
-        self.used_volume = 0 # filled volume
+        #self.total_volume = 0
+        #self.used_volume = 0 # filled volume
 
     #---------------------------------------------------------------------------
     def update(self):

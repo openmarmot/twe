@@ -22,11 +22,14 @@ class AINone(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
-        # string set on creation. gas/diesel/water/etc 
-        self.liquid_type=None
+
 
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+
+        # evaporate
+
+        # leak 
 
     #---------------------------------------------------------------------------

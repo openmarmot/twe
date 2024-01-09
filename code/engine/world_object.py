@@ -55,7 +55,7 @@ class WorldObject(object):
         self.altitude=0
 
         # - physics stuff -
-        self.volume=0 # liters
+        self.volume=0 # liters. for containers this is considered max vol, or max holding capacity
         self.weight=0 #kilograms
         self.rolling_resistance=0.015
         self.drag_coefficient=0.8
@@ -98,8 +98,7 @@ class WorldObject(object):
 
         self.is_large_human_pickup=False # fills a large pickup slot
         
-        self.is_object_container=False # object that stores other objects
-        self.is_liquid_container=False # water/gas/diesel/??  stores liquid NOT world_objects
+        self.is_container=False # object that stores other objects
         self.is_ammo_container=False # contains ammo 
         self.is_projectile=False
         self.is_consumable=False

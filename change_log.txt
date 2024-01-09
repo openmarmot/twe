@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 08 2024 
+- more container work 
+- added small_clear_spill sprite
+- added gas as a world object
+
+I've renamed some things now that there is only one type of container. 
+
+world_menu will have to be re-done to handle the new system. basically everything that can hold other objects that isn't a special 
+thing is a container - including the old ammo containers, liquid containers, and object containers 
+
+once i'm through with this I should do the same for ammo_container. 
+A ammo_container is just a container with ammo in it. No reason to have its own class  
+
+
+----------------------------------
 Jan 07 2024 
 - added coffee tin 
 - world_object gets volume
