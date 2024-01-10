@@ -1,5 +1,8 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 09 2024 
+- more container work 
 
 ----------------------------------
 Jan 08 2024 
@@ -14,7 +17,6 @@ thing is a container - including the old ammo containers, liquid containers, and
 
 once i'm through with this I should do the same for ammo_container. 
 A ammo_container is just a container with ammo in it. No reason to have its own class  
-
 
 ----------------------------------
 Jan 07 2024 
