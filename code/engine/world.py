@@ -552,8 +552,6 @@ class World(object):
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
             self.vehicle_text_queue.append('wheel steering: '+str(round(self.player.ai.vehicle.ai.wheel_steering,1)))
-            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
-                self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.used_volume,2)))
 
             # airplane specific 
             if self.player.ai.vehicle.is_airplane:

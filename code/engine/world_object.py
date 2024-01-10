@@ -55,7 +55,9 @@ class WorldObject(object):
         self.altitude=0
 
         # - physics stuff -
-        self.volume=0 # liters. for containers this is considered max vol, or max holding capacity
+        # for containers this is the max volume / max capacity
+        # for liquids and most other things this is the current actual volume
+        self.volume=0 # liters.
         self.weight=0 #kilograms
         self.rolling_resistance=0.015
         self.drag_coefficient=0.8

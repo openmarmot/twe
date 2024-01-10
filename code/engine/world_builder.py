@@ -1628,7 +1628,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
         z.render_level=2
         z.name='Volkswagen Type 82 Engine'
-        z.ai.fuel_type='gas'
+        z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=25277.9
         z.rotation_angle=float(random.randint(0,359)) 
@@ -1655,7 +1655,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=350.
         z.is_projectile=True
         z.render_level=3
-        #z.ai.projectile_type=PROJECTILE_TYPE
     elif OBJECT_TYPE=='gas_80_octane':
         z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
         z.name='gas_80_octane'
