@@ -349,6 +349,16 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
     else:
         print('ERROR ! : Faction not recognized in world_builder.create_squad()')
             
+#------------------------------------------------------------------------------
+def fill_container(WORLD,CONTAINER,FILL_NAME):
+    ''' fill container with an object (liquid)'''
+    # CONTAINER - should be empty
+    # FILL_NAME - name of object (liquid) to fill the container with 
+
+    fill=spawn_object(WORLD,[0,0]],FILL_NAME,False)
+    fill.volume=CONTAINER.volume
+    CONTAINER.ai.inventory.append(fill)
+
 
 #------------------------------------------------------------------------------
 def generate_clutter(WORLD):
@@ -1481,6 +1491,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
         if random.randint(0,3)==1:
@@ -1531,6 +1542,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
 
     # this is only used briefly until the player picks a spawn type
