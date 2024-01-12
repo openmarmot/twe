@@ -21,8 +21,8 @@ class AIEngine(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
         
-        # gas / diesel / jet fuel?
-        self.fuel_type = None
+        # list of acceptable fuels
+        self.fuel_type = []
 
         # fuel consumptuion as liters per second
         self.fuel_consumption_rate=0

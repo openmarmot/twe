@@ -26,9 +26,48 @@ class AIContainer(AIBase):
 
         self.inventory=[]
 
+        # contaminated if liquid_type isn't the same as what is added
+        self.contaminated = False
+
+        # self sealing fuel tanks should be relatively uncommon
+        self.self_sealing= False
+
+        self.punctured=False
+        
+        # decimal percent. 0 is none, 1 is uh maximum puncture
+        self.punctured_percent=0
+
+        # this is in the base object
+        # these are in liters 
+        #self.total_volume = 0
+        #self.used_volume = 0 # filled volume
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+
+        # check if leaking 
+
+        # check if contaminated 
+        if not self.contaminated:
+            liquid=False
+            liquid_count=0
+            solid=False
+            for b in self.inventory:
+                if b.is_liquid:
+                    liquid=True
+                    liquid_count+=1
+                elif b.is_solid:
+                    solid=True
+            
+            if liquid_count>1:
+                self.contaminated=True
+            if liquid==True and solid==True:
+                self.contaminated=True
+
+            # apply contamination to inventory objects
+            if self.contaminated:
+                pass
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):

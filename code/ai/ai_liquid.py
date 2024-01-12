@@ -1,10 +1,10 @@
 
 '''
-module : ai_none.py
+module : ai_liquid.py
 version : see module_version variable
 Language : Python 3.x
 email : andrew@openmarmot.com
-notes :
+notes : special characteristics for a liquid
 '''
 
 
@@ -22,8 +22,14 @@ class AINone(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
+
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+
+        # evaporate
+
+        # leak 
 
     #---------------------------------------------------------------------------

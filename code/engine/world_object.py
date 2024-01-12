@@ -55,6 +55,9 @@ class WorldObject(object):
         self.altitude=0
 
         # - physics stuff -
+        # for containers this is the max volume / max capacity
+        # for liquids and most other things this is the current actual volume
+        self.volume=0 # liters.
         self.weight=0 #kilograms
         self.rolling_resistance=0.015
         self.drag_coefficient=0.8
@@ -97,8 +100,7 @@ class WorldObject(object):
 
         self.is_large_human_pickup=False # fills a large pickup slot
         
-        self.is_object_container=False # object that stores other objects
-        self.is_liquid_container=False # water/gas/diesel/??  stores liquid NOT world_objects
+        self.is_container=False # object that stores other objects
         self.is_ammo_container=False # contains ammo 
         self.is_projectile=False
         self.is_consumable=False
@@ -110,9 +112,12 @@ class WorldObject(object):
         self.is_map_pointer=False
         self.is_furniture=False
 
-        # stuff that i don't think is used at the moment
+        # state of matter
+        self.is_liquid=False
+        self.is_solid=True
         self.is_gas=False
-        self.is_diesel=False
+
+        # stuff that i don't think is used at the moment
         self.is_melee=False # melee close combat weapon like a dagger 
         self.is_gun_mag_carrier=False
 

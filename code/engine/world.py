@@ -58,8 +58,7 @@ class World(object):
         self.wo_objects_airplane=[]
         self.wo_objects_medical=[]
         self.wo_objects_ammo_container=[]
-        self.wo_objects_liquid_container=[]
-        self.wo_objects_object_container=[]
+        self.wo_objects_container=[]
         self.wo_objects_furniture=[]
 
         #world areas
@@ -168,10 +167,8 @@ class World(object):
                 self.wo_objects_melee.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_medical:
                 self.wo_objects_medical.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_object_container:
-                self.wo_objects_object_container.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_liquid_container:
-                self.wo_objects_liquid_container.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_container:
+                self.wo_objects_container.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_ammo_container:
                 self.wo_objects_ammo_container.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_furniture:
@@ -379,10 +376,8 @@ class World(object):
                 self.wo_objects_melee.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_medical:
                 self.wo_objects_medical.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_object_container:
-                self.wo_objects_object_container.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_liquid_container:
-                self.wo_objects_liquid_container.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_container:
+                self.wo_objects_container.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_ammo_container:
                 self.wo_objects_ammo_container.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_furniture:
@@ -425,8 +420,8 @@ class World(object):
         if temp==None:
             for b in self.graphic_engine.renderlists:
                 for c in b:
-                    if (c.is_human or c.is_object_container or c.is_vehicle or c.is_airplane
-                    or c.is_liquid_container or c.is_ammo_container or c.is_furniture):
+                    if (c.is_human or c.is_container or c.is_vehicle or c.is_airplane
+                    or c.is_ammo_container or c.is_furniture):
                         possible_objects.append(c)
             if len(possible_objects)>0:
                 temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
@@ -551,14 +546,17 @@ class World(object):
             self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
             if len(self.player.ai.vehicle.ai.engines)>0:
                 self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engines[0].ai.engine_on))
+
+            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
+                if len(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory)>0:
+                    if self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].is_liquid:
+                        self.vehicle_text_queue.append('Fuel:'+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].volume,2)))
             self.vehicle_text_queue.append('max speed / current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
                 ' / '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
             self.vehicle_text_queue.append('wheel steering: '+str(round(self.player.ai.vehicle.ai.wheel_steering,1)))
-            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
-                self.vehicle_text_queue.append('fuel: '+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.used_volume,2)))
 
             # airplane specific 
             if self.player.ai.vehicle.is_airplane:

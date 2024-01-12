@@ -46,7 +46,6 @@ from ai.ai_throwable import AIThrowable
 from ai.ai_squad import AISquad
 from ai.ai_map_pointer import AIMapPointer
 from ai.ai_container import AIContainer
-from ai.ai_liquid_container import AILiquidContainer
 from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
 from ai.ai_engine import AIEngine
@@ -60,6 +59,8 @@ list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-chee
 list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
+
+list_household_items=['blue_coffee_cup']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
@@ -348,6 +349,16 @@ def create_squads_from_human_list(WORLD,HUMANS,FACTION):
     else:
         print('ERROR ! : Faction not recognized in world_builder.create_squad()')
             
+#------------------------------------------------------------------------------
+def fill_container(WORLD,CONTAINER,FILL_NAME):
+    ''' fill container with an object (liquid)'''
+    # CONTAINER - should be empty
+    # FILL_NAME - name of object (liquid) to fill the container with 
+
+    fill=spawn_object(WORLD,[0,0],FILL_NAME,False)
+    fill.volume=CONTAINER.volume
+    CONTAINER.ai.inventory.append(fill)
+
 
 #------------------------------------------------------------------------------
 def generate_clutter(WORLD):
@@ -367,8 +378,10 @@ def generate_clutter(WORLD):
             spawn_crate(WORLD,coords,'random_consumables_ultra_rare')
         elif chance==4:
             spawn_object(WORLD,coords,'red_bicycle',True)
-        elif chance==5 or chance==6 or chance==7:
+        elif chance==5 or chance==6:
             spawn_object(WORLD,coords,'brown_chair',True)
+        elif chance==7 or chance==8:
+            spawn_object(WORLD,coords,'cupboard',True)
 
     # supply drop 
     chance=random.randint(0,10)
@@ -387,10 +400,7 @@ def generate_clutter(WORLD):
     chance=random.randint(0,10)
     if chance==0:
         k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k1.ai.fuel_tanks[0].ai.used_volume=random.randint(0,k1.ai.fuel_tanks[0].ai.total_volume)
         k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k1.ai.fuel_tanks[0].ai.used_volume=random.randint(0,k1.ai.fuel_tanks[0].ai.total_volume)
-
 
 #------------------------------------------------------------------------------
 def generate_civilians_and_civilan_spawns(WORLD):
@@ -565,6 +575,8 @@ def load_images(world):
     world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
     world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
     world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
+    world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
+    world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -572,6 +584,7 @@ def load_images(world):
     world.graphic_engine.loadImage('brass','images/sprites/brass.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
+    world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
 
     # consumables
     world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
@@ -598,6 +611,7 @@ def load_images(world):
 
     # furniture 
     world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
+    world.graphic_engine.loadImage('cupboard','images/furniture/cupboard.png')
 
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
@@ -713,7 +727,7 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     '''spawns a custom container'''
 
     z=WorldObject(WORLD,[IMAGE],AIContainer)
-    z.is_object_container=True
+    z.is_container=True
     z.render_level=2
     z.name=NAME
     z.world_coords=WORLD_COORDS
@@ -943,32 +957,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fatigue_effect=-300  
 
     elif OBJECT_TYPE=='german_fuel_can':
-        z=WorldObject(WORLD,['german_fuel_can'],AILiquidContainer)
-        z.is_object_container=False # going to be something special
-        z.is_liquid_container=True
+        z=WorldObject(WORLD,['german_fuel_can'],AIContainer)
+        z.is_container=True
         z.is_large_human_pickup=True
-        z.ai.total_volume=20
-        z.ai.used_volume=20
-        z.ai.liquid_type='gas'
-        z.ai.health_effect=-150
-        z.ai.hunger_effect=100
-        z.ai.thirst_effect=100
-        z.ai.fatigue_effect=500  
+        z.volume=20
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='blue_coffee_cup':
+        z=WorldObject(WORLD,['blue_coffee_cup'],AIContainer)
+        z.is_container=True
+        z.volume=0.3
+        z.render_level=2
+        z.name='blue_coffee_cup'
+        z.world_builder_identity='blue_coffee_cup'
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='55_gallon_drum':
-        z=WorldObject(WORLD,['55_gallon_drum'],AILiquidContainer)
-        z.is_liquid_container=True
-        z.ai.total_volume=208
-        z.ai.used_volume=208
-        z.ai.liquid_type='gas'
-        z.ai.health_effect=-150
-        z.ai.hunger_effect=100
-        z.ai.thirst_effect=100
-        z.ai.fatigue_effect=500  
+        z=WorldObject(WORLD,['55_gallon_drum'],AIContainer)
+        z.is_container=True
+        z.volume=208
         z.render_level=2
         z.name='55_gallon_drum'
         z.collision_radius=15
@@ -986,7 +996,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_drop_canister':
         z=WorldObject(WORLD,['german_drop_canister'],AIContainer)
-        z.is_object_container=True
+        z.is_container=True
         z.is_large_human_pickup=True
         z.render_level=2
         z.name='german drop canister'
@@ -996,7 +1006,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='crate':
         z=WorldObject(WORLD,['crate'],AIContainer)
-        z.is_object_container=True
+        z.is_container=True
         z.is_large_human_pickup=True
         z.render_level=2
         z.name='crate'
@@ -1006,12 +1016,37 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='small_crate':
         z=WorldObject(WORLD,['small_crate'],AIContainer)
-        z.is_object_container=True
+        z.is_container=True
         z.is_large_human_pickup=True
         z.render_level=2
         z.name='small_crate'
         z.collision_radius=20
         z.world_builder_identity='small_crate'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='cupboard':
+        z=WorldObject(WORLD,['cupboard'],AIContainer)
+        z.is_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='cupboard'
+        z.collision_radius=20
+        z.world_builder_identity='cupboard'
+        z.rotation_angle=float(random.randint(0,359))
+
+        if random.randint(0,1)==1:
+            z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
+            z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+
+
+    elif OBJECT_TYPE=='coffee_tin':
+        z=WorldObject(WORLD,['coffee_tin'],AIContainer)
+        z.is_container=True
+        z.is_large_human_pickup=True
+        z.render_level=2
+        z.name='coffee_tin'
+        z.collision_radius=20
+        z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust':
@@ -1042,8 +1077,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         p.image_list=['panzerfaust_warhead']
         p.ai.projectile_type='panzerfaust_60'
         z.ai.projectiles.append(p)
-
-
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(WORLD,['model24'],AIThrowable)
@@ -1458,6 +1491,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
         
         if random.randint(0,3)==1:
@@ -1508,6 +1542,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
 
     # this is only used briefly until the player picks a spawn type
@@ -1605,20 +1640,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
         z.render_level=2
         z.name='Volkswagen Type 82 Engine'
-        z.ai.fuel_type='gas'
+        z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=25277.9
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='vehicle_fuel_tank':
-        z=WorldObject(WORLD,['vehicle_fuel_tank'],AILiquidContainer)
-        z.is_liquid_container=True
-        z.ai.total_volume=20
-        z.ai.used_volume=20
-        z.ai.liquid_type='gas'
-        z.ai.health_effect=-150
-        z.ai.hunger_effect=100
-        z.ai.thirst_effect=100
-        z.ai.fatigue_effect=500  
+        z=WorldObject(WORLD,['vehicle_fuel_tank'],AIContainer)
+        z.is_container=True
+        z.volume=20
         z.render_level=2
         z.name='vehicle_fuel_tank'
         z.world_builder_identity='vehicle_fuel_tank'
@@ -1638,7 +1667,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=350.
         z.is_projectile=True
         z.render_level=3
-        #z.ai.projectile_type=PROJECTILE_TYPE
+    elif OBJECT_TYPE=='gas_80_octane':
+        z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
+        z.name='gas_80_octane'
+        z.is_liquid=True
+        z.is_solid=False
+        z.render_level=2
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
