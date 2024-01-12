@@ -355,7 +355,7 @@ def fill_container(WORLD,CONTAINER,FILL_NAME):
     # CONTAINER - should be empty
     # FILL_NAME - name of object (liquid) to fill the container with 
 
-    fill=spawn_object(WORLD,[0,0]],FILL_NAME,False)
+    fill=spawn_object(WORLD,[0,0],FILL_NAME,False)
     fill.volume=CONTAINER.volume
     CONTAINER.ai.inventory.append(fill)
 
@@ -611,7 +611,7 @@ def load_images(world):
 
     # furniture 
     world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
-    world.graphic_engine.loadImage('brown_chair','images/furniture/cupboard.png')
+    world.graphic_engine.loadImage('cupboard','images/furniture/cupboard.png')
 
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
@@ -960,7 +960,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['german_fuel_can'],AIContainer)
         z.is_container=True
         z.is_large_human_pickup=True
-        z.ai.volume=20
+        z.volume=20
         z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
@@ -969,7 +969,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='blue_coffee_cup':
         z=WorldObject(WORLD,['blue_coffee_cup'],AIContainer)
         z.is_container=True
-        z.ai.volume=0.3
+        z.volume=0.3
         z.render_level=2
         z.name='blue_coffee_cup'
         z.world_builder_identity='blue_coffee_cup'
@@ -978,7 +978,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='55_gallon_drum':
         z=WorldObject(WORLD,['55_gallon_drum'],AIContainer)
         z.is_container=True
-        z.ai.volume=208
+        z.volume=208
         z.render_level=2
         z.name='55_gallon_drum'
         z.collision_radius=15
@@ -1647,7 +1647,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='vehicle_fuel_tank':
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AIContainer)
         z.is_container=True
-        z.ai.volume=20
+        z.volume=20
         z.render_level=2
         z.name='vehicle_fuel_tank'
         z.world_builder_identity='vehicle_fuel_tank'

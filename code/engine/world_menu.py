@@ -338,7 +338,7 @@ class World_Menu(object):
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
-        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ "not implemented"
+        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ "not implemented")
         self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
         self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
         self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')

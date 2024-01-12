@@ -550,7 +550,7 @@ class World(object):
             if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
                 if len(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory)>0:
                     if self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].is_liquid:
-                        self.vehicle_text_queue.append('Fuel:'+str(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].volume))
+                        self.vehicle_text_queue.append('Fuel:'+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].volume,2)))
             self.vehicle_text_queue.append('max speed / current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
                 ' / '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))

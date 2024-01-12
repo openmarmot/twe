@@ -309,6 +309,7 @@ class AIVehicle(AIBase):
     def update_fuel_system(self):
         ''' distributes fuel from the tanks to the engines'''
 
+        # well this is not great
 
         for b in self.engines:
             if b.ai.fuel_consumed>0:
@@ -316,9 +317,9 @@ class AIVehicle(AIBase):
                 for c in self.fuel_tanks:
                     if fuel<b.ai.fuel_consumed:
                         if len(c.ai.inventory)==1: # fuel tank should have one object - the fuel liquid
-                            if c[0].is_liquid:
-                                if c[0].name in b.ai.fuel_type:
-                                    c[0].volume,fuel=engine.math_2d.get_transfer_results(c[0].volume,fuel,b.ai.fuel_consumed)
+                            if c.ai.inventory[0].is_liquid:
+                                if c.ai.inventory[0].name in b.ai.fuel_type:
+                                    c.ai.inventory[0].volume,fuel=engine.math_2d.get_transfer_results(c.ai.inventory[0].volume,fuel,b.ai.fuel_consumed)
                                 else:
                                     print('warn - fuel type mismatch')
                                     # note - this should hard kill the engine
