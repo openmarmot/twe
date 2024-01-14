@@ -421,7 +421,7 @@ class World(object):
             for b in self.graphic_engine.renderlists:
                 for c in b:
                     if (c.is_human or c.is_container or c.is_vehicle or c.is_airplane
-                    or c.is_ammo_container or c.is_furniture):
+                    or c.is_ammo_container or c.is_furniture or c.is_large_human_pickup):
                         possible_objects.append(c)
             if len(possible_objects)>0:
                 temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)

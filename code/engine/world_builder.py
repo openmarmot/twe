@@ -620,6 +620,10 @@ def load_images(world):
     # fuel tanks 
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
 
+    # fuel / combustable 
+    world.graphic_engine.loadImage('wood_log','images/fuel/wood_log.png')
+    world.graphic_engine.loadImage('wood_quarter','images/fuel/wood_quarter.png')
+
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
     '''loads a magazine with bullets'''
@@ -679,6 +683,41 @@ def load_test_environment(world):
     # bikes 
     #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
   
+
+#------------------------------------------------------------------------------
+def spawn_aligned_pile(WORLD,point_a,point_b,spawn_string,separation_distance,count):
+    ''' spawn an aligned pile like a wood pile'''
+    # point_a - initial spawn point
+    # point_b - direction in which the pile grows to 
+    # spawn_string - name of the object to spawn
+    # separation_distance - distance betwween objects
+
+    rotation=engine.math_2d.get_rotation(point_a,point_b)
+    heading=engine.math_2d.get_heading_from_rotation(rotation)
+    
+
+    # bottom layer
+    current_coords=point_a
+    for x in range(count):
+        current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
+
+        x=spawn_object(WORLD,point_a,spawn_string,True)
+        x.rotation_angle=rotation
+        x.heading=heading
+        x.world_coords=current_coords
+
+    # mid layer
+    current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
+    for x in range(int(count/2)):
+        current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
+
+        x=spawn_object(WORLD,point_a,spawn_string,True)
+        x.rotation_angle=rotation
+        x.heading=heading
+        x.world_coords=current_coords
+
+
+
 
 #------------------------------------------------------------------------------
 def spawn_civilians(WORLD,CIVILIAN_TYPE):
@@ -1673,6 +1712,18 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_liquid=True
         z.is_solid=False
         z.render_level=2
+    elif OBJECT_TYPE=='wood_log':
+        z=WorldObject(WORLD,['wood_log'],AINone)
+        z.render_level=2
+        z.name='wood_log'
+        z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='wood_quarter':
+        z=WorldObject(WORLD,['wood_log'],AINone)
+        z.render_level=2
+        z.name='wood_log'
+        z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359)) 
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  

@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 14 2024 
+- added wood_log and wood_quarter (quarter log) art and objects 
+- added function to create piles of things 
+- added large_human_pickup items as a mouse selection 
+
+
+----------------------------------
 Jan 11 2024 
 - more container work 
 

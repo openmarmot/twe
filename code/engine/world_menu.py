@@ -299,6 +299,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('5 - model 24 grenade')
                 self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
                 self.world.graphic_engine.menu_text_queue.append('7 - beer ')
+                self.world.graphic_engine.menu_text_queue.append('8 - wood pile ')
                 
             elif Key=='4':
                 pass
@@ -331,6 +332,11 @@ class World_Menu(object):
             elif Key=='7':
                 # german field shovel
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'beer',True)
+            elif Key=='8':
+                # german field shovel
+                engine.world_builder.spawn_aligned_pile(self.world, [self.world.player.world_coords[0]+20,self.world.player.world_coords[1]],
+                                                         [self.world.player.world_coords[0]+60,self.world.player.world_coords[1]],
+                                                         'wood_log',6,5)
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
         # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
