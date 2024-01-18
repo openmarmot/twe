@@ -60,7 +60,7 @@ list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
-list_household_items=['blue_coffee_cup']
+list_household_items=['blue_coffee_cup','coffee_tin']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
@@ -368,7 +368,7 @@ def generate_clutter(WORLD):
     # building related clutter
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
-        chance=random.randint(0,8)
+        chance=random.randint(0,15)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
         if chance==0 or chance==1:
             spawn_crate(WORLD,coords,'random_consumables_common')
@@ -382,6 +382,8 @@ def generate_clutter(WORLD):
             spawn_object(WORLD,coords,'brown_chair',True)
         elif chance==7 or chance==8:
             spawn_object(WORLD,coords,'cupboard',True)
+        elif chance==9:
+            spawn_aligned_pile(WORLD,coords,'wood_log',6,5)
 
     # supply drop 
     chance=random.randint(0,10)
@@ -585,6 +587,7 @@ def load_images(world):
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
     world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
+    world.graphic_engine.loadImage('coffee_beans','images/sprites/coffee_beans.png')
 
     # consumables
     world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
@@ -1075,18 +1078,22 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
         if random.randint(0,1)==1:
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
+        if random.randint(0,1)==1:  
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 
 
     elif OBJECT_TYPE=='coffee_tin':
         z=WorldObject(WORLD,['coffee_tin'],AIContainer)
         z.is_container=True
-        z.is_large_human_pickup=True
+        z.volume=1
         z.render_level=2
         z.name='coffee_tin'
-        z.collision_radius=20
         z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
+        contents='coffee_beans'
+        if random.randint(0,1)==1:
+            contents='ground_coffee'
+        fill_container(WORLD,z,contents)
 
     elif OBJECT_TYPE=='panzerfaust':
         z=WorldObject(WORLD,['panzerfaust'],AIGun)
@@ -1723,7 +1730,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='wood_log'
         z.is_large_human_pickup=True
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='coffee_beans':
+        z=WorldObject(WORLD,['coffee_beans'],AINone)
+        z.render_level=2
+        z.name='coffee_beans'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='ground_coffee':
+        z=WorldObject(WORLD,['coffee_beans'],AINone)
+        z.render_level=2
+        z.name='ground_coffee'
+        z.rotation_angle=float(random.randint(0,359))
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  

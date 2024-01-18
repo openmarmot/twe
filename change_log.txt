@@ -1,12 +1,18 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 17 2024 
+- added coffee_beans sprite
+- added coffee_beans and ground_coffee as objects 
+- coffee_tin is now filled with either coffee_beans or ground_coffee
+- wood pile has a chance to spawn (probably in a house.. lol)
+
 
 ----------------------------------
 Jan 14 2024 
 - added wood_log and wood_quarter (quarter log) art and objects 
 - added function to create piles of things 
 - added large_human_pickup items as a mouse selection 
-
 
 ----------------------------------
 Jan 11 2024 
