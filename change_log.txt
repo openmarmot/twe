@@ -1,12 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 20 2024 
+- added coffee_grinder object
+- added barrel
+- added water
+----------------------------------
 Jan 17 2024 
 - added coffee_beans sprite
 - added coffee_beans and ground_coffee as objects 
 - coffee_tin is now filled with either coffee_beans or ground_coffee
 - wood pile has a chance to spawn (probably in a house.. lol)
-
 
 ----------------------------------
 Jan 14 2024 

@@ -60,7 +60,7 @@ list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
-list_household_items=['blue_coffee_cup','coffee_tin']
+list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
@@ -384,6 +384,8 @@ def generate_clutter(WORLD):
             spawn_object(WORLD,coords,'cupboard',True)
         elif chance==9:
             spawn_aligned_pile(WORLD,coords,'wood_log',6,5)
+        elif chance==10:
+            spawn_object(WORLD,coords,'barrel',True)
 
     # supply drop 
     chance=random.randint(0,10)
@@ -579,6 +581,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
     world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
     world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
+    world.graphic_engine.loadImage('barrel','images/containers/barrel.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -626,6 +629,9 @@ def load_images(world):
     # fuel / combustable 
     world.graphic_engine.loadImage('wood_log','images/fuel/wood_log.png')
     world.graphic_engine.loadImage('wood_quarter','images/fuel/wood_quarter.png')
+
+    # household
+    world.graphic_engine.loadImage('coffee_grinder','images/kitchen/coffee_grinder.png')
 
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
@@ -1025,6 +1031,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='55_gallon_drum'
         z.collision_radius=15
         z.world_builder_identity='55_gallon_drum'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='barrel':
+        z=WorldObject(WORLD,['barrel'],AIContainer)
+        z.is_container=True
+        z.volume=208
+        z.render_level=2
+        z.name='barrel'
+        z.collision_radius=15
+        z.world_builder_identity='barrel'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
@@ -1719,6 +1735,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_liquid=True
         z.is_solid=False
         z.render_level=2
+    elif OBJECT_TYPE=='water':
+        z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
+        z.name='water'
+        z.is_liquid=True
+        z.is_solid=False
+        z.render_level=2
     elif OBJECT_TYPE=='wood_log':
         z=WorldObject(WORLD,['wood_log'],AINone)
         z.render_level=2
@@ -1740,6 +1762,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['coffee_beans'],AINone)
         z.render_level=2
         z.name='ground_coffee'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='coffee_grinder':
+        z=WorldObject(WORLD,['coffee_grinder'],AINone)
+        z.render_level=2
+        z.name='coffee_grinder'
         z.rotation_angle=float(random.randint(0,359))
 
     else:
