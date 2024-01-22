@@ -60,7 +60,7 @@ list_consumables_common=['green_apple','potato','turnip']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
-list_household_items=['blue_coffee_cup']
+list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
@@ -368,8 +368,9 @@ def generate_clutter(WORLD):
     # building related clutter
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
-        chance=random.randint(0,8)
+        chance=random.randint(0,15)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+        coords2=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
         if chance==0 or chance==1:
             spawn_crate(WORLD,coords,'random_consumables_common')
         elif chance==2:
@@ -382,6 +383,10 @@ def generate_clutter(WORLD):
             spawn_object(WORLD,coords,'brown_chair',True)
         elif chance==7 or chance==8:
             spawn_object(WORLD,coords,'cupboard',True)
+        elif chance==9:
+            spawn_aligned_pile(WORLD,coords,coords2,'wood_log',6,5)
+        elif chance==10:
+            spawn_object(WORLD,coords,'barrel',True)
 
     # supply drop 
     chance=random.randint(0,10)
@@ -577,6 +582,7 @@ def load_images(world):
     world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
     world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
     world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
+    world.graphic_engine.loadImage('barrel','images/containers/barrel.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -585,6 +591,7 @@ def load_images(world):
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
     world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
+    world.graphic_engine.loadImage('coffee_beans','images/sprites/coffee_beans.png')
 
     # consumables
     world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
@@ -619,6 +626,13 @@ def load_images(world):
 
     # fuel tanks 
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
+
+    # fuel / combustable 
+    world.graphic_engine.loadImage('wood_log','images/fuel/wood_log.png')
+    world.graphic_engine.loadImage('wood_quarter','images/fuel/wood_quarter.png')
+
+    # household
+    world.graphic_engine.loadImage('coffee_grinder','images/kitchen/coffee_grinder.png')
 
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
@@ -679,6 +693,41 @@ def load_test_environment(world):
     # bikes 
     #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
   
+
+#------------------------------------------------------------------------------
+def spawn_aligned_pile(WORLD,point_a,point_b,spawn_string,separation_distance,count):
+    ''' spawn an aligned pile like a wood pile'''
+    # point_a - initial spawn point
+    # point_b - direction in which the pile grows to 
+    # spawn_string - name of the object to spawn
+    # separation_distance - distance betwween objects
+
+    rotation=engine.math_2d.get_rotation(point_a,point_b)
+    heading=engine.math_2d.get_heading_from_rotation(rotation)
+    
+
+    # bottom layer
+    current_coords=point_a
+    for x in range(count):
+        current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
+
+        x=spawn_object(WORLD,point_a,spawn_string,True)
+        x.rotation_angle=rotation
+        x.heading=heading
+        x.world_coords=current_coords
+
+    # mid layer
+    current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
+    for x in range(int(count/2)):
+        current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
+
+        x=spawn_object(WORLD,point_a,spawn_string,True)
+        x.rotation_angle=rotation
+        x.heading=heading
+        x.world_coords=current_coords
+
+
+
 
 #------------------------------------------------------------------------------
 def spawn_civilians(WORLD,CIVILIAN_TYPE):
@@ -985,6 +1034,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='barrel':
+        z=WorldObject(WORLD,['barrel'],AIContainer)
+        z.is_container=True
+        z.volume=208
+        z.render_level=2
+        z.name='barrel'
+        z.collision_radius=15
+        z.world_builder_identity='barrel'
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
         z.is_ammo_container=True
@@ -1036,18 +1095,22 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
         if random.randint(0,1)==1:
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
+        if random.randint(0,1)==1:  
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
 
 
     elif OBJECT_TYPE=='coffee_tin':
         z=WorldObject(WORLD,['coffee_tin'],AIContainer)
         z.is_container=True
-        z.is_large_human_pickup=True
+        z.volume=1
         z.render_level=2
         z.name='coffee_tin'
-        z.collision_radius=20
         z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
+        contents='coffee_beans'
+        if random.randint(0,1)==1:
+            contents='ground_coffee'
+        fill_container(WORLD,z,contents)
 
     elif OBJECT_TYPE=='panzerfaust':
         z=WorldObject(WORLD,['panzerfaust'],AIGun)
@@ -1673,6 +1736,39 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_liquid=True
         z.is_solid=False
         z.render_level=2
+    elif OBJECT_TYPE=='water':
+        z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
+        z.name='water'
+        z.is_liquid=True
+        z.is_solid=False
+        z.render_level=2
+    elif OBJECT_TYPE=='wood_log':
+        z=WorldObject(WORLD,['wood_log'],AINone)
+        z.render_level=2
+        z.name='wood_log'
+        z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='wood_quarter':
+        z=WorldObject(WORLD,['wood_log'],AINone)
+        z.render_level=2
+        z.name='wood_log'
+        z.is_large_human_pickup=True
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='coffee_beans':
+        z=WorldObject(WORLD,['coffee_beans'],AINone)
+        z.render_level=2
+        z.name='coffee_beans'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='ground_coffee':
+        z=WorldObject(WORLD,['coffee_beans'],AINone)
+        z.render_level=2
+        z.name='ground_coffee'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='coffee_grinder':
+        z=WorldObject(WORLD,['coffee_grinder'],AINone)
+        z.render_level=2
+        z.name='coffee_grinder'
+        z.rotation_angle=float(random.randint(0,359))
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
