@@ -402,30 +402,51 @@ class World(object):
         
         radius=10
         possible_objects=[]
+        check_objects=[]
 
         # this has been reworked to favor selecting items over humans/vehicles/storage
 
         temp=None
 
-        # first pass - filter for desirable objects
+        # add all rendered objects to an array
         for b in self.graphic_engine.renderlists:
             for c in b:
-                if (c.is_gun or c.is_consumable or c.is_handheld_antitank or c.is_throwable or c.is_gun_magazine):
-                    possible_objects.append(c)
+                possible_objects.append(c)
 
-        if len(possible_objects)>0:
-            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
+        #-- first pass - filter for desirable objects
+        for b in possible_objects:
+            if (b.is_gun or b.is_consumable or b.is_handheld_antitank or b.is_throwable or b.is_gun_magazine):
+                check_objects.append(b)
 
-        # second pass - check for less desirable objects
+        if len(check_objects)>0:
+            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,check_objects)
+
+        #-- second pass - check for less desirable objects
         if temp==None:
-            for b in self.graphic_engine.renderlists:
-                for c in b:
-                    if (c.is_human or c.is_container or c.is_vehicle or c.is_airplane
-                    or c.is_ammo_container or c.is_furniture or c.is_large_human_pickup):
-                        possible_objects.append(c)
+            # first remove the objects we already checked
+            for b in check_objects:
+                possible_objects.remove(b)
+            check_objects=[]
+
+            # build a list of less desirable objects
+            for b in possible_objects:
+                if (b.is_human or b.is_container or b.is_vehicle or b.is_airplane
+                    or b.is_ammo_container or b.is_furniture or b.is_large_human_pickup):
+                    check_objects.append(b)
+            if len(check_objects)>0:
+                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,check_objects)
+
+        #-- third pass - check everything that is left
+        if temp==None:
+            # first remove the objects we already checked
+            for b in check_objects:
+                possible_objects.remove(b)
+            check_objects=[]
+
+            # check everything that is left
             if len(possible_objects)>0:
                 temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
-        
+
         if temp != None:
             self.world_menu.activate_menu(temp)
 

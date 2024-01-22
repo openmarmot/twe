@@ -370,6 +370,7 @@ def generate_clutter(WORLD):
     for b in WORLD.wo_objects_building:
         chance=random.randint(0,15)
         coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+        coords2=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
         if chance==0 or chance==1:
             spawn_crate(WORLD,coords,'random_consumables_common')
         elif chance==2:
@@ -383,7 +384,7 @@ def generate_clutter(WORLD):
         elif chance==7 or chance==8:
             spawn_object(WORLD,coords,'cupboard',True)
         elif chance==9:
-            spawn_aligned_pile(WORLD,coords,'wood_log',6,5)
+            spawn_aligned_pile(WORLD,coords,coords2,'wood_log',6,5)
         elif chance==10:
             spawn_object(WORLD,coords,'barrel',True)
 

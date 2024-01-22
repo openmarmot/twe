@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 21 2024 
+- rewrote mouse select to consider all objects within 10 distance from the mouse
+    - uses a three pass method to pick the most likely objects
+- fixed spawn bug with wood pile 
+- created new empty interior for the house 
+
+I guess I should ponder if every object should be selectable. If the 
+answer is no - then I need to come up with more bool labels as I'm 
+creating a lot of basic objects lately to fill in the world details 
+
+I had to remove all the furniture i had painted into the house interior 
+because I am starting to actually model that stuff with real objects. 
+
+I need to make a building placement function that is able to place objects in 
+buildings - it should correctly align the objects 
+
+----------------------------------
 Jan 20 2024 
 - added coffee_grinder object
 - added barrel
