@@ -92,6 +92,8 @@ class World_Menu(object):
             self.fuel_menu(Key)
         elif self.active_menu=='change_vehicle_role':
             self.change_vehicle_role_menu(Key)
+        elif self.active_menu=='coffee_grinder':
+            self.coffee_grinder_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -107,8 +109,10 @@ class World_Menu(object):
             self.deactivate_menu()
             
             self.selected_object=SELECTED_OBJECT
-
-            if SELECTED_OBJECT.is_vehicle: 
+            if SELECTED_OBJECT.name=='coffee_grinder':
+                self.active_menu='coffee_grinder'
+                self.coffee_grinder_menu(None)
+            elif SELECTED_OBJECT.is_vehicle: 
                 self.active_menu='vehicle'
                 self.vehicle_menu(None)
             elif SELECTED_OBJECT.is_gun or SELECTED_OBJECT.is_handheld_antitank:
@@ -220,6 +224,40 @@ class World_Menu(object):
                 self.world.player.ai.handle_change_vehicle_role('passenger')
                 self.deactivate_menu()
 
+     #---------------------------------------------------------------------------
+    def coffee_grinder_menu(self, Key):
+        if self.menu_state=='none':
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue.append('-- Coffee Grinder Menu --')
+            
+            beans=None
+            for b in self.world.player.ai.inventory:
+                if b.name=='coffee_beans':
+                    if beans!=None:
+                        print('!!Warning multi-bean-verse detected!!')
+                    beans=b
+            self.world.graphic_engine.menu_text_queue.append('Beans.. volume? : '+str(beans.volume))
+            self.world.graphic_engine.menu_text_queue.append('Beans.. weight? : '+str(beans.weight))
+            self.world.graphic_engine.menu_text_queue.append('Fine Grounds : ')
+            self.world.graphic_engine.menu_text_queue.append('Course Grounds : ')
+            self.world.graphic_engine.menu_text_queue.append('1 - Fine Grind')
+            self.world.graphic_engine.menu_text_queue.append('2 - Coarse Grind')
+            self.world.graphic_engine.menu_text_queue.append('3 - Clean')
+            self.world.graphic_engine.menu_text_queue.append('4 - Exit')
+            self.menu_state='base'
+        if self.menu_state=='base':
+            if Key=='1':
+                
+                self.coffee_grinder_menu()
+            elif Key=='2':
+                
+                self.coffee_grinder_menu()
+            elif Key=='3':
+                
+                self.coffee_grinder_menu()
+            elif Key=='4':
+                self.deactivate_menu()
+
     #---------------------------------------------------------------------------
     def consumable_menu(self, Key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
@@ -300,6 +338,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
                 self.world.graphic_engine.menu_text_queue.append('7 - beer ')
                 self.world.graphic_engine.menu_text_queue.append('8 - wood pile ')
+                self.world.graphic_engine.menu_text_queue.append('9 - coffee grinder')
                 
             elif Key=='4':
                 pass
@@ -337,6 +376,9 @@ class World_Menu(object):
                 engine.world_builder.spawn_aligned_pile(self.world, [self.world.player.world_coords[0]+20,self.world.player.world_coords[1]],
                                                          [self.world.player.world_coords[0]+60,self.world.player.world_coords[1]],
                                                          'wood_log',6,5)
+            elif Key=='9':
+                # german field shovel
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'coffee_grinder',True)
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
         # i think if you get here it assumes you are holding fuel and have clicked on a vehicle

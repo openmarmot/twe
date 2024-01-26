@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 25 2024 
+- working on a coffee grinder menu 
+
+this is the introduction of 'crafting' to some degree. 
+Wasn't sure whether to have a central menu - decided to make it a specific
+object menu per specific object/action
+
 ----------------------------------
 Jan 21 2024 
 - rewrote mouse select to consider all objects within 10 distance from the mouse
