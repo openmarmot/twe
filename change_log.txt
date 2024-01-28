@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 28 2024 
+- added an option to pick up storage containers that are <5 liters in volume 
+- rewriting some of the menus to remove the overly complex menu state system
+    where it was not needed
+- some work on coffee crafting. more needed 
+
+the fact that your inventory can contain containers now causes a bit of a 
+recursion issue. i was thinking about writing a function that searches inventory 
+and containers in inventory for items - but if an object gets removed that 
+gets a bit complicated 
 
 ----------------------------------
 Jan 25 2024 

@@ -1082,6 +1082,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=20
         z.world_builder_identity='small_crate'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=100
 
     elif OBJECT_TYPE=='cupboard':
         z=WorldObject(WORLD,['cupboard'],AIContainer)
@@ -1092,6 +1093,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=20
         z.world_builder_identity='cupboard'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=100
 
         if random.randint(0,1)==1:
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
