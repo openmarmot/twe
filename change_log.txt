@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 ----------------------------------
 Jan 28 2024 
+- made ai_coffee_grinder instead of putting the logic in world_menu 
+
+coffee grinding works now. 
+1. find a coffee tin. 
+2. remove the coffee beans from the tin (some tins may contain grounds, you need beans)
+3. find a coffee grinder 
+4. coffee grinder context menu allows you to turn beans into grounds 
+
+i need a density measure, or some way of determining the weight of something given the volume 
+----------------------------------
+Jan 28 2024 
 - added an option to pick up storage containers that are <5 liters in volume 
 - rewriting some of the menus to remove the overly complex menu state system
     where it was not needed

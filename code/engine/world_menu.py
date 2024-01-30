@@ -230,34 +230,38 @@ class World_Menu(object):
         self.world.graphic_engine.menu_text_queue.append('-- Coffee Grinder Menu --')
         
         beans=None
+        grounds=None
         for b in self.world.player.ai.inventory:
             if b.name=='coffee_beans':
                 if beans!=None:
                     print('!!Warning multi-bean-verse detected!!')
                 beans=b
+            if b.name=='ground_coffee':
+                grounds=b
+
+        if grounds!=None:
+            self.world.graphic_engine.menu_text_queue.append('Ground Coffee weight: '+str(grounds.weight))
         if beans==None:
             self.world.graphic_engine.menu_text_queue.append("I will need to get some coffee beans first..")
         else:
             self.world.graphic_engine.menu_text_queue.append('Beans.. volume? : '+str(beans.volume))
             self.world.graphic_engine.menu_text_queue.append('Beans.. weight? : '+str(beans.weight))
-            self.world.graphic_engine.menu_text_queue.append('Fine Grounds : ')
-            self.world.graphic_engine.menu_text_queue.append('Course Grounds : ')
-            self.world.graphic_engine.menu_text_queue.append('1 - Fine Grind')
-            self.world.graphic_engine.menu_text_queue.append('2 - Coarse Grind')
-            self.world.graphic_engine.menu_text_queue.append('3 - Clean')
+        
+            self.world.graphic_engine.menu_text_queue.append('1 - Grind Beans')
             self.world.graphic_engine.menu_text_queue.append('4 - Exit')
 
             if Key=='1':
-                
-                self.coffee_grinder_menu()
+                result=self.selected_object.ai.grind(beans)
+                if result!=None:
+                    self.world.player.add_inventory(result)
+                    self.world.player.remove_inventory(beans)
+                self.coffee_grinder_menu(None)
             elif Key=='2':
-                
-                self.coffee_grinder_menu()
+                pass
             elif Key=='3':
-                
-                self.coffee_grinder_menu()
+                pass
             elif Key=='4':
-                self.deactivate_menu()
+                self.deactivate_menu(None)
 
     #---------------------------------------------------------------------------
     def consumable_menu(self, Key):
