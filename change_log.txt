@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Feb 03 2024 
+- working on a squad menu 
+
+mostly doing a squad menu because having civilians around annoys the 
+heck out of me and i want to be able to tell them to disband 
+
 ----------------------------------
 Jan 28 2024 
 - made ai_coffee_grinder instead of putting the logic in world_menu 
