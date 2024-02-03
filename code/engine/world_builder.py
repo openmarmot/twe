@@ -49,7 +49,7 @@ from ai.ai_container import AIContainer
 from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
 from ai.ai_engine import AIEngine
-
+from ai.ai_coffee_grinder import AICoffeeGrinder
 
 #global variables
 
@@ -357,6 +357,8 @@ def fill_container(WORLD,CONTAINER,FILL_NAME):
 
     fill=spawn_object(WORLD,[0,0],FILL_NAME,False)
     fill.volume=CONTAINER.volume
+    # need something more clever here.. maybe a density value per object
+    fill.weight=CONTAINER.volume
     CONTAINER.ai.inventory.append(fill)
 
 
@@ -1082,6 +1084,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=20
         z.world_builder_identity='small_crate'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=100
 
     elif OBJECT_TYPE=='cupboard':
         z=WorldObject(WORLD,['cupboard'],AIContainer)
@@ -1092,6 +1095,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=20
         z.world_builder_identity='cupboard'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=100
 
         if random.randint(0,1)==1:
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
@@ -1765,7 +1769,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='ground_coffee'
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='coffee_grinder':
-        z=WorldObject(WORLD,['coffee_grinder'],AINone)
+        z=WorldObject(WORLD,['coffee_grinder'],AICoffeeGrinder)
         z.render_level=2
         z.name='coffee_grinder'
         z.rotation_angle=float(random.randint(0,359))

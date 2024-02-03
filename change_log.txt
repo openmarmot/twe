@@ -1,5 +1,46 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Feb 03 2024 
+- working on a squad menu 
+- some world_menu cleanup 
+- fixed a new bug where clicking on bots would cause them to join your squad 
+
+mostly doing a squad menu because having civilians around annoys the 
+heck out of me and i want to be able to tell them to disband 
+
+----------------------------------
+Jan 28 2024 
+- made ai_coffee_grinder instead of putting the logic in world_menu 
+
+coffee grinding works now. 
+1. find a coffee tin. 
+2. remove the coffee beans from the tin (some tins may contain grounds, you need beans)
+3. find a coffee grinder 
+4. coffee grinder context menu allows you to turn beans into grounds 
+
+i need a density measure, or some way of determining the weight of something given the volume 
+----------------------------------
+Jan 28 2024 
+- added an option to pick up storage containers that are <5 liters in volume 
+- rewriting some of the menus to remove the overly complex menu state system
+    where it was not needed
+- some work on coffee crafting. more needed 
+
+the fact that your inventory can contain containers now causes a bit of a 
+recursion issue. i was thinking about writing a function that searches inventory 
+and containers in inventory for items - but if an object gets removed that 
+gets a bit complicated 
+
+----------------------------------
+Jan 25 2024 
+- working on a coffee grinder menu 
+
+this is the introduction of 'crafting' to some degree. 
+Wasn't sure whether to have a central menu - decided to make it a specific
+object menu per specific object/action
+
 ----------------------------------
 Jan 21 2024 
 - rewrote mouse select to consider all objects within 10 distance from the mouse

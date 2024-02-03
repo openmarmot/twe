@@ -66,23 +66,24 @@ class AIFactionTactical(object):
             self.squads.append(b)
         self.squad_spawn_queue.clear()
 
+    
     #---------------------------------------------------------------------------
-    def update(self):
-        time_passed=self.world.graphic_engine.time_passed_seconds
-        self.time_since_update+=time_passed
+    def split_squad(self,members):
+        '''removes members from their current squad and puts them in a new squad'''
+        # members - list of humans that you want to put in a new squad. 
+        squad=AISquad(self.world)
+        squad.faction=self.faction
+        squad.faction_tactical=self
+        
+        for b in members:
+            # note! this will remove the members from their old squad if they had one
+            squad.add_to_squad(b)
 
-        # spawn any new squads
-        if len(self.squad_spawn_queue)>0:
-            self.process_spawn_queue()
+        # run a think cycle to set squad variables correctly
+        squad.handle_ai_think()
 
-        # run the update for each squad
-        for b in self.squads:
-            b.update()
-
-        if self.time_since_update>self.think_rate:
-            self.time_since_update=0
-            if len(self.squads)>0:
-                self.tactical_order()
+        # add to the list of squads we are keeping track of
+        self.squads.append(squad)
 
     #---------------------------------------------------------------------------
     def tactical_order(self):
@@ -125,3 +126,21 @@ class AIFactionTactical(object):
 
             if len(unassigned_squads)<1:
                 assign_orders=False
+    
+    #---------------------------------------------------------------------------
+    def update(self):
+        time_passed=self.world.graphic_engine.time_passed_seconds
+        self.time_since_update+=time_passed
+
+        # spawn any new squads
+        if len(self.squad_spawn_queue)>0:
+            self.process_spawn_queue()
+
+        # run the update for each squad
+        for b in self.squads:
+            b.update()
+
+        if self.time_since_update>self.think_rate:
+            self.time_since_update=0
+            if len(self.squads)>0:
+                self.tactical_order()
