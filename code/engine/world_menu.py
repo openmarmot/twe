@@ -94,6 +94,8 @@ class World_Menu(object):
             self.change_vehicle_role_menu(Key)
         elif self.active_menu=='coffee_grinder':
             self.coffee_grinder_menu(Key)
+        elif self.active_menu=='squad':
+            self.squad_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -125,63 +127,16 @@ class World_Menu(object):
                 self.active_menu='human'
                 self.human_menu(None)
             elif SELECTED_OBJECT.is_airplane:
-                #self.active_menu='airplane'
-                #self.airplane_menu(None)
                 self.active_menu='vehicle'
                 self.vehicle_menu(None)
             elif SELECTED_OBJECT.is_consumable:
                 self.active_menu='consumable'
                 self.consumable_menu(None)
             else :
+                print('warn - generic menu activated')
                 # just dump everything else in here for now
                 self.active_menu='generic'
                 self.generic_item_menu(None)
-
-    #---------------------------------------------------------------------------
-    def airplane_menu(self, Key):
-        if self.menu_state=='none':
-
-            if self.world.player in self.selected_object.ai.passengers:
-                self.menu_state='internal'
-            else:
-                self.menu_state='external'
-
-        if self.menu_state=='external':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('--External Airplane Menu --')
-            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
-            self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
-            self.world.graphic_engine.menu_text_queue.append('2 - enter vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - storage')
-            if Key=='1':
-                pass
-            if Key=='2':
-                # enter the vehicle 
-                self.world.player.ai.handle_enter_vehicle(self.selected_object)
-
-                self.world.display_vehicle_text=True
-                self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
-                self.deactivate_menu()
-            if Key=='3':
-                # pull up the storage/container menu
-                self.change_menu('storage')
-
-        if self.menu_state=='internal':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('--Internal Airplane Menu --')
-            self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
-            self.world.graphic_engine.menu_text_queue.append('1 - Engines')
-            self.world.graphic_engine.menu_text_queue.append('2 - Flight Controls ')
-            self.world.graphic_engine.menu_text_queue.append('3 - Landing Gear ')
-            self.world.graphic_engine.menu_text_queue.append('4 - Exit Plane ')
-            if Key=='1':
-                pass
-            if Key=='4':
-                # exit the vehicle
-                self.world.player.ai.handle_exit_vehicle(self.selected_object)
-                self.world.display_vehicle_text=False
-                self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
-                self.deactivate_menu()
 
     #---------------------------------------------------------------------------
     def change_menu(self,menu_name):
@@ -496,14 +451,19 @@ class World_Menu(object):
 
         if self.menu_state == 'player_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
+            self.world.graphic_engine.menu_text_queue.append('2 - Squad Menu')
             if self.selected_object.ai.large_pickup!=None:
-                self.world.graphic_engine.menu_text_queue.append('2 - Drop '+self.selected_object.ai.large_pickup.name)
+                self.world.graphic_engine.menu_text_queue.append('3 - Drop '+self.selected_object.ai.large_pickup.name)
+                if Key=='3':
+                    self.selected_object.ai.handle_drop_object(self.selected_object.ai.large_pickup)
+                    self.deactivate_menu()
             if Key=='1':
             # pull up the storage/container menu
                 self.change_menu('storage')
             if Key=='2':
-                self.selected_object.ai.handle_drop_object(self.selected_object.ai.large_pickup)
-                self.deactivate_menu()
+            # pull up the storage/container menu
+                self.change_menu('squad')
+            
         elif self.menu_state == 'squad_member_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Manage Inventory')
@@ -522,11 +482,51 @@ class World_Menu(object):
         elif self.menu_state == 'non_squad_member_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Will you join my squad?')
+            if Key=='1':
+                self.selected_object.ai.speak('status')
+            if Key=='2':
             # ask the ai to join the squad
-            self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
-            self.deactivate_menu()
+                self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
+                self.deactivate_menu()
                 
-    
+    #---------------------------------------------------------------------------
+    def squad_menu(self,Key):
+        distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+        if self.menu_state=='none':
+            squad=self.world.player.ai.squad
+            # print out the basic menu
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Squad Menu --')
+            self.world.graphic_engine.menu_text_queue.append('Faction: '+squad.faction)
+            self.world.graphic_engine.menu_text_queue.append('Squad size: '+str(len(squad.members)))
+            self.world.graphic_engine.menu_text_queue.append('Very near enemies: '+str(len(squad.very_near_enemies)))
+            self.world.graphic_engine.menu_text_queue.append('Near enemies: '+str(len(squad.near_enemies)))
+            self.world.graphic_engine.menu_text_queue.append('Far enemies: '+str(len(squad.far_enemies)))
+
+            self.world.graphic_engine.menu_text_queue.append('1 - Disband')
+            self.world.graphic_engine.menu_text_queue.append('2 - Re-arm')
+            self.world.graphic_engine.menu_text_queue.append('3 - Loose formation (not implemented)')
+            self.world.graphic_engine.menu_text_queue.append('4 - Tight formation (not implemented)')
+
+            if Key=='1':
+                self.world.graphic_engine.add_text('[ Squad disbanded ]')
+                # note - this will remove everyone but the player from the player's squad
+                # and put them in a new squad
+                members=[]
+                for b in squad.members:
+                    if b.is_player==False:
+                        members.append(b)
+                squad.faction_tactical.split_squad(members)
+
+                # go back to the menu to reset the text
+                self.squad_menu(None)
+
+            if Key=='2':
+                # tell each ai to rearm if possible 
+                for b in squad.members:
+                    if b.is_player==False:
+                        b.ai.react_asked_to_upgrade_gear()
+
     #---------------------------------------------------------------------------
     def start_menu(self, Key):
         if self.menu_state=='none':
@@ -733,20 +733,13 @@ class World_Menu(object):
                     self.world.player.ai.handle_enter_vehicle(self.selected_object)
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
-                    self.world.graphic_engine.text_queue.insert(0, '[ You climb into the vehicle ]')
+                    self.world.graphic_engine.add_text('[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 if Key=='3':
                     # pull up the storage/container menu
                     self.change_menu('storage')
                 if Key=='4' and fuel_option:
                     self.change_menu('fuel')
-
-            
-
-                
-
-            
-
 
         if self.menu_state=='internal':
             currentRole='None'

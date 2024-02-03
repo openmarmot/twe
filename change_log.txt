@@ -4,6 +4,8 @@ TWE Project : Change Log
 ----------------------------------
 Feb 03 2024 
 - working on a squad menu 
+- some world_menu cleanup 
+- fixed a new bug where clicking on bots would cause them to join your squad 
 
 mostly doing a squad menu because having civilians around annoys the 
 heck out of me and i want to be able to tell them to disband 

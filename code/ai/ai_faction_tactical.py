@@ -70,8 +70,20 @@ class AIFactionTactical(object):
     #---------------------------------------------------------------------------
     def split_squad(self,members):
         '''removes members from their current squad and puts them in a new squad'''
-        squad=AIS
-        sdf
+        # members - list of humans that you want to put in a new squad. 
+        squad=AISquad(self.world)
+        squad.faction=self.faction
+        squad.faction_tactical=self
+        
+        for b in members:
+            # note! this will remove the members from their old squad if they had one
+            squad.add_to_squad(b)
+
+        # run a think cycle to set squad variables correctly
+        squad.handle_ai_think()
+
+        # add to the list of squads we are keeping track of
+        self.squads.append(squad)
 
     #---------------------------------------------------------------------------
     def tactical_order(self):
