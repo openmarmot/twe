@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 05 2024 
+- barrel has 50% chance of being filled with water 
+
+need to research 40s coffee makers next. probably also need a stove 
+----------------------------------
 Feb 03 2024 
 - working on a squad menu 
 - some world_menu cleanup 
@@ -9,6 +14,8 @@ Feb 03 2024
 
 mostly doing a squad menu because having civilians around annoys the 
 heck out of me and i want to be able to tell them to disband 
+
+note - barrel should have some liquid added 
 
 ----------------------------------
 Jan 28 2024 

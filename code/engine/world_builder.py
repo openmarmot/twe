@@ -1045,6 +1045,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.world_builder_identity='barrel'
         z.rotation_angle=float(random.randint(0,359))
+        if random.randint(0,1)==1:
+            fill_container(WORLD,z,'water')
 
     elif OBJECT_TYPE=='german_mg_ammo_can':
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
@@ -1098,6 +1100,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.volume=100
 
         if random.randint(0,1)==1:
+            z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_household_items,False))
         if random.randint(0,1)==1:  
             z.ai.inventory.append(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
