@@ -2,6 +2,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 07 2024 
+- rewrite of how squads get spawned in 
+
+spawn points are now removed. 
+tactical ai no longer decides where things spawn, instead this is decided when 
+the squads are created in world_builder 
+
+i was thinking about how to add a time based reinforcement system but i ran into 
+a issue with the squad spawn system and had to rewrite that to be more flexible first. 
+
+a near term step will be to add in a ability for squads to retreat / remove themselves from the world map. 
+- as part of this I will have to think about how big a map should be - it is not currently a defined size. 
+interestingly i think this is one of the last features that was in the old 3d game engine that hasn't been 
+added here yet.
+
+
+
+----------------------------------
 Feb 05 2024 
 - barrel has 50% chance of being filled with water 
 
