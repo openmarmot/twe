@@ -23,6 +23,7 @@ class AIFactionTactical(object):
     def __init__(self,WORLD,FACTION):
 
         # squads waiting to enter the map
+        # format for this is [[spawn_coordinates,squad]]
         self.squad_spawn_queue=[]
 
         # squads in the faction who are present on this map
@@ -49,23 +50,19 @@ class AIFactionTactical(object):
         # faction - german/soviet/american/civilian
         self.faction=FACTION
 
-        # list of spawn point world_coords
-        self.spawn_points=[]
-
     #---------------------------------------------------------------------------
     # spawns squads in the spawn queue
     def process_spawn_queue(self):
+        # spawn queue is a array of arrays [[spawn_location,squad]]
         for b in self.squad_spawn_queue:
-            # get a random spawn point
-            coords=self.spawn_points[random.randint(0,len(self.spawn_points)-1)]
+            coords=b[0]
             # add random offsets
-            b.world_coords=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
-            b.destination=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
-            b.spawn_on_map()
-            b.faction_tactical=self # give the squad a ref back to hq..
-            self.squads.append(b)
+            b[1].world_coords=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
+            b[1].destination=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
+            b[1].spawn_on_map()
+            b[1].faction_tactical=self # give the squad a ref back to hq..
+            self.squads.append(b[1])
         self.squad_spawn_queue.clear()
-
     
     #---------------------------------------------------------------------------
     def split_squad(self,members):

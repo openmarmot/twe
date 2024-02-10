@@ -37,6 +37,10 @@ class World(object):
         self.american_ai=AIFactionTactical(self,'american')
         self.civilian_ai=AIFactionTactical(self,'civilian')
 
+        # off man reinforcements
+        # array of  [time,faction,[spawn_point,squad]]
+        self.reinforcements=[]
+
 
         # object lists 
         self.wo_objects=[]
@@ -106,6 +110,10 @@ class World(object):
 
         # air density in kg/m^3. good default is 1.225
         self.air_density=1.225
+
+        # seconds that the world has existed for 
+        # can be used by other classes for time keeping
+        self.world_seconds=0
 
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
@@ -329,6 +337,28 @@ class World(object):
             self.player.ai.handle_keydown('b')
         elif KEY==114: #r
             self.player.ai.handle_keydown('r')
+
+    #---------------------------------------------------------------------------
+    def process_reinforcements(self):
+        # array of  [time,faction,[spawn_point,squad]]
+        process_queue=[]
+        for b in self.reinforcements:
+            if b[0]<self.world_seconds:
+                process_queue.append(b)
+        for b in process_queue:
+            self.reinforcements.remove(b)
+            print('spawning reinforcements')
+            if b[1]=='german':
+                self.german_ai.squad_spawn_queue.append(b[2])
+            elif b[1]=='american':
+                self.american_ai.squad_spawn_queue.append(b[2])
+            elif b[1]=='soviet':
+                self.soviet_ai.squad_spawn_queue.append(b[2])
+            elif b[1]=='civilian':
+                self.civilian_ai.squad_spawn_queue.append(b[2])
+            else:
+                print('Error - faction not recognized in process_reinforements: ',b[1])
+
     #---------------------------------------------------------------------------
     def random_player_spawn(self):
         if len(self.wo_objects_human)>0:
@@ -517,6 +547,9 @@ class World(object):
         self.graphic_engine.update()
 
         if self.is_paused==False:
+            self.world_seconds+=self.graphic_engine.time_passed_seconds
+            self.process_reinforcements()
+
             for b in self.wo_objects:
                 b.update()
 
@@ -549,8 +582,8 @@ class World(object):
         self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
         self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
-        self.debug_text_queue.append('Player World Coords: '+str(self.player.world_coords))
-        self.debug_text_queue.append('Player Fatigue: '+str(self.player.ai.fatigue))
+        self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.round_vector_2(self.player.world_coords)))
+        self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
 
