@@ -263,6 +263,9 @@ def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
 
 	return var
 	
+#------------------------------------------------------------------------------
+def round_vector_2(vector):
+	return [round(vector[0],2),round(vector[1],2)]
 
 
 

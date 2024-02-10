@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+----------------------------------
+Feb 10 2024 
+- added a timed reinforcement system 
+- added german and soviet reinforcements to the test map 
+- rounded some numbers in the debug menu for easier viewing
+
+the german reinforcements spawn two squads from the west at the same time.
+the soviet reinforcements spawn squads from north,south, and east each at random times. 
+should add some variation to who wins the battle (probably soviet now?)
+
 
 ----------------------------------
 Feb 07 2024 
@@ -16,8 +26,6 @@ a near term step will be to add in a ability for squads to retreat / remove them
 - as part of this I will have to think about how big a map should be - it is not currently a defined size. 
 interestingly i think this is one of the last features that was in the old 3d game engine that hasn't been 
 added here yet.
-
-
 
 ----------------------------------
 Feb 05 2024 
