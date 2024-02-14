@@ -64,6 +64,7 @@ class World(object):
         self.wo_objects_ammo_container=[]
         self.wo_objects_container=[]
         self.wo_objects_furniture=[]
+        self.wo_objects_cleanup=[]
 
         #world areas
         self.world_areas=[]
@@ -115,6 +116,10 @@ class World(object):
         # can be used by other classes for time keeping
         self.world_seconds=0
 
+
+        # number of objects over which the world starts to cleanup un-needed objects
+        self.cleanup_threshold=2000
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -142,6 +147,10 @@ class World(object):
         WORLD_OBJECT.reset_image=True
 
         if WORLD_OBJECT not in self.wo_objects:
+            
+            # set or reset spawn time in world_seconds
+            WORLD_OBJECT.spawn_time=self.world_seconds
+
             self.wo_objects.append(WORLD_OBJECT)
             if WORLD_OBJECT.collision:
                 self.wo_objects_collision.append(WORLD_OBJECT)
@@ -181,6 +190,8 @@ class World(object):
                 self.wo_objects_ammo_container.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_furniture:
                 self.wo_objects_furniture.append(WORLD_OBJECT)
+            if WORLD_OBJECT.can_be_deleted:
+                self.wo_objects_cleanup.append(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' already in world.wo_objects. Add fails !!')
         
@@ -214,7 +225,27 @@ class World(object):
                 collided=temp
 
         return collided
+    
+    #------------------------------------------------------------------------------
+    def cleanup(self):
+        '''cleanup routine for when performance is hurting'''
 
+        # find the oldest time (which is the lowest number, as spawn_time counts up from zero)
+        oldest_time=10000
+        for b in self.wo_objects_cleanup:
+            if b.spawn_time<oldest_time:
+                oldest_time=b.spawn_time
+                oldest_object=b
+        
+        # remove objects that are in the same approximate spawn time
+        remove_list=[]
+        for b in self.wo_objects_cleanup:
+            if b.spawn_time>oldest_time-1 and b.spawn_time<oldest_time+1:
+                remove_list.append(b)
+
+        print('Cleanup function removing '+str(len(remove_list))+' objects')
+        for b in remove_list:
+            self.remove_object(b)
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,OBJ):
         ''' generates a ignore list for collision checking'''
@@ -412,6 +443,8 @@ class World(object):
                 self.wo_objects_ammo_container.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_furniture:
                 self.wo_objects_furniture.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.can_be_deleted:
+                self.wo_objects_cleanup.remove(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         
@@ -572,11 +605,16 @@ class World(object):
             if self.display_vehicle_text:
                 self.update_vehicle_text()
 
+            # check if we need to start cleaning up old objects for performance
+            if len(self.wo_objects_cleanup)>self.cleanup_threshold:
+                self.cleanup()
+
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
         self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
         self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
+        self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
         self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.german_ai.squads))+']')
         self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')

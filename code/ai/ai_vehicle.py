@@ -76,7 +76,7 @@ class AIVehicle(AIBase):
         # ----- instruments ------
 
 
-        # passengers  
+        # passengers - note that passengers are not removed from the world, so they are still updated
         self.passengers=[]
         self.max_occupants=4 # max people that can be in the vehicle, including driver
 

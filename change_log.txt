@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 13 2024 
+- ever object now has a spawn_time in world.world_seconds
+- added a cleanup function 
+
+cleanup function should start removing groups of unnecessary objects once the unnecessary 
+object count gets > 2000. Will have to think on that number - I need to add a performance options ui 
+
+I saw some performance issues at >6000 a couple days back in play testing, but note that was 
+RENDERED objects, not total objects. I could switch the cleanup routine over to only activate 
+for rendered objects - but that is going to be really variable depending on your view zoom level. 
+Either way - it only cleans up brass from guns and dirt piles from bullets hitting the ground at 
+the moment - no reason to have thousands of those things. The function cleans up items oldest to 
+newest in chunks, so hopefully it won't be super jarring for the user. 
+
+----------------------------------
 Feb 10 2024 
 - added a timed reinforcement system 
 - added german and soviet reinforcements to the test map 
@@ -10,7 +25,8 @@ the german reinforcements spawn two squads from the west at the same time.
 the soviet reinforcements spawn squads from north,south, and east each at random times. 
 should add some variation to who wins the battle (probably soviet now?)
 
-
+going to need to add a process to clean up bullet impact craters. 
+maybe add a spawn_time every time something spawns and clean it up if its been around for a long time
 ----------------------------------
 Feb 07 2024 
 - rewrite of how squads get spawned in 

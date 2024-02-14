@@ -1652,7 +1652,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_coords=copy.copy(w)
         z.render_level=2
         z.name='brass'
-        z.rotation_angle=float(random.randint(0,359))  
+        z.rotation_angle=float(random.randint(0,359))
+        z.can_be_deleted=True  
     
     elif OBJECT_TYPE=='blood_splatter':
         z=WorldObject(WORLD,['blood_splatter'],AINone)
@@ -1671,6 +1672,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))
+        z.can_be_deleted=True
     
     elif OBJECT_TYPE=='brown_chair':
         z=WorldObject(WORLD,['brown_chair'],AINone)
