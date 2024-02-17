@@ -23,6 +23,10 @@ class WorldObject(object):
         self.world = world
         self.name = None
 
+        # this gets set every time a object is added to the world
+        # in world.world_seconds
+        self.spawn_time=None
+
         # string that tells world_builder how to spawn this object
         # used for saving/loading objects
         self.world_builder_identity=''
@@ -80,6 +84,7 @@ class WorldObject(object):
 
         # checked by graphics_2d_pygame.update_render_info 
         # to determine whether to render the object or not
+        # this is used RARELY for special effects like passengers of vehicles
         self.render=True
 
         # ---- descriptor bools ----------------------------
@@ -120,6 +125,9 @@ class WorldObject(object):
         # stuff that i don't think is used at the moment
         self.is_melee=False # melee close combat weapon like a dagger 
         self.is_gun_mag_carrier=False
+
+        # denotes objects that can be deleted for performance reasons
+        self.can_be_deleted=False
 
         # ---- \ descriptor bools ----------------------------
 
