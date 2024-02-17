@@ -118,7 +118,7 @@ class World(object):
 
 
         # number of objects over which the world starts to cleanup un-needed objects
-        self.cleanup_threshold=2000
+        self.cleanup_threshold=4000
 
     #---------------------------------------------------------------------------
     def activate_context_menu(self):

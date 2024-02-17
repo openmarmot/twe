@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 17 2024 
+- bumped cleanup threshold to 4000
+- gave reinforcement spawn times some bigger ranges to keep it interesting. 
+- added steel_case sprite - will be used instead of brass 
+
+After doing some research I concluded that by late war most small arms ammo is going to 
+be steel case - at least on the eastern front. Added a steel case sprite and switched everything 
+over for now. In the future I may revisit and find a way to make this per bullet 
+
+----------------------------------
 Feb 13 2024 
 - ever object now has a spawn_time in world.world_seconds
 - added a cleanup function 

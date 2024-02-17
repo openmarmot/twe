@@ -114,7 +114,8 @@ class AIGun(AIBase):
                     self.owner.world.add_object(projectile)
 
                     # spawn brass 
-                    engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                    #engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                    engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
 
         return fired
 

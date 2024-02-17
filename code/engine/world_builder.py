@@ -571,6 +571,7 @@ def load_images(world):
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
     world.graphic_engine.loadImage('small_blood','images/sprites/small_blood.png')
     world.graphic_engine.loadImage('brass','images/sprites/brass.png')
+    world.graphic_engine.loadImage('steel_case','images/sprites/steel_case.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
     world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
@@ -654,7 +655,7 @@ def load_test_environment(world):
     world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 volksgrenadier fire group')])
     
     # add german reinforcements
-    time=random.randint(60,500)
+    time=random.randint(120,500)
     world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
     world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
 
@@ -665,11 +666,11 @@ def load_test_environment(world):
     world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle')])
 
     # add soviet reinforcements
-    time=random.randint(60,500)
+    time=random.randint(120,500)
     world.reinforcements.append([time,'soviet',[world.spawn_north,create_standard_squad(world,'soviet 1943 rifle')]])
-    time=random.randint(60,500)
+    time=random.randint(60,600)
     world.reinforcements.append([time,'soviet',[world.spawn_south,create_standard_squad(world,'soviet 1943 rifle')]])
-    time=random.randint(60,500)
+    time=random.randint(120,700)
     world.reinforcements.append([time,'soviet',[world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')]])
 
 
@@ -1652,6 +1653,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.world_coords=copy.copy(w)
         z.render_level=2
         z.name='brass'
+        z.rotation_angle=float(random.randint(0,359))
+        z.can_be_deleted=True  
+    # steel bullet casing
+    elif OBJECT_TYPE=='steel_case':
+        z=WorldObject(WORLD,['steel_case'],AINone)
+        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.render_level=2
+        z.name='steel_case'
         z.rotation_angle=float(random.randint(0,359))
         z.can_be_deleted=True  
     
