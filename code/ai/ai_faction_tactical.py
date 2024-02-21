@@ -103,7 +103,13 @@ class AIFactionTactical(object):
 
         # hand out orders 
         assign_orders=True
-        unassigned_squads=copy.copy(self.squads)
+        unassigned_squads=[]
+
+        # only count the squads that have members
+        # note that squads that have all memberes dead/gone don't get deleted at the moment
+        for b in self.squads:
+            if len(b.members)>0:
+                unassigned_squads.append(b)
 
         while assign_orders:
             b=unassigned_squads.pop()

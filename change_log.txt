@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 20 2024 
+- ai_faction_tactical no longer issues orders to empty squads 
+
+squads stick around after all the members die/leave mostly for record keeping. 
+not sure this is really necessary - will have to revisit at some point 
+
+squad asssignments need a rewrite to take in consideration the squads current location 
+relative to the world_areas 
+----------------------------------
 Feb 17 2024 
 - bumped cleanup threshold to 4000
 - gave reinforcement spawn times some bigger ranges to keep it interesting. 
