@@ -41,6 +41,8 @@ class World(object):
         # array of  [time,faction,[spawn_point,squad]]
         self.reinforcements=[]
 
+        # world objects that need to exit the map 
+        self.exit_queue=[]
 
         # object lists 
         self.wo_objects=[]
@@ -76,6 +78,11 @@ class World(object):
         self.spawn_west=[-4000.,0.]
         self.spawn_east=[4000.,0.]
 
+        # size of the map in every direction from 0,0
+        self.map_size=10000
+        self.map_check_interval=5
+        self.last_map_check=0
+        self.exited_object_count=0
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
@@ -226,6 +233,15 @@ class World(object):
 
         return collided
     
+    #---------------------------------------------------------------------------
+    def check_map_bounds(self):
+        '''check if anything is out of bounds'''
+        check_objects=self.wo_objects_human+self.wo_objects_vehicle
+        for b in check_objects:
+            if b.world_coords[0]>self.map_size or b.world_coords[0]<-self.map_size \
+                or b.world_coords[1]>self.map_size or b.world_coords[1]<-self.map_size:
+                self.exit_queue.append(b)
+
     #------------------------------------------------------------------------------
     def cleanup(self):
         '''cleanup routine for when performance is hurting'''
@@ -368,6 +384,29 @@ class World(object):
             self.player.ai.handle_keydown('b')
         elif KEY==114: #r
             self.player.ai.handle_keydown('r')
+
+    #---------------------------------------------------------------------------
+    def process_exit_queue(self):
+        '''process objects that need to leave the map'''
+
+        for b in self.exit_queue:
+            if b.is_human:
+                # exit vehicle
+                if b.ai.in_vehicle:
+                    b.ai.handle_exit_vehicle()
+
+                # remove from squad 
+                b.ai.squad.members.remove(b)
+
+            print(b.name+' has exited the world area!')
+
+            # remove from the world
+            self.remove_object(b)
+
+            self.exited_object_count+=1
+
+        #clear the queue        
+        self.exit_queue=[]
 
     #---------------------------------------------------------------------------
     def process_reinforcements(self):
@@ -608,14 +647,25 @@ class World(object):
             # check if we need to start cleaning up old objects for performance
             if len(self.wo_objects_cleanup)>self.cleanup_threshold:
                 self.cleanup()
+            
+            # check if anything is out of map bounds
+            if self.world_seconds-self.last_map_check>self.map_check_interval:
+                self.map_check_interval=random.randint(1,10)
+                self.last_map_check=self.world_seconds
+                self.check_map_bounds()
+
+                # process anything that has exited
+                self.process_exit_queue()
 
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
         self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
         self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
-        self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
+        self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
+        self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
+        self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
         self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.german_ai.squads))+']')
         self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
         self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')

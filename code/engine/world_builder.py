@@ -730,13 +730,14 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
     if CIVILIAN_TYPE=='default':
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
         return z
     if CIVILIAN_TYPE=='pistol':
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(WORLD,[0,0],'adler-cheese',False))
+        z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'ppk_magazine',False))
         return z
     if CIVILIAN_TYPE=='big cheese':
         '''goofy unique civilain. don't mess with big cheese'''
@@ -761,6 +762,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg34_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'panzerfaust',False))
         return z
 
