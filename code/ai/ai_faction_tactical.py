@@ -103,13 +103,15 @@ class AIFactionTactical(object):
 
         # hand out orders 
         assign_orders=True
-        unassigned_squads=copy.copy(self.squads)
+        unassigned_squads=[]
 
-        while assign_orders:
-            b=unassigned_squads.pop()
-
-            # order of importance is reinforce, attack, defend 
-
+        # only count the squads that have members
+        # note that squads that have all memberes dead/gone don't get deleted at the moment
+        for b in self.squads:
+            if len(b.members)>0:
+                unassigned_squads.append(b)
+        
+        for b in unassigned_squads:
             if len(reinforce_queue)>0:
                 b.destination=reinforce_queue.pop().world_coords
             elif len(attack_queue)>0:
@@ -120,9 +122,6 @@ class AIFactionTactical(object):
                 # seems like all the queues are empty
                 # just send them somewhere random
                 b.destination=self.world.world_areas[random.randint(0,len(self.world.world_areas)-1)].world_coords
-
-            if len(unassigned_squads)<1:
-                assign_orders=False
     
     #---------------------------------------------------------------------------
     def update(self):

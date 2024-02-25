@@ -1,5 +1,61 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Feb 24 2024 
+- several small changes to remove the ability to pick up containeres that 
+shouldn't be picked up (humans, large containers, etc)
+- added eat/drink menu for player 
+- added first aid menu for player 
+- cleaned up storage menu a bit 
+
+rewrote the code for array selection style menus and it is a lot more compact now. 
+the downside is it is still limited to 9 items 
+
+First aid isn't super meaningful at the moment. this stuff needs more detail and reasoning 
+
+
+----------------------------------
+Feb 23 2024 
+- moved debug text over so it doesn't clip over the vehicle menu text
+- added map bounds (10000 each direction). objects that exceed exit the map 
+
+now objects that wander off too far will get removed, and it also provides a 
+method for objects to intentionally exit the map.
+
+I'm not sure about what a good map size is. I think 10k in each direction is 
+probably too small, but its still bigger than you would want to drive in a kubelwagen 
+without getting bored. walking that far would be a huge pain. 
+
+I recall from my 3d game that there were some odd behaviors near the edge of the map 
+caused (i think) by floating point in-precision. I think that game was quite a bit 
+larger though. Also worth noting that the previous game was C# so floats were single 
+precision compared to python floats that are double precision - so this may not really 
+be an issue..
+
+also noted that now that you can pick up containers you can pick up .. yourself. 
+amusingly the game doesn't crash but you can no longer control anything.
+
+I accidentally left a test session from the last update running for about 20 hours. 
+- 1 soviet survived the entire time, with about 7 Germans surviving 
+- I didn't see any bikes, and general civilians were less visible than i would have expected 
+- I'm guessing that all the vehicles were ridden far off screen 
+- my character had about -14,000 stamina for some reason 
+
+----------------------------------
+Feb 22 2024 
+- fixed a empty list error in squad ai that was exposed by the previous update 
+- some small changes to civilian spawn loadouts 
+
+----------------------------------
+Feb 20 2024 
+- ai_faction_tactical no longer issues orders to empty squads 
+
+squads stick around after all the members die/leave mostly for record keeping. 
+not sure this is really necessary - will have to revisit at some point 
+
+squad asssignments need a rewrite to take in consideration the squads current location 
+relative to the world_areas 
 ----------------------------------
 Feb 17 2024 
 - bumped cleanup threshold to 4000

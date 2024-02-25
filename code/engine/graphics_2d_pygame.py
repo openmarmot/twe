@@ -263,7 +263,7 @@ class Graphics_2D_Pygame(object):
             self.h=0
             for b in self.world.debug_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (650, self.h), b, (255, 51, 51))
+                self.small_font.render_to(self.screen, (750, self.h), b, (255, 51, 51))
 
         if(self.world.display_vehicle_text):
             self.h=0
