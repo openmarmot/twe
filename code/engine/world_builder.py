@@ -779,6 +779,7 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
     z.rotation_angle=ROTATION_ANGLE
     z.ai.inventory=INVENTORY
     z.world_builder_identity='skip'
+    z.volume=50
     z.wo_start()
 
 #------------------------------------------------------------------------------

@@ -96,6 +96,10 @@ class World_Menu(object):
             self.coffee_grinder_menu(Key)
         elif self.active_menu=='squad':
             self.squad_menu(Key)
+        elif self.active_menu=='eat_drink':
+            self.eat_drink_menu(Key)
+        elif self.active_menu=='first_aid':
+            self.first_aid_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -333,6 +337,61 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'coffee_tin',True)
             elif Key=='9':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'coffee_grinder',True)
+
+    #---------------------------------------------------------------------------            
+    def eat_drink_menu(self, Key):
+
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- Eat/Drink Menu --')
+        self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
+        self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
+        self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
+
+        selectable_objects=[]
+        selection_key=1
+        for b in self.selected_object.ai.inventory:
+            if selection_key<10 and b.is_consumable:
+                self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                selection_key+=1
+                selectable_objects.append(b)
+
+        # get the array position corresponding to the key press
+        temp=self.translate_key_to_array_position(Key)
+        if temp !=None:
+            if len(selectable_objects)>temp:
+                self.selected_object.ai.handle_eat(selectable_objects[temp])
+                # reset the menue
+                self.eat_drink_menu(None)
+
+    #---------------------------------------------------------------------------            
+    def first_aid_menu(self, Key):
+
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- First Aid Menu --')
+        self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
+        self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
+        self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
+
+        selectable_objects=[]
+        selection_key=1
+        for b in self.selected_object.ai.inventory:
+            if selection_key<10 and b.is_medical:
+                self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                selection_key+=1
+                selectable_objects.append(b)
+
+        # get the array position corresponding to the key press
+        temp=self.translate_key_to_array_position(Key)
+        if temp !=None:
+            if len(selectable_objects)>temp:
+                self.selected_object.ai.handle_use_medical_object(selectable_objects[temp])
+                # reset the menue
+                self.first_aid_menu(None)
+
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
         # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
@@ -370,6 +429,7 @@ class World_Menu(object):
             if Key=='1':
                 self.world.player.ai.handle_pickup_object(self.selected_object)
                 self.deactivate_menu()
+
 
     #---------------------------------------------------------------------------
     def gun_menu(self, Key):
@@ -452,17 +512,21 @@ class World_Menu(object):
         if self.menu_state == 'player_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
             self.world.graphic_engine.menu_text_queue.append('2 - Squad Menu')
+            self.world.graphic_engine.menu_text_queue.append('3 - Eat/Drink')
+            self.world.graphic_engine.menu_text_queue.append('4 - First Aid')
             if self.selected_object.ai.large_pickup!=None:
-                self.world.graphic_engine.menu_text_queue.append('3 - Drop '+self.selected_object.ai.large_pickup.name)
-                if Key=='3':
+                self.world.graphic_engine.menu_text_queue.append('5 - Drop '+self.selected_object.ai.large_pickup.name)
+                if Key=='5':
                     self.selected_object.ai.handle_drop_object(self.selected_object.ai.large_pickup)
                     self.deactivate_menu()
             if Key=='1':
-            # pull up the storage/container menu
                 self.change_menu('storage')
             if Key=='2':
-            # pull up the storage/container menu
                 self.change_menu('squad')
+            if Key=='3':
+                self.change_menu('eat_drink')
+            if Key=='4':
+                self.change_menu('first_aid')
             
         elif self.menu_state == 'squad_member_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
@@ -584,9 +648,11 @@ class World_Menu(object):
             if distance<self.max_menu_distance:  
 
                 # guessing that objects > 5 liters can't be picked up
-                pickup_option=self.selected_object.volume<5
+                pickup_option=False
+                if self.selected_object.is_human==False and self.selected_object.volume<5:
+                    pickup_option=True
 
-                self.world.graphic_engine.menu_text_queue.append('1 - List')
+                self.world.graphic_engine.menu_text_queue.append('1 - ')
                 self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
                 self.world.graphic_engine.menu_text_queue.append('3 - Remove Items ')
                 if pickup_option:
@@ -596,77 +662,71 @@ class World_Menu(object):
                         self.deactivate_menu()
 
                 if Key=='1':
-                    Key=None
-                    self.menu_state='list'
+                    pass
                 if Key=='2':
                     Key=None
-                    pass
                     #self.menu_state='add'
                 if Key=='3':
                     Key=None
                     self.menu_state='remove'
 
-        if self.menu_state=='list':
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- List Inventory Menu --')
-            for b in self.selected_object.ai.inventory:
-                self.world.graphic_engine.menu_text_queue.append(' - '+b.name)
 
         if self.menu_state=='remove':
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
+
+            selectable_objects=[]
             selection_key=1
             for b in self.selected_object.ai.inventory:
-                if selection_key<10:
+                if selection_key<10 and b.is_medical:
                     self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
                     selection_key+=1
-            temp=None
-            if Key=='1':
-                if len(self.selected_object.ai.inventory)>0:
-                    temp=self.selected_object.ai.inventory[0]
-            if Key=='2':
-                if len(self.selected_object.ai.inventory)>1:
-                    temp=self.selected_object.ai.inventory[1]
-            if Key=='3':
-                if len(self.selected_object.ai.inventory)>2:
-                    temp=self.selected_object.ai.inventory[2]
-            if Key=='4':
-                if len(self.selected_object.ai.inventory)>3:
-                    temp=self.selected_object.ai.inventory[3]
-            if Key=='5':
-                if len(self.selected_object.ai.inventory)>4:
-                    temp=self.selected_object.ai.inventory[4]
-            if Key=='6':
-                if len(self.selected_object.ai.inventory)>5:
-                    temp=self.selected_object.ai.inventory[5]
-            if Key=='7':
-                if len(self.selected_object.ai.inventory)>6:
-                    temp=self.selected_object.ai.inventory[6]
-            if Key=='8':
-                if len(self.selected_object.ai.inventory)>7:
-                    temp=self.selected_object.ai.inventory[7]
-            if Key=='9':
-                if len(self.selected_object.ai.inventory)>8:
-                    temp=self.selected_object.ai.inventory[8]
+                    selectable_objects.append(b)
 
+            # get the array position corresponding to the key press
+            temp=self.translate_key_to_array_position(Key)
             if temp !=None:
-                if self.selected_object.is_player:
-                    #player is looking at their own storage, so dump anything they remove on the ground
-                    self.world.player.ai.handle_drop_object(temp)
-                else:
-                    # player is grabbing objects from some other object so put in players inventory
-                    # remove from the other object
-                    self.selected_object.remove_inventory(temp)
-                    # add to the player
-                    self.world.player.add_inventory(temp)
+                if len(selectable_objects)>temp:
+                    self.first_aid_menu(None)
 
-            self.world.graphic_engine.menu_text_queue=[]
-            self.world.graphic_engine.menu_text_queue.append('-- Remove Inventory Menu --')
-            selection_key=1
-            for b in self.selected_object.ai.inventory:
-                if selection_key<10:
-                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
-                    selection_key+=1
+                    if self.selected_object.is_player:
+                        #player is looking at their own storage, so dump anything they remove on the ground
+                        self.world.player.ai.handle_drop_object(selectable_objects[temp])
+                    else:
+                        # player is grabbing objects from some other object so put in players inventory
+                        # remove from the other object
+                        self.selected_object.remove_inventory(selectable_objects[temp])
+                        # add to the player
+                        self.world.player.add_inventory(selectable_objects[temp])
+                    # reset menu 
+                    self.storage_menu(None)
+
+
+
+    #--------------------------------------------------------------------------
+    def translate_key_to_array_position(self,Key):
+        '''translates a Key string to a array position'''
+        temp=None
+        if Key=='1':
+            temp=0
+        elif Key=='2':
+            temp=1
+        elif Key=='3':
+            temp=2
+        elif Key=='4':
+            temp=3
+        elif Key=='5':
+            temp=4
+        elif Key=='6':
+            temp=5
+        elif Key=='7':
+            temp=6
+        elif Key=='8':
+            temp=7
+        elif Key=='9':
+            temp=8
+
+        return temp
 
     #---------------------------------------------------------------------------
     def vehicle_menu(self, Key):
