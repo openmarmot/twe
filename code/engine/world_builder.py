@@ -170,7 +170,10 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
             s.members.append(spawn_civilians(WORLD,'default'))
     elif SQUAD_TYPE=='big cheese':
         s.faction='civilian'
-        s.members.append(spawn_civilians(WORLD,'big cheese'))
+        s.members.append(spawn_civilians(WORLD,'big_cheese'))
+    elif SQUAD_TYPE=='shovel man':
+        s.faction='civilian'
+        s.members.append(spawn_civilians(WORLD,'shovel_man'))
     else:
         print('!! Error : squad type not recognized : '+SQUAD_TYPE)
 
@@ -648,6 +651,25 @@ def load_test_environment(world):
     # generate civilians and civilan spawns
     generate_civilians_and_civilan_spawns(world)
 
+    # some civilian reinforcements
+    time=random.randint(120,800)
+    world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+    world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+    time=random.randint(120,900)
+    world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+    world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+    time=random.randint(120,1000)
+    world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+    world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+    time=random.randint(120,1100)
+    world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+    world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+
+    # shovel man !
+    if random.randint(0,10)==10:
+        time=random.randint(120,500)
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'shovel man')]])
+
     # add germans
     world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
     world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
@@ -732,14 +754,14 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.world_builder_identity='civilian_default'
         z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
         return z
-    if CIVILIAN_TYPE=='pistol':
+    elif CIVILIAN_TYPE=='pistol':
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.world_builder_identity='civilian_default'
         z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppk',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppk_magazine',False))
         return z
-    if CIVILIAN_TYPE=='big cheese':
+    elif CIVILIAN_TYPE=='big_cheese':
         '''goofy unique civilain. don't mess with big cheese'''
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.ai.health*=2
@@ -765,7 +787,20 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'panzerfaust',False))
         return z
-
+    elif CIVILIAN_TYPE=='shovel_man':
+        '''goofy unique civilain. '''
+        z=spawn_object(WORLD,[0.0],'civilian_man',False)
+        z.ai.health*=2
+        z.name='big cheese'
+        z.world_builder_identity='civilian_default'
+        z.add_inventory(spawn_object(WORLD,[0,0],'coffee_tin',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'german_folding_shovel',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'german_field_shovel',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
+        z.add_inventory(get_random_from_list(WORLD,[0,0],list_consumables_common,False))
+        return z
 #------------------------------------------------------------------------------
 # currently used for wrecks and bodies
 def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
