@@ -5,6 +5,9 @@ Feb 26 2024
 - added unique civilian spawn "shovel man"
 - added some civilian reinforcement spawns 
 
+the new unique 'shovel man' has both (!) types of shovel in the game. Shovels are tagged 
+as throwable so he should throw them if provoked.
+
 i'm not 100% sure how civilian squads are influenced by their ai_faction_tactial
 I think if theoretically they will just wander from site to site as they cannot hold territory. 
 However the civilian max squad distance is very large so they don't really appear to follow the group 
@@ -12,7 +15,6 @@ However the civilian max squad distance is very large so they don't really appea
 
 note - this reminds me that i need to tighten up the behavior around going to a vehicle 
 - the bots need to understand when vehicles are being driven away from them + when they are full 
-
 
 ----------------------------------
 Feb 24 2024 
