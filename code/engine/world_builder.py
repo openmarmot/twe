@@ -791,7 +791,7 @@ def spawn_civilians(WORLD,CIVILIAN_TYPE):
         '''goofy unique civilain. '''
         z=spawn_object(WORLD,[0.0],'civilian_man',False)
         z.ai.health*=2
-        z.name='big cheese'
+        z.name='Mr. Shovel'
         z.world_builder_identity='civilian_default'
         z.add_inventory(spawn_object(WORLD,[0,0],'coffee_tin',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'german_folding_shovel',False))

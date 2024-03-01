@@ -1,12 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 29 2024 
+- added distance check before firing anti-tank in think_engage_far
+- added a anti-tank launch option for think_engage_close for distances >100
+- added a check to ignore targets >1500 with a printed warning - uclear how often this is happening 
+- reordered engagement code a bit. hopefully leading to less random firing but we will see.. 
+- bumped the check that blocks movement if there are personal enemies from 300 to 400 as the max movement allowed 
+- think_move now checks whether a vehicle is full before trying to enter it (probably a rare issue)
+    - this may keep the ai from chasing bikes 
+    - also added this check for the function that actually adds the bot to the vehicle 
+
+----------------------------------
 Feb 26 2024 
 - added unique civilian spawn "shovel man"
 - added some civilian reinforcement spawns 
 
 the new unique 'shovel man' has both (!) types of shovel in the game. Shovels are tagged 
-as throwable so he should throw them if provoked.
+as throwable so he should throw them if provoked. I think at the moment this is the only 
+place the shovels show up in game - but that is likely to change in the future 
 
 i'm not 100% sure how civilian squads are influenced by their ai_faction_tactial
 I think if theoretically they will just wander from site to site as they cannot hold territory. 

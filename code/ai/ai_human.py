@@ -477,23 +477,28 @@ class AIHuman(AIBase):
     def handle_enter_vehicle(self,VEHICLE):
         # should maybe pick driver or gunner role here
 
-        VEHICLE.ai.passengers.append(self.owner)
-        self.in_vehicle=True
-        self.vehicle=VEHICLE
-        self.ai_goal='in_vehicle'
-        self.ai_state='in_vehicle'
-        
-        if self.vehicle.ai.open_top==False:
-            # human is hidden by top of vehicle so don't render
-            self.owner.render=False
+        if len(VEHICLE.ai.passengers)<VEHICLE.ai.max_occupants:
 
-        if self.owner.is_player or self.vehicle.ai.driver==None:
-            self.handle_change_vehicle_role('driver')
+            VEHICLE.ai.passengers.append(self.owner)
+            self.in_vehicle=True
+            self.vehicle=VEHICLE
+            self.ai_goal='in_vehicle'
+            self.ai_state='in_vehicle'
+            
+            if self.vehicle.ai.open_top==False:
+                # human is hidden by top of vehicle so don't render
+                self.owner.render=False
+
+            if self.owner.is_player or self.vehicle.ai.driver==None:
+                self.handle_change_vehicle_role('driver')
+            else:
+                # not driver, how about gunner?
+                if self.vehicle.ai.gunner==None:
+                    self.handle_change_vehicle_role('gunner')
         else:
-            # not driver, how about gunner?
-            if self.vehicle.ai.gunner==None:
-                self.handle_change_vehicle_role('gunner')
-
+            self.speak('No more room in this vehicle!')
+            self.ai_goal='none'
+            self.ai_state='none'
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
@@ -1179,7 +1184,12 @@ class AIHuman(AIBase):
         else:
             #target is alive, determine the best way to engage
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
-            if distance>300:
+            if distance>1500:
+                print('debug : target ignored. target distance is'+str(distance))
+                self.ai_state='sleeping'
+                self.ai_goal='none'
+                self.target_object=None
+            elif distance>300:
                 self.think_engage_far(distance)
             else:
                 self.think_engage_close(distance)
@@ -1193,6 +1203,12 @@ class AIHuman(AIBase):
         # if the ai_state isn't changed the gun will be fired on the next action cycle
         action=False
         if DISTANCE>100:
+            # need to make sure we have a minimum distance to arm the weapon 
+            if self.target_object.is_vehicle:
+                if self.antitank!=None and DISTANCE<800:
+                    self.launch_antitank(self.target_object.world_coords)
+                    action=True
+                    self.ai_want_antitank=True
             # maybe throw a grendate !
             if self.throwable != None:
                self.throw(self.target_object.world_coords)
@@ -1239,7 +1255,7 @@ class AIHuman(AIBase):
 
         action=False # used locally to help with decision tree
         if self.target_object.is_vehicle:
-            if self.antitank!=None:
+            if self.antitank!=None and DISTANCE<800:
                 self.launch_antitank(self.target_object.world_coords)
                 action=True
                 self.ai_want_antitank=True
@@ -1247,7 +1263,7 @@ class AIHuman(AIBase):
         if action==False:
             if self.primary_weapon==None:
                 # take an AT shot
-                if self.antitank!=None:
+                if self.antitank!=None and DISTANCE<800:
                     self.launch_antitank(self.target_object.world_coords)
                     action=True
                     self.ai_want_gun=True
@@ -1260,22 +1276,20 @@ class AIHuman(AIBase):
             else:
                 # check ammo (this is duplicated from think close. should be combined)
                 ammo=self.handle_check_ammo(self.primary_weapon)
-                if ammo[0]>0:
-                    # we can fire. this will be done automatically
-                    # check if target is too far 
-                    if DISTANCE >self.primary_weapon.ai.range :
-                        if self.prone:
-                            self.handle_prone_state_change()
-                        self.ai_goal='close_with_target'
-                        self.destination=copy.copy(self.target_object.world_coords)
-                        self.ai_state='start_moving'
-                        action=True
-                else:
+                if ammo[0]==0:
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
                         print('Error: (think_engage_far) out of ammo. need to handle this better')
-                        
+
+                 # check if target is too far 
+                if DISTANCE >self.primary_weapon.ai.range :
+                    if self.prone:
+                        self.handle_prone_state_change()
+                    self.ai_goal='close_with_target'
+                    self.destination=copy.copy(self.target_object.world_coords)
+                    self.ai_state='start_moving'
+                    action=True
 
                 
     #-----------------------------------------------------------------------
@@ -1614,15 +1628,18 @@ class AIHuman(AIBase):
                 b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle,2000)
                 if b!=None:
                     # should we check if its hostile??
-
-                    self.take_action_enter_vehicle(b)
+                    if len(b.ai.passengers)<b.ai.max_occupants:
+                        self.take_action_enter_vehicle(b)
+                    else:
+                        print('debug - closest vehicle is full')
+                        # should find another vehicle but there isn't a great mechanism for that
 
                 else:
                     # no vehicles ?
                     pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
-            if distance >300 and len(self.personal_enemies)>0:
+            if distance >400 and len(self.personal_enemies)>0:
                 self.think_generic()
                 print('error ! blocked from movement by close enemy')
             else:
