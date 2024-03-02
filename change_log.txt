@@ -1,5 +1,40 @@
 TWE Project : Change Log
 
+----------------------------------
+March 02 2024 
+- added a bit of code to spawn a couple bikes if there are no other vehicles 
+- added some panzerfausts to german squads 
+
+damage for humans in vehicles needs to be sorted out. 
+the current situation is bullets collide with humans or vehicles depending on whatever it 
+runs into first in the list of objects its checking 
+----------------------------------
+Feb 29 2024 
+- added distance check before firing anti-tank in think_engage_far
+- added a anti-tank launch option for think_engage_close for distances >100
+- added a check to ignore targets >1500 with a printed warning - uclear how often this is happening 
+- reordered engagement code a bit. hopefully leading to less random firing but we will see.. 
+- bumped the check that blocks movement if there are personal enemies from 300 to 400 as the max movement allowed 
+- think_move now checks whether a vehicle is full before trying to enter it (probably a rare issue)
+    - this may keep the ai from chasing bikes 
+    - also added this check for the function that actually adds the bot to the vehicle 
+
+----------------------------------
+Feb 26 2024 
+- added unique civilian spawn "shovel man"
+- added some civilian reinforcement spawns 
+
+the new unique 'shovel man' has both (!) types of shovel in the game. Shovels are tagged 
+as throwable so he should throw them if provoked. I think at the moment this is the only 
+place the shovels show up in game - but that is likely to change in the future 
+
+i'm not 100% sure how civilian squads are influenced by their ai_faction_tactial
+I think if theoretically they will just wander from site to site as they cannot hold territory. 
+However the civilian max squad distance is very large so they don't really appear to follow the group 
+- i may consider tightening this up 
+
+note - this reminds me that i need to tighten up the behavior around going to a vehicle 
+- the bots need to understand when vehicles are being driven away from them + when they are full 
 
 ----------------------------------
 Feb 24 2024 
@@ -13,7 +48,6 @@ rewrote the code for array selection style menus and it is a lot more compact no
 the downside is it is still limited to 9 items 
 
 First aid isn't super meaningful at the moment. this stuff needs more detail and reasoning 
-
 
 ----------------------------------
 Feb 23 2024 
