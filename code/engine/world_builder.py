@@ -122,8 +122,8 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_mp40'))
         s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
         s.members.append(spawn_soldiers(WORLD,'german_kar98k')) # asst machine gunner
-        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
-        s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
@@ -136,16 +136,16 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # asst machine gunner
-        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer
-        s.members.append(spawn_soldiers(WORLD,'german_stg44')) # ammo bearer 
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust')) # ammo bearer
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust')) # ammo bearer 
     elif SQUAD_TYPE=='german 1944 volksgrenadier storm group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) #squad lead
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) # deputy squad lead
-        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
-        s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_stg44')) #  rifle man
@@ -156,8 +156,8 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_fg42-type2')) # deputy squad lead
         s.members.append(spawn_soldiers(WORLD,'german_mg34')) #  mg
         s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  asst mg
-        s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  rifle man
-        s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust')) #  rifle man
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  rifle man
         s.members.append(spawn_soldiers(WORLD,'german_kar98k')) #  rifle man
@@ -396,6 +396,12 @@ def generate_clutter(WORLD):
     if chance==0:
         k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
         k1=spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
+
+    # make sure there are a couple vehicles at least 
+    if len(WORLD.wo_objects_vehicle)<4:
+        spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
+        spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
+        spawn_object(WORLD,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
 
 #------------------------------------------------------------------------------
 def generate_civilians_and_civilan_spawns(WORLD):
@@ -1922,6 +1928,19 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
         return z
+    if SOLDIER_TYPE=='german_kar98k_panzerfaust':
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'kar98k_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'panzerfaust',False))
+        return z
     if SOLDIER_TYPE=='german_k43':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_k43'
@@ -1981,6 +2000,20 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        return z
+    if SOLDIER_TYPE=='german_stg44_panzerfaust':
+        z=spawn_object(WORLD,[0.0],'german_soldier',False)
+        z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'stg44_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'panzerfaust',False))
         return z
     if SOLDIER_TYPE=='german_fg42-type2':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)

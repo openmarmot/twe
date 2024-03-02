@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 02 2024 
+- added a bit of code to spawn a couple bikes if there are no other vehicles 
+- added some panzerfausts to german squads 
+
+damage for humans in vehicles needs to be sorted out. 
+the current situation is bullets collide with humans or vehicles depending on whatever it 
+runs into first in the list of objects its checking 
+----------------------------------
 Feb 29 2024 
 - added distance check before firing anti-tank in think_engage_far
 - added a anti-tank launch option for think_engage_close for distances >100
