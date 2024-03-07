@@ -450,6 +450,9 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------
     def human_menu(self, Key):
+
+        self.world.graphic_engine.menu_text_queue=[]
+
         # get distance
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
 
@@ -490,10 +493,12 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
             self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             if self.selected_object.ai.primary_weapon != None:
-                self.world.graphic_engine.menu_text_queue.append(self.selected_object.ai.primary_weapon.name)
+                self.world.graphic_engine.menu_text_queue.append('[primary] '+self.selected_object.ai.primary_weapon.name)
                 self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
                 if self.selected_object.ai.primary_weapon.ai.magazine!=None:
-                    self.world.graphic_engine.menu_text_queue.append('  - Magazine : '+str(len(self.selected_object.ai.primary_weapon.ai.magazine.ai.projectiles)))
+                    self.world.graphic_engine.menu_text_queue.append('  - Ammo in magazine : '+str(len(self.selected_object.ai.primary_weapon.ai.magazine.ai.projectiles)))
+            if self.selected_object.ai.throwable!=None:
+                self.world.graphic_engine.menu_text_queue.append('[throw] '+self.selected_object.ai.throwable.name)
             self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
             self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
@@ -678,7 +683,7 @@ class World_Menu(object):
             selectable_objects=[]
             selection_key=1
             for b in self.selected_object.ai.inventory:
-                if selection_key<10 and b.is_medical:
+                if selection_key<10:
                     self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
                     selection_key+=1
                     selectable_objects.append(b)
@@ -687,7 +692,6 @@ class World_Menu(object):
             temp=self.translate_key_to_array_position(Key)
             if temp !=None:
                 if len(selectable_objects)>temp:
-                    self.first_aid_menu(None)
 
                     if self.selected_object.is_player:
                         #player is looking at their own storage, so dump anything they remove on the ground
