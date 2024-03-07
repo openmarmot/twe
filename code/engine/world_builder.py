@@ -1052,6 +1052,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
         z.rotation_angle=float(random.randint(0,359))
+        fill_container(WORLD,z,'gas_80_octane')
 
     elif OBJECT_TYPE=='blue_coffee_cup':
         z=WorldObject(WORLD,['blue_coffee_cup'],AIContainer)
@@ -1071,6 +1072,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=208.2
+        fill_container(WORLD,z,'gas_80_octane')
 
     elif OBJECT_TYPE=='barrel':
         z=WorldObject(WORLD,['barrel'],AIContainer)
@@ -1112,6 +1115,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.collision_radius=20
         z.world_builder_identity='crate'
         z.rotation_angle=float(random.randint(0,359))
+        z.volume=100
 
     elif OBJECT_TYPE=='small_crate':
         z=WorldObject(WORLD,['small_crate'],AIContainer)

@@ -549,7 +549,8 @@ class AIHuman(AIBase):
             # controls for when you are walking about
 
             if key=='b':
-                self.bleeding=False
+                print('note - bandaging is now done through the player medical menu ')
+                pass
             elif key=='g':
                 self.throw([])
             elif key=='p':

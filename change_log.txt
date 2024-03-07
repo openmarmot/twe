@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 07 2024 
+- fixed a bug with human menu where the text wasn't clearing right 
+- fixed a issue with the storage->remove menu where nothing was displaying
+- human menu now displays if you have a equipped throwable 
+- fixed several other issues with storage->remove
+- german_fuel_can and 55_gallon_drum now filled with gasoline 
+- [b] key for bandage is now disabled. you have to use the menu and have actual item now 
+
+need to check if adding fuel still works after the storage and engine overhaul - assuming it doesn't
+
+probably need to add oil - including oil tanks on vehicles and simulating that as part of the engine mechanics 
+
+
+----------------------------------
 March 02 2024 
 - added a bit of code to spawn a couple bikes if there are no other vehicles 
 - added some panzerfausts to german squads 
