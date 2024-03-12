@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+
+----------------------------------
+March 11 2024 
+- bumped up max size of storage objects that can be picked up to 20
+- minor fixes and changes to storage_menu 
+- storage_menu now lists contents 
+
 ----------------------------------
 March 07 2024 
 - fixed a bug with human menu where the text wasn't clearing right 
@@ -12,7 +19,6 @@ March 07 2024
 need to check if adding fuel still works after the storage and engine overhaul - assuming it doesn't
 
 probably need to add oil - including oil tanks on vehicles and simulating that as part of the engine mechanics 
-
 
 ----------------------------------
 March 02 2024 

@@ -654,26 +654,37 @@ class World_Menu(object):
 
                 # guessing that objects > 5 liters can't be picked up
                 pickup_option=False
-                if self.selected_object.is_human==False and self.selected_object.volume<5:
+                if self.selected_object.is_human==False and self.selected_object.volume<21:
                     pickup_option=True
 
-                self.world.graphic_engine.menu_text_queue.append('1 - ')
-                self.world.graphic_engine.menu_text_queue.append('2 - Add (not implemented) ')
-                self.world.graphic_engine.menu_text_queue.append('3 - Remove Items ')
+                self.world.graphic_engine.menu_text_queue.append('1 - Add (not implemented) ')
+                self.world.graphic_engine.menu_text_queue.append('2 - Remove Items ')
                 if pickup_option:
-                    self.world.graphic_engine.menu_text_queue.append('4 - Pick up '+self.selected_object.name)
-                    if Key=='4':
+                    self.world.graphic_engine.menu_text_queue.append('3 - Pick up '+self.selected_object.name)
+                    if Key=='3':
                         self.world.player.ai.handle_pickup_object(self.selected_object)
                         self.deactivate_menu()
+                
+                # print out contents
+                count=0
+                self.world.graphic_engine.menu_text_queue.append('------------- ')
+                for b in self.selected_object.ai.inventory:
+                    if count<6:
+                        self.world.graphic_engine.menu_text_queue.append(b.name)
+                    else:
+                        self.world.graphic_engine.menu_text_queue.append('...')
+                        break
+                self.world.graphic_engine.menu_text_queue.append('------------- ')
+
 
                 if Key=='1':
+                    Key=None
                     pass
                 if Key=='2':
                     Key=None
-                    #self.menu_state='add'
-                if Key=='3':
-                    Key=None
                     self.menu_state='remove'
+            else:
+                print('get closer')
 
 
         if self.menu_state=='remove':
