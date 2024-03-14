@@ -652,16 +652,21 @@ class World_Menu(object):
 
             if distance<self.max_menu_distance:  
 
-                # guessing that objects > 5 liters can't be picked up
-                pickup_option=False
-                if self.selected_object.is_human==False and self.selected_object.volume<21:
-                    pickup_option=True
+                if self.selected_object.is_player==False:
+                    self.world.graphic_engine.menu_text_queue.append('1 - Add Items ')
+                    if Key=='1':
+                        Key=None
+                        self.menu_state='add'
 
-                self.world.graphic_engine.menu_text_queue.append('1 - Add (not implemented) ')
                 self.world.graphic_engine.menu_text_queue.append('2 - Remove Items ')
-                if pickup_option:
+                if Key=='2':
+                    Key=None
+                    self.menu_state='remove'
+                # should make this decision on max vol for pickup somewhere else
+                if self.selected_object.is_human==False and self.selected_object.volume<21:
                     self.world.graphic_engine.menu_text_queue.append('3 - Pick up '+self.selected_object.name)
                     if Key=='3':
+                        Key=None
                         self.world.player.ai.handle_pickup_object(self.selected_object)
                         self.deactivate_menu()
                 
@@ -677,15 +682,32 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('------------- ')
 
 
-                if Key=='1':
-                    Key=None
-                    pass
-                if Key=='2':
-                    Key=None
-                    self.menu_state='remove'
+                
+                
             else:
                 print('get closer')
 
+        if self.menu_state=='add':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('-- Add Inventory Menu --')
+
+            selectable_objects=[]
+            selection_key=1
+            for b in self.world.player.ai.inventory:
+                if selection_key<10:
+                    self.world.graphic_engine.menu_text_queue.append(str(selection_key)+' - '+b.name)
+                    selection_key+=1
+                    selectable_objects.append(b)
+
+            # get the array position corresponding to the key press
+            temp=self.translate_key_to_array_position(Key)
+            if temp !=None:
+                if len(selectable_objects)>temp:
+                    self.world.player.remove_inventory(selectable_objects[temp])
+                    self.selected_object.add_inventory(selectable_objects[temp])
+
+                    # reset menu 
+                    self.storage_menu(None)
 
         if self.menu_state=='remove':
             self.world.graphic_engine.menu_text_queue=[]

@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 13 2024 
+- added 'add items' to storage menus (really transfer)
+
+the storage menus are pretty bad because there are only 9 number 
+keys to choose objects from. This needs to be fixed - but i think the 
+fix is to go to a gui system -- and that is something I'm not interested 
+in tackling at the moment 
+
+encountered a unique situation where a kubelwagen has a fuel can - which is a large pickup, but 
+it is in inventory - which is a unusual state for a large pickup. 
+If you remove the fuel can you cannot drop it - and its not showing in the world 
+like a large human pickup is supposed to. this will have to be fixed.  
+
+----------------------------------
 March 11 2024 
 - bumped up max size of storage objects that can be picked up to 20
 - minor fixes and changes to storage_menu 
