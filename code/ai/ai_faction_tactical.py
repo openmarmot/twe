@@ -67,20 +67,24 @@ class AIFactionTactical(object):
     #---------------------------------------------------------------------------
     def split_squad(self,members):
         '''removes members from their current squad and puts them in a new squad'''
-        # members - list of humans that you want to put in a new squad. 
-        squad=AISquad(self.world)
-        squad.faction=self.faction
-        squad.faction_tactical=self
-        
-        for b in members:
-            # note! this will remove the members from their old squad if they had one
-            squad.add_to_squad(b)
+        if len(members)>0:
 
-        # run a think cycle to set squad variables correctly
-        squad.handle_ai_think()
+            # members - list of humans that you want to put in a new squad. 
+            squad=AISquad(self.world)
+            squad.faction=self.faction
+            squad.faction_tactical=self
+            
+            for b in members:
+                # note! this will remove the members from their old squad if they had one
+                squad.add_to_squad(b)
 
-        # add to the list of squads we are keeping track of
-        self.squads.append(squad)
+            # run a think cycle to set squad variables correctly
+            squad.handle_ai_think()
+
+            # add to the list of squads we are keeping track of
+            self.squads.append(squad)
+        else:
+            print('debug : attempt to split a squad with zero new members')
 
     #---------------------------------------------------------------------------
     def tactical_order(self):
