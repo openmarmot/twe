@@ -220,40 +220,51 @@ class AIHuman(AIBase):
     def event_add_inventory(self,EVENT_DATA):
         ''' add object to inventory. does not remove obj from world'''
         if EVENT_DATA not in self.inventory:
-            self.inventory.append(EVENT_DATA)
+            if EVENT_DATA.is_large_human_pickup:
+                # note - this will happen when a large_human_pickup is in another container
+                # for example if a fuel can is in a kubelwagen
+                # this does NOT happen when an object is picked up from the world as it is intercepted
+                # before it gets this far
 
-            if EVENT_DATA.is_gun :
-                if self.primary_weapon!=None:
-                    # drop the current obj and pick up the new one
-                    self.handle_drop_object(self.primary_weapon)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.primary_weapon=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-                self.ai_want_gun=False
-            elif EVENT_DATA.is_throwable :
-                if self.throwable==None:
+                #add to world. (the object was in a inventory array)
+                self.owner.world.add_object(EVENT_DATA)
+
+                self.large_pickup=EVENT_DATA
+
+            else:
+
+                self.inventory.append(EVENT_DATA)
+
+                if EVENT_DATA.is_gun :
+                    if self.primary_weapon!=None:
+                        # drop the current obj and pick up the new one
+                        self.handle_drop_object(self.primary_weapon)
                     if self.owner.is_player :
                         self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.throwable=EVENT_DATA
+                    self.primary_weapon=EVENT_DATA
                     EVENT_DATA.ai.equipper=self.owner
-                if EVENT_DATA.is_grenade:
-                    self.ai_want_grenade=False
-            elif EVENT_DATA.is_handheld_antitank :
-                if self.antitank!=None:
-                    # drop the current obj and pick up the new one
-                    self.handle_drop_object(self.antitank)
-                if self.owner.is_player :
-                    self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                self.antitank=EVENT_DATA
-                EVENT_DATA.ai.equipper=self.owner
-                self.ai_want_antitank=False
-            elif EVENT_DATA.is_large_human_pickup :
-                print('ERROR - large pickup should not go through inventory functions')
-            elif EVENT_DATA.is_consumable:
-                self.ai_want_food=False
-            elif EVENT_DATA.is_medical:
-                self.ai_want_medical=False
+                    self.ai_want_gun=False
+                elif EVENT_DATA.is_throwable :
+                    if self.throwable==None:
+                        if self.owner.is_player :
+                            self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                        self.throwable=EVENT_DATA
+                        EVENT_DATA.ai.equipper=self.owner
+                    if EVENT_DATA.is_grenade:
+                        self.ai_want_grenade=False
+                elif EVENT_DATA.is_handheld_antitank :
+                    if self.antitank!=None:
+                        # drop the current obj and pick up the new one
+                        self.handle_drop_object(self.antitank)
+                    if self.owner.is_player :
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
+                    self.antitank=EVENT_DATA
+                    EVENT_DATA.ai.equipper=self.owner
+                    self.ai_want_antitank=False
+                elif EVENT_DATA.is_consumable:
+                    self.ai_want_food=False
+                elif EVENT_DATA.is_medical:
+                    self.ai_want_medical=False
         else:
             print('ERROR - object '+EVENT_DATA.name+' is already in inventory')
             print('inventory list:')

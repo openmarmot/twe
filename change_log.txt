@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 16 2024 
+- if you choose to spawn as civilian, your squad will be auto disbanded
+- added code to handle the possibility of a large_human_pickup being a inventory item
+- fixed a index error when attempting to split a zero member squad 
+- removed player, players large_human_pickup, players vehicle from mouse selection 
+
+disbanded the initial player civilian squad as they are SUPER ANNOYING.
+You can always click on civilians and ask them to join your squad if you 
+want them following you around 
+
+removing the player and the objects they are using from mouse select was a huge 
+QOL improvement. If you need to pull up a player context menu just hit [tab]
+
+
+----------------------------------
 March 13 2024 
 - added 'add items' to storage menus (really transfer)
 

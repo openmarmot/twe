@@ -635,6 +635,16 @@ class World_Menu(object):
                 if len(self.world.wo_objects_civilian)>0:
                     self.world.spawn_player('civilian')
                     spawned=True
+
+                    # disband player squad, as they are super annoying
+                    squad=self.world.player.ai.squad
+                    members=[]
+                    for b in squad.members:
+                        if b.is_player==False:
+                            members.append(b)
+                    squad.faction_tactical.split_squad(members)
+
+
                 else:
                     print('No bots of this type available')
             

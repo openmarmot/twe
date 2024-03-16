@@ -52,7 +52,7 @@ esc - exit the current menu
 # identifying the player 
 - the player is always in the center of the screen 
 
-# you can click on yourself or hit tab to pull up a context menu
+# hit tab to bring up either the player menu or the menu for the vehicle you are in 
 - this is how you access your inventory 
 
 # gun aim 
@@ -67,6 +67,7 @@ esc - exit the current menu
 # squad stuff 
 - you can click on a bot and ask it to join your squad 
     - it will then follow you when it doesn't have more important tasks 
+- you can disband your current squad from the player menu 
 
 # autoplay 
 - if you don't touch any controls for awhile the ai takes over. 
