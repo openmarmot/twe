@@ -106,7 +106,7 @@ class WorldObject(object):
         self.is_large_human_pickup=False # fills a large pickup slot
         
         self.is_container=False # object that stores other objects
-        self.is_ammo_container=False # contains ammo 
+        self.is_ammo_container=False # contains ammo. note this should go away
         self.is_projectile=False
         self.is_consumable=False
         self.is_medical=False # general medical objects. bandage / pain pills / etc

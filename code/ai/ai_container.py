@@ -71,8 +71,23 @@ class AIContainer(AIBase):
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):
-        self.owner.world.remove_object(EVENT_DATA)
-        self.inventory.add(EVENT_DATA)
+
+        # merge liquids 
+        if EVENT_DATA.is_liquid:
+            existing_liquid=None
+            for b in self.inventory:
+                if b.name==EVENT_DATA.name:
+                    existing_liquid=EVENT_DATA
+            
+            if existing_liquid==None:
+                # no existing liquid so just add the new liquid
+                self.inventory.add(EVENT_DATA)
+            else:
+                #combine them
+                existing_liquid.volume+=EVENT_DATA.volume
+
+        else:
+            self.inventory.add(EVENT_DATA)
     
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):

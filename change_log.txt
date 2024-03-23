@@ -2,6 +2,27 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 22 2024
+- ai_container no longer removes from world when adding inventory 
+    - this probably only triggered recently 
+- ai_container now merges liquids 
+- lots of code changes for fueling vehicles
+
+! note - did not test these changes as i am tired. will test and bug fix in the next commit 
+
+i was going to delete ai_container but the liquid merging code works well there. 
+I don't think there is anywhere else where it would be needed. Something that holds 
+a liquid should have container ai.
+
+fueling vehicles should work now but probably has bugs. it is a lot more complicated 
+than you would think. 
+
+multiple fuel tanks is not well supported atm 
+
+wine and beer should be rewritten as bottles containing wine and beer 
+instead of one object 
+
+----------------------------------
 March 16 2024 
 - if you choose to spawn as civilian, your squad will be auto disbanded
 - added code to handle the possibility of a large_human_pickup being a inventory item
@@ -14,7 +35,6 @@ want them following you around
 
 removing the player and the objects they are using from mouse select was a huge 
 QOL improvement. If you need to pull up a player context menu just hit [tab]
-
 
 ----------------------------------
 March 13 2024 

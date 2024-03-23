@@ -64,8 +64,8 @@ list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
-list_guns_rare=['mp40','ppk','stg44','mg34','dp28','1911','k43','g41w']
-list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper']
+list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w']
+list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']

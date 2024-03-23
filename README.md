@@ -43,7 +43,6 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - 'f' to fire weapon (if you have one)
 - 'g' throw grenade (if you have one)
 - 't' launch panzerfaust (if you have one)
-- 'b' to bandage wound if you are bleeding
 - '[' zoom out
 - ']' zoom in 
 

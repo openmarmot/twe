@@ -394,8 +394,18 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
-        # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
+        # to get to this menu you have to be holding a container with fuel and clicking a vehicle
         # no need for a menu state
+
+        # find the actual fuel
+        fuel=None
+        for b in self.world.player.ai.large_pickup.ai.inventory:
+            if 'gas' in b.name:
+                fuel=b
+
+        # in the future should distribute across the tanks 
+        fuel_tank=self.selected_object.ai.fuel_tanks[0]
+
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
@@ -405,11 +415,11 @@ class World_Menu(object):
         self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
         self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
         if Key=='1':
-            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            self.world.player.ai.handle_transfer(fuel,fuel_tank)
             # update text
             self.fuel_menu('')
         elif Key=='2':
-            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            self.world.player.ai.handle_transfer(fuel,self.selected_object)
             # update text
             self.fuel_menu('')
 
@@ -787,9 +797,14 @@ class World_Menu(object):
 
         if self.menu_state=='external':
             fuel_option=False
+            # determine if the large pickup contains fuel
             if self.world.player.ai.large_pickup!=None:
-                # this is where it used to check if it was a fuel can with fuel
-                pass
+                if self.world.player.ai.large_pickup.is_container:
+                    # some vehicles don't use a fuel tank
+                    if len(self.selected_object.ai.fuel_tanks)>0:
+                        for b in self.world.player.ai.large_pickup.ai.inventory:
+                            if 'gas' in b.name:
+                                fuel_option=True
             primaryWeapon='None'
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name
