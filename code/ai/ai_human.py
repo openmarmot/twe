@@ -881,7 +881,7 @@ class AIHuman(AIBase):
             FROM_OBJECT.volume=source_result
             
             # spawn a new liquid object with the amount to transfer
-            z=self.owner.world.world_buidler.spawn_object(self.owner.world,[0,0]FROM_OBJECT.name,False)
+            z=engine.world_builder.spawn_object(self.owner.world,[0,0],FROM_OBJECT.name,False)
             z.volume=destination_result
 
             # add the new liquid to the container

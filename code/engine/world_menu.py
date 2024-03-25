@@ -409,9 +409,9 @@ class World_Menu(object):
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
-        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ "not implemented")
-        self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
-        self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
+        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ fuel.name)
+        self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(fuel_tank.ai.inventory[0].volume))
+        self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(fuel_tank.volume))
         self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
         self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
         if Key=='1':
@@ -689,6 +689,8 @@ class World_Menu(object):
                         Key=None
                         self.world.player.ai.handle_pickup_object(self.selected_object)
                         self.deactivate_menu()
+                        # exit function
+                        return
                 
                 # print out contents
                 count=0

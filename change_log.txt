@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 23 2024
+- fix syntax error in ai_human 
+- fixed storage_menu bug 
+- fuel_menu fixes 
+
+bug fix and cleanup from last update 
+
+----------------------------------
 March 22 2024
 - ai_container no longer removes from world when adding inventory 
     - this probably only triggered recently 
