@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 25 2024
+- changed text color to a dark grey. 
+
+
+red text was hard to see. i put in some random numbers and got dark grey. 
+
+----------------------------------
 March 23 2024
 - fix syntax error in ai_human 
 - fixed storage_menu bug 
