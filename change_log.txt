@@ -2,9 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 26 2024
+- if a human is carrying a large pickup when entering a vehicle 
+it will be put in the vehicles inventory 
+
+----------------------------------
 March 25 2024
 - changed text color to a dark grey. 
 
+some play testing. fueling seems to be working maybe? no errors at least
 
 red text was hard to see. i put in some random numbers and got dark grey. 
 

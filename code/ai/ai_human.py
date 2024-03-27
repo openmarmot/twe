@@ -490,6 +490,12 @@ class AIHuman(AIBase):
 
         if len(VEHICLE.ai.passengers)<VEHICLE.ai.max_occupants:
 
+            # put your large items in the trunk
+            if self.large_pickup:
+                VEHICLE.add_inventory(self.large_pickup)
+                self.owner.world.remove_object(self.large_pickup)
+                self.large_pickup=None
+
             VEHICLE.ai.passengers.append(self.owner)
             self.in_vehicle=True
             self.vehicle=VEHICLE
