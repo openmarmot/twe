@@ -2,6 +2,60 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 28 2024
+- added requirement of weight<50 kg for world_menu pickup options 
+- adjusted weight of JU-88
+- added german sc250 bomb (aprox 550 pound)
+- made second layer optional on spawn_aligned_pile
+
+getting back to aviation a bit. i think. maybe.
+
+bombs probably need their own AI class. we also need better support 
+for explosions in game, along with some fire and smoke graphics 
+
+----------------------------------
+March 26 2024
+- if a human is carrying a large pickup when entering a vehicle 
+it will be put in the vehicles inventory 
+
+----------------------------------
+March 25 2024
+- changed text color to a dark grey. 
+
+some play testing. fueling seems to be working maybe? no errors at least
+
+red text was hard to see. i put in some random numbers and got dark grey. 
+
+----------------------------------
+March 23 2024
+- fix syntax error in ai_human 
+- fixed storage_menu bug 
+- fuel_menu fixes 
+
+bug fix and cleanup from last update 
+
+----------------------------------
+March 22 2024
+- ai_container no longer removes from world when adding inventory 
+    - this probably only triggered recently 
+- ai_container now merges liquids 
+- lots of code changes for fueling vehicles
+
+! note - did not test these changes as i am tired. will test and bug fix in the next commit 
+
+i was going to delete ai_container but the liquid merging code works well there. 
+I don't think there is anywhere else where it would be needed. Something that holds 
+a liquid should have container ai.
+
+fueling vehicles should work now but probably has bugs. it is a lot more complicated 
+than you would think. 
+
+multiple fuel tanks is not well supported atm 
+
+wine and beer should be rewritten as bottles containing wine and beer 
+instead of one object 
+
+----------------------------------
 March 16 2024 
 - if you choose to spawn as civilian, your squad will be auto disbanded
 - added code to handle the possibility of a large_human_pickup being a inventory item
@@ -14,7 +68,6 @@ want them following you around
 
 removing the player and the objects they are using from mouse select was a huge 
 QOL improvement. If you need to pull up a player context menu just hit [tab]
-
 
 ----------------------------------
 March 13 2024 

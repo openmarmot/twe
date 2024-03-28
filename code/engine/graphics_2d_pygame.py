@@ -74,6 +74,8 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
+        self.menu_color=(50, 51, 51)
+
         # used for temporary text. call add_text to add 
         self.text_queue=[]
         self.text_queue_clear_rate=4
@@ -252,24 +254,24 @@ class Graphics_2D_Pygame(object):
         self.h=0
         for b in islice(self.text_queue,self.text_queue_display_size):
             self.h+=15
-            self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
+            self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
         self.h+=20
         for b in self.menu_text_queue:
             self.h+=15
-            self.small_font.render_to(self.screen, (40, self.h), b, (255, 51, 51))
+            self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
         if(self.world.debug_mode):
             self.h=0
             for b in self.world.debug_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (750, self.h), b, (255, 51, 51))
+                self.small_font.render_to(self.screen, (750, self.h), b,self.menu_color )
 
         if(self.world.display_vehicle_text):
             self.h=0
             for b in self.world.vehicle_text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (500, self.h), b, (255, 51, 51))
+                self.small_font.render_to(self.screen, (500, self.h), b, self.menu_color)
 
         if self.double_buffering:
             pygame.display.flip()

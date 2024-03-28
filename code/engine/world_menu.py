@@ -394,41 +394,51 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------
     def fuel_menu(self, Key):
-        # i think if you get here it assumes you are holding fuel and have clicked on a vehicle
+        # to get to this menu you have to be holding a container with fuel and clicking a vehicle
         # no need for a menu state
+
+        # find the actual fuel
+        fuel=None
+        for b in self.world.player.ai.large_pickup.ai.inventory:
+            if 'gas' in b.name:
+                fuel=b
+
+        # in the future should distribute across the tanks 
+        fuel_tank=self.selected_object.ai.fuel_tanks[0]
+
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Fuel Menu: '+self.selected_object.name+' --')
-        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ "not implemented")
-        self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(self.selected_object.ai.fuel))
-        self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(self.selected_object.ai.fuel_capacity))
+        self.world.graphic_engine.menu_text_queue.append('Fuel Can Contents: '+ fuel.name)
+        self.world.graphic_engine.menu_text_queue.append('Current Fuel Load : '+str(fuel_tank.ai.inventory[0].volume))
+        self.world.graphic_engine.menu_text_queue.append('Maximum Fuel Capacity : '+str(fuel_tank.volume))
         self.world.graphic_engine.menu_text_queue.append('1 - Add Fuel')
         self.world.graphic_engine.menu_text_queue.append('2 - Remove Fuel')
         if Key=='1':
-            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            self.world.player.ai.handle_transfer(fuel,fuel_tank)
             # update text
             self.fuel_menu('')
         elif Key=='2':
-            self.world.player.ai.handle_transfer(self.world.player.ai.large_pickup,self.selected_object)
+            self.world.player.ai.handle_transfer(fuel,self.selected_object)
             # update text
             self.fuel_menu('')
 
     #---------------------------------------------------------------------------
     def generic_item_menu(self, Key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            if self.world.debug_mode==True:
-                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
 
-            if distance<self.max_menu_distance:  
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+        if self.world.debug_mode==True:
+            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
+
+        if distance<self.max_menu_distance:
+            if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
                 self.world.graphic_engine.menu_text_queue.append('1 - pick up')
-                self.menu_state='base'
-        if self.menu_state=='base':
-            if Key=='1':
-                self.world.player.ai.handle_pickup_object(self.selected_object)
-                self.deactivate_menu()
+                if Key=='1':
+                    self.world.player.ai.handle_pickup_object(self.selected_object)
+                    self.deactivate_menu()
 
 
     #---------------------------------------------------------------------------
@@ -673,12 +683,15 @@ class World_Menu(object):
                     Key=None
                     self.menu_state='remove'
                 # should make this decision on max vol for pickup somewhere else
-                if self.selected_object.is_human==False and self.selected_object.volume<21:
+                # 100 pounds is about 45 kilograms. thats about max that a normal human would carry
+                if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
                     self.world.graphic_engine.menu_text_queue.append('3 - Pick up '+self.selected_object.name)
                     if Key=='3':
                         Key=None
                         self.world.player.ai.handle_pickup_object(self.selected_object)
                         self.deactivate_menu()
+                        # exit function
+                        return
                 
                 # print out contents
                 count=0
@@ -787,9 +800,14 @@ class World_Menu(object):
 
         if self.menu_state=='external':
             fuel_option=False
+            # determine if the large pickup contains fuel
             if self.world.player.ai.large_pickup!=None:
-                # this is where it used to check if it was a fuel can with fuel
-                pass
+                if self.world.player.ai.large_pickup.is_container:
+                    # some vehicles don't use a fuel tank
+                    if len(self.selected_object.ai.fuel_tanks)>0:
+                        for b in self.world.player.ai.large_pickup.ai.inventory:
+                            if 'gas' in b.name:
+                                fuel_option=True
             primaryWeapon='None'
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name

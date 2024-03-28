@@ -490,6 +490,12 @@ class AIHuman(AIBase):
 
         if len(VEHICLE.ai.passengers)<VEHICLE.ai.max_occupants:
 
+            # put your large items in the trunk
+            if self.large_pickup:
+                VEHICLE.add_inventory(self.large_pickup)
+                self.owner.world.remove_object(self.large_pickup)
+                self.large_pickup=None
+
             VEHICLE.ai.passengers.append(self.owner)
             self.in_vehicle=True
             self.vehicle=VEHICLE
@@ -866,17 +872,28 @@ class AIHuman(AIBase):
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
         
-        print('transfers not currently implemented')
 
-        #if FROM_OBJECT.is_liquid_container and TO_OBJECT.is_vehicle:
-        #    source_amount=FROM_OBJECT.ai.used_volume
-        #    destination_amount=TO_OBJECT.ai.fuel
-        #    destination_maximum=TO_OBJECT.ai.fuel_capacity
-        #    source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
-        #    FROM_OBJECT.ai.used_volume=source_result
-        #    TO_OBJECT.ai.fuel=destination_result
-        #else:
-        #    print('handle_transfer error: src/dest not recognized!')
+        if FROM_OBJECT.is_liquid and TO_OBJECT.is_container:
+            source_amount=FROM_OBJECT.volume
+            
+            # add up total destination volume
+            destination_amount=0
+            for b in TO_OBJECT.ai.inventory:
+                destination_amount+=b.volume
+
+            # remember in containers this is considered a max volume    
+            destination_maximum=TO_OBJECT.volume
+            source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
+            FROM_OBJECT.volume=source_result
+            
+            # spawn a new liquid object with the amount to transfer
+            z=engine.world_builder.spawn_object(self.owner.world,[0,0],FROM_OBJECT.name,False)
+            z.volume=destination_result
+
+            # add the new liquid to the container
+            TO_OBJECT.add_inventory(z)
+        else:
+            print('handle_transfer error: src/dest not recognized!')
 
     #-----------------------------------------------------------------------
     def handle_vehicle_died(self):
