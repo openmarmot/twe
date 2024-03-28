@@ -426,19 +426,19 @@ class World_Menu(object):
     #---------------------------------------------------------------------------
     def generic_item_menu(self, Key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
-            if self.world.debug_mode==True:
-                self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
 
-            if distance<self.max_menu_distance:  
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- '+self.selected_object.name+' --')
+        if self.world.debug_mode==True:
+            self.world.graphic_engine.menu_text_queue.append('Distance: '+str(distance))
+
+        if distance<self.max_menu_distance:
+            if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
                 self.world.graphic_engine.menu_text_queue.append('1 - pick up')
-                self.menu_state='base'
-        if self.menu_state=='base':
-            if Key=='1':
-                self.world.player.ai.handle_pickup_object(self.selected_object)
-                self.deactivate_menu()
+                if Key=='1':
+                    self.world.player.ai.handle_pickup_object(self.selected_object)
+                    self.deactivate_menu()
 
 
     #---------------------------------------------------------------------------
@@ -683,7 +683,8 @@ class World_Menu(object):
                     Key=None
                     self.menu_state='remove'
                 # should make this decision on max vol for pickup somewhere else
-                if self.selected_object.is_human==False and self.selected_object.volume<21:
+                # 100 pounds is about 45 kilograms. thats about max that a normal human would carry
+                if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
                     self.world.graphic_engine.menu_text_queue.append('3 - Pick up '+self.selected_object.name)
                     if Key=='3':
                         Key=None

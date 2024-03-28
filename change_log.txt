@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 28 2024
+- added requirement of weight<50 kg for world_menu pickup options 
+- adjusted weight of JU-88
+- added german sc250 bomb (aprox 550 pound)
+- made second layer optional on spawn_aligned_pile
+
+getting back to aviation a bit. i think. maybe.
+
+bombs probably need their own AI class. we also need better support 
+for explosions in game, along with some fire and smoke graphics 
+
+----------------------------------
 March 26 2024
 - if a human is carrying a large pickup when entering a vehicle 
 it will be put in the vehicles inventory 

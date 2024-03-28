@@ -547,6 +547,9 @@ def load_images(world):
     world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
     world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
 
+    # bombs
+    world.graphic_engine.loadImage('sc250','images/bombs/sc250.png')
+
     # projectiles
     world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
     world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
@@ -710,14 +713,15 @@ def load_test_environment(world):
     # add ju88
     spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
-    
+    # add a pile of bombs
+    spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
 
     # bikes 
     #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
   
 
 #------------------------------------------------------------------------------
-def spawn_aligned_pile(WORLD,point_a,point_b,spawn_string,separation_distance,count):
+def spawn_aligned_pile(WORLD,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
     ''' spawn an aligned pile like a wood pile'''
     # point_a - initial spawn point
     # point_b - direction in which the pile grows to 
@@ -738,15 +742,15 @@ def spawn_aligned_pile(WORLD,point_a,point_b,spawn_string,separation_distance,co
         x.heading=heading
         x.world_coords=current_coords
 
-    # mid layer
-    current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
-    for x in range(int(count/2)):
-        current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
+    if second_layer:
+        current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
+        for x in range(int(count/2)):
+            current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
 
-        x=spawn_object(WORLD,point_a,spawn_string,True)
-        x.rotation_angle=rotation
-        x.heading=heading
-        x.world_coords=current_coords
+            x=spawn_object(WORLD,point_a,spawn_string,True)
+            x.rotation_angle=rotation
+            x.heading=heading
+            x.world_coords=current_coords
 
 
 
@@ -1647,7 +1651,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
-        z.weight=800
+        z.weight=9800
         z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
@@ -1827,6 +1831,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.render_level=2
         z.name='coffee_grinder'
         z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='sc250':
+        z=WorldObject(WORLD,['sc250'],AINone)
+        z.render_level=2
+        z.name='sc250'
+        z.weight=250
+        z.rotation_angle=float(random.randint(0,359)) 
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
