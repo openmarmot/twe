@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 29 2024
+- added jumo_211 engine 
+- ju88 now has two engines (jumo 211 type)
+
+need to rewrite engine start menu for multi-engine 
+need to handle multi engine power in vehicle physics 
+
+----------------------------------
 March 28 2024
 - added requirement of weight<50 kg for world_menu pickup options 
 - adjusted weight of JU-88
