@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 31 2024
+- added a engine menu 
+    - for now lets you turn multiple engines on and off 
+- vehicle HUD now correctly shows multiple engine status 
+
+note - it turns out the vehicle physics already accounts for multi engine 
+
+probably need to do some work on fuel tanks next 
+
+----------------------------------
 March 29 2024
 - added jumo_211 engine 
 - ju88 now has two engines (jumo 211 type)

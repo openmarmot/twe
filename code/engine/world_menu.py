@@ -100,6 +100,8 @@ class World_Menu(object):
             self.eat_drink_menu(Key)
         elif self.active_menu=='first_aid':
             self.first_aid_menu(Key)
+        elif self.active_menu=='engine_menu':
+            self.engine_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -364,6 +366,31 @@ class World_Menu(object):
                 self.selected_object.ai.handle_eat(selectable_objects[temp])
                 # reset the menue
                 self.eat_drink_menu(None)
+
+    #---------------------------------------------------------------------------            
+    def engine_menu(self, Key):
+
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- Engine Menu --')
+        self.world.graphic_engine.menu_text_queue.append('Engine / Turned On')
+        
+        selectable_objects=self.world.player.ai.vehicle.ai.engines
+        selection_key=1
+        for b in selectable_objects:
+            self.world.graphic_engine.menu_text_queue.append(str(selection_key) + ': ' + b.name + ' ' + str(b.ai.engine_on))
+            selection_key+=1
+
+        self.world.graphic_engine.menu_text_queue.append('Select an engine to turn it on or off')
+
+        # get the array position corresponding to the key  press
+        temp=self.translate_key_to_array_position(Key)
+        if temp !=None:
+            if len(selectable_objects)>temp:
+                selectable_objects[temp].ai.engine_on=not selectable_objects[temp].ai.engine_on
+
+                # refresh text
+                self.engine_menu(None)
 
     #---------------------------------------------------------------------------            
     def first_aid_menu(self, Key):
@@ -885,7 +912,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.world.graphic_engine.menu_text_queue.append('1 - change role')
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
-            self.world.graphic_engine.menu_text_queue.append('3 - start/stop engine')
+            self.world.graphic_engine.menu_text_queue.append('3 - engine menu')
             self.world.graphic_engine.menu_text_queue.append('4 - toggle HUD')
             if Key=='1':
                 self.change_menu('change_vehicle_role')
@@ -896,11 +923,7 @@ class World_Menu(object):
                 self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
-                #flip the bool
-                if len(self.selected_object.ai.engines)>0:
-                    self.selected_object.ai.engines[0].ai.engine_on=not self.selected_object.ai.engines[0].ai.engine_on
-                #refresh the text
-                self.vehicle_menu('none')
+                self.change_menu('engine_menu')
             if Key=='4':
                 #flip the bool
                 self.world.display_vehicle_text=not self.world.display_vehicle_text
