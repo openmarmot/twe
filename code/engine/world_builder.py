@@ -619,6 +619,7 @@ def load_images(world):
     # engines 
     world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
     world.graphic_engine.loadImage('bicycle_pedals','images/engines/bicycle_pedals.png')
+    world.graphic_engine.loadImage('jumo_211','images/engines/jumo_211.png')
 
     # fuel tanks 
     world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
@@ -1657,7 +1658,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
 
     # this is only used briefly until the player picks a spawn type
     # this is required because a lot of stuff in the game references the player object.
@@ -1768,7 +1770,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=25277.9
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250
+    elif OBJECT_TYPE=='jumo_211':
+        z=WorldObject(WORLD,['jumo_211'],AIEngine)
+        z.render_level=2
+        z.name='Jumo 211 Engine'
+        z.ai.fuel_type=['gas_80_octane']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=2549953.75 #based on 1000 hp
         z.rotation_angle=float(random.randint(0,359)) 
+        z.weight=640
     elif OBJECT_TYPE=='vehicle_fuel_tank':
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AIContainer)
         z.is_container=True

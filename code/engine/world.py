@@ -688,8 +688,9 @@ class World(object):
 
         if self.player.ai.in_vehicle:
             self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
-            if len(self.player.ai.vehicle.ai.engines)>0:
-                self.vehicle_text_queue.append('Engine On: '+str(self.player.ai.vehicle.ai.engines[0].ai.engine_on))
+
+            for b in self.player.ai.vehicle.ai.engines:
+                self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
 
             if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
                 if len(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory)>0:
