@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 1 2024
+- added multi fuel tank readout to vehicle menu 
+
+----------------------------------
 March 31 2024
 - added a engine menu 
     - for now lets you turn multiple engines on and off 

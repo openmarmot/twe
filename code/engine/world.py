@@ -692,12 +692,16 @@ class World(object):
             for b in self.player.ai.vehicle.ai.engines:
                 self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
 
-            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
-                if len(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory)>0:
-                    if self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].is_liquid:
-                        self.vehicle_text_queue.append('Fuel:'+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].volume,2)))
-            self.vehicle_text_queue.append('max speed / current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
-                ' / '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
+            for b in self.player.ai.vehicle.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+
+            self.vehicle_text_queue.append('max speed | current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
+                ' | '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
