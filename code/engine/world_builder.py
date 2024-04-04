@@ -1644,6 +1644,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
         z.ai.max_speed=500
+        z.ai.stall_speed=100
         z.ai.rotation_speed=50
         z.ai.acceleration=100
         z.ai.throttle_zero=False
@@ -1656,8 +1657,19 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
+        # fuel tank ref : https://airpages.ru/eng/lw/ju88_2.shtml
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=415
+        z.ai.fuel_tanks[1].volume=415
+        z.ai.fuel_tanks[2].volume=425
+        z.ai.fuel_tanks[3].volume=425
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
+        fill_container(WORLD,z.ai.fuel_tanks[1],'gas_80_octane')
+        fill_container(WORLD,z.ai.fuel_tanks[2],'gas_80_octane')
+        fill_container(WORLD,z.ai.fuel_tanks[3],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
 

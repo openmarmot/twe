@@ -73,9 +73,6 @@ class AIVehicle(AIBase):
 
 
 
-        # ----- instruments ------
-
-
         # passengers - note that passengers are not removed from the world, so they are still updated
         self.passengers=[]
         self.max_occupants=4 # max people that can be in the vehicle, including driver
@@ -91,11 +88,7 @@ class AIVehicle(AIBase):
         # 
         self.inventory=[]
 
-        # the current speed
-        self.current_speed=0.
-
-        # max speed - this is in game terms and does not have a real world unit at the moment
-        self.max_speed=0 
+        
 
 
         # this is computed. should not be set by anything else
@@ -107,8 +100,19 @@ class AIVehicle(AIBase):
 
         # max rate of climb in meters/second. vehicle specific 
         self.max_rate_of_climb=0
+
+        # the current speed
+        self.current_speed=0.
+
+        # max speed - this is in game terms and does not have a real world unit at the moment
+        self.max_speed=0 
+
+        # minimum speed needed to take off
+
+        # stall speed. should be affected by angle of attack
+        self.stall_speed=0
         
-        self.rotation_speed=0 # max rotation speed
+        self.rotation_speed=0 # max rotation speed around axis (wheel steering)
 
         # update physics needs to know if its never been run before
         self.first_update=True

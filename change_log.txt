@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+----------------------------------
+April 3 2024
+- updated ju88 to a hopefully historical 4 fuel tank setup
+- added stall speed variable to vehicles 
+
+adding fuel tanks is awkward currently. One fix would be to make 
+a unique fuel tank object for each plane type - but the Ju88 would need 
+at least two types and probably more. At some point I have to stop creating 
+unique objects and share some resources. otherwise it just gets too complicated
+
+in game speed not having a real world conversion value is 
+going to be a challenge. will probably have to figure that one out 
 
 ----------------------------------
 April 1 2024
