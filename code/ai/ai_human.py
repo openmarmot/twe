@@ -1808,9 +1808,11 @@ class AIHuman(AIBase):
         # actually driving here
         self.ai_think_rate=0.1
 
-        if len(self.vehicle.ai.engines)>0:
-            self.vehicle.ai.engines[0].ai.engine_on=True
-
+        # turn engines on
+        # could do smarter checks here once engines have more stats
+        for b in self.vehicle.ai.engines:
+            if b.ai.engine_on==False:
+                b.ai.engine_on=True
 
         # get the rotation to the destination 
         r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
@@ -1918,8 +1920,9 @@ class AIHuman(AIBase):
     def update_human_vehicle_position(self):
         '''update the humans position relative to the vehicle'''
 
-        # 
+        # coordinates + altitude
         self.owner.world_coords=copy.copy(self.vehicle.world_coords)
+        self.owner.altitude=self.vehicle.altitude
 
         # rotate to match vehicle heading
         if self.vehicle.ai.open_top:

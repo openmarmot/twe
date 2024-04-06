@@ -153,11 +153,11 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
-        self.elevator=1
+        self.elevator=-1
 
     #---------------------------------------------------------------------------
     def handle_elevator_down(self):
-        self.elevator=-1
+        self.elevator=1
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -283,6 +283,9 @@ class AIVehicle(AIBase):
         else:
             self.acceleration=0
 
+        # update rate of climb
+        self.update_rate_of_climb_calculation()
+
         self.update_physics()
 
         # bring controls back to neutral slowly over time
@@ -402,7 +405,13 @@ class AIVehicle(AIBase):
         self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
 
     
+    #---------------------------------------------------------------------------
+    def update_rate_of_climb_calculation(self):
 
+        # need some sort of actual algo here
+
+        if self.current_speed>self.stall_speed:
+            self.rate_of_climb=1*self.throttle*self.elevator
 
 
 

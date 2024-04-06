@@ -11,6 +11,7 @@ notes :
 #import built in modules
 
 #import custom packages
+import engine.math_2d
 
 #global variables
 
@@ -165,10 +166,21 @@ class WorldObject(object):
     def update(self):
             self.ai.update()
             self.update_scale()
+            self.update_physics()
 
     def render_pass_2(self):
         ''' only override if the object needs special additional rendering'''
         pass
+
+    #---------------------------------------------------------------------------
+    def update_physics(self):
+
+        # gravity 
+        if self.altitude>0:
+            self.altitude+(engine.math_2d.GRAVITY*self.world.graphic_engine.time_passed_seconds)
+            if self.altitude<0:
+                self.altitude=0
+
 
     #---------------------------------------------------------------------------
     def update_scale(self):
@@ -177,10 +189,10 @@ class WorldObject(object):
         if self.altitude==0:
             self.scale_modifier=0
         else:
-            new_modifier=round(0.001*self.owner.altitude,2)
-            if new_modifier!=self.owner.scale_modifier:
-                self.owner.scale_modifier=new_modifier
-                self.owner.reset_image=True
+            new_modifier=round(0.001*self.altitude,2)
+            if new_modifier!=self.scale_modifier:
+                self.scale_modifier=new_modifier
+                self.reset_image=True
 
                 # if player or vehicle with player in it ..
                 # theoretically also change the global scale by the amount that it changed

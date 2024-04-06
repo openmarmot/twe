@@ -62,10 +62,10 @@ list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder']
 
-list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper']
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w']
-list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911']
+list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911','mg15']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
@@ -528,6 +528,7 @@ def load_images(world):
     world.graphic_engine.loadImage('fg42-type2','images/weapons/fg42-type2.png')
     world.graphic_engine.loadImage('svt40','images/weapons/svt40.png')
     world.graphic_engine.loadImage('svt40','images/weapons/svt40-sniper.png')
+    world.graphic_engine.loadImage('mg15','images/weapons/mg15.png')
 
     # weapon magazines
     world.graphic_engine.loadImage('stg44_magazine','images/weapons/magazines/stg44_magazine.png')
@@ -1395,6 +1396,30 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_gun_magazine=True
         z.ai.compatible_guns=['mg34']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=50
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(WORLD,z)
+
+    elif OBJECT_TYPE=='mg15':
+        z=WorldObject(WORLD,['mg15'],AIGun)
+        z.name='mg34'
+        z.is_gun=True
+        z.ai.magazine=spawn_object(WORLD,[0,0],'mg15_drum_magazine',False)
+        z.ai.rate_of_fire=0.06
+        z.ai.reload_speed=13
+        z.ai.flight_time=3.5
+        z.ai.range=850
+        z.ai.type='machine gun'
+        z.render_level=2
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='mg15_drum_magazine':
+        z=WorldObject(WORLD,['stg44_magazine'],AIMagazine)
+        z.name='mg15_drum_magazine'
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['mg15']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=75
         z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
@@ -1650,13 +1675,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.throttle_zero=False
         z.render_level=3
         z.collision_radius=200
-        z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False)) 
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg15',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
         z.is_airplane=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
         z.rolling_resistance=0.015
         z.drag_coefficient=0.8
-        z.frontal_area=3
+        z.frontal_area=6
         # fuel tank ref : https://airpages.ru/eng/lw/ju88_2.shtml
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))

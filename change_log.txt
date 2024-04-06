@@ -1,5 +1,31 @@
 TWE Project : Change Log
 
+
+----------------------------------
+April 5 2024
+- added mg15
+- adjusted mg34 drum mag from 75 to 50 (more common)
+- switched ju88 over to mg15 and added a couple drum mags
+- added a poor rate of climb calculation to ai_vehicle 
+- flipped elevator up and down values 
+- fixed bugs in world_object.update_scale
+- doubled ju88 frontal area 
+- ai_human now can turn on multi engine vehicles 
+- added a simple gravity calculation to all objects 
+
+I thought the MG15 would have more going for it but stat wise it is 
+very similar to a MG34. It does use a 75 round drum instead of the 50 
+round mg34 drum so that is something I guess. It looks like the MG34 
+had a early war 75 round drum, so might add that as well.
+
+The acceleration calculation that works great for the kubelwagen and bike 
+does not work for airplanes. I need to take into the account the differences between 
+a engine moving a propeller and a engine directly moving wheels 
+
+I accidentally jumped out of the ju88 after taking off. I could no longer see 
+the player. I think the relative altitude or something was not reset. idk 
+
+
 ----------------------------------
 April 3 2024
 - updated ju88 to a hopefully historical 4 fuel tank setup
