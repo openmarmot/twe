@@ -1,5 +1,8 @@
 TWE Project : Change Log
 
+----------------------------------
+April 6 2024
+- temporarily fixed the ju88 mg so it can be fired by the gunner 
 
 ----------------------------------
 April 5 2024
@@ -12,6 +15,7 @@ April 5 2024
 - doubled ju88 frontal area 
 - ai_human now can turn on multi engine vehicles 
 - added a simple gravity calculation to all objects 
+- re-enabled firing guns in airplanes (not working atm)
 
 I thought the MG15 would have more going for it but stat wise it is 
 very similar to a MG34. It does use a 75 round drum instead of the 50 
@@ -24,6 +28,8 @@ a engine moving a propeller and a engine directly moving wheels
 
 I accidentally jumped out of the ju88 after taking off. I could no longer see 
 the player. I think the relative altitude or something was not reset. idk 
+
+vehicle weapons need to be redone. maybe need a weapon_stations object array
 
 
 ----------------------------------

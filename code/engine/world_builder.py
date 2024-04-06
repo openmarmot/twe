@@ -1403,7 +1403,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='mg15':
         z=WorldObject(WORLD,['mg15'],AIGun)
-        z.name='mg34'
+        z.name='mg15'
         z.is_gun=True
         z.ai.magazine=spawn_object(WORLD,[0,0],'mg15_drum_magazine',False)
         z.ai.rate_of_fire=0.06
@@ -1675,7 +1675,9 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.throttle_zero=False
         z.render_level=3
         z.collision_radius=200
-        z.add_inventory(spawn_object(WORLD,[0,0],'mg15',False))
+        mg=spawn_object(WORLD,[0,0],'mg15',False)
+        z.add_inventory(mg)
+        z.ai.primary_weapon=mg
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
