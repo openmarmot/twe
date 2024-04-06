@@ -710,21 +710,22 @@ class AIHuman(AIBase):
                 if(self.owner.world.graphic_engine.keyPressed('d')):
                     self.vehicle.ai.handle_steer_right()
 
-                if(self.owner.world.graphic_engine.keyPressed('f')):
-                    #print('pew!')
-                    # fire the gun
-                    if self.vehicle.ai.gunner==self.owner:
-                        if self.vehicle.ai.primary_weapon!=None:
-                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
-                        else:
-                            print('no vehicle weapon')
-                            # fire our own weapon
-                            if self.primary_weapon!=None:
-                                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
-                            else:
-                                print('no vehicle gun, no personal gun')
+            # ---- controls for all vehicles ------------
+            if(self.owner.world.graphic_engine.keyPressed('f')):
+                #print('pew!')
+                # fire the gun
+                if self.vehicle.ai.gunner==self.owner:
+                    if self.vehicle.ai.primary_weapon!=None:
+                        self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
                     else:
-                        print('you arent the gunner!')
+                        print('no vehicle weapon')
+                        # fire our own weapon
+                        if self.primary_weapon!=None:
+                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
+                        else:
+                            print('no vehicle gun, no personal gun')
+                else:
+                    print('you arent the gunner!')
 
         else:
 
