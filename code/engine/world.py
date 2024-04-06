@@ -672,7 +672,10 @@ class World(object):
         self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
         self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
+        self.debug_text_queue.append('----- Player Stats -----')
+        self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.round_vector_2(self.player.world_coords)))
+        self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
@@ -692,12 +695,16 @@ class World(object):
             for b in self.player.ai.vehicle.ai.engines:
                 self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
 
-            if len(self.player.ai.vehicle.ai.fuel_tanks)>0:
-                if len(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory)>0:
-                    if self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].is_liquid:
-                        self.vehicle_text_queue.append('Fuel:'+str(round(self.player.ai.vehicle.ai.fuel_tanks[0].ai.inventory[0].volume,2)))
-            self.vehicle_text_queue.append('max speed / current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
-                ' / '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
+            for b in self.player.ai.vehicle.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+
+            self.vehicle_text_queue.append('max speed | current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
+                ' | '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
             self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
             self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
             self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))

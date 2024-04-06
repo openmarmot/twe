@@ -30,6 +30,10 @@ import random
 
 #global variables
 
+# constants (should be all caps as per pep8)
+# velocity of gravity in meters/second
+GRAVITY=-9.8
+
 
 #------------------------------------------------------------------------------
 def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
