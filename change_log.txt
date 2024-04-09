@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+April 8 2024
+- reversed aileron controls 
+- ailerons now affect rotation when in the air 
+
 ----------------------------------
 April 6 2024
 - temporarily fixed the ju88 mg so it can be fired by the gunner 
