@@ -54,9 +54,9 @@ from ai.ai_coffee_grinder import AICoffeeGrinder
 #global variables
 
 # ------ object rarity lists -----------------------------------
-list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
+list_consumables=['green_apple','potato','turnip','cucumber','pickle','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
-list_consumables_common=['green_apple','potato','turnip']
+list_consumables_common=['green_apple','potato','turnip','cucumber','pickle']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
@@ -599,6 +599,7 @@ def load_images(world):
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
     world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
+    world.graphic_engine.loadImage('cucumber','images/consumables/cucumber.png')
 
     # bottles 
     world.graphic_engine.loadImage('wine_bottle','images/bottles/wine_bottle.png')
@@ -951,6 +952,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.hunger_effect=-60
         z.ai.thirst_effect=-8
         z.ai.fatigue_effect=-10  
+    
+    elif OBJECT_TYPE=='cucumber':
+        z=WorldObject(WORLD,['cucumber'],AIConsumable)
+        z.render_level=2
+        z.name='cucumber'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10  
+
+    elif OBJECT_TYPE=='pickle':
+        z=WorldObject(WORLD,['cucumber'],AIConsumable)
+        z.render_level=2
+        z.name='pickle'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)

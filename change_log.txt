@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 9 2024
+- added cucumber art 
+- added cucumber and pickle objects 
+
+want to make a pickle jar but that will take some thought and will 
+have to create a appropriate jar. moving towards simulating things 
+like jars and glasses seperate from their contents - which will eventually 
+require redoing the beer and wine and possibly other things 
+
+----------------------------------
 April 8 2024
 - reversed aileron controls 
 - ailerons now affect rotation when in the air 
