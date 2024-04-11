@@ -299,7 +299,7 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('1 - KubelWagen ')
                 self.world.graphic_engine.menu_text_queue.append('2 - fg42-type2 ')
                 self.world.graphic_engine.menu_text_queue.append('3 - panzerfaust ')
-                self.world.graphic_engine.menu_text_queue.append('4 - brown_chair ')
+                self.world.graphic_engine.menu_text_queue.append('4 - pickle jar ')
                 self.world.graphic_engine.menu_text_queue.append('5 - model 24 grenade')
                 self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
                 self.world.graphic_engine.menu_text_queue.append('7 - beer ')
@@ -326,8 +326,7 @@ class World_Menu(object):
                 #panzerfaust
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
             elif Key=='4':
-                #brown_chair
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'brown_chair',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'pickle_jar',True)
             elif Key=='5':
                 # grenade
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)

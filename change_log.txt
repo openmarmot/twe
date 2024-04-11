@@ -1,6 +1,38 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 11 2024
+- added pickle jar to debug spawn menu 
+- fixed bug with ai container event add inventory 
+- fixed pickle jar world coords on spawn issue 
+
+
+
+----------------------------------
+April 10 2024
+- added jar art
+- added jar object 
+- added pickle jar 
+
+pickle jar is a container and has pickles added. 
+this will be the new method for food and beverage containers 
+
+----------------------------------
+April 9 2024
+- added cucumber art 
+- added cucumber and pickle objects 
+
+want to make a pickle jar but that will take some thought and will 
+have to create a appropriate jar. moving towards simulating things 
+like jars and glasses seperate from their contents - which will eventually 
+require redoing the beer and wine and possibly other things 
+
+----------------------------------
+April 8 2024
+- reversed aileron controls 
+- ailerons now affect rotation when in the air 
+
+----------------------------------
 April 6 2024
 - temporarily fixed the ju88 mg so it can be fired by the gunner 
 

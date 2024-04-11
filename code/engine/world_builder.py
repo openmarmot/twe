@@ -54,13 +54,13 @@ from ai.ai_coffee_grinder import AICoffeeGrinder
 #global variables
 
 # ------ object rarity lists -----------------------------------
-list_consumables=['green_apple','potato','turnip','adler-cheese','camembert-cheese'
+list_consumables=['green_apple','potato','turnip','cucumber','pickle','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
-list_consumables_common=['green_apple','potato','turnip']
+list_consumables_common=['green_apple','potato','turnip','cucumber','pickle']
 list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
 list_consumables_ultra_rare=['schokakola']
 
-list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder']
+list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
 
 list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
@@ -579,6 +579,7 @@ def load_images(world):
     world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
     world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
     world.graphic_engine.loadImage('barrel','images/containers/barrel.png')
+    world.graphic_engine.loadImage('jar','images/containers/jar.png')
 
     # effects (sprites)
     world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
@@ -599,6 +600,7 @@ def load_images(world):
     world.graphic_engine.loadImage('potato','images/consumables/potato.png')
     world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
     world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
+    world.graphic_engine.loadImage('cucumber','images/consumables/cucumber.png')
 
     # bottles 
     world.graphic_engine.loadImage('wine_bottle','images/bottles/wine_bottle.png')
@@ -951,6 +953,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.hunger_effect=-60
         z.ai.thirst_effect=-8
         z.ai.fatigue_effect=-10  
+    
+    elif OBJECT_TYPE=='cucumber':
+        z=WorldObject(WORLD,['cucumber'],AIConsumable)
+        z.render_level=2
+        z.name='cucumber'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10  
+
+    elif OBJECT_TYPE=='pickle':
+        z=WorldObject(WORLD,['cucumber'],AIConsumable)
+        z.render_level=2
+        z.name='pickle'
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-60
+        z.ai.thirst_effect=-8
+        z.ai.fatigue_effect=-10 
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
@@ -1164,6 +1188,25 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         if random.randint(0,1)==1:
             contents='ground_coffee'
         fill_container(WORLD,z,contents)
+
+    elif OBJECT_TYPE=='jar':
+        z=WorldObject(WORLD,['jar'],AIContainer)
+        z.is_container=True
+        z.volume=1
+        z.render_level=2
+        z.name='jar'
+        z.world_builder_identity='jar'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='pickle_jar':
+        z=spawn_object(WORLD,WORLD_COORDS,'jar',False)
+        z.name='pickle jar'
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
+        z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
 
     elif OBJECT_TYPE=='panzerfaust':
         z=WorldObject(WORLD,['panzerfaust'],AIGun)

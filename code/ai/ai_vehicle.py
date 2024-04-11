@@ -145,11 +145,11 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_aileron_left(self):
-        self.ailerons=-1
+        self.ailerons=1
 
     #---------------------------------------------------------------------------
     def handle_aileron_right(self):
-        self.ailerons=1
+        self.ailerons=-1
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
@@ -353,8 +353,13 @@ class AIVehicle(AIBase):
 
         # check control input
 
-        # update rotation angle
-        rotation_change=(self.rotation_speed*self.wheel_steering)*time_passed
+        # update rotation angle on the ground
+        if self.owner.altitude<1:
+            rotation_change=(self.rotation_speed*self.wheel_steering)*time_passed
+        # update rotation angle in the air
+        else:
+            rotation_change=(self.rotation_speed*self.ailerons)*time_passed
+
         if rotation_change !=0 and self.current_speed>0:
             self.owner.rotation_angle+=rotation_change
             heading_changed=True
