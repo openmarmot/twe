@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 10 2024
+- added jar art
+- added jar object 
+- added pickle jar 
+
+pickle jar is a container and has pickles added. 
+this will be the new method for food and beverage containers 
+
+----------------------------------
 April 9 2024
 - added cucumber art 
 - added cucumber and pickle objects 
