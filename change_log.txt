@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+April 11 2024
+- added pickle jar to debug spawn menu 
+- fixed bug with ai container event add inventory 
+- fixed pickle jar world coords on spawn issue 
+
+
 
 ----------------------------------
 April 10 2024

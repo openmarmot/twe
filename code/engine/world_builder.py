@@ -1199,7 +1199,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='pickle_jar':
-        z=spawn_object(WORLD,[0,0],'jar',False)
+        z=spawn_object(WORLD,WORLD_COORDS,'jar',False)
         z.name='pickle jar'
         z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'pickle',False))

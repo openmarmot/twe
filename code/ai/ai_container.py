@@ -87,7 +87,7 @@ class AIContainer(AIBase):
                 existing_liquid.volume+=EVENT_DATA.volume
 
         else:
-            self.inventory.add(EVENT_DATA)
+            self.inventory.append(EVENT_DATA)
     
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
