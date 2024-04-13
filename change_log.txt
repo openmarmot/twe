@@ -1,12 +1,28 @@
 TWE Project : Change Log
 
+
+----------------------------------
+April 12 2024
+- added some debug info on world and player scale level 
+- fixed bug where gravity change was not being saved 
+- added a function to set render level 
+- render level now auto adjusts to highest when altitude is >0 (done poorly)
+- fixed a bug with world scale where floating point precision could cause unintended scales
+- removed some rounding from displayed data and started adding rounding in the math that creates the values 
+
+scaling is kinda half working. 
+
+after realizing that some of the goofy high decimal count on some values was cuased 
+by floating point math funkyness I've started adding rounding to some of the math functions.
+For now I'm going with two significant digits on most stuff -which seems to be working fine.
+
+gravity needs testing. for now it seems to have negated airplane lift. 
+
 ----------------------------------
 April 11 2024
 - added pickle jar to debug spawn menu 
 - fixed bug with ai container event add inventory 
 - fixed pickle jar world coords on spawn issue 
-
-
 
 ----------------------------------
 April 10 2024

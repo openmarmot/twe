@@ -822,7 +822,6 @@ def spawn_container(NAME,WORLD,WORLD_COORDS,ROTATION_ANGLE,IMAGE,INVENTORY):
 
     z=WorldObject(WORLD,[IMAGE],AIContainer)
     z.is_container=True
-    z.render_level=2
     z.name=NAME
     z.world_coords=WORLD_COORDS
     z.rotation_angle=ROTATION_ANGLE
@@ -910,20 +909,17 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     if OBJECT_TYPE=='warehouse':
         z=WorldObject(WORLD,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
-        z.render_level=1
         z.collision_radius=200
         z.is_building=True
 
     elif OBJECT_TYPE=='square_building':
         z=WorldObject(WORLD,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
-        z.render_level=1
         z.collision_radius=60
         z.is_building=True
 
     elif OBJECT_TYPE=='green_apple':
         z=WorldObject(WORLD,['green_apple'],AIConsumable)
-        z.render_level=2
         z.name='Green Apple'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -934,7 +930,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='potato':
         z=WorldObject(WORLD,['potato'],AIConsumable)
-        z.render_level=2
         z.name='potato'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -945,7 +940,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='turnip':
         z=WorldObject(WORLD,['turnip'],AIConsumable)
-        z.render_level=2
         z.name='turnip'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -956,7 +950,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     
     elif OBJECT_TYPE=='cucumber':
         z=WorldObject(WORLD,['cucumber'],AIConsumable)
-        z.render_level=2
         z.name='cucumber'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -967,7 +960,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='pickle':
         z=WorldObject(WORLD,['cucumber'],AIConsumable)
-        z.render_level=2
         z.name='pickle'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -978,7 +970,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='adler-cheese':
         z=WorldObject(WORLD,['adler-cheese'],AIConsumable)
-        z.render_level=2
         z.name='Adler cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -989,7 +980,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='camembert-cheese':
         z=WorldObject(WORLD,['camembert-cheese'],AIConsumable)
-        z.render_level=2
         z.name='Camembert cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1000,7 +990,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='champignon-cheese':
         z=WorldObject(WORLD,['champignon-cheese'],AIConsumable)
-        z.render_level=2
         z.name='Champignon cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1011,7 +1000,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='karwendel-cheese':
         z=WorldObject(WORLD,['karwendel-cheese'],AIConsumable)
-        z.render_level=2
         z.name='Karwendel cheese'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1022,7 +1010,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='wine':
         z=WorldObject(WORLD,['wine_bottle'],AIConsumable)
-        z.render_level=2
         z.name='wine'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1033,7 +1020,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='beer':
         z=WorldObject(WORLD,['green_bottle'],AIConsumable)
-        z.render_level=2
         z.name='beer'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1044,7 +1030,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='schokakola':
         z=WorldObject(WORLD,['schokakola'],AIConsumable)
-        z.render_level=2
         z.name='scho-ka-kola'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_consumable=True
@@ -1054,7 +1039,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fatigue_effect=-250 
     elif OBJECT_TYPE=='bandage':
         z=WorldObject(WORLD,['bandage'],AIMedical)
-        z.render_level=2
         z.name='bandage'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
@@ -1064,7 +1048,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fatigue_effect=0
     elif OBJECT_TYPE=='german_officer_first_aid_kit':
         z=WorldObject(WORLD,['german_officer_first_aid_kit'],AIMedical)
-        z.render_level=2
         z.name='German Officer First Aid Kit'
         z.rotation_angle=float(random.randint(0,359)) 
         z.is_medical=True
@@ -1078,7 +1061,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_container=True
         z.is_large_human_pickup=True
         z.volume=20
-        z.render_level=2
         z.name='german_fuel_can'
         z.world_builder_identity='german_fuel_can'
         z.rotation_angle=float(random.randint(0,359))
@@ -1088,7 +1070,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['blue_coffee_cup'],AIContainer)
         z.is_container=True
         z.volume=0.3
-        z.render_level=2
         z.name='blue_coffee_cup'
         z.world_builder_identity='blue_coffee_cup'
         z.rotation_angle=float(random.randint(0,359))
@@ -1097,7 +1078,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['55_gallon_drum'],AIContainer)
         z.is_container=True
         z.volume=208
-        z.render_level=2
         z.name='55_gallon_drum'
         z.collision_radius=15
         z.world_builder_identity='55_gallon_drum'
@@ -1109,7 +1089,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['barrel'],AIContainer)
         z.is_container=True
         z.volume=208
-        z.render_level=2
         z.name='barrel'
         z.collision_radius=15
         z.world_builder_identity='barrel'
@@ -1121,7 +1100,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['german_mg_ammo_can'],AIContainer)
         z.is_ammo_container=True
         z.is_large_human_pickup=True
-        z.render_level=2
         z.name='german_mg_ammo_can'
         z.world_builder_identity='german_mg_ammo_can'
         z.rotation_angle=float(random.randint(0,359))
@@ -1130,7 +1108,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['german_drop_canister'],AIContainer)
         z.is_container=True
         z.is_large_human_pickup=True
-        z.render_level=2
         z.name='german drop canister'
         z.collision_radius=20
         z.world_builder_identity='german_drop_canister'
@@ -1140,7 +1117,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['crate'],AIContainer)
         z.is_container=True
         z.is_large_human_pickup=True
-        z.render_level=2
         z.name='crate'
         z.collision_radius=20
         z.world_builder_identity='crate'
@@ -1151,7 +1127,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['small_crate'],AIContainer)
         z.is_container=True
         z.is_large_human_pickup=True
-        z.render_level=2
         z.name='small_crate'
         z.collision_radius=20
         z.world_builder_identity='small_crate'
@@ -1162,7 +1137,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['cupboard'],AIContainer)
         z.is_container=True
         z.is_large_human_pickup=True
-        z.render_level=2
         z.name='cupboard'
         z.collision_radius=20
         z.world_builder_identity='cupboard'
@@ -1180,7 +1154,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['coffee_tin'],AIContainer)
         z.is_container=True
         z.volume=1
-        z.render_level=2
         z.name='coffee_tin'
         z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
@@ -1193,7 +1166,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['jar'],AIContainer)
         z.is_container=True
         z.volume=1
-        z.render_level=2
         z.name='jar'
         z.world_builder_identity='jar'
         z.rotation_angle=float(random.randint(0,359))
@@ -1211,7 +1183,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='panzerfaust':
         z=WorldObject(WORLD,['panzerfaust'],AIGun)
         z.name='panzerfaust'
-        z.render_level=2
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(WORLD,[0,0],'panzerfaust_magazine',False)
@@ -1230,7 +1201,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['panzerfaust_60']
         z.ai.capacity=1
         z.ai.removable=False
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         p=spawn_object(WORLD,[0,0],'projectile',False)
         p.image_list=['panzerfaust_warhead']
@@ -1246,7 +1216,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.speed=112
         z.ai.max_speed=112
         z.ai.maxTime=3.0
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mp40':
@@ -1260,7 +1229,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mp40_magazine':
@@ -1270,7 +1238,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['mp40']
         z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
         z.ai.capacity=32
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1284,7 +1251,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='submachine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ppsh43_magazine':
@@ -1294,7 +1260,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['ppsh43']
         z.ai.compatible_projectiles=['7.62x25']
         z.ai.capacity=35
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1308,7 +1273,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=2.5
         z.ai.range=800
         z.ai.type='assault rifle'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
     
     elif OBJECT_TYPE=='stg44_magazine':
@@ -1318,7 +1282,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['stg44']
         z.ai.compatible_projectiles=['7.92x33_SME']
         z.ai.capacity=30
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1332,7 +1295,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3.5
         z.ai.range=800
         z.ai.type='machine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='dp28_magazine':
@@ -1342,7 +1304,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['dp28']
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=47
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1356,7 +1317,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     # NOTE - this should be 32 ACP or something
@@ -1367,7 +1327,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['ppk']
         z.ai.compatible_projectiles=['9mm_ME']
         z.ai.capacity=8
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1381,7 +1340,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='tt33_magazine':
@@ -1391,7 +1349,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['tt33']
         z.ai.compatible_projectiles=['7.62x25']
         z.ai.capacity=8
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1405,7 +1362,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=1
         z.ai.range=380
         z.ai.type='pistol'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
     
     elif OBJECT_TYPE=='1911_magazine':
@@ -1415,7 +1371,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['1911']
         z.ai.compatible_projectiles=['45acp']
         z.ai.capacity=7
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1430,7 +1385,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='machine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mg34_drum_magazine':
@@ -1440,7 +1394,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['mg34']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=50
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1454,7 +1407,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3.5
         z.ai.range=850
         z.ai.type='machine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mg15_drum_magazine':
@@ -1464,7 +1416,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_guns=['mg15']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=75
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1478,7 +1429,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='kar98k_magazine':
@@ -1489,7 +1439,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=5
         z.ai.removable=False
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1503,7 +1452,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='semi auto rifle'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='g41w_magazine':
@@ -1514,7 +1462,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=10
         z.ai.removable=True
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1528,7 +1475,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='semi auto rifle'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='k43_magazine':
@@ -1539,7 +1485,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=10
         z.ai.removable=True
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1553,7 +1498,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='machine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='fg42_type1_magazine':
@@ -1564,7 +1508,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=20
         z.ai.removable=True
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1578,7 +1521,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='machine gun'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='fg42_type2_magazine':
@@ -1589,7 +1531,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=20
         z.ai.removable=True
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1603,7 +1544,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=3
         z.ai.range=800
         z.ai.type='rifle'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mosin_magazine':
@@ -1614,7 +1554,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=5
         z.ai.removable=False
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
     
@@ -1629,7 +1568,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.range=800
         z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='svt40_magazine':
@@ -1640,7 +1578,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=10
         z.ai.removable=True
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(WORLD,z)
 
@@ -1658,14 +1595,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.range=850
         z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
-        z.render_level=2
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
         z.is_vehicle=True
-        z.render_level=3
         z.ai.max_speed=200
         z.ai.rotation_speed=40.
         z.collision_radius=50
@@ -1692,7 +1627,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['red_bicycle','red_bicycle'],AIVehicle)
         z.name='red_bicycle'
         z.is_vehicle=True
-        z.render_level=3
         z.ai.max_speed=100
         z.ai.rotation_speed=50.
         z.ai.max_occupants=1
@@ -1716,7 +1650,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.rotation_speed=50
         z.ai.acceleration=100
         z.ai.throttle_zero=False
-        z.render_level=3
         z.collision_radius=200
         mg=spawn_object(WORLD,[0,0],'mg15',False)
         z.add_inventory(mg)
@@ -1754,7 +1687,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='player'
         z.ai.speed=50.
         z.is_player=True
-        z.render_level=4
         z.is_human=True
         WORLD.player=z
 
@@ -1762,7 +1694,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
         z.name=engine.name_gen.generate('civilian')
         z.ai.speed=float(random.randint(10,25))
-        z.render_level=4
         z.collision_radius=10
         z.is_human=True
         z.is_civilian=True
@@ -1771,7 +1702,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
         z.name=engine.name_gen.generate('german')
         z.ai.speed=float(random.randint(20,25))
-        z.render_level=4
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
@@ -1781,7 +1711,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
         z.name=engine.name_gen.generate('soviet')
         z.ai.speed=float(random.randint(20,25))
-        z.render_level=4
         z.collision_radius=10
         z.is_human=True
         z.is_soldier=True
@@ -1791,7 +1720,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['brass'],AINone)
         w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
-        z.render_level=2
         z.name='brass'
         z.rotation_angle=float(random.randint(0,359))
         z.can_be_deleted=True  
@@ -1800,40 +1728,34 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['steel_case'],AINone)
         w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
-        z.render_level=2
         z.name='steel_case'
         z.rotation_angle=float(random.randint(0,359))
         z.can_be_deleted=True  
     
     elif OBJECT_TYPE=='blood_splatter':
         z=WorldObject(WORLD,['blood_splatter'],AINone)
-        z.render_level=2
         z.name='blood_splatter'
         z.rotation_angle=float(random.randint(0,359))  
 
     elif OBJECT_TYPE=='small_blood':
         z=WorldObject(WORLD,['small_blood'],AINone)
-        z.render_level=2
         z.name='small_blood'
         z.rotation_angle=float(random.randint(0,359)) 
            
     elif OBJECT_TYPE=='dirt':
         z=WorldObject(WORLD,['dirt'],AINone)
-        z.render_level=2
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))
         z.can_be_deleted=True
     
     elif OBJECT_TYPE=='brown_chair':
         z=WorldObject(WORLD,['brown_chair'],AINone)
-        z.render_level=2
         z.name='brown_chair'
         z.is_furniture=True
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_field_shovel':
         z=WorldObject(WORLD,['german_field_shovel'],AIThrowable)
-        z.render_level=2
         z.name='german field shovel'
         z.is_throwable=True
         z.ai.speed=112
@@ -1842,7 +1764,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='german_folding_shovel':
         z=WorldObject(WORLD,['german_folding_shovel'],AIThrowable)
-        z.render_level=2
         z.name='german folding shovel'
         z.is_throwable=True
         z.ai.speed=112
@@ -1851,7 +1772,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='volkswagen_type_82_engine':
         z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
-        z.render_level=2
         z.name='Volkswagen Type 82 Engine'
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
@@ -1860,7 +1780,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.weight=250
     elif OBJECT_TYPE=='jumo_211':
         z=WorldObject(WORLD,['jumo_211'],AIEngine)
-        z.render_level=2
         z.name='Jumo 211 Engine'
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
@@ -1871,13 +1790,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['vehicle_fuel_tank'],AIContainer)
         z.is_container=True
         z.volume=20
-        z.render_level=2
         z.name='vehicle_fuel_tank'
         z.world_builder_identity='vehicle_fuel_tank'
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='bicycle_pedals':
         z=WorldObject(WORLD,['bicycle_pedals'],AIEngine)
-        z.render_level=2
         z.name='bicycle pedals'
         z.ai.fuel_type='none'
         z.ai.fuel_consumption_rate=0
@@ -1889,49 +1806,40 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='projectile'
         z.ai.speed=350.
         z.is_projectile=True
-        z.render_level=3
     elif OBJECT_TYPE=='gas_80_octane':
         z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
         z.name='gas_80_octane'
         z.is_liquid=True
         z.is_solid=False
-        z.render_level=2
     elif OBJECT_TYPE=='water':
         z=WorldObject(WORLD,['small_clear_spill'],AIProjectile)
         z.name='water'
         z.is_liquid=True
         z.is_solid=False
-        z.render_level=2
     elif OBJECT_TYPE=='wood_log':
         z=WorldObject(WORLD,['wood_log'],AINone)
-        z.render_level=2
         z.name='wood_log'
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='wood_quarter':
         z=WorldObject(WORLD,['wood_log'],AINone)
-        z.render_level=2
         z.name='wood_log'
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='coffee_beans':
         z=WorldObject(WORLD,['coffee_beans'],AINone)
-        z.render_level=2
         z.name='coffee_beans'
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='ground_coffee':
         z=WorldObject(WORLD,['coffee_beans'],AINone)
-        z.render_level=2
         z.name='ground_coffee'
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='coffee_grinder':
         z=WorldObject(WORLD,['coffee_grinder'],AICoffeeGrinder)
-        z.render_level=2
         z.name='coffee_grinder'
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='sc250':
         z=WorldObject(WORLD,['sc250'],AINone)
-        z.render_level=2
         z.name='sc250'
         z.weight=250
         z.rotation_angle=float(random.randint(0,359)) 
