@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+----------------------------------
+April 15 2024
+- added some horrible rate of climb calculations 
+- added a zero to map size (now 100,000 "units" square) as 
+    otherwise airplanes get off map very quickly 
+
+
+map size needs a rethink now that airplanes are (barely) usable. 
+
+airplane physics need a total rewrite but i can probably kick that can 
+down the road awhile.
 
 ----------------------------------
 April 12 2024

@@ -99,7 +99,7 @@ class AIVehicle(AIBase):
         self.rate_of_climb=0
 
         # max rate of climb in meters/second. vehicle specific 
-        self.max_rate_of_climb=0
+        self.max_rate_of_climb=3
 
         # the current speed
         self.current_speed=0.
@@ -414,9 +414,11 @@ class AIVehicle(AIBase):
     def update_rate_of_climb_calculation(self):
 
         # need some sort of actual algo here
-
+        lift=9.8 # counter act gravity for now
         if self.current_speed>self.stall_speed:
-            self.rate_of_climb=1*self.throttle*self.elevator
+            # if elevator is zero then rate of climb will be zero
+            # if elevator is up (-1) then rate of climb will be negative
+            self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
 
 
 

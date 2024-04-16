@@ -79,7 +79,7 @@ class World(object):
         self.spawn_east=[4000.,0.]
 
         # size of the map in every direction from 0,0
-        self.map_size=10000
+        self.map_size=100000
         self.map_check_interval=5
         self.last_map_check=0
         self.exited_object_count=0
@@ -715,6 +715,7 @@ class World(object):
             # airplane specific 
             if self.player.ai.vehicle.is_airplane:
                 self.vehicle_text_queue.append('altitude: '+str(round(self.player.ai.vehicle.altitude,1)))
+                self.vehicle_text_queue.append('rate of climb: '+str(round(self.player.ai.vehicle.ai.rate_of_climb,1)))
                 self.vehicle_text_queue.append('ailerons: '+str(round(self.player.ai.vehicle.ai.ailerons,1)))
                 self.vehicle_text_queue.append('elevator: '+str(round(self.player.ai.vehicle.ai.elevator,1)))
                 self.vehicle_text_queue.append('rudder: '+str(round(self.player.ai.vehicle.ai.rudder,1)))
