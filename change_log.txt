@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 17 2024
+- ju88 is now a vehicle as well as an airplane 
+- added brake_power return to zero on vehicles (i think all vehicles would want this - except for trains maybe)
+- airplane now brakes with s when on the ground (works fine for now, may need a dedicated key later)
+
+bots will probably try to fly/drive the plane now that it is a vehicle. i'll just leave it for now, should be 
+amusing. 
+
+rate of climb calculation doesn't work well for going down, and loss of altitude in general is handled poorly.
+
+ai ridesharing needs to be handled better. seeing a ton of debug messages around full vehicles
+
+need a 'exit vehicle' mode for AI where they slow the vehicle down to zero or near zero 
+
+----------------------------------
 April 15 2024
 - added some horrible rate of climb calculations 
 - added a zero to map size (now 100,000 "units" square) as 

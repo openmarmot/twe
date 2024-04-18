@@ -51,6 +51,10 @@ class AIVehicle(AIBase):
         # should generally be true for cars and false for planes
         self.throttle_zero=True
 
+        # if true brake returns to zero quickly
+        # should be true for everything (?)
+        self.brake_zero=True
+
         # brake_power 0 is none 1 is max
         self.brake_power=0
 
@@ -243,6 +247,9 @@ class AIVehicle(AIBase):
         # return throttle to neutral
         if self.throttle_zero:
             self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
+
+        if self.brake_zero:
+            self.brake_power=engine.math_2d.regress_to_zero(self.brake_power,time_passed)
 
          # aierlons 
         self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)

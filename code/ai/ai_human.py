@@ -675,6 +675,8 @@ class AIHuman(AIBase):
                     self.vehicle.ai.handle_elevator_up()
                 if(self.owner.world.graphic_engine.keyPressed('s')):
                     self.vehicle.ai.handle_elevator_down()
+                    if self.owner.altitude<1:
+                        self.vehicle.ai.brake_power=1
                 if(self.owner.world.graphic_engine.keyPressed('a')):
                     self.vehicle.ai.handle_aileron_left()
                     self.vehicle.ai.handle_rudder_left()

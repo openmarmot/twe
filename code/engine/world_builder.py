@@ -1658,7 +1658,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg15_drum_magazine',False))
-        z.is_airplane=True 
+        z.is_airplane=True
+        z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
         z.rolling_resistance=0.015
