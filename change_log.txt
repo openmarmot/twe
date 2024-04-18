@@ -1,12 +1,54 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 17 2024
+- ju88 is now a vehicle as well as an airplane 
+- added brake_power return to zero on vehicles (i think all vehicles would want this - except for trains maybe)
+- airplane now brakes with s when on the ground (works fine for now, may need a dedicated key later)
+
+bots will probably try to fly/drive the plane now that it is a vehicle. i'll just leave it for now, should be 
+amusing. 
+
+rate of climb calculation doesn't work well for going down, and loss of altitude in general is handled poorly.
+
+ai ridesharing needs to be handled better. seeing a ton of debug messages around full vehicles
+
+need a 'exit vehicle' mode for AI where they slow the vehicle down to zero or near zero 
+
+----------------------------------
+April 15 2024
+- added some horrible rate of climb calculations 
+- added a zero to map size (now 100,000 "units" square) as 
+    otherwise airplanes get off map very quickly 
+
+
+map size needs a rethink now that airplanes are (barely) usable. 
+
+airplane physics need a total rewrite but i can probably kick that can 
+down the road awhile.
+
+----------------------------------
+April 12 2024
+- added some debug info on world and player scale level 
+- fixed bug where gravity change was not being saved 
+- added a function to set render level 
+- render level now auto adjusts to highest when altitude is >0 (done poorly)
+- fixed a bug with world scale where floating point precision could cause unintended scales
+- removed some rounding from displayed data and started adding rounding in the math that creates the values 
+
+scaling is kinda half working. 
+
+after realizing that some of the goofy high decimal count on some values was cuased 
+by floating point math funkyness I've started adding rounding to some of the math functions.
+For now I'm going with two significant digits on most stuff -which seems to be working fine.
+
+gravity needs testing. for now it seems to have negated airplane lift. 
+
+----------------------------------
 April 11 2024
 - added pickle jar to debug spawn menu 
 - fixed bug with ai container event add inventory 
 - fixed pickle jar world coords on spawn issue 
-
-
 
 ----------------------------------
 April 10 2024

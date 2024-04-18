@@ -57,6 +57,9 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
 	# adjust to game units 
 	acceleration*=adjustment
 
+	# round to 2 sd
+	acceleration=round(acceleration,2)
+
 	return acceleration
 
 
@@ -212,6 +215,10 @@ def get_transfer_results(source_amount, destination_amount, destination_maximum)
 	source_amount -= transferable_amount
 	destination_amount += transferable_amount
 
+	# round 
+	source_amount=round(source_amount,2)
+	destination_amount=round(destination_amount,2)
+
 	return source_amount, destination_amount
 
 
@@ -264,6 +271,9 @@ def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
 		var+=1*time_passed
 		if var>-dead_zone:
 			var=0
+
+	# round
+	var=round(var,2)
 
 	return var
 	

@@ -79,9 +79,7 @@ class WorldObject(object):
         # can be set with math_2d.get_heading_vector
         self.heading=[0,0]
 
-        # render level kind of a 'z' layer
-        # see graphics_2d_pygame for the current list of levels
-        self.render_level=1
+        
 
         # checked by graphics_2d_pygame.update_render_info 
         # to determine whether to render the object or not
@@ -144,7 +142,10 @@ class WorldObject(object):
         self.collision_radius=5
         
 
-        
+        # render level kind of a 'z' layer
+        # see graphics_2d_pygame for the current list of levels
+        self.render_level=None
+        self.reset_render_level()
 
         # is this used? pretty sure its not 
         self.id = 0
@@ -156,6 +157,20 @@ class WorldObject(object):
     #remove_inventory
     def remove_inventory(self, ITEM):
         self.ai.handle_event('remove_inventory',ITEM)
+
+    #---------------------------------------------------------------------------
+    def reset_render_level(self):
+        '''reset render level to defaults based on object type '''
+        if self.is_human:
+            self.render_level=4
+        elif self.is_gun:
+            self.render_level=2
+        elif self.is_vehicle:
+            self.render_level=3
+        elif self.is_building:
+            self.render_level=1
+        else:
+            self.render_level=2
 
     def wo_start(self):
         self.world.add_object(self)
@@ -177,9 +192,11 @@ class WorldObject(object):
 
         # gravity 
         if self.altitude>0:
-            self.altitude+(engine.math_2d.GRAVITY*self.world.graphic_engine.time_passed_seconds)
-            if self.altitude<0:
+            self.render_level=5
+            self.altitude+=(engine.math_2d.GRAVITY*self.world.graphic_engine.time_passed_seconds)
+            if self.altitude<=0:
                 self.altitude=0
+                self.reset_render_level()
 
 
     #---------------------------------------------------------------------------

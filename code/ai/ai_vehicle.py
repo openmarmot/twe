@@ -51,6 +51,10 @@ class AIVehicle(AIBase):
         # should generally be true for cars and false for planes
         self.throttle_zero=True
 
+        # if true brake returns to zero quickly
+        # should be true for everything (?)
+        self.brake_zero=True
+
         # brake_power 0 is none 1 is max
         self.brake_power=0
 
@@ -99,7 +103,7 @@ class AIVehicle(AIBase):
         self.rate_of_climb=0
 
         # max rate of climb in meters/second. vehicle specific 
-        self.max_rate_of_climb=0
+        self.max_rate_of_climb=3
 
         # the current speed
         self.current_speed=0.
@@ -243,6 +247,9 @@ class AIVehicle(AIBase):
         # return throttle to neutral
         if self.throttle_zero:
             self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
+
+        if self.brake_zero:
+            self.brake_power=engine.math_2d.regress_to_zero(self.brake_power,time_passed)
 
          # aierlons 
         self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)
@@ -414,9 +421,11 @@ class AIVehicle(AIBase):
     def update_rate_of_climb_calculation(self):
 
         # need some sort of actual algo here
-
+        lift=9.8 # counter act gravity for now
         if self.current_speed>self.stall_speed:
-            self.rate_of_climb=1*self.throttle*self.elevator
+            # if elevator is zero then rate of climb will be zero
+            # if elevator is up (-1) then rate of climb will be negative
+            self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
 
 
 

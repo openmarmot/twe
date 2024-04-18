@@ -79,7 +79,7 @@ class World(object):
         self.spawn_east=[4000.,0.]
 
         # size of the map in every direction from 0,0
-        self.map_size=10000
+        self.map_size=100000
         self.map_check_interval=5
         self.last_map_check=0
         self.exited_object_count=0
@@ -663,6 +663,7 @@ class World(object):
     def update_debug_info(self):
         self.debug_text_queue=[]
         self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
+        self.debug_text_queue.append('World scale: '+str(self.graphic_engine.scale))
         self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
         self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
@@ -674,6 +675,7 @@ class World(object):
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
+        self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.round_vector_2(self.player.world_coords)))
         self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
@@ -705,14 +707,15 @@ class World(object):
 
             self.vehicle_text_queue.append('max speed | current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
                 ' | '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
-            self.vehicle_text_queue.append('acceleration: '+str(round(self.player.ai.vehicle.ai.acceleration,1)))
-            self.vehicle_text_queue.append('throttle: '+str(round(self.player.ai.vehicle.ai.throttle,1)))
-            self.vehicle_text_queue.append('brake: '+str(round(self.player.ai.vehicle.ai.brake_power,1)))
-            self.vehicle_text_queue.append('wheel steering: '+str(round(self.player.ai.vehicle.ai.wheel_steering,1)))
+            self.vehicle_text_queue.append('acceleration: '+str(self.player.ai.vehicle.ai.acceleration))
+            self.vehicle_text_queue.append('throttle: '+str(self.player.ai.vehicle.ai.throttle))
+            self.vehicle_text_queue.append('brake: '+str(self.player.ai.vehicle.ai.brake_power))
+            self.vehicle_text_queue.append('wheel steering: '+str(self.player.ai.vehicle.ai.wheel_steering))
 
             # airplane specific 
             if self.player.ai.vehicle.is_airplane:
                 self.vehicle_text_queue.append('altitude: '+str(round(self.player.ai.vehicle.altitude,1)))
+                self.vehicle_text_queue.append('rate of climb: '+str(round(self.player.ai.vehicle.ai.rate_of_climb,1)))
                 self.vehicle_text_queue.append('ailerons: '+str(round(self.player.ai.vehicle.ai.ailerons,1)))
                 self.vehicle_text_queue.append('elevator: '+str(round(self.player.ai.vehicle.ai.elevator,1)))
                 self.vehicle_text_queue.append('rudder: '+str(round(self.player.ai.vehicle.ai.rudder,1)))

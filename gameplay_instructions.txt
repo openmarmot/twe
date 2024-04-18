@@ -27,7 +27,7 @@ d - steer right
 
 -airplane-
 w - elevator 
-s - elevator 
+s - elevator + brake (if on ground)
 a - aileron roll left + rudder + wheel (if on ground)
 d - aileron roll right + rudder + wheel (if on ground)
 
