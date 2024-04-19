@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 19 2024
+- bots now apply the brakes on vehicles if they are close to their destination
+- bots now wait to exit vehicles until they are nearly stopped 
+
+----------------------------------
 April 17 2024
 - ju88 is now a vehicle as well as an airplane 
 - added brake_power return to zero on vehicles (i think all vehicles would want this - except for trains maybe)
@@ -20,7 +25,6 @@ April 15 2024
 - added some horrible rate of climb calculations 
 - added a zero to map size (now 100,000 "units" square) as 
     otherwise airplanes get off map very quickly 
-
 
 map size needs a rethink now that airplanes are (barely) usable. 
 
