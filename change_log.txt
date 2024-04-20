@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 20 2024
+- added a vehicle search function that only returns vehicles that aren't full 
+
+not 100% on letting the ai auto figure out if a vehicle is full or not, but the 
+new function should clear up vehicle choice logic immensely 
+
+----------------------------------
 April 19 2024
 - bots now apply the brakes on vehicles if they are close to their destination
 - bots now wait to exit vehicles until they are nearly stopped 

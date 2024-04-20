@@ -1658,14 +1658,10 @@ class AIHuman(AIBase):
                 self.think_generic()
             else:
                 # fine lets go treking across the map
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle,2000)
+                b=self.owner.world.get_closest_vehicle(self.owner.world_coords,2000)
                 if b!=None:
-                    # should we check if its hostile??
-                    if len(b.ai.passengers)<b.ai.max_occupants:
-                        self.take_action_enter_vehicle(b)
-                    else:
-                        print('debug - closest vehicle is full')
-                        # should find another vehicle but there isn't a great mechanism for that
+                    # get_closest_vehicle only returns vehicles that aren't full
+                    self.take_action_enter_vehicle(b)
 
                 else:
                     # no vehicles ?
