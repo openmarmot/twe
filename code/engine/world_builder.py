@@ -564,6 +564,7 @@ def load_images(world):
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
     world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
+    world.graphic_engine.loadImage('dodge_g505_wc','images/vehicles/dodge_g505_wc/dodge_g505_wc.png')
     world.graphic_engine.loadImage('red_bicycle','images/vehicles/bicycle/red_bicycle.png')
 
     #terrain
@@ -1595,6 +1596,26 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.range=850
         z.ai.type='semi auto rifle'
         z.ai.projectile_type='7.62x54_L'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='dodge_g505_wc':
+        z=WorldObject(WORLD,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
+        z.name='dodge_g505_wc'
+        z.is_vehicle=True
+        z.ai.max_speed=200
+        z.ai.rotation_speed=30.
+        z.collision_radius=50
+        z.weight=800
+        z.rolling_resistance=0.015
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
+        
+        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='kubelwagen':

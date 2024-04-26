@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 26 2024
+- added Dodge 'Weapons Carrier' G505 4x4 1/2 ton truck
+
+I read the world's longest wikipedia article on Dodge WC trucks 
+https://en.wikipedia.org/wiki/Dodge_WC_series
+
+As best as I can tell the 1/2 ton was sent over to the soviets 
+as lend lease.
+
+I'd like to add a ton more vehicles but I'm hopeless at 2d art. 
+Amusingly I think 3d was actually easier. 
+
+It will be useful to get at least a couple representative types for 
+each side
+
+----------------------------------
 April 20 2024
 - added a vehicle search function that only returns vehicles that aren't full 
 
