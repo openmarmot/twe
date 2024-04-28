@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 27 2024
+- added chrysler flathead engine for the G505 
+- misc small things related to the g505 
+
+some things todo next
+-i think i need to simulate a vehicle gearbox, at least to some degree. 
+-might also need a acceleration tuning variable. 
+-need to think about how vehicles are going to be integrated with squads and how they will 
+be spawned in with squads
+- need to review how passengers can or cannot get shot/damaged (i think this has been broken for a long time?) 
+
+----------------------------------
 April 26 2024
 - added Dodge 'Weapons Carrier' G505 4x4 1/2 ton truck
 

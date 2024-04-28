@@ -722,7 +722,10 @@ def load_test_environment(world):
     spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
 
     # bikes 
-    #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+
+    # trucks 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
   
 
 #------------------------------------------------------------------------------
@@ -1600,18 +1603,20 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='dodge_g505_wc':
         z=WorldObject(WORLD,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
-        z.name='dodge_g505_wc'
+        z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
+        z.ai.max_occupants=10
         z.ai.max_speed=200
         z.ai.rotation_speed=30.
         z.collision_radius=50
-        z.weight=800
-        z.rolling_resistance=0.015
+        z.weight=2380
+        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
         
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
@@ -1798,6 +1803,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=25277.9
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250
+    elif OBJECT_TYPE=='chrysler_flathead_straight_6_engine':
+        z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
+        z.name='Chrysler Flathead Straight 6 Engine'
+        z.ai.fuel_type=['gas_80_octane']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=93022.91
         z.rotation_angle=float(random.randint(0,359))
         z.weight=250
     elif OBJECT_TYPE=='jumo_211':
