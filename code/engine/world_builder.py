@@ -104,6 +104,19 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+    elif SQUAD_TYPE=='soviet 1944 rifle motorized':
+        s.faction='soviet'
+        # ref : https://www.battleorder.org/ussr-rifle-co-1944
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # squad lead 
+        s.members.append(spawn_soldiers(WORLD,'soviet_svt40')) # asst squad lead could hav svt_40
+        s.members.append(spawn_soldiers(WORLD,'soviet_dp28')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -564,6 +577,7 @@ def load_images(world):
     # vehicle
     world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
     world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
+    world.graphic_engine.loadImage('dodge_g505_wc','images/vehicles/dodge_g505_wc/dodge_g505_wc.png')
     world.graphic_engine.loadImage('red_bicycle','images/vehicles/bicycle/red_bicycle.png')
 
     #terrain
@@ -695,10 +709,10 @@ def load_test_environment(world):
     world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
 
     # add soviets
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 submachine gun')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
 
     # add soviet reinforcements
     time=random.randint(120,500)
@@ -721,7 +735,10 @@ def load_test_environment(world):
     spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
 
     # bikes 
-    #spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+
+    # trucks 
+    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
   
 
 #------------------------------------------------------------------------------
@@ -1597,6 +1614,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.projectile_type='7.62x54_L'
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='dodge_g505_wc':
+        z=WorldObject(WORLD,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
+        z.name='Dodge G505 WC Truck'
+        z.is_vehicle=True
+        z.ai.max_occupants=10
+        z.ai.max_speed=200
+        z.ai.rotation_speed=30.
+        z.collision_radius=50
+        z.weight=2380
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
+        
+        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
@@ -1777,6 +1816,14 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=25277.9
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250
+    elif OBJECT_TYPE=='chrysler_flathead_straight_6_engine':
+        z=WorldObject(WORLD,['volkswagen_type_82_engine'],AIEngine)
+        z.name='Chrysler Flathead Straight 6 Engine'
+        z.ai.fuel_type=['gas_80_octane']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=93022.91
         z.rotation_angle=float(random.randint(0,359))
         z.weight=250
     elif OBJECT_TYPE=='jumo_211':

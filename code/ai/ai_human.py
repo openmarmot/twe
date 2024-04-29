@@ -1532,9 +1532,10 @@ class AIHuman(AIBase):
         # check if we are close to our destination (if we have one)
         elif self.ai_vehicle_goal=='travel':
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
-            if distance<150:
-                self.handle_exit_vehicle()
-                action=True
+            if distance<200:
+                if self.vehicle.ai.current_speed<1:
+                    self.handle_exit_vehicle()
+                    action=True
                 # should probably let everyone else know as well
         else:
             print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
@@ -1657,14 +1658,10 @@ class AIHuman(AIBase):
                 self.think_generic()
             else:
                 # fine lets go treking across the map
-                b=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_vehicle,2000)
+                b=self.owner.world.get_closest_vehicle(self.owner.world_coords,2000)
                 if b!=None:
-                    # should we check if its hostile??
-                    if len(b.ai.passengers)<b.ai.max_occupants:
-                        self.take_action_enter_vehicle(b)
-                    else:
-                        print('debug - closest vehicle is full')
-                        # should find another vehicle but there isn't a great mechanism for that
+                    # get_closest_vehicle only returns vehicles that aren't full
+                    self.take_action_enter_vehicle(b)
 
                 else:
                     # no vehicles ?
@@ -1841,9 +1838,14 @@ class AIHuman(AIBase):
             #self.vehicle.rotation_angle=r
             self.vehicle.reset_image=True
 
-
-        self.vehicle.ai.throttle=1
-        self.vehicle.ai.brake_power=0
+        distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
+        if distance<150:
+            # apply brakes. bot will only exit when speed is zero
+            self.vehicle.ai.throttle=0
+            self.vehicle.ai.brake_power=1
+        else:
+            self.vehicle.ai.throttle=1
+            self.vehicle.ai.brake_power=0
 
 
     #---------------------------------------------------------------------------

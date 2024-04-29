@@ -1,6 +1,54 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 29 2024
+- added squad starting_vehicles concept 
+- added soviet rifles 1944 motorized squad 
+- starting soviet squads in the test scenario are now motorized 
+
+the motorized squad is a test concept. not sure if that will stay long term 
+
+----------------------------------
+April 27 2024
+- added chrysler flathead engine for the G505 
+- misc small things related to the g505 
+
+some things todo next
+-i think i need to simulate a vehicle gearbox, at least to some degree. 
+-might also need a acceleration tuning variable. 
+-need to think about how vehicles are going to be integrated with squads and how they will 
+be spawned in with squads
+- need to review how passengers can or cannot get shot/damaged (i think this has been broken for a long time?) 
+
+----------------------------------
+April 26 2024
+- added Dodge 'Weapons Carrier' G505 4x4 1/2 ton truck
+
+I read the world's longest wikipedia article on Dodge WC trucks 
+https://en.wikipedia.org/wiki/Dodge_WC_series
+
+As best as I can tell the 1/2 ton was sent over to the soviets 
+as lend lease.
+
+I'd like to add a ton more vehicles but I'm hopeless at 2d art. 
+Amusingly I think 3d was actually easier. 
+
+It will be useful to get at least a couple representative types for 
+each side
+
+----------------------------------
+April 20 2024
+- added a vehicle search function that only returns vehicles that aren't full 
+
+not 100% on letting the ai auto figure out if a vehicle is full or not, but the 
+new function should clear up vehicle choice logic immensely 
+
+----------------------------------
+April 19 2024
+- bots now apply the brakes on vehicles if they are close to their destination
+- bots now wait to exit vehicles until they are nearly stopped 
+
+----------------------------------
 April 17 2024
 - ju88 is now a vehicle as well as an airplane 
 - added brake_power return to zero on vehicles (i think all vehicles would want this - except for trains maybe)
@@ -20,7 +68,6 @@ April 15 2024
 - added some horrible rate of climb calculations 
 - added a zero to map size (now 100,000 "units" square) as 
     otherwise airplanes get off map very quickly 
-
 
 map size needs a rethink now that airplanes are (barely) usable. 
 

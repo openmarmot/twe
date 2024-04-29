@@ -43,6 +43,9 @@ class AISquad(object):
         # ai_human will remove itself on death 
         self.members=[] 
 
+        # vehicles that the squad spawned with. 
+        self.starting_vehicles=[]
+
         # near enemies
         self.very_near_enemies=[]
         self.near_enemies=[]
@@ -169,6 +172,12 @@ class AISquad(object):
     def spawn_on_map(self):
         '''spawns the squad on the map at the squads world coords '''
 
+        # spawn attached vehicles
+        for b in self.starting_vehicles:
+            b.world_coords=[self.world_coords[0]+float(random.randint(-15,15)),self.world_coords[1]+float(random.randint(-15,15))]
+            b.wo_start()
+        
+        # spawn humans
         for b in self.members :
             # set the squad - i don't think this is set anywhere else
             b.ai.squad=self
