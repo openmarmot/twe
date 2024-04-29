@@ -104,6 +104,19 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+    elif SQUAD_TYPE=='soviet 1944 rifle motorized':
+        s.faction='soviet'
+        # ref : https://www.battleorder.org/ussr-rifle-co-1944
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # squad lead 
+        s.members.append(spawn_soldiers(WORLD,'soviet_svt40')) # asst squad lead could hav svt_40
+        s.members.append(spawn_soldiers(WORLD,'soviet_dp28')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'soviet_ppsh43'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
+        s.members.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -696,10 +709,10 @@ def load_test_environment(world):
     world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
 
     # add soviets
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 submachine gun')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
 
     # add soviet reinforcements
     time=random.randint(120,500)
