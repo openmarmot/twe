@@ -85,6 +85,8 @@ class AIHuman(AIBase):
         self.ai_think_rate=0
         # the ai group that this human is a part of 
         self.squad=None
+        self.squad_min_distance=30
+        self.squad_max_distance=300
         self.target_object=None
         self.destination=None
 
@@ -106,6 +108,13 @@ class AIHuman(AIBase):
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
+
+        # target lists. these are refreshed periodically 
+        self.near_targets=[]
+        self.mid_targets=[]
+        self.far_targets=[]
+        self.time_since_target_evaluation=0
+        self.target_eval_rate=random.uniform(0.1,0.9)
 
         self.inventory=[]
 
@@ -129,7 +138,30 @@ class AIHuman(AIBase):
         # max distance that is walkable before deciding a vehicle is better 
         self.max_walk_distance=2000
 
+    #---------------------------------------------------------------------------
+    def evaluate_targets(self):
+        '''find and categorzie targets'''
+        target_list=[]
+        if self.squad.faction=='german':
+            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_american
+        elif self.squad.faction=='american':
+            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_german
+        elif self.squad.faction=='soviet':
+            target_list=self.owner.world.wo_objects_german+self.owner.world.wo_objects_american
+        elif self.squad.faction=='civilian':
+            pass
+        else:
+            print('error! unknown squad faction!')
 
+        for b in target_list:
+            d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+
+            if d<500:
+                self.near_targets.append(b)
+            elif d<850:
+                self.mid_targets.append(b)
+            elif d<1300:
+                self.far_targets.append(b)
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -151,11 +183,8 @@ class AIHuman(AIBase):
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
 
-                # let the squad know (this is only until the enemy list is rebuilt)
-                # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
-                        self.squad.near_enemies.append(EVENT_DATA.ai.shooter)
                         # this creates a lot of friendly fire - but its interesting 
                         self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
@@ -333,6 +362,27 @@ class AIHuman(AIBase):
         return calc_speed
     
     #---------------------------------------------------------------------------
+    def get_target(self):
+        '''returns a target or None if there are None'''
+        target=None
+        if len(self.near_targets)>0:
+            target=self.near_targets.pop()
+        elif len(self.mid_targets)>0:
+            target=self.mid_targets.pop()
+        elif len(self.far_targets)>0:
+            target=self.far_targets.pop()
+
+        if target!=None:
+            if target.ai.health<1:
+                # could get intesting if there are a lot of dead targets but 
+                # it should self clear with this recursion
+                print('error: got dead target, retrying')
+                target=self.get_target()
+                
+
+        return target
+    
+    #---------------------------------------------------------------------------
     def handle_building_check(self):
 
         # reset transition to zero
@@ -437,6 +487,9 @@ class AIHuman(AIBase):
         if self.squad != None:
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
+
+            if self.owner==self.squad.squad_leader:
+                self.squad.squad_leader=None
             else: 
                 # note this just in case but the bug causing this was fixed.
                 print('!! Error : '+self.owner.name+' not in squad somehow')
@@ -620,6 +673,14 @@ class AIHuman(AIBase):
         # if there is something that should be decided it goes in handle_normal_ai_think
 
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        # identify and categorize targets
+        self.time_since_target_evaluation+=time_passed
+        if self.time_since_target_evaluation>self.target_eval_rate :
+            self.target_eval_rate=random.uniform(0.8,6.5)
+            self.evaluate_targets()
+
+
         self.time_since_ai_transition+=time_passed
 
         if self.time_since_ai_transition>self.ai_think_rate :
@@ -870,6 +931,44 @@ class AIHuman(AIBase):
             for b in self.inventory:
                 if b.is_gun_magazine:
                     engine.world_builder.load_magazine(self.owner.world,b)
+
+    #--------------------------------------------------------------------------
+    def handle_squad_actions(self):
+        '''handle various squad decisions. returns true/false if an action was taken'''
+        action=False
+        if self.squad.squad_leader!=None:
+            
+            # are we the squad leader?
+            if self.owner==self.squad.squad_leader:
+
+                # check distance to destination 
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
+
+                if distance>100:
+                    self.ai_goal='move towards squad destination'
+                    self.destination=self.squad.destination
+                    self.ai_state='start_moving'
+                    action=True
+                    
+            else:
+                    
+                # first we should check if we outrank the squad leader 
+                        
+                # check to see if we should get closer 
+                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
+                if distance_group >self.squad_max_distance:
+                    if self.prone:
+                        self.handle_prone_state_change()
+                    self.ai_goal='close_with_group'
+                    self.destination=copy.copy(self.squad.squad_leader.world_coords)
+                    self.time_since_ai_transition=0
+                    self.ai_state='start_moving'
+
+                    action=True
+        else:
+            # elect yourself as squad leader. Naturally!
+            self.squad.squad_leader=self.owner
+        return action
 
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
@@ -1375,10 +1474,10 @@ class AIHuman(AIBase):
                         else:
                             c=False # exit while loop
 
-                # get a squad enemy  
+                # get a target 
                 if action==False :
                     # get an enemy from the squad
-                    self.target_object=self.squad.get_enemy()
+                    self.target_object=self.get_target()
                     if self.target_object!=None:
                         self.ai_state='engaging'
                         self.ai_goal='none'
@@ -1420,17 +1519,14 @@ class AIHuman(AIBase):
                 self.ai_want_cover=False
                 # not implemented
             else:
-                # note - code may not get here often enough. will have to play test. distance from group is very important
-                # distance from group 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                if distance_group >self.squad.max_distance :
-                    if self.prone:
-                        self.handle_prone_state_change()
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.world_coords)
-                    self.time_since_ai_transition=0
-                    self.ai_state='start_moving'
-                else:
+                
+                # handle various squad actions
+                action=self.handle_squad_actions()
+
+                
+
+
+                if action==False:
                     if self.ai_want_food:
                         self.ai_want_food=False
                         self.take_action_get_item(False,self.owner.world.wo_objects_consumable)
@@ -1743,7 +1839,7 @@ class AIHuman(AIBase):
                         self.destination=copy.copy(self.target_object.world_coords)
                         self.ai_state='start_moving'
         elif self.ai_goal=='close_with_group':
-            if DISTANCE<self.squad.min_distance:
+            if DISTANCE<self.squad_min_distance:
                 self.ai_state='sleeping'
         elif self.ai_goal=='player_move':
             # this is initiated from world.select_with_mouse when

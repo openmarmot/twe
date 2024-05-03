@@ -709,10 +709,10 @@ def load_test_environment(world):
     world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
 
     # add soviets
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
 
     # add soviet reinforcements
     time=random.randint(120,500)

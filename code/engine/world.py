@@ -77,6 +77,7 @@ class World(object):
         self.spawn_south=[0.,4000.]
         self.spawn_west=[-4000.,0.]
         self.spawn_east=[4000.,0.]
+        self.spawn_far_east=[10000.,0.]
 
         # size of the map in every direction from 0,0
         self.map_size=100000

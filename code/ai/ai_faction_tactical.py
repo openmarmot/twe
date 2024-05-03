@@ -78,9 +78,6 @@ class AIFactionTactical(object):
                 # note! this will remove the members from their old squad if they had one
                 squad.add_to_squad(b)
 
-            # run a think cycle to set squad variables correctly
-            squad.handle_ai_think()
-
             # add to the list of squads we are keeping track of
             self.squads.append(squad)
         else:
