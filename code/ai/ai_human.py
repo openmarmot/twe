@@ -9,7 +9,7 @@ event - something that could happen to the ai, possibly caused by external force
 handle_SOMETHING - something that the AI decides to do that requires some code to make happen
 take_action_ - something simple that sets ai_state and ai_goal to start an action, but not a lot of logic
 think_ - something that requires a lot of logic code
-
+react_ - player or bot calls this when they want to give orders to another bot
 for humans the current owner.image_list is [normal,prone,dead]
 '''
 
@@ -54,8 +54,14 @@ class AIHuman(AIBase):
 
         # what the ai is actually doing (an action)
         self.ai_state='none'
+        # - waiting : if a vehicle driver will cause the driver to wait with the brake on for the wait_interval
+
         # what the ai is trying to accomplish
         self.ai_goal='none'
+
+        # ai 'waiting' state timer 
+        self.time_since_asked_to_wait=0
+        self.wait_interval=60
 
         # a lot of these are reset by event_add_inventory()
         self.ai_want_gun=False
@@ -85,6 +91,8 @@ class AIHuman(AIBase):
         self.ai_think_rate=0
         # the ai group that this human is a part of 
         self.squad=None
+        self.squad_min_distance=30
+        self.squad_max_distance=300
         self.target_object=None
         self.destination=None
 
@@ -106,6 +114,13 @@ class AIHuman(AIBase):
         # list of personal enemies the AI has
         # not assigned from squad - mostly assigned through getting shot at the moment 
         self.personal_enemies=[]
+
+        # target lists. these are refreshed periodically 
+        self.near_targets=[]
+        self.mid_targets=[]
+        self.far_targets=[]
+        self.time_since_target_evaluation=0
+        self.target_eval_rate=random.uniform(0.1,0.9)
 
         self.inventory=[]
 
@@ -129,7 +144,34 @@ class AIHuman(AIBase):
         # max distance that is walkable before deciding a vehicle is better 
         self.max_walk_distance=2000
 
+    #---------------------------------------------------------------------------
+    def evaluate_targets(self):
+        '''find and categorzie targets'''
+        target_list=[]
+        if self.squad.faction=='german':
+            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_american
+        elif self.squad.faction=='american':
+            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_german
+        elif self.squad.faction=='soviet':
+            target_list=self.owner.world.wo_objects_german+self.owner.world.wo_objects_american
+        elif self.squad.faction=='civilian':
+            pass
+        else:
+            print('error! unknown squad faction!')
 
+        self.near_targets=[]
+        self.mid_targets=[]
+        self.far_targets=[]
+
+        for b in target_list:
+            d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+
+            if d<500:
+                self.near_targets.append(b)
+            elif d<850:
+                self.mid_targets.append(b)
+            elif d<1300:
+                self.far_targets.append(b)
 
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
@@ -151,11 +193,8 @@ class AIHuman(AIBase):
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
 
-                # let the squad know (this is only until the enemy list is rebuilt)
-                # enemy may not be 'near' the rest of the squad - which creates interesting behaviors
                 if EVENT_DATA.ai.shooter.ai.squad != None:
                     if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
-                        self.squad.near_enemies.append(EVENT_DATA.ai.shooter)
                         # this creates a lot of friendly fire - but its interesting 
                         self.personal_enemies.append(EVENT_DATA.ai.shooter)
 
@@ -333,6 +372,30 @@ class AIHuman(AIBase):
         return calc_speed
     
     #---------------------------------------------------------------------------
+    def get_target(self):
+        '''returns a target or None if there are None'''
+        target=None
+        if len(self.near_targets)>0:
+            target=self.near_targets.pop()
+        elif len(self.mid_targets)>0:
+            target=self.mid_targets.pop()
+        elif len(self.far_targets)>0:
+            target=self.far_targets.pop()
+
+        if target!=None:
+            if target.ai.health<1:
+                # could get intesting if there are a lot of dead targets but 
+                # it should self clear with this recursion
+                print('error: got dead target: '+target.name+' retrying')
+                print('near ',len(self.near_targets))
+                print('mid',len(self.mid_targets))
+                print('far',len(self.far_targets))
+                target=self.get_target()
+                
+
+        return target
+    
+    #---------------------------------------------------------------------------
     def handle_building_check(self):
 
         # reset transition to zero
@@ -437,6 +500,9 @@ class AIHuman(AIBase):
         if self.squad != None:
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
+
+            if self.owner==self.squad.squad_leader:
+                self.squad.squad_leader=None
             else: 
                 # note this just in case but the bug causing this was fixed.
                 print('!! Error : '+self.owner.name+' not in squad somehow')
@@ -529,6 +595,8 @@ class AIHuman(AIBase):
 
         # make sure we are visible again
         self.owner.render=True
+
+        # maybe grab your large pick up if you put it in the trunk
         
         self.speak('Jumping out')
 
@@ -589,6 +657,11 @@ class AIHuman(AIBase):
         # randomize time before we hit this method again
         self.ai_think_rate=random.uniform(0.1,1.5)
 
+        if self.ai_state=='waiting':
+            if self.time_since_asked_to_wait>self.wait_interval:
+                self.ai_state='none'
+
+
         if self.in_vehicle:
             self.think_in_vehicle()
         elif self.ai_state=='moving':
@@ -605,6 +678,7 @@ class AIHuman(AIBase):
             if self.in_vehicle:
                 # maybe need more nuance to this. is there a good reason to be in a vehicle if you are almost dead?
                 self.handle_exit_vehicle()
+                print('debug: human exited vehicle because human health<10')
 
             if self.think_healing_options()==False :
                 # no health to be had! (probably impossible with the amount of consumables)
@@ -620,6 +694,15 @@ class AIHuman(AIBase):
         # if there is something that should be decided it goes in handle_normal_ai_think
 
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+        # identify and categorize targets
+        self.time_since_target_evaluation+=time_passed
+        if self.time_since_target_evaluation>self.target_eval_rate :
+            self.target_eval_rate=random.uniform(0.8,6.5)
+            self.evaluate_targets()
+
+        self.time_since_asked_to_wait+=time_passed
+
         self.time_since_ai_transition+=time_passed
 
         if self.time_since_ai_transition>self.ai_think_rate :
@@ -871,6 +954,73 @@ class AIHuman(AIBase):
                 if b.is_gun_magazine:
                     engine.world_builder.load_magazine(self.owner.world,b)
 
+    #--------------------------------------------------------------------------
+    def handle_squad_actions(self):
+        '''handle various squad decisions. returns true/false if an action was taken'''
+        action=False
+        if self.squad.squad_leader!=None:
+            
+            # are we the squad leader?
+            if self.owner==self.squad.squad_leader:
+
+                # check distance to destination 
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
+
+                if distance>100:
+                    self.ai_goal='move towards squad destination'
+                    self.destination=self.squad.destination
+                    self.ai_state='start_moving'
+                    action=True
+                    
+            else:
+                    
+                # first we should check if we outrank the squad leader 
+                        
+                # check to see if we should get closer 
+                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
+                if distance_group >self.squad_max_distance:
+                    if self.prone:
+                        self.handle_prone_state_change()
+                    self.ai_goal='close_with_group'
+                    self.destination=copy.copy(self.squad.squad_leader.world_coords)
+                    self.time_since_ai_transition=0
+                    self.ai_state='start_moving'
+
+                    action=True
+        else:
+            # elect yourself as squad leader. Naturally!
+            self.squad.squad_leader=self.owner
+        return action
+    
+    #---------------------------------------------------------------------------
+    def handle_squad_transportation_orders(self):
+        '''assign transportation for the squad'''
+
+        near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
+
+        # remove yourself to prevent recursion
+        near_squad.remove(self.owner)
+
+        near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,1000)
+
+        for b in near_vehicle:
+            if len(near_squad)==0:
+                break
+            # calculate occupants
+            occupants=len(b.ai.passengers)
+            for c in self.owner.world.wo_objects_human:
+                if c.ai.ai_goal=='enter_vehicle' and c.ai.target_object==b:
+                    occupants+=1
+
+            while occupants<b.ai.max_occupants:
+                if len(near_squad)>0:
+                    near_squad[0].ai.react_asked_to_enter_vehicle(b)
+                    occupants+=1
+                    near_squad.pop(0)
+                else:
+                    break
+        
+
     #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
@@ -966,16 +1116,32 @@ class AIHuman(AIBase):
                     s+=WHAT
 
                 self.owner.world.graphic_engine.add_text(s)
-
-
+          
     #-----------------------------------------------------------------------
     def react_asked_to_enter_vehicle(self,VEHICLE):
         '''react to the player asking the ai to enter the players vehicle'''
         if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
             self.speak('There is no where to sit!')
         else:
-            self.take_action_enter_vehicle(VEHICLE)
-            self.speak('Climbing onboard')      
+
+            distance=engine.math_2d.get_distance(self.owner.world_coords,VEHICLE.world_coords)
+
+            if distance<1000:
+                self.take_action_enter_vehicle(VEHICLE,'ride along')
+                self.speak('Climbing onboard')   
+            else:
+                self.speak('Too far') 
+
+    #-----------------------------------------------------------------------
+    def react_asked_to_exit_vehicle(self): 
+        ''' react to being asked to exit the vehicle'''
+
+        # could put some logic in here to keep crew memebers in the vehicle
+
+        if self.in_vehicle:
+            self.handle_exit_vehicle()
+        else:
+            self.speak("I'm not in a vehicle")
 
     #-----------------------------------------------------------------------
     def react_asked_to_join_squad(self,SQUAD):
@@ -999,16 +1165,31 @@ class AIHuman(AIBase):
             self.speak('nothing better than what i got')
 
     #-----------------------------------------------------------------------
-    def take_action_enter_vehicle(self,VEHICLE):
+    def react_asked_to_wait(self,INTERVAL=60):
+        self.ai_state='waiting'
+        self.time_since_asked_to_wait=0
+        self.wait_interval=INTERVAL
+        self.speak("I'll wait for "+str(self.wait_interval))
+
+    #-----------------------------------------------------------------------
+    def take_action_enter_vehicle(self,VEHICLE,vehicle_goal='travel'):
         '''move to and enter vehicle'''
+
+        # should check and see if we are trying to enter another vehicle
 
         if self.prone:
             self.handle_prone_state_change()
 
+
+        # ask the driver to wait for us
+        if VEHICLE.ai.driver!=None:
+            # could specify a time based on how long we need to get there
+            VEHICLE.ai.driver.ai.react_asked_to_wait()
+
         # head towards the vehicle
         # should check if the vehicle is hostile
 
-        self.ai_vehicle_goal='travel'
+        self.ai_vehicle_goal=vehicle_goal
         self.ai_vehicle_destination=copy.copy(self.destination)
 
         self.target_object=VEHICLE
@@ -1016,6 +1197,10 @@ class AIHuman(AIBase):
         # not using copy here because vehicle may move
         self.destination=self.target_object.world_coords
         self.ai_state='start_moving'
+
+        # tell the squad to mount up
+        if self.owner==self.squad.squad_leader:
+            self.handle_squad_transportation_orders()
 
     #-----------------------------------------------------------------------
     def take_action_get_ammo(self,NEAR):
@@ -1375,10 +1560,10 @@ class AIHuman(AIBase):
                         else:
                             c=False # exit while loop
 
-                # get a squad enemy  
+                # get a target 
                 if action==False :
                     # get an enemy from the squad
-                    self.target_object=self.squad.get_enemy()
+                    self.target_object=self.get_target()
                     if self.target_object!=None:
                         self.ai_state='engaging'
                         self.ai_goal='none'
@@ -1420,17 +1605,14 @@ class AIHuman(AIBase):
                 self.ai_want_cover=False
                 # not implemented
             else:
-                # note - code may not get here often enough. will have to play test. distance from group is very important
-                # distance from group 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.world_coords)
-                if distance_group >self.squad.max_distance :
-                    if self.prone:
-                        self.handle_prone_state_change()
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.world_coords)
-                    self.time_since_ai_transition=0
-                    self.ai_state='start_moving'
-                else:
+                
+                # handle various squad actions
+                action=self.handle_squad_actions()
+
+                
+
+
+                if action==False:
                     if self.ai_want_food:
                         self.ai_want_food=False
                         self.take_action_get_item(False,self.owner.world.wo_objects_consumable)
@@ -1534,9 +1716,15 @@ class AIHuman(AIBase):
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
             if distance<200:
                 if self.vehicle.ai.current_speed<1:
-                    self.handle_exit_vehicle()
+                    # tell everyone to exit (including yourself)
+                    for b in self.vehicle.ai.passengers:
+                        b.ai.react_asked_to_exit_vehicle()
+                    #self.handle_exit_vehicle()
                     action=True
-                # should probably let everyone else know as well
+
+
+        elif self.ai_vehicle_goal=='ride along':
+            pass
         else:
             print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
 
@@ -1743,7 +1931,7 @@ class AIHuman(AIBase):
                         self.destination=copy.copy(self.target_object.world_coords)
                         self.ai_state='start_moving'
         elif self.ai_goal=='close_with_group':
-            if DISTANCE<self.squad.min_distance:
+            if DISTANCE<self.squad_min_distance:
                 self.ai_state='sleeping'
         elif self.ai_goal=='player_move':
             # this is initiated from world.select_with_mouse when
@@ -1804,48 +1992,56 @@ class AIHuman(AIBase):
     def think_vehicle_drive(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
-        # we want a tighter and more uniform time interval because we are 
-        # actually driving here
-        self.ai_think_rate=0.1
-
-        # turn engines on
-        # could do smarter checks here once engines have more stats
-        for b in self.vehicle.ai.engines:
-            if b.ai.engine_on==False:
-                b.ai.engine_on=True
-
-        # get the rotation to the destination 
-        r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
-
-        # compare that with the current vehicle rotation.. somehow?
-        v = self.vehicle.rotation_angle
-
-        if r>v:
-            #self.vehicle.rotation_angle+=1*time_passed
-            #self.vehicle.reset_image=True
-            self.vehicle.ai.handle_steer_left()
-            self.ai_think_rate=0.01
-        if r<v:
-            #self.vehicle.rotation_angle-=1*time_passed
-            #self.vehicle.reset_image=True
-            self.vehicle.ai.handle_steer_right()
-            self.ai_think_rate=0.01
-        
-        # if its close just set it equal
-        if r>v-1 and r<v+1:
-            # neutral out steering 
-            self.vehicle.ai.handle_steer_neutral()
-            #self.vehicle.rotation_angle=r
-            self.vehicle.reset_image=True
-
-        distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
-        if distance<150:
-            # apply brakes. bot will only exit when speed is zero
-            self.vehicle.ai.throttle=0
+        if self.ai_state=='waiting':
             self.vehicle.ai.brake_power=1
+            self.vehicle.ai.throtte=0
         else:
-            self.vehicle.ai.throttle=1
-            self.vehicle.ai.brake_power=0
+            if self.ai_vehicle_destination==None:
+                # determine vehicle destination
+                self.ai_vehicle_destination=self.squad.destination
+            
+            # we want a tighter and more uniform time interval because we are 
+            # actually driving here
+            self.ai_think_rate=0.1
+
+            # turn engines on
+            # could do smarter checks here once engines have more stats
+            for b in self.vehicle.ai.engines:
+                if b.ai.engine_on==False:
+                    b.ai.engine_on=True
+
+            # get the rotation to the destination 
+            r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)
+
+            # compare that with the current vehicle rotation.. somehow?
+            v = self.vehicle.rotation_angle
+
+            if r>v:
+                #self.vehicle.rotation_angle+=1*time_passed
+                #self.vehicle.reset_image=True
+                self.vehicle.ai.handle_steer_left()
+                self.ai_think_rate=0.01
+            if r<v:
+                #self.vehicle.rotation_angle-=1*time_passed
+                #self.vehicle.reset_image=True
+                self.vehicle.ai.handle_steer_right()
+                self.ai_think_rate=0.01
+            
+            # if its close just set it equal
+            if r>v-1 and r<v+1:
+                # neutral out steering 
+                self.vehicle.ai.handle_steer_neutral()
+                #self.vehicle.rotation_angle=r
+                self.vehicle.reset_image=True
+
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
+            if distance<150:
+                # apply brakes. bot will only exit when speed is zero
+                self.vehicle.ai.throttle=0
+                self.vehicle.ai.brake_power=1
+            else:
+                self.vehicle.ai.throttle=1
+                self.vehicle.ai.brake_power=0
 
 
     #---------------------------------------------------------------------------

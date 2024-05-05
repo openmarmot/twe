@@ -77,6 +77,7 @@ class World(object):
         self.spawn_south=[0.,4000.]
         self.spawn_west=[-4000.,0.]
         self.spawn_east=[4000.,0.]
+        self.spawn_far_east=[10000.,0.]
 
         # size of the map in every direction from 0,0
         self.map_size=100000
@@ -348,6 +349,16 @@ class World(object):
         ''' return a random object from a list '''
         i=random.randint(0,len(OBJECT_LIST)-1)
         return OBJECT_LIST[i]
+    
+    #---------------------------------------------------------------------------
+    def get_objects_within_range(self,WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
+        '''check distance on objects from an array and returns the ones that are in range'''
+        near_objects=[]
+        for b in OBJECT_LIST:
+            d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
+            if d<MAX_DISTANCE:
+                near_objects.append(b)
+        return near_objects
 
     #---------------------------------------------------------------------------
     def handle_keydown(self,KEY):

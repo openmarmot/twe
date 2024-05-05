@@ -1,4 +1,53 @@
 TWE Project : Change Log
+----------------------------------
+May 05 2024
+- added 'waiting' ai_state. mostly affects vehicle drivers now 
+- vehicle passengers will now exit if someone in the vehicle reached their destination
+- fixed bug where vehicle was added as a squad member, not a starting_vehicle 
+- misc vehicle related bug fixing
+- fixed target evaluation bug where lists were not being cleared 
+- misc bug fixes 
+
+the current code is stable. it feels vastly different from it used to due to the 
+large changes with squads, vehicles, and enemy selection.
+
+I let it run for about 15 minutes. after awhile almost every ai in the game was in 
+a long line apparently attempting to get into the same distant vehicle. this needs to 
+be reviewed 
+
+----------------------------------
+May 04 2024
+- misc changes to how bots enter vehicles 
+- squad_leader can now ask the squad to enter vehicles
+
+----------------------------------
+May 02 2024
+- added far_east spawn at 10k units vs the original 4k for east to test vehicle use 
+- soviet initial spawns are now far_east 
+- rewrite of ai_squad, moving a lot of functions into ai_human 
+- introduced squad.squad_leader concept 
+
+!! note - this was a large rewrite. probably broke a ton of stuff. ai behavior 
+has changed quite a bit with the squad changes  
+
+realized that ai bots in squads will almost never use vehicles because they are most 
+often just moving to get closer to the squad position, which is almost pretty close 
+to them so it doesn't trigger vehicle usage. squads are going to need a squad order 
+system to get around this. 
+
+I am rewriting squad_ai under the general guiding principal of this project that 
+actual ai thinking should all be done under ai_human. other ai classes should 
+just have minimal logic that simulates physics and mechanisms. 
+
+squads now follow a leader instead of having a squad world_coordinate that was 
+determined with a chunk of code. 
+
+some possible next steps 
+- implement some sort of squad order system where the squad lead can issue 
+commands to bots that are in range (600?)
+    - main one needed at the moment is 'get in vehicle' 
+- vehicle drivers need to determine if anyone is trying to get in a vehicle and 
+wait a reasonable time for them. 
 
 ----------------------------------
 April 29 2024
