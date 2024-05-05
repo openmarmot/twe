@@ -3,7 +3,17 @@ TWE Project : Change Log
 May 05 2024
 - added 'waiting' ai_state. mostly affects vehicle drivers now 
 - vehicle passengers will now exit if someone in the vehicle reached their destination
+- fixed bug where vehicle was added as a squad member, not a starting_vehicle 
+- misc vehicle related bug fixing
+- fixed target evaluation bug where lists were not being cleared 
+- misc bug fixes 
 
+the current code is stable. it feels vastly different from it used to due to the 
+large changes with squads, vehicles, and enemy selection.
+
+I let it run for about 15 minutes. after awhile almost every ai in the game was in 
+a long line apparently attempting to get into the same distant vehicle. this needs to 
+be reviewed 
 
 ----------------------------------
 May 04 2024

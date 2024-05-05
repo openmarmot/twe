@@ -75,10 +75,13 @@ class AISquad(object):
         
         # spawn humans
         for b in self.members :
-            # set the squad - i don't think this is set anywhere else
-            b.ai.squad=self
-            b.world_coords=[self.world_coords[0]+float(random.randint(-15,15)),self.world_coords[1]+float(random.randint(-15,15))]
-            b.wo_start()
+            if b.is_human:
+                # set the squad - i don't think this is set anywhere else
+                b.ai.squad=self
+                b.world_coords=[self.world_coords[0]+float(random.randint(-15,15)),self.world_coords[1]+float(random.randint(-15,15))]
+                b.wo_start()
+            else:
+                print('Error - non human in squad members')
 
     #---------------------------------------------------------------------------
     def update(self):

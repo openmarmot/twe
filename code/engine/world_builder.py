@@ -116,7 +116,7 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
-        s.members.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
+        s.starting_vehicles.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -1682,7 +1682,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='ju88':
-        z=WorldObject(WORLD,['ju88-winter-weathered'],AIVehicle)
+        z=WorldObject(WORLD,['ju88-winter-weathered','ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
         z.ai.max_speed=500
         z.ai.stall_speed=100

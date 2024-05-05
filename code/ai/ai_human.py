@@ -159,6 +159,10 @@ class AIHuman(AIBase):
         else:
             print('error! unknown squad faction!')
 
+        self.near_targets=[]
+        self.mid_targets=[]
+        self.far_targets=[]
+
         for b in target_list:
             d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
@@ -382,7 +386,10 @@ class AIHuman(AIBase):
             if target.ai.health<1:
                 # could get intesting if there are a lot of dead targets but 
                 # it should self clear with this recursion
-                print('error: got dead target, retrying')
+                print('error: got dead target: '+target.name+' retrying')
+                print('near ',len(self.near_targets))
+                print('mid',len(self.mid_targets))
+                print('far',len(self.far_targets))
                 target=self.get_target()
                 
 
@@ -990,6 +997,10 @@ class AIHuman(AIBase):
         '''assign transportation for the squad'''
 
         near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
+
+        # remove yourself to prevent recursion
+        near_squad.remove(self.owner)
+
         near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,1000)
 
         for b in near_vehicle:
@@ -1712,7 +1723,8 @@ class AIHuman(AIBase):
                     action=True
 
 
-                # should probably let everyone else know as well
+        elif self.ai_vehicle_goal=='ride along':
+            pass
         else:
             print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
 
@@ -1984,7 +1996,10 @@ class AIHuman(AIBase):
             self.vehicle.ai.brake_power=1
             self.vehicle.ai.throtte=0
         else:
-
+            if self.ai_vehicle_destination==None:
+                # determine vehicle destination
+                self.ai_vehicle_destination=self.squad.destination
+            
             # we want a tighter and more uniform time interval because we are 
             # actually driving here
             self.ai_think_rate=0.1
