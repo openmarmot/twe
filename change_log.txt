@@ -1,5 +1,16 @@
 TWE Project : Change Log
 ----------------------------------
+May 05 2024
+- added 'waiting' ai_state. mostly affects vehicle drivers now 
+- vehicle passengers will now exit if someone in the vehicle reached their destination
+
+
+----------------------------------
+May 04 2024
+- misc changes to how bots enter vehicles 
+- squad_leader can now ask the squad to enter vehicles
+
+----------------------------------
 May 02 2024
 - added far_east spawn at 10k units vs the original 4k for east to test vehicle use 
 - soviet initial spawns are now far_east 
