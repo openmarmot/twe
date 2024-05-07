@@ -1,4 +1,10 @@
 TWE Project : Change Log
+
+----------------------------------
+May 06 2024
+- detected and partially fixed edge case where the bot tries to enter 
+a vehicle that moves too far away to walk to. 
+
 ----------------------------------
 May 05 2024
 - added 'waiting' ai_state. mostly affects vehicle drivers now 

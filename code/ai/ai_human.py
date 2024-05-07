@@ -1845,15 +1845,23 @@ class AIHuman(AIBase):
             if len(self.personal_enemies)>0:
                 self.think_generic()
             else:
-                # fine lets go treking across the map
-                b=self.owner.world.get_closest_vehicle(self.owner.world_coords,2000)
-                if b!=None:
-                    # get_closest_vehicle only returns vehicles that aren't full
-                    self.take_action_enter_vehicle(b)
+                if self.ai_goal=='enter_vehicle':
+                    #the vehicle we were trying to enter must have driven off, or something equally weird happened
+                    print('error: vehicle inception! tried to get into a vehicle to get to another vehicle')
+                    # lets pause and rethink our priorities
+                    self.ai_state='sleep'
+                    self.ai_goal='sleep'
 
+                # this should be the case most of the time
                 else:
-                    # no vehicles ?
-                    pass
+                    b=self.owner.world.get_closest_vehicle(self.owner.world_coords,2000)
+                    if b!=None:
+                        # get_closest_vehicle only returns vehicles that aren't full
+                        self.take_action_enter_vehicle(b)
+
+                    else:
+                        # no vehicles ? guess we are walking
+                        pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
             if distance >400 and len(self.personal_enemies)>0:
