@@ -330,13 +330,19 @@ class World(object):
         return best_object
     
     #---------------------------------------------------------------------------
-    def get_closest_vehicle(self, WORLD_COORDS,MAX_DISTANCE):
-        '''gets the closest vehicle that has passenger space'''
+    def get_closest_vehicle(self, WORLD_COORDS,MAX_DISTANCE,FACTION):
+        '''gets the closest vehicle that has passenger space and is the right faction'''
         best_distance=MAX_DISTANCE
         best_object=None
         for b in self.wo_objects_vehicle:
+            acceptable=True
+
+            if b.ai.driver!=None:
+                if b.ai.driver.ai.squad.faction!=FACTION:
+                    acceptable=False
+
             # check if its full first
-            if len(b.ai.passengers)<b.ai.max_occupants:
+            if acceptable and len(b.ai.passengers)<b.ai.max_occupants:
                 d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
                 if d<best_distance:
                     best_distance=d 

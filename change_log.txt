@@ -1,4 +1,32 @@
 TWE Project : Change Log
+
+----------------------------------
+May 08 2024
+- added some debug text to menus and some debug print outs 
+- when a bot searches for a vehicle the range will now be <the max walking distance 
+    - this was to prevent needing a vehicle to get to a vehicle 
+- when switching role to driver the ai now checks to see if anyone is trying to get into 
+    the vehicle and if so waits for them for a bit. 
+- get_closest_vehicle will now not return vehicles that have a driver of a different faction 
+- when getting in a vehicle the ai now checks if the driver is a different faction
+- several small tuning changes 
+
+seeing way more debug statements showing that a bot is trying to get a vehicle to get 
+to a vehicle (because it is now too far away) than I was expecting. I think what happened 
+is these were bots that were trying to enter a vehicle with no driver (so no one to ask to wait)
+and then a driver jumps in and drives off before they get to it. 
+
+idk whats going on with vehicles. I think the wait system is causing some unexpected behavior 
+and also the turning circle of the truck might not be tight enough and it may be overshooting. 
+I'm having trouble getting the bots to actually exit the vehicle. 
+
+might help to get the bots to go to half throttle when they are within 600 or so of the destination 
+
+----------------------------------
+May 06 2024
+- detected and partially fixed edge case where the bot tries to enter 
+a vehicle that moves too far away to walk to. 
+
 ----------------------------------
 May 05 2024
 - added 'waiting' ai_state. mostly affects vehicle drivers now 

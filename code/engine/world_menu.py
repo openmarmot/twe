@@ -868,6 +868,12 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append('driver ai_state: '+self.selected_object.ai.driver.ai.ai_state)
                     self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+                    self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
+                    self.world.graphic_engine.menu_text_queue.append('Name [ai_state/ai_goal/vehicle_ai_goal]')
+                    for b in self.selected_object.ai.passengers:
+                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
+                    self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+
 
             if distance<self.max_menu_distance:
                 self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)

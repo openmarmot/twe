@@ -432,6 +432,15 @@ class AIHuman(AIBase):
                 if self.vehicle.ai.driver!=self.owner.world.player:
                     self.vehicle.ai.driver=self.owner
                     self.speak("Taking over driving")
+
+                    # check if anyone is trying to get in the vehicle
+                    new_passengers=0
+                    for c in self.owner.world.wo_objects_human:
+                        if c.ai.ai_goal=='enter_vehicle' and c.ai.target_object==self.vehicle:
+                            new_passengers+=1
+                    if new_passengers>0:
+                        # politely remind yourself to wait a minute so they can get in
+                        self.react_asked_to_wait()
                     
             elif ROLE=='gunner':
                 if self.vehicle.ai.gunner!=self.owner.world.player:
@@ -553,8 +562,18 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_enter_vehicle(self,VEHICLE):
         # should maybe pick driver or gunner role here
-
-        if len(VEHICLE.ai.passengers)<VEHICLE.ai.max_occupants:
+        preheck=True
+        
+        if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
+            preheck=False
+            self.speak('No more room in this vehicle!')
+        
+        if VEHICLE.ai.driver!=None:
+            if VEHICLE.ai.driver.ai.squad.faction!=self.squad.faction:
+                preheck=False
+                self.speak('The enemy took this vehicle!')
+        
+        if preheck:
 
             # put your large items in the trunk
             if self.large_pickup:
@@ -579,26 +598,29 @@ class AIHuman(AIBase):
                 if self.vehicle.ai.gunner==None:
                     self.handle_change_vehicle_role('gunner')
         else:
-            self.speak('No more room in this vehicle!')
             self.ai_goal='none'
             self.ai_state='none'
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
-        # remove self from any vehicle roles
-        self.handle_change_vehicle_role('none')
-        self.in_vehicle=False
-        self.vehicle.ai.passengers.remove(self.owner)
-        self.vehicle=None
-        self.ai_goal='none'
-        self.ai_state='none'
+        if self.in_vehicle:
+            # remove self from any vehicle roles
+            self.handle_change_vehicle_role('none')
+            self.in_vehicle=False
+            self.vehicle.ai.passengers.remove(self.owner)
+            self.vehicle=None
+            self.ai_goal='none'
+            self.ai_state='none'
+            self.ai_vehicle_goal='none'
 
-        # make sure we are visible again
-        self.owner.render=True
+            # make sure we are visible again
+            self.owner.render=True
 
-        # maybe grab your large pick up if you put it in the trunk
-        
-        self.speak('Jumping out')
+            # maybe grab your large pick up if you put it in the trunk
+            
+            self.speak('Jumping out')
+        else:
+            print('error: handle_exit_vehicle called but not in vehicle')
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -660,6 +682,7 @@ class AIHuman(AIBase):
         if self.ai_state=='waiting':
             if self.time_since_asked_to_wait>self.wait_interval:
                 self.ai_state='none'
+                self.ai_goal='none'
 
 
         if self.in_vehicle:
@@ -1014,6 +1037,9 @@ class AIHuman(AIBase):
 
             while occupants<b.ai.max_occupants:
                 if len(near_squad)>0:
+                    # set this so they know where to go
+                    if self.ai_vehicle_destination!=None:
+                        near_squad[0].ai.ai_vehicle_destination=self.ai_vehicle_destination
                     near_squad[0].ai.react_asked_to_enter_vehicle(b)
                     occupants+=1
                     near_squad.pop(0)
@@ -1138,9 +1164,12 @@ class AIHuman(AIBase):
 
         # could put some logic in here to keep crew memebers in the vehicle
 
+        print('debug - bot was asked to exit the vehicle')
+
         if self.in_vehicle:
             self.handle_exit_vehicle()
         else:
+            print('debug: asked to exit a vehicle, but not in a vehicle')
             self.speak("I'm not in a vehicle")
 
     #-----------------------------------------------------------------------
@@ -1190,7 +1219,10 @@ class AIHuman(AIBase):
         # should check if the vehicle is hostile
 
         self.ai_vehicle_goal=vehicle_goal
-        self.ai_vehicle_destination=copy.copy(self.destination)
+        if self.destination==None:
+            self.ai_vehicle_destination=self.squad.destination
+        else:
+            self.ai_vehicle_destination=copy.copy(self.destination)
 
         self.target_object=VEHICLE
         self.ai_goal='enter_vehicle'
@@ -1712,7 +1744,7 @@ class AIHuman(AIBase):
             # should probably let everyone else know
             action=True
         # check if we are close to our destination (if we have one)
-        elif self.ai_vehicle_goal=='travel':
+        elif self.ai_vehicle_goal=='travel' or self.vehicle.ai.driver==self.owner:
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
             if distance<200:
                 if self.vehicle.ai.current_speed<1:
@@ -1845,15 +1877,23 @@ class AIHuman(AIBase):
             if len(self.personal_enemies)>0:
                 self.think_generic()
             else:
-                # fine lets go treking across the map
-                b=self.owner.world.get_closest_vehicle(self.owner.world_coords,2000)
-                if b!=None:
-                    # get_closest_vehicle only returns vehicles that aren't full
-                    self.take_action_enter_vehicle(b)
+                if self.ai_goal=='enter_vehicle':
+                    #the vehicle we were trying to enter must have driven off, or something equally weird happened
+                    print('error: vehicle inception! '+self.owner.name+' is in enter_vehicle state and distance to vehicle is '+str(distance))
+                    # lets pause and rethink our priorities
+                    self.ai_state='sleep'
+                    self.ai_goal='sleep'
 
+                # this should be the case most of the time
                 else:
-                    # no vehicles ?
-                    pass
+                    b=self.owner.world.get_closest_vehicle(self.owner.world_coords,(self.max_walk_distance*0.6),self.squad.faction)
+                    if b!=None:
+                        # get_closest_vehicle only returns vehicles that aren't full
+                        self.take_action_enter_vehicle(b)
+
+                    else:
+                        # no vehicles ? guess we are walking
+                        pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
             if distance >400 and len(self.personal_enemies)>0:
@@ -1997,6 +2037,7 @@ class AIHuman(AIBase):
             self.vehicle.ai.throtte=0
         else:
             if self.ai_vehicle_destination==None:
+                print('debugL think_vehicle_drive ai_vehicle_destination==None')
                 # determine vehicle destination
                 self.ai_vehicle_destination=self.squad.destination
             
