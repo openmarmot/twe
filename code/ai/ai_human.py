@@ -562,18 +562,18 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_enter_vehicle(self,VEHICLE):
         # should maybe pick driver or gunner role here
-        preheck=True
+        precheck=True
         
         if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
-            preheck=False
+            precheck=False
             self.speak('No more room in this vehicle!')
         
         if VEHICLE.ai.driver!=None:
             if VEHICLE.ai.driver.ai.squad.faction!=self.squad.faction:
-                preheck=False
+                precheck=False
                 self.speak('The enemy took this vehicle!')
         
-        if preheck:
+        if precheck:
 
             # put your large items in the trunk
             if self.large_pickup:
@@ -597,6 +597,8 @@ class AIHuman(AIBase):
                 # not driver, how about gunner?
                 if self.vehicle.ai.gunner==None:
                     self.handle_change_vehicle_role('gunner')
+
+            print(self.owner.name,self.squad.faction,' debug entering vehicle')
         else:
             self.ai_goal='none'
             self.ai_state='none'
@@ -619,6 +621,8 @@ class AIHuman(AIBase):
             # maybe grab your large pick up if you put it in the trunk
             
             self.speak('Jumping out')
+
+            print(self.owner.name,self.squad.faction,' debug exiting vehicle')
         else:
             print('error: handle_exit_vehicle called but not in vehicle')
 
@@ -1037,12 +1041,16 @@ class AIHuman(AIBase):
 
             while occupants<b.ai.max_occupants:
                 if len(near_squad)>0:
+                    if near_squad[0].ai.in_vehicle:
+                        #already in a vehicle, so no further action needed
+                        near_squad.pop(0)
+                    else:
                     # set this so they know where to go
-                    if self.ai_vehicle_destination!=None:
-                        near_squad[0].ai.ai_vehicle_destination=self.ai_vehicle_destination
-                    near_squad[0].ai.react_asked_to_enter_vehicle(b)
-                    occupants+=1
-                    near_squad.pop(0)
+                        if self.ai_vehicle_destination!=None:
+                            near_squad[0].ai.ai_vehicle_destination=self.ai_vehicle_destination
+                        near_squad[0].ai.react_asked_to_enter_vehicle(b)
+                        occupants+=1
+                        near_squad.pop(0)
                 else:
                     break
         
@@ -1149,14 +1157,17 @@ class AIHuman(AIBase):
         if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
             self.speak('There is no where to sit!')
         else:
-
-            distance=engine.math_2d.get_distance(self.owner.world_coords,VEHICLE.world_coords)
-
-            if distance<1000:
-                self.take_action_enter_vehicle(VEHICLE,'ride along')
-                self.speak('Climbing onboard')   
+            if self.in_vehicle:
+                print('debug bot asked to enter vehicle but already in a vehicle')
+                self.speak("I'm already in a vehicle")
             else:
-                self.speak('Too far') 
+                distance=engine.math_2d.get_distance(self.owner.world_coords,VEHICLE.world_coords)
+
+                if distance<1000:
+                    self.take_action_enter_vehicle(VEHICLE,'ride along')
+                    self.speak('Climbing onboard')   
+                else:
+                    self.speak('Too far') 
 
     #-----------------------------------------------------------------------
     def react_asked_to_exit_vehicle(self): 
@@ -2080,6 +2091,9 @@ class AIHuman(AIBase):
                 # apply brakes. bot will only exit when speed is zero
                 self.vehicle.ai.throttle=0
                 self.vehicle.ai.brake_power=1
+            elif distance<500:
+                self.vehicle.ai.throttle=0.5
+                self.vehicle.ai.brake_power=0
             else:
                 self.vehicle.ai.throttle=1
                 self.vehicle.ai.brake_power=0

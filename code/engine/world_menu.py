@@ -869,9 +869,9 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
                     self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('Name [ai_state/ai_goal/vehicle_ai_goal]')
+                    self.world.graphic_engine.menu_text_queue.append('Name [faction/ai_state/ai_goal/vehicle_ai_goal]')
                     for b in self.selected_object.ai.passengers:
-                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
+                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.squad.faction+'/'+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
 
 

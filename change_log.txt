@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 12 2024
+- driver ai slows down to 0.5 throttle when near its destination 
+- misc small vehicle related changes 
+
+I think at least part of the vehicle issues can be explained by the squad orders changing by the time 
+they get to their destination - causing everyone to jump out of the vehicle and then immediately be 
+told to jump back in 
+
+
+----------------------------------
 May 08 2024
 - added some debug text to menus and some debug print outs 
 - when a bot searches for a vehicle the range will now be <the max walking distance 
