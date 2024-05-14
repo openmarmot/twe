@@ -43,6 +43,11 @@ class WorldArea(object):
         #  basically who is currently in control 
         self.faction='none'
 
+        self.german_count=0
+        self.soviet_count=0
+        self.american_count=0
+        self.civilian_count=0
+
         # helps AI determine how to interact with it
         # town / fuel_dump / 
         self.type='none'
@@ -68,36 +73,41 @@ class WorldArea(object):
     #---------------------------------------------------------------------------
     def update_control(self):
         ''' determine who is in control of the world area '''
-        german_count=0
-        soviet_count=0
-        american_count=0
+        self.german_count=0
+        self.soviet_count=0
+        self.american_count=0
+        self.civilian_count=0
 
         for b in self.world.wo_objects_human:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
             if d < self.size:
                 if b.is_german:
-                    german_count+=1
+                    self.german_count+=1
                 elif b.is_soviet:
-                    soviet_count+=1
+                    self.soviet_count+=1
                 elif b.is_american:
-                    american_count+=1
+                    self.american_count+=1
+                elif b.is_civilian:
+                    self.civilian_count+=1
+                else:
+                    print('debug: world_area.update_control unidentified human object')
 
         # determine who controls it
         # todo - need to understand if it is a free for all or if soviets and americans are allied
-        if german_count>soviet_count and german_count>american_count:
+        if self.german_count>self.soviet_count and self.german_count>self.american_count:
             self.faction='german'
-        elif soviet_count>german_count and soviet_count>american_count:
+        elif self.soviet_count>self.german_count and self.soviet_count>self.american_count:
             self.faction='soviet'
-        elif american_count>german_count and american_count>soviet_count:
+        elif self.american_count>self.german_count and self.american_count>self.soviet_count:
             self.faction='american'
         else:
             self.faction='none'
 
-        if german_count>0 and soviet_count>0:
+        if self.german_count>0 and self.soviet_count>0:
             self.is_contested=True
-        elif german_count>0 and american_count>0:
+        elif self.german_count>0 and self.american_count>0:
             self.is_contested=True
-        elif soviet_count>0 and american_count>0:
+        elif self.soviet_count>0 and self.american_count>0:
             # need to check if they are allies or not
             self.is_contested=True
         else:

@@ -92,7 +92,12 @@ class WorldObject(object):
         # might just make this a string or something but bools are fast and easy to use 
         self.is_player=False
         self.is_human=False # something that has ai_human
+        
         self.is_civilian=False
+        self.is_german=False
+        self.is_soviet=False
+        self.is_american=False
+
         self.is_soldier=False
         self.is_vehicle=False
         self.is_airplane=False
@@ -109,9 +114,7 @@ class WorldObject(object):
         self.is_projectile=False
         self.is_consumable=False
         self.is_medical=False # general medical objects. bandage / pain pills / etc
-        self.is_german=False
-        self.is_soviet=False
-        self.is_american=False
+        
         self.is_building=False
         self.is_map_pointer=False
         self.is_furniture=False

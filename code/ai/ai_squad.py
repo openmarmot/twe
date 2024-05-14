@@ -32,6 +32,7 @@ class AISquad(object):
 
         # world_object squad member who is the leader.
         # squad memebers will self elect and update this 
+        # however if the squad is busy it might take a minute
         self.squad_leader=None
 
         # vehicles that the squad spawned with. 

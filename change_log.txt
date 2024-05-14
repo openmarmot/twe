@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+
+----------------------------------
+May 13 2024
+- ai_faction_tactical rewrite
+
+I completely rewrote the tatical orders system. It is quite a bit more advanced than it used to 
+be and probably won't just constantly move squads around like it used to - but it probably needs 
+more like 8 squads per faction to really be effective. world areas probably also need to be spread 
+out more 
+
 ----------------------------------
 May 12 2024
 - driver ai slows down to 0.5 throttle when near its destination 
@@ -8,7 +18,6 @@ May 12 2024
 I think at least part of the vehicle issues can be explained by the squad orders changing by the time 
 they get to their destination - causing everyone to jump out of the vehicle and then immediately be 
 told to jump back in 
-
 
 ----------------------------------
 May 08 2024

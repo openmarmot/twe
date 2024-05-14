@@ -16,6 +16,7 @@ import copy
 import engine.math_2d
 import copy
 from ai.ai_squad import AISquad
+import engine.math_2d
 
 #global variables
 
@@ -49,6 +50,30 @@ class AIFactionTactical(object):
 
         # faction - german/soviet/american/civilian
         self.faction=FACTION
+
+    #---------------------------------------------------------------------------
+    def get_area_enemy_count(self,area):
+        '''get a enemy count for a world_area'''
+        if self.faction=='german':
+            return area.soviet_count+area.american_count
+        elif self.faction=='soviet':
+            return area.german_count+area.american_count
+        elif self.faction=='american':
+            return area.german_count+area.soviet_count
+        else:
+            print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
+
+    #---------------------------------------------------------------------------
+    def get_area_friendly_count(self,area):
+        '''get a friendly count for a world_area'''
+        if self.faction=='german':
+            return area.german_count
+        elif self.faction=='soviet':
+            return area.soviet_count
+        elif self.faction=='american':
+            return area.american_count
+        else:
+            print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
     #---------------------------------------------------------------------------
     # spawns squads in the spawn queue
@@ -85,44 +110,129 @@ class AIFactionTactical(object):
 
     #---------------------------------------------------------------------------
     def tactical_order(self):
-        attack_queue=[] # areas that are owned by the enemy
-        defend_queue=[] # areas that are neutral
-        reinforce_queue=[] # areas that are contested
 
-        # populate queues 
-        for b in self.world.world_areas:
-            if b.faction=='none':
-                defend_queue.append(b)
-            elif b.faction==self.faction:
-                # we already have this one. not sure what to do here
-                pass
-            else :
-                # i guess that means the owner isn't us 
-                attack_queue.append(b)
-            if b.is_contested:
-                reinforce_queue.append(b)
+        idle_squads=[] # these are squads that are near their current squad destination
+        busy_squads=[]
 
-        # hand out orders 
-        assign_orders=True
-        unassigned_squads=[]
-
-        # only count the squads that have members
-        # note that squads that have all memberes dead/gone don't get deleted at the moment
         for b in self.squads:
             if len(b.members)>0:
-                unassigned_squads.append(b)
-        
-        for b in unassigned_squads:
-            if len(reinforce_queue)>0:
-                b.destination=reinforce_queue.pop().world_coords
-            elif len(attack_queue)>0:
-                b.destination=attack_queue.pop().world_coords
-            elif len(defend_queue)>0:
-                b.destination=defend_queue.pop().world_coords
+                if b.squad_leader!=None:
+                    d=engine.math_2d.get_distance(b.destination,b.squad_leader.world_coords)
+                    
+                    # this probably could be a ai_state check instead of a pure distance meansurement
+                    if d<600:
+                        idle_squads.append(b)
+                    else:
+                        busy_squads.append(b)
+
+        contested_areas=[]
+        enemy_areas=[]
+        empty_areas=[]
+        controlled_areas=[]
+
+        # categorize zones
+        for b in self.world.world_areas:
+            if b.is_contested:
+                contested_areas.append(b)
+            elif b.faction=='none':
+                empty_areas.append(b)
+            elif b.faction==self.faction:
+                controlled_areas.append(b)
             else :
-                # seems like all the queues are empty
-                # just send them somewhere random
-                b.destination=self.world.world_areas[random.randint(0,len(self.world.world_areas)-1)].world_coords
+                # only option left is enemy controlled
+                enemy_areas.append(b)
+
+        # contested zones are top priority
+        if len(contested_areas)>0:
+
+            most_troops=None
+            troops=0
+            for b in contested_areas:
+                count=self.get_area_friendly_count(b)
+                if count>troops:
+                    most_troops=b
+                    troops=count
+            least_troops=most_troops
+            for b in contested_areas:
+                count=self.get_area_friendly_count(b)
+                if count<troops:
+                    least_troops=b
+                    troops=count  
+
+            # make a tactics decision !
+            choice=random.randint(1,3)
+            
+            # overwhelming force !!
+            if choice==1:
+                troop_count=0
+                for b in idle_squads:
+                    b.destination=most_troops.world_coords
+                    troop_count+=len(b.members)
+
+                # check if we have numerical superiority
+                if (self.get_area_friendly_count(most_troops)+troop_count)<self.get_area_enemy_count(most_troops):
+                    # lets send in the busy squads as well. this is a dangerous decision.
+                    for b in busy_squads:
+                        b.destination=most_troops.world_coords
+            
+            # shore up the weakest area
+            elif choice==2:
+                for b in idle_squads:
+                    b.destination=least_troops.world_coords
+
+            # do nothing
+            elif choice==3:
+                pass
+        
+        elif len(enemy_areas)>0:
+            most_enemies=None
+            troops=0
+            for b in enemy_areas:
+                count=self.get_area_enemy_count(b)
+                if count>troops:
+                    most_enemies=b
+                    troops=count
+            least_enemies=most_enemies
+            for b in enemy_areas:
+                count=self.get_area_enemy_count(b)
+                if count<troops:
+                    least_enemies=b
+                    troops=count  
+
+            # make a tactics decision !
+            choice=random.randint(1,3)
+            
+            # overwhelm the weak area !!
+            if choice==1:
+                troop_count=0
+                for b in idle_squads:
+                    b.destination=least_enemies.world_coords
+                    troop_count+=len(b.members)
+
+                # check if we have numerical superiority
+                if (self.get_area_friendly_count(least_enemies)+troop_count)<self.get_area_enemy_count(least_enemies):
+                    # lets send in the busy squads as well. this is a dangerous decision.
+                    for b in busy_squads:
+                        b.destination=least_enemies.world_coords
+            
+            # smaller attach on the weak area
+            elif choice==2:
+                for b in idle_squads:
+                    b.destination=least_enemies.world_coords
+
+            # do nothing
+            elif choice==3:
+                pass
+        
+        else:
+            # no contested areas, no enemy held areas
+
+            # just send the idle squads all over
+
+            for b in self.world.world_areas:
+                if len(idle_squads)>0:
+                    idle_squads.pop().destination=b.world_coords
+
     
     #---------------------------------------------------------------------------
     def update(self):
@@ -139,5 +249,9 @@ class AIFactionTactical(object):
 
         if self.time_since_update>self.think_rate:
             self.time_since_update=0
-            if len(self.squads)>0:
-                self.tactical_order()
+            if self.faction=='civilian':
+                #not sure if civilians will eventually have tactical orders or not
+                pass
+            else:
+                if len(self.squads)>0:
+                    self.tactical_order()
