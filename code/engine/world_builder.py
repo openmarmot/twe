@@ -660,85 +660,212 @@ def load_magazine(world,magazine):
         count+=1
 
 #------------------------------------------------------------------------------
-def load_test_environment(world):
+def load_test_environment(world,scenario):
     ''' test environment. not a normal map load '''
 
 
+    if scenario=='1':
+        # add some world areas
+        generate_world_area(world,[-2000,2000],'town','Alfa')
+        generate_world_area(world,[2000,-2000],'town','Bravo')
+        generate_world_area(world,[2000,2000],'town','Charlie')
+        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
+        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
 
-    # add some world areas
-    generate_world_area(world,[-2000,2000],'town','Alfa')
-    generate_world_area(world,[2000,-2000],'town','Bravo')
-    generate_world_area(world,[2000,2000],'town','Charlie')
-    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
-    generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
+        # generate clutter after world areas are created
+        generate_clutter(world)
 
-    # generate clutter after world areas are created
-    generate_clutter(world)
+        # generate civilians and civilan spawns
+        generate_civilians_and_civilan_spawns(world)
 
-    # generate civilians and civilan spawns
-    generate_civilians_and_civilan_spawns(world)
+        # some civilian reinforcements
+        time=random.randint(120,800)
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,900)
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1000)
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1100)
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
 
-    # some civilian reinforcements
-    time=random.randint(120,800)
-    world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
-    world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
-    time=random.randint(120,900)
-    world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
-    world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
-    time=random.randint(120,1000)
-    world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
-    world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
-    time=random.randint(120,1100)
-    world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
-    world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+        # shovel man !
+        if random.randint(0,10)==10:
+            time=random.randint(120,500)
+            world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'shovel man')]])
 
-    # shovel man !
-    if random.randint(0,10)==10:
+        # add germans
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 volksgrenadier fire group')])
+        
+        # add german reinforcements
         time=random.randint(120,500)
-        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'shovel man')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
 
-    # add germans
-    world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
-    world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
-    world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
-    world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 volksgrenadier fire group')])
-    
-    # add german reinforcements
-    time=random.randint(120,500)
-    world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
-    world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        # add soviets
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
 
-    # add soviets
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
-    world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        # add soviet reinforcements
+        time=random.randint(120,500)
+        world.reinforcements.append([time,'soviet',[world.spawn_north,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(60,600)
+        world.reinforcements.append([time,'soviet',[world.spawn_south,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(120,700)
+        world.reinforcements.append([time,'soviet',[world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')]])
 
-    # add soviet reinforcements
-    time=random.randint(120,500)
-    world.reinforcements.append([time,'soviet',[world.spawn_north,create_standard_squad(world,'soviet 1943 rifle')]])
-    time=random.randint(60,600)
-    world.reinforcements.append([time,'soviet',[world.spawn_south,create_standard_squad(world,'soviet 1943 rifle')]])
-    time=random.randint(120,700)
-    world.reinforcements.append([time,'soviet',[world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')]])
+        # add ju88
+        spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
+        # add a pile of bombs
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
 
-    #---------misc stuff for testing ---------
+        # bikes 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
 
-    #spawn_object(world,[float(random.randint(0,0)),float(random.randint(0,0))],"55_gallon_drum",True)
+        # trucks 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
 
+    # mega sized meeting engagement   
+    elif scenario=='2':
+                # add some world areas
+        generate_world_area(world,[-5000,5000],'town','Alfa')
+        generate_world_area(world,[5000,-5000],'town','Bravo')
+        generate_world_area(world,[5000,5000],'town','Charlie')
+        generate_world_area(world,[float(random.randint(-6500,6500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
+        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
 
-    # add ju88
-    spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
+        # generate clutter after world areas are created
+        generate_clutter(world)
 
-    # add a pile of bombs
-    spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+        # generate civilians and civilan spawns
+        generate_civilians_and_civilan_spawns(world)
 
-    # bikes 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+        # some civilian reinforcements
+        time=random.randint(120,800)
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,900)
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1000)
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1100)
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
 
-    # trucks 
-    spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
+        # shovel man !
+        if random.randint(0,10)==10:
+            time=random.randint(120,500)
+            world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'shovel man')]])
+
+        # add germans
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 volksgrenadier fire group')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 rifle')])
+        world.german_ai.squad_spawn_queue.append([world.spawn_west,create_standard_squad(world,'german 1944 volksgrenadier fire group')])
+        
+        # add german reinforcements
+        time=random.randint(120,500)
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+
+        # add soviets
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+        world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
+
+        # add soviet reinforcements
+        time=random.randint(120,500)
+        world.reinforcements.append([time,'soviet',[world.spawn_north,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(60,600)
+        world.reinforcements.append([time,'soviet',[world.spawn_south,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(120,700)
+        world.reinforcements.append([time,'soviet',[world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(120,500)
+        world.reinforcements.append([time,'soviet',[world.spawn_north,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(60,600)
+        world.reinforcements.append([time,'soviet',[world.spawn_south,create_standard_squad(world,'soviet 1943 rifle')]])
+        time=random.randint(120,700)
+        world.reinforcements.append([time,'soviet',[world.spawn_east,create_standard_squad(world,'soviet 1943 rifle')]])
+
+        # add ju88
+        spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
+
+        # add a pile of bombs
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+
+        # bikes 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+
+        # trucks 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
+
+    # civilian only  
+    elif scenario=='3':
+                # add some world areas
+        generate_world_area(world,[-2000,2000],'town','Alfa')
+        generate_world_area(world,[2000,-2000],'town','Bravo')
+        generate_world_area(world,[2000,2000],'town','Charlie')
+        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
+        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
+
+        # generate clutter after world areas are created
+        generate_clutter(world)
+
+        # generate civilians and civilan spawns
+        generate_civilians_and_civilan_spawns(world)
+
+        # some civilian reinforcements
+        time=random.randint(120,800)
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,900)
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_west,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1000)
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_east,create_standard_squad(world,'civilian small random')]])
+        time=random.randint(120,1100)
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+        world.reinforcements.append([time,'civilian',[world.spawn_south,create_standard_squad(world,'civilian small random')]])
+
+        # shovel man !
+        if random.randint(0,10)==10:
+            time=random.randint(120,500)
+            world.reinforcements.append([time,'civilian',[world.spawn_north,create_standard_squad(world,'shovel man')]])
+
+        # add ju88
+        spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
+
+        # add a pile of bombs
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+
+        # bikes 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
+
+        # trucks 
+        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
   
 
 #------------------------------------------------------------------------------

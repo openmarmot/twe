@@ -598,7 +598,7 @@ class AIHuman(AIBase):
                 if self.vehicle.ai.gunner==None:
                     self.handle_change_vehicle_role('gunner')
 
-            print(self.owner.name,self.squad.faction,' debug entering vehicle')
+            #print(self.owner.name,self.squad.faction,' debug entering vehicle')
         else:
             self.ai_goal='none'
             self.ai_state='none'
@@ -622,7 +622,7 @@ class AIHuman(AIBase):
             
             self.speak('Jumping out')
 
-            print(self.owner.name,self.squad.faction,' debug exiting vehicle')
+            #print(self.owner.name,self.squad.faction,' debug exiting vehicle')
         else:
             print('error: handle_exit_vehicle called but not in vehicle')
 

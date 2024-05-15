@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 15 2024
+- added a menu to load a test environment at the start 
+
+added a couple different test scenario options. none of them are particulariy interesting.
+this will be more useful for testing specific things in the future 
+
+----------------------------------
 May 13 2024
 - ai_faction_tactical rewrite
 
