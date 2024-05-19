@@ -1,6 +1,40 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 19 2024
+- rewrite of the spawn menu - much more options 
+- turned off friendly fire as I was noticing a TON of it as squad numbers go up
+- fixed a incorrect indent on a if statement that was causing incorrect 'not in squad' warnings on death 
+- removed some print statements for things I wasn't activelly debugging 
+
+The new spawn menu has some new stuff - like squad spawns. Remember you can hit '~' to get to it. 
+
+----------------------------------
+May 15 2024
+- added a menu to load a test environment at the start 
+
+added a couple different test scenario options. none of them are particulariy interesting.
+this will be more useful for testing specific things in the future 
+
+----------------------------------
+May 13 2024
+- ai_faction_tactical rewrite
+
+I completely rewrote the tatical orders system. It is quite a bit more advanced than it used to 
+be and probably won't just constantly move squads around like it used to - but it probably needs 
+more like 8 squads per faction to really be effective. world areas probably also need to be spread 
+out more 
+
+----------------------------------
+May 12 2024
+- driver ai slows down to 0.5 throttle when near its destination 
+- misc small vehicle related changes 
+
+I think at least part of the vehicle issues can be explained by the squad orders changing by the time 
+they get to their destination - causing everyone to jump out of the vehicle and then immediately be 
+told to jump back in 
+
+----------------------------------
 May 08 2024
 - added some debug text to menus and some debug print outs 
 - when a bot searches for a vehicle the range will now be <the max walking distance 

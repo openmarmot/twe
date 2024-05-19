@@ -286,58 +286,87 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('4 - none')
             self.world.graphic_engine.menu_text_queue.append('5 - toggle collision circle visual')
             self.world.graphic_engine.menu_text_queue.append('6 - none')
-            self.menu_state='base'
-        elif self.menu_state=='base':
+
             if Key=='1':
                 self.world.toggle_map()
             elif Key=='2':
                 self.world.debug_mode=not self.world.debug_mode
             elif Key=='3':
                 self.menu_state='spawn'
-                self.world.graphic_engine.menu_text_queue=[]
-                self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu --')
-                self.world.graphic_engine.menu_text_queue.append('1 - KubelWagen ')
-                self.world.graphic_engine.menu_text_queue.append('2 - fg42-type2 ')
-                self.world.graphic_engine.menu_text_queue.append('3 - panzerfaust ')
-                self.world.graphic_engine.menu_text_queue.append('4 - dodge_g505_wc')
-                self.world.graphic_engine.menu_text_queue.append('5 - model 24 grenade')
-                self.world.graphic_engine.menu_text_queue.append('6 - german field shovel ')
-                self.world.graphic_engine.menu_text_queue.append('7 - beer ')
-                self.world.graphic_engine.menu_text_queue.append('8 -  coffee tin ')
-                self.world.graphic_engine.menu_text_queue.append('9 - coffee grinder')
-                
+                Key=None
             elif Key=='4':
                 pass
             elif Key=='5':
                 self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
             elif Key=='6':
                 pass
-        elif self.menu_state=='spawn':
+        if self.menu_state=='spawn':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu --')
+            self.world.graphic_engine.menu_text_queue.append('1 - Vehicles ')
+            self.world.graphic_engine.menu_text_queue.append('2 - Weapons ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Squads ')
+            self.world.graphic_engine.menu_text_queue.append('4 - ? ')
+ 
             if Key=='1':
-                #kubelwagen
+                self.menu_state='spawn_vehicles'
+                Key=None
+            elif Key=='2':
+                self.menu_state='spawn_weapons'
+                Key=None
+            elif Key=='3':
+                self.menu_state='spawn_squads'
+                Key=None   
+            elif Key=='4':
+                pass
+        if self.menu_state=='spawn_vehicles':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
+            self.world.graphic_engine.menu_text_queue.append('1 - Kubelwagen ')
+            self.world.graphic_engine.menu_text_queue.append('2 - Red Bicycle ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Ju88 ')
+            self.world.graphic_engine.menu_text_queue.append('4 - Dodge G505 Weapons Carrier ')
+            if Key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='2':
-                #fg42-type2
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'red_bicycle',True)
+            elif Key=='3':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ju88',True)
+            elif Key=='4':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'dodge_g505_wc',True)
+        if self.menu_state=='spawn_weapons':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Weapons --')
+            self.world.graphic_engine.menu_text_queue.append('1 - FG-42 Type 2 ')
+            self.world.graphic_engine.menu_text_queue.append('2 - Panzerfaust ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Model 24 Stick Grenade ')
+            self.world.graphic_engine.menu_text_queue.append('4 - German Field Shovel')
+            if Key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42-type2',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
-            elif Key=='3':
-                #panzerfaust
+            elif Key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
-            elif Key=='4':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'dodge_g505_wc',True)
-            elif Key=='5':
-                # grenade
+            elif Key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
-            elif Key=='6':
+            elif Key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_field_shovel',True)
-            elif Key=='7':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'beer',True)
-            elif Key=='8':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'coffee_tin',True)
-            elif Key=='9':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'coffee_grinder',True)
+        if self.menu_state=='spawn_squads':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Squads --')
+            self.world.graphic_engine.menu_text_queue.append('1 - German 1944 Rifle  ')
+            self.world.graphic_engine.menu_text_queue.append('2 - German 1944 VG Storm Group ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Soviet 1944 Rifle')
+            self.world.graphic_engine.menu_text_queue.append('4 - Soviet 1944 Submachine Gun')
+            if Key=='1':
+                self.world.german_ai.squad_spawn_queue.append([self.world.spawn_west,engine.world_builder.create_standard_squad(self.world,'german 1944 rifle')])
+            elif Key=='2':
+                self.world.german_ai.squad_spawn_queue.append([self.world.spawn_west,engine.world_builder.create_standard_squad(self.world,'german 1944 volksgrenadier storm group')])
+            elif Key=='3':
+                self.world.soviet_ai.squad_spawn_queue.append([self.world.spawn_east,engine.world_builder.create_standard_squad(self.world,'soviet 1944 rifle')])
+            elif Key=='4':
+                self.world.soviet_ai.squad_spawn_queue.append([self.world.spawn_east,engine.world_builder.create_standard_squad(self.world,'soviet 1944 submachine gun')])
 
     #---------------------------------------------------------------------------            
     def eat_drink_menu(self, Key):
@@ -638,8 +667,21 @@ class World_Menu(object):
     def start_menu(self, Key):
         if self.menu_state=='none':
             self.world.is_paused=False
-            # print out the basic menu
-            # eventually 'spawn' should get its own submenu
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('TWE: To Whatever End')
+            self.world.graphic_engine.menu_text_queue.append('---------------')
+            self.world.graphic_engine.menu_text_queue.append('Pick a Test Scenario to Load')
+            self.world.graphic_engine.menu_text_queue.append('1 - Meeting Engagement : German vs Soviet')
+            self.world.graphic_engine.menu_text_queue.append('2 - Larger Meeting Engagement : German vs Soviet ')
+            self.world.graphic_engine.menu_text_queue.append('3 - Civilans Only')
+            #self.world.graphic_engine.menu_text_queue.append('4 - Nothing')
+
+            if Key=='1' or Key=='2' or Key=='3':
+                self.menu_state='faction_select'
+                engine.world_builder.load_test_environment(self.world,Key)
+
+        if self.menu_state=='faction_select':
+            self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('TWE: To Whatever End')
             self.world.graphic_engine.menu_text_queue.append('---------------')
             self.world.graphic_engine.menu_text_queue.append('Pick a Faction')
@@ -647,8 +689,6 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('2 - German')
             self.world.graphic_engine.menu_text_queue.append('3 - Soviet')
             self.world.graphic_engine.menu_text_queue.append('4 - Civilian/Neutral')
-            self.menu_state='base'
-        if self.menu_state=='base':
             spawned=False
             faction='none'
             if Key=='1':
@@ -869,9 +909,9 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
                     self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('Name [ai_state/ai_goal/vehicle_ai_goal]')
+                    self.world.graphic_engine.menu_text_queue.append('Name [faction/ai_state/ai_goal/vehicle_ai_goal]')
                     for b in self.selected_object.ai.passengers:
-                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
+                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.squad.faction+'/'+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
 
 

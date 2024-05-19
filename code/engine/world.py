@@ -109,7 +109,7 @@ class World(object):
 
         # checked by ai_gun.fire() and world_builder.spawn_shrapnel_cloud
         # True== get hurt, False== don't get hurt
-        self.friendly_fire=True # complete friendly fire
+        self.friendly_fire=False # complete friendly fire
         self.friendly_fire_squad=False # only at the squad level
         self.friendly_fire_explosive=True # grenade shrap clouds
         self.friendly_fire_explosive_squad=True # only at the squad level
