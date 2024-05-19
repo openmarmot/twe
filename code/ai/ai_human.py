@@ -510,8 +510,8 @@ class AIHuman(AIBase):
             if self.owner in self.squad.members:
                 self.squad.members.remove(self.owner)
 
-            if self.owner==self.squad.squad_leader:
-                self.squad.squad_leader=None
+                if self.owner==self.squad.squad_leader:
+                    self.squad.squad_leader=None
             else: 
                 # note this just in case but the bug causing this was fixed.
                 print('!! Error : '+self.owner.name+' not in squad somehow')
@@ -597,8 +597,6 @@ class AIHuman(AIBase):
                 # not driver, how about gunner?
                 if self.vehicle.ai.gunner==None:
                     self.handle_change_vehicle_role('gunner')
-
-            #print(self.owner.name,self.squad.faction,' debug entering vehicle')
         else:
             self.ai_goal='none'
             self.ai_state='none'
@@ -621,8 +619,6 @@ class AIHuman(AIBase):
             # maybe grab your large pick up if you put it in the trunk
             
             self.speak('Jumping out')
-
-            #print(self.owner.name,self.squad.faction,' debug exiting vehicle')
         else:
             print('error: handle_exit_vehicle called but not in vehicle')
 
@@ -1174,8 +1170,6 @@ class AIHuman(AIBase):
         ''' react to being asked to exit the vehicle'''
 
         # could put some logic in here to keep crew memebers in the vehicle
-
-        print('debug - bot was asked to exit the vehicle')
 
         if self.in_vehicle:
             self.handle_exit_vehicle()
