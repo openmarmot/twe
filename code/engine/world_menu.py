@@ -1,7 +1,6 @@
 '''
 module : world_menu.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu

@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 20 2024
+- added small_smoke image 
+- removed a lot of old comments and descriptions that weren't used/accurate 
+    and general code cleanup 
+- added a couple names to the name generator before losing interest
+- started working on ai_animated_sprite to animate smoke and bullet casings 
+- added option for projectile to be either steel or brass cased but projectile init doesn't support yet 
+
+name generator probably needs a rewrite to just pull names from a text document. writing it in list format is tedious
+
+todo 
+- penetration_calculator - rewrite into a static function. shouldn't be a class 
+- add casing type to bullet data. incorporate into projectile init 
+- finish ai_animated_sprite 
+- add smoke 
+
+----------------------------------
 May 19 2024
 - rewrite of the spawn menu - much more options 
 - turned off friendly fire as I was noticing a TON of it as squad numbers go up

@@ -1,12 +1,10 @@
 
 '''
 module : ai_coffee_grinder.py
-version : see module_version variable
-Language : Python 3.x
+anguage : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
-
 
 #import built in modules
 

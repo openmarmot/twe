@@ -1,7 +1,6 @@
 '''
 module : engine/penetration_calculator.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : various penetration "calculations"
 '''
@@ -11,9 +10,7 @@ notes : various penetration "calculations"
 import random
 #import custom packages
 import engine.math_2d
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='April 10 2021' #date of last update
+
 
 class Penetration_Calculator(object):
     

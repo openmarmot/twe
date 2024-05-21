@@ -1,8 +1,7 @@
 
 '''
 module : math_2d.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : 
 
@@ -16,10 +15,15 @@ import random
 
 
 #global variables
-last_german=['Müller', 'Schmidt', 'Bauer', 'Wagner', 'Becker', 'Hoffmann', 'Schmitt', 'Schneider', 'Fischer', 'Meyer']
-first_german = ['Hans', 'Max', 'Michael', 'Felix', 'Klaus', 'Lukas', 'Markus', 'Johanne', 'Matthias', 'Kurt']
+last_german=['Müller', 'Schmidt', 'Bauer', 'Wagner', 'Becker', 'Hoffmann',
+     'Richter', 'Schneider', 'Fischer', 'Meyer', 'Wolf', 'Becker', 'Schulz',
+    'Konig', 'Weber', 'Klein', 'Krause']
 
-last_soviet = ['Ivanov', 'Smirnov', 'Kuznetsov', 'Popov', 'Sokolov', 'Mikhailov', 'Novikov', 'Fedorov', 'Volkov', 'Kovalenko']
+first_german = ['Hans', 'Max', 'Michael', 'Felix', 'Klaus', 'Lukas', 'Markus',
+     'Johanne', 'Matthias', 'Kurt', 'Gunther', 'Werner', 'Walther', 'Erich']
+
+last_soviet = ['Ivanov', 'Smirnov', 'Kuznetsov', 'Popov', 'Sokolov',
+     'Mikhailov', 'Novikov', 'Fedorov', 'Volkov', 'Kovalenko', 'Vasiliev']
 first_soviet = ['Vladimir', 'Sergei', 'Ivan', 'Dmitri', 'Nikolai', 'Yuri', 'Mikhail', 'Alexei', 'Boris', 'Andrei']
 
 first_polish = ['Adam', 'Michał', 'Krzysztof', 'Jan', 'Piotr', 'Tomasz', 'Marek', 'Bartłomiej', 'Jacek', 'Łukasz']

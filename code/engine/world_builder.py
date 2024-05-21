@@ -1,8 +1,7 @@
 
 '''
 module : world_builder.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : 
 
@@ -602,6 +601,7 @@ def load_images(world):
     world.graphic_engine.loadImage('steel_case','images/sprites/steel_case.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
+    world.graphic_engine.loadImage('dirt','images/sprites/small_smoke.png')
     world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
     world.graphic_engine.loadImage('coffee_beans','images/sprites/coffee_beans.png')
 

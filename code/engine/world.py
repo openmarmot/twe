@@ -1,8 +1,7 @@
 
 '''
 module : engine.world.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 The world class should handle all of the world logic and world objects.

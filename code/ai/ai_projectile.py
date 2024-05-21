@@ -1,12 +1,10 @@
 
 '''
 module : ai_projectile.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
-
 
 #import built in modules
 
@@ -44,6 +42,9 @@ class AIProjectile(AIBase):
         self.shooter=None
 
         self.speed=0
+
+        # if this is false the casing will be brass
+        self.steel_case=True
 
     #---------------------------------------------------------------------------
     def contact_effect(self):

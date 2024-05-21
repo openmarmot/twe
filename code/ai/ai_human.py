@@ -1,8 +1,7 @@
 
 '''
 module : ai_player.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces

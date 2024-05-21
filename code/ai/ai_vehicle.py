@@ -1,8 +1,7 @@
 
 '''
 module : ai_vehicle.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : the vehicle isn't really meant to have AI. 
 the only thing that should be here is physics and hardware stuff.

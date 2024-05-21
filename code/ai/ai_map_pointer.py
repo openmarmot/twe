@@ -1,21 +1,16 @@
 
 '''
 module : ai_map_pointer.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
-
 
 #import built in modules
 
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='july 05 2021' #date of last update
 
 #global variables
 

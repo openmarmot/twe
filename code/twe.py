@@ -1,8 +1,7 @@
 
 '''
 module : twe.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 
@@ -22,9 +21,6 @@ import random
 #import custom packages
 import engine.world_builder
 
-# module specific variables
-module_version='0.1' #module software version
-module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
