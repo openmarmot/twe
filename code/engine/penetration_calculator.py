@@ -38,8 +38,6 @@ projectile_data['HEAT_jet']={'material':'copper','case_material':'none','grain_w
 
 
 
-
-
 #---------------------------------------------------------------------------
 def check_passthrough(PROJECTILE,TARGET):
     ''' returns bool as to whether or not a projectile passed through (over pen) an object '''

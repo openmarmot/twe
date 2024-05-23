@@ -112,9 +112,11 @@ class AIGun(AIBase):
 
                     # spawn bullet case
                     if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
-                        engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
+                        z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
                     elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
-                        engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                        z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
         return fired
 

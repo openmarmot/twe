@@ -49,6 +49,7 @@ from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
 from ai.ai_engine import AIEngine
 from ai.ai_coffee_grinder import AICoffeeGrinder
+from ai.ai_animated_sprite import AIAnimatedSprite
 
 #global variables
 
@@ -1884,19 +1885,28 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_soviet=True
 
     elif OBJECT_TYPE=='brass':
-        z=WorldObject(WORLD,['brass'],AINone)
-        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
-        z.world_coords=copy.copy(w)
+        z=WorldObject(WORLD,['brass'],AIAnimatedSprite)
+        z.world_coords=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.name='brass'
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=150
+        z.ai.rotation_speed=800
+        z.ai.rotate_time_max=0.8
+        z.ai.move_time_max=0.3
+        z.ai.alive_time_max=1
         z.can_be_deleted=True  
     # steel bullet casing
     elif OBJECT_TYPE=='steel_case':
-        z=WorldObject(WORLD,['steel_case'],AINone)
+        z=WorldObject(WORLD,['steel_case'],AIAnimatedSprite)
         w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='steel_case'
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=150
+        z.ai.rotation_speed=800
+        z.ai.rotate_time_max=0.8
+        z.ai.move_time_max=0.3
+        z.ai.alive_time_max=1
         z.can_be_deleted=True  
     
     elif OBJECT_TYPE=='blood_splatter':

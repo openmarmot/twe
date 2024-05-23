@@ -29,13 +29,15 @@ class AIAnimatedSprite(AIBase):
         self.rotate_time_max=3
 
         # rotation speed per second
-        self.rotation_speed=4
+        self.rotation_speed=400
 
         # how long it moves along its heading 
         self.move_time_max=2
 
         # if true the heading is updated when rotation is updated
         self.heading_from_rotation=False
+
+        self.speed=50
 
     #---------------------------------------------------------------------------
     def update(self):

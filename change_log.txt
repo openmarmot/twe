@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 23 2024
+- added bullet casing animation.
+
+the animation code was originally meant for smoke - that is next. maybe 
+----------------------------------
 May 22 2024
 - converted penetration_calculator from a class to a standalone module
 - added full support for different case types. projectiles are now a mix of brass and steel cases
