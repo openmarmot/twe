@@ -14,7 +14,7 @@ import random
 from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
-
+import engine.penetration_calculator
 
 
 #global variables
@@ -111,9 +111,9 @@ class AIGun(AIBase):
                     self.owner.world.add_object(projectile)
 
                     # spawn bullet case
-                    if projectile.ai.steel_case: 
+                    if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
                         engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
-                    else:
+                    elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
                         engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
 
         return fired
