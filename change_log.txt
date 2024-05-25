@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+
+----------------------------------
+May 24 2024
+- added smoke and smoke clouds. 
+- updated animated sprite to handle self removing sprites
+- added vehicle functions to start/stop engines 
+- engines now differentiate between internal combustion and not 
+- internal combustion engines in vehicles will now smoke on startup 
+
+the new start_engines function opens up the possibility to check the ignition system 
+or electrical system first. 
+
 ----------------------------------
 May 23 2024
 - added bullet casing animation.

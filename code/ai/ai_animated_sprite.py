@@ -39,6 +39,9 @@ class AIAnimatedSprite(AIBase):
 
         self.speed=50
 
+        # remove from world when alive time runs out
+        self.self_remove=False
+
     #---------------------------------------------------------------------------
     def update(self):
         
@@ -49,6 +52,11 @@ class AIAnimatedSprite(AIBase):
 
             if self.alive_time>self.alive_time_max:
                 self.alive=False
+                
+                # self terminate
+                if self.self_remove:
+                    self.owner.wo_stop()
+
             else:
                 if self.alive_time<self.rotate_time_max:
                     #rotate

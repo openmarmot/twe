@@ -195,6 +195,22 @@ class AIVehicle(AIBase):
         self.rudder=1
 
     #---------------------------------------------------------------------------
+    def handle_start_engines(self):
+        for b in self.engines:
+            if b.ai.engine_on==False:
+                b.ai.engine_on=True
+                if b.ai.internal_combustion:
+                    #smoke!
+                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,self.owner.world_coords,heading)
+
+    #---------------------------------------------------------------------------
+    def handle_stop_engines(self):
+        for b in self.engines:
+            if b.ai.engine_on==True:
+                b.ai.engine_on=False
+
+    #---------------------------------------------------------------------------
     def handle_steer_left(self):
         ''' recieve left steering input '''
         if self.owner.altitude<1:

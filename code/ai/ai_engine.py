@@ -21,6 +21,9 @@ class AIEngine(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
         
+        # internal combustion engine
+        self.internal_combustion=True
+
         # list of acceptable fuels
         self.fuel_type = []
 
@@ -71,6 +74,7 @@ class AIEngine(AIBase):
         
         # probably excessive to run this every update. could add up fuel usage
         # and run it randomly instead
-        self.consume_fuel()
+        if self.internal_combustion:
+            self.consume_fuel()
 
     #---------------------------------------------------------------------------

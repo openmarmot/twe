@@ -305,7 +305,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - Vehicles ')
             self.world.graphic_engine.menu_text_queue.append('2 - Weapons ')
             self.world.graphic_engine.menu_text_queue.append('3 - Squads ')
-            self.world.graphic_engine.menu_text_queue.append('4 - ? ')
+            self.world.graphic_engine.menu_text_queue.append('4 - Misc')
  
             if Key=='1':
                 self.menu_state='spawn_vehicles'
@@ -317,7 +317,8 @@ class World_Menu(object):
                 self.menu_state='spawn_squads'
                 Key=None   
             elif Key=='4':
-                pass
+                self.menu_state='spawn_misc'
+                Key=None
         if self.menu_state=='spawn_vehicles':
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
@@ -366,6 +367,24 @@ class World_Menu(object):
                 self.world.soviet_ai.squad_spawn_queue.append([self.world.spawn_east,engine.world_builder.create_standard_squad(self.world,'soviet 1944 rifle')])
             elif Key=='4':
                 self.world.soviet_ai.squad_spawn_queue.append([self.world.spawn_east,engine.world_builder.create_standard_squad(self.world,'soviet 1944 submachine gun')])
+        if self.menu_state=='spawn_misc':
+            self.world.graphic_engine.menu_text_queue=[]
+            self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Misc --')
+            self.world.graphic_engine.menu_text_queue.append('1 - smoke cloud  ')
+            self.world.graphic_engine.menu_text_queue.append('2 - ? ')
+            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.world.graphic_engine.menu_text_queue.append('4 - ?')
+            if Key=='1':
+                heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
+                engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
+
+            elif Key=='2':
+                pass
+            elif Key=='3':
+                pass
+            elif Key=='4':
+                pass
+
 
     #---------------------------------------------------------------------------            
     def eat_drink_menu(self, Key):
@@ -408,16 +427,16 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append(str(selection_key) + ': ' + b.name + ' ' + str(b.ai.engine_on))
             selection_key+=1
 
-        self.world.graphic_engine.menu_text_queue.append('Select an engine to turn it on or off')
+        self.world.graphic_engine.menu_text_queue.append('1 - Start Engines')
+        self.world.graphic_engine.menu_text_queue.append('2 - Stop Engines')
 
-        # get the array position corresponding to the key  press
-        temp=self.translate_key_to_array_position(Key)
-        if temp !=None:
-            if len(selectable_objects)>temp:
-                selectable_objects[temp].ai.engine_on=not selectable_objects[temp].ai.engine_on
+        if Key=='1':
+            self.world.player.ai.vehicle.ai.handle_start_engines()
+            self.engine_menu(None)
+        if Key=='2':
+            self.world.player.ai.vehicle.ai.handle_stop_engines()
+            self.engine_menu(None)
 
-                # refresh text
-                self.engine_menu(None)
 
     #---------------------------------------------------------------------------            
     def first_aid_menu(self, Key):
