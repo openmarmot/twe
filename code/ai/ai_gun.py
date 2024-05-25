@@ -1,8 +1,7 @@
 
 '''
 module : ai_gun.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
@@ -15,10 +14,8 @@ import random
 from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
+import engine.penetration_calculator
 
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='June 22 2021' #date of last update
 
 #global variables
 
@@ -113,9 +110,13 @@ class AIGun(AIBase):
 
                     self.owner.world.add_object(projectile)
 
-                    # spawn brass 
-                    #engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
-                    engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
+                    # spawn bullet case
+                    if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
+                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
+                        z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
+                    elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
+                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                        z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
         return fired
 

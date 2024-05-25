@@ -1,8 +1,7 @@
 
 '''
 module : ai_group.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : holds some squad specific variables
 most of the logic should be in ai_human

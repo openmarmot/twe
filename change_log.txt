@@ -1,5 +1,50 @@
 TWE Project : Change Log
 
+
+----------------------------------
+May 24 2024
+- added smoke and smoke clouds. 
+- updated animated sprite to handle self removing sprites
+- added vehicle functions to start/stop engines 
+- engines now differentiate between internal combustion and not 
+- internal combustion engines in vehicles will now smoke on startup 
+
+the new start_engines function opens up the possibility to check the ignition system 
+or electrical system first. 
+
+----------------------------------
+May 23 2024
+- added bullet casing animation.
+
+the animation code was originally meant for smoke - that is next. maybe 
+----------------------------------
+May 22 2024
+- converted penetration_calculator from a class to a standalone module
+- added full support for different case types. projectiles are now a mix of brass and steel cases
+mostly depending on when the projectile was introduced
+
+ideally I think projectiles need to be split into the actual projectile and the bullet as a whole 
+so I can handle edge cases like a US Chrysler plant manufacturing both steel and brass case 45 ACP.
+
+I am also in general having a hard time finding good information on World War 2 ammo. 
+
+----------------------------------
+May 20 2024
+- added small_smoke image 
+- removed a lot of old comments and descriptions that weren't used/accurate 
+    and general code cleanup 
+- added a couple names to the name generator before losing interest
+- started working on ai_animated_sprite to animate smoke and bullet casings 
+- added option for projectile to be either steel or brass cased but projectile init doesn't support yet 
+
+name generator probably needs a rewrite to just pull names from a text document. writing it in list format is tedious
+
+todo 
+- penetration_calculator - rewrite into a static function. shouldn't be a class 
+- add casing type to bullet data. incorporate into projectile init 
+- finish ai_animated_sprite 
+- add smoke 
+
 ----------------------------------
 May 19 2024
 - rewrite of the spawn menu - much more options 

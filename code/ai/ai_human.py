@@ -1,8 +1,7 @@
 
 '''
 module : ai_player.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
@@ -2052,9 +2051,12 @@ class AIHuman(AIBase):
 
             # turn engines on
             # could do smarter checks here once engines have more stats
+            need_start=False
             for b in self.vehicle.ai.engines:
                 if b.ai.engine_on==False:
-                    b.ai.engine_on=True
+                    need_start=True
+            if need_start:
+                self.vehicle.ai.handle_start_engines()
 
             # get the rotation to the destination 
             r = engine.math_2d.get_rotation(self.vehicle.world_coords,self.ai_vehicle_destination)

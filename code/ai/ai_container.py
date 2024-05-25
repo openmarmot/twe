@@ -1,9 +1,7 @@
 
 '''
 module : ai_container.py
-version : see module_version variable
-Language : Python 3.x
-author : andrew christ
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : not sure this is needed 
 '''
@@ -15,8 +13,6 @@ import copy
 #import custom packages
 from ai.ai_base import AIBase
 
-
-# this is for objects that don't need AI
 
 #global variables
 

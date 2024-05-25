@@ -1,8 +1,7 @@
 
 '''
 module : ai_liquid.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : special characteristics for a liquid
 '''
@@ -21,8 +20,6 @@ from ai.ai_base import AIBase
 class AINone(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-
-
 
     #---------------------------------------------------------------------------
     def update(self):

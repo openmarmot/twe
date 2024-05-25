@@ -1,8 +1,7 @@
 
 '''
 module : engine.world.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 The world class should handle all of the world logic and world objects.
@@ -18,7 +17,6 @@ import copy
 #import custom packages
 from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
-from engine.penetration_calculator import Penetration_Calculator
 import engine.math_2d
 import engine.world_builder
 from ai.ai_faction_tactical import AIFactionTactical
@@ -87,7 +85,6 @@ class World(object):
 
         self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
         self.world_menu=World_Menu(self)
-        self.penetration_calculator=Penetration_Calculator()
 
         self.player=None
 

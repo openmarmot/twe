@@ -1,9 +1,7 @@
 
 '''
 module : ai_magazine.py
-version : see module_version variable
-Language : Python 3.x
-author : andrew christ
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : A (gun) magazine is a object that holds projectiles
 '''
@@ -13,8 +11,6 @@ notes : A (gun) magazine is a object that holds projectiles
 
 #import custom packages
 from ai.ai_base import AIBase
-# module specific variables
-module_version='0.0' #module software version
 
 #global variables
 

@@ -1,8 +1,7 @@
 
 '''
 module : module_template.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 This class should hold as much of the pygame specifc code as possibe.

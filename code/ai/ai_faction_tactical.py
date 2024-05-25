@@ -1,8 +1,7 @@
 
 '''
 module : ai_faction_tactical.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : AI that controls all a factions squads on the tactical map 
 '''

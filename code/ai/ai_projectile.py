@@ -1,12 +1,10 @@
 
 '''
 module : ai_projectile.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
-
 
 #import built in modules
 
@@ -34,9 +32,6 @@ class AIProjectile(AIBase):
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
 
-        self.is_shrapnel=False # not used at the moment
-        self.is_bullet=False # not used at the moment
-
 
         # the weapon that created this
         self.weapon_name=''
@@ -51,8 +46,8 @@ class AIProjectile(AIBase):
         print('kablooey!')
         # add the shrapnel
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
-        shrapnel_count=self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']
-        contact_effect=self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
+        shrapnel_count=engine.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']
+        contact_effect=engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
         if contact_effect=='HEAT':
             engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,self.shooter,self.owner.name)
         else:
@@ -70,7 +65,7 @@ class AIProjectile(AIBase):
 
         self.flightTime+=time_passed
         if(self.flightTime>self.maxTime):
-            if self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+            if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
                 self.contact_effect()
             else:
                 engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
@@ -85,10 +80,10 @@ class AIProjectile(AIBase):
                 self.last_collision_check=self.flightTime
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
                 if collide_obj !=None:
-                    if self.owner.world.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+                    if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
                         self.contact_effect()
                     else:
-                        if self.owner.world.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                        if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
                             # add the collided object to ignore list so we don't hit it again
                             # this is mostly to deal with buildings where we would hit it a ton of times
                             self.ignore_list.append(collide_obj)

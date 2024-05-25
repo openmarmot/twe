@@ -1,9 +1,7 @@
 
 '''
 module : ai_building.py
-version : see module_version variable
-Language : Python 3.x
-author : andrew christ
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
@@ -14,9 +12,6 @@ notes :
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
-# module specific variables
-module_version='0.0' #module software version
-module_last_update_date='July 16 2021' #date of last update
 
 # this is for objects that don't need AI
 

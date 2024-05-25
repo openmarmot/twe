@@ -1,8 +1,7 @@
 
 '''
 module : world_builder.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : 
 
@@ -50,6 +49,7 @@ from ai.ai_consumable import AIConsumable
 from ai.ai_medical import AIMedical
 from ai.ai_engine import AIEngine
 from ai.ai_coffee_grinder import AICoffeeGrinder
+from ai.ai_animated_sprite import AIAnimatedSprite
 
 #global variables
 
@@ -602,6 +602,7 @@ def load_images(world):
     world.graphic_engine.loadImage('steel_case','images/sprites/steel_case.png')
     # regular dirt was cool but it was huge. may use in future
     world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
+    world.graphic_engine.loadImage('small_smoke','images/sprites/small_smoke.png')
     world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
     world.graphic_engine.loadImage('coffee_beans','images/sprites/coffee_beans.png')
 
@@ -1884,20 +1885,42 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_soviet=True
 
     elif OBJECT_TYPE=='brass':
-        z=WorldObject(WORLD,['brass'],AINone)
-        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
-        z.world_coords=copy.copy(w)
+        z=WorldObject(WORLD,['brass'],AIAnimatedSprite)
+        z.world_coords=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.name='brass'
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=150
+        z.ai.rotation_speed=800
+        z.ai.rotate_time_max=0.8
+        z.ai.move_time_max=0.3
+        z.ai.alive_time_max=1
         z.can_be_deleted=True  
     # steel bullet casing
     elif OBJECT_TYPE=='steel_case':
-        z=WorldObject(WORLD,['steel_case'],AINone)
+        z=WorldObject(WORLD,['steel_case'],AIAnimatedSprite)
         w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='steel_case'
         z.rotation_angle=float(random.randint(0,359))
-        z.can_be_deleted=True  
+        z.ai.speed=150
+        z.ai.rotation_speed=800
+        z.ai.rotate_time_max=0.8
+        z.ai.move_time_max=0.3
+        z.ai.alive_time_max=1
+        z.can_be_deleted=True
+    elif OBJECT_TYPE=='small_smoke':
+        z=WorldObject(WORLD,['small_smoke'],AIAnimatedSprite)
+        w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.name='small_smoke'
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=15
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=3
+        z.ai.self_remove=True
+        z.can_be_deleted=True   
     
     elif OBJECT_TYPE=='blood_splatter':
         z=WorldObject(WORLD,['blood_splatter'],AINone)
@@ -1971,6 +1994,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='bicycle_pedals':
         z=WorldObject(WORLD,['bicycle_pedals'],AIEngine)
         z.name='bicycle pedals'
+        z.ai.internal_combustion=False
         z.ai.fuel_type='none'
         z.ai.fuel_consumption_rate=0
         z.ai.max_engine_force=131.44
@@ -2097,6 +2121,23 @@ def spawn_shrapnel_cloud(WORLD,WORLD_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+WORLD_COORDS[0],float(random.randint(-150,150))+WORLD_COORDS[1]]
         spawn_shrapnel(WORLD,WORLD_COORDS,target_coords,ignore_list,'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
+
+#------------------------------------------------------------------------------
+def spawn_smoke_cloud(world,world_coords,heading,amount=30):
+    ''' creates a shrapnel starburst pattern. used for grenades '''
+    # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+
+
+    for x in range(amount):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_smoke',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(9,11)
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=random.uniform(1.5,3)
+
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(WORLD,WORLD_COORDS,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):

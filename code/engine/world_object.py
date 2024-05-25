@@ -1,12 +1,10 @@
 
 '''
 module : module_template.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 '''
-
 
 #import built in modules
 
@@ -14,7 +12,6 @@ notes :
 import engine.math_2d
 
 #global variables
-
 
 
 class WorldObject(object):

@@ -1,8 +1,7 @@
 
 '''
 module : ai_vehicle.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : the vehicle isn't really meant to have AI. 
 the only thing that should be here is physics and hardware stuff.
@@ -194,6 +193,22 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_rudder_right(self):
         self.rudder=1
+
+    #---------------------------------------------------------------------------
+    def handle_start_engines(self):
+        for b in self.engines:
+            if b.ai.engine_on==False:
+                b.ai.engine_on=True
+                if b.ai.internal_combustion:
+                    #smoke!
+                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,self.owner.world_coords,heading)
+
+    #---------------------------------------------------------------------------
+    def handle_stop_engines(self):
+        for b in self.engines:
+            if b.ai.engine_on==True:
+                b.ai.engine_on=False
 
     #---------------------------------------------------------------------------
     def handle_steer_left(self):

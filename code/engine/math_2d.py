@@ -1,8 +1,7 @@
 
 '''
 module : math_2d.py
-version : see module_version variable
-Language : Python 3.x
+language : Python 3.x
 email : andrew@openmarmot.com
 notes : 
 
