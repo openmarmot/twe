@@ -1761,7 +1761,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks[0].volume=114
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
-        
+        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
@@ -1781,7 +1781,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
-        
+        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         if random.randint(0,3)==1:
             mg=spawn_object(WORLD,[0,0],'mg34',False)
             z.ai.primary_weapon=mg
@@ -1850,6 +1850,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         fill_container(WORLD,z.ai.fuel_tanks[3],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
+        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_24v",False))
 
     # this is only used briefly until the player picks a spawn type
     # this is required because a lot of stuff in the game references the player object.
@@ -2048,6 +2049,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='battery_vehicle_6v':
         z=WorldObject(WORLD,['battery_vehicle_6v'],AINone)
         z.name='battery_vehicle_6v'
+        z.weight=25
+        z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='battery_vehicle_24v':
+        z=WorldObject(WORLD,['battery_vehicle_6v'],AINone)
+        z.name='battery_vehicle_24v'
         z.weight=25
         z.rotation_angle=float(random.randint(0,359)) 
 

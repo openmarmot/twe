@@ -3,7 +3,13 @@ TWE Project : Change Log
 
 ----------------------------------
 May 26 2024
-- added 6v vehicle battery 
+- added 6v vehicle battery + art
+- added 24v vehicle battery 
+
+from what i researched it seems most ww2 vehicles would be 6v, and most 
+ww2 airplanes would be 24v
+
+currently electric systems aren't really modeled but that will probably change 
 
 ----------------------------------
 May 24 2024
