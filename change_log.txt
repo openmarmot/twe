@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 26 2024
+- added 6v vehicle battery 
+
+----------------------------------
 May 24 2024
 - added smoke and smoke clouds. 
 - updated animated sprite to handle self removing sprites

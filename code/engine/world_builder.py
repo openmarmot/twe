@@ -649,6 +649,9 @@ def load_images(world):
     # household
     world.graphic_engine.loadImage('coffee_grinder','images/kitchen/coffee_grinder.png')
 
+    # batteries 
+    world.graphic_engine.loadImage('battery_vehicle_6v','images/batteries/battery_vehicle_6v.png')
+
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
     '''loads a magazine with bullets'''
@@ -727,7 +730,7 @@ def load_test_environment(world,scenario):
         spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
         # add a pile of bombs
-        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'bomb_sc250',15,4,False)
 
         # bikes 
         spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
@@ -2037,10 +2040,15 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['coffee_grinder'],AICoffeeGrinder)
         z.name='coffee_grinder'
         z.rotation_angle=float(random.randint(0,359))
-    elif OBJECT_TYPE=='sc250':
+    elif OBJECT_TYPE=='bomb_sc250':
         z=WorldObject(WORLD,['sc250'],AINone)
-        z.name='sc250'
+        z.name='bomb_sc250'
         z.weight=250
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='battery_vehicle_6v':
+        z=WorldObject(WORLD,['battery_vehicle_6v'],AINone)
+        z.name='battery_vehicle_6v'
+        z.weight=25
         z.rotation_angle=float(random.randint(0,359)) 
 
     else:
