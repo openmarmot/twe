@@ -12,6 +12,10 @@ static module for interfacing with sqllite db
 
 # ref
 https://www.pythoncentral.io/introduction-to-sqlite-in-python/
+
+!!!!!! Note --- this is old code and is probably going to be deleted
+
+
 '''
 
 

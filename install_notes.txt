@@ -6,6 +6,12 @@
 This should run fine on pretty much any modern laptop. 
 I was even successful running it on a proxmox virtual machine with virtio at 30 FPS.
 
+# -- Python notes --
+
+Python version : 3.x 
+
+External module requirements : 
+- pygame : https://pypi.org/project/pygame/
 
 # --- Windows --- 
 # Install VS Code 
@@ -55,7 +61,6 @@ python3 twe.py
 sudo dnf install python3-pip
 
 # install pygame 
-# note at the time of writing python 3.11 requires --pre for pygame to work 
 pip install pygame --user
 
 # git clone project 

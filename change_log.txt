@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+----------------------------------
+May 27 2024
+- added data.sqlite 
+- loaded name data into data.sqlite 
+- converted name_gen to pull from data.sqlite 
+- fixed a bug with the start menu where the key wasn't being zeroed out
+after scenario selection 
+
+turns out sqlite3 is built into python. that is super nice 
+
 
 ----------------------------------
 May 26 2024

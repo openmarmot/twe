@@ -1761,7 +1761,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks[0].volume=114
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
-        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
+        z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
@@ -1781,7 +1781,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
-        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
+        z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         if random.randint(0,3)==1:
             mg=spawn_object(WORLD,[0,0],'mg34',False)
             z.ai.primary_weapon=mg
@@ -1850,7 +1850,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         fill_container(WORLD,z.ai.fuel_tanks[3],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
-        z.a.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_24v",False))
+        z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_24v",False))
 
     # this is only used briefly until the player picks a spawn type
     # this is required because a lot of stuff in the game references the player object.
@@ -1864,7 +1864,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(WORLD,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
-        z.name=engine.name_gen.generate('civilian')
+        z.name=engine.name_gen.get_name('civilian')
         z.ai.speed=float(random.randint(10,25))
         z.collision_radius=10
         z.is_human=True
@@ -1872,7 +1872,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(WORLD,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
-        z.name=engine.name_gen.generate('german')
+        z.name=engine.name_gen.get_name('german')
         z.ai.speed=float(random.randint(20,25))
         z.collision_radius=10
         z.is_human=True
@@ -1881,7 +1881,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(WORLD,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
-        z.name=engine.name_gen.generate('soviet')
+        z.name=engine.name_gen.get_name('soviet')
         z.ai.speed=float(random.randint(20,25))
         z.collision_radius=10
         z.is_human=True
