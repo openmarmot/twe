@@ -57,13 +57,16 @@ def load_data():
     global polish_names
     global loaded
 
-    german_names=generate_names('german')
-    soviet_names=generate_names('soviet')
-    polish_names=generate_names('polish')
+    if loaded==False:
+        german_names=generate_names('german')
+        soviet_names=generate_names('soviet')
+        polish_names=generate_names('polish')
 
-    loaded=True
+        loaded=True
 
-    print('Name data load is complete')
+        print('Name data load complete')
+    else:
+        print('Error: name data is already loaded')
 
 #------------------------------------------------------------------------------
 def get_name(ethnicity):
@@ -71,10 +74,6 @@ def get_name(ethnicity):
     global german_names
     global soviet_names
     global polish_names
-    global loaded
-
-    if loaded==False:
-        load_data()
 
     if ethnicity=='german':
         return random.choice(german_names)
@@ -82,3 +81,7 @@ def get_name(ethnicity):
         return random.choice(soviet_names)
     elif ethnicity=='civilian' or ethnicity=='polish':
         return random.choice(polish_names)
+    
+
+# init 
+load_data()

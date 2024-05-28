@@ -9,29 +9,30 @@ testing area for queries
 
 import sqlite3
 
-#------------------------------------------------------------------------------
-def generate_names(ethnicity):
-    # Connect to the SQLite database
-    conn = sqlite3.connect('data.sqlite')
-    cursor = conn.cursor()
 
-    cursor.execute("SELECT name FROM names WHERE ethnicity=? AND name_type='last'", (ethnicity,))    
-    rows = cursor.fetchall()
-    last_names = [row[0] for row in rows]
+# Connect to the SQLite database
+conn = sqlite3.connect('data.sqlite')
 
-    cursor.execute("SELECT name FROM names WHERE ethnicity=? AND name_type='first'", (ethnicity,))
+# Create a cursor object
+cursor = conn.cursor()
 
-    rows = cursor.fetchall()
-    first_names = [row[0] for row in rows]
+cursor.execute("SELECT name,projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count FROM projectile_data")
 
-    # Close the connection
-    conn.close()
+# Fetch all column names
+column_names = [description[0] for description in cursor.description]
 
-    names=[]
-    for b in first_names:
-        for c in last_names:
-            names.append(b+' '+c)
+# Fetch all rows from the table
+rows = cursor.fetchall()
 
-    return names
+# Close the database connection
+conn.close()
 
-print(generate_names('german'))
+# Convert rows to dictionary, excluding the 'id' field
+data_dict = {}
+for row in rows:
+    row_dict = {column_names[i]: row[i] for i in range(len(column_names))}
+    key = row_dict.pop('name')
+    data_dict[key] = row_dict
+
+# Print the resulting dictionary
+print(data_dict)

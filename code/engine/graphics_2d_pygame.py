@@ -21,9 +21,9 @@ import pygame
 from pygame.locals import *
 import pygame.freetype
 from itertools import islice
-#import custom packages
+import os 
 
-#global variables
+#import custom packages
 
 
 class Graphics_2D_Pygame(object):
@@ -106,14 +106,16 @@ class Graphics_2D_Pygame(object):
 
         # adjustment to viewing area
         self.view_adjust=0
+
+        # load all images
+        self.load_all_images('images')
+
 #------------------------------------------------------------------------------
     def add_text(self,TEXT):
         ''' add text to the text queue'''
         self.text_queue.append(TEXT)
         if len(self.text_queue)<4:
             self.time_since_last_text_clear=-1
-
-
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -224,8 +226,21 @@ class Graphics_2D_Pygame(object):
             return False
 
 #------------------------------------------------------------------------------
-    def loadImage(self,imageName,imageURL):
-        self.images[imageName]=pygame.image.load(imageURL).convert_alpha()
+    def load_all_images(self,folder_path):
+        '''load all the images into pygame'''
+        files_and_dirs = os.listdir(folder_path)
+        # Filter out directories, keeping only files
+        files = [f for f in files_and_dirs if os.path.isfile(os.path.join(folder_path, f))]
+
+        for b in files:
+            name=b.split('.')[0]
+            image_path=folder_path+'/'+b
+            self.images[name]=pygame.image.load(image_path).convert_alpha()
+        
+        print('Image loading complete')
+
+
+
 
 #------------------------------------------------------------------------------
     def render(self):

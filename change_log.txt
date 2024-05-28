@@ -7,9 +7,19 @@ May 27 2024
 - converted name_gen to pull from data.sqlite 
 - fixed a bug with the start menu where the key wasn't being zeroed out
 after scenario selection 
+- enabled vehicle passthrough calculation (it was set to always true)
+- loaded projectile data into data.sqlite
+- converted penetration_calculator to pull from sqlite 
+- rewrote and massively simplified image loading. also moved to graphics_2d_pygame
+- renamed a couple image files to reflect their in game name 
 
 turns out sqlite3 is built into python. that is super nice 
 
+for some unknown reason vehicle bullet passthrough was set to always true despite 
+the fact that a calculation function existed. I'm not sure why that was 
+
+note - i no longer have a mac, and need to re-test on windows. 
+the new image loading needs cross platform testing 
 
 ----------------------------------
 May 26 2024

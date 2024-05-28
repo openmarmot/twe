@@ -24,9 +24,9 @@ from ai.ai_human import AIHuman
 import math
 import random
 import copy 
+import os
 
 #import custom packages
-from engine.world import World
 import engine.math_2d
 import engine.name_gen
 
@@ -488,169 +488,6 @@ def grid_spawn(WORLD,WORLD_COORDS,OBJECT_STRING,DIAMETER,COUNT):
         last_coord=[last_coord[0]+DIAMETER,last_coord[1]+0]
         spawn_object(WORLD,last_coord,OBJECT_STRING,True)
 
-#------------------------------------------------------------------------------
-def initialize_world(SCREEN_SIZE):
-    '''
-    returns a world object that has completed basic init
-    '''
-
-    world = World(SCREEN_SIZE)
-
-    load_images(world)
-
-    return world
-
-#------------------------------------------------------------------------------
-def load_images(world):
-    '''
-    load art assets
-    '''
-    # people
-    world.graphic_engine.loadImage('man','images/humans/man.png')
-    world.graphic_engine.loadImage('german_soldier','images/humans/german_soldier.png')
-    world.graphic_engine.loadImage('german_soldier_prone','images/humans/german_soldier_prone.png')
-    world.graphic_engine.loadImage('german_dead','images/humans/german_dead.png')
-
-    world.graphic_engine.loadImage('german_ss_fall_helm_soldier','images/humans/german_ss_fall_helm_soldier.png')
-    
-    world.graphic_engine.loadImage('soviet_soldier','images/humans/russian_soldier.png')
-    world.graphic_engine.loadImage('soviet_soldier_prone','images/humans/russian_soldier_prone.png')
-    world.graphic_engine.loadImage('soviet_dead','images/humans/russian_dead.png')
-    
-    # not used at the moment
-    world.graphic_engine.loadImage('zombie_soldier','images/humans/zombie_soldier.png')
-    
-    world.graphic_engine.loadImage('civilian_man','images/humans/civilian_man.png')
-    world.graphic_engine.loadImage('civilian_prone','images/humans/civilian_prone.png')
-    world.graphic_engine.loadImage('civilian_dead','images/humans/civilian_dead.png')
-
-    # guns
-    world.graphic_engine.loadImage('1911','images/weapons/1911.png')
-    world.graphic_engine.loadImage('dp28','images/weapons/dp28.png')
-    world.graphic_engine.loadImage('mp40','images/weapons/mp40.png')
-    world.graphic_engine.loadImage('ppk','images/weapons/ppk.png')
-    world.graphic_engine.loadImage('stg44','images/weapons/stg44.png')
-    world.graphic_engine.loadImage('tt33','images/weapons/tt33.png')
-    world.graphic_engine.loadImage('kar98k','images/weapons/kar98k.png')
-    world.graphic_engine.loadImage('mg34','images/weapons/mg34.png')
-    world.graphic_engine.loadImage('mosin_nagant','images/weapons/mosin_nagant.png')
-    world.graphic_engine.loadImage('ppsh43','images/weapons/ppsh43.png')
-    world.graphic_engine.loadImage('k43','images/weapons/k43.png')
-    world.graphic_engine.loadImage('g41w','images/weapons/g41-walther.png')
-    world.graphic_engine.loadImage('fg42-type1','images/weapons/fg42-type1.png')
-    world.graphic_engine.loadImage('fg42-type2','images/weapons/fg42-type2.png')
-    world.graphic_engine.loadImage('svt40','images/weapons/svt40.png')
-    world.graphic_engine.loadImage('svt40','images/weapons/svt40-sniper.png')
-    world.graphic_engine.loadImage('mg15','images/weapons/mg15.png')
-
-    # weapon magazines
-    world.graphic_engine.loadImage('stg44_magazine','images/weapons/magazines/stg44_magazine.png')
-
-    # shovels 
-    world.graphic_engine.loadImage('german_folding_shovel','images/shovels/german_folding_shovel.png')
-    world.graphic_engine.loadImage('german_field_shovel','images/shovels/german_field_shovel.png')
-    
-
-    # airplanes
-    world.graphic_engine.loadImage('ju88-winter-weathered','images/airplanes/ju88-winter-weathered.png')
-
-    # grenades
-    world.graphic_engine.loadImage('model24','images/weapons/model24.png')
-
-    # at rockets
-    world.graphic_engine.loadImage('panzerfaust','images/weapons/panzerfaust.png')
-    world.graphic_engine.loadImage('panzerfaust_warhead','images/projectiles/panzerfaust_warhead.png')
-
-    # bombs
-    world.graphic_engine.loadImage('sc250','images/bombs/sc250.png')
-
-    # projectiles
-    world.graphic_engine.loadImage('projectile','images/projectiles/projectile.png')
-    world.graphic_engine.loadImage('shrapnel','images/projectiles/shrapnel.png')
-
-    # buildings
-    world.graphic_engine.loadImage('warehouse-inside','images/buildings/warehouse-inside.png')
-    world.graphic_engine.loadImage('warehouse-outside','images/buildings/warehouse-outside.png')
-    world.graphic_engine.loadImage('square_building_inside','images/buildings/square_building_inside.png')
-    world.graphic_engine.loadImage('square_building_outside','images/buildings/square_building_outside.png')
-
-    # vehicle
-    world.graphic_engine.loadImage('kubelwagen','images/vehicles/kubelwagen/kubelwagen.png')
-    world.graphic_engine.loadImage('kubelwagen_destroyed','images/vehicles/kubelwagen/kubelwagen_destroyed.png')
-    world.graphic_engine.loadImage('dodge_g505_wc','images/vehicles/dodge_g505_wc/dodge_g505_wc.png')
-    world.graphic_engine.loadImage('red_bicycle','images/vehicles/bicycle/red_bicycle.png')
-
-    #terrain
-    world.graphic_engine.loadImage('catgrass','images/catgrass.png')
-
-    #containers
-    world.graphic_engine.loadImage('crate','images/containers/crate.png')
-    world.graphic_engine.loadImage('small_crate','images/containers/small_crate.png')
-    world.graphic_engine.loadImage('german_mg_ammo_can','images/containers/german_mg_ammo_can.png')
-    world.graphic_engine.loadImage('german_fuel_can','images/containers/german_fuel_can.png')
-    world.graphic_engine.loadImage('55_gallon_drum','images/containers/55_gal_drum.png')
-    world.graphic_engine.loadImage('german_drop_canister','images/containers/german_drop_canister.png')
-    world.graphic_engine.loadImage('blue_coffee_cup','images/containers/blue_coffee_cup.png')
-    world.graphic_engine.loadImage('coffee_tin','images/containers/coffee_tin.png')
-    world.graphic_engine.loadImage('barrel','images/containers/barrel.png')
-    world.graphic_engine.loadImage('jar','images/containers/jar.png')
-
-    # effects (sprites)
-    world.graphic_engine.loadImage('blood_splatter','images/sprites/blood_splatter.png')
-    world.graphic_engine.loadImage('small_blood','images/sprites/small_blood.png')
-    world.graphic_engine.loadImage('brass','images/sprites/brass.png')
-    world.graphic_engine.loadImage('steel_case','images/sprites/steel_case.png')
-    # regular dirt was cool but it was huge. may use in future
-    world.graphic_engine.loadImage('dirt','images/sprites/small_dirt.png')
-    world.graphic_engine.loadImage('small_smoke','images/sprites/small_smoke.png')
-    world.graphic_engine.loadImage('small_clear_spill','images/sprites/small_clear_spill.png')
-    world.graphic_engine.loadImage('coffee_beans','images/sprites/coffee_beans.png')
-
-    # consumables
-    world.graphic_engine.loadImage('adler-cheese','images/consumables/adler-cheese.png')
-    world.graphic_engine.loadImage('camembert-cheese','images/consumables/camembert-cheese.png')
-    world.graphic_engine.loadImage('champignon-cheese','images/consumables/champignon-cheese.png')
-    world.graphic_engine.loadImage('karwendel-cheese','images/consumables/karwendel-cheese.png')
-    world.graphic_engine.loadImage('green_apple','images/consumables/green_apple.png')
-    world.graphic_engine.loadImage('potato','images/consumables/potato.png')
-    world.graphic_engine.loadImage('turnip','images/consumables/turnip.png')
-    world.graphic_engine.loadImage('schokakola','images/consumables/schokakola.png')
-    world.graphic_engine.loadImage('cucumber','images/consumables/cucumber.png')
-
-    # bottles 
-    world.graphic_engine.loadImage('wine_bottle','images/bottles/wine_bottle.png')
-    world.graphic_engine.loadImage('green_bottle','images/bottles/green_bottle.png')
-
-    # random 
-    world.graphic_engine.loadImage('map_pointer_green','images/map/map_pointer_green.png')
-    world.graphic_engine.loadImage('map_pointer_blue','images/map/map_pointer_blue.png')
-    world.graphic_engine.loadImage('map_pointer_orange','images/map/map_pointer_orange.png')
-
-    # medical 
-    world.graphic_engine.loadImage('bandage','images/medical/bandage.png')
-    world.graphic_engine.loadImage('german_officer_first_aid_kit','images/medical/german_officer_first_aid_kit.png')
-
-    # furniture 
-    world.graphic_engine.loadImage('brown_chair','images/furniture/brown_chair.png')
-    world.graphic_engine.loadImage('cupboard','images/furniture/cupboard.png')
-
-    # engines 
-    world.graphic_engine.loadImage('volkswagen_type_82_engine','images/engines/volkswagen_type_82_engine.png')
-    world.graphic_engine.loadImage('bicycle_pedals','images/engines/bicycle_pedals.png')
-    world.graphic_engine.loadImage('jumo_211','images/engines/jumo_211.png')
-
-    # fuel tanks 
-    world.graphic_engine.loadImage('vehicle_fuel_tank','images/fuel_tanks/vehicle_fuel_tank.png')
-
-    # fuel / combustable 
-    world.graphic_engine.loadImage('wood_log','images/fuel/wood_log.png')
-    world.graphic_engine.loadImage('wood_quarter','images/fuel/wood_quarter.png')
-
-    # household
-    world.graphic_engine.loadImage('coffee_grinder','images/kitchen/coffee_grinder.png')
-
-    # batteries 
-    world.graphic_engine.loadImage('battery_vehicle_6v','images/batteries/battery_vehicle_6v.png')
 
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
@@ -817,7 +654,7 @@ def load_test_environment(world,scenario):
         spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
         # add a pile of bombs
-        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'bomb_sc250',15,4,False)
 
         # bikes 
         spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
@@ -863,7 +700,7 @@ def load_test_environment(world,scenario):
         spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
 
         # add a pile of bombs
-        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'sc250',15,4,False)
+        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'bomb_sc250',15,4,False)
 
         # bikes 
         spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
@@ -1937,7 +1774,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359)) 
            
     elif OBJECT_TYPE=='dirt':
-        z=WorldObject(WORLD,['dirt'],AINone)
+        z=WorldObject(WORLD,['small_dirt'],AINone)
         z.name='dirt'
         z.rotation_angle=float(random.randint(0,359))
         z.can_be_deleted=True
