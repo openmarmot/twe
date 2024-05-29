@@ -50,6 +50,7 @@ from ai.ai_medical import AIMedical
 from ai.ai_engine import AIEngine
 from ai.ai_coffee_grinder import AICoffeeGrinder
 from ai.ai_animated_sprite import AIAnimatedSprite
+from ai.ai_wearable import AIWearable
 
 #global variables
 

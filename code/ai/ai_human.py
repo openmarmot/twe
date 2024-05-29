@@ -28,10 +28,17 @@ class AIHuman(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
+        # equipment
         self.primary_weapon=None
         self.throwable=None
         self.antitank=None
         self.melee=None
+
+        self.wearable_head=None
+        self.wearable_upper_body=None
+        self.wearable_lower_body=None
+        self.wearable_feet=None
+
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
 

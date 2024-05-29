@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 28 2024
+- ai_human changes for wearables (clothes, helmets, etc)
+
+starting to think about clothing. eventually the same system could handle backpacks 
+
+spent some time looking at german helmet designs, but ran out of steam before implementing one. 
+
+wearables are getting their own ai class, so they will have their own variables and theoretically 
+could have a update function referenced by the wearer (although idk what the use would be)
+
+the reason i started all of this was i wanted to take helmets into account for penetration/damage 
+on humans and start working on a more complicated human damage model.
+
+----------------------------------
 May 27 2024
 - added data.sqlite 
 - loaded name data into data.sqlite 
