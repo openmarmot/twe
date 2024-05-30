@@ -38,6 +38,7 @@ class AIHuman(AIBase):
         self.wearable_upper_body=None
         self.wearable_lower_body=None
         self.wearable_feet=None
+        self.wearable_hand=None
 
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
@@ -151,6 +152,67 @@ class AIHuman(AIBase):
         self.max_walk_distance=2000
 
     #---------------------------------------------------------------------------
+    def calculate_projectile_damage(self,projectile):
+        '''calculate and apply damage from projectile hit'''
+
+        bleeding_hit=False
+        hit=random.randint(1,5)
+        if hit==1:
+            #head
+            if self.wearable_hand==None:
+                if projectile.name=='shrapnel':
+                    self.health-=random.randint(50,100)
+                    bleeding_hit=True
+                else:
+                    self.health-=random.randint(90,150)
+                    bleeding_hit=True
+            else:
+                # wearing a helmet 
+                if projectile.name=='shrapnel':
+                    save_roll=random.randint(1,2)
+                    if save_roll==1:
+                        # glances off, minor damage
+                        self.health-=1
+                    else:
+                        self.health-=random.randint(10,30)
+                        bleeding_hit=True
+                else:
+                    save_roll=random.randint(1,3)
+                    if save_roll==1:
+                        # glancing hit
+                        self.health-=random.randint(1,10)
+                    else:
+                        self.health-=random.randint(50,100)
+                        bleeding_hit=True
+                
+        elif hit==2:
+            #upper body
+            self.health-=random.randint(50,80)
+            bleeding_hit=True
+        elif hit==3:
+            #lower body
+            self.health-=random.randint(30,60)
+            bleeding_hit=True
+        elif hit==4:
+            # feet
+            self.health-=random.randint(30,400)
+            bleeding_hit=True
+        elif hit==5:
+            # hands
+            self.health-=random.randint(30,40)
+            bleeding_hit=True
+        
+        if bleeding_hit:
+            self.bleeding=True
+            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+            if self.owner.is_player:
+                self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
+
+        self.speak('react to being shot')
+
+        
+
+    #---------------------------------------------------------------------------
     def evaluate_targets(self):
         '''find and categorzie targets'''
         target_list=[]
@@ -183,19 +245,14 @@ class AIHuman(AIBase):
     def event_collision(self,EVENT_DATA):
         self.last_collision_description=''
         if EVENT_DATA.is_projectile:
-            self.last_collision_description='hit by '+EVENT_DATA.name
+            distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
+            self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
             starting_health=self.health
-            self.health-=random.randint(25,75)
-            self.bleeding=True
-            engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
-            self.speak('react to being shot')
-
-            if self.owner.is_player:
-                self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
+            self.calculate_projectile_damage(EVENT_DATA)
 
             # add the shooter of the bullet to the personal enemies list
-            # bullets and shrapnel from grenades and panzerfausts track ownership
+            # shrapnel from grenades and panzerfausts dont track ownership
             if EVENT_DATA.ai.shooter !=None:
                 self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
 
@@ -310,6 +367,10 @@ class AIHuman(AIBase):
                     self.ai_want_food=False
                 elif EVENT_DATA.is_medical:
                     self.ai_want_medical=False
+                elif EVENT_DATA.is_wearable:
+                    if EVENT_DATA.wearable_region=='head':
+                        if self.wearable_head==None:
+                            self.wearable_head=EVENT_DATA
         else:
             print('ERROR - object '+EVENT_DATA.name+' is already in inventory')
             print('inventory list:')
@@ -339,6 +400,8 @@ class AIHuman(AIBase):
                 EVENT_DATA.ai.equipper=None
             elif self.large_pickup==EVENT_DATA:
                 print('ERROR - large pickup should not go through inventory functions')
+            elif self.wearable_head==EVENT_DATA:
+                self.wearable_head=None
 
             # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
 

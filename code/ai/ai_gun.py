@@ -8,7 +8,8 @@ notes :
 
 
 #import built in modules
-import random 
+import random
+import copy
 
 #import custom packages
 from ai.ai_base import AIBase
@@ -94,7 +95,8 @@ class AIGun(AIBase):
                     projectile.ai.weapon_name=self.owner.name
                     projectile.ai.shooter=self.equipper
                     projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
-                    projectile.world_coords=self.equipper.world_coords
+                    projectile.world_coords=copy.copy(self.equipper.world_coords)
+                    projectile.ai.starting_coords=copy.copy(self.equipper.world_coords)
                     projectile.ai.maxTime=self.flight_time + random.uniform(0.01, 0.05)
                     
                     if self.equipper.is_player :

@@ -1,6 +1,31 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 29 2024
+- added stalhelm for the Germans 
+- added helmet v ssh-40 for the Soviets
+- adding a helmet to inventory will equip it if one is not equipped 
+- projectiles now record starting coordinates so a distance can be calculated 
+- added more complicated damage model for ai_human 
+- helmet now gives a save role for bullet and shrapnel hits and possible reduced damage
+
+now that the distance the bullet traveled before it hit something can be calculated we can 
+start thinking about creating some penetration tables for various bullets against various objects 
+
+I want to start tracking human damage at a body part level - will have to think about this more. 
+Unfortunately besides the helmet there isn't really much in the way of armor in ww2, and with the new 
+system, getting hit in the head is a 1 in 5 chance. So most of the time the armor does nothing..
+
+maybe i need a crouch mode where the chance of a head hit is increased, but overall chance of hit is 
+decreased. 
+
+I think towards the end game the surviving early squads are out of ammo and get wiped out by reinforcement 
+squads. Need to look further into this - out of ammo is not being handled well 
+
+in play testing there were at least two large groups of Soviets that exited the map. 
+maybe the leader was panicked, or it could have been a vehicle bug. needs debugging
+
+----------------------------------
 May 28 2024
 - ai_human changes for wearables (clothes, helmets, etc)
 

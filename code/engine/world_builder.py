@@ -1894,6 +1894,20 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='battery_vehicle_24v'
         z.weight=25
         z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='helmet_stahlhelm':
+        z=WorldObject(WORLD,['helmet_stahlhelm'],AIWearable)
+        z.name='helmet_stahlhelm'
+        z.weight=0.98
+        z.is_wearable=True
+        z.wearable_region='head'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='helmet_ssh40':
+        z=WorldObject(WORLD,['helmet_ssh40'],AIWearable)
+        z.name='helmet_ssh40'
+        z.weight=0.98
+        z.is_wearable=True
+        z.wearable_region='head'
+        z.rotation_angle=float(random.randint(0,359)) 
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  
@@ -1940,6 +1954,7 @@ def spawn_shrapnel(WORLD,WORLD_COORDS,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     z=WorldObject(WORLD,['shrapnel'],AIProjectile)
     z.name='shrapnel'
     z.world_coords=copy.copy(WORLD_COORDS)
+    z.ai.starting_coords=copy.copy(WORLD_COORDS)
     z.ai.speed=300.
     z.ai.maxTime=random.uniform(MIN_TIME, MAX_TIME)
     z.is_projectile=True
@@ -2007,6 +2022,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_kar98k':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2019,6 +2035,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_kar98k_panzerfaust':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'kar98k',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2032,6 +2049,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_k43':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_k43'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'k43',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2044,6 +2062,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_g41w':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_g41w'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'g41w',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2056,6 +2075,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_mp40':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mp40'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mp40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2069,6 +2089,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_mg34':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_mg34'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mg34',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2079,6 +2100,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_stg44':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2092,6 +2114,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_stg44_panzerfaust':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'stg44',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2106,6 +2129,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='german_fg42-type2':
         z=spawn_object(WORLD,[0.0],'german_soldier',False)
         z.world_builder_identity='german_fg42-type2'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'fg42-type2',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2121,6 +2145,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='soviet_mosin_nagant':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_mosin_nagant'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_ssh40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'mosin_nagant',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2133,6 +2158,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='soviet_svt40':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_svt40'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_ssh40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'svt40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2145,6 +2171,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='soviet_ppsh43':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_ppsh43'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_ssh40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'ppsh43',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2158,6 +2185,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='soviet_dp28':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_dp28'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_ssh40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'dp28',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))
@@ -2168,6 +2196,7 @@ def spawn_soldiers(WORLD,SOLDIER_TYPE):
     if SOLDIER_TYPE=='soviet_tt33':
         z=spawn_object(WORLD,[0.0],'soviet_soldier',False)
         z.world_builder_identity='soviet_tt33'
+        z.add_inventory(spawn_object(WORLD,[0,0],'helmet_ssh40',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'tt33',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'model24',False))
         z.add_inventory(spawn_object(WORLD,[0,0],'bandage',False))

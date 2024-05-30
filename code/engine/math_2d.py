@@ -140,10 +140,16 @@ def collision_sort(RUNS,WO_OBJECTS):
 # 	return collided
 
 #------------------------------------------------------------------------------
-def get_distance(coords1, coords2):
+def get_distance(coords1, coords2,round_number=False):
 	x=coords1[0]-coords2[0]
 	y=coords1[1]-coords2[1]
-	return math.sqrt(x*x+y*y)
+	distance=math.sqrt(x*x+y*y)
+	if round_number:
+		return round(distance,1)
+	else:
+		return distance
+	
+
 
 #------------------------------------------------------------------------------
 def get_heading_vector(location,destination):
