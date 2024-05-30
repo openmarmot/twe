@@ -34,7 +34,11 @@ class AIVehicle(AIBase):
         # array of engine objects
         self.engines=[]
 
+        # array of fuel tank objects
         self.fuel_tanks=[]
+
+        # array of battery objects
+        self.batteries=[]
 
         # open top aka passengers are viewable
         self.open_top=False

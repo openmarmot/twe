@@ -697,6 +697,7 @@ class World_Menu(object):
             if Key=='1' or Key=='2' or Key=='3':
                 self.menu_state='faction_select'
                 engine.world_builder.load_test_environment(self.world,Key)
+                Key=None
 
         if self.menu_state=='faction_select':
             self.world.graphic_engine.menu_text_queue=[]

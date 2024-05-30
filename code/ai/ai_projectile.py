@@ -21,6 +21,10 @@ class AIProjectile(AIBase):
         super().__init__(owner)
         self.flightTime=0.
 
+        # initial coordinates for the bullet. set when fired
+        # used for distance calculation for penetration testing
+        self.starting_coords=None
+
         # max flight time
         self.maxTime=5.
         self.ignore_list=[]

@@ -20,7 +20,7 @@ import random
 
 #import custom packages
 import engine.world_builder
-
+from engine.world import World
 
 #global variables
 
@@ -30,7 +30,7 @@ SCREEN_SIZE = (1200, 900)
 #------------------------------------------------------------------------------
 def run():
 
-    world=engine.world_builder.initialize_world(SCREEN_SIZE)
+    world = World(SCREEN_SIZE)
 
     # this has to be here because graphics engine uses player coords in its update
     #  so it needs to be created

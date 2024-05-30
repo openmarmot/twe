@@ -128,6 +128,10 @@ class WorldObject(object):
         # denotes objects that can be deleted for performance reasons
         self.can_be_deleted=False
 
+        # wearables are clothing, helmets, etc 
+        self.is_wearable=False
+        self.wearable_region='' # head/upper_body/ etc. see ai_human wearable_* parameters 
+
         # ---- \ descriptor bools ----------------------------
 
         # AI where any unique code for the object is held

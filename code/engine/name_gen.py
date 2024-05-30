@@ -11,32 +11,77 @@ basic name generator
 
 #import built in modules
 import random
+import sqlite3
+
 #import custom packages
 
 
 #global variables
-last_german=['Müller', 'Schmidt', 'Bauer', 'Wagner', 'Becker', 'Hoffmann',
-     'Richter', 'Schneider', 'Fischer', 'Meyer', 'Wolf', 'Becker', 'Schulz',
-    'Konig', 'Weber', 'Klein', 'Krause']
+german_names=[]
+soviet_names=[]
+polish_names=[]
 
-first_german = ['Hans', 'Max', 'Michael', 'Felix', 'Klaus', 'Lukas', 'Markus',
-     'Johanne', 'Matthias', 'Kurt', 'Gunther', 'Werner', 'Walther', 'Erich']
+# whether the data is loaded 
+loaded=False
 
-last_soviet = ['Ivanov', 'Smirnov', 'Kuznetsov', 'Popov', 'Sokolov',
-     'Mikhailov', 'Novikov', 'Fedorov', 'Volkov', 'Kovalenko', 'Vasiliev']
-first_soviet = ['Vladimir', 'Sergei', 'Ivan', 'Dmitri', 'Nikolai', 'Yuri', 'Mikhail', 'Alexei', 'Boris', 'Andrei']
+#------------------------------------------------------------------------------
+def generate_names(ethnicity):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('data/data.sqlite')
+    cursor = conn.cursor()
 
-first_polish = ['Adam', 'Michał', 'Krzysztof', 'Jan', 'Piotr', 'Tomasz', 'Marek', 'Bartłomiej', 'Jacek', 'Łukasz']
-last_polish = ['Kowalski', 'Nowak', 'Wiśniewski', 'Dąbrowski', 'Lewandowski', 'Wójcik', 'Kamiński', 'Kowalczyk', 'Zieliński', 'Szymański']
+    cursor.execute("SELECT name FROM names WHERE ethnicity=? AND name_type='last'", (ethnicity,))    
+    rows = cursor.fetchall()
+    last_names = [row[0] for row in rows]
 
+    cursor.execute("SELECT name FROM names WHERE ethnicity=? AND name_type='first'", (ethnicity,))
+
+    rows = cursor.fetchall()
+    first_names = [row[0] for row in rows]
+
+    # Close the connection
+    conn.close()
+
+    names=[]
+    for b in first_names:
+        for c in last_names:
+            names.append(b+' '+c)
+
+    return names
 
 
 #------------------------------------------------------------------------------
-def generate(NAME_TYPE):
-    '''generate a name of NAME_TYPE'''
-    if NAME_TYPE=='german':
-        return random.choice(first_german)+' '+random.choice(last_german)
-    elif NAME_TYPE=='soviet':
-        return random.choice(first_soviet)+' '+random.choice(last_soviet)
-    elif NAME_TYPE=='civilian':
-        return random.choice(first_polish)+' '+random.choice(last_polish)
+def load_data():
+    global german_names
+    global soviet_names
+    global polish_names
+    global loaded
+
+    if loaded==False:
+        german_names=generate_names('german')
+        soviet_names=generate_names('soviet')
+        polish_names=generate_names('polish')
+
+        loaded=True
+
+        print('Name data load complete')
+    else:
+        print('Error: name data is already loaded')
+
+#------------------------------------------------------------------------------
+def get_name(ethnicity):
+    '''get a random name'''
+    global german_names
+    global soviet_names
+    global polish_names
+
+    if ethnicity=='german':
+        return random.choice(german_names)
+    elif ethnicity=='soviet':
+        return random.choice(soviet_names)
+    elif ethnicity=='civilian' or ethnicity=='polish':
+        return random.choice(polish_names)
+    
+
+# init 
+load_data()
