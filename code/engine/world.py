@@ -419,7 +419,13 @@ class World(object):
         '''process objects that need to leave the map'''
 
         for b in self.exit_queue:
+            message=b.name + ' has exited the world area'
             if b.is_human:
+                message+=('\n  - faction: '+b.ai.squad.faction)
+                message+=('\n  - ai_state: '+b.ai.ai_state)
+                message+=('\n  - ai_goal: '+b.ai.ai_goal)
+                message+=('\n  - ai_vehicle_goal: '+b.ai.ai_vehicle_goal)
+
                 # exit vehicle
                 if b.ai.in_vehicle:
                     b.ai.handle_exit_vehicle()
@@ -427,7 +433,16 @@ class World(object):
                 # remove from squad 
                 b.ai.squad.members.remove(b)
 
-            print(b.name+' has exited the world area!')
+            elif b.is_vehicle:
+                # tell all the passengers to get out
+                # kind of a fail safe as they are likely already in the list
+                if len(b.ai.passengers)>0:
+                    temp=copy.copy(b.ai.passengers)
+                    for c in temp:
+                        c.ai.handle_exit_vehicle()
+
+
+            print(message)
 
             # remove from the world
             self.remove_object(b)

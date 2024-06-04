@@ -561,14 +561,19 @@ class AIHuman(AIBase):
         dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
         dm+=('\n  - probable kills: '+str(self.probable_kills))
         dm+=('\n  - killed by : '+self.last_collision_description)
-        print(dm)
-
+        
         # exit vehicle 
         if self.in_vehicle:
             self.handle_exit_vehicle()
 
         # drop primary weapon 
         if self.primary_weapon!=None:
+            ammo=self.handle_check_ammo(self.primary_weapon)
+            dm+=('\n  - weapon: '+self.primary_weapon.name)
+            dm+=('\n  -- ammo in gun: '+str(ammo[0]))
+            dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
+            dm+=('\n  -- magazine count: '+str(ammo[2]))
+
             self.handle_drop_object(self.primary_weapon)
 
         if self.large_pickup!=None:
@@ -596,6 +601,9 @@ class AIHuman(AIBase):
             self.owner.world.world_menu.menu_state='none'
             # fake input to get the text added
             self.owner.world.world_menu.handle_input('none')
+    
+        #print death message
+        print(dm)
 
     #---------------------------------------------------------------------------
     def handle_drink(self,LIQUID):
@@ -1972,7 +1980,7 @@ class AIHuman(AIBase):
             # another fail safe to stop movement if we are possibly being attacked
             if distance >400 and len(self.personal_enemies)>0:
                 self.think_generic()
-                print('error ! blocked from movement by close enemy')
+                print('debug : '+self.owner.name+' blocked from moving '+str(distance)+' by personal enemy count: '+ str(len(self.personal_enemies)))
             else:
                 self.think_move_close(distance)
 
