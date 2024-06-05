@@ -538,6 +538,9 @@ class World_Menu(object):
 
         # get distance
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+        if self.world.debug_mode==True:
+            # do this so that ALL the text shows up
+            distance=0
 
         # print out the basic menu
         name=''
@@ -570,6 +573,8 @@ class World_Menu(object):
                     self.menu_state = 'non_squad_member_menu'
 
         if distance<500:
+            if self.selected_object.ai.squad.squad_leader==self.selected_object:
+                self.world.graphic_engine.menu_text_queue.append('Squad Leader')
             self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
             self.world.graphic_engine.menu_text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
             self.world.graphic_engine.menu_text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
@@ -587,13 +592,18 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
 
         if self.world.debug_mode==True:
-            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords,True)
             d2='no squad lead'
             if self.selected_object.ai.squad.squad_leader!=None:
-                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords)
+                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords,True)
+
+            d3='no target object'
+            if self.selected_object.ai.target_object!=None:
+                d3=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.target_object.world_coords,True)
 
             self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
+            self.world.graphic_engine.menu_text_queue.append('Distance from target object: '+str(d3))
             self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
             self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
             self.world.graphic_engine.menu_text_queue.append('Personal Enemies Count: '+str(len(self.selected_object.ai.personal_enemies)))

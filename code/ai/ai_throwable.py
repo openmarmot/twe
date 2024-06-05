@@ -89,7 +89,7 @@ class AIThrowable(AIBase):
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else
-        self.owner.world.remove_object(self.owner)
+        self.owner.world.remove_queue.append(self.owner)
 
     #---------------------------------------------------------------------------
     def redirect(self,TARGET_COORDS):
