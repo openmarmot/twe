@@ -110,7 +110,7 @@ class AIGun(AIBase):
                         projectile.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,dst)
                         projectile.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
 
-                    self.owner.world.add_object(projectile)
+                    self.owner.world.add_queue.append(projectile)
 
                     # spawn bullet case
                     if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':

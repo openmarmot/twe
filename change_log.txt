@@ -1,6 +1,43 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 04 2024
+- added world add_queue and remove_queue (fixing two for loop bugs)
+- set world_coords to [0,0] instead of None to fix a bug with how map pointers are initalized 
+- added more data to human menu when debug is on 
+- added advanced weapon aiming when a target is a moving human 
+- maybe fixed the bug with bots not exiting vehicles (for loop that removes objs from itself.. again!)
+- added a possible fix for vehicles doing figure 8s
+
+the previous add/remove process was objects adding and removing things as part of the update cycle.
+this likely resulted in weird behavior as it changed the size of the wo_objects array while it was 
+in a for loop. theoretically this could mean some objects towards the end of the array did not get updated 
+
+I tried to go through all the for loops looking for other instances where the array it is looping through 
+can change size during iteration, but I got bored. I probably got them all.
+
+The new advanced aiming is likely quite a bit better than the previous situation where the AI absolutely 
+could not hit moving targets. This will take play testing and some luck to confirm. somehow i always miss 
+the battles lately. All the new tactical changes mean battle locations are less predictable.
+
+Figure 8 driving in vehicles may be due to the transition from 360->0 and 0->360. added a bit of code to 
+catch when that situation may happen and just hard set the vehicle rotation 
+
+bot vehicle behavior seems even crazier than usual.
+
+I'm seeing bots walk around with fuel cans. that is new (i think??). they may be getting them from vehicle wrecks. 
+
+todo items from playtesting 
+- bots need to grab nearby magazines when they pickup a gun 
+- try to set smoke spawn location using the same method i used for aiming at moving targets 
+- human ai should detect when a human it is targeting is in a vehicle, and use vehicle velocity and rotation for aiming 
+- collision on humans in vehicles should be passed to the vehicle -- or something. vehicle and human in vehicle damage needs 
+to be handled. 
+- personal enemies need to be shared with the squad for civilian and military interactions. otherwise the military just ignores 
+you if you are killing them if you are civilian. 
+- look at out of ammo code. add more details to debug statements for it. try to debug/fix actions that get more ammo 
+
+----------------------------------
 June 03 2024
 - added a ai_data printout when humans exit the map to help with debugging 
 - when vehicles exit it will cause the passengers to exit the vehicle 

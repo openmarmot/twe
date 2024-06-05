@@ -51,7 +51,7 @@ class WorldObject(object):
         self.scale_modifier=0
 
         # updated by the object AI
-        self.world_coords=None
+        self.world_coords=[0,0]
         
         # altitude above ground in meters
         self.altitude=0
@@ -177,10 +177,10 @@ class WorldObject(object):
             self.render_level=2
 
     def wo_start(self):
-        self.world.add_object(self)
+        self.world.add_queue.append(self)
 
     def wo_stop(self):
-        self.world.remove_object(self)
+        self.world.remove_queue.append(self)
 
     def update(self):
             self.ai.update()

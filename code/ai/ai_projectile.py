@@ -59,7 +59,7 @@ class AIProjectile(AIBase):
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else
-        self.owner.world.remove_object(self.owner)
+        self.owner.world.remove_queue.append(self.owner)
 
 
     #---------------------------------------------------------------------------
@@ -73,7 +73,8 @@ class AIProjectile(AIBase):
                 self.contact_effect()
             else:
                 engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
-                self.owner.world.remove_object(self.owner)
+                # remove from world
+                self.owner.world.remove_queue.append(self.owner)
         else:
 
             # move along path
@@ -93,6 +94,6 @@ class AIProjectile(AIBase):
                             self.ignore_list.append(collide_obj)
                         else:
                             # bullet stuck in something. remove bullet from world
-                            self.owner.world.remove_object(self.owner) 
+                            self.owner.world.remove_queue.append(self.owner) 
 
 

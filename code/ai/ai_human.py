@@ -329,7 +329,7 @@ class AIHuman(AIBase):
                 # before it gets this far
 
                 #add to world. (the object was in a inventory array)
-                self.owner.world.add_object(EVENT_DATA)
+                self.owner.world.add_queue.append(EVENT_DATA)
 
                 self.large_pickup=EVENT_DATA
 
@@ -465,6 +465,19 @@ class AIHuman(AIBase):
         return target
     
     #---------------------------------------------------------------------------
+    def handle_aim_and_fire_weapon(self,weapon):
+        aim_coords=self.target_object.world_coords
+
+        if self.target_object.is_human:
+            if self.target_object.ai.ai_state=='moving':
+                # guess how long it will take for the bullet to arrive
+                time_passed=random.uniform(0.1,1)
+                aim_coords=engine.math_2d.moveTowardsTarget(self.target_object.ai.get_calculated_speed(),aim_coords,self.target_object.ai.destination,time_passed)
+
+
+        self.fire(aim_coords,weapon)
+
+    #---------------------------------------------------------------------------
     def handle_building_check(self):
 
         # reset transition to zero
@@ -593,7 +606,8 @@ class AIHuman(AIBase):
         # spawn body
         engine.world_builder.spawn_container('body: '+self.owner.name,self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
 
-        self.owner.world.remove_object(self.owner)
+        # remove from world
+        self.owner.world.remove_queue.append(self.owner)
 
         if self.owner.is_player:
             # turn on the player death menu
@@ -623,7 +637,7 @@ class AIHuman(AIBase):
             # grenades get 'dropped' when they are thrown and are special
             if OBJECT_TO_DROP.is_grenade==False:
                 engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
-            self.owner.world.add_object(OBJECT_TO_DROP)
+            self.owner.world.add_queue.append(OBJECT_TO_DROP)
 
     #---------------------------------------------------------------------------
     def handle_eat(self,CONSUMABLE):
@@ -655,7 +669,7 @@ class AIHuman(AIBase):
             # put your large items in the trunk
             if self.large_pickup:
                 VEHICLE.add_inventory(self.large_pickup)
-                self.owner.world.remove_object(self.large_pickup)
+                self.owner.world.remove_queue.append(self.large_pickup)
                 self.large_pickup=None
 
             VEHICLE.ai.passengers.append(self.owner)
@@ -819,7 +833,7 @@ class AIHuman(AIBase):
             elif self.ai_state=='engaging':
                 # wondering if we can remove this if statement
                 if self.primary_weapon!=None:
-                    self.fire(self.target_object.world_coords,self.primary_weapon)
+                    self.handle_aim_and_fire_weapon(self.primary_weapon)
                 else:
                     print('warning: attempt to fire with no primary weapon')
                 self.fatigue+=self.fatigue_add_rate*time_passed
@@ -973,7 +987,8 @@ class AIHuman(AIBase):
                 self.large_pickup=OBJECT_TO_PICKUP
         else:
             self.event_add_inventory(OBJECT_TO_PICKUP)
-            self.owner.world.remove_object(OBJECT_TO_PICKUP)
+            # remove from world
+            self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
 
     #---------------------------------------------------------------------------
     def handle_player_reload(self):
@@ -1831,7 +1846,7 @@ class AIHuman(AIBase):
             if distance<200:
                 if self.vehicle.ai.current_speed<1:
                     # tell everyone to exit (including yourself)
-                    for b in self.vehicle.ai.passengers:
+                    for b in copy.copy(self.vehicle.ai.passengers):
                         b.ai.react_asked_to_exit_vehicle()
                     #self.handle_exit_vehicle()
                     action=True
@@ -2159,6 +2174,12 @@ class AIHuman(AIBase):
                 self.vehicle.ai.handle_steer_neutral()
                 #self.vehicle.rotation_angle=r
                 self.vehicle.reset_image=True
+
+            if (r>355 and v<5) or (r<5 and v>355):
+                # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
+                self.vehicle.ai.handle_steer_neutral()
+                self.vehicle.rotation_angle=r
+                print('debug - fixing 360 vehicle steering bug')
 
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
             if distance<150:

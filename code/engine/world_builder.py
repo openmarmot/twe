@@ -369,6 +369,9 @@ def generate_clutter(WORLD):
     '''generates and auto places small objects around the map'''
     # this should be called after buildings are placed
 
+    # make sure anything pending is added/removed
+    WORLD.process_add_remove_queue()
+
     # building related clutter
     # need to smart position this in the future
     for b in WORLD.wo_objects_building:
@@ -421,6 +424,9 @@ def generate_clutter(WORLD):
 def generate_civilians_and_civilan_spawns(WORLD):
     '''generates civilans and civilan spawn points'''
     # this should be called after buildings are placed
+
+    # make sure anything pending is added/removed
+    WORLD.process_add_remove_queue()
 
     for b in WORLD.wo_objects_building:
         # add a random amount of civilians
@@ -1915,7 +1921,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     # -- generic settings that apply to all --
     z.world_builder_identity=OBJECT_TYPE
     # set world coords if they weren't already set
-    if z.world_coords==None:
+    if z.world_coords==[0,0]:
         z.world_coords=copy.copy(WORLD_COORDS)
 
     if SPAWN :

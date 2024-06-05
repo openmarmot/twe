@@ -290,8 +290,8 @@ class AIVehicle(AIBase):
             engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
 
             # human ai will figure out for itself that it needs to leave
-
-            self.owner.world.remove_object(self.owner)
+            # remove from world
+            self.owner.world.remove_queue.append(self.owner)
 
         # update engines
         for b in self.engines:

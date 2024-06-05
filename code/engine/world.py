@@ -42,6 +42,12 @@ class World(object):
         # world objects that need to exit the map 
         self.exit_queue=[]
 
+        # objects to be added to the world
+        self.add_queue=[]
+
+        # objects to be removed from the world
+        self.remove_queue=[]
+
         # object lists 
         self.wo_objects=[]
         # not sure this one is used
@@ -147,6 +153,8 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
+        '''add object to the world'''
+        # !! NOTE this should not be called by objects directly. use the add_queue instead
 
         # reset the image so that the graphics engine can make sure it matches the current view scale
         WORLD_OBJECT.reset_image=True
@@ -249,7 +257,7 @@ class World(object):
         for b in self.wo_objects_cleanup:
             if b.spawn_time<oldest_time:
                 oldest_time=b.spawn_time
-                oldest_object=b
+                #oldest_object=b
         
         # remove objects that are in the same approximate spawn time
         remove_list=[]
@@ -258,8 +266,7 @@ class World(object):
                 remove_list.append(b)
 
         print('Cleanup function removing '+str(len(remove_list))+' objects')
-        for b in remove_list:
-            self.remove_object(b)
+        self.remove_queue+=remove_list
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,OBJ):
         ''' generates a ignore list for collision checking'''
@@ -415,6 +422,18 @@ class World(object):
             self.player.ai.handle_keydown('r')
 
     #---------------------------------------------------------------------------
+    def process_add_remove_queue(self):
+        if len(self.add_queue)>0:
+            for b in self.add_queue:
+                self.add_object(b)
+            self.add_queue=[]
+
+        if len(self.remove_queue)>0:
+            for b in self.remove_queue:
+                self.remove_object(b)
+            self.remove_queue=[]
+
+    #---------------------------------------------------------------------------
     def process_exit_queue(self):
         '''process objects that need to leave the map'''
 
@@ -445,7 +464,7 @@ class World(object):
             print(message)
 
             # remove from the world
-            self.remove_object(b)
+            self.remove_queue.append(b)
 
             self.exited_object_count+=1
 
@@ -461,7 +480,7 @@ class World(object):
                 process_queue.append(b)
         for b in process_queue:
             self.reinforcements.remove(b)
-            print('spawning reinforcements')
+            print('spawning reinforcements',b[1])
             if b[1]=='german':
                 self.german_ai.squad_spawn_queue.append(b[2])
             elif b[1]=='american':
@@ -486,6 +505,9 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
+        ''' remove object from world. '''
+        # !! note - objects should add themselves to the remove_queue instead of calling this directly
+
         if WORLD_OBJECT in self.wo_objects:
             self.wo_objects.remove(WORLD_OBJECT)
             if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
@@ -639,8 +661,9 @@ class World(object):
             # iterating through causes odd issues. working with a copy is much 
             # better
             temp=copy.copy(self.wo_objects_map_pointer)
-            for b in temp:
-                self.remove_object(b)
+            
+            # remove map objects
+            self.remove_queue+=temp
         else:
             self.map_enabled=True
             print('map enabled :','green= world area','blue= squad','green= squad destination')
@@ -702,6 +725,9 @@ class World(object):
 
                 # process anything that has exited
                 self.process_exit_queue()
+
+            # add/remove objects to/from the world
+            self.process_add_remove_queue()
 
     #------------------------------------------------------------------------------
     def update_debug_info(self):
