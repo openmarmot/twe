@@ -469,7 +469,7 @@ class AIHuman(AIBase):
         ''' handles special aiming and firing code for various targets'''
         aim_coords=self.target_object.world_coords
         # guess how long it will take for the bullet to arrive
-        time_passed=random.uniform(0.1,1)
+        time_passed=random.uniform(0.8,1.5)
         if self.target_object.is_vehicle:
             vehicle=self.target_object.ai.vehicle
             if self.target_object.ai.vehicle.ai.current_speed>0:
@@ -1054,6 +1054,7 @@ class AIHuman(AIBase):
                 weapon.ai.magazine=new_magazine
             else:
                 self.speak("I'm out of ammo!")
+                self.ai_want_ammo=True
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
@@ -1589,9 +1590,15 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        # could probably reload - but does that get caught elsewhere?
+                        self.ai_want_ammo=True
+
                         print('Error : out of ammo. need to handle this better')
-                        pass
+                        dm=self.owner.name
+                        dm+=('\n  - weapon: '+self.primary_weapon.name)
+                        dm+=('\n  -- ammo in gun: '+str(ammo[0]))
+                        dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
+                        dm+=('\n  -- magazine count: '+str(ammo[2]))
+                        print(dm)
 
         if action==False:
             # no way to engage, best to run awaay 
@@ -1638,6 +1645,14 @@ class AIHuman(AIBase):
                         self.handle_reload(self.primary_weapon)
                     else:
                         print('Error: (think_engage_far) out of ammo. need to handle this better')
+                        self.ai_want_ammo=True
+
+                        dm=self.owner.name
+                        dm+=('\n  - weapon: '+self.primary_weapon.name)
+                        dm+=('\n  -- ammo in gun: '+str(ammo[0]))
+                        dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
+                        dm+=('\n  -- magazine count: '+str(ammo[2]))
+                        print(dm)
 
                  # check if target is too far 
                 if DISTANCE >self.primary_weapon.ai.range :
@@ -2128,6 +2143,12 @@ class AIHuman(AIBase):
                 if ammo[1]<(ammo[0]*1.5):
                     # basically if we have less ammo in our inventory than in our gun
                     print('debug : getting ammo')
+                    dm=''
+                    dm+=('\n  - weapon: '+self.primary_weapon.name)
+                    dm+=('\n  -- ammo in gun: '+str(ammo[0]))
+                    dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
+                    dm+=('\n  -- magazine count: '+str(ammo[2]))
+                    print(dm)
                     status=self.take_action_get_ammo(True)
             else:
                 # no magazines, should we get a new gun?

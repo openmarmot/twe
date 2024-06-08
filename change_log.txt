@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 08 2024
+- bumped up the aim lead on moving targets a bit.
+- bumped dodge truck from rotation 30 to rotation 40
+- fixed squad menu bug (trying to display nonexistent info)
+- minor human menu info changes 
+- menu self close time bumped from 15 -> 25
+- moved debug text further right 
+- human ai now correctly flags ai_want_ammo when out of ammo 
+
+bumping up the rotation speed on the truck seems to have fixed the occasional 
+behavior where the ai gets stuck driving circles or alternating half circles. 
+need to look into this further sometime and find a better solution. 
+Also possible that I just haven't observed it but it seems fixed. 
+
+----------------------------------
 June 07 2024
 - aiming now differentiates between humans and vehicles and uses vehicle data for computation
 - added smoke cloud on panzerfaust launch
