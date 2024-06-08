@@ -118,6 +118,10 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.starting_vehicles.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
+        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
+        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
+        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
+        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -1183,6 +1187,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='antitank launcher'
+        z.ai.smoke_on_fire=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust_magazine':
@@ -1595,7 +1600,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.is_vehicle=True
         z.ai.max_occupants=10
         z.ai.max_speed=200
-        z.ai.rotation_speed=30.
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=2380
         z.rolling_resistance=0.03

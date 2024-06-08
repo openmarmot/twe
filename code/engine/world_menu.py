@@ -37,7 +37,7 @@ class World_Menu(object):
         
         # variables that handle when a menu should be cleared from the screen
         self.time_since_input=0
-        self.max_menu_idle_time=15 # how long a menu should be up before its closed/cleared
+        self.max_menu_idle_time=25 # how long a menu should be up before its closed/cleared
         
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=90
@@ -573,6 +573,8 @@ class World_Menu(object):
                     self.menu_state = 'non_squad_member_menu'
 
         if distance<500:
+            self.world.graphic_engine.menu_text_queue.append('')
+            self.world.graphic_engine.menu_text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
                 self.world.graphic_engine.menu_text_queue.append('Squad Leader')
             self.world.graphic_engine.menu_text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
@@ -581,17 +583,26 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
             self.world.graphic_engine.menu_text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             if self.selected_object.ai.primary_weapon != None:
-                self.world.graphic_engine.menu_text_queue.append('[primary] '+self.selected_object.ai.primary_weapon.name)
-                self.world.graphic_engine.menu_text_queue.append('  - Rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
-                if self.selected_object.ai.primary_weapon.ai.magazine!=None:
-                    self.world.graphic_engine.menu_text_queue.append('  - Ammo in magazine : '+str(len(self.selected_object.ai.primary_weapon.ai.magazine.ai.projectiles)))
+                self.world.graphic_engine.menu_text_queue.append('')
+                self.world.graphic_engine.menu_text_queue.append('--- Weapon Info ---')
+                ammo=self.selected_object.ai.handle_check_ammo(self.selected_object.ai.primary_weapon)
+                self.world.graphic_engine.menu_text_queue.append('weapon: '+self.selected_object.ai.primary_weapon.name)
+                self.world.graphic_engine.menu_text_queue.append('- ammo in gun: '+str(ammo[0]))
+                self.world.graphic_engine.menu_text_queue.append('- ammo in inventory: '+str(ammo[1]))
+                self.world.graphic_engine.menu_text_queue.append('- magazine count: '+str(ammo[2]))
+                self.world.graphic_engine.menu_text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+
             if self.selected_object.ai.throwable!=None:
                 self.world.graphic_engine.menu_text_queue.append('[throw] '+self.selected_object.ai.throwable.name)
             self.world.graphic_engine.menu_text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.world.graphic_engine.menu_text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
             self.world.graphic_engine.menu_text_queue.append(str(self.selected_object.ai.last_collision_description))
 
+            self.world.graphic_engine.menu_text_queue.append('')
+
         if self.world.debug_mode==True:
+            self.world.graphic_engine.menu_text_queue.append('')
+            self.world.graphic_engine.menu_text_queue.append('--- Debug Info ---')
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords,True)
             d2='no squad lead'
             if self.selected_object.ai.squad.squad_leader!=None:
@@ -606,8 +617,11 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Distance from target object: '+str(d3))
             self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
             self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
+            self.world.graphic_engine.menu_text_queue.append('AI Vehicle Goal: '+str(self.selected_object.ai.ai_vehicle_goal))
             self.world.graphic_engine.menu_text_queue.append('Personal Enemies Count: '+str(len(self.selected_object.ai.personal_enemies)))
             self.world.graphic_engine.menu_text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
+
+            self.world.graphic_engine.menu_text_queue.append('')
 
         if self.menu_state == 'player_menu':
             self.world.graphic_engine.menu_text_queue.append('1 - Manage Inventory')
@@ -663,9 +677,9 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('-- Squad Menu --')
             self.world.graphic_engine.menu_text_queue.append('Faction: '+squad.faction)
             self.world.graphic_engine.menu_text_queue.append('Squad size: '+str(len(squad.members)))
-            self.world.graphic_engine.menu_text_queue.append('Very near enemies: '+str(len(squad.very_near_enemies)))
-            self.world.graphic_engine.menu_text_queue.append('Near enemies: '+str(len(squad.near_enemies)))
-            self.world.graphic_engine.menu_text_queue.append('Far enemies: '+str(len(squad.far_enemies)))
+            #self.world.graphic_engine.menu_text_queue.append('Very near enemies: '+str(len(squad.very_near_enemies)))
+            #self.world.graphic_engine.menu_text_queue.append('Near enemies: '+str(len(squad.near_enemies)))
+            #self.world.graphic_engine.menu_text_queue.append('Far enemies: '+str(len(squad.far_enemies)))
 
             self.world.graphic_engine.menu_text_queue.append('1 - Disband')
             self.world.graphic_engine.menu_text_queue.append('2 - Re-arm')

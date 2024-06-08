@@ -64,7 +64,8 @@ class AIGun(AIBase):
         # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun/antitank launcher
         self.type=''
 
-        
+        # spawns smoke when fired
+        self.smoke_on_fire=False
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -111,6 +112,11 @@ class AIGun(AIBase):
                         projectile.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
 
                     self.owner.world.add_queue.append(projectile)
+
+                    # spawn smoke
+                    if self.smoke_on_fire:
+                        heading=engine.math_2d.get_heading_from_rotation(self.equipper.rotation_angle+180)
+                        engine.world_builder.spawn_smoke_cloud(self.owner.world,self.equipper.world_coords,heading)
 
                     # spawn bullet case
                     if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
