@@ -466,13 +466,24 @@ class AIHuman(AIBase):
     
     #---------------------------------------------------------------------------
     def handle_aim_and_fire_weapon(self,weapon):
+        ''' handles special aiming and firing code for various targets'''
         aim_coords=self.target_object.world_coords
+        # guess how long it will take for the bullet to arrive
+        time_passed=random.uniform(0.1,1)
+        if self.target_object.is_vehicle:
+            vehicle=self.target_object.ai.vehicle
+            if self.target_object.ai.vehicle.ai.current_speed>0:
+                aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
 
         if self.target_object.is_human:
-            if self.target_object.ai.ai_state=='moving':
-                # guess how long it will take for the bullet to arrive
-                time_passed=random.uniform(0.1,1)
-                aim_coords=engine.math_2d.moveTowardsTarget(self.target_object.ai.get_calculated_speed(),aim_coords,self.target_object.ai.destination,time_passed)
+            if self.target_object.ai.in_vehicle:
+                vehicle=self.target_object.ai.vehicle
+                if self.target_object.ai.vehicle.ai.current_speed>0:
+                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
+            
+            else:
+                if self.target_object.ai.ai_state=='moving':    
+                    aim_coords=engine.math_2d.moveTowardsTarget(self.target_object.ai.get_calculated_speed(),aim_coords,self.target_object.ai.destination,time_passed)
 
 
         self.fire(aim_coords,weapon)

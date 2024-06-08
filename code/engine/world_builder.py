@@ -1183,6 +1183,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.flight_time=2
         z.ai.range=700
         z.ai.type='antitank launcher'
+        z.ai.smoke_on_fire=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='panzerfaust_magazine':

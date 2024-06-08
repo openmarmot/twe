@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 07 2024
+- aiming now differentiates between humans and vehicles and uses vehicle data for computation
+- added smoke cloud on panzerfaust launch
+
+the aiming code is hard to test. I basically have to observe it in action, and humans 
+engaging vehicles is very rare at the moment. I think with the current code they won't 
+target vehicles on purpose, but at least now if they target a bot that is in a vehicle they 
+will switch to targeting the vehicle 
+
+still issues with steering vehicles (is it getting worse somehow?)
+
+----------------------------------
 June 04 2024
 - added world add_queue and remove_queue (fixing two for loop bugs)
 - set world_coords to [0,0] instead of None to fix a bug with how map pointers are initalized 
