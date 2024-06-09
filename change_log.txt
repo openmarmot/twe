@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 09 2024
+- repositioned the smoke spawn for vehicle start so its closer to the tail pipe 
+- fixed a situation where a ai may incorrectly flee if it needs to reload while in combat 
+
+----------------------------------
 June 08 2024
 - bumped up the aim lead on moving targets a bit.
 - bumped dodge truck from rotation 30 to rotation 40
@@ -9,6 +14,7 @@ June 08 2024
 - menu self close time bumped from 15 -> 25
 - moved debug text further right 
 - human ai now correctly flags ai_want_ammo when out of ammo 
+- slightly incrased ammo load for some troops
 
 bumping up the rotation speed on the truck seems to have fixed the occasional 
 behavior where the ai gets stuck driving circles or alternating half circles. 

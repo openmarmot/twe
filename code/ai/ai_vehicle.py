@@ -206,7 +206,8 @@ class AIVehicle(AIBase):
                 if b.ai.internal_combustion:
                     #smoke!
                     heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    engine.world_builder.spawn_smoke_cloud(self.owner.world,self.owner.world_coords,heading)
+                    smoke_coords=engine.math_2d.moveAlongVector(50,self.owner.world_coords,heading,1)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
 
     #---------------------------------------------------------------------------
     def handle_stop_engines(self):
