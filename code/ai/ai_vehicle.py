@@ -305,6 +305,12 @@ class AIVehicle(AIBase):
 
         self.update_fuel_system()
 
+        # update batteries
+        for b in self.batteries:
+            b.update()
+
+        self.update_electrical_system()
+
         if self.throttle>0:
             self.update_acceleration_calculation()
         else:
@@ -337,6 +343,13 @@ class AIVehicle(AIBase):
             total_engine_force,self.owner.rolling_resistance,
             self.owner.drag_coefficient,self.owner.world.air_density,
             self.owner.frontal_area,self.owner.weight)
+        
+    #---------------------------------------------------------------------------
+    def update_electrical_system(self):
+        # need alternators
+
+        # alternators should recharge batteries
+        pass
 
 
     #---------------------------------------------------------------------------

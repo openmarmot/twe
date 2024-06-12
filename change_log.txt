@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 11 2024
+- started working on defining ai_battery
+- started work on vehicle electrical systems
+
+so i think batteries are reasonable to simulate. it will add some processing but not much.
+
+however i realized i need alternators - but do i create objects for those? should they be part 
+of the engine class? maybe just a float value? idk 
+
+----------------------------------
 June 09 2024
 - repositioned the smoke spawn for vehicle start so its closer to the tail pipe 
 - fixed a situation where a ai may incorrectly flee if it needs to reload while in combat 
