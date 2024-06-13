@@ -28,8 +28,7 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        # the ai group that this human is a part of 
-        self.squad=None
+        # --- components ---
 
         # array of engine objects
         self.engines=[]
@@ -40,9 +39,12 @@ class AIVehicle(AIBase):
         # array of battery objects
         self.batteries=[]
 
+        # amp output for the alternator(s)
+        # if i lose more of my sanity it would be nice to model individual alternators
+        self.alternator_amps=15
+        
         # open top aka passengers are viewable
         self.open_top=False
- 
 
         # ----- controls ------
 
@@ -78,8 +80,6 @@ class AIVehicle(AIBase):
         self.flaps=0
         self.rudder=0
 
-
-
         # passengers - note that passengers are not removed from the world, so they are still updated
         self.passengers=[]
         self.max_occupants=4 # max people that can be in the vehicle, including driver
@@ -94,8 +94,6 @@ class AIVehicle(AIBase):
 
         # 
         self.inventory=[]
-
-        
 
 
         # this is computed. should not be set by anything else
@@ -206,7 +204,8 @@ class AIVehicle(AIBase):
                 if b.ai.internal_combustion:
                     #smoke!
                     heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    engine.world_builder.spawn_smoke_cloud(self.owner.world,self.owner.world_coords,heading)
+                    smoke_coords=engine.math_2d.moveAlongVector(50,self.owner.world_coords,heading,1)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
 
     #---------------------------------------------------------------------------
     def handle_stop_engines(self):
@@ -304,6 +303,13 @@ class AIVehicle(AIBase):
 
         self.update_fuel_system()
 
+        # update batteries
+        for b in self.batteries:
+            b.update()
+
+        # mostly battery stuff for now
+        self.update_electrical_system()
+
         if self.throttle>0:
             self.update_acceleration_calculation()
         else:
@@ -336,7 +342,20 @@ class AIVehicle(AIBase):
             total_engine_force,self.owner.rolling_resistance,
             self.owner.drag_coefficient,self.owner.world.air_density,
             self.owner.frontal_area,self.owner.weight)
+        
+    #---------------------------------------------------------------------------
+    def update_electrical_system(self):
+        
+        #electrical units are in hours for whatever reason. gotta get the conversion
+        time_passed_hours=self.owner.world.graphic_engine.time_passed_seconds/3600
 
+        charge=self.alternator_amps*time_passed_hours # I think the result of this is amp hours ?
+        
+        # charge batteries with the alternator 
+        # theoretically the charge should be divided up amongst all the batteries?
+        # but then we should be modelling multiple alternators 
+        for b in self.batteries:
+            b.ai.recharge(charge)
 
     #---------------------------------------------------------------------------
     def update_fuel_system(self):

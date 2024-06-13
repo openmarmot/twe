@@ -1589,6 +1589,7 @@ class AIHuman(AIBase):
                 else:
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
+                        action=True
                     else:
                         self.ai_want_ammo=True
 

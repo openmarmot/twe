@@ -1,6 +1,34 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 12 2024
+- removed squad from vehicle - vehicles don't have a concept of faction identity
+- more work on vehicle electrical systems 
+- minor cleanup 
+- added a new screenshot to the readme 
+
+interesting thing about ampere hours is its in hours. 
+most of the time affected values in the game are relative to a second 
+
+decided to abstract alternators for now. want to model them and may come back to this 
+but i've got a lot of other vehicle systems to implement yet.
+
+----------------------------------
+June 11 2024
+- started working on defining ai_battery
+- started work on vehicle electrical systems
+
+so i think batteries are reasonable to simulate. it will add some processing but not much.
+
+however i realized i need alternators - but do i create objects for those? should they be part 
+of the engine class? maybe just a float value? idk 
+
+----------------------------------
+June 09 2024
+- repositioned the smoke spawn for vehicle start so its closer to the tail pipe 
+- fixed a situation where a ai may incorrectly flee if it needs to reload while in combat 
+
+----------------------------------
 June 08 2024
 - bumped up the aim lead on moving targets a bit.
 - bumped dodge truck from rotation 30 to rotation 40
@@ -9,6 +37,7 @@ June 08 2024
 - menu self close time bumped from 15 -> 25
 - moved debug text further right 
 - human ai now correctly flags ai_want_ammo when out of ammo 
+- slightly incrased ammo load for some troops
 
 bumping up the rotation speed on the truck seems to have fixed the occasional 
 behavior where the ai gets stuck driving circles or alternating half circles. 

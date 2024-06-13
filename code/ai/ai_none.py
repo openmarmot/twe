@@ -3,7 +3,7 @@
 module : ai_none.py
 language : Python 3.x
 email : andrew@openmarmot.com
-notes :
+notes : default ai class for objects that don't use AI
 '''
 
 #import built in modules
@@ -12,9 +12,6 @@ notes :
 from ai.ai_base import AIBase
 
 
-# this is for objects that don't need AI
-
-#global variables
 
 class AINone(AIBase):
     def __init__(self, owner):
