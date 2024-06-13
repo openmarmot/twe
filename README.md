@@ -53,4 +53,5 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - On this project it is rare that I copy code from the internet, almost all of it is from scratch (that is why the math is so bad) - 
 but when I have copied code I will try to include references from where I got it
 
+
 ![screenshot](/screenshots/twe-june-12-2024.png "TWE screenshot")
