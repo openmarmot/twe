@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 12 2024
+- removed squad from vehicle - vehicles don't have a concept of faction identity
+- more work on vehicle electrical systems 
+- minor cleanup 
+- added a new screenshot to the readme 
+
+interesting thing about ampere hours is its in hours. 
+most of the time affected values in the game are relative to a second 
+
+decided to abstract alternators for now. want to model them and may come back to this 
+but i've got a lot of other vehicle systems to implement yet.
+
+----------------------------------
 June 11 2024
 - started working on defining ai_battery
 - started work on vehicle electrical systems

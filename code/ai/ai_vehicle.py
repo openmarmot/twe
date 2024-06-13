@@ -28,8 +28,7 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        # the ai group that this human is a part of 
-        self.squad=None
+        # --- components ---
 
         # array of engine objects
         self.engines=[]
@@ -40,9 +39,12 @@ class AIVehicle(AIBase):
         # array of battery objects
         self.batteries=[]
 
+        # amp output for the alternator(s)
+        # if i lose more of my sanity it would be nice to model individual alternators
+        self.alternator_amps=15
+        
         # open top aka passengers are viewable
         self.open_top=False
- 
 
         # ----- controls ------
 
@@ -78,8 +80,6 @@ class AIVehicle(AIBase):
         self.flaps=0
         self.rudder=0
 
-
-
         # passengers - note that passengers are not removed from the world, so they are still updated
         self.passengers=[]
         self.max_occupants=4 # max people that can be in the vehicle, including driver
@@ -94,8 +94,6 @@ class AIVehicle(AIBase):
 
         # 
         self.inventory=[]
-
-        
 
 
         # this is computed. should not be set by anything else
@@ -309,6 +307,7 @@ class AIVehicle(AIBase):
         for b in self.batteries:
             b.update()
 
+        # mostly battery stuff for now
         self.update_electrical_system()
 
         if self.throttle>0:
@@ -346,11 +345,17 @@ class AIVehicle(AIBase):
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
-        # need alternators
+        
+        #electrical units are in hours for whatever reason. gotta get the conversion
+        time_passed_hours=self.owner.world.graphic_engine.time_passed_seconds/3600
 
-        # alternators should recharge batteries
-        pass
-
+        charge=self.alternator_amps*time_passed_hours # I think the result of this is amp hours ?
+        
+        # charge batteries with the alternator 
+        # theoretically the charge should be divided up amongst all the batteries?
+        # but then we should be modelling multiple alternators 
+        for b in self.batteries:
+            b.ai.recharge(charge)
 
     #---------------------------------------------------------------------------
     def update_fuel_system(self):

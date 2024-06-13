@@ -51,6 +51,7 @@ from ai.ai_engine import AIEngine
 from ai.ai_coffee_grinder import AICoffeeGrinder
 from ai.ai_animated_sprite import AIAnimatedSprite
 from ai.ai_wearable import AIWearable
+from ai.ai_battery import AIBattery
 
 #global variables
 
@@ -1895,12 +1896,12 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.weight=250
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='battery_vehicle_6v':
-        z=WorldObject(WORLD,['battery_vehicle_6v'],AINone)
+        z=WorldObject(WORLD,['battery_vehicle_6v'],AIBattery)
         z.name='battery_vehicle_6v'
         z.weight=25
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='battery_vehicle_24v':
-        z=WorldObject(WORLD,['battery_vehicle_6v'],AINone)
+        z=WorldObject(WORLD,['battery_vehicle_6v'],AIBattery)
         z.name='battery_vehicle_24v'
         z.weight=25
         z.rotation_angle=float(random.randint(0,359)) 
