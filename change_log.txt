@@ -1,6 +1,30 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 15 2024
+- world tracks gun magazines now 
+- add reset_ai to human_ai and try to standardize on using it 
+- add check_if_object_exists to world and try to standardize on using it 
+- when picking up a gun the ai will make some attempt to find magazines 
+- panicking humans now reliquish squad lead position 
+
+I think in the current game a gun magazine will never end up 
+in the world, but its easy enough to add it in while i'm working on 
+other stuff. I also set it to check a very near container if one exists, 
+this should theoretically be the body of whoever dropped the gun (if that happened)
+
+fairly large amount of changes trying to standardize some ai_state handling and 
+object checks in ai_human. probably low actual effect, but might clear up some bugs 
+or at least make ai states more standard 
+
+I think a rewrite of the ai state system is probably in order. thats going to be a large task
+
+panicking humans no longer being squad lead should stop some odd behavior that was likely caused 
+by a panicked squad lead leading the squad off the map. 
+
+more should be done with the panic state. 
+
+----------------------------------
 June 12 2024
 - removed squad from vehicle - vehicles don't have a concept of faction identity
 - more work on vehicle electrical systems 

@@ -54,6 +54,7 @@ class World(object):
         self.wo_objects_collision=[]
         self.wo_objects_human=[]
         self.wo_objects_guns=[]
+        self.wo_objects_gun_magazines=[]
         self.wo_objects_german=[]
         self.wo_objects_soviet=[]
         self.wo_objects_american=[]
@@ -203,6 +204,8 @@ class World(object):
                 self.wo_objects_ammo_container.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_furniture:
                 self.wo_objects_furniture.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_gun_magazine:
+                self.wo_objects_gun_magazines.append(WORLD_OBJECT)
             if WORLD_OBJECT.can_be_deleted:
                 self.wo_objects_cleanup.append(WORLD_OBJECT)
         else:
@@ -247,6 +250,24 @@ class World(object):
             if b.world_coords[0]>self.map_size or b.world_coords[0]<-self.map_size \
                 or b.world_coords[1]>self.map_size or b.world_coords[1]<-self.map_size:
                 self.exit_queue.append(b)
+
+
+    #---------------------------------------------------------------------------
+    def check_object_exists(self,object):
+        '''returns a bool as to whether the object is in the world'''
+
+        if object in self.wo_objects:
+            if object in self.remove_queue:
+                print('debug : check object on object in remove_queue')
+                return False
+            elif object in self.exit_queue:
+                print('debug : check object on object in exit_queue')
+                return False
+            else:
+                return True
+        else:
+            return False
+            
 
     #------------------------------------------------------------------------------
     def cleanup(self):
@@ -550,6 +571,8 @@ class World(object):
                 self.wo_objects_furniture.remove(WORLD_OBJECT)
             if WORLD_OBJECT.can_be_deleted:
                 self.wo_objects_cleanup.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_gun_magazine:
+                self.wo_objects_gun_magazines.remove(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         

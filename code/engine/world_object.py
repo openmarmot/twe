@@ -99,10 +99,11 @@ class WorldObject(object):
         self.is_vehicle=False
         self.is_airplane=False
         self.is_gun=False
+        self.is_gun_magazine=False # something that has ai_magazine 
         self.is_grenade=False
         self.is_handheld_antitank=False
         self.is_throwable=False #something that can be thrown 
-        self.is_gun_magazine=False # something that has ai_magazine        
+               
 
         self.is_large_human_pickup=False # fills a large pickup slot
         
