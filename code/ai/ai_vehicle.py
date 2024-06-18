@@ -122,15 +122,28 @@ class AIVehicle(AIBase):
         # update physics needs to know if its never been run before
         self.first_update=True
 
-
+    #---------------------------------------------------------------------------
+    def calculate_projectile_damage(self,projectile):
+        '''calculate projectile related damage'''
+        # note this should be a lot better. 
+        # need armor/pen values 
+        
+        self.health-=random.randint(1,10)
+        temp=self.passengers
+        for b in temp:
+            if random.randint(1,4)==3:
+                b.ai.handle_event("collision",projectile)
+                print('debug - human in vehicle hit')
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         if EVENT_DATA.is_projectile:
-            self.health-=random.randint(3,15)
+            self.calculate_projectile_damage(EVENT_DATA)
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
+        else:
+            print('Debug : unknown collision with vehicle - '+EVENT_DATA.name)
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):

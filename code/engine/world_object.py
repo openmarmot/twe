@@ -77,7 +77,6 @@ class WorldObject(object):
         self.heading=[0,0]
 
         
-
         # checked by graphics_2d_pygame.update_render_info 
         # to determine whether to render the object or not
         # this is used RARELY for special effects like passengers of vehicles
@@ -150,19 +149,25 @@ class WorldObject(object):
         # render level kind of a 'z' layer
         # see graphics_2d_pygame for the current list of levels
         self.render_level=None
+        # doesn't do much here, should also be called after all variables are set by the spawner
         self.reset_render_level()
 
         # is this used? pretty sure its not 
         self.id = 0
 
-    #add_inventory
+    #---------------------------------------------------------------------------
     def add_inventory(self, ITEM):
         self.ai.handle_event('add_inventory',ITEM)
 
-    #remove_inventory
+    #---------------------------------------------------------------------------
     def remove_inventory(self, ITEM):
         self.ai.handle_event('remove_inventory',ITEM)
 
+    #---------------------------------------------------------------------------
+    def render_pass_2(self):
+        ''' only override if the object needs special additional rendering'''
+        pass
+    
     #---------------------------------------------------------------------------
     def reset_render_level(self):
         '''reset render level to defaults based on object type '''
@@ -176,21 +181,12 @@ class WorldObject(object):
             self.render_level=1
         else:
             self.render_level=2
-
-    def wo_start(self):
-        self.world.add_queue.append(self)
-
-    def wo_stop(self):
-        self.world.remove_queue.append(self)
-
+            
+    #---------------------------------------------------------------------------
     def update(self):
-            self.ai.update()
-            self.update_scale()
-            self.update_physics()
-
-    def render_pass_2(self):
-        ''' only override if the object needs special additional rendering'''
-        pass
+        self.ai.update()
+        self.update_scale()
+        self.update_physics()
 
     #---------------------------------------------------------------------------
     def update_physics(self):
@@ -202,7 +198,6 @@ class WorldObject(object):
             if self.altitude<=0:
                 self.altitude=0
                 self.reset_render_level()
-
 
     #---------------------------------------------------------------------------
     def update_scale(self):
@@ -218,4 +213,14 @@ class WorldObject(object):
 
                 # if player or vehicle with player in it ..
                 # theoretically also change the global scale by the amount that it changed
-                # and reset every obj. otherwise the player relative scale will change
+                # and reset every obj. otherwise the player relative scale will change   
+                             
+    #---------------------------------------------------------------------------
+    def wo_start(self):
+        '''add object to world'''
+        self.world.add_queue.append(self)
+
+    #---------------------------------------------------------------------------
+    def wo_stop(self):
+        ''' remove object from world'''
+        self.world.remove_queue.append(self)

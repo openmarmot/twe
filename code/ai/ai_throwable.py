@@ -72,7 +72,9 @@ class AIThrowable(AIBase):
 
             # give it a little time to get away from the thrower 
             if self.flightTime>0.1:
-                if self.owner.world.check_collision_return_object(self.owner,[self.equipper],False,True) !=None:
+                objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
+                ignore=[self.equipper]
+                if self.owner.world.check_collision_return_object(self.owner,ignore,objects,True) !=None:
                     # just stop the grenade. maybe some spin or reverse movement?
                     if self.redirected==False:
                         self.speed=-20

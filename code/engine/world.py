@@ -212,33 +212,37 @@ class World(object):
             print('Error!! '+ WORLD_OBJECT.name+' already in world.wo_objects. Add fails !!')
         
     #---------------------------------------------------------------------------
-    def check_collision_return_object(self,COLLIDER,IGNORE_LIST, CHECK_ALL,CHECK_HUMAN,CONSIDER_PRONE=False):
+    def check_collision_return_object(self,collider,ignore_list, objects,consider_prone=False):
         ''' collision check. returns colliding object or None'''
-        # COLLIDER - worldobject doing the colliding
-        # IGNORE LIST - list of objects to ignore
+        # important - this function is what hands out collision events that result in damage
 
-        # NOTE - this function sucks - should be replaced. maybe better somewhere else
+        # collider - worldobject doing the colliding
+        # ignore_list - list of objects to ignore
+        # objects - array of objects to check collision against
 
-        collided=None
-        objects=[]
-        if CHECK_ALL :
-            # in this case all is humans+vehicles+buidings
-            objects=self.wo_objects_human+self.wo_objects_building+self.wo_objects_vehicle
-        elif CHECK_HUMAN:
-            objects=self.wo_objects_human
 
-        temp=engine.math_2d.checkCollisionCircleOneResult(COLLIDER,objects,IGNORE_LIST)
-        if temp !=None:
-            if CONSIDER_PRONE and temp.is_human:
-                if temp.ai.prone:
-                    chance=random.randint(0,1)
-                    if chance==1:
-                        temp=None
-                        print('debug - bullet missed due to prone')
-            # need to check again
-            if temp !=None:
-                temp.ai.handle_event("collision",COLLIDER)
-                collided=temp
+        collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
+        if collided !=None:
+            if collided.is_human:
+                if collided.ai.in_vehicle:
+                    # if in vehicle the vehicle handles the collision and damage
+                    collided.ai.vehicle.ai.handle_event("collision",collider)
+                else:
+                    # check if object misses due to prone
+                    if consider_prone:
+                        chance=random.randint(0,1)
+                        if chance==1:
+                            # missed due to prone
+                            collided=None
+                        else:
+                            # object hits. 
+                            collided.ai.handle_event("collision",collider)
+                    else:
+                        # not prone, object hits 100% of the time
+                        collided.ai.handle_event("collision",collider)
+            else:
+                # object is vehicle, building, whatever. handle the standard way
+                collided.ai.handle_event("collision",collider)
 
         return collided
     

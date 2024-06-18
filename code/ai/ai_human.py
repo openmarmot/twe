@@ -1522,7 +1522,6 @@ class AIHuman(AIBase):
             self.speak("I'm going to check that "+item.name)
             return True
         
-
     #-----------------------------------------------------------------------
     def take_action_move_short_random_distance(self):
         distance=random.randint(50,200)
