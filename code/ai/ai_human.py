@@ -576,6 +576,22 @@ class AIHuman(AIBase):
 
         return [ammo_gun,ammo_inventory,magazine_count]        
 
+    #---------------------------------------------------------------------------
+    def handle_check_near_magazines(self,weapon,range=50):
+        ''' check nearby surroundings for specific magazines'''
+
+        # can something more useful be done here ? 
+
+        # for now we will return a list of nearby magazines, in the future maybe 
+        # actually do something like create tasks 
+
+        near_mags=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_gun_magazines,range)
+        correct_mags=[]
+        for b in near_mags:
+            if weapon.name in b.ai.compatible_guns:
+                correct_mags.append(b)
+
+        return near_mags
 
     #---------------------------------------------------------------------------
     def handle_death(self):
@@ -664,44 +680,47 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def handle_enter_vehicle(self,VEHICLE):
         # should maybe pick driver or gunner role here
-        precheck=True
-        
-        if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
-            precheck=False
-            self.speak('No more room in this vehicle!')
-        
-        if VEHICLE.ai.driver!=None:
-            if VEHICLE.ai.driver.ai.squad.faction!=self.squad.faction:
-                precheck=False
-                self.speak('The enemy took this vehicle!')
-        
-        if precheck:
+       
+        # reset ai
+        self.reset_ai()
 
-            # put your large items in the trunk
-            if self.large_pickup:
-                VEHICLE.add_inventory(self.large_pickup)
-                self.owner.world.remove_queue.append(self.large_pickup)
-                self.large_pickup=None
-
-            VEHICLE.ai.passengers.append(self.owner)
-            self.in_vehicle=True
-            self.vehicle=VEHICLE
-            self.ai_goal='in_vehicle'
-            self.ai_state='in_vehicle'
-            
-            if self.vehicle.ai.open_top==False:
-                # human is hidden by top of vehicle so don't render
-                self.owner.render=False
-
-            if self.owner.is_player or self.vehicle.ai.driver==None:
-                self.handle_change_vehicle_role('driver')
-            else:
-                # not driver, how about gunner?
-                if self.vehicle.ai.gunner==None:
-                    self.handle_change_vehicle_role('gunner')
+        # check the vehicle still exists
+        if self.owner.world.check_object_exists(VEHICLE)==False:
+            self.speak('Where did that '+VEHICLE.name+' go?')
         else:
-            self.ai_goal='none'
-            self.ai_state='none'
+            precheck=True
+            if VEHICLE.ai.max_occupants<=len(VEHICLE.ai.passengers):
+                precheck=False
+                self.speak('No more room in this vehicle!')
+            
+            if VEHICLE.ai.driver!=None:
+                if VEHICLE.ai.driver.ai.squad.faction!=self.squad.faction:
+                    precheck=False
+                    self.speak('The enemy took this vehicle!')
+            
+            if precheck:
+                # put your large items in the trunk
+                if self.large_pickup:
+                    VEHICLE.add_inventory(self.large_pickup)
+                    self.owner.world.remove_queue.append(self.large_pickup)
+                    self.large_pickup=None
+
+                VEHICLE.ai.passengers.append(self.owner)
+                self.in_vehicle=True
+                self.vehicle=VEHICLE
+                self.ai_goal='in_vehicle'
+                self.ai_state='in_vehicle'
+                
+                if self.vehicle.ai.open_top==False:
+                    # human is hidden by top of vehicle so don't render
+                    self.owner.render=False
+
+                if self.owner.is_player or self.vehicle.ai.driver==None:
+                    self.handle_change_vehicle_role('driver')
+                else:
+                    # not driver, how about gunner?
+                    if self.vehicle.ai.gunner==None:
+                        self.handle_change_vehicle_role('gunner')
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
@@ -984,22 +1003,45 @@ class AIHuman(AIBase):
     def handle_pickup_object(self,OBJECT_TO_PICKUP):
         ''' pickup object from the world '''
         # any distance calculation would be made before this function is called
-        if OBJECT_TO_PICKUP.is_large_human_pickup:
 
-            # need to make sure nobody else is already carrying it
-            in_use=False
-            for b in self.owner.world.wo_objects_human:
-                if b.ai.large_pickup==OBJECT_TO_PICKUP:
-                    in_use=True
+        # reset ai 
+        self.reset_ai()
 
-            if in_use:
-                print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
-            else:
-                self.large_pickup=OBJECT_TO_PICKUP
+        # double check the object is still there 
+        if self.owner.world.check_object_exists(OBJECT_TO_PICKUP)==False:
+            print('Debug object to pickup '+OBJECT_TO_PICKUP.name+' is no longer in the world')
         else:
-            self.event_add_inventory(OBJECT_TO_PICKUP)
-            # remove from world
-            self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
+
+            if OBJECT_TO_PICKUP.is_large_human_pickup:
+
+                # need to make sure nobody else is already carrying it
+                in_use=False
+                for b in self.owner.world.wo_objects_human:
+                    if b.ai.large_pickup==OBJECT_TO_PICKUP:
+                        in_use=True
+
+                if in_use:
+                    print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
+                else:
+                    self.large_pickup=OBJECT_TO_PICKUP
+            else:
+                if OBJECT_TO_PICKUP.is_gun:
+
+                    # for now just pick up near by magazines (probably aren't any)
+                    near_mags=self.handle_check_near_magazines(OBJECT_TO_PICKUP,50)
+                    for b in near_mags:
+                        self.handle_pickup_object(b)
+
+                    # also loot any nearby containers
+                    container=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_container,100)
+                    if container!=None:
+                        self.take_action_loot_container(container)
+
+                self.speak('Picking up a '+OBJECT_TO_PICKUP.name)
+
+                self.event_add_inventory(OBJECT_TO_PICKUP)
+                # remove from world
+                self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
 
     #---------------------------------------------------------------------------
     def handle_player_reload(self):
@@ -1310,6 +1352,17 @@ class AIHuman(AIBase):
         self.speak("I'll wait for "+str(self.wait_interval))
 
     #-----------------------------------------------------------------------
+    def reset_ai(self):
+        '''resets all ai state variables'''
+
+        # note this does NOT reset ai_wants
+
+        self.ai_goal='none'
+        self.ai_state='none'
+        self.ai_vehicle_goal='none'
+        self.target_object=None
+
+    #-----------------------------------------------------------------------
     def take_action_enter_vehicle(self,VEHICLE,vehicle_goal='travel'):
         '''move to and enter vehicle'''
 
@@ -1469,7 +1522,6 @@ class AIHuman(AIBase):
             self.speak("I'm going to check that "+item.name)
             return True
         
-
     #-----------------------------------------------------------------------
     def take_action_move_short_random_distance(self):
         distance=random.randint(50,200)
@@ -1484,6 +1536,11 @@ class AIHuman(AIBase):
 
     #-----------------------------------------------------------------------
     def take_action_panic(self):
+
+        # step down from squad lead. 
+        # this keeps from leading the squad off the map 
+        if self.squad.squad_leader==self.owner:
+            self.squad.squad_leader=None
 
         if self.prone:
             self.handle_prone_state_change()
@@ -1535,18 +1592,14 @@ class AIHuman(AIBase):
         ''' think about the current engagement'''
         # check if target is still alive
         if self.target_object.ai.health<1:
-            self.ai_state='sleeping'
-            self.ai_goal='none'
-            self.target_object=None
+            self.reset_ai()
             self.speak('Got him !!')
         else:
             #target is alive, determine the best way to engage
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.target_object.world_coords)
             if distance>1500:
                 print('debug : target ignored. target distance is'+str(distance))
-                self.ai_state='sleeping'
-                self.ai_goal='none'
-                self.target_object=None
+                self.reset_ai()
             elif distance>300:
                 self.think_engage_far(distance)
             else:
@@ -1882,7 +1935,8 @@ class AIHuman(AIBase):
         elif self.ai_vehicle_goal=='ride along':
             pass
         else:
-            print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
+            pass
+            #print('Error - vehicle goal '+self.ai_vehicle_goal+' is not recognized')
 
 
         # basically if we haven't bailed out yet..
@@ -1902,89 +1956,93 @@ class AIHuman(AIBase):
         '''look at the contents of a container and take what we need'''
         # written for ai_container but will work for anything that has ai.inventory
         # getting to this function assumes that the bot is <5 from the container
-        # and assumes that it exists in teh world
 
-        # assess needs first
-        
-        medical_items=[]
-        consumable_items=[]
-        guns=[]
-        grenades=[]
-        anti_tank=[]
-        gun_magazine=[]
-        
-        # should handle liquids consumable + fuel
+        # reset AI 
+        self.reset_ai()
 
-        # should handle ammo containers
+        # make sure the object is still there
+        if self.owner.world.check_object_exists(CONTAINER)==False:
+            self.speak('Where did that '+CONTAINER.name+' go?')
+        else:       
+            medical_items=[]
+            consumable_items=[]
+            guns=[]
+            grenades=[]
+            anti_tank=[]
+            gun_magazine=[]
+            
+            # should handle liquids consumable + fuel
 
-        # sort items
-        for b in CONTAINER.ai.inventory:
-            if b.is_medical:
-                medical_items.append(b)
-            elif b.is_consumable:
-                consumable_items.append(b)
-            elif b.is_gun:
-                guns.append(b)
-            elif b.is_grenade:
-                grenades.append(b)
-            elif b.is_handheld_antitank:
-                anti_tank.append(b)
-            elif b.is_gun_magazine:
-                gun_magazine.append(b)
+            # should handle ammo containers
 
-        # grab stuff based on what we want
-        take=[]
-        if self.ai_want_medical and len(medical_items)>0:
-            take.append(medical_items[0])
-            self.ai_want_medical=False
-        if self.ai_want_food and len(consumable_items)>0:
-            take.append(consumable_items[0])
-            self.ai_want_food=False
-        if self.ai_want_gun and len(guns)>0:
-            take.append(guns[0])
-            self.ai_want_gun=False
-        if self.ai_want_grenade and len(grenades)>0:
-            take.append(grenades[0])
-            self.ai_want_grenade=False
-        if self.ai_want_antitank and len(anti_tank)>0:
-            take.append(anti_tank[0])
-            self.ai_want_antitank=False
+            # sort items
+            for b in CONTAINER.ai.inventory:
+                if b.is_medical:
+                    medical_items.append(b)
+                elif b.is_consumable:
+                    consumable_items.append(b)
+                elif b.is_gun:
+                    guns.append(b)
+                elif b.is_grenade:
+                    grenades.append(b)
+                elif b.is_handheld_antitank:
+                    anti_tank.append(b)
+                elif b.is_gun_magazine:
+                    gun_magazine.append(b)
 
-        if len(take)==0:
-            # nothing we wanted. lets grab something random
-            chance=random.randint(1,5)
-            if chance==1 and len(CONTAINER.ai.inventory)>0:
-                take.append(CONTAINER.ai.inventory[0])
-        
-        # handle gun magazine decisions
-        if len(gun_magazine)>0:
-            gun=None
+            # grab stuff based on what we want
+            take=[]
+            if self.ai_want_medical and len(medical_items)>0:
+                take.append(medical_items[0])
+                self.ai_want_medical=False
+            if self.ai_want_food and len(consumable_items)>0:
+                take.append(consumable_items[0])
+                self.ai_want_food=False
+            if self.ai_want_gun and len(guns)>0:
+                take.append(guns[0])
+                self.ai_want_gun=False
+            if self.ai_want_grenade and len(grenades)>0:
+                take.append(grenades[0])
+                self.ai_want_grenade=False
+            if self.ai_want_antitank and len(anti_tank)>0:
+                take.append(anti_tank[0])
+                self.ai_want_antitank=False
 
-            # check if we are grabbing a gun
-            for b in take:
-                if b.is_gun:
-                    gun=b
+            if len(take)==0:
+                # nothing we wanted. lets grab something random
+                chance=random.randint(1,5)
+                if chance==1 and len(CONTAINER.ai.inventory)>0:
+                    take.append(CONTAINER.ai.inventory[0])
+            
+            # handle gun magazine decisions
+            if len(gun_magazine)>0:
+                gun=None
 
-            # if not, set it to the gun we have, if we have one
-            if gun==None:
-                if self.primary_weapon!=None:
-                    gun=self.primary_weapon
+                # check if we are grabbing a gun
+                for b in take:
+                    if b.is_gun:
+                        gun=b
 
-            # if we have a gun now, grab compatible magazines
-            # only grab 2 magazines though
-            grabbed=0
-            if gun!=None:
-                for b in gun_magazine:
-                    if gun.name in b.ai.compatible_guns:
-                        if grabbed<2:
-                            take.append(b)
-                            grabbed+=1
+                # if not, set it to the gun we have, if we have one
+                if gun==None:
+                    if self.primary_weapon!=None:
+                        gun=self.primary_weapon
 
-        # take items!
-        for c in take:
-            CONTAINER.remove_inventory(c)
-            self.event_add_inventory(c)
-            self.speak('Grabbed a '+c.name)
+                # if we have a gun now, grab compatible magazines
+                # only grab 2 magazines though
+                grabbed=0
+                if gun!=None:
+                    for b in gun_magazine:
+                        if gun.name in b.ai.compatible_guns:
+                            if grabbed<2:
+                                take.append(b)
+                                grabbed+=1
+
+            # take items!
+            for c in take:
+                CONTAINER.remove_inventory(c)
+                self.event_add_inventory(c)
+                self.speak('Grabbed a '+c.name)
             
     #-----------------------------------------------------------------------
     def think_move(self):
@@ -2005,8 +2063,7 @@ class AIHuman(AIBase):
                     #the vehicle we were trying to enter must have driven off, or something equally weird happened
                     print('error: vehicle inception! '+self.owner.name+' is in enter_vehicle state and distance to vehicle is '+str(distance))
                     # lets pause and rethink our priorities
-                    self.ai_state='sleep'
-                    self.ai_goal='sleep'
+                    self.reset_ai()
 
                 # this should be the case most of the time
                 else:
@@ -2035,23 +2092,12 @@ class AIHuman(AIBase):
 
         if self.ai_goal=='pickup':
             if DISTANCE<5:
-                if self.target_object in self.owner.world.wo_objects:
-                    self.handle_pickup_object(self.target_object)
-                else:
-                    # hmm object is gone. someone else must have grabbed it
-                    pass
-                self.target_object=None
-                self.ai_state='sleeping'
+                self.handle_pickup_object(self.target_object)
+          
         if self.ai_goal=='loot_container':
             if DISTANCE<5:
-                if self.target_object in self.owner.world.wo_objects:
-                    # check contents and grab what we want
-                    self.think_loot_container(self.target_object)
-                else:
-                    # hmm object is gone. someone else must have grabbed it
-                    # this is especially odd because it is a container
-                    print('error: container is unexpectedly missing')
-                self.ai_state='sleeping'
+                self.think_loot_container(self.target_object)
+
         elif self.ai_goal=='enter_vehicle':
 
             # vehicles move around a lot so gotta check
@@ -2060,27 +2106,19 @@ class AIHuman(AIBase):
                 self.ai_state='start_moving'
             else:
                 if DISTANCE<5:
-                    if self.target_object in self.owner.world.wo_objects:
-                        self.handle_enter_vehicle(self.target_object)
-                    else:
-                        # hmm object is gone. idk how that happened
-                        print('error: vehicle bot was going to enter no longer exists')
-                        self.ai_state='sleeping'
+                    self.handle_enter_vehicle(self.target_object)
 
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
                 self.handle_replenish_ammo()
-                self.ai_state='sleeping'
         elif self.ai_goal=='close_with_target':
             if self.target_object==None:
                 print('warn: ai_goal is close_with_target but target is None')
-                self.ai_goal='none'
+                self.reset_ai()
             else:
                 # check if target is dead 
                 if self.target_object.ai.health<1:
-                    self.ai_state='sleeping'
-                    self.ai_goal='none'
-                    self.target_object=None
+                    self.reset_ai()
                 elif DISTANCE<self.primary_weapon.ai.range:
                     self.ai_state='engaging'
                     self.ai_goal='none'
@@ -2101,8 +2139,7 @@ class AIHuman(AIBase):
             # this is initiated from world.select_with_mouse when
             # the selected object is too far away
             if DISTANCE<35:
-                self.ai_state='sleeping'
-                self.ai_goal='none'
+                self.reset_ai()
                 # basically disables the bot again. wait for player
                 # interaction or another timeout
                 self.time_since_player_interact=0
@@ -2110,7 +2147,7 @@ class AIHuman(AIBase):
             #print('error: unhandled moving goal: '+self.ai_goal)
             # catchall for random moving related goals:
             if DISTANCE<5:
-                self.ai_state='sleeping'
+                self.reset_ai()
 
     #-----------------------------------------------------------------------
     def think_upgrade_gear(self):
@@ -2167,7 +2204,7 @@ class AIHuman(AIBase):
             self.vehicle.ai.throtte=0
         else:
             if self.ai_vehicle_destination==None:
-                print('debugL think_vehicle_drive ai_vehicle_destination==None')
+                print('debug: think_vehicle_drive ai_vehicle_destination==None')
                 # determine vehicle destination
                 self.ai_vehicle_destination=self.squad.destination
             

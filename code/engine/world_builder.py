@@ -1929,6 +1929,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
     if z.world_coords==[0,0]:
         z.world_coords=copy.copy(WORLD_COORDS)
 
+    # reset render level now that variables are set
+    z.reset_render_level()
     if SPAWN :
         z.wo_start()
     return z

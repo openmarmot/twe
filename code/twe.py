@@ -32,9 +32,8 @@ def run():
 
     world = World(SCREEN_SIZE)
 
-    # this has to be here because graphics engine uses player coords in its update
-    #  so it needs to be created
-    # player will get spawned into the world by its squad
+    # fake player that is only used until the player actually spawns via the menu
+    # required because the game engine needs to know the player position
     p=engine.world_builder.spawn_object(world, [50.,50.],'player',False)
     
 

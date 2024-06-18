@@ -83,11 +83,14 @@ class AIProjectile(AIBase):
             # check collision 
             if self.flightTime>self.last_collision_check+self.collision_check_interval:
                 self.last_collision_check=self.flightTime
-                collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,True,False,True)
+                objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle+self.owner.world.wo_objects_building
+                collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
                 if collide_obj !=None:
                     if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+                        # bullet has collided and exploded
                         self.contact_effect()
                     else:
+                        # bullet has collided, check if it over penetrates and keeps going
                         if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
                             # add the collided object to ignore list so we don't hit it again
                             # this is mostly to deal with buildings where we would hit it a ton of times

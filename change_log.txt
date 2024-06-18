@@ -1,6 +1,60 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 17 2024
+- rewrite of the main collision check in world to be more versatile
+- throwables can now collide with vehicles and check miss roll against prone humans
+- humans in vehicles no longer get direct collisions, the vehicle gets hit first 
+- humans in vehicles have a 25% chance of getting hit if a vehicle gets hit 
+- minor cleanup
+- fixed a bug where the auto render level was not really being used because 
+it was called before variables were set
+
+that render level bug has been around for a LONG time - ever since i rewrote the render level system. 
+can't believe I didn't catch it until now. this was causing stuff like shell casings rendering on top 
+of humans instead of under them. basically everything was the same render level
+
+vehicle damage is extremely basic right now. I need to incorporate armor, component damage, etc 
+
+I am slowly changing function parameters from caps to non-caps to follow standard convention
+
+vehicle collision changes should be a big improvement. it used to be pretty common for the passengers 
+to get hit and not the vehicle, now the vehicle should always get hit. 
+
+vehicles (that aren't dead) seem to offer a large advantage to recently disembarked passengers as they 
+have the possibility of soaking up damage with their larger collision radius. this is OK i think - but 
+is probably too large of an advantage. Soviets that are exiting a truck seem to have a large firefight 
+advantage. 
+
+todo 
+- vehicles transporting team mates need to be added to the ignore list 
+- vehicle death log similar to the human death log 
+- spread out disembarking passengers a little 
+----------------------------------
+June 15 2024
+- world tracks gun magazines now 
+- add reset_ai to human_ai and try to standardize on using it 
+- add check_if_object_exists to world and try to standardize on using it 
+- when picking up a gun the ai will make some attempt to find magazines 
+- panicking humans now reliquish squad lead position 
+
+I think in the current game a gun magazine will never end up 
+in the world, but its easy enough to add it in while i'm working on 
+other stuff. I also set it to check a very near container if one exists, 
+this should theoretically be the body of whoever dropped the gun (if that happened)
+
+fairly large amount of changes trying to standardize some ai_state handling and 
+object checks in ai_human. probably low actual effect, but might clear up some bugs 
+or at least make ai states more standard 
+
+I think a rewrite of the ai state system is probably in order. thats going to be a large task
+
+panicking humans no longer being squad lead should stop some odd behavior that was likely caused 
+by a panicked squad lead leading the squad off the map. 
+
+more should be done with the panic state. 
+
+----------------------------------
 June 12 2024
 - removed squad from vehicle - vehicles don't have a concept of faction identity
 - more work on vehicle electrical systems 
