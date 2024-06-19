@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 18 2024
+- added expanded vehicle death function with death message
+
+ended up not being sure what stats to give the vehicle death message, but 
+I added last hit tracking so we will at least know what killed it. 
+
+launched a ton of panzerfausts. very hard to hit people with them for whatever reason.
+damage seems like it needs to be tweaked - i suspect most of the projectiles miss. 
+
+----------------------------------
 June 17 2024
 - rewrite of the main collision check in world to be more versatile
 - throwables can now collide with vehicles and check miss roll against prone humans
