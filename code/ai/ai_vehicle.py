@@ -122,12 +122,15 @@ class AIVehicle(AIBase):
         # update physics needs to know if its never been run before
         self.first_update=True
 
+        # used for death message 
+        self.last_collision_description=''
+
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile):
         '''calculate projectile related damage'''
         # note this should be a lot better. 
         # need armor/pen values 
-        
+
         self.health-=random.randint(1,10)
         temp=self.passengers
         for b in temp:
@@ -136,7 +139,11 @@ class AIVehicle(AIBase):
                 print('debug - human in vehicle hit')
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
+        
+
         if EVENT_DATA.is_projectile:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
+            self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
             self.calculate_projectile_damage(EVENT_DATA)
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
 
@@ -168,6 +175,28 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_aileron_right(self):
         self.ailerons=-1
+
+    #---------------------------------------------------------------------------
+    def handle_death(self):
+        engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
+        
+        dm=''
+        dm+=(self.owner.name+' died.')
+        dm+=('\n  - killed by : '+self.last_collision_description)
+        
+        # i think primary weapons aren't a thing for vehicles at the moment
+        if self.primary_weapon!=None:
+            #ammo=self.handle_check_ammo(self.primary_weapon)
+            dm+=('\n  - weapon: '+self.primary_weapon.name)
+            #dm+=('\n  -- ammo in gun: '+str(ammo[0]))
+            #dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
+            #dm+=('\n  -- magazine count: '+str(ammo[2]))
+
+        print(dm)
+
+        # human ai will figure out for itself that it needs to leave
+        # remove from world
+        self.owner.world.remove_queue.append(self.owner)
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
@@ -298,12 +327,7 @@ class AIVehicle(AIBase):
 
         # -- general stuff for all objects --
         if self.health<1:
-            print(self.owner.name+' has died')
-            engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
-
-            # human ai will figure out for itself that it needs to leave
-            # remove from world
-            self.owner.world.remove_queue.append(self.owner)
+            self.handle_death()
 
         # update engines
         for b in self.engines:
