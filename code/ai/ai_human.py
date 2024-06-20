@@ -730,12 +730,14 @@ class AIHuman(AIBase):
             self.in_vehicle=False
             self.vehicle.ai.passengers.remove(self.owner)
             self.vehicle=None
-            self.ai_goal='none'
-            self.ai_state='none'
-            self.ai_vehicle_goal='none'
+            self.reset_ai()
+            self.ai_vehicle_destination=None # reset this so things don't get funky
 
             # make sure we are visible again
             self.owner.render=True
+
+            # move a tiny bit so everyone isn't in the exact same spot
+            self.owner.world_coords=[self.owner.world_coords[0]+float(random.randint(-7,7)),self.owner.world_coords[1]+float(random.randint(-7,7))]
 
             # maybe grab your large pick up if you put it in the trunk
             
@@ -1381,10 +1383,10 @@ class AIHuman(AIBase):
         # should check if the vehicle is hostile
 
         self.ai_vehicle_goal=vehicle_goal
-        if self.destination==None:
+
+        # this should have been set before this with the correct destination
+        if self.ai_vehicle_destination==None:
             self.ai_vehicle_destination=self.squad.destination
-        else:
-            self.ai_vehicle_destination=copy.copy(self.destination)
 
         self.target_object=VEHICLE
         self.ai_goal='enter_vehicle'
@@ -2070,6 +2072,10 @@ class AIHuman(AIBase):
                     b=self.owner.world.get_closest_vehicle(self.owner.world_coords,(self.max_walk_distance*0.6),self.squad.faction)
                     if b!=None:
                         # get_closest_vehicle only returns vehicles that aren't full
+
+                        # make the destination the vehicle destination so you will know where to go
+                        self.ai_vehicle_destination=copy.copy(self.destination)
+
                         self.take_action_enter_vehicle(b)
 
                     else:

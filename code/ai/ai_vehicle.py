@@ -139,10 +139,11 @@ class AIVehicle(AIBase):
                 print('debug - human in vehicle hit')
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
-        self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
+        
 
         if EVENT_DATA.is_projectile:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
+            self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
             self.calculate_projectile_damage(EVENT_DATA)
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
 

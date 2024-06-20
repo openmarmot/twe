@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+
+----------------------------------
+June 19 2024
+- added a little variation to world coords when exiting a vehicle to prevent stacking 
+- made several changes to how ai_vehicle_destination is set 
+- fixed a new bug where a grenade hitting a vehicle would cause a crash 
+
+so i think some of the vehicle oddity was caused by drivers hopping out and being 
+replaced by passengers who weren't really sure where they were going. the function that 
+kicks off moving towards a vehicle would reset the vehicle destination to whatever the 
+destination variable was. I think they were driving to the destination they were walking 
+to when they entered the vehicle.
+
+i observed soviet and german bots with no squad lead. one did eventually get a lead so 
+that mechanism works but it is maybe rarer/slower than expected. this is fine i think 
+
+todo 
+- civilian squad leaders should probably not move towards squad destination 
+
 ----------------------------------
 June 18 2024
 - added expanded vehicle death function with death message
