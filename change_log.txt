@@ -1,9 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 23 2024
+- radio class 
+- feldfunk b and feldfunk battery charger objects
+
+might be best to have some 'pool' of electric capacity that 
+electrical systems can use, and then have this topped off by the battery or 
+external power. this would be similar to how engines currently work 
+
+todo 
+- electrical system updates 
+- more radio work 
+
+----------------------------------
 June 22 2024
 - feldfunk and charger art (german backpack field radio)
-
 
 ----------------------------------
 June 19 2024
