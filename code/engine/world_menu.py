@@ -371,7 +371,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Misc --')
             self.world.graphic_engine.menu_text_queue.append('1 - smoke cloud  ')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? ')
+            self.world.graphic_engine.menu_text_queue.append('2 - Feldfunk radio and charger ')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             self.world.graphic_engine.menu_text_queue.append('4 - ?')
             if Key=='1':
@@ -379,7 +379,8 @@ class World_Menu(object):
                 engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
 
             elif Key=='2':
-                pass
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'radio_feldfu_b',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+60,self.world.player.world_coords[1]],'feldfunk_battery_charger',True)
             elif Key=='3':
                 pass
             elif Key=='4':

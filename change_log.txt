@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 25 2024
+- added radio stuff to debug->spawn->misc for testing 
+- vehicle gets a (single) radio object slot 
+- rearrangement of some vehicle code 
+
+todo 
+- ai should probably check vehicle inventory when they dismount to see if 
+there is anything they need. ESPECIALLY large pickup objects as those get dumped in 
+inventory when they board.
+- world_menu vehicle->radio code and/or a seperate radio menu 
+
+
+----------------------------------
 June 23 2024
 - radio class 
 - feldfunk b and feldfunk battery charger objects

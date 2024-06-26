@@ -102,10 +102,8 @@ class WorldObject(object):
         self.is_grenade=False
         self.is_handheld_antitank=False
         self.is_throwable=False #something that can be thrown 
-               
-
+        self.is_radio=False
         self.is_large_human_pickup=False # fills a large pickup slot
-        
         self.is_container=False # object that stores other objects
         self.is_ammo_container=False # contains ammo. note this should go away
         self.is_projectile=False

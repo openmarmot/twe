@@ -1929,6 +1929,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         # ref https://feldfunker-la7sna.com/wehrm_foto.htm
         z=WorldObject(WORLD,['radio_feldfunk'],AIRadio)
         z.name='Feldfunk.b'
+        z.is_radio=True
         z.weight=15
         #z.is_wearable=True
         #z.wearable_region='head'

@@ -39,6 +39,9 @@ class AIVehicle(AIBase):
         # array of battery objects
         self.batteries=[]
 
+        # radio - only one for now
+        self.radio=None
+
         # amp output for the alternator(s)
         # if i lose more of my sanity it would be nice to model individual alternators
         self.alternator_amps=15
@@ -156,8 +159,15 @@ class AIVehicle(AIBase):
     def event_add_inventory(self,EVENT_DATA):
 
         if EVENT_DATA.is_human:
+            # we don't want humans in here
             print('! Error - human added to vehicle inventory')
         else:
+
+            if EVENT_DATA.is_radio:
+                if self.radio==None:
+                    self.radio=EVENT_DATA
+
+            # put whatever it is in the inventory
             self.inventory.append(EVENT_DATA) 
 
 
@@ -165,6 +175,11 @@ class AIVehicle(AIBase):
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA in self.inventory:
             self.inventory.remove(EVENT_DATA)
+
+            if EVENT_DATA.is_radio:
+                if self.radio==EVENT_DATA:
+                    self.radio=None
+
             # make sure the obj world_coords reflect the obj that had it in inventory
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
@@ -334,18 +349,15 @@ class AIVehicle(AIBase):
             b.throttle_control=self.throttle
             b.update()
 
-        # update fuel tanks
-        for b in self.fuel_tanks:
-            b.update()
-
+        # updates fuel tanks and handles fuel flow to engines
         self.update_fuel_system()
 
-        # update batteries
-        for b in self.batteries:
-            b.update()
-
-        # mostly battery stuff for now
+        # update batteries and electrical distribution
         self.update_electrical_system()
+
+        # update radio
+        if self.radio!=None:
+            self.radio.update()
 
         if self.throttle>0:
             self.update_acceleration_calculation()
@@ -382,6 +394,10 @@ class AIVehicle(AIBase):
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
+
+        # update batteries
+        for b in self.batteries:
+            b.update()
         
         #electrical units are in hours for whatever reason. gotta get the conversion
         time_passed_hours=self.owner.world.graphic_engine.time_passed_seconds/3600
@@ -397,6 +413,10 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def update_fuel_system(self):
         ''' distributes fuel from the tanks to the engines'''
+
+        # update fuel tanks
+        for b in self.fuel_tanks:
+            b.update()
 
         # well this is not great
 
