@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 29 2024
+- radio menu fixes 
+
+----------------------------------
+June 26 2024
+- added radio menu 
+
+----------------------------------
 June 25 2024
 - added radio stuff to debug->spawn->misc for testing 
 - vehicle gets a (single) radio object slot 
@@ -11,7 +19,6 @@ todo
 there is anything they need. ESPECIALLY large pickup objects as those get dumped in 
 inventory when they board.
 - world_menu vehicle->radio code and/or a seperate radio menu 
-
 
 ----------------------------------
 June 23 2024

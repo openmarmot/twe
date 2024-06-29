@@ -101,6 +101,8 @@ class World_Menu(object):
             self.first_aid_menu(Key)
         elif self.active_menu=='engine_menu':
             self.engine_menu(Key)
+        elif self.active_menu=='radio_menu':
+            self.radio_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -137,6 +139,9 @@ class World_Menu(object):
             elif SELECTED_OBJECT.is_consumable:
                 self.active_menu='consumable'
                 self.consumable_menu(None)
+            elif SELECTED_OBJECT.is_radio:
+                self.active_menu='radio_menu'
+                self.radio_menu(None)
             else :
                 print('warn - generic menu activated')
                 # just dump everything else in here for now
@@ -667,7 +672,36 @@ class World_Menu(object):
             # ask the ai to join the squad
                 self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
-                
+
+
+    #---------------------------------------------------------------------------            
+    def radio_menu(self, Key):
+
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- Radio Menu --')
+        self.world.graphic_engine.menu_text_queue.append('Radio: '+self.selected_object.name)
+        self.world.graphic_engine.menu_text_queue.append('Power status: '+str(self.selected_object.ai.power_on))
+        self.world.graphic_engine.menu_text_queue.append('Frequency: '+str(self.selected_object.ai.current_frequency))
+        self.world.graphic_engine.menu_text_queue.append('Volume: '+str(self.selected_object.ai.volume))
+        self.world.graphic_engine.menu_text_queue.append('Transmission Power: '+str(self.selected_object.ai.transmission_power))
+        
+
+        if self.world.check_object_exists(self.selected_object):
+            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+            if Key=='1':
+                self.world.player.ai.handle_pickup_object(self.selected_object)
+                self.deactivate_menu()
+                # we don't want to process anyhting after this so nothing else prints
+                return
+
+        self.world.graphic_engine.menu_text_queue.append('2 - Toggle power')
+
+        if Key=='2':
+            self.selected_object.ai.power_on= not self.selected_object.ai.power_on
+            self.radio_menu(None)
+            self.deactivate_menu()
+
     #---------------------------------------------------------------------------
     def squad_menu(self,Key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
