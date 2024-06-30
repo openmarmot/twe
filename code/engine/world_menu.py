@@ -101,6 +101,8 @@ class World_Menu(object):
             self.first_aid_menu(Key)
         elif self.active_menu=='engine_menu':
             self.engine_menu(Key)
+        elif self.active_menu=='radio_menu':
+            self.radio_menu(Key)
         else:
             print('Error : active menu not recognized ',self.active_menu)
 
@@ -137,6 +139,9 @@ class World_Menu(object):
             elif SELECTED_OBJECT.is_consumable:
                 self.active_menu='consumable'
                 self.consumable_menu(None)
+            elif SELECTED_OBJECT.is_radio:
+                self.active_menu='radio_menu'
+                self.radio_menu(None)
             else :
                 print('warn - generic menu activated')
                 # just dump everything else in here for now
@@ -371,7 +376,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Misc --')
             self.world.graphic_engine.menu_text_queue.append('1 - smoke cloud  ')
-            self.world.graphic_engine.menu_text_queue.append('2 - ? ')
+            self.world.graphic_engine.menu_text_queue.append('2 - Feldfunk radio and charger ')
             self.world.graphic_engine.menu_text_queue.append('3 - ?')
             self.world.graphic_engine.menu_text_queue.append('4 - ?')
             if Key=='1':
@@ -379,7 +384,8 @@ class World_Menu(object):
                 engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
 
             elif Key=='2':
-                pass
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'radio_feldfu_b',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+60,self.world.player.world_coords[1]],'feldfunk_battery_charger',True)
             elif Key=='3':
                 pass
             elif Key=='4':
@@ -666,7 +672,36 @@ class World_Menu(object):
             # ask the ai to join the squad
                 self.selected_object.ai.react_asked_to_join_squad(self.world.player.ai.squad)
                 self.deactivate_menu()
-                
+
+
+    #---------------------------------------------------------------------------            
+    def radio_menu(self, Key):
+
+        # print out the basic menu
+        self.world.graphic_engine.menu_text_queue=[]
+        self.world.graphic_engine.menu_text_queue.append('-- Radio Menu --')
+        self.world.graphic_engine.menu_text_queue.append('Radio: '+self.selected_object.name)
+        self.world.graphic_engine.menu_text_queue.append('Power status: '+str(self.selected_object.ai.power_on))
+        self.world.graphic_engine.menu_text_queue.append('Frequency: '+str(self.selected_object.ai.current_frequency))
+        self.world.graphic_engine.menu_text_queue.append('Volume: '+str(self.selected_object.ai.volume))
+        self.world.graphic_engine.menu_text_queue.append('Transmission Power: '+str(self.selected_object.ai.transmission_power))
+        
+
+        if self.world.check_object_exists(self.selected_object):
+            self.world.graphic_engine.menu_text_queue.append('1 - pick up')
+            if Key=='1':
+                self.world.player.ai.handle_pickup_object(self.selected_object)
+                self.deactivate_menu()
+                # we don't want to process anyhting after this so nothing else prints
+                return
+
+        self.world.graphic_engine.menu_text_queue.append('2 - Toggle power')
+
+        if Key=='2':
+            self.selected_object.ai.power_on= not self.selected_object.ai.power_on
+            self.radio_menu(None)
+            self.deactivate_menu()
+
     #---------------------------------------------------------------------------
     def squad_menu(self,Key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
@@ -992,11 +1027,17 @@ class World_Menu(object):
                 currentRole='Gunner'
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name
+
+            radio=False
+            if self.selected_object.ai.radio!=None:
+                radio=True
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
+            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
+            if radio:
+                self.world.graphic_engine.menu_text_queue.append('Radio : '+self.selected_object.ai.radio.name)
             if len(self.selected_object.ai.engines)>0:
                 self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
@@ -1004,6 +1045,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
             self.world.graphic_engine.menu_text_queue.append('3 - engine menu')
             self.world.graphic_engine.menu_text_queue.append('4 - toggle HUD')
+            if radio:
+                self.world.graphic_engine.menu_text_queue.append('5 - radio')
             if Key=='1':
                 self.change_menu('change_vehicle_role')
             if Key=='2':
@@ -1019,6 +1062,9 @@ class World_Menu(object):
                 self.world.display_vehicle_text=not self.world.display_vehicle_text
                 #refresh the text
                 self.vehicle_menu('none')
+            if Key=='5' and radio:
+                self.selected_object=self.selected_object.ai.radio
+                self.change_menu('radio_menu')
 
     #---------------------------------------------------------------------------
     def update(self):

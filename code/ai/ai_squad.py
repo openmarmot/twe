@@ -18,9 +18,9 @@ import engine.math_2d
 #global variables
 
 class AISquad(object):
-    def __init__(self,WORLD):
+    def __init__(self,world):
 
-        self.world=WORLD
+        self.world=world
 
         # destination - this is set by the faction tactical ai
         self.destination=[0.,0.]

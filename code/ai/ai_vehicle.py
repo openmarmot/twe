@@ -39,6 +39,9 @@ class AIVehicle(AIBase):
         # array of battery objects
         self.batteries=[]
 
+        # radio - only one for now
+        self.radio=None
+
         # amp output for the alternator(s)
         # if i lose more of my sanity it would be nice to model individual alternators
         self.alternator_amps=15
@@ -156,8 +159,15 @@ class AIVehicle(AIBase):
     def event_add_inventory(self,EVENT_DATA):
 
         if EVENT_DATA.is_human:
+            # we don't want humans in here
             print('! Error - human added to vehicle inventory')
         else:
+
+            if EVENT_DATA.is_radio:
+                if self.radio==None:
+                    self.radio=EVENT_DATA
+
+            # put whatever it is in the inventory
             self.inventory.append(EVENT_DATA) 
 
 
@@ -165,6 +175,11 @@ class AIVehicle(AIBase):
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA in self.inventory:
             self.inventory.remove(EVENT_DATA)
+
+            if EVENT_DATA.is_radio:
+                if self.radio==EVENT_DATA:
+                    self.radio=None
+
             # make sure the obj world_coords reflect the obj that had it in inventory
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
@@ -207,18 +222,18 @@ class AIVehicle(AIBase):
         self.elevator=1
 
     #---------------------------------------------------------------------------
-    def handle_event(self, EVENT, EVENT_DATA):
+    def handle_event(self, event, event_data):
         ''' overrides base handle_event'''
         # EVENT - text describing event
-        # EVENT_DATA - most likely a world_object but could be anything
+        # event_data - most likely a world_object but could be anything
 
         # not sure what to do here yet. will have to think of some standard events
-        if EVENT=='add_inventory':
-            self.event_add_inventory(EVENT_DATA)
-        elif EVENT=='collision':
-            self.event_collision(EVENT_DATA)
-        elif EVENT=='remove_inventory':
-            self.event_remove_inventory(EVENT_DATA)
+        if event=='add_inventory':
+            self.event_add_inventory(event_data)
+        elif event=='collision':
+            self.event_collision(event_data)
+        elif event=='remove_inventory':
+            self.event_remove_inventory(event_data)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
@@ -334,18 +349,15 @@ class AIVehicle(AIBase):
             b.throttle_control=self.throttle
             b.update()
 
-        # update fuel tanks
-        for b in self.fuel_tanks:
-            b.update()
-
+        # updates fuel tanks and handles fuel flow to engines
         self.update_fuel_system()
 
-        # update batteries
-        for b in self.batteries:
-            b.update()
-
-        # mostly battery stuff for now
+        # update batteries and electrical distribution
         self.update_electrical_system()
+
+        # update radio
+        if self.radio!=None:
+            self.radio.update()
 
         if self.throttle>0:
             self.update_acceleration_calculation()
@@ -382,6 +394,10 @@ class AIVehicle(AIBase):
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
+
+        # update batteries
+        for b in self.batteries:
+            b.update()
         
         #electrical units are in hours for whatever reason. gotta get the conversion
         time_passed_hours=self.owner.world.graphic_engine.time_passed_seconds/3600
@@ -397,6 +413,10 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def update_fuel_system(self):
         ''' distributes fuel from the tanks to the engines'''
+
+        # update fuel tanks
+        for b in self.fuel_tanks:
+            b.update()
 
         # well this is not great
 

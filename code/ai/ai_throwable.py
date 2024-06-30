@@ -94,15 +94,15 @@ class AIThrowable(AIBase):
         self.owner.world.remove_queue.append(self.owner)
 
     #---------------------------------------------------------------------------
-    def redirect(self,TARGET_COORDS):
+    def redirect(self,target_coords):
         ''' redirect/rethrow after grenade has been thrown'''
         print('redirect')
         # grenade should already be thrown
         if self.thrown==False:
             print('grenade error, redirect w/o thrown')
         
-        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
-        self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+        self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,target_coords)
         self.collided=True
         self.speed=190
         self.maxTime-=self.flightTime

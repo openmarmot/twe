@@ -242,42 +242,42 @@ class AIHuman(AIBase):
                 self.far_targets.append(b)
 
     #---------------------------------------------------------------------------
-    def event_collision(self,EVENT_DATA):
+    def event_collision(self,event_data):
         self.last_collision_description=''
-        if EVENT_DATA.is_projectile:
-            distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
-            self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
+        if event_data.is_projectile:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords,True)
+            self.last_collision_description='hit by '+event_data.name + ' at a distance of '+ str(distance)
             starting_health=self.health
 
-            self.calculate_projectile_damage(EVENT_DATA)
+            self.calculate_projectile_damage(event_data)
 
             # add the shooter of the bullet to the personal enemies list
             # shrapnel from grenades and panzerfausts dont track ownership
-            if EVENT_DATA.ai.shooter !=None:
-                self.last_collision_description+=(' from '+EVENT_DATA.ai.shooter.name)
+            if event_data.ai.shooter !=None:
+                self.last_collision_description+=(' from '+event_data.ai.shooter.name)
 
-                if EVENT_DATA.ai.shooter.ai.squad != None:
-                    if EVENT_DATA.ai.shooter.ai.squad.faction != self.squad.faction or EVENT_DATA.ai.shooter.is_player:
+                if event_data.ai.shooter.ai.squad != None:
+                    if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
                         # this creates a lot of friendly fire - but its interesting 
-                        self.personal_enemies.append(EVENT_DATA.ai.shooter)
+                        self.personal_enemies.append(event_data.ai.shooter)
 
                 # kill tracking
                 # just focus on humans for now
-                if EVENT_DATA.ai.shooter.is_human:
+                if event_data.ai.shooter.is_human:
                     if self.health<30:
                         # protects from recording hits on something that was already dead
                         if starting_health>0:
                             if self.health<1:
-                                EVENT_DATA.ai.shooter.ai.confirmed_kills+=1
+                                event_data.ai.shooter.ai.confirmed_kills+=1
                             else:
-                                EVENT_DATA.ai.shooter.ai.probable_kills+=1
+                                event_data.ai.shooter.ai.probable_kills+=1
                         else:
                             print('collision on a dead human ai detected')
 
-                    if EVENT_DATA.ai.shooter.ai.primary_weapon!=None:
-                        self.last_collision_description+=("'s "+EVENT_DATA.ai.weapon_name)
+                    if event_data.ai.shooter.ai.primary_weapon!=None:
+                        self.last_collision_description+=("'s "+event_data.ai.weapon_name)
             else:
-                if EVENT_DATA.ai.shooter==None:
+                if event_data.ai.shooter==None:
                     print('Error - projectile shooter is none')
                 # other way to get here is if its not a projectile
                 print('or its not a projectile')
@@ -293,17 +293,17 @@ class AIHuman(AIBase):
                 self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                 self.ai_state='start_moving'
 
-        elif EVENT_DATA.is_grenade:
+        elif event_data.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything
 
             # attempt to throw the grenade back
             if random.randint(1,5)==1:
-                EVENT_DATA.ai.redirect(EVENT_DATA.ai.equipper.world_coords)
+                event_data.ai.redirect(event_data.ai.equipper.world_coords)
             else:
                 self.ai_goal='react to collision'
                 self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
                 self.ai_state='start_moving'
-        elif EVENT_DATA.is_throwable:
+        elif event_data.is_throwable:
             #throwable but not a grenade 
             self.speak('Oww!')
             # temp do something else later
@@ -319,94 +319,94 @@ class AIHuman(AIBase):
             self.ai_state='start_moving'
 
     #---------------------------------------------------------------------------
-    def event_add_inventory(self,EVENT_DATA):
+    def event_add_inventory(self,event_data):
         ''' add object to inventory. does not remove obj from world'''
-        if EVENT_DATA not in self.inventory:
-            if EVENT_DATA.is_large_human_pickup:
+        if event_data not in self.inventory:
+            if event_data.is_large_human_pickup:
                 # note - this will happen when a large_human_pickup is in another container
                 # for example if a fuel can is in a kubelwagen
                 # this does NOT happen when an object is picked up from the world as it is intercepted
                 # before it gets this far
 
                 #add to world. (the object was in a inventory array)
-                self.owner.world.add_queue.append(EVENT_DATA)
+                self.owner.world.add_queue.append(event_data)
 
-                self.large_pickup=EVENT_DATA
+                self.large_pickup=event_data
 
             else:
 
-                self.inventory.append(EVENT_DATA)
+                self.inventory.append(event_data)
 
-                if EVENT_DATA.is_gun :
+                if event_data.is_gun :
                     if self.primary_weapon!=None:
                         # drop the current obj and pick up the new one
                         self.handle_drop_object(self.primary_weapon)
                     if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.primary_weapon=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                    self.primary_weapon=event_data
+                    event_data.ai.equipper=self.owner
                     self.ai_want_gun=False
-                elif EVENT_DATA.is_throwable :
+                elif event_data.is_throwable :
                     if self.throwable==None:
                         if self.owner.is_player :
-                            self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                        self.throwable=EVENT_DATA
-                        EVENT_DATA.ai.equipper=self.owner
-                    if EVENT_DATA.is_grenade:
+                            self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                        self.throwable=event_data
+                        event_data.ai.equipper=self.owner
+                    if event_data.is_grenade:
                         self.ai_want_grenade=False
-                elif EVENT_DATA.is_handheld_antitank :
+                elif event_data.is_handheld_antitank :
                     if self.antitank!=None:
                         # drop the current obj and pick up the new one
                         self.handle_drop_object(self.antitank)
                     if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+EVENT_DATA.name + ' equipped ]')
-                    self.antitank=EVENT_DATA
-                    EVENT_DATA.ai.equipper=self.owner
+                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                    self.antitank=event_data
+                    event_data.ai.equipper=self.owner
                     self.ai_want_antitank=False
-                elif EVENT_DATA.is_consumable:
+                elif event_data.is_consumable:
                     self.ai_want_food=False
-                elif EVENT_DATA.is_medical:
+                elif event_data.is_medical:
                     self.ai_want_medical=False
-                elif EVENT_DATA.is_wearable:
-                    if EVENT_DATA.wearable_region=='head':
+                elif event_data.is_wearable:
+                    if event_data.wearable_region=='head':
                         if self.wearable_head==None:
-                            self.wearable_head=EVENT_DATA
+                            self.wearable_head=event_data
         else:
-            print('ERROR - object '+EVENT_DATA.name+' is already in inventory')
+            print('ERROR - object '+event_data.name+' is already in inventory')
             print('inventory list:')
             for b in self.inventory:
                 print(' - ',b.name)
 
 
     #---------------------------------------------------------------------------
-    def event_remove_inventory(self,EVENT_DATA):
+    def event_remove_inventory(self,event_data):
         ''' remove object from inventory. does NOT add to world '''
 
-        if EVENT_DATA in self.inventory:
+        if event_data in self.inventory:
 
-            self.inventory.remove(EVENT_DATA)
+            self.inventory.remove(event_data)
             # NOTE - if this object is meant to be added to the world it should be done by whatever calls this
 
-            if self.primary_weapon==EVENT_DATA:
+            if self.primary_weapon==event_data:
                 self.primary_weapon=None
-                EVENT_DATA.ai.equipper=None
-            elif self.throwable==EVENT_DATA:
+                event_data.ai.equipper=None
+            elif self.throwable==event_data:
                 self.throwable=None
                 # equipper is used to figure out who threw the grenade
                 # need a better way to handle this in the future
                 #EVENT_DATA.ai.equipper=None
-            elif self.antitank==EVENT_DATA:
+            elif self.antitank==event_data:
                 self.antitank=None
-                EVENT_DATA.ai.equipper=None
-            elif self.large_pickup==EVENT_DATA:
+                event_data.ai.equipper=None
+            elif self.large_pickup==event_data:
                 print('ERROR - large pickup should not go through inventory functions')
-            elif self.wearable_head==EVENT_DATA:
+            elif self.wearable_head==event_data:
                 self.wearable_head=None
 
             # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
 
         else:
-            print('removal error - object not in inventory',EVENT_DATA.name)
+            print('removal error - object not in inventory',event_data.name)
 
     #---------------------------------------------------------------------------
     def fire(self,TARGET_COORDS,WEAPON):

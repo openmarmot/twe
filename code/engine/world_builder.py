@@ -52,6 +52,7 @@ from ai.ai_coffee_grinder import AICoffeeGrinder
 from ai.ai_animated_sprite import AIAnimatedSprite
 from ai.ai_wearable import AIWearable
 from ai.ai_battery import AIBattery
+from ai.ai_radio import AIRadio
 
 #global variables
 
@@ -1895,6 +1896,11 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='bomb_sc250'
         z.weight=250
         z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='battery_feldfunk_2v':
+        z=WorldObject(WORLD,['battery_vehicle_6v'],AIBattery)
+        z.name='Feldfunk 2V battery'
+        z.weight=3
+        z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='battery_vehicle_6v':
         z=WorldObject(WORLD,['battery_vehicle_6v'],AIBattery)
         z.name='battery_vehicle_6v'
@@ -1918,6 +1924,27 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.weight=0.98
         z.is_wearable=True
         z.wearable_region='head'
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='radio_feldfu_b':
+        # ref https://feldfunker-la7sna.com/wehrm_foto.htm
+        z=WorldObject(WORLD,['radio_feldfunk'],AIRadio)
+        z.name='Feldfunk.b'
+        z.is_radio=True
+        z.weight=15
+        #z.is_wearable=True
+        #z.wearable_region='head'
+        z.is_large_human_pickup=True
+        z.ai.frequency_range=[90.57,109.45]
+        z.ai.battery=spawn_object(WORLD,[0,0],"battery_feldfunk_2v",False)
+        z.rotation_angle=float(random.randint(0,359)) 
+    elif OBJECT_TYPE=='feldfunk_battery_charger':
+        # ref https://feldfunker-la7sna.com/wehrm_foto.htm
+        z=WorldObject(WORLD,['radio_feldfunk_charger'],AIRadio)
+        z.name='Feldfunk battery charger'
+        z.weight=15
+        #z.is_wearable=True
+        #z.wearable_region='head'
+        z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359)) 
 
     else:
