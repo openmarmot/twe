@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 30 2024
+-added is_pilot skill so the bots stop stealing planes
+- added properly positioned startup exhaust for all combustion vehicles 
+- added a bool for particle effects so they can have a specific render level 
+
+working with chatgpt to figure out the offset math and i was getting 
+nonsense results until i swapped x for y. i must have used something nonstandard 
+when i started writing the movement system. interesting 
+
+----------------------------------
 June 29 2024
 - radio menu fixes 
 - vehicle and radio and radio menu integration 

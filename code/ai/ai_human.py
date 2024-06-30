@@ -40,6 +40,11 @@ class AIHuman(AIBase):
         self.wearable_feet=None
         self.wearable_hand=None
 
+        # skills
+        self.is_pilot=False
+
+
+
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
 
@@ -2069,9 +2074,11 @@ class AIHuman(AIBase):
 
                 # this should be the case most of the time
                 else:
-                    b=self.owner.world.get_closest_vehicle(self.owner.world_coords,(self.max_walk_distance*0.6),self.squad.faction)
+                    b=self.owner.world.get_closest_vehicle(self.owner,(self.max_walk_distance*0.6))
                     if b!=None:
                         # get_closest_vehicle only returns vehicles that aren't full
+
+                        # won't return planes if not a pilot
 
                         # make the destination the vehicle destination so you will know where to go
                         self.ai_vehicle_destination=copy.copy(self.destination)

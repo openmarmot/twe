@@ -1611,6 +1611,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks[0].volume=114
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
         z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
@@ -1631,6 +1632,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
         fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"volkswagen_type_82_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[65,10]
         z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
         if random.randint(0,3)==1:
             mg=spawn_object(WORLD,[0,0],'mg34',False)
@@ -1700,6 +1702,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         fill_container(WORLD,z.ai.fuel_tanks[3],'gas_80_octane')
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
         z.ai.engines.append(spawn_object(WORLD,[0,0],"jumo_211",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[-10,65]
+        z.ai.engines[1].ai.exhaust_position_offset=[-10,-75]
         z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_24v",False))
 
     # this is only used briefly until the player picks a spawn type
@@ -1767,6 +1771,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         w=[WORLD_COORDS[0]+float(random.randint(-7,7)),WORLD_COORDS[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_smoke'
+        z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15
         z.ai.rotation_speed=random.randint(400,500)

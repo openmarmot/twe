@@ -63,6 +63,19 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
 
 
 #------------------------------------------------------------------------------
+def calculate_relative_position(coords,rotation,offset):
+	''' calculate a position based on a offset and a given coordinate and rotation'''
+	# Rotate the offset
+	# Convert angle from degrees to radians
+	angle_radians = math.radians(rotation)
+	# Calculate the new offset after rotation
+	# note y and x are flopped for this to work. my coordinates must be backwards
+	dy_new = offset[0] * math.cos(angle_radians) - offset[1] * math.sin(angle_radians)
+	dx_new = offset[0] * math.sin(angle_radians) + offset[1] * math.cos(angle_radians)
+
+	return [coords[0]+dx_new,coords[1]+dy_new]
+
+#------------------------------------------------------------------------------
 def checkCollisionCircleMouse(mouse_coords, radius, collision_list):
 	''' collision check modified for mouse screen coords'''
 	# modified collision check for screen coords 

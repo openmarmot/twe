@@ -27,6 +27,9 @@ class AIEngine(AIBase):
         # list of acceptable fuels
         self.fuel_type = []
 
+        # this is going to be vehicle specific
+        self.exhaust_position_offset=[0,0]
+
         # fuel consumptuion as liters per second
         self.fuel_consumption_rate=0
 
