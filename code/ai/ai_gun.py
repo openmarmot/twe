@@ -76,7 +76,7 @@ class AIGun(AIBase):
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
 
     #---------------------------------------------------------------------------
-    def fire(self,WORLD_COORDS,TARGET_COORDS):
+    def fire(self,world_coords,target_coords):
         ''' fire the gun. returns True/False as to whether the gun fired '''
         fired=False
         # check that we have a magazine loaded
@@ -107,9 +107,9 @@ class AIGun(AIBase):
                         projectile.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
                         projectile.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
                     else :
-                        dst=[TARGET_COORDS[0]+spread[0],TARGET_COORDS[1]+spread[1]]
-                        projectile.rotation_angle=engine.math_2d.get_rotation(WORLD_COORDS,dst)
-                        projectile.heading=engine.math_2d.get_heading_vector(WORLD_COORDS,dst)
+                        dst=[target_coords[0]+spread[0],target_coords[1]+spread[1]]
+                        projectile.rotation_angle=engine.math_2d.get_rotation(world_coords,dst)
+                        projectile.heading=engine.math_2d.get_heading_vector(world_coords,dst)
 
                     self.owner.world.add_queue.append(projectile)
 
@@ -120,10 +120,10 @@ class AIGun(AIBase):
 
                     # spawn bullet case
                     if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
-                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'steel_case',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,world_coords,'steel_case',True)
                         z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
                     elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
-                        z=engine.world_builder.spawn_object(self.owner.world,WORLD_COORDS,'brass',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,world_coords,'brass',True)
                         z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
         return fired

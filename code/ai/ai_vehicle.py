@@ -222,18 +222,18 @@ class AIVehicle(AIBase):
         self.elevator=1
 
     #---------------------------------------------------------------------------
-    def handle_event(self, EVENT, EVENT_DATA):
+    def handle_event(self, event, event_data):
         ''' overrides base handle_event'''
         # EVENT - text describing event
-        # EVENT_DATA - most likely a world_object but could be anything
+        # event_data - most likely a world_object but could be anything
 
         # not sure what to do here yet. will have to think of some standard events
-        if EVENT=='add_inventory':
-            self.event_add_inventory(EVENT_DATA)
-        elif EVENT=='collision':
-            self.event_collision(EVENT_DATA)
-        elif EVENT=='remove_inventory':
-            self.event_remove_inventory(EVENT_DATA)
+        if event=='add_inventory':
+            self.event_add_inventory(event_data)
+        elif event=='collision':
+            self.event_collision(event_data)
+        elif event=='remove_inventory':
+            self.event_remove_inventory(event_data)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 

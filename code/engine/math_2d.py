@@ -63,7 +63,7 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
 
 
 #------------------------------------------------------------------------------
-def checkCollisionCircleMouse(MOUSE_COORDS, RADIUS, COLLISION_LIST):
+def checkCollisionCircleMouse(mouse_coords, radius, collision_list):
 	''' collision check modified for mouse screen coords'''
 	# modified collision check for screen coords 
 	# radius is used for both objects because screen coords perspective 
@@ -71,11 +71,11 @@ def checkCollisionCircleMouse(MOUSE_COORDS, RADIUS, COLLISION_LIST):
 	# called by world.select_with_mouse at the moment
 
 	collided=None
-	for b in COLLISION_LIST:
+	for b in collision_list:
 
-		distance=get_distance(MOUSE_COORDS,b.screen_coords)
+		distance=get_distance(mouse_coords,b.screen_coords)
 
-		if distance < (RADIUS*2):
+		if distance < (radius*2):
 			collided=b
 			break
 	return collided
@@ -102,13 +102,13 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 	return collided
 
 #-----------------------------------------------------------------------------
-def collision_sort(RUNS,WO_OBJECTS):
+def collision_sort(runs,wo_objects):
 	''' moves around objects so they no longer collide'''
 	# RUNS - number of runs through the resort algo you want to do. probably >100
 	# WO_OBJECTS - list of objects to sort
-	for x in range(RUNS):
-		for a in WO_OBJECTS:
-			if checkCollisionCircleOneResult(a,WO_OBJECTS,[a]) !=None:
+	for x in range(runs):
+		for a in wo_objects:
+			if checkCollisionCircleOneResult(a,wo_objects,[a]) !=None:
                 #collided. lets move the building in a super intelligent way
 				a.world_coords[0]+=float(random.randint(-100,100))
 				a.world_coords[1]+=float(random.randint(-100,100))
@@ -161,10 +161,10 @@ def get_heading_vector(location,destination):
 	return heading 
 
 #--------------------------------------------------------------------------------
-def get_heading_from_rotation(ROTATION):
+def get_heading_from_rotation(rotation):
 	''' get heading vector. input is rotation in degrees'''
 
-	r=math.radians(ROTATION)
+	r=math.radians(rotation)
 	b=[math.degrees(-math.sin(r)),-math.degrees(math.cos(r))]
 	return get_normalized(b)
 

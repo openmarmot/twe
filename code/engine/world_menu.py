@@ -1027,11 +1027,17 @@ class World_Menu(object):
                 currentRole='Gunner'
             if self.selected_object.ai.primary_weapon!=None:
                 primaryWeapon=self.selected_object.ai.primary_weapon.name
+
+            radio=False
+            if self.selected_object.ai.radio!=None:
+                radio=True
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
+            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
+            if radio:
+                self.world.graphic_engine.menu_text_queue.append('Radio : '+self.selected_object.ai.radio.name)
             if len(self.selected_object.ai.engines)>0:
                 self.world.graphic_engine.menu_text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
             self.world.graphic_engine.menu_text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
@@ -1039,6 +1045,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('2 - exit vehicle ')
             self.world.graphic_engine.menu_text_queue.append('3 - engine menu')
             self.world.graphic_engine.menu_text_queue.append('4 - toggle HUD')
+            if radio:
+                self.world.graphic_engine.menu_text_queue.append('5 - radio')
             if Key=='1':
                 self.change_menu('change_vehicle_role')
             if Key=='2':
@@ -1054,6 +1062,9 @@ class World_Menu(object):
                 self.world.display_vehicle_text=not self.world.display_vehicle_text
                 #refresh the text
                 self.vehicle_menu('none')
+            if Key=='5' and radio:
+                self.selected_object=self.selected_object.ai.radio
+                self.change_menu('radio_menu')
 
     #---------------------------------------------------------------------------
     def update(self):

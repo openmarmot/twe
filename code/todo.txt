@@ -1,23 +1,36 @@
 
 ========= Code Cleanup ================================
-- i need to pick a style. maybe try PEP8?
---- need to write a simplified style guide as i never remember this stuff 
+- need to clean up old capalized function parameters and replace with lowercase 
 
 
 ======== Engine Stuff ====================================
 
 - need terrain tiling engine 
+- armor and armor penetration calculation 
+- fix zoom levels.
+    - need more zoom in both directions if possible 
 
 
 ======== Tactical Mode Stuff =============================
 
-# ai behavior to add or fix 
-- driving vehicles 
+ai_human 
+- more wearables
+- some sort of task engine
+- morale
 
-# items 
-- bicycle 
-- seats 
+radio 
+- contact tactical ai 
+- contact local squads 
+
+mini map 
+
+aviation
+- parachute 
+- damage from impacting the ground wrong 
+- fix relative zoom 
 
 
 
 ======= Strategic Mode (MAP) Stuff =======================
+
+this is completely unimplemented

@@ -66,46 +66,46 @@ class AIContainer(AIBase):
                 pass
 
     #---------------------------------------------------------------------------
-    def event_add_inventory(self,EVENT_DATA):
+    def event_add_inventory(self,event_data):
 
         # merge liquids 
-        if EVENT_DATA.is_liquid:
+        if event_data.is_liquid:
             existing_liquid=None
             for b in self.inventory:
-                if b.name==EVENT_DATA.name:
-                    existing_liquid=EVENT_DATA
+                if b.name==event_data.name:
+                    existing_liquid=event_data
             
             if existing_liquid==None:
                 # no existing liquid so just add the new liquid
-                self.inventory.add(EVENT_DATA)
+                self.inventory.add(event_data)
             else:
                 #combine them
-                existing_liquid.volume+=EVENT_DATA.volume
+                existing_liquid.volume+=event_data.volume
 
         else:
-            self.inventory.append(EVENT_DATA)
+            self.inventory.append(event_data)
     
     #---------------------------------------------------------------------------
-    def event_remove_inventory(self,EVENT_DATA):
+    def event_remove_inventory(self,event_data):
 
-        if EVENT_DATA in self.inventory:
+        if event_data in self.inventory:
 
             # make sure the obj world_coords reflect the obj that had it in inventory
-            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
+            event_data.world_coords=copy.copy(self.owner.world_coords)
 
-            self.inventory.remove(EVENT_DATA)
+            self.inventory.remove(event_data)
 
     #---------------------------------------------------------------------------
-    def handle_event(self, EVENT, EVENT_DATA):
+    def handle_event(self, event, event_data):
         ''' overrides base handle_event'''
-        # EVENT - text describing event
-        # EVENT_DATA - most likely a world_object but could be anything
+        # event - text describing event
+        # event_data - most likely a world_object but could be anything
 
-        if EVENT=='add_inventory':
-            self.event_add_inventory(EVENT_DATA)
+        if event=='add_inventory':
+            self.event_add_inventory(event_data)
         #elif EVENT=='collision':
-        #    self.event_collision(EVENT_DATA)
-        elif EVENT=='remove_inventory':
-            self.event_remove_inventory(EVENT_DATA)
+        #    self.event_collision(event_data)
+        elif event=='remove_inventory':
+            self.event_remove_inventory(event_data)
         else:
-            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
+            print('Error: '+self.owner.name+' cannot handle event '+event)

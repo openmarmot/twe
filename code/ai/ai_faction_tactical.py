@@ -20,7 +20,7 @@ import engine.math_2d
 #global variables
 
 class AIFactionTactical(object):
-    def __init__(self,WORLD,FACTION):
+    def __init__(self,world,faction):
 
         # squads waiting to enter the map
         # format for this is [[spawn_coordinates,squad]]
@@ -37,7 +37,7 @@ class AIFactionTactical(object):
 
         # general map goal (attack/defend/scout ?)
 
-        self.world=WORLD
+        self.world=world
 
         # should be higher than think_rate to get an immediate think
         self.time_since_update=70
@@ -48,7 +48,7 @@ class AIFactionTactical(object):
         self.think_rate=60
 
         # faction - german/soviet/american/civilian
-        self.faction=FACTION
+        self.faction=faction
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):

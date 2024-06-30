@@ -29,7 +29,7 @@ import os
 class Graphics_2D_Pygame(object):
     ''' 2D Graphics Engine using PyGame '''
 
-    def __init__(self,Screen_size,World):
+    def __init__(self,Screen_size,world):
         # called by World.__init__
 
         self.images=dict()
@@ -60,7 +60,7 @@ class Graphics_2D_Pygame(object):
         # count of rendered objects
         self.renderCount=0
 
-        self.world=World
+        self.world=world
         
         # time stuff
         self.clock=pygame.time.Clock()
@@ -111,9 +111,9 @@ class Graphics_2D_Pygame(object):
         self.load_all_images('images')
 
 #------------------------------------------------------------------------------
-    def add_text(self,TEXT):
+    def add_text(self,text):
         ''' add text to the text queue'''
-        self.text_queue.append(TEXT)
+        self.text_queue.append(text)
         if len(self.text_queue)<4:
             self.time_since_last_text_clear=-1
 
@@ -386,7 +386,7 @@ class Graphics_2D_Pygame(object):
         return [self.screen_size[0]/2,self.screen_size[1]/2]
 
 #------------------------------------------------------------------------------
-    def get_rotated_scaled_image(self, image, IMAGE_SIZE, angle):
+    def get_rotated_scaled_image(self, image, image_size, angle):
         """
         rotate an image while keeping its center and size
         image must be square
@@ -405,7 +405,7 @@ class Graphics_2D_Pygame(object):
         rot_rect = orig_rect.copy()
         rot_rect.center = rot_image.get_rect().center
         rot_image = rot_image.subsurface(rot_rect).copy()
-        resize_image=pygame.transform.scale(rot_image,IMAGE_SIZE)
+        resize_image=pygame.transform.scale(rot_image,image_size)
         return resize_image
     
 #------------------------------------------------------------------------------

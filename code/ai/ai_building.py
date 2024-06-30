@@ -47,25 +47,25 @@ class AIBuilding(AIBase):
             
 
     #---------------------------------------------------------------------------
-    def event_collision(self,EVENT_DATA):
-        if EVENT_DATA.is_projectile:
+    def event_collision(self,event_data):
+        if event_data.is_projectile:
             #self.health-=random.randint(25,75)
-            engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
-        elif EVENT_DATA.is_grenade:
+            engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
+        elif event_data.is_grenade:
             print('The mighty building laughs at your puny grenade')
 
 
     #---------------------------------------------------------------------------
-    def handle_event(self, EVENT, EVENT_DATA):
+    def handle_event(self, EVENT, event_data):
         ''' overrides base handle_event'''
         # EVENT - text describing event
-        # EVENT_DATA - most likely a world_object but could be anything
+        # event_data - most likely a world_object but could be anything
 
         # not sure what to do here yet. will have to think of some standard events
         if EVENT=='add_inventory':
-            #self.event_add_inventory(EVENT_DATA)
+            #self.event_add_inventory(event_data)
             pass
         elif EVENT=='collision':
-            self.event_collision(EVENT_DATA)
+            self.event_collision(event_data)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)

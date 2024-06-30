@@ -3,6 +3,8 @@ TWE Project : Change Log
 ----------------------------------
 June 29 2024
 - radio menu fixes 
+- vehicle and radio and radio menu integration 
+- misc code cleanup 
 
 ----------------------------------
 June 26 2024
