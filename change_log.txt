@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 01 2024
+- added the Sd.Kfz.251 half track 
+- 'meeting engagement' scenario now has the german reinforcements 
+changed from fallshirmjager to panzergrenadier with sd.kfz.251
+
+the sd.kfz.251 is incomplete. for now it basically is a copy of the US GMC truck 
+stat wise. It is going to be the test bed vehicle for turrets and the armor system.
+
+
+----------------------------------
 June 30 2024
 -added is_pilot skill so the bots stop stealing planes
 - added properly positioned startup exhaust for all combustion vehicles 
@@ -9,6 +19,10 @@ June 30 2024
 working with chatgpt to figure out the offset math and i was getting 
 nonsense results until i swapped x for y. i must have used something nonstandard 
 when i started writing the movement system. interesting 
+
+next 
+- model a vehicle that has a turret 
+- add a special rare civilian pilot 
 
 ----------------------------------
 June 29 2024

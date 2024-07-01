@@ -120,10 +120,6 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.members.append(spawn_soldiers(WORLD,'soviet_mosin_nagant'))
         s.starting_vehicles.append(spawn_object(WORLD,[0,0],'dodge_g505_wc',False))
-        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
-        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
-        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
-        #s.starting_vehicles.append(spawn_object(WORLD,[0,0],'kubelwagen',False))
     elif SQUAD_TYPE=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -146,7 +142,19 @@ def create_standard_squad(WORLD,SQUAD_TYPE):
         s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.members.append(spawn_soldiers(WORLD,'german_k43'))
+    elif SQUAD_TYPE=='german 1944 panzergrenadier':
+        s.faction='german'
+        s.members.append(spawn_soldiers(WORLD,'german_k43'))
+        s.members.append(spawn_soldiers(WORLD,'german_k43'))
+        s.members.append(spawn_soldiers(WORLD,'german_mg34')) # machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k')) # asst machine gunner
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust'))
+        s.members.append(spawn_soldiers(WORLD,'german_kar98k_panzerfaust'))
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust'))
+        s.members.append(spawn_soldiers(WORLD,'german_stg44_panzerfaust'))
         s.members.append(spawn_soldiers(WORLD,'german_kar98k'))
+        s.starting_vehicles.append(spawn_object(WORLD,[0,0],'sd_kfz_251',False))
     elif SQUAD_TYPE=='german 1944 volksgrenadier fire group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944
@@ -559,8 +567,8 @@ def load_test_environment(world,scenario):
         
         # add german reinforcements
         time=random.randint(120,500)
-        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
-        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 fallschirmjager')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 panzergrenadier')]])
+        world.reinforcements.append([time,'german',[world.spawn_west,create_standard_squad(world,'german 1944 panzergrenadier')]])
 
         # add soviets
         world.soviet_ai.squad_spawn_queue.append([world.spawn_far_east,create_standard_squad(world,'soviet 1944 rifle motorized')])
@@ -1618,6 +1626,41 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='sd_kfz_251':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(WORLD,['sd_kfz_251','sd_kfz_251'],AIVehicle)
+        z.name='Sd.Kfz.251'
+        z.is_vehicle=True
+        z.ai.max_occupants=10
+        z.ai.max_speed=200
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=2380
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(WORLD,[0,0],"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(WORLD,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(WORLD,[0,0],"chrysler_flathead_straight_6_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(WORLD,[0,0],"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
+        z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+
+        # for now. eventually will get dedicaated turrets 
+        if random.randint(0,3)==1:
+            mg=spawn_object(WORLD,[0,0],'mg34',False)
+            z.ai.primary_weapon=mg
+            z.add_inventory(mg)
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
+
     elif OBJECT_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
@@ -1638,6 +1681,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
             mg=spawn_object(WORLD,[0,0],'mg34',False)
             z.ai.primary_weapon=mg
             z.add_inventory(mg)
+            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
             z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
         z.add_inventory(spawn_object(WORLD,[0,0],"german_fuel_can",False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))

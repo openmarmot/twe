@@ -331,6 +331,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('2 - Red Bicycle ')
             self.world.graphic_engine.menu_text_queue.append('3 - Ju88 ')
             self.world.graphic_engine.menu_text_queue.append('4 - Dodge G505 Weapons Carrier ')
+            self.world.graphic_engine.menu_text_queue.append('5 - sd_kfz_251 ')
             if Key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif Key=='2':
@@ -339,6 +340,8 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ju88',True)
             elif Key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'dodge_g505_wc',True)
+            elif Key=='5':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'sd_kfz_251',True)
         if self.menu_state=='spawn_weapons':
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Weapons --')
