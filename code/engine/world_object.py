@@ -109,6 +109,7 @@ class WorldObject(object):
         self.is_projectile=False
         self.is_consumable=False
         self.is_medical=False # general medical objects. bandage / pain pills / etc
+        self.is_particle_effect=False # smoke/whatever. used to set a higher z level
         
         self.is_building=False
         self.is_map_pointer=False
@@ -177,6 +178,8 @@ class WorldObject(object):
             self.render_level=3
         elif self.is_building:
             self.render_level=1
+        elif self.is_particle_effect:
+            self.render_level=4
         else:
             self.render_level=2
             
