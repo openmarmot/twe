@@ -1603,6 +1603,8 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='dodge_g505_wc':
+        # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
+        # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
         z=WorldObject(WORLD,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
@@ -1636,7 +1638,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=2380
+        z.weight=7800
         z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5

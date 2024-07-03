@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 02 2024
+- updated sd.kfz.251 weight
+
+thinking about creating penetration data in the same way as 
+projectile data but didn't get far. 
+probably have distances rounded to the nearest 100 and provide penetration 
+data out to 1500 or so. 
+
+distances present a issue as the zoom only goes out so far.. 
+
 ----------------------------------
 July 01 2024
 - added the Sd.Kfz.251 half track 
@@ -8,7 +20,6 @@ changed from fallshirmjager to panzergrenadier with sd.kfz.251
 
 the sd.kfz.251 is incomplete. for now it basically is a copy of the US GMC truck 
 stat wise. It is going to be the test bed vehicle for turrets and the armor system.
-
 
 ----------------------------------
 June 30 2024

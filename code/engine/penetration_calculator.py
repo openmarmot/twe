@@ -24,6 +24,9 @@ loaded=False
 # {name:{projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count},}
 projectile_data={}
 
+# dictionary of weapon penetration data
+# {weapon:{distance:penetration,distance:penetration}}
+penetration_data=[]
 
 #---------------------------------------------------------------------------
 def check_passthrough(PROJECTILE,TARGET):
@@ -140,6 +143,7 @@ def load_projectile_data():
             projectile_data[key] = row_dict
 
         print('Projectile data load complete')
+        #print(projectile_data)
         loaded=True
 
     else:
