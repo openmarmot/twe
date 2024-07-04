@@ -19,7 +19,9 @@ from ai.ai_base import AIBase
 class AIWearable(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
-
+        # head / whatever
+        self.wearable_region='none'
+        # thickness of armor grade steel in mm
         self.armor_thickness=0
 
     #---------------------------------------------------------------------------

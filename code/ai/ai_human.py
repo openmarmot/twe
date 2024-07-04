@@ -350,7 +350,7 @@ class AIHuman(AIBase):
                 elif event_data.is_medical:
                     self.ai_want_medical=False
                 elif event_data.is_wearable:
-                    if event_data.wearable_region=='head':
+                    if event_data.ai.wearable_region=='head':
                         if self.wearable_head==None:
                             self.wearable_head=event_data
         else:

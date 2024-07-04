@@ -1968,14 +1968,16 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='helmet_stahlhelm'
         z.weight=0.98
         z.is_wearable=True
-        z.wearable_region='head'
+        z.ai.wearable_region='head'
+        z.ai.armor_thickness=3
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='helmet_ssh40':
         z=WorldObject(WORLD,['helmet_ssh40'],AIWearable)
         z.name='helmet_ssh40'
         z.weight=0.98
         z.is_wearable=True
-        z.wearable_region='head'
+        z.ai.wearable_region='head'
+        z.ai.armor_thickness=2
         z.rotation_angle=float(random.randint(0,359))
     elif OBJECT_TYPE=='radio_feldfu_b':
         # ref https://feldfunker-la7sna.com/wehrm_foto.htm
@@ -1983,8 +1985,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.name='Feldfunk.b'
         z.is_radio=True
         z.weight=15
-        #z.is_wearable=True
-        #z.wearable_region='head'
         z.is_large_human_pickup=True
         z.ai.frequency_range=[90.57,109.45]
         z.ai.battery=spawn_object(WORLD,[0,0],"battery_feldfunk_2v",False)
@@ -1994,8 +1994,6 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['radio_feldfunk_charger'],AIRadio)
         z.name='Feldfunk battery charger'
         z.weight=15
-        #z.is_wearable=True
-        #z.wearable_region='head'
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359)) 
 

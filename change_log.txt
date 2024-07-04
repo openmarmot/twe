@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 04 2024
+- updated helmet armor values 
+- minor updates to wearable variables 
+
+
+----------------------------------
 July 03 2024
 - added penetration data at 500 increment ranges to projectile_data
 - added armor values for vehicles and wearables 
