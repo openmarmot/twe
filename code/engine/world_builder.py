@@ -1633,6 +1633,7 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z=WorldObject(WORLD,['sd_kfz_251','sd_kfz_251'],AIVehicle)
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
+        z.ai.armor_thickness=13
         z.ai.max_occupants=10
         z.ai.max_speed=200
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control

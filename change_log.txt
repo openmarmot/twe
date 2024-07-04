@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+----------------------------------
+July 03 2024
+- added penetration data at 500 increment ranges to projectile_data
+- added armor values for vehicles and wearables 
+- rewrite of collision handling and projectile collision decision tree 
+
+I was going to rewrite the projectile passthrough code but decided to keep 
+it for now - with the difference that now a projectile has to penetrate in order 
+to hit the passthrough check. I think passthrough chances are likely too high overall.
+
+did a hack job on human damage as the armor saves are now calculated in penetration_calculator.
+need to think about and redo this section.
 
 ----------------------------------
 July 02 2024

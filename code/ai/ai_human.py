@@ -164,31 +164,8 @@ class AIHuman(AIBase):
         hit=random.randint(1,5)
         if hit==1:
             #head
-            if self.wearable_hand==None:
-                if projectile.name=='shrapnel':
-                    self.health-=random.randint(50,100)
-                    bleeding_hit=True
-                else:
-                    self.health-=random.randint(90,150)
-                    bleeding_hit=True
-            else:
-                # wearing a helmet 
-                if projectile.name=='shrapnel':
-                    save_roll=random.randint(1,2)
-                    if save_roll==1:
-                        # glances off, minor damage
-                        self.health-=1
-                    else:
-                        self.health-=random.randint(10,30)
-                        bleeding_hit=True
-                else:
-                    save_roll=random.randint(1,3)
-                    if save_roll==1:
-                        # glancing hit
-                        self.health-=random.randint(1,10)
-                    else:
-                        self.health-=random.randint(50,100)
-                        bleeding_hit=True
+            self.health-=random.randint(85,100)
+            bleeding_hit=True
                 
         elif hit==2:
             #upper body
@@ -200,7 +177,7 @@ class AIHuman(AIBase):
             bleeding_hit=True
         elif hit==4:
             # feet
-            self.health-=random.randint(30,400)
+            self.health-=random.randint(30,40)
             bleeding_hit=True
         elif hit==5:
             # hands

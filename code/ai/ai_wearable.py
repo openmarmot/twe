@@ -20,6 +20,8 @@ class AIWearable(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
+        self.armor_thickness=0
+
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
