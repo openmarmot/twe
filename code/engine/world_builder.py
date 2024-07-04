@@ -513,7 +513,7 @@ def grid_spawn(WORLD,WORLD_COORDS,OBJECT_STRING,DIAMETER,COUNT):
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
     '''loads a magazine with bullets'''
-    count=0
+    count=len(magazine.ai.projectiles)
     while count<magazine.ai.capacity:
         z=spawn_object(world,[0,0],'projectile',False)
         z.ai.projectile_type=magazine.ai.compatible_projectiles[0]

@@ -4,7 +4,28 @@ TWE Project : Change Log
 July 04 2024
 - updated helmet armor values 
 - minor updates to wearable variables 
+- rewrite of the magazine loading function to hopefully fix a bug 
+where magazines occasionally end up way over capacity
+- misc cleanup and refactoring in ai_human 
+- fixed what i think was causing a replenish ammo loop 
+- bumped up the 'can't move because personal enemy' check from 400 to 500 distance
+    - this check seems important but also causes a ton of issues when movement is critical
 
+# need to fix this 
+
+debug : getting ammo
+
+  - weapon: mg34
+  -- ammo in gun: 50
+  -- ammo in inventory: 50
+  -- magazine count: 1
+debug: big cheese replenishing ammo
+
+
+now that vehicles are small arms immune this causes issues with excessive blocking of bullets
+especially of troops that just disembarked 
+
+the bug with vehicles getting stuck weaving back and forth when the angle is near 360 still exists 
 
 ----------------------------------
 July 03 2024

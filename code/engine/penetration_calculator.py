@@ -52,7 +52,7 @@ def calculate_penetration(projectile,target):
         if max_penetration>=target.ai.armor_thickness:
                 penetration=True
         else:
-            print('bounce!')
+            pass
             # maybe do a redirect here 
     else:
         penetration=True
