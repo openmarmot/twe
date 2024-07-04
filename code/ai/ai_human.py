@@ -164,31 +164,8 @@ class AIHuman(AIBase):
         hit=random.randint(1,5)
         if hit==1:
             #head
-            if self.wearable_hand==None:
-                if projectile.name=='shrapnel':
-                    self.health-=random.randint(50,100)
-                    bleeding_hit=True
-                else:
-                    self.health-=random.randint(90,150)
-                    bleeding_hit=True
-            else:
-                # wearing a helmet 
-                if projectile.name=='shrapnel':
-                    save_roll=random.randint(1,2)
-                    if save_roll==1:
-                        # glances off, minor damage
-                        self.health-=1
-                    else:
-                        self.health-=random.randint(10,30)
-                        bleeding_hit=True
-                else:
-                    save_roll=random.randint(1,3)
-                    if save_roll==1:
-                        # glancing hit
-                        self.health-=random.randint(1,10)
-                    else:
-                        self.health-=random.randint(50,100)
-                        bleeding_hit=True
+            self.health-=random.randint(85,100)
+            bleeding_hit=True
                 
         elif hit==2:
             #upper body
@@ -200,7 +177,7 @@ class AIHuman(AIBase):
             bleeding_hit=True
         elif hit==4:
             # feet
-            self.health-=random.randint(30,400)
+            self.health-=random.randint(30,40)
             bleeding_hit=True
         elif hit==5:
             # hands
@@ -373,7 +350,7 @@ class AIHuman(AIBase):
                 elif event_data.is_medical:
                     self.ai_want_medical=False
                 elif event_data.is_wearable:
-                    if event_data.wearable_region=='head':
+                    if event_data.ai.wearable_region=='head':
                         if self.wearable_head==None:
                             self.wearable_head=event_data
         else:
@@ -1130,6 +1107,15 @@ class AIHuman(AIBase):
                 if b.is_gun_magazine:
                     engine.world_builder.load_magazine(self.owner.world,b)
 
+            # load the magazine in the gun as well
+            if self.primary_weapon!=None:
+                if self.primary_weapon.ai.magazine!=None:
+                    engine.world_builder.load_magazine(self.owner.world,self.primary_weapon.ai.magazine)
+
+            self.ai_want_ammo=False
+
+            print('debug: '+self.owner.name+' replenishing ammo')
+
     #--------------------------------------------------------------------------
     def handle_squad_actions(self):
         '''handle various squad decisions. returns true/false if an action was taken'''
@@ -1229,7 +1215,7 @@ class AIHuman(AIBase):
             # add the new liquid to the container
             TO_OBJECT.add_inventory(z)
         else:
-            print('handle_transfer error: src/dest not recognized!')
+            print('error: handle_transfer error: src/dest not recognized!')
 
     #-----------------------------------------------------------------------
     def handle_vehicle_died(self):
@@ -1307,7 +1293,7 @@ class AIHuman(AIBase):
             self.speak('There is no where to sit!')
         else:
             if self.in_vehicle:
-                print('debug bot asked to enter vehicle but already in a vehicle')
+                print('error: bot asked to enter vehicle but already in a vehicle')
                 self.speak("I'm already in a vehicle")
             else:
                 distance=engine.math_2d.get_distance(self.owner.world_coords,VEHICLE.world_coords)
@@ -1327,7 +1313,7 @@ class AIHuman(AIBase):
         if self.in_vehicle:
             self.handle_exit_vehicle()
         else:
-            print('debug: asked to exit a vehicle, but not in a vehicle')
+            print('error: asked to exit a vehicle, but not in a vehicle')
             self.speak("I'm not in a vehicle")
 
     #-----------------------------------------------------------------------
@@ -1442,7 +1428,7 @@ class AIHuman(AIBase):
                 return True
             else: 
                 # curious how often this happens
-                print('warn - bot could not find ammo')
+                print('debug:  - bot could not find ammo')
                 return False
 
     #-----------------------------------------------------------------------
@@ -1653,7 +1639,7 @@ class AIHuman(AIBase):
                     else:
                         self.ai_want_ammo=True
 
-                        print('Error : out of ammo. need to handle this better')
+                        print('debug : thing_engage_close : out of ammo')
                         dm=self.owner.name
                         dm+=('\n  - weapon: '+self.primary_weapon.name)
                         dm+=('\n  -- ammo in gun: '+str(ammo[0]))
@@ -1705,24 +1691,18 @@ class AIHuman(AIBase):
                     if ammo[1]>0:
                         self.handle_reload(self.primary_weapon)
                     else:
-                        print('Error: (think_engage_far) out of ammo. need to handle this better')
                         self.ai_want_ammo=True
 
-                        dm=self.owner.name
-                        dm+=('\n  - weapon: '+self.primary_weapon.name)
-                        dm+=('\n  -- ammo in gun: '+str(ammo[0]))
-                        dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
-                        dm+=('\n  -- magazine count: '+str(ammo[2]))
-                        print(dm)
-
-                 # check if target is too far 
-                if DISTANCE >self.primary_weapon.ai.range :
-                    if self.prone:
-                        self.handle_prone_state_change()
-                    self.ai_goal='close_with_target'
-                    self.destination=copy.copy(self.target_object.world_coords)
-                    self.ai_state='start_moving'
-                    action=True
+                        self.reset_ai()
+                else:
+                    # check if target is too far 
+                    if DISTANCE >self.primary_weapon.ai.range :
+                        if self.prone:
+                            self.handle_prone_state_change()
+                        self.ai_goal='close_with_target'
+                        self.destination=copy.copy(self.target_object.world_coords)
+                        self.ai_state='start_moving'
+                        action=True
 
                 
     #-----------------------------------------------------------------------
@@ -1824,9 +1804,6 @@ class AIHuman(AIBase):
                 
                 # handle various squad actions
                 action=self.handle_squad_actions()
-
-                
-
 
                 if action==False:
                     if self.ai_want_food:
@@ -2090,7 +2067,7 @@ class AIHuman(AIBase):
                         pass
         else:
             # another fail safe to stop movement if we are possibly being attacked
-            if distance >400 and len(self.personal_enemies)>0:
+            if distance >500 and len(self.personal_enemies)>0:
                 self.think_generic()
                 print('debug : '+self.owner.name+' blocked from moving '+str(distance)+' by personal enemy count: '+ str(len(self.personal_enemies)))
             else:
@@ -2124,9 +2101,10 @@ class AIHuman(AIBase):
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
                 self.handle_replenish_ammo()
+                self.reset_ai()
         elif self.ai_goal=='close_with_target':
             if self.target_object==None:
-                print('warn: ai_goal is close_with_target but target is None')
+                print('error: ai_goal is close_with_target but target is None')
                 self.reset_ai()
             else:
                 # check if target is dead 

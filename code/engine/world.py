@@ -214,7 +214,7 @@ class World(object):
     #---------------------------------------------------------------------------
     def check_collision_return_object(self,collider,ignore_list, objects,consider_prone=False):
         ''' collision check. returns colliding object or None'''
-        # important - this function is what hands out collision events that result in damage
+        # note - this no longer hands out collision events 
 
         # collider - worldobject doing the colliding
         # ignore_list - list of objects to ignore
@@ -225,8 +225,7 @@ class World(object):
         if collided !=None:
             if collided.is_human:
                 if collided.ai.in_vehicle:
-                    # if in vehicle the vehicle handles the collision and damage
-                    collided.ai.vehicle.ai.handle_event("collision",collider)
+                    collided=collided.ai.vehicle
                 else:
                     # check if object misses due to prone
                     if consider_prone:
@@ -234,15 +233,6 @@ class World(object):
                         if chance==1:
                             # missed due to prone
                             collided=None
-                        else:
-                            # object hits. 
-                            collided.ai.handle_event("collision",collider)
-                    else:
-                        # not prone, object hits 100% of the time
-                        collided.ai.handle_event("collision",collider)
-            else:
-                # object is vehicle, building, whatever. handle the standard way
-                collided.ai.handle_event("collision",collider)
 
         return collided
     

@@ -129,8 +129,7 @@ class WorldObject(object):
 
         # wearables are clothing, helmets, etc 
         self.is_wearable=False
-        self.wearable_region='' # head/upper_body/ etc. see ai_human wearable_* parameters 
-
+        
         # ---- \ descriptor bools ----------------------------
 
         # AI where any unique code for the object is held

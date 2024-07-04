@@ -25,8 +25,43 @@ loaded=False
 projectile_data={}
 
 
+
 #---------------------------------------------------------------------------
-def check_passthrough(PROJECTILE,TARGET):
+def calculate_penetration(projectile,target):
+    '''calculate penetration, return bool'''
+    penetration=False
+    distance=engine.math_2d.get_distance(projectile.ai.starting_coords,target.world_coords)
+
+    # normalize distance to nearest 500
+    distance=round(distance/500)*500
+
+    # get penetration value for projectile at range
+    max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
+
+    if target.is_human:
+        body_part=random.randint(1,3)
+        if body_part==1:
+            if target.ai.wearable_head==None:
+                penetration=True
+            else:
+                if max_penetration>=target.ai.wearable_head.ai.armor_thickness:
+                    penetration=True
+        else:
+            penetration=True
+    elif target.is_vehicle:
+        if max_penetration>=target.ai.armor_thickness:
+                penetration=True
+        else:
+            pass
+            # maybe do a redirect here 
+    else:
+        penetration=True
+    
+    return penetration
+
+
+#---------------------------------------------------------------------------
+def check_passthrough(projectile,target):
     ''' returns bool as to whether or not a projectile passed through (over pen) an object '''
     global projectile_data
 
@@ -34,12 +69,12 @@ def check_passthrough(PROJECTILE,TARGET):
     # TARGET - world_object that is hit by the projectile
 
     passthrough=False
-    if TARGET.is_building:
-        passthrough=get_building_passthrough(PROJECTILE,TARGET)
-    elif TARGET.is_human:
-        passthrough=get_human_passthrough(PROJECTILE,TARGET)
-    elif TARGET.is_vehicle:
-        passthrough=get_vehicle_passthrough(PROJECTILE,TARGET)
+    if target.is_building:
+        passthrough=get_building_passthrough(projectile,target)
+    elif target.is_human:
+        passthrough=get_human_passthrough(projectile,target)
+    elif target.is_vehicle:
+        passthrough=get_vehicle_passthrough(projectile,target)
 
     return passthrough
 
@@ -121,8 +156,8 @@ def load_projectile_data():
         # Create a cursor object
         cursor = conn.cursor()
 
-        cursor.execute("SELECT name,projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count FROM projectile_data")
-
+        #cursor.execute("SELECT name,projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count FROM projectile_data")
+        cursor.execute("SELECT * FROM projectile_data")
         # Fetch all column names
         column_names = [description[0] for description in cursor.description]
 
@@ -140,6 +175,7 @@ def load_projectile_data():
             projectile_data[key] = row_dict
 
         print('Projectile data load complete')
+        #print(projectile_data)
         loaded=True
 
     else:

@@ -28,6 +28,9 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
+        # armor grade steel. standard soft aluminum/steel is a 0-1
+        self.armor_thickness=0 # in mm
+
         # --- components ---
 
         # array of engine objects

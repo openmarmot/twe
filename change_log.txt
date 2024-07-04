@@ -1,6 +1,57 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 04 2024
+- updated helmet armor values 
+- minor updates to wearable variables 
+- rewrite of the magazine loading function to hopefully fix a bug 
+where magazines occasionally end up way over capacity
+- misc cleanup and refactoring in ai_human 
+- fixed what i think was causing a replenish ammo loop 
+- bumped up the 'can't move because personal enemy' check from 400 to 500 distance
+    - this check seems important but also causes a ton of issues when movement is critical
+
+# need to fix this 
+
+debug : getting ammo
+
+  - weapon: mg34
+  -- ammo in gun: 50
+  -- ammo in inventory: 50
+  -- magazine count: 1
+debug: big cheese replenishing ammo
+
+
+now that vehicles are small arms immune this causes issues with excessive blocking of bullets
+especially of troops that just disembarked 
+
+the bug with vehicles getting stuck weaving back and forth when the angle is near 360 still exists 
+
+----------------------------------
+July 03 2024
+- added penetration data at 500 increment ranges to projectile_data
+- added armor values for vehicles and wearables 
+- rewrite of collision handling and projectile collision decision tree 
+
+I was going to rewrite the projectile passthrough code but decided to keep 
+it for now - with the difference that now a projectile has to penetrate in order 
+to hit the passthrough check. I think passthrough chances are likely too high overall.
+
+did a hack job on human damage as the armor saves are now calculated in penetration_calculator.
+need to think about and redo this section.
+
+----------------------------------
+July 02 2024
+- updated sd.kfz.251 weight
+
+thinking about creating penetration data in the same way as 
+projectile data but didn't get far. 
+probably have distances rounded to the nearest 100 and provide penetration 
+data out to 1500 or so. 
+
+distances present a issue as the zoom only goes out so far.. 
+
+----------------------------------
 July 01 2024
 - added the Sd.Kfz.251 half track 
 - 'meeting engagement' scenario now has the german reinforcements 
@@ -8,7 +59,6 @@ changed from fallshirmjager to panzergrenadier with sd.kfz.251
 
 the sd.kfz.251 is incomplete. for now it basically is a copy of the US GMC truck 
 stat wise. It is going to be the test bed vehicle for turrets and the armor system.
-
 
 ----------------------------------
 June 30 2024

@@ -90,13 +90,21 @@ class AIProjectile(AIBase):
                         # bullet has collided and exploded
                         self.contact_effect()
                     else:
-                        # bullet has collided, check if it over penetrates and keeps going
-                        if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
-                            # add the collided object to ignore list so we don't hit it again
-                            # this is mostly to deal with buildings where we would hit it a ton of times
-                            self.ignore_list.append(collide_obj)
+                        penetration=engine.penetration_calculator.calculate_penetration(self.owner,collide_obj)
+                        if penetration:
+                            collide_obj.ai.handle_event('collision',self.owner)
+                            # bullet has collided, check if it over penetrates and keeps going
+                            if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
+                                # add the collided object to ignore list so we don't hit it again
+                                # this is mostly to deal with buildings where we would hit it a ton of times
+                                self.ignore_list.append(collide_obj)
+                            else:
+                                # bullet stuck in something. remove bullet from world
+                                self.owner.world.remove_queue.append(self.owner) 
                         else:
-                            # bullet stuck in something. remove bullet from world
+                            # penetration fails! 
+                            # should probably have some sort of non-penetration event
+                            print('bonk!')
                             self.owner.world.remove_queue.append(self.owner) 
 
 
