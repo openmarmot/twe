@@ -190,6 +190,10 @@ def get_normalized(vec2):
 	except ZeroDivisionError:
 		pass
 	return b
+
+#------------------------------------------------------------------------------
+def get_normalized_angle(degrees):
+	return round(degrees % 360,2)
  
 #------------------------------------------------------------------------------
 def get_optimal_column_count(AMOUNT):
@@ -217,10 +221,12 @@ def get_rotation(coords, target_coords):
     
     # Convert the angle to degrees and ensure it's positive
     angle_deg = math.degrees(angle_rad)
-    if angle_deg < 0:
-        angle_deg += 360
         
-    return angle_deg
+    return get_normalized_angle(angle_deg)
+
+#------------------------------------------------------------------------------
+def get_round_vector_2(vector):
+	return [round(vector[0],2),round(vector[1],2)]
 
 #------------------------------------------------------------------------------
 def get_transfer_results(source_amount, destination_amount, destination_maximum):
@@ -256,7 +262,7 @@ def moveAlongVector(speed,location,heading,time_passed):
 	''' returns a location vector that has been moved along a heading vector'''
 	travel_distance=speed*time_passed
 	change=[heading[0]*travel_distance,heading[1]*travel_distance]
-	return [location[0]+change[0],location[1]+change[1]]
+	return get_round_vector_2([location[0]+change[0],location[1]+change[1]])
 
 
 #------------------------------------------------------------------------------
@@ -267,7 +273,7 @@ def moveTowardsTarget(speed,location,destination, time_passed):
 	# basically takes the minimum of distance or travel so as not to go past the target
 	travel_distance=min(distance,time_passed*speed)
 	change=[heading[0]*travel_distance,heading[1]*travel_distance]
-	return [location[0]+change[0],location[1]+change[1]]
+	return get_round_vector_2([location[0]+change[0],location[1]+change[1]])
 
 #------------------------------------------------------------------------------
 def randomize_position_and_rotation(worldobj,amount=15,):
@@ -296,7 +302,7 @@ def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
 	return var
 	
 #------------------------------------------------------------------------------
-def round_vector_2(vector):
+def get_round_vector_2(vector):
 	return [round(vector[0],2),round(vector[1],2)]
 
 

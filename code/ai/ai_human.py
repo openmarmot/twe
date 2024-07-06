@@ -2219,13 +2219,9 @@ class AIHuman(AIBase):
             v = self.vehicle.rotation_angle
 
             if r>v:
-                #self.vehicle.rotation_angle+=1*time_passed
-                #self.vehicle.reset_image=True
                 self.vehicle.ai.handle_steer_left()
                 self.ai_think_rate=0.01
             if r<v:
-                #self.vehicle.rotation_angle-=1*time_passed
-                #self.vehicle.reset_image=True
                 self.vehicle.ai.handle_steer_right()
                 self.ai_think_rate=0.01
             

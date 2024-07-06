@@ -53,6 +53,7 @@ from ai.ai_animated_sprite import AIAnimatedSprite
 from ai.ai_wearable import AIWearable
 from ai.ai_battery import AIBattery
 from ai.ai_radio import AIRadio
+from ai.ai_turret import AITurret
 
 #global variables
 
@@ -1653,17 +1654,31 @@ def spawn_object(WORLD,WORLD_COORDS,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_medical,False))
         z.add_inventory(get_random_from_list(WORLD,WORLD_COORDS,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
+        turret=spawn_object(WORLD,[0,0],'sd_kfz_251_mg34_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        # turret ammo, temporary 
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(WORLD,[0,0],"mg34_drum_magazine",False))
 
-        # for now. eventually will get dedicaated turrets 
-        if random.randint(0,3)==1:
-            mg=spawn_object(WORLD,[0,0],'mg34',False)
-            z.ai.primary_weapon=mg
-            z.add_inventory(mg)
-            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
-            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
-            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
-            z.add_inventory(spawn_object(WORLD,[0,0],"german_mg_ammo_can",False))
-
+        
+    elif OBJECT_TYPE=='sd_kfz_251_mg34_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(WORLD,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
+        z.name='Sd.Kfz.251 MG34 Turret'
+        z.is_turret=True
+        z.ai.position_offset=[-10,0]
+        z.ai.primary_weapon=spawn_object(WORLD,[0,0],'mg34',False)
+  
     elif OBJECT_TYPE=='kubelwagen':
         z=WorldObject(WORLD,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
