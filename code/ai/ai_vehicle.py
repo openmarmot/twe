@@ -33,6 +33,9 @@ class AIVehicle(AIBase):
 
         # --- components ---
 
+        # turrets - these are spawned and are in world 
+        self.turrets=[]
+
         # array of engine objects
         self.engines=[]
 
@@ -390,10 +393,13 @@ class AIVehicle(AIBase):
             if b.ai.engine_on:
                 total_engine_force+=b.ai.max_engine_force*b.ai.throttle_control
 
-        self.acceleration=engine.math_2d.calculate_acceleration(
-            total_engine_force,self.owner.rolling_resistance,
-            self.owner.drag_coefficient,self.owner.world.air_density,
-            self.owner.frontal_area,self.owner.weight)
+        # prevents this from going negative. but maybe we want that?
+        # 0 engine force could result in negative accelleration 
+        if total_engine_force>0:
+            self.acceleration=engine.math_2d.calculate_acceleration(
+                total_engine_force,self.owner.rolling_resistance,
+                self.owner.drag_coefficient,self.owner.world.air_density,
+                self.owner.frontal_area,self.owner.weight)
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
@@ -503,16 +509,15 @@ class AIVehicle(AIBase):
         #  reset image if heading has changed 
         if heading_changed:
             # normalize angles 
-            if self.owner.rotation_angle>360:
-                self.owner.rotation_angle=0
-            elif self.owner.rotation_angle<0:
-                self.owner.rotation_angle=360
+            self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
             self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
             self.owner.reset_image=True
 
 
         # move along vector
-        self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
+        if self.current_speed>0:
+            self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
+            
 
     
     #---------------------------------------------------------------------------

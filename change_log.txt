@@ -1,5 +1,25 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 06 2024
+- made a significantly better angle normalization function 
+- started working on turrets 
+- added rounding to some vector math, and some angle math 
+- fixed a vehicle issue where accelleration could be slightly negative with the engine off
+    this made sense but was unintended. brakes should be re-done to counteract and this should be 
+    re-enabled 
+- deleted deprecated 'art' folder 
+
+i think the rounding and angle normalization changes likely fixed a lot of odd quirks and bugs. 
+
+turrent positioning has a bit of wobble when vehicles are moving. could probably fix by having the 
+vehicle update the turret rather than having turret do it itself (potentially before the vehicle updates)
+but that would cause other complication.will think on it. should turret really be in the world ? 
+
+notes 
+- need to add more mg34 ammo container options like belts 
+
 ----------------------------------
 July 04 2024
 - updated helmet armor values 

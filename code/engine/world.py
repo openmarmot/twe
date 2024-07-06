@@ -769,7 +769,7 @@ class World(object):
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
-        self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.round_vector_2(self.player.world_coords)))
+        self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
         self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
