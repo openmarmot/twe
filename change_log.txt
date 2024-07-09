@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+----------------------------------
+July 08 2024
+- tweaking some parameters so ai with one spare
+magazine doesn't repeatedly try to refill ammo
+- added some checks to make sure the obj exists in the world to think_move_close 
 
 ----------------------------------
 July 06 2024

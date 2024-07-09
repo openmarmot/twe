@@ -2077,36 +2077,42 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def think_move_close(self,DISTANCE):
         ''' think about movement when you are close to the objective'''
-        # close is currently <200
+        # close is currently < self.max_walk_distance + no personal enemies
         # we are close to wherever we are going. don't worry about enemies too much
 
         if self.ai_goal=='pickup':
-            if DISTANCE<5:
-                self.handle_pickup_object(self.target_object)
+            if self.owner.world.check_object_exists(self.target_object):
+                if DISTANCE<5:
+                    self.handle_pickup_object(self.target_object)
+            else:
+                # object has been removed from world for whatever reason
+                self.reset_ai()
           
-        if self.ai_goal=='loot_container':
+        elif self.ai_goal=='loot_container':
             if DISTANCE<5:
                 self.think_loot_container(self.target_object)
 
         elif self.ai_goal=='enter_vehicle':
 
-            # vehicles move around a lot so gotta check
-            if self.destination!=self.target_object.world_coords:
-                self.destination=copy.copy(self.target_object.world_coords)
-                self.ai_state='start_moving'
+            if self.owner.world.check_object_exists(self.target_object):
+
+                # vehicles move around a lot so gotta check
+                if self.destination!=self.target_object.world_coords:
+                    self.destination=copy.copy(self.target_object.world_coords)
+                    self.ai_state='start_moving'
+                else:
+                    if DISTANCE<5:
+                        self.handle_enter_vehicle(self.target_object)
             else:
-                if DISTANCE<5:
-                    self.handle_enter_vehicle(self.target_object)
+                # object has been removed from world for whatever reason
+                self.reset_ai()
 
         elif self.ai_goal=='get_ammo':
             if DISTANCE<5:
                 self.handle_replenish_ammo()
                 self.reset_ai()
         elif self.ai_goal=='close_with_target':
-            if self.target_object==None:
-                print('error: ai_goal is close_with_target but target is None')
-                self.reset_ai()
-            else:
+            if self.owner.world.check_object_exists(self.target_object):
                 # check if target is dead 
                 if self.target_object.ai.health<1:
                     self.reset_ai()
@@ -2123,6 +2129,10 @@ class AIHuman(AIBase):
                         self.ai_goal='close_with_target'
                         self.destination=copy.copy(self.target_object.world_coords)
                         self.ai_state='start_moving'
+            else:
+                # object has been removed from world for whatever reason
+                self.reset_ai()
+
         elif self.ai_goal=='close_with_group':
             if DISTANCE<self.squad_min_distance:
                 self.ai_state='sleeping'
@@ -2163,25 +2173,17 @@ class AIHuman(AIBase):
         # upgrade clothes / armor
 
         # top off ammo ?
-        # note - if a bot doesn't have magazines for the gun then it will always trigger this
         if status==False and self.primary_weapon!=None:
             ammo=self.handle_check_ammo(self.primary_weapon)
             # check if we have extra magazines in inventory
             # - if we don't then it is somewhat pointless to get more ammo
-            if ammo[2]>0:
-                if ammo[1]<(ammo[0]*1.5):
+            if ammo[2]>0 :
+                if ammo[1]<(ammo[0]):
                     # basically if we have less ammo in our inventory than in our gun
-                    print('debug : getting ammo')
-                    dm=''
-                    dm+=('\n  - weapon: '+self.primary_weapon.name)
-                    dm+=('\n  -- ammo in gun: '+str(ammo[0]))
-                    dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
-                    dm+=('\n  -- magazine count: '+str(ammo[2]))
-                    print(dm)
                     status=self.take_action_get_ammo(True)
             else:
                 # no magazines, should we get a new gun?
-                pass
+                status=self.take_action_get_gun(True,False)
 
 
         return status
