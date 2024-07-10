@@ -96,10 +96,6 @@ class AIVehicle(AIBase):
         # set when a world_object claims the driver position. ai_human checks this to determine behavior
         self.driver=None
 
-        # set when a world_object claims the gunner position. ai_human checks this to determine behavior
-        self.gunner=None
-
-        self.primary_weapon=None
 
         # 
         self.inventory=[]
@@ -205,13 +201,6 @@ class AIVehicle(AIBase):
         dm+=(self.owner.name+' died.')
         dm+=('\n  - killed by : '+self.last_collision_description)
         
-        # i think primary weapons aren't a thing for vehicles at the moment
-        if self.primary_weapon!=None:
-            #ammo=self.handle_check_ammo(self.primary_weapon)
-            dm+=('\n  - weapon: '+self.primary_weapon.name)
-            #dm+=('\n  -- ammo in gun: '+str(ammo[0]))
-            #dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
-            #dm+=('\n  -- magazine count: '+str(ammo[2]))
 
         print(dm)
 
@@ -377,10 +366,6 @@ class AIVehicle(AIBase):
 
         # bring controls back to neutral slowly over time
         self.neutral_controls()
-
-        if self.primary_weapon!=None:
-            # needs updates for time tracking and other stuff
-            self.primary_weapon.update()
 
     
     #---------------------------------------------------------------------------

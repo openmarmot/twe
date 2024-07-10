@@ -93,6 +93,11 @@ class AIHuman(AIBase):
         self.ai_vehicle_goal='none'
         # a destination the ai wants to get to with the vehicle
         self.ai_vehicle_destination=None
+        # the job that the ai is performing in the vehicle
+        self.ai_vehicle_role=None # driver / gunner / passenger 
+        # the turret the human is controlling if they are a gunner
+        self.vehicle_turret=None
+
 
         self.in_building=False
         self.building_list=[] # list of buildings the ai is overlapping spatially
@@ -494,10 +499,11 @@ class AIHuman(AIBase):
         if self.in_vehicle:
 
             # remove from existing roles
-            if self.vehicle.ai.gunner==self.owner:
-                self.vehicle.ai.gunner=None
-                if self.vehicle.ai.primary_weapon!=None:
-                    self.vehicle.ai.primary_weapon.ai.equipper=None
+            for b in self.vehicle.ai.turrets:
+                if b.ai.gunner==self.owner:
+                    b.ai.gunner=None
+                    self.vehicle_turret=None
+
             if self.vehicle.ai.driver==self.owner:
                 self.vehicle.ai.driver=None
                 # turn on the brakes to prevent roll away
@@ -505,7 +511,10 @@ class AIHuman(AIBase):
 
             if ROLE=='driver':
                 if self.vehicle.ai.driver!=self.owner.world.player:
+                    if self.vehicle.ai.driver!=None:
+                        self.vehicle.ai.driver.ai.vehicle_ai_role=None
                     self.vehicle.ai.driver=self.owner
+                    self.ai_vehicle_role='driver'
                     self.speak("Taking over driving")
 
                     # check if anyone is trying to get in the vehicle
@@ -518,13 +527,13 @@ class AIHuman(AIBase):
                         self.react_asked_to_wait()
                     
             elif ROLE=='gunner':
-                if self.vehicle.ai.gunner!=self.owner.world.player:
-                    self.vehicle.ai.gunner=self.owner
-
-                    if self.vehicle.ai.primary_weapon!=None:
-                        self.vehicle.ai.primary_weapon.ai.equipper=self.owner
-
-                    self.speak("Taking over gunner position")
+                for b in self.vehicle.ai.turrets:
+                    if b.ai.gunner==None:
+                        self.speak("Taking over gunner position")
+                        b.ai.gunner=self.owner
+                        self.vehicle_turret=b
+                        self.ai_vehicle_role='gunner'
+                        break
 
             elif ROLE=='passenger':
                 # nothing to do here, roles already removed
@@ -697,12 +706,9 @@ class AIHuman(AIBase):
                     # human is hidden by top of vehicle so don't render
                     self.owner.render=False
 
-                if self.owner.is_player or self.vehicle.ai.driver==None:
+                if self.vehicle.ai.driver==None:
                     self.handle_change_vehicle_role('driver')
-                else:
-                    # not driver, how about gunner?
-                    if self.vehicle.ai.gunner==None:
-                        self.handle_change_vehicle_role('gunner')
+
 
     #---------------------------------------------------------------------------
     def handle_exit_vehicle(self):
@@ -880,65 +886,61 @@ class AIHuman(AIBase):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
         if self.in_vehicle:
 
-            if self.vehicle.is_airplane:
-                # ---- controls for airplanes ------------
-                if(self.owner.world.graphic_engine.keyPressed('w')):
-                    self.vehicle.ai.handle_elevator_up()
-                if(self.owner.world.graphic_engine.keyPressed('s')):
-                    self.vehicle.ai.handle_elevator_down()
-                    if self.owner.altitude<1:
-                        self.vehicle.ai.brake_power=1
-                if(self.owner.world.graphic_engine.keyPressed('a')):
-                    self.vehicle.ai.handle_aileron_left()
-                    self.vehicle.ai.handle_rudder_left()
-                    if self.owner.altitude<1:
-                        self.vehicle.ai.handle_steer_left()
-                if(self.owner.world.graphic_engine.keyPressed('d')):
-                    self.vehicle.ai.handle_aileron_right()
-                    self.vehicle.ai.handle_rudder_right()
-                    if self.owner.altitude<1:
-                        self.vehicle.ai.handle_steer_right()
-                if(self.owner.world.graphic_engine.keyPressed('up')):
-                    print('up')
-                if(self.owner.world.graphic_engine.keyPressed('down')):
-                    print('down')
-                if(self.owner.world.graphic_engine.keyPressed('left')):
-                    self.vehicle.ai.handle_throttle_down()
-                if(self.owner.world.graphic_engine.keyPressed('right')):
-                    self.vehicle.ai.handle_throttle_up()
-            else:
-                # ---- controls for ground vehicles ------------
+            if self.ai_vehicle_role=='driver':
 
-                if(self.owner.world.graphic_engine.keyPressed('w')):
-                    self.vehicle.ai.throttle=1
-                    self.vehicle.ai.brake_power=0
-
-                if(self.owner.world.graphic_engine.keyPressed('s')):
-                    self.vehicle.ai.brake_power=1
-                    self.vehicle.ai.throttle=0
-
-                if(self.owner.world.graphic_engine.keyPressed('a')):
-                    self.vehicle.ai.handle_steer_left()
-
-                if(self.owner.world.graphic_engine.keyPressed('d')):
-                    self.vehicle.ai.handle_steer_right()
-
-            # ---- controls for all vehicles ------------
-            if(self.owner.world.graphic_engine.keyPressed('f')):
-                #print('pew!')
-                # fire the gun
-                if self.vehicle.ai.gunner==self.owner:
-                    if self.vehicle.ai.primary_weapon!=None:
-                        self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.vehicle.ai.primary_weapon)
-                    else:
-                        print('no vehicle weapon')
-                        # fire our own weapon
-                        if self.primary_weapon!=None:
-                            self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
-                        else:
-                            print('no vehicle gun, no personal gun')
+                if self.vehicle.is_airplane:
+                    # ---- controls for airplanes ------------
+                    if(self.owner.world.graphic_engine.keyPressed('w')):
+                        self.vehicle.ai.handle_elevator_up()
+                    if(self.owner.world.graphic_engine.keyPressed('s')):
+                        self.vehicle.ai.handle_elevator_down()
+                        if self.owner.altitude<1:
+                            self.vehicle.ai.brake_power=1
+                    if(self.owner.world.graphic_engine.keyPressed('a')):
+                        self.vehicle.ai.handle_aileron_left()
+                        self.vehicle.ai.handle_rudder_left()
+                        if self.owner.altitude<1:
+                            self.vehicle.ai.handle_steer_left()
+                    if(self.owner.world.graphic_engine.keyPressed('d')):
+                        self.vehicle.ai.handle_aileron_right()
+                        self.vehicle.ai.handle_rudder_right()
+                        if self.owner.altitude<1:
+                            self.vehicle.ai.handle_steer_right()
+                    if(self.owner.world.graphic_engine.keyPressed('up')):
+                        print('up')
+                    if(self.owner.world.graphic_engine.keyPressed('down')):
+                        print('down')
+                    if(self.owner.world.graphic_engine.keyPressed('left')):
+                        self.vehicle.ai.handle_throttle_down()
+                    if(self.owner.world.graphic_engine.keyPressed('right')):
+                        self.vehicle.ai.handle_throttle_up()
                 else:
-                    print('you arent the gunner!')
+                    # ---- controls for ground vehicles ------------
+
+                    if(self.owner.world.graphic_engine.keyPressed('w')):
+                        self.vehicle.ai.throttle=1
+                        self.vehicle.ai.brake_power=0
+
+                    if(self.owner.world.graphic_engine.keyPressed('s')):
+                        self.vehicle.ai.brake_power=1
+                        self.vehicle.ai.throttle=0
+
+                    if(self.owner.world.graphic_engine.keyPressed('a')):
+                        self.vehicle.ai.handle_steer_left()
+
+                    if(self.owner.world.graphic_engine.keyPressed('d')):
+                        self.vehicle.ai.handle_steer_right()
+
+            elif self.ai_vehicle_role=='gunner':
+                if(self.owner.world.graphic_engine.keyPressed('a')):
+                    self.vehicle_turret.ai.handle_rotate_left()
+
+                if(self.owner.world.graphic_engine.keyPressed('d')):
+                    self.vehicle_turret.ai.handle_rotate_right()
+
+                if(self.owner.world.graphic_engine.keyPressed('f')):
+                    self.vehicle_turret.ai.handle_fire()
+
 
         else:
 

@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 09 2024
+- removed primary_weapon from vehicles 
+- removed gunner role from vehicles 
+- added gunner role to turrets 
+- rewrite of how ai handles vehicle gunner roles 
+- player no longer auto takes over driving if the driver seat is occupied
+
+notes
+- consider adding a option for the ai to boot civilians from vehicles 
+
+todo 
+- rewrite bot vehicle ai to handle turrets and new ai_vehicle_role string 
+- vehicle menu needs to be rewritten to understand the current role and give 
+role specific data 
+- turret probably shouldn't be selectable.
+
+----------------------------------
 July 08 2024
 - tweaking some parameters so ai with one spare
 magazine doesn't repeatedly try to refill ammo
