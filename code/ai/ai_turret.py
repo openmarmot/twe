@@ -24,23 +24,74 @@ class AITurret(AIBase):
         self.position_offset=[0,0]
 
         # this is relative to the vehicle
+        # really + or - a certain amount of degrees
         self.turret_rotation=0
+
+        # gunner requested rotation change
+        self.rotation_change=0
+
+        self.rotation_range=[-20,20]
+
+        # speed of rotation
+        self.rotation_speed=20
 
         self.vehicle=None
         self.last_vehicle_position=[0,0]
         self.last_vehicle_rotation=0
 
+        self.gunner=None # used to keep track of who is manning this turret
+
         # note - extra magazines/ammo should be stored in the vehicle inventory
         self.primary_weapon=None
         self.secondary_weapon=None
+
+
+    #---------------------------------------------------------------------------
+    def handle_rotate_left(self):
+        self.rotation_change=1
+
+    #---------------------------------------------------------------------------
+    def handle_rotate_right(self):
+        self.rotation_change=-1
+
+    #---------------------------------------------------------------------------
+    def handle_fire(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    def neutral_controls(self):
+        ''' return controls to neutral over time'''
+
+        if self.rotation_change!=0:
+            # controls should return to neutral over time 
+            time_passed=self.owner.world.graphic_engine.time_passed_seconds
+
+            #return wheel to neutral
+            self.rotation_change=engine.math_2d.regress_to_zero(self.rotation_change,time_passed)
+
     #---------------------------------------------------------------------------
     def update(self):
         
         self.update_physics()
 
+        self.neutral_controls()
+
     #---------------------------------------------------------------------------
     def update_physics(self):
+        time_passed=self.owner.world.graphic_engine.time_passed_seconds
         moved=False
+
+        if self.rotation_change!=0:
+            moved=True
+            self.turret_rotation+=(self.rotation_change*self.rotation_speed*time_passed)
+            
+            # make sure rotation is within bounds
+            if self.turret_rotation<self.rotation_range[0]:
+                self.turret_rotation=self.rotation_range[0]
+                self.rotation_change=0
+            elif self.turret_rotation>self.rotation_range[1]:
+                self.turret_rotation=self.rotation_range[1]
+                self.rotation_change=0
 
         if self.vehicle!=None:
             if self.last_vehicle_position!=self.vehicle.world_coords:
@@ -49,8 +100,6 @@ class AITurret(AIBase):
             elif self.last_vehicle_rotation!=self.vehicle.rotation_angle:
                 moved=True
                 self.last_vehicle_rotation=copy.copy(self.vehicle.rotation_angle)
-
-            
 
         if moved:
             self.owner.reset_image=True

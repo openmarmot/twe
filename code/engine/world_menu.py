@@ -162,21 +162,14 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- Change Vehicle Role --')
-            currentRole='None'
-            primaryWeapon='None'
-            if self.selected_object.ai.driver==self.world.player:
-                currentRole='Driver'
-            if self.selected_object.ai.gunner==self.world.player:
-                currentRole='Gunner'
-            if self.selected_object.ai.primary_weapon!=None:
-                primaryWeapon=self.selected_object.ai.primary_weapon.name
+            currentRole=self.world.player.ai.ai_vehicle_role
 
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
-            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
             self.world.graphic_engine.menu_text_queue.append('1 - Driver')
             self.world.graphic_engine.menu_text_queue.append('2 - Gunner')
             self.world.graphic_engine.menu_text_queue.append('3 - Passenger')
+            self.world.graphic_engine.menu_text_queue.append('4 - Chef')
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
@@ -957,12 +950,11 @@ class World_Menu(object):
                         for b in self.world.player.ai.large_pickup.ai.inventory:
                             if 'gas' in b.name:
                                 fuel_option=True
-            primaryWeapon='None'
-            if self.selected_object.ai.primary_weapon!=None:
-                primaryWeapon=self.selected_object.ai.primary_weapon.name
+
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Health : '+str(self.selected_object.ai.health))
 
             # -- add debug info --
             if self.world.debug_mode==True:
@@ -990,14 +982,13 @@ class World_Menu(object):
                     self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
                     self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('Name [faction/ai_state/ai_goal/vehicle_ai_goal]')
+                    self.world.graphic_engine.menu_text_queue.append('Name [faction/ai_state/ai_goal/vehicle_ai_goal/ai_vehicle_role]')
                     for b in self.selected_object.ai.passengers:
-                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.squad.faction+'/'+b.ai.ai_state+'/'+b.ai.ai_goal+'/'+b.ai.ai_vehicle_goal+']')
+                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.squad.faction+' / '+b.ai.ai_state+' / '+b.ai.ai_goal+' / '+b.ai.ai_vehicle_goal+' / '+b.ai.ai_vehicle_role+']')
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
 
 
             if distance<self.max_menu_distance:
-                self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
                 self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
                 self.world.graphic_engine.menu_text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
                 self.world.graphic_engine.menu_text_queue.append('1 - info (not implemented) ')
@@ -1022,14 +1013,9 @@ class World_Menu(object):
                     self.change_menu('fuel')
 
         if self.menu_state=='internal':
-            currentRole='None'
-            primaryWeapon='None'
-            if self.selected_object.ai.driver==self.world.player:
-                currentRole='Driver'
-            if self.selected_object.ai.gunner==self.world.player:
-                currentRole='Gunner'
-            if self.selected_object.ai.primary_weapon!=None:
-                primaryWeapon=self.selected_object.ai.primary_weapon.name
+            currentRole=self.world.player.ai.ai_vehicle_role
+            if currentRole==None:
+                currentRole='none'
 
             radio=False
             if self.selected_object.ai.radio!=None:
@@ -1037,8 +1023,8 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue=[]
             self.world.graphic_engine.menu_text_queue.append('--Internal Vehicle Menu --')
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
+            self.world.graphic_engine.menu_text_queue.append('Health : '+str(self.selected_object.ai.health))
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
-            self.world.graphic_engine.menu_text_queue.append('Primary Weapon: '+primaryWeapon)
             if radio:
                 self.world.graphic_engine.menu_text_queue.append('Radio : '+self.selected_object.ai.radio.name)
             if len(self.selected_object.ai.engines)>0:
