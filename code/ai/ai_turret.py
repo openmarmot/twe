@@ -30,7 +30,7 @@ class AITurret(AIBase):
         # gunner requested rotation change
         self.rotation_change=0
 
-        self.rotation_range=[-20.20]
+        self.rotation_range=[-20,20]
 
         # speed of rotation
         self.rotation_speed=20
@@ -82,6 +82,7 @@ class AITurret(AIBase):
         moved=False
 
         if self.rotation_change!=0:
+            moved=True
             self.turret_rotation+=(self.rotation_change*self.rotation_speed*time_passed)
             
             # make sure rotation is within bounds

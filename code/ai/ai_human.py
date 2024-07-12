@@ -499,6 +499,7 @@ class AIHuman(AIBase):
         if self.in_vehicle:
 
             # remove from existing roles
+            self.ai_vehicle_role='none'
             for b in self.vehicle.ai.turrets:
                 if b.ai.gunner==self.owner:
                     b.ai.gunner=None
@@ -512,7 +513,7 @@ class AIHuman(AIBase):
             if ROLE=='driver':
                 if self.vehicle.ai.driver!=self.owner.world.player:
                     if self.vehicle.ai.driver!=None:
-                        self.vehicle.ai.driver.ai.vehicle_ai_role=None
+                        self.vehicle.ai.driver.ai.ai_vehicle_role='none'
                     self.vehicle.ai.driver=self.owner
                     self.ai_vehicle_role='driver'
                     self.speak("Taking over driving")

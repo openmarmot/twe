@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 11 2024
+- working on vehicle role related code 
+- minor vehicle menu changes 
+- working on turret rotation code 
+
+kind of hard to see it but turret rotation actually works now if you change role to 
+gunner in the sd.kfz.251
+
+I don't have the turret firing yet, that is going to be a bit more involved than I initially thought. 
+It is the first thing that fires a bullet based on how the gun (well the turret) is aligned.
+Also getting the bot to aim turrets might be a bit tricky. 
+
+I need to figure out if i can get more zoom in. i think i was hitting some sort of pygame limitation but need to check again 
+
+----------------------------------
 July 09 2024
 - removed primary_weapon from vehicles 
 - removed gunner role from vehicles 
