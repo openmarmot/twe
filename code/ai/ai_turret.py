@@ -56,7 +56,9 @@ class AITurret(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_fire(self):
-        pass
+        self.primary_weapon.rotation_angle=self.owner.rotation_angle
+        #self.primary_weapon.ai.fire()
+        self.primary_weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):
@@ -71,6 +73,10 @@ class AITurret(AIBase):
 
     #---------------------------------------------------------------------------
     def update(self):
+
+        if self.primary_weapon!=None:
+            # needs updates for time tracking and other stuff
+            self.primary_weapon.update()
         
         self.update_physics()
 

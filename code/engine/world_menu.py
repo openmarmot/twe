@@ -163,6 +163,8 @@ class World_Menu(object):
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- Change Vehicle Role --')
             currentRole=self.world.player.ai.ai_vehicle_role
+            if currentRole==None:
+                currentRole='None!'
 
             self.world.graphic_engine.menu_text_queue.append('Vehicle : '+self.selected_object.name)
             self.world.graphic_engine.menu_text_queue.append('Current Role : '+currentRole)
@@ -745,11 +747,12 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('---------------')
             self.world.graphic_engine.menu_text_queue.append('Pick a Test Scenario to Load')
             self.world.graphic_engine.menu_text_queue.append('1 - Meeting Engagement : German vs Soviet')
-            self.world.graphic_engine.menu_text_queue.append('2 - Larger Meeting Engagement : German vs Soviet ')
-            self.world.graphic_engine.menu_text_queue.append('3 - Civilans Only')
+            self.world.graphic_engine.menu_text_queue.append('2 -  ')
+            self.world.graphic_engine.menu_text_queue.append('3 - ')
             #self.world.graphic_engine.menu_text_queue.append('4 - Nothing')
 
             if Key=='1' or Key=='2' or Key=='3':
+                Key='1'
                 self.menu_state='faction_select'
                 engine.world_builder.load_test_environment(self.world,Key)
                 Key=None

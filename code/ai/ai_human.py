@@ -243,14 +243,15 @@ class AIHuman(AIBase):
             if event_data.ai.shooter !=None:
                 self.last_collision_description+=(' from '+event_data.ai.shooter.name)
 
-                if event_data.ai.shooter.ai.squad != None:
-                    if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
-                        # this creates a lot of friendly fire - but its interesting 
-                        self.personal_enemies.append(event_data.ai.shooter)
-
-                # kill tracking
-                # just focus on humans for now
                 if event_data.ai.shooter.is_human:
+
+                    if event_data.ai.shooter.ai.squad != None:
+                        if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
+                            # this creates a lot of friendly fire - but its interesting 
+                            self.personal_enemies.append(event_data.ai.shooter)
+
+                    # kill tracking
+
                     if self.health<30:
                         # protects from recording hits on something that was already dead
                         if starting_health>0:
@@ -264,8 +265,7 @@ class AIHuman(AIBase):
                     if event_data.ai.shooter.ai.primary_weapon!=None:
                         self.last_collision_description+=("'s "+event_data.ai.weapon_name)
             else:
-                if event_data.ai.shooter==None:
-                    print('Error - projectile shooter is none')
+                print('Error - projectile '+event_data.name+' shooter is none')
                 # other way to get here is if its not a projectile
                 print('or its not a projectile')
 
@@ -396,18 +396,22 @@ class AIHuman(AIBase):
             print('removal error - object not in inventory',event_data.name)
 
     #---------------------------------------------------------------------------
-    def fire(self,TARGET_COORDS,WEAPON):
-        ''' fires a weapon '''    
+    def fire(self,target_coords,weapon):
+        ''' fires a weapon '''
+        if self.owner.is_player :
+            # do computations based off of where the mouse is. TARGET_COORDS is ignored
+            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
 
-        if WEAPON.ai.fire(self.owner.world_coords,TARGET_COORDS):
+        else :
+            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+
+        if weapon.ai.fire():
             self.current_burst+=1
 
         if self.current_burst>self.max_burst:
             # stop firing, give the ai a chance to rethink and re-engage
             self.current_burst=0
-            self.ai_state='sleeping'
-            self.ai_goal='none'
-            self.target_object=None
+            self.reset_ai()
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):

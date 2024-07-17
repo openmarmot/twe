@@ -347,7 +347,7 @@ class Graphics_2D_Pygame(object):
                 
                 # check if the relative scale of the object is enough to make it visible
                 if (self.scale+b.scale_modifier)>self.minimum_visible_scale:
-
+                    
                     #determine whether object 'b' world_coords are within
                     #the viewport bounding box
                     if(b.world_coords[0]<viewrange_x[0] and
