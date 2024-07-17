@@ -39,7 +39,7 @@ class AIProjectile(AIBase):
 
         # the weapon that created this
         self.weapon_name=''
-        # the equipper of the gun that fired the projectile
+        # the equipper of the gun that fired the projectile. this can be a human or a turret
         self.shooter=None
 
         self.speed=0

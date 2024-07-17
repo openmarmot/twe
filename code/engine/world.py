@@ -288,29 +288,35 @@ class World(object):
         # OBJ - the world object that needs the ignore list
         # this is for objects that use ai_human
         ignore_list=[OBJ]
-        if self.friendly_fire==False:
-            if OBJ.is_german:
-                    ignore_list+=self.wo_objects_german
-            elif OBJ.is_soviet:
-                ignore_list+=self.wo_objects_soviet
-            elif OBJ.is_american:
-                ignore_list+=self.wo_objects_american
-        elif self.friendly_fire_squad==False:
-            # just add the squad
-            ignore_list+=OBJ.ai.squad.members
 
-        if OBJ.is_player:
-            pass
-        elif OBJ.is_soldier:
-            pass
-        if OBJ.ai.in_vehicle:
-            # add the vehicle otherwise it tends to get hit
+        if OBJ.is_human:
+            if self.friendly_fire==False:
+                if OBJ.is_german:
+                        ignore_list+=self.wo_objects_german
+                elif OBJ.is_soviet:
+                    ignore_list+=self.wo_objects_soviet
+                elif OBJ.is_american:
+                    ignore_list+=self.wo_objects_american
+            elif self.friendly_fire_squad==False:
+                # just add the squad
+                ignore_list+=OBJ.ai.squad.members
+
+            if OBJ.is_player:
+                pass
+            elif OBJ.is_soldier:
+                pass
+            if OBJ.ai.in_vehicle:
+                # add the vehicle otherwise it tends to get hit
+                ignore_list.append(OBJ.ai.vehicle)
+                for b in OBJ.ai.vehicle.turrets:
+                    ignore_list.append(b)
+
+            if OBJ.ai.in_building:
+                # add possible buildings the equipper is in.
+                # assuming they are shooting out windows so should not hit the building
+                ignore_list+=OBJ.ai.building_list
+        elif OBJ.is_turret:
             ignore_list.append(OBJ.ai.vehicle)
-
-        if OBJ.ai.in_building:
-            # add possible buildings the equipper is in.
-            # assuming they are shooting out windows so should not hit the building
-            ignore_list+=OBJ.ai.building_list
 
         return ignore_list
 
@@ -494,7 +500,7 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def process_reinforcements(self):
-        # array of  [time,faction,[spawn_point,squad]]
+        # array of  [time,faction,spawn_point,squad]
         process_queue=[]
         for b in self.reinforcements:
             if b[0]<self.world_seconds:
@@ -503,13 +509,13 @@ class World(object):
             self.reinforcements.remove(b)
             print('spawning reinforcements',b[1])
             if b[1]=='german':
-                self.german_ai.squad_spawn_queue.append(b[2])
+                engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
             elif b[1]=='american':
-                self.american_ai.squad_spawn_queue.append(b[2])
+                engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
             elif b[1]=='soviet':
-                self.soviet_ai.squad_spawn_queue.append(b[2])
+                engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
             elif b[1]=='civilian':
-                self.civilian_ai.squad_spawn_queue.append(b[2])
+                engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
             else:
                 print('Error - faction not recognized in process_reinforements: ',b[1])
 

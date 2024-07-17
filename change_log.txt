@@ -1,5 +1,32 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 16 2024
+- ai_gun equipper can now be a turret or a human 
+- misc code changes for turret gun integration 
+- rewrite of the firing code to bring human vs ai code back into ai_human from ai_gun
+- guns now fire bullets in the direction the gun is rotated
+- bullet spread mechanic removed as the firing code no longer uses position 
+- code style cleanup in world_builder 
+- large rewrite of a lot of the spawning code 
+- removed scenarios 2 and 3 rather than rewriting all of the spawn code for them. will create 
+more interesting ones in the future 
+- the player can now fire a gun in a turret. it is hard to aim however 
+
+guns now basically fire a bullet down the heading of the actual gun, following how they work in real life 
+this opens up the possibility of having guns displayed in the world while in use however most guns 
+are not drawn top down 
+
+I ended up doing a large rewrite of the spawning code because with the new turrets we have issues if the 
+turret spawns significantly later than the vehicle. this was happening with the old reinforcement system.
+While rewriting it I removed the spawning code from ai_faction_tactical and ai_squad 
+
+todo 
+- come up with a new bullet spread mechanic 
+- some sort of turret aiming gui - maybe similar to how the map works 
+
+
 ----------------------------------
 July 11 2024
 - working on vehicle role related code 

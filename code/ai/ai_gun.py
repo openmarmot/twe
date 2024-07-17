@@ -52,13 +52,13 @@ class AIGun(AIBase):
         self.range=0
 
         # spread
-        self.spread=15
+        #self.spread=15
 
         # internal counter of rounds fired
         self.rounds_fired=0
 
-        # the object (human) that actually equipped this weapon
-        # set by ai_man.event_inventory
+        # the object that actually equipped this weapon. either a turret or a human
+        # set by ai_man.event_inventory or worldbuilder for turrets
         self.equipper=None
 
         # type pistol/rifle/semi auto rifle/submachine gun/assault rifle/machine gun/antitank launcher
@@ -76,7 +76,7 @@ class AIGun(AIBase):
         self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
 
     #---------------------------------------------------------------------------
-    def fire(self,world_coords,target_coords):
+    def fire(self):
         ''' fire the gun. returns True/False as to whether the gun fired '''
         fired=False
         # check that we have a magazine loaded
@@ -91,26 +91,16 @@ class AIGun(AIBase):
                     fired=True
                     projectile=self.magazine.ai.projectiles.pop()
                     self.rounds_fired+=1
-                    spread=[random.randint(-self.spread,self.spread),random.randint(-self.spread,self.spread)]
-
+                    
                     projectile.ai.weapon_name=self.owner.name
                     projectile.ai.shooter=self.equipper
                     projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
                     projectile.world_coords=copy.copy(self.equipper.world_coords)
                     projectile.ai.starting_coords=copy.copy(self.equipper.world_coords)
                     projectile.ai.maxTime=self.flight_time + random.uniform(0.01, 0.05)
+                    projectile.rotation_angle=self.owner.rotation_angle
+                    projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
                     
-                    if self.equipper.is_player :
-                        # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                        dst=self.owner.world.graphic_engine.get_mouse_screen_coords()
-                        dst=[dst[0]+spread[0],dst[1]+spread[1]]
-                        projectile.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
-                        projectile.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),dst)
-                    else :
-                        dst=[target_coords[0]+spread[0],target_coords[1]+spread[1]]
-                        projectile.rotation_angle=engine.math_2d.get_rotation(world_coords,dst)
-                        projectile.heading=engine.math_2d.get_heading_vector(world_coords,dst)
-
                     self.owner.world.add_queue.append(projectile)
 
                     # spawn smoke
@@ -120,10 +110,10 @@ class AIGun(AIBase):
 
                     # spawn bullet case
                     if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
-                        z=engine.world_builder.spawn_object(self.owner.world,world_coords,'steel_case',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'steel_case',True)
                         z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
                     elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
-                        z=engine.world_builder.spawn_object(self.owner.world,world_coords,'brass',True)
+                        z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'brass',True)
                         z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
         return fired

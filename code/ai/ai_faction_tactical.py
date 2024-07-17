@@ -15,7 +15,7 @@ import copy
 import engine.math_2d
 import copy
 from ai.ai_squad import AISquad
-import engine.math_2d
+import engine.world_builder 
 
 #global variables
 
@@ -74,19 +74,6 @@ class AIFactionTactical(object):
         else:
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
-    #---------------------------------------------------------------------------
-    # spawns squads in the spawn queue
-    def process_spawn_queue(self):
-        # spawn queue is a array of arrays [[spawn_location,squad]]
-        for b in self.squad_spawn_queue:
-            coords=b[0]
-            # add random offsets
-            b[1].world_coords=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
-            b[1].destination=[coords[0]+float(random.randint(-200,200)),coords[1]+float(random.randint(-200,200))]
-            b[1].spawn_on_map()
-            b[1].faction_tactical=self # give the squad a ref back to hq..
-            self.squads.append(b[1])
-        self.squad_spawn_queue.clear()
     
     #---------------------------------------------------------------------------
     def split_squad(self,members):
@@ -237,10 +224,6 @@ class AIFactionTactical(object):
     def update(self):
         time_passed=self.world.graphic_engine.time_passed_seconds
         self.time_since_update+=time_passed
-
-        # spawn any new squads
-        if len(self.squad_spawn_queue)>0:
-            self.process_spawn_queue()
 
         # run the update for each squad
         for b in self.squads:
