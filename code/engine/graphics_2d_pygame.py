@@ -73,7 +73,7 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.menu_color=(50, 51, 51)
+        self.menu_color=('#394B32')
 
         # used for temporary text. call add_text to add 
         self.text_queue=[]

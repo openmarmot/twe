@@ -609,7 +609,7 @@ class World(object):
         for b in self.graphic_engine.renderlists:
             for c in b:
                 # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c!=self.player.ai.vehicle:
+                if c.is_player==False and c!=self.player.ai.large_pickup and c!=self.player.ai.vehicle and c.is_turret==False:
                     possible_objects.append(c)
 
         #-- first pass - filter for desirable objects
