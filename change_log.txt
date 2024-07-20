@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+----------------------------------
+July 19 2024
+- turrets are no longer selectable with the mouse 
+- changed menu text a bit but its still a pain to see 
+- reload (r) now works when in a vehicle turret (get in the sd.kfz and change role to gunner)
+
+if you get in a vehicle and switch to gunner it seems pretty common that a team mate will hop in and 
+drive you somewhere, which is kinda fun. You will then jump out when they do automatically. 
 
 ----------------------------------
 July 16 2024

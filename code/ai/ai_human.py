@@ -770,11 +770,7 @@ class AIHuman(AIBase):
                     # note - physics needs to be udpdate to handle falling
         else:
             # controls for when you are walking about
-
-            if key=='b':
-                print('note - bandaging is now done through the player medical menu ')
-                pass
-            elif key=='g':
+            if key=='g':
                 self.throw([])
             elif key=='p':
                 self.handle_prone_state_change()
@@ -782,6 +778,10 @@ class AIHuman(AIBase):
                 self.handle_player_reload()
             elif key=='t':
                 self.launch_antitank([])
+
+        # controls for vehicles and walking 
+        if key=='r':
+            self.handle_player_reload()
 
     #-----------------------------------------------------------------------
     def handle_normal_ai_think(self):
@@ -879,6 +879,49 @@ class AIHuman(AIBase):
                 # sleeping or whatever 
                 self.fatigue-=self.fatigue_remove_rate*time_passed
 
+    #---------------------------------------------------------------------------
+    def handle_pickup_object(self,OBJECT_TO_PICKUP):
+        ''' pickup object from the world '''
+        # any distance calculation would be made before this function is called
+
+        # reset ai 
+        self.reset_ai()
+
+        # double check the object is still there 
+        if self.owner.world.check_object_exists(OBJECT_TO_PICKUP)==False:
+            print('Debug object to pickup '+OBJECT_TO_PICKUP.name+' is no longer in the world')
+        else:
+
+            if OBJECT_TO_PICKUP.is_large_human_pickup:
+
+                # need to make sure nobody else is already carrying it
+                in_use=False
+                for b in self.owner.world.wo_objects_human:
+                    if b.ai.large_pickup==OBJECT_TO_PICKUP:
+                        in_use=True
+
+                if in_use:
+                    print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
+                else:
+                    self.large_pickup=OBJECT_TO_PICKUP
+            else:
+                if OBJECT_TO_PICKUP.is_gun:
+
+                    # for now just pick up near by magazines (probably aren't any)
+                    near_mags=self.handle_check_near_magazines(OBJECT_TO_PICKUP,50)
+                    for b in near_mags:
+                        self.handle_pickup_object(b)
+
+                    # also loot any nearby containers
+                    container=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_container,100)
+                    if container!=None:
+                        self.take_action_loot_container(container)
+
+                self.speak('Picking up a '+OBJECT_TO_PICKUP.name)
+
+                self.event_add_inventory(OBJECT_TO_PICKUP)
+                # remove from world
+                self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
 
     #---------------------------------------------------------------------------
     def handle_player_update(self):
@@ -991,53 +1034,13 @@ class AIHuman(AIBase):
                     self.handle_normal_ai_update()
 
     #---------------------------------------------------------------------------
-    def handle_pickup_object(self,OBJECT_TO_PICKUP):
-        ''' pickup object from the world '''
-        # any distance calculation would be made before this function is called
-
-        # reset ai 
-        self.reset_ai()
-
-        # double check the object is still there 
-        if self.owner.world.check_object_exists(OBJECT_TO_PICKUP)==False:
-            print('Debug object to pickup '+OBJECT_TO_PICKUP.name+' is no longer in the world')
-        else:
-
-            if OBJECT_TO_PICKUP.is_large_human_pickup:
-
-                # need to make sure nobody else is already carrying it
-                in_use=False
-                for b in self.owner.world.wo_objects_human:
-                    if b.ai.large_pickup==OBJECT_TO_PICKUP:
-                        in_use=True
-
-                if in_use:
-                    print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
-                else:
-                    self.large_pickup=OBJECT_TO_PICKUP
-            else:
-                if OBJECT_TO_PICKUP.is_gun:
-
-                    # for now just pick up near by magazines (probably aren't any)
-                    near_mags=self.handle_check_near_magazines(OBJECT_TO_PICKUP,50)
-                    for b in near_mags:
-                        self.handle_pickup_object(b)
-
-                    # also loot any nearby containers
-                    container=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_container,100)
-                    if container!=None:
-                        self.take_action_loot_container(container)
-
-                self.speak('Picking up a '+OBJECT_TO_PICKUP.name)
-
-                self.event_add_inventory(OBJECT_TO_PICKUP)
-                # remove from world
-                self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
-
-    #---------------------------------------------------------------------------
     def handle_player_reload(self):
         ''' player reload. called by world when you press 'r' '''
-        if self.primary_weapon!=None:
+        if self.in_vehicle:
+            if self.vehicle_turret!=None:
+                if self.vehicle_turret.ai.primary_weapon!=None:
+                    self.handle_reload_turret()
+        elif self.primary_weapon!=None:
             self.handle_reload(self.primary_weapon)
 
     #---------------------------------------------------------------------------
@@ -1088,6 +1091,43 @@ class AIHuman(AIBase):
             else:
                 self.speak("I'm out of ammo!")
                 self.ai_want_ammo=True
+
+        # at this point we should do a ai_mode change with a timer to simulate the 
+        # reload time
+        
+        self.speak('reloading!')
+
+    #-----------------------------------------------------------------------
+    def handle_reload_turret(self):
+        if self.vehicle_turret!=None:
+            if self.vehicle_turret.ai.vehicle!=None and self.vehicle_turret.ai.primary_weapon!=None:
+                weapon=self.vehicle_turret.ai.primary_weapon
+                # first get the current magazine
+                old_magazine=None
+                if weapon.ai.magazine!=None:
+                    if weapon.ai.magazine.ai.removable:
+                        old_magazine=weapon.ai.magazine
+
+                # find a new magazine, sorting by size
+                new_magazine=None
+                biggest=0
+                for b in self.vehicle.ai.inventory:
+                    if b.is_gun_magazine:
+                        if weapon.name in b.ai.compatible_guns:
+                            if len(b.ai.projectiles)>biggest:
+                                new_magazine=b
+                                biggest=len(b.ai.projectiles)
+
+                # perform the swap 
+                if old_magazine!=None:
+                    self.vehicle.ai.event_add_inventory(old_magazine)
+                    weapon.ai.magazine=None
+                if new_magazine!=None:
+                    self.vehicle.ai.event_remove_inventory(new_magazine)
+                    weapon.ai.magazine=new_magazine
+                else:
+                    self.speak("This turret is out of ammo!")
+                    #self.ai_want_ammo=True
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
