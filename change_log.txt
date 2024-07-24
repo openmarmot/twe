@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 23 2024
+- mouse select uses collision radius now instead of a static number 
+- fixed a function call error with the panzerfaust launch 
+- fixed squad spawning from the debug spawn menu 
+- updated the body and dead vehicle spawn so it now has the correct 
+    collision radius and volume 
+
+notes 
+- noticed a possible reloading oddity as the player. seemed to be unable to 
+reload yet the stats from the player menu said I had 20 rounds in inventory 
+----------------------------------
 July 19 2024
 - turrets are no longer selectable with the mouse 
 - changed menu text a bit but its still a pain to see 

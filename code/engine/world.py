@@ -592,12 +592,10 @@ class World(object):
     def select_with_mouse(self, mouse_screen_coords):
         '''
         return a object that is 'under' the mouse cursor
-        radius of 10 or so seems fine
 
         called by graphics_2d_pygame on mouse down event currently 
         '''
         
-        radius=10
         possible_objects=[]
         check_objects=[]
 
@@ -618,7 +616,7 @@ class World(object):
                 check_objects.append(b)
 
         if len(check_objects)>0:
-            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,check_objects)
+            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,check_objects)
 
         #-- second pass - check for less desirable objects
         if temp==None:
@@ -633,7 +631,7 @@ class World(object):
                     or b.is_ammo_container or b.is_furniture or b.is_large_human_pickup):
                     check_objects.append(b)
             if len(check_objects)>0:
-                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,check_objects)
+                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,check_objects)
 
         #-- third pass - check everything that is left
         if temp==None:
@@ -644,7 +642,7 @@ class World(object):
 
             # check everything that is left
             if len(possible_objects)>0:
-                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,radius,possible_objects)
+                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,possible_objects)
 
         if temp != None:
             self.world_menu.activate_menu(temp)

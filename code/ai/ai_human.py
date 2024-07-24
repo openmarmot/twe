@@ -627,7 +627,7 @@ class AIHuman(AIBase):
                 print('!! Error : '+self.owner.name+' not in squad somehow')
 
         # spawn body
-        engine.world_builder.spawn_container('body: '+self.owner.name,self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[2],self.inventory)
+        engine.world_builder.spawn_container('body: ',self.owner,2)
 
         # remove from world
         self.owner.world.remove_queue.append(self.owner)
@@ -1294,7 +1294,7 @@ class AIHuman(AIBase):
         self.event_remove_inventory(selected)
 
     #---------------------------------------------------------------------------
-    def launch_antitank(self,TARGET_COORDS):
+    def launch_antitank(self,target_coords):
         ''' throw like you know the thing. cmon man ''' 
 
         # standup. kneel would be better if it becomes an option later
@@ -1302,7 +1302,13 @@ class AIHuman(AIBase):
             self.handle_prone_state_change()
 
         if self.antitank!=None:
-            self.antitank.ai.fire(self.owner.world_coords,TARGET_COORDS)
+            if self.owner.is_player :
+                # do computations based off of where the mouse is. TARGET_COORDS is ignored
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+
+            else :
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+            self.antitank.ai.fire()
 
             # drop the tube now that it is empty
             self.handle_drop_object(self.antitank)

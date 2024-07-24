@@ -695,17 +695,20 @@ def spawn_civilians(world,CIVILIAN_TYPE,world_coords):
         return z
 #------------------------------------------------------------------------------
 # currently used for wrecks and bodies
-def spawn_container(NAME,world,world_coords,ROTATION_ANGLE,IMAGE,INVENTORY):
+def spawn_container(name,world_object,image_index):
     '''spawns a custom container'''
-
-    z=WorldObject(world,[IMAGE],AIContainer)
+    # name 
+    # world_object - the world_object that is being replaced
+    # image_index - index of the image to be used - from the world object
+    z=WorldObject(world_object.world,[world_object.image_list[image_index]],AIContainer)
     z.is_container=True
-    z.name=NAME
-    z.world_coords=world_coords
-    z.rotation_angle=ROTATION_ANGLE
-    z.ai.inventory=INVENTORY
+    z.name=name
+    z.world_coords=world_object.world_coords
+    z.rotation_angle=world_object.rotation_angle
+    z.ai.inventory=world_object.ai.inventory
     z.world_builder_identity='skip'
-    z.volume=50
+    z.volume=world_object.volume
+    z.collision_radius=world_object.collision_radius
     z.wo_start()
 
 #------------------------------------------------------------------------------

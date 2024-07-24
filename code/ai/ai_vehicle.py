@@ -195,7 +195,7 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_death(self):
-        engine.world_builder.spawn_container('wreck',self.owner.world,self.owner.world_coords,self.owner.rotation_angle,self.owner.image_list[1],self.inventory)
+        engine.world_builder.spawn_container('wreck',self.owner,1)
         
         dm=''
         dm+=(self.owner.name+' died.')
