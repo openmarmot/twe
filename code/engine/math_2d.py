@@ -76,7 +76,7 @@ def calculate_relative_position(coords,rotation,offset):
 	return [coords[0]+dx_new,coords[1]+dy_new]
 
 #------------------------------------------------------------------------------
-def checkCollisionCircleMouse(mouse_coords, radius, collision_list):
+def checkCollisionCircleMouse(mouse_coords, collision_list):
 	''' collision check modified for mouse screen coords'''
 	# modified collision check for screen coords 
 	# radius is used for both objects because screen coords perspective 
@@ -88,7 +88,7 @@ def checkCollisionCircleMouse(mouse_coords, radius, collision_list):
 
 		distance=get_distance(mouse_coords,b.screen_coords)
 
-		if distance < (radius*2):
+		if distance < (b.collision_radius*2):
 			collided=b
 			break
 	return collided
