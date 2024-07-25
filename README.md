@@ -5,7 +5,7 @@ TWE is short for 'To Whatever End' which was the title of a game I worked on fro
 The game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
 Sometime in 2010 I lost all the code when I accidentally erased the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
 
-I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress.
+I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress. 
 
 ![screenshot](/screenshots/twe-may-23-2021.png "TWE screenshot")
 
@@ -22,9 +22,10 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - spawn as a german or russian and lead your squad into combat
 - spawn as a civilian and try to survive the cross fire
 - explore in a kubelwagen or a bicycle
+- check cupboards for the elusive pickle jar item. eat pickles!
 
 
-### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details.
+### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
   
 ### To Play 
 - install python3 and pygame
@@ -34,6 +35,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - tested on Windows 10, Linux, Apple (M2)
 
 ### Controls
+See gameplay_instructions.txt for a full list
 - '~' opens/closes debug menu 
 - 'w/s/a/d' movement
 - left click on a object to open context menu
