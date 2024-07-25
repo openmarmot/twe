@@ -1062,7 +1062,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'pickle',False))
 
     elif OBJECT_TYPE=='panzerfaust':
-        z=WorldObject(world,['panzerfaust'],AIGun)
+        z=WorldObject(world,['panzerfaust','panzerfaust_empty'],AIGun)
         z.name='panzerfaust'
         z.ai.speed=300
         z.is_handheld_antitank=True

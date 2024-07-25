@@ -843,7 +843,10 @@ class World_Menu(object):
                 self.world.graphic_engine.menu_text_queue.append('------------- ')
                 for b in self.selected_object.ai.inventory:
                     if count<6:
-                        self.world.graphic_engine.menu_text_queue.append(b.name)
+                        if b.is_gun_magazine:
+                            self.world.graphic_engine.menu_text_queue.append(b.name+' '+str(len(b.ai.projectiles)))
+                        else:
+                            self.world.graphic_engine.menu_text_queue.append(b.name)
                     else:
                         self.world.graphic_engine.menu_text_queue.append('...')
                         break

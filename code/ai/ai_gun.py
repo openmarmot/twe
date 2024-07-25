@@ -116,6 +116,11 @@ class AIGun(AIBase):
                         z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'brass',True)
                         z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
+                    # handle special case for weapons that change appearance when empty
+                    if len(self.magazine.ai.projectiles)==0:
+                        if 'panzerfaust' in self.owner.name:
+                            self.owner.image_index=1
+
         return fired
 
 

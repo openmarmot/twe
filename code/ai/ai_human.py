@@ -774,8 +774,6 @@ class AIHuman(AIBase):
                 self.throw([])
             elif key=='p':
                 self.handle_prone_state_change()
-            elif key=='r':
-                self.handle_player_reload()
             elif key=='t':
                 self.launch_antitank([])
 
@@ -1064,6 +1062,7 @@ class AIHuman(AIBase):
     #-----------------------------------------------------------------------
     def handle_reload(self,weapon):
         '''reload weapon'''
+        self.speak('reloading!')
         if weapon.is_gun:
             # first get the current magazine
             old_magazine=None
@@ -1081,10 +1080,11 @@ class AIHuman(AIBase):
                             new_magazine=b
                             biggest=len(b.ai.projectiles)
 
-            # perform the swap 
-            if old_magazine!=None:
+            # remove old magazine ONLY if we have a new magazine
+            if old_magazine!=None and new_magazine!=None:
                 self.event_add_inventory(old_magazine)
                 weapon.ai.magazine=None
+            # add a new magazine (either the old magazine was removed, or was never there)
             if new_magazine!=None:
                 self.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
@@ -1095,7 +1095,7 @@ class AIHuman(AIBase):
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
         
-        self.speak('reloading!')
+        
 
     #-----------------------------------------------------------------------
     def handle_reload_turret(self):
