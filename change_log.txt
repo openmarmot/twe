@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 28 2024
+- added spark and flash effects 
+- panzerfaust projectile hit has sparks and flash 
+- failing to penetrate armor results in sparks 
+
+
 ----------------------------------
 July 24 2024
 - fixed bug where reload was called twice when player pressed 'r'
