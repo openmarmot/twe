@@ -1554,6 +1554,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
 
         
     elif OBJECT_TYPE=='sd_kfz_251_mg34_turret':
@@ -1584,13 +1585,15 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
         if random.randint(0,3)==1:
             mg=spawn_object(world,world_coords,'mg34',False)
-            z.ai.primary_weapon=mg
             z.add_inventory(mg)
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
             z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
             z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_german_military_equipment,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='red_bicycle':
