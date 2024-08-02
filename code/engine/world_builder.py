@@ -781,7 +781,19 @@ def spawn_drop_canister(world,world_coords,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
 
+#------------------------------------------------------------------------------
+def spawn_flash(world,world_coords,heading,amount=2):
+    ''' spawn smoke cloud '''
 
+    for x in range(amount):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_flash',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(9,11)
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=random.uniform(0.1,0.4)
   
 #------------------------------------------------------------------------------
 def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
@@ -1542,6 +1554,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
 
         
     elif OBJECT_TYPE=='sd_kfz_251_mg34_turret':
@@ -1572,13 +1585,15 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
         if random.randint(0,3)==1:
             mg=spawn_object(world,world_coords,'mg34',False)
-            z.ai.primary_weapon=mg
             z.add_inventory(mg)
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
             z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
             z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_german_military_equipment,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='red_bicycle':
@@ -1716,7 +1731,35 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True   
+        z.can_be_deleted=True
+    elif OBJECT_TYPE=='small_flash':
+        z=WorldObject(world,['explosion_flash'],AIAnimatedSprite)
+        w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.name='small_flash'
+        z.is_particle_effect=True
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=15
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=3
+        z.ai.self_remove=True
+        z.can_be_deleted=True
+    elif OBJECT_TYPE=='spark':
+        z=WorldObject(world,['spark'],AIAnimatedSprite)
+        w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.name='spark'
+        z.is_particle_effect=True
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=random.randint(100,300)
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=3
+        z.ai.self_remove=True
+        z.can_be_deleted=True 
     
     elif OBJECT_TYPE=='blood_splatter':
         z=WorldObject(world,['blood_splatter'],AINone)
@@ -1971,7 +2014,7 @@ def spawn_shrapnel_cloud(world,world_coords,AMOUNT,ORIGINATOR,WEAPON_NAME):
 
 #------------------------------------------------------------------------------
 def spawn_smoke_cloud(world,world_coords,heading,amount=30):
-    ''' creates a shrapnel starburst pattern. used for grenades '''
+    ''' spawn smoke cloud '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
 
 
@@ -1985,6 +2028,21 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
         z.ai.move_time_max=3
         z.ai.alive_time_max=random.uniform(1.5,3)
 
+#------------------------------------------------------------------------------
+def spawn_sparks(world,world_coords,amount=30):
+    ''' spawn spark '''
+    # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+
+
+    for x in range(amount):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'spark',True)
+        z.heading=engine.math_2d.get_heading_from_rotation(z.rotation_angle)
+        z.ai.speed=random.uniform(60,70)
+        z.ai.rotation_speed=0
+        z.ai.rotate_time_max=0
+        z.ai.move_time_max=1
+        z.ai.alive_time_max=random.uniform(1.5,2)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):

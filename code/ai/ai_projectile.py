@@ -7,6 +7,7 @@ notes :
 '''
 
 #import built in modules
+import random 
 
 #import custom packages
 from ai.ai_base import AIBase
@@ -53,7 +54,9 @@ class AIProjectile(AIBase):
         shrapnel_count=engine.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']
         contact_effect=engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
         if contact_effect=='HEAT':
+            engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
             engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,self.shooter,self.owner.name)
+            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,10))
         else:
             print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 
@@ -104,7 +107,8 @@ class AIProjectile(AIBase):
                         else:
                             # penetration fails! 
                             # should probably have some sort of non-penetration event
-                            print('bonk!')
+                            #engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
+                            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,10))
                             self.owner.world.remove_queue.append(self.owner) 
 
 
