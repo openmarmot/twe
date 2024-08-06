@@ -698,7 +698,7 @@ class World_Menu(object):
         if Key=='2':
             self.selected_object.ai.power_on= not self.selected_object.ai.power_on
             self.radio_menu(None)
-            self.deactivate_menu()
+            
 
     #---------------------------------------------------------------------------
     def squad_menu(self,Key):

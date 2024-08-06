@@ -162,8 +162,6 @@ def get_distance(coords1, coords2,round_number=False):
 	else:
 		return distance
 	
-
-
 #------------------------------------------------------------------------------
 def get_heading_vector(location,destination):
 	''' normalized vector representing the heading (direction) to a target'''

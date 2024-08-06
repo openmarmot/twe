@@ -22,18 +22,10 @@ import engine.world_builder
 class AIFactionTactical(object):
     def __init__(self,world,faction):
 
-        # squads waiting to enter the map
-        # format for this is [[spawn_coordinates,squad]]
-        self.squad_spawn_queue=[]
 
         # squads in the faction who are present on this map
         self.squads=[] 
 
-        # current ai state
-        self.ai_state='none'
-
-        # current ai goal
-        self.ai_goal='none'
 
         # general map goal (attack/defend/scout ?)
 

@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+----------------------------------
+August 04 2024
+- starting massive human ai rewrite 
+- guns no longer need to have their update function called 
+- vehicles now update the passengers positions (rather than the other way around)
+- added a logging utility
+
+the game is going to be broken in the dev branch for a pretty long time I think. 
+i'm doing pretty much a complete ai rewrite
 
 ----------------------------------
 August 01 2024
