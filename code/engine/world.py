@@ -382,6 +382,15 @@ class World(object):
         return best_object
 
     #---------------------------------------------------------------------------
+    def get_compatible_magazines_within_range(self,world_coords,gun,max_distance):
+        compatible_magazines=[]
+        for b in self.wo_objects_gun_magazines:
+            if gun.name in b.ai.compatible_guns:
+                if engine.math_2d.get_distance(world_coords,b.world_coords)<max_distance:
+                    compatible_magazines.append(b)
+        return compatible_magazines
+
+    #---------------------------------------------------------------------------
     def get_random_object(self,OBJECT_LIST):
         ''' return a random object from a list '''
         i=random.randint(0,len(OBJECT_LIST)-1)

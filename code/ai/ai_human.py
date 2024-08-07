@@ -173,7 +173,26 @@ class AIHuman(AIBase):
 
         self.speak('react to being shot')
 
-        
+    #---------------------------------------------------------------------------
+    def check_ammo(self,gun):
+        '''check ammo and magazines for a gun. return ammo_gun,ammo_inventory,magazine_count'''
+        # gun - a world object with ai_gun
+        # check_inventory - bool. if true also check inventory
+        # return [ammo in gun, ammo in inventory]
+        ammo_gun=0
+        if gun.ai.magazine!=None:
+            ammo_gun=len(gun.ai.magazine.ai.projectiles)
+
+        ammo_inventory=0
+        magazine_count=0
+        for b in self.inventory:
+            if b.is_gun_magazine:
+                if gun.name in b.ai.compatible_guns:
+                    ammo_inventory+=len(b.ai.projectiles)
+                    magazine_count+=1
+
+
+        return ammo_gun,ammo_inventory,magazine_count       
 
     #---------------------------------------------------------------------------
     def evaluate_targets(self):
@@ -452,45 +471,7 @@ class AIHuman(AIBase):
 
 
 
-    #---------------------------------------------------------------------------
-    def handle_check_ammo(self,gun):
-        '''check ammo and magazines for a gun'''
-        # gun - a world object with ai_gun
-        # check_inventory - bool. if true also check inventory
-        # return [ammo in gun, ammo in inventory]
-        ammo_gun=0
-        if gun.ai.magazine!=None:
-            ammo_gun=len(gun.ai.magazine.ai.projectiles)
-
-        ammo_inventory=0
-        magazine_count=0
-        for b in self.inventory:
-            if b.is_gun_magazine:
-                if gun.name in b.ai.compatible_guns:
-                    ammo_inventory+=len(b.ai.projectiles)
-                    magazine_count+=1
-
-
-        return [ammo_gun,ammo_inventory,magazine_count]        
-
-    #---------------------------------------------------------------------------
-    def handle_check_near_magazines(self,weapon,range=50):
-        ''' check nearby surroundings for specific magazines'''
-
-        # can something more useful be done here ? 
-
-        # for now we will return a list of nearby magazines, in the future maybe 
-        # actually do something like create tasks 
-
-        near_mags=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_gun_magazines,range)
-        correct_mags=[]
-        for b in near_mags:
-            if weapon.name in b.ai.compatible_guns:
-                correct_mags.append(b)
-
-        return near_mags
-
-
+    
     #---------------------------------------------------------------------------
     def handle_drink(self,LIQUID):
         print('drinking no longer implemented')
@@ -586,51 +567,6 @@ class AIHuman(AIBase):
         if self.time_since_target_evaluation>self.target_eval_rate :
             self.target_eval_rate=random.uniform(0.8,6.5)
             self.evaluate_targets()
-
-
-    #---------------------------------------------------------------------------
-    def handle_pickup_object(self,OBJECT_TO_PICKUP):
-        ''' pickup object from the world '''
-        # any distance calculation would be made before this function is called
-
-        # reset ai 
-        self.reset_ai()
-
-        # double check the object is still there 
-        if self.owner.world.check_object_exists(OBJECT_TO_PICKUP)==False:
-            print('Debug object to pickup '+OBJECT_TO_PICKUP.name+' is no longer in the world')
-        else:
-
-            if OBJECT_TO_PICKUP.is_large_human_pickup:
-
-                # need to make sure nobody else is already carrying it
-                in_use=False
-                for b in self.owner.world.wo_objects_human:
-                    if b.ai.large_pickup==OBJECT_TO_PICKUP:
-                        in_use=True
-
-                if in_use:
-                    print('Error large pick up is already picked up: ',OBJECT_TO_PICKUP.name)
-                else:
-                    self.large_pickup=OBJECT_TO_PICKUP
-            else:
-                if OBJECT_TO_PICKUP.is_gun:
-
-                    # for now just pick up near by magazines (probably aren't any)
-                    near_mags=self.handle_check_near_magazines(OBJECT_TO_PICKUP,50)
-                    for b in near_mags:
-                        self.handle_pickup_object(b)
-
-                    # also loot any nearby containers
-                    container=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_container,100)
-                    if container!=None:
-                        self.take_action_loot_container(container)
-
-                self.speak('Picking up a '+OBJECT_TO_PICKUP.name)
-
-                self.event_add_inventory(OBJECT_TO_PICKUP)
-                # remove from world
-                self.owner.world.remove_queue.append(OBJECT_TO_PICKUP)
 
 
 
@@ -729,73 +665,6 @@ class AIHuman(AIBase):
         
         self.speak('reloading!')
 
-    #-----------------------------------------------------------------------
-    def handle_replenish_ammo(self):
-        '''replenish ammo from a target object that we walked to'''
-        if self.target_object==None:
-            print('Error: replenish ammo from None target_object')
-        else:
-            if self.target_object.is_human:
-                pass
-            elif self.target_object.is_ammo_container:
-                pass
-            elif self.target_object.is_gun_magazine:
-                pass
-            elif self.target_object.is_container:
-                pass
-
-            # for now just cheat 
-            for b in self.inventory:
-                if b.is_gun_magazine:
-                    engine.world_builder.load_magazine(self.owner.world,b)
-
-            # load the magazine in the gun as well
-            if self.primary_weapon!=None:
-                if self.primary_weapon.ai.magazine!=None:
-                    engine.world_builder.load_magazine(self.owner.world,self.primary_weapon.ai.magazine)
-
-            self.ai_want_ammo=False
-
-            print('debug: '+self.owner.name+' replenishing ammo')
-
-    #--------------------------------------------------------------------------
-    def handle_squad_actions(self):
-        '''handle various squad decisions. returns true/false if an action was taken'''
-        action=False
-        if self.squad.squad_leader!=None:
-            
-            # are we the squad leader?
-            if self.owner==self.squad.squad_leader:
-
-                # check distance to destination 
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
-
-                if distance>100:
-                    self.ai_goal='move towards squad destination'
-                    self.destination=self.squad.destination
-                    self.ai_state='start_moving'
-                    action=True
-                    
-            else:
-                    
-                # first we should check if we outrank the squad leader 
-                        
-                # check to see if we should get closer 
-                distance_group=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
-                if distance_group >self.squad_max_distance:
-                    if self.prone:
-                        self.handle_prone_state_change()
-                    self.ai_goal='close_with_group'
-                    self.destination=copy.copy(self.squad.squad_leader.world_coords)
-                    self.time_since_ai_transition=0
-                    self.ai_state='start_moving'
-
-                    action=True
-        else:
-            # elect yourself as squad leader. Naturally!
-            self.squad.squad_leader=self.owner
-        return action
-    
     #---------------------------------------------------------------------------
     def handle_squad_transportation_orders(self):
         '''assign transportation for the squad'''
@@ -1463,9 +1332,20 @@ class AIHuman(AIBase):
                 self.memory['task_engage_enemy']['think_interval']=random.uniform(0.1,1.5)
 
                 # distance?
+                distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
 
 
                 # out of ammo ?
+                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
+                if ammo_gun==0:
+                    if ammo_inventory>0:
+                        self.reload_weapon(self.primary_weapon)
+                    else:
+                        # need ammo or new gun
+                        near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+                        if len(near_magazines)>0:
+                            self.switch_task_pickup_objects(near_magazines)
+
 
 
 
@@ -1626,6 +1506,52 @@ class AIHuman(AIBase):
             # add some fatigue
             self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
 
+    #---------------------------------------------------------------------------
+    def update_task_pickup_objects(self):
+        objects=self.memory['task_pickup_objects']['objects']
+        remove_queue=[]
+        for b in objects:
+            if self.owner.world.check_object_exists(b)==False:
+                remove_queue.append(b)
+            else:
+                distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                if distance<self.max_distance_to_interact_with_object:
+                    # -- pickup object --
+                    # remove as we will be picking it up
+                    remove_queue.append(b)
+
+                    if b.is_large_human_pickup:
+
+                        # need to make sure nobody else is already carrying it
+                        in_use=False
+                        for b in self.owner.world.wo_objects_human:
+                            if b.ai.large_pickup==b:
+                                in_use=True
+
+                        if in_use:
+                            engine.log.add_data('warn','Error large pick up is already picked up: '+b.name,True)
+                        else:
+                            self.large_pickup=b
+                    else:
+                        if b.is_gun:
+
+                            near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+                            if len(near_magazines)>0:
+                                self.switch_task_pickup_objects(near_magazines)
+
+                        self.speak('Picking up a '+b.name)
+
+                        self.event_add_inventory(b)
+                        # remove from world
+                        self.owner.world.remove_queue.append(b)
+                elif distance>self.max_walk_distance:
+                    # maybe should add a option to ignore this but for the most part you want to forget distant objects
+                    remove_queue.append(b)
+        # process remove queue
+        for b in remove_queue:
+            objects.remove(b)
+
+        # go towards the closest one
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
