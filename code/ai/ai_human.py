@@ -30,11 +30,12 @@ class AIHuman(AIBase):
 
         self.task_map={
             'task_player_control':update_task_player_control,
-            'task_player_vehicle_control':update_task_player_vehicle_control,
             'task_enter_vehicle':update_task_enter_vehicle,
             'task_exit_vehicle':update_task_exit_vehicle,
             'task_move_to_location':update_task_move_to_location,
-            'task_vehicle_crew':update_task_vehicle_crew
+            'task_vehicle_crew':update_task_vehicle_crew,
+            'task_engage_enemy':update_task_engage_enemy,
+            'task_pickup_objects':update_task_pickup_objects
         }
 
         self.memory={}
@@ -471,11 +472,6 @@ class AIHuman(AIBase):
 
 
 
-    
-    #---------------------------------------------------------------------------
-    def handle_drink(self,LIQUID):
-        print('drinking no longer implemented')
-
     #---------------------------------------------------------------------------
     def handle_drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
@@ -811,6 +807,24 @@ class AIHuman(AIBase):
         self.current_task=task_name
 
     #---------------------------------------------------------------------------
+    def switch_task_engage_enemy(self,destination):
+        '''switch task'''
+        # destination : this is a world_coords
+        task_name='task_engage_enemy'
+        task_details = {
+            'enemy': enemy,
+            'last_think_time': 0,
+            'think_interval': 0.5
+        }
+
+        self.memory[task_name]=task_details
+        self.current_task=task_name
+
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+        # tell graphics engine to redo the image 
+        self.owner.reset_image=True
+
+    #---------------------------------------------------------------------------
     def switch_task_exit_vehicle(self,vehicle):
         '''switch task'''
         task_name='task_exit_vehicle'
@@ -838,6 +852,25 @@ class AIHuman(AIBase):
         self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
         # tell graphics engine to redo the image 
         self.owner.reset_image=True
+
+    #---------------------------------------------------------------------------
+    def switch_task_pickup_objects(self,objects):
+        '''switch task'''
+
+        # if this task already exists we just want to update it
+        if 'task_pickup_objects' in self.memory:
+            # just add the extra objects on
+            self.memory['task_pickup_objects'][objects]+=objects
+        else:
+            # otherwise create a new one
+            task_name='task_pickup_objects'
+            task_details = {
+                'objects': objects
+            }
+
+            self.memory[task_name]=task_details
+
+        self.current_task=task_name
 
     #---------------------------------------------------------------------------
     def switch_task_vehicle_crew(self,vehicle,destination,role=None,turret=None):
@@ -871,60 +904,6 @@ class AIHuman(AIBase):
 
         self.memory[task_name]=task_details
         self.current_task=task_name
-
-
-    #-----------------------------------------------------------------------
-    def think_eat(self):
-        '''evaluate food options return bool as to whether something is eaten'''
-        status=False
-
-        if self.hunger>75 or self.thirst>50:
-            # 1 check if we have anything in inventory
-            item=None
-            for b in self.inventory:
-                if b.is_consumable:
-                    item=b
-                    break
-            if item!=None:
-                self.speak('eating '+item.name)
-                self.handle_eat(item)
-                status=True
-            else:
-                self.ai_want_food=True
-
-        return status
-
-
-    #-----------------------------------------------------------------------
-    def think_healing_options(self):
-        '''evaluate health options return bool as to whether action is taken'''
-        status=False
-        # 1 check if we have anything in inventory
-        items=[]
-        for b in self.inventory:
-            if b.is_medical:
-                items.append(b)
-                #break #why was this here? don't we want all of them?s
-        if len(items)>0:
-            # pass the whole list and let the function determine the best one to use
-            self.handle_use_medical_object(items)
-            status=True
-        else:
-            self.ai_want_medical=True
-
-        # 3 (kind of)
-        if self.bleeding:
-            if random.randint(1,15)==1:
-                self.speak('applying bandage')
-                # bleeding stopped through make shift bandage
-                self.bleeding=False
-                self.health+=5
-                self.fatigue+=10
-                # i guess this counts as an action
-                status=True
-        return status
-
-
         
     #-----------------------------------------------------------------------
     def think_loot_container(self,CONTAINER):
@@ -1019,47 +998,10 @@ class AIHuman(AIBase):
                 self.event_add_inventory(c)
                 self.speak('Grabbed a '+c.name)
 
-    #-----------------------------------------------------------------------
-    def think_upgrade_gear(self):
-        '''think about upgrading gear. return True/False if upgrading'''
 
-        # !! this is kinda pointless as most of this stuff is also done under think_generic now
-        # maybe make it more thinky than think_generic which is kind of a last ditch find something to do 
-        # method 
-
-        status=False
-        # grab another grenade?
-        if self.throwable == None:
-            status=self.take_action_get_item(True,self.owner.world.wo_objects_grenade)
-        # upgrade weapon?
-        if status==False:
-            # will attempt to upgrade gun, or get any nearby gun if ai doesn't have one
-            status=self.take_action_get_gun(True,True)
-        # grab anti-tank 
-        if status==False and self.antitank==None:
-            status=self.take_action_get_item(True,self.owner.world.wo_objects_handheld_antitank)
-
-        # upgrade clothes / armor
-
-        # top off ammo ?
-        if status==False and self.primary_weapon!=None:
-            ammo=self.handle_check_ammo(self.primary_weapon)
-            # check if we have extra magazines in inventory
-            # - if we don't then it is somewhat pointless to get more ammo
-            if ammo[2]>0 :
-                if ammo[1]<(ammo[0]):
-                    # basically if we have less ammo in our inventory than in our gun
-                    status=self.take_action_get_ammo(True)
-            else:
-                # no magazines, should we get a new gun?
-                status=self.take_action_get_gun(True,False)
-
-
-        return status
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         destination=self.memory['task_vehicle_crew']['destination']
 
@@ -1510,6 +1452,8 @@ class AIHuman(AIBase):
     def update_task_pickup_objects(self):
         objects=self.memory['task_pickup_objects']['objects']
         remove_queue=[]
+        nearest_distance=2000
+        nearest_object=None
         for b in objects:
             if self.owner.world.check_object_exists(b)==False:
                 remove_queue.append(b)
@@ -1547,11 +1491,19 @@ class AIHuman(AIBase):
                 elif distance>self.max_walk_distance:
                     # maybe should add a option to ignore this but for the most part you want to forget distant objects
                     remove_queue.append(b)
+                else:
+                    # the distance is intermediate. we still want to pick the item up
+                    # track which object is closest
+                    if distance<nearest_distance:
+                        nearest_object=b
+                        nearest_distance=distance
         # process remove queue
         for b in remove_queue:
             objects.remove(b)
 
         # go towards the closest one
+        if nearest_object!=None:
+            self.switch_task_move_to_location(nearest_object.world_coords)
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
