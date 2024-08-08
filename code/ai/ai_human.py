@@ -77,6 +77,11 @@ class AIHuman(AIBase):
         self.probable_kills=0
         self.last_collision_description=''
 
+        # -- firing pattern stuff
+        # burst control keeps ai from shooting continuous streams
+        self.current_burst=0 # int number of bullets shot in current burst
+        self.max_burst=10
+
         # -- OLD ---
         
         # self.throwable=None
@@ -100,9 +105,7 @@ class AIHuman(AIBase):
         # self.squad_max_distance=300
 
 
-        # # burst control keeps ai from shooting continuous streams
-        # self.current_burst=0 # int number of bullets shot in current burst
-        # self.max_burst=10
+        
  
         # # target lists. these are refreshed periodically 
         # self.near_targets=[]
@@ -407,7 +410,7 @@ class AIHuman(AIBase):
         if self.current_burst>self.max_burst:
             # stop firing, give the ai a chance to rethink and re-engage
             self.current_burst=0
-            self.reset_ai()
+            self.memory['current_task']='None'
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
@@ -452,7 +455,6 @@ class AIHuman(AIBase):
         return target
     
 
-
     #---------------------------------------------------------------------------
     def handle_building_check(self):
 
@@ -469,8 +471,6 @@ class AIHuman(AIBase):
             if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
                 self.building_list.append(b)
                 self.in_building=True
-
-
 
     #---------------------------------------------------------------------------
     def handle_drop_object(self,OBJECT_TO_DROP):
@@ -498,9 +498,6 @@ class AIHuman(AIBase):
 
         # this should remove the object from the game because it is not added to world
         self.event_remove_inventory(CONSUMABLE)
-
-
-
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -564,10 +561,6 @@ class AIHuman(AIBase):
             self.target_eval_rate=random.uniform(0.8,6.5)
             self.evaluate_targets()
 
-
-
- 
-
     #---------------------------------------------------------------------------
     def handle_prone_state_change(self):
         '''if prone, stand up. If standing, go prone'''
@@ -622,8 +615,6 @@ class AIHuman(AIBase):
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
         
-        
-
     #-----------------------------------------------------------------------
     def reload_turret(self):
         if self.vehicle_turret!=None:
@@ -748,7 +739,7 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords):
-        ''' throw like you know the thing. cmon man ''' 
+        ''' launch antitank ''' 
 
         # standup. kneel would be better if it becomes an option later
         if self.prone:
@@ -807,7 +798,7 @@ class AIHuman(AIBase):
         self.current_task=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_engage_enemy(self,destination):
+    def switch_task_engage_enemy(self,enemy):
         '''switch task'''
         # destination : this is a world_coords
         task_name='task_engage_enemy'
@@ -830,6 +821,17 @@ class AIHuman(AIBase):
         task_name='task_exit_vehicle'
         task_details = {
             'vehicle': vehicle,
+        }
+
+        self.memory[task_name]=task_details
+        self.current_task=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_loot_container(self,container):
+        '''switch task'''
+        task_name='task_loot_container'
+        task_details = {
+            'container': container,
         }
 
         self.memory[task_name]=task_details
@@ -905,99 +907,6 @@ class AIHuman(AIBase):
         self.memory[task_name]=task_details
         self.current_task=task_name
         
-    #-----------------------------------------------------------------------
-    def think_loot_container(self,CONTAINER):
-        '''look at the contents of a container and take what we need'''
-        # written for ai_container but will work for anything that has ai.inventory
-        # getting to this function assumes that the bot is <5 from the container
-
-        # reset AI 
-        self.reset_ai()
-
-        # make sure the object is still there
-        if self.owner.world.check_object_exists(CONTAINER)==False:
-            self.speak('Where did that '+CONTAINER.name+' go?')
-        else:       
-            medical_items=[]
-            consumable_items=[]
-            guns=[]
-            grenades=[]
-            anti_tank=[]
-            gun_magazine=[]
-            
-            # should handle liquids consumable + fuel
-
-            # should handle ammo containers
-
-            # sort items
-            for b in CONTAINER.ai.inventory:
-                if b.is_medical:
-                    medical_items.append(b)
-                elif b.is_consumable:
-                    consumable_items.append(b)
-                elif b.is_gun:
-                    guns.append(b)
-                elif b.is_grenade:
-                    grenades.append(b)
-                elif b.is_handheld_antitank:
-                    anti_tank.append(b)
-                elif b.is_gun_magazine:
-                    gun_magazine.append(b)
-
-            # grab stuff based on what we want
-            take=[]
-            if self.ai_want_medical and len(medical_items)>0:
-                take.append(medical_items[0])
-                self.ai_want_medical=False
-            if self.ai_want_food and len(consumable_items)>0:
-                take.append(consumable_items[0])
-                self.ai_want_food=False
-            if self.ai_want_gun and len(guns)>0:
-                take.append(guns[0])
-                self.ai_want_gun=False
-            if self.ai_want_grenade and len(grenades)>0:
-                take.append(grenades[0])
-                self.ai_want_grenade=False
-            if self.ai_want_antitank and len(anti_tank)>0:
-                take.append(anti_tank[0])
-                self.ai_want_antitank=False
-
-            if len(take)==0:
-                # nothing we wanted. lets grab something random
-                chance=random.randint(1,5)
-                if chance==1 and len(CONTAINER.ai.inventory)>0:
-                    take.append(CONTAINER.ai.inventory[0])
-            
-            # handle gun magazine decisions
-            if len(gun_magazine)>0:
-                gun=None
-
-                # check if we are grabbing a gun
-                for b in take:
-                    if b.is_gun:
-                        gun=b
-
-                # if not, set it to the gun we have, if we have one
-                if gun==None:
-                    if self.primary_weapon!=None:
-                        gun=self.primary_weapon
-
-                # if we have a gun now, grab compatible magazines
-                # only grab 2 magazines though
-                grabbed=0
-                if gun!=None:
-                    for b in gun_magazine:
-                        if gun.name in b.ai.compatible_guns:
-                            if grabbed<2:
-                                take.append(b)
-                                grabbed+=1
-
-            # take items!
-            for c in take:
-                CONTAINER.remove_inventory(c)
-                self.event_add_inventory(c)
-                self.speak('Grabbed a '+c.name)
-
 
 
     #---------------------------------------------------------------------------
@@ -1406,6 +1315,106 @@ class AIHuman(AIBase):
         # move slightly
         coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
         self.switch_task_move_to_location(coords)
+
+    #---------------------------------------------------------------------------
+    def update_task_loot_container(self):
+        '''loot a container or object with ai.inventory'''
+        container=self.memory['task_loot_container']['container']
+
+        if self.owner.world.check_object_exists(container)==False:
+            self.memory.pop('task_loot_container',None)
+        else:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,container.world_coords)
+            if distance<self.max_distance_to_interact_with_object:
+                # done with this task
+                self.memory.pop('task_loot_container',None)
+
+                # -- loot container --
+                need_medical=True
+                need_consumable=True
+                need_grenade=True
+                need_antitank=False
+                need_gun=self.primary_weapon==None
+
+                # check our inventory
+                for b in self.inventory:
+                    if b.is_medical:
+                        need_medical=False
+                    elif b.is_consumable:
+                        need_consumable=False
+                    elif b.is_grenade:
+                        need_grenade=False
+                    elif b.is_handheld_antitank:
+                        need_antitank=False
+
+                # grab stuff based on what we want
+                take=[]
+                gun_magazines=[]
+                for b in container.ai.inventory:
+                    if b.is_medical and need_medical:
+                        take.append(b)
+                        need_medical=False
+                    elif b.is_consumable and need_consumable:
+                        take.append(b)
+                        need_consumable=False
+                    elif b.is_grenade and need_grenade:
+                        take.append(b)
+                        need_grenade=False
+                    elif b.is_handheld_antitank and need_antitank:
+                        take.append(b)
+                        need_antitank=False
+                    elif b.is_gun and need_gun:
+                        take.append(b)
+                        need_gun=False
+                    elif b.is_gun_magazine:
+                        gun_magazines.append(b)
+
+                if len(take)==0:
+                    # nothing we wanted. lets grab something random
+                    chance=random.randint(1,5)
+                    if chance==1 and len(container.ai.inventory)>0:
+                        take.append(container.ai.inventory[0])
+                
+                # handle gun magazine decisions
+                if len(gun_magazine)>0:
+                    gun=None
+
+                    # check if we are grabbing a gun
+                    for b in take:
+                        if b.is_gun:
+                            gun=b
+
+                    # if not, set it to the gun we have, if we have one
+                    if gun==None:
+                        if self.primary_weapon!=None:
+                            gun=self.primary_weapon
+
+                    # if we have a gun now, grab compatible magazines
+                    # only grab 2 magazines though
+                    grabbed=0
+                    if gun!=None:
+                        for b in gun_magazines:
+                            if gun.name in b.ai.compatible_guns:
+                                if grabbed<2:
+                                    take.append(b)
+                                    grabbed+=1
+
+                # take items!
+                for c in take:
+                    container.remove_inventory(c)
+                    self.event_add_inventory(c)
+                    self.speak('Grabbed a '+c.name)
+
+            elif distance>self.max_walk_distance:
+                # maybe should add a option to ignore this but for the most part you want to forget distant objects
+                # done with this task
+                self.memory.pop('task_loot_container',None)
+            else:
+                # the distance is intermediate. we still want to pick the item up
+                self.switch_task_move_to_location(container.world_coords)
+
+
+
 
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
