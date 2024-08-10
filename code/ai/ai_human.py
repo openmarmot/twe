@@ -88,35 +88,32 @@ class AIHuman(AIBase):
         # self.antitank=None
         # self.melee=None
 
-        # self.wearable_head=None
-        # self.wearable_upper_body=None
-        # self.wearable_lower_body=None
-        # self.wearable_feet=None
-        # self.wearable_hand=None
+        self.wearable_head=None
+        self.wearable_upper_body=None
+        self.wearable_lower_body=None
+        self.wearable_feet=None
+        self.wearable_hand=None
 
-        # self.in_building=False
-        # self.building_list=[] # list of buildings the ai is overlapping spatially
-        # self.time_since_building_check=0
-        # self.building_check_rate=1
+        self.in_building=False
+        self.building_list=[] # list of buildings the ai is overlapping spatially
+        self.last_building_check_time=0
+        self.building_check_rate=1
 
-        # # the ai group that this human is a part of 
-        # self.squad=None
-        # self.squad_min_distance=30
-        # self.squad_max_distance=300
+        # the ai group that this human is a part of 
+        self.squad=None
+        self.squad_min_distance=30
+        self.squad_max_distance=300
 
 
-        
- 
         # # target lists. these are refreshed periodically 
-        # self.near_targets=[]
-        # self.mid_targets=[]
-        # self.far_targets=[]
-        # self.time_since_target_evaluation=0
-        # self.target_eval_rate=random.uniform(0.1,0.9)
+        self.near_targets=[]
+        self.mid_targets=[]
+        self.far_targets=[]
+        self.last_target_eval_time=0
+        self.target_eval_rate=random.uniform(0.1,0.9)
 
-        
         # # used to prevent repeats
-        # self.last_speak=''
+        self.last_speak=''
 
     #---------------------------------------------------------------------------
     def aim_and_fire_weapon(self,weapon,target):
@@ -139,7 +136,20 @@ class AIHuman(AIBase):
                     aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
 
         self.fire(aim_coords,weapon)
-        
+
+    #---------------------------------------------------------------------------
+    def building_check(self):
+
+        # randomize time before we hit this method again
+        self.building_check_rate=random.uniform(0.1,1.5)
+        # clear building list and in_building bool
+        self.building_list=[]
+        self.in_building=False
+        # check to see if we are colliding with any of the buildings
+        for b in self.owner.world.wo_objects_building:
+            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
+                self.building_list.append(b)
+                self.in_building=True
 
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile):
@@ -454,24 +464,6 @@ class AIHuman(AIBase):
 
         return target
     
-
-    #---------------------------------------------------------------------------
-    def handle_building_check(self):
-
-        # reset transition to zero
-        self.time_since_building_check=0
-
-        # randomize time before we hit this method again
-        self.building_check_rate=random.uniform(0.1,1.5)
-        # clear building list and in_building bool
-        self.building_list=[]
-        self.in_building=False
-        # check to see if we are colliding with any of the buildings
-        for b in self.owner.world.wo_objects_building:
-            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
-                self.building_list.append(b)
-                self.in_building=True
-
     #---------------------------------------------------------------------------
     def handle_drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
@@ -523,10 +515,10 @@ class AIHuman(AIBase):
         # this is a one off key press, not press and hold
         # world.handle_keydown will pass the key as the actual keyboard letter
 
-        if self.in_vehicle:
-            if self.vehicle.is_airplane:
+        if self.memory['current_task']=='task_vehicle_crew':
+            if self.memory['task_vehicle_crew']['vehicle'].is_airplane:
                 if key=='p':
-                    self.handle_exit_vehicle()
+                    self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
                     self.speak('bailing out!')
                     # note - physics needs to be udpdate to handle falling
         else:
@@ -545,21 +537,6 @@ class AIHuman(AIBase):
             elif self.memory['current_task']=='task_vehicle_crew':
                 self.reload_turret()
 
-  
-    #-----------------------------------------------------------------------
-    def handle_normal_ai_update(self):
-        ''' handle code for civilians and soldiers '''
-        # this is what the bot does when it isn't thinking 
-        # basically mindlessly carries on whatever task it is doing 
-        # if there is something that should be decided it goes in handle_normal_ai_think
-
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
-
-        # identify and categorize targets
-        self.time_since_target_evaluation+=time_passed
-        if self.time_since_target_evaluation>self.target_eval_rate :
-            self.target_eval_rate=random.uniform(0.8,6.5)
-            self.evaluate_targets()
 
     #---------------------------------------------------------------------------
     def handle_prone_state_change(self):
@@ -1026,18 +1003,20 @@ class AIHuman(AIBase):
         # update health 
         self.update_health()
 
-        #----------- OLD ----------------------------------------
- 
+        # identify and categorize targets
+        if self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate:
+            self.last_target_eval_time=self.owner.world.world_seconds
+            self.target_eval_rate=random.uniform(0.8,6.5)
+            self.evaluate_targets()
 
-
-        #     # might be faster to have a bool we could check
-        #     if self.large_pickup!=None:
-        #         self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
+        # might be faster to have a bool we could check
+        if self.large_pickup!=None:
+            self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
             
-        #     # building awareness stuff. ai and human need this 
-        #     self.time_since_building_check+=self.owner.world.graphic_engine.time_passed_seconds
-        #     if self.time_since_building_check>self.building_check_rate:
-        #         self.handle_building_check()
+        # building awareness stuff. ai and human need this
+        if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
+            self.last_building_check_time=self.owner.world.world_seconds
+            self.building_check()
 
 
     #---------------------------------------------------------------------------
