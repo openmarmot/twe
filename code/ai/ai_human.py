@@ -206,11 +206,22 @@ class AIHuman(AIBase):
                     magazine_count+=1
 
 
-        return ammo_gun,ammo_inventory,magazine_count       
+        return ammo_gun,ammo_inventory,magazine_count
+
+    #---------------------------------------------------------------------------
+    def check_ammo_bool(self,gun):
+        '''returns True/False as to whether gun has ammo'''
+        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(gun)
+        if ammo_gun>0:
+            return True
+        elif ammo_inventory>0:
+            return True
+        else:
+            return False    
 
     #---------------------------------------------------------------------------
     def evaluate_targets(self):
-        '''find and categorize targets'''
+        '''find and categorize targets. react to close ones'''
         target_list=[]
         if self.squad.faction=='german':
             target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_american
@@ -227,6 +238,8 @@ class AIHuman(AIBase):
         self.mid_targets=[]
         self.far_targets=[]
 
+        closest_distance=600
+        closest_object=None
         for b in target_list:
             d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
@@ -236,6 +249,21 @@ class AIHuman(AIBase):
                 self.mid_targets.append(b)
             elif d<1300:
                 self.far_targets.append(b)
+
+            if d<closest_distance:
+                closest_distance=d
+                closest_object=b
+
+        if closest_object!=None:
+            if self.memory['current_task']=='task_vehicle_crew':
+                # not sure what to do here yet
+                engine.log.add_data('warn','close enemy while in vehicle. not handled',True)
+        else:
+            if self.primary_weapon!=None:
+                if self.check_ammo_bool(self.primary_weapon):
+                    self.switch_task_engage_enemy(closest_object)
+            else:
+                engine.log.add_data('warn','close enemy and no primary weapon. not handled',True)
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
@@ -341,15 +369,12 @@ class AIHuman(AIBase):
                         self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.primary_weapon=event_data
                     event_data.ai.equipper=self.owner
-                    self.ai_want_gun=False
                 elif event_data.is_throwable :
                     if self.throwable==None:
                         if self.owner.is_player :
                             self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                         self.throwable=event_data
                         event_data.ai.equipper=self.owner
-                    if event_data.is_grenade:
-                        self.ai_want_grenade=False
                 elif event_data.is_handheld_antitank :
                     if self.antitank!=None:
                         # drop the current obj and pick up the new one
@@ -358,11 +383,7 @@ class AIHuman(AIBase):
                         self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.antitank=event_data
                     event_data.ai.equipper=self.owner
-                    self.ai_want_antitank=False
-                elif event_data.is_consumable:
-                    self.ai_want_food=False
-                elif event_data.is_medical:
-                    self.ai_want_medical=False
+
                 elif event_data.is_wearable:
                     if event_data.ai.wearable_region=='head':
                         if self.wearable_head==None:
@@ -461,7 +482,6 @@ class AIHuman(AIBase):
                 print('far',len(self.far_targets))
                 target=self.get_target()
                 
-
         return target
     
     #---------------------------------------------------------------------------
@@ -587,7 +607,6 @@ class AIHuman(AIBase):
                 weapon.ai.magazine=new_magazine
             else:
                 self.speak("I'm out of ammo!")
-                self.ai_want_ammo=True
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
@@ -622,7 +641,6 @@ class AIHuman(AIBase):
                     weapon.ai.magazine=new_magazine
                 else:
                     self.speak("This turret is out of ammo!")
-                    #self.ai_want_ammo=True
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
@@ -760,8 +778,6 @@ class AIHuman(AIBase):
 
                 self.owner.world.graphic_engine.add_text(s)
           
-
-
     #---------------------------------------------------------------------------
     def switch_task_enter_vehicle(self,vehicle,destination):
         '''switch task'''
@@ -852,6 +868,24 @@ class AIHuman(AIBase):
         self.current_task=task_name
 
     #---------------------------------------------------------------------------
+    def switch_task_think(self):
+
+        # if this task already exists we just want to update it
+        if 'task_think' in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            task_name='task_think'
+            task_details = {
+                'something': 'something'
+            }
+
+            self.memory[task_name]=task_details
+
+        self.current_task=task_name
+
+    #---------------------------------------------------------------------------
     def switch_task_vehicle_crew(self,vehicle,destination,role=None,turret=None):
         '''switch task to vehicle crew and determine role'''
         # pick a role
@@ -884,7 +918,6 @@ class AIHuman(AIBase):
         self.memory[task_name]=task_details
         self.current_task=task_name
         
-
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
@@ -998,7 +1031,7 @@ class AIHuman(AIBase):
                 engine.log.add_data('error','current task '+self.memory['current_task']+' not in task map',True)
 
         else:
-            self.determine_current_task()
+            self.switch_task_think()
 
         # update health 
         self.update_health()
@@ -1176,9 +1209,6 @@ class AIHuman(AIBase):
                         if len(near_magazines)>0:
                             self.switch_task_pickup_objects(near_magazines)
 
-
-
-
             else:
                 # -- fire --
                 self.aim_and_fire_weapon(self.primary_weapon,enemy)
@@ -1355,7 +1385,7 @@ class AIHuman(AIBase):
                         take.append(container.ai.inventory[0])
                 
                 # handle gun magazine decisions
-                if len(gun_magazine)>0:
+                if len(gun_magazines)>0:
                     gun=None
 
                     # check if we are grabbing a gun
@@ -1391,9 +1421,6 @@ class AIHuman(AIBase):
             else:
                 # the distance is intermediate. we still want to pick the item up
                 self.switch_task_move_to_location(container.world_coords)
-
-
-
 
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
@@ -1535,6 +1562,71 @@ class AIHuman(AIBase):
             self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
             self.time_since_player_interact=0
 
+    #---------------------------------------------------------------------------
+    def update_task_squad_lead(self):
+
+        last_think_time=self.memory['task_move_to_location']['last_think_time']
+        think_interval=self.memory['task_move_to_location']['think_interval']
+        destination=self.memory['task_move_to_location']['destination']
+
+        
+        if self.owner.world.world_seconds-last_think_time>think_interval:
+            # reset time
+            self.memory['task_move_to_location']['last_think_time']=self.owner.world.world_seconds
+
+            # -- do the longer thing ---
+        else:
+            # -- do the shorter thing --
+            pass
+
+    #---------------------------------------------------------------------------
+    def update_task_think(self):
+        '''task think - thinking about what to do next'''
+        # the ugly function where we have to determine what we are doing
+
+        # !! probably need to check the last time we were here so we aren't 
+        # hitting this too often as it is likely computationally intense
+
+        action=False
+        
+        # -- priorities --
+
+        # health - maybe this should be all done by update_health?
+
+        # primary weapon
+        if self.primary_weapon==None:
+            # need to get a gun
+            distance=2000
+            if self.near_targets>0:
+                distance=200
+            elif self.mid_targets>0:
+                distance=400
+            elif self.far_targets>0:
+                distance=900
+
+            gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+
+            if gun!=None:
+                self.switch_task_pickup_objects([gun])
+                action=True
+        else:
+            if self.check_ammo_bool==False:
+                # need to get ammo
+                pass
+
+        
+        if action==False:
+            if self.squad.squad_leader==self.owner:
+                pass
+            else:
+
+                # are we close enough to squad?
+                pass
+
+
+        # check if we have a primary weapon ?
+
+        # do we need ammo ?
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

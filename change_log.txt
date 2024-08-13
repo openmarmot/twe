@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 12 2024
+- more ai rewrite
+
+still making progress i promise 
+----------------------------------
+August 11 2024
+- more ai rewrite
+
+----------------------------------
 August 10 2024
 - more ai rewrite 
 ----------------------------------

@@ -321,27 +321,6 @@ class World(object):
         return ignore_list
 
     #---------------------------------------------------------------------------
-    def get_closest_gun(self, WORLD_COORDS):
-        ''' returns the closest gun. spawns one if there are none '''
-        best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns,5000)
-        if best_object==None:
-            # spawn a new gun and return it
-
-            # first lets get a random building
-            b=self.get_random_object(self.wo_objects_building)
-
-            # randomize the coords a bit 
-            w=[b.world_coords[0]+float(random.randint(-20,20)),b.world_coords[1]+float(random.randint(-20,20))]
-
-            # spawn a ppk
-            engine.world_builder.spawn_object(self,w,'ppk',True)
-            # hmm we don't have the object reference, so lets just run this method again
-            # does this make sense? am i insane? HA HA HAHAHAHA
-            return self.get_closest_gun(WORLD_COORDS)
-        else : 
-            return best_object
-
-    #---------------------------------------------------------------------------
     def get_closest_object(self, WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
         ''' can be used on its own or referenced like get_closest_gun() does'''
         best_distance=MAX_DISTANCE

@@ -37,7 +37,6 @@ class AISquad(object):
         # vehicles that the squad spawned with. 
         self.starting_vehicles=[]
 
-
         # faction - german/soviet/american/civilian
         self.faction='none'
 
