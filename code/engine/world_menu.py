@@ -619,10 +619,6 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
             self.world.graphic_engine.menu_text_queue.append('Distance from target object: '+str(d3))
-            self.world.graphic_engine.menu_text_queue.append('AI State: '+str(self.selected_object.ai.ai_state))
-            self.world.graphic_engine.menu_text_queue.append('AI Goal: '+str(self.selected_object.ai.ai_goal))
-            self.world.graphic_engine.menu_text_queue.append('AI Vehicle Goal: '+str(self.selected_object.ai.ai_vehicle_goal))
-            self.world.graphic_engine.menu_text_queue.append('Personal Enemies Count: '+str(len(self.selected_object.ai.personal_enemies)))
             self.world.graphic_engine.menu_text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
 
             self.world.graphic_engine.menu_text_queue.append('')
@@ -984,13 +980,11 @@ class World_Menu(object):
                     r = engine.math_2d.get_rotation(self.selected_object.world_coords,self.selected_object.ai.driver.ai.ai_vehicle_destination)
                     self.world.graphic_engine.menu_text_queue.append('rotation to destination: '+str(r))
                     self.world.graphic_engine.menu_text_queue.append('vehicle rotation: '+str(self.selected_object.rotation_angle))
-                    self.world.graphic_engine.menu_text_queue.append('driver ai_state: '+self.selected_object.ai.driver.ai.ai_state)
-                    self.world.graphic_engine.menu_text_queue.append('driver ai_goal: '+self.selected_object.ai.driver.ai.ai_goal)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
                     self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('Name [faction/ai_state/ai_goal/vehicle_ai_goal/ai_vehicle_role]')
+                    self.world.graphic_engine.menu_text_queue.append('Name/Faction')
                     for b in self.selected_object.ai.passengers:
-                        self.world.graphic_engine.menu_text_queue.append(b.name + '['+b.ai.squad.faction+' / '+b.ai.ai_state+' / '+b.ai.ai_goal+' / '+b.ai.ai_vehicle_goal+' / '+b.ai.ai_vehicle_role+']')
+                        self.world.graphic_engine.menu_text_queue.append(b.name + '/'+b.ai.squad.faction)
                     self.world.graphic_engine.menu_text_queue.append('------------------------------------')
 
 

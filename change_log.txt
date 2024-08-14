@@ -2,10 +2,27 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 13 2024
+- more ai rewrite 
+- started world_menu updates for the new ai 
+
+old ai stuff that isn't implemented yet 
+- eating 
+- react_to* system 
+- most prone/un-prone decisions 
+- grenade throwing 
+- anti-tank weapon usage 
+- panic state
+
+I think the ai rewrite is within a 2-4 updates of being playable so i'll switch 
+back to detailed change logs in the next update. 
+
+----------------------------------
 August 12 2024
 - more ai rewrite
 
 still making progress i promise 
+
 ----------------------------------
 August 11 2024
 - more ai rewrite
@@ -13,6 +30,7 @@ August 11 2024
 ----------------------------------
 August 10 2024
 - more ai rewrite 
+
 ----------------------------------
 August 08 2024
 -yup more ai rewrite

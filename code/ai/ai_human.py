@@ -5,10 +5,6 @@ language : Python 3.x
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
-handle_SOMETHING - something that the AI decides to do that requires some code to make happen
-take_action_ - something simple that sets ai_state and ai_goal to start an action, but not a lot of logic
-think_ - something that requires a lot of logic code
-react_ - player or bot calls this when they want to give orders to another bot
 for humans the current owner.image_list is [normal,prone,dead]
 '''
 
@@ -101,9 +97,7 @@ class AIHuman(AIBase):
 
         # the ai group that this human is a part of 
         self.squad=None
-        self.squad_min_distance=30
         self.squad_max_distance=300
-
 
         # # target lists. these are refreshed periodically 
         self.near_targets=[]
@@ -275,7 +269,6 @@ class AIHuman(AIBase):
 
             self.calculate_projectile_damage(event_data)
 
-            # add the shooter of the bullet to the personal enemies list
             # shrapnel from grenades and panzerfausts dont track ownership
             if event_data.ai.shooter !=None:
                 self.last_collision_description+=(' from '+event_data.ai.shooter.name)
@@ -284,8 +277,9 @@ class AIHuman(AIBase):
 
                     if event_data.ai.shooter.ai.squad != None:
                         if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
-                            # this creates a lot of friendly fire - but its interesting 
-                            self.personal_enemies.append(event_data.ai.shooter)
+                            # not sure if this is the best way to do this.
+                            # this used to be where the shooter was added to personal_enemies
+                            self.switch_task_engage_enemy(event_data.ai.shooter)
 
                     # kill tracking
 
@@ -305,17 +299,20 @@ class AIHuman(AIBase):
                 print('Error - projectile '+event_data.name+' shooter is none')
                 # other way to get here is if its not a projectile
                 print('or its not a projectile')
-
+            
+            destination=[0,0]
             if self.owner.is_civilian:
                 # civilian runs further
-                self.ai_goal='react to collision'
-                self.destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
-                self.ai_state='start_moving'
+                destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
             else:
-                # soldier just repositions
-                self.ai_goal='react to collision'
-                self.destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                self.ai_state='start_moving'
+                # soldier just repositions to get away from the fire
+                destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+            if self.memory['current_task']!='task_vehicle_crew':
+                if self.prone==False:
+                    self.handle_prone_state_change()
+                self.switch_task_move_to_location(destination)
+            else:
+                engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
 
         elif event_data.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything
@@ -324,23 +321,20 @@ class AIHuman(AIBase):
             if random.randint(1,5)==1:
                 event_data.ai.redirect(event_data.ai.equipper.world_coords)
             else:
-                self.ai_goal='react to collision'
-                self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
-                self.ai_state='start_moving'
+                if self.memory['current_task']!='task_vehicle_crew':
+                    if self.prone==True:
+                        self.handle_prone_state_change()
+                    destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
+                    self.switch_task_move_to_location(destination)
+                else:
+                    engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
+
         elif event_data.is_throwable:
             #throwable but not a grenade 
             self.speak('Oww!')
-            # temp do something else later
-            self.take_action_panic()
 
         else:
-            print('unidentified collision')
-
-            # this is very important because it breaks us out of whatever ai cycle we were in
-            # we are put in a very short movement cycle and then the AI can 'think' about what to do next
-            self.ai_goal='react to collision'
-            self.destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
-            self.ai_state='start_moving'
+            engine.log.add_data('debug','unidentified collision: '+event_data.name,True)
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,event_data):
@@ -483,6 +477,40 @@ class AIHuman(AIBase):
                 target=self.get_target()
                 
         return target
+    
+    #---------------------------------------------------------------------------
+    def give_squad_transportation_orders(self,destination):
+        '''assign transportation for the squad'''
+
+        near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
+
+        # remove yourself to prevent recursion
+        near_squad.remove(self.owner)
+
+        near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,500)
+
+        for b in near_vehicle:
+            if len(near_squad)==0:
+                break
+            # calculate occupants
+            occupants=len(b.ai.passengers)
+            for c in self.owner.world.wo_objects_human:
+                if 'task_enter_vehicle' in c.ai.memory:
+                    if c.ai.memory['task_enter_vehicle']['vehicle']==b
+                        occupants+=1
+
+            while occupants<b.ai.max_occupants:
+                if len(near_squad)>0:
+                    if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
+                        #already in a vehicle, so no further action needed
+                        near_squad.pop(0)
+                    else:
+                        self.switch_task_enter_vehicle()
+                        near_squad[0].ai.switch_task_enter_vehicle(b,destination)
+                        occupants+=1
+                        near_squad.pop(0)
+                else:
+                    break
     
     #---------------------------------------------------------------------------
     def handle_drop_object(self,OBJECT_TO_DROP):
@@ -648,42 +676,6 @@ class AIHuman(AIBase):
         self.speak('reloading!')
 
     #---------------------------------------------------------------------------
-    def handle_squad_transportation_orders(self):
-        '''assign transportation for the squad'''
-
-        near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
-
-        # remove yourself to prevent recursion
-        near_squad.remove(self.owner)
-
-        near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,1000)
-
-        for b in near_vehicle:
-            if len(near_squad)==0:
-                break
-            # calculate occupants
-            occupants=len(b.ai.passengers)
-            for c in self.owner.world.wo_objects_human:
-                if c.ai.ai_goal=='enter_vehicle' and c.ai.target_object==b:
-                    occupants+=1
-
-            while occupants<b.ai.max_occupants:
-                if len(near_squad)>0:
-                    if near_squad[0].ai.in_vehicle:
-                        #already in a vehicle, so no further action needed
-                        near_squad.pop(0)
-                    else:
-                    # set this so they know where to go
-                        if self.ai_vehicle_destination!=None:
-                            near_squad[0].ai.ai_vehicle_destination=self.ai_vehicle_destination
-                        near_squad[0].ai.react_asked_to_enter_vehicle(b)
-                        occupants+=1
-                        near_squad.pop(0)
-                else:
-                    break
-        
-
-    #---------------------------------------------------------------------------
     def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
         
@@ -764,7 +756,7 @@ class AIHuman(AIBase):
                 s='['+self.owner.name+'] '
 
                 if WHAT=='status':
-                    s+=' '+self.ai_state+' '+self.ai_goal
+                    s+=' what?'
                 elif WHAT=='bandage':
                     s+=' applying bandage'
                 elif WHAT=='joined squad':
@@ -788,7 +780,10 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
+
+        if self.squad.squad_lead==self.owner:
+            self.give_squad_transportation_orders(destination)
 
     #---------------------------------------------------------------------------
     def switch_task_engage_enemy(self,enemy):
@@ -802,9 +797,9 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
 
-        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,enemy.world_coords)
         # tell graphics engine to redo the image 
         self.owner.reset_image=True
 
@@ -817,7 +812,7 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
     def switch_task_loot_container(self,container):
@@ -828,7 +823,7 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
     def switch_task_move_to_location(self,destination):
@@ -842,52 +837,73 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
 
-        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.destination)
+        self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,destination)
         # tell graphics engine to redo the image 
         self.owner.reset_image=True
 
     #---------------------------------------------------------------------------
     def switch_task_pickup_objects(self,objects):
         '''switch task'''
-
+        
+        task_name='task_pickup_objects'
         # if this task already exists we just want to update it
-        if 'task_pickup_objects' in self.memory:
+        if task_name in self.memory:
             # just add the extra objects on
-            self.memory['task_pickup_objects'][objects]+=objects
+            self.memory[task_name][objects]+=objects
         else:
             # otherwise create a new one
-            task_name='task_pickup_objects'
+            
             task_details = {
                 'objects': objects
             }
 
             self.memory[task_name]=task_details
 
-        self.current_task=task_name
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_squad_lead(self):
+        '''switch task'''
+        task_name='task_squad_lead'
+
+        if task_name in self.memory:
+            # something here eventually?
+            pass
+        else:
+            task_details = {
+                'last_think_time': 0,
+                'think_interval': 0.5
+            }
+
+            self.memory[task_name]=task_details
+
+        self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
     def switch_task_think(self):
+        task_name='task_think'
 
-        # if this task already exists we just want to update it
-        if 'task_think' in self.memory:
+        if task_name in self.memory:
             # eventually will probably having something to update here
             pass
         else:
             # otherwise create a new one
-            task_name='task_think'
+            
             task_details = {
                 'something': 'something'
             }
 
             self.memory[task_name]=task_details
 
-        self.current_task=task_name
+        self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
     def switch_task_vehicle_crew(self,vehicle,destination,role=None,turret=None):
         '''switch task to vehicle crew and determine role'''
+        # this should always overwrite if it exists
+
         # pick a role
         if role==None:
             if vehicle.ai.driver==None:
@@ -916,7 +932,7 @@ class AIHuman(AIBase):
         }
 
         self.memory[task_name]=task_details
-        self.current_task=task_name
+        self.memory['current_task']=task_name
         
 
     #---------------------------------------------------------------------------
@@ -1459,7 +1475,7 @@ class AIHuman(AIBase):
             # -- walk --
             # move
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),
-                self.owner.world_coords,self.destination,self.owner.world.graphic_engine.time_passed_seconds)
+                self.owner.world_coords,destination,self.owner.world.graphic_engine.time_passed_seconds)
             # add some fatigue
             self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
 
@@ -1565,9 +1581,8 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def update_task_squad_lead(self):
 
-        last_think_time=self.memory['task_move_to_location']['last_think_time']
-        think_interval=self.memory['task_move_to_location']['think_interval']
-        destination=self.memory['task_move_to_location']['destination']
+        last_think_time=self.memory['task_squad_lead']['last_think_time']
+        think_interval=self.memory['task_squad_lead']['think_interval']
 
         
         if self.owner.world.world_seconds-last_think_time>think_interval:
@@ -1575,9 +1590,24 @@ class AIHuman(AIBase):
             self.memory['task_move_to_location']['last_think_time']=self.owner.world.world_seconds
 
             # -- do the longer thing ---
+            action=False
+            
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
+            if distance>150:
+                self.switch_task_move_to_location(self.squad.destination)
+                action=True
+
+            # check on squad members?
+                
+            # coordinate with nearby squad lead?
+                
+            # check in with HQ ?
+            
         else:
             # -- do the shorter thing --
-            pass
+            # go for a walk
+            coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
+            self.switch_task_move_to_location(coords)
 
     #---------------------------------------------------------------------------
     def update_task_think(self):
@@ -1596,7 +1626,7 @@ class AIHuman(AIBase):
         # primary weapon
         if self.primary_weapon==None:
             # need to get a gun
-            distance=2000
+            distance=4000
             if self.near_targets>0:
                 distance=200
             elif self.mid_targets>0:
@@ -1604,29 +1634,64 @@ class AIHuman(AIBase):
             elif self.far_targets>0:
                 distance=900
 
-            gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+            if distance<4000:
+                gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
 
             if gun!=None:
                 self.switch_task_pickup_objects([gun])
                 action=True
         else:
+            # -- we have a gun. is it usable? --
             if self.check_ammo_bool==False:
-                # need to get ammo
-                pass
-
+                # need to get ammo. check for nearby magazines
+                near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
+                if len(near_magazines)>0:
+                    self.switch_task_pickup_objects(near_magazines)
+                    action=True
         
+        # -- check if we have older tasks to resume --
+        # this is important for compound tasks 
         if action==False:
+            if 'task_enter_vehicle' in self.memory:
+                self.memory['current_task']='task_enter_vehicle'
+                action=True
+            elif 'task_pickup_objects' in self.memory:
+                self.memory['current_task']='task_pickup_objects'
+                action=True
+            elif 'task_loot_container' in self.memory:
+                self.memory['current_task']='task_loot_container'
+                action=True
+
+        # -- squad stuff --
+        # this should be AFTER anything else important
+        if action==False:
+            if self.squad.squad_leader==None:
+                self.squad.squad_leader=self.owner
+
             if self.squad.squad_leader==self.owner:
-                pass
+                self.switch_task_squad_lead()
+                action=True
             else:
-
+                # being in a squad wwhen we aren't lead basically just means staying close to the squad lead
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_lead.world_coords)
                 # are we close enough to squad?
-                pass
+                if distance>self.squad_max_distance:
+                    self.switch_task_move_to_location(self.squad.squad_lead.world_coords)
+                    action=True
 
-
-        # check if we have a primary weapon ?
-
-        # do we need ammo ?
+        # -- ok now we've really run out of things to do. do things that don't matter
+        # ! NOTE Squad Lead will never get this far
+        if action==False:
+            decision=random.randint(0,10)
+            if decision==1:
+                # go for a walk
+                coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
+                self.switch_task_move_to_location(coords)
+            elif decision==2:
+                # check containers
+                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
+                if len(containers)>0:
+                    self.switch_task_loot_container(random.choice(containers))
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):
