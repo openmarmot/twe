@@ -61,6 +61,9 @@ class AIHuman(AIBase):
         # -- equipment --
         self.inventory=[]
         self.primary_weapon=None
+        self.throwable=None
+        self.antitank=None
+        # self.melee=None
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
         self.carrying_offset=[10,10]  #vector offset for when you are carrying a object
@@ -77,12 +80,6 @@ class AIHuman(AIBase):
         # burst control keeps ai from shooting continuous streams
         self.current_burst=0 # int number of bullets shot in current burst
         self.max_burst=10
-
-        # -- OLD ---
-        
-        # self.throwable=None
-        # self.antitank=None
-        # self.melee=None
 
         self.wearable_head=None
         self.wearable_upper_body=None
@@ -212,6 +209,17 @@ class AIHuman(AIBase):
             return True
         else:
             return False    
+        
+    #---------------------------------------------------------------------------
+    def eat(self,CONSUMABLE):
+        # eat the consumable object. or part of it anyway
+        self.health+=CONSUMABLE.ai.health_effect
+        self.hunger+=CONSUMABLE.ai.hunger_effect
+        self.thirst+=CONSUMABLE.ai.thirst_effect
+        self.fatigue+=CONSUMABLE.ai.fatigue_effect
+
+        # this should remove the object from the game because it is not added to world
+        self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
     def evaluate_targets(self):
@@ -279,7 +287,9 @@ class AIHuman(AIBase):
                         if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
                             # not sure if this is the best way to do this.
                             # this used to be where the shooter was added to personal_enemies
-                            self.switch_task_engage_enemy(event_data.ai.shooter)
+                            if self.primary_weapon!=None:
+                                if self.check_ammo_bool(self.primary_weapon):
+                                    self.switch_task_engage_enemy(event_data.ai.shooter)
 
                     # kill tracking
 
@@ -496,7 +506,7 @@ class AIHuman(AIBase):
             occupants=len(b.ai.passengers)
             for c in self.owner.world.wo_objects_human:
                 if 'task_enter_vehicle' in c.ai.memory:
-                    if c.ai.memory['task_enter_vehicle']['vehicle']==b
+                    if c.ai.memory['task_enter_vehicle']['vehicle']==b:
                         occupants+=1
 
             while occupants<b.ai.max_occupants:
@@ -527,17 +537,6 @@ class AIHuman(AIBase):
             if OBJECT_TO_DROP.is_grenade==False:
                 engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
             self.owner.world.add_queue.append(OBJECT_TO_DROP)
-
-    #---------------------------------------------------------------------------
-    def handle_eat(self,CONSUMABLE):
-        # eat the consumable object. or part of it anyway
-        self.health+=CONSUMABLE.ai.health_effect
-        self.hunger+=CONSUMABLE.ai.hunger_effect
-        self.thirst+=CONSUMABLE.ai.thirst_effect
-        self.fatigue+=CONSUMABLE.ai.fatigue_effect
-
-        # this should remove the object from the game because it is not added to world
-        self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -1196,6 +1195,8 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def update_task_engage_enemy(self):
 
+        # - getting this far assumes that you have a primary weapon
+
         enemy=self.memory['task_engage_enemy']['enemy']
         if enemy.ai.health<1:
             self.memory.pop('task_engage_enemy',None)
@@ -1213,17 +1214,41 @@ class AIHuman(AIBase):
                 # distance?
                 distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
 
+                if distance<self.primary_weapon.ai.range:
+                    # maybe only when not in buildings??
+                    if not self.prone:
+                        self.handle_prone_state_change()
 
-                # out of ammo ?
-                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
-                if ammo_gun==0:
-                    if ammo_inventory>0:
-                        self.reload_weapon(self.primary_weapon)
+                    # out of ammo ?
+                    ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
+                    if ammo_gun==0:
+                        if ammo_inventory>0:
+                            self.reload_weapon(self.primary_weapon)
+                        else:
+                            # need ammo or new gun
+                            near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+                            if len(near_magazines)>0:
+                                self.switch_task_pickup_objects(near_magazines)
+
+                    # also check if we should chuck a grenade at it
+                    if distance<300 and distance>100 and self.throwable!=None:
+                        self.throw(enemy.world_coords)
+                        self.speak('Throwing Grenade !!!!')
+
+                    # also check if we should launch antitank
+                    if enemy.is_vehicle:
+                        if self.antitank!=None and distance<800:
+                            self.launch_antitank(self.target_object.world_coords)
+                else:
+                    # distance is > gun range
+                    if distance>1800:
+                        self.memory.pop('task_engage_enemy',None)
                     else:
-                        # need ammo or new gun
-                        near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
-                        if len(near_magazines)>0:
-                            self.switch_task_pickup_objects(near_magazines)
+                        if self.near_targets+self.mid_targets>0:
+                            # probably a closer enemy to engage
+                            self.switch_task_engage_enemy(self.get_target())
+                        else:
+                            self.switch_task_move_to_location(enemy.world_coords)
 
             else:
                 # -- fire --
@@ -1453,6 +1478,9 @@ class AIHuman(AIBase):
 
             # -- think about walking --
             distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
+
+            if distance>200 and self.prone:
+                self.handle_prone_state_change()
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
             if distance>self.max_walk_distance:
@@ -1692,6 +1720,12 @@ class AIHuman(AIBase):
                 containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
                 if len(containers)>0:
                     self.switch_task_loot_container(random.choice(containers))
+            elif decision==3:
+                # eat 
+                for b in self.inventory:
+                    if b.is_consumable:
+                        self.eat(b)
+                        break
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 14 2024
+- added basic support for antitank and grenade throws to the new ai
+- added eating as a random action 
+- wrote more of the engage enemy task 
+- sprinkled in some prone/not prone decision code 
+
+I was planning on doing away with primary_weapon/throwable/antitank but will keep them for now 
+and save that for a future re-write. 
+
+main todo items before trying to run this mess 
+- need a way to have the vehicle drivers wait for close passengers 
+- review what (if any) 'react to' functions need to be recreated 
+- world_menu is probably hilariously broken. probably need to go through it line by line and reimplement stuff
+
+----------------------------------
 August 13 2024
 - more ai rewrite 
 - started world_menu updates for the new ai 
