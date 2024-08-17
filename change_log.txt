@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 16 2024
+- making world_menu compatible with the new human_ai 
+
+----------------------------------
 August 14 2024
 - added basic support for antitank and grenade throws to the new ai
 - added eating as a random action 

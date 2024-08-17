@@ -744,6 +744,66 @@ class AIHuman(AIBase):
             self.handle_drop_object(self.antitank)
 
     #---------------------------------------------------------------------------
+    def player_vehicle_role_change(self,role):
+        'player changes vehicle roles'
+        # this is called by world_menu
+
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        current_role=self.memory['task_vehicle_crew']['role']
+        turret=self.memory['task_vehicle_crew']['turret']
+
+        # remove from current role
+        if current_role=='driver':
+            vehicle.ai.driver=None
+        if current_role=='gunner':
+            pass
+
+
+        if role=='driver':
+            if vehicle.ai.driver!=None:
+                # reassign current driver
+                vehicle.ai.driver.ai.memory['task_vehicle_crew']['role']='passenger'
+            vehicle.ai.driver=self.owner
+            self.memory['task_vehicle_crew']['role']='driver'
+        elif role=='gunner':
+            found_turret=False
+
+            # search for an empty turret
+            for b in self.vehicle.ai.turrets:
+                if b.ai.gunner==None:
+                    self.speak("Taking over gunner position")
+                    b.ai.gunner=self.owner
+                    self.memory['task_vehicle_crew']['turret']=b
+                    self.memory['task_vehicle_crew']['role']='gunner'
+                    found_turret=True
+                    break
+            
+            # didn't find one. can we boot someone out?
+            if found_turret==False:
+                for b in self.vehicle.ai.turrets:
+                    if b.ai.gunner!=None:
+
+                        # reassign gunner
+                        b.ai.gunner.ai.memory['task_vehicle_crew']['role']='passenger'
+
+                        # take over as normal
+                        self.speak("Taking over gunner position")
+                        b.ai.gunner=self.owner
+                        self.memory['task_vehicle_crew']['turret']=b
+                        self.memory['task_vehicle_crew']['role']='gunner'
+                        found_turret=True
+                        break
+
+            # still didn't find one somehow?
+            self.memory['task_vehicle_crew']['role']='passenger'
+            engine.log.add_data('warn','player change role to gunner failed',True)   
+
+
+        elif role=='passenger':
+            self.memory['task_vehicle_crew']['role']='passenger'
+
+
+    #---------------------------------------------------------------------------
     def speak(self,WHAT):
         ''' say something if the ai is close to the player '''
 

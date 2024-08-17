@@ -162,7 +162,7 @@ class World_Menu(object):
         if self.menu_state=='none':
             # print out the basic menu
             self.world.graphic_engine.menu_text_queue.append('-- Change Vehicle Role --')
-            currentRole=self.world.player.ai.ai_vehicle_role
+            currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
             if currentRole==None:
                 currentRole='None!'
 
@@ -175,13 +175,13 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if Key=='1':
-                self.world.player.ai.handle_change_vehicle_role('driver')
+                self.world.player.ai.player_vehicle_role_change('driver')
                 self.deactivate_menu()
             elif Key=='2':
-                self.world.player.ai.handle_change_vehicle_role('gunner')
+                self.world.player.ai.player_vehicle_role_change('gunner')
                 self.deactivate_menu()
             elif Key=='3':
-                self.world.player.ai.handle_change_vehicle_role('passenger')
+                self.world.player.ai.player_vehicle_role_change('passenger')
                 self.deactivate_menu()
 
      #---------------------------------------------------------------------------
