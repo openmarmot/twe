@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 17 2024
+- more world_menu compatibility changes 
+- added event_speak to replace the 'react_to' functions
+ 
+----------------------------------
 August 16 2024
 - making world_menu compatible with the new human_ai 
 

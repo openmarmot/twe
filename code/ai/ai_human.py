@@ -208,7 +208,22 @@ class AIHuman(AIBase):
         elif ammo_inventory>0:
             return True
         else:
-            return False    
+            return False  
+    #---------------------------------------------------------------------------
+    def drop_object(self,OBJECT_TO_DROP):
+        ''' drop object into the world '''
+        # any distance calculation would be made before this function is called
+        if OBJECT_TO_DROP.is_large_human_pickup:
+            self.large_pickup=None
+        else:
+            self.event_remove_inventory(OBJECT_TO_DROP)
+            # make sure the obj world_coords reflect the obj that had it in inventory
+            OBJECT_TO_DROP.world_coords=copy.copy(self.owner.world_coords)
+            
+            # grenades get 'dropped' when they are thrown and are special
+            if OBJECT_TO_DROP.is_grenade==False:
+                engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
+            self.owner.world.add_queue.append(OBJECT_TO_DROP)  
         
     #---------------------------------------------------------------------------
     def eat(self,CONSUMABLE):
@@ -319,7 +334,7 @@ class AIHuman(AIBase):
                 destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
             if self.memory['current_task']!='task_vehicle_crew':
                 if self.prone==False:
-                    self.handle_prone_state_change()
+                    self.prone_state_change()
                 self.switch_task_move_to_location(destination)
             else:
                 engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
@@ -333,7 +348,7 @@ class AIHuman(AIBase):
             else:
                 if self.memory['current_task']!='task_vehicle_crew':
                     if self.prone==True:
-                        self.handle_prone_state_change()
+                        self.prone_state_change()
                     destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
                     self.switch_task_move_to_location(destination)
                 else:
@@ -368,7 +383,7 @@ class AIHuman(AIBase):
                 if event_data.is_gun :
                     if self.primary_weapon!=None:
                         # drop the current obj and pick up the new one
-                        self.handle_drop_object(self.primary_weapon)
+                        self.drop_object(self.primary_weapon)
                     if self.owner.is_player :
                         self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.primary_weapon=event_data
@@ -382,7 +397,7 @@ class AIHuman(AIBase):
                 elif event_data.is_handheld_antitank :
                     if self.antitank!=None:
                         # drop the current obj and pick up the new one
-                        self.handle_drop_object(self.antitank)
+                        self.drop_object(self.antitank)
                     if self.owner.is_player :
                         self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.antitank=event_data
@@ -428,6 +443,33 @@ class AIHuman(AIBase):
 
         else:
             print('removal error - object not in inventory',event_data.name)
+
+    #---------------------------------------------------------------------------
+    def event_speak(self,event_data):
+        '''speak event'''
+        # note - this replaces the 'react' system
+
+        # event_data ['command',relevant_data]
+        if event_data[0]=='task_enter_vehicle':
+            # should probably sanity check this first
+            self.switch_task_enter_vehicle(event_data[1])
+        elif event_data[0]=='ask to join squad':
+            if event_data[1]==self.squad:
+                self.speak("I'm already in that squad")
+            else:
+                if event_data[1].faction==self.squad.faction:
+                    # yes - lets join this squad 
+
+                    event_data[1].add_to_squad(self.owner)
+                    self.speak('joined squad')
+                else:
+                    self.speak('no')
+        elif event_data[0]=='ask to upgrade gear':
+            self.speak("wut?")
+            engine.log.add_data('warn','ask upgrade gear not implemented',True)
+        else:
+            self.speak("I don't understand")
+            engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
     #---------------------------------------------------------------------------
     def fire(self,target_coords,weapon):
@@ -515,29 +557,12 @@ class AIHuman(AIBase):
                         #already in a vehicle, so no further action needed
                         near_squad.pop(0)
                     else:
-                        self.switch_task_enter_vehicle()
                         near_squad[0].ai.switch_task_enter_vehicle(b,destination)
                         occupants+=1
                         near_squad.pop(0)
                 else:
                     break
     
-    #---------------------------------------------------------------------------
-    def handle_drop_object(self,OBJECT_TO_DROP):
-        ''' drop object into the world '''
-        # any distance calculation would be made before this function is called
-        if OBJECT_TO_DROP.is_large_human_pickup:
-            self.large_pickup=None
-        else:
-            self.event_remove_inventory(OBJECT_TO_DROP)
-            # make sure the obj world_coords reflect the obj that had it in inventory
-            OBJECT_TO_DROP.world_coords=copy.copy(self.owner.world_coords)
-            
-            # grenades get 'dropped' when they are thrown and are special
-            if OBJECT_TO_DROP.is_grenade==False:
-                engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
-            self.owner.world.add_queue.append(OBJECT_TO_DROP)
-
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
         ''' overrides base handle_event'''
@@ -552,6 +577,8 @@ class AIHuman(AIBase):
             self.event_collision(EVENT_DATA)
         elif EVENT=='remove_inventory':
             self.event_remove_inventory(EVENT_DATA)
+        elif EVENT=='speak':
+            self.event_speak(EVENT_DATA)
 
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
@@ -573,7 +600,7 @@ class AIHuman(AIBase):
             if key=='g':
                 self.throw([])
             elif key=='p':
-                self.handle_prone_state_change()
+                self.prone_state_change()
             elif key=='t':
                 self.launch_antitank([])
 
@@ -583,10 +610,8 @@ class AIHuman(AIBase):
                 self.reload_weapon()
             elif self.memory['current_task']=='task_vehicle_crew':
                 self.reload_turret()
-
-
     #---------------------------------------------------------------------------
-    def handle_prone_state_change(self):
+    def prone_state_change(self):
         '''if prone, stand up. If standing, go prone'''
 
         # reverse state
@@ -602,7 +627,6 @@ class AIHuman(AIBase):
 
         # add some fatigue, not sure how much
         self.fatigue+=15
-
     #-----------------------------------------------------------------------
     def reload_weapon(self,weapon):
         '''reload weapon'''
@@ -675,61 +699,12 @@ class AIHuman(AIBase):
         self.speak('reloading!')
 
     #---------------------------------------------------------------------------
-    def handle_transfer(self,FROM_OBJECT,TO_OBJECT):
-        '''transfer liquid/ammo/??? from one object to another'''
-        
-
-        if FROM_OBJECT.is_liquid and TO_OBJECT.is_container:
-            source_amount=FROM_OBJECT.volume
-            
-            # add up total destination volume
-            destination_amount=0
-            for b in TO_OBJECT.ai.inventory:
-                destination_amount+=b.volume
-
-            # remember in containers this is considered a max volume    
-            destination_maximum=TO_OBJECT.volume
-            source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
-            FROM_OBJECT.volume=source_result
-            
-            # spawn a new liquid object with the amount to transfer
-            z=engine.world_builder.spawn_object(self.owner.world,[0,0],FROM_OBJECT.name,False)
-            z.volume=destination_result
-
-            # add the new liquid to the container
-            TO_OBJECT.add_inventory(z)
-        else:
-            print('error: handle_transfer error: src/dest not recognized!')
-
-
-    #-----------------------------------------------------------------------
-    def handle_use_medical_object(self,MEDICAL):
-        # MEDICAL - list of is_medical World Object(s)
-
-        # should eventually handle bandages, morphine, etc etc
-        # probably need attributes similar to consumables
-
-        # should select the correct medical item to fix whatever the issue is
-        selected = MEDICAL[0]
-        self.speak('Using medical '+selected.name)
-
-        self.bleeding=False
-
-        self.health+=selected.ai.health_effect
-        self.hunger+=selected.ai.hunger_effect
-        self.thirst_rate+=selected.ai.thirst_effect
-        self.fatigue+=selected.ai.fatigue_effect
-
-        # calling this by itself should remove all references to the object
-        self.event_remove_inventory(selected)
-
-    #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords):
         ''' launch antitank ''' 
 
         # standup. kneel would be better if it becomes an option later
         if self.prone:
-            self.handle_prone_state_change()
+            self.prone_state_change()
 
         if self.antitank!=None:
             if self.owner.is_player :
@@ -741,7 +716,36 @@ class AIHuman(AIBase):
             self.antitank.ai.fire()
 
             # drop the tube now that it is empty
-            self.handle_drop_object(self.antitank)
+            self.drop_object(self.antitank)
+
+    #---------------------------------------------------------------------------
+    def pickup_object(self,world_object):
+        '''pick up a world object'''
+        # called by world_menu and task_pickup_objects
+        if world_object.is_large_human_pickup:
+
+            # need to make sure nobody else is already carrying it
+            in_use=False
+            for b in self.owner.world.wo_objects_human:
+                if b.ai.large_pickup==b:
+                    in_use=True
+
+            if in_use:
+                engine.log.add_data('warn','Error large pick up is already picked up: '+b.name,True)
+            else:
+                self.large_pickup=world_object
+        else:
+            if world_object.is_gun:
+                if self.owner.is_player==False:
+                    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+                    if len(near_magazines)>0:
+                        self.switch_task_pickup_objects(near_magazines)
+
+            self.speak('Picking up a '+world_object.name)
+
+            self.event_add_inventory(world_object)
+            # remove from world
+            self.owner.world.remove_queue.append(world_object)
 
     #---------------------------------------------------------------------------
     def player_vehicle_role_change(self,role):
@@ -962,6 +966,7 @@ class AIHuman(AIBase):
     def switch_task_vehicle_crew(self,vehicle,destination,role=None,turret=None):
         '''switch task to vehicle crew and determine role'''
         # this should always overwrite if it exists
+        # A player can go through this if they enter a vehicle
 
         # pick a role
         if role==None:
@@ -1076,7 +1081,7 @@ class AIHuman(AIBase):
         ''' throw like you know the thing. cmon man '''   
         # stand up
         if self.prone:
-            self.handle_prone_state_change() 
+            self.prone_state_change() 
         if self.throwable!=None:
             #self.throwable.ai.throw(TARGET_COORDS)
 
@@ -1091,7 +1096,34 @@ class AIHuman(AIBase):
                 self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
                 self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
 
-            self.handle_drop_object(self.throwable)
+            self.drop_object(self.throwable)
+
+    #---------------------------------------------------------------------------
+    def transfer_liquid(self,FROM_OBJECT,TO_OBJECT):
+        '''transfer liquid/ammo/??? from one object to another'''
+        
+
+        if FROM_OBJECT.is_liquid and TO_OBJECT.is_container:
+            source_amount=FROM_OBJECT.volume
+            
+            # add up total destination volume
+            destination_amount=0
+            for b in TO_OBJECT.ai.inventory:
+                destination_amount+=b.volume
+
+            # remember in containers this is considered a max volume    
+            destination_maximum=TO_OBJECT.volume
+            source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
+            FROM_OBJECT.volume=source_result
+            
+            # spawn a new liquid object with the amount to transfer
+            z=engine.world_builder.spawn_object(self.owner.world,[0,0],FROM_OBJECT.name,False)
+            z.volume=destination_result
+
+            # add the new liquid to the container
+            TO_OBJECT.add_inventory(z)
+        else:
+            print('error: transfer_liquid error: src/dest not recognized!')
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -1162,10 +1194,10 @@ class AIHuman(AIBase):
                 dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
                 dm+=('\n  -- magazine count: '+str(ammo[2]))
 
-                self.handle_drop_object(self.primary_weapon)
+                self.drop_object(self.primary_weapon)
 
             if self.large_pickup!=None:
-                self.handle_drop_object(self.large_pickup)
+                self.drop_object(self.large_pickup)
 
             # remove from squad 
             if self.squad != None:
@@ -1277,7 +1309,7 @@ class AIHuman(AIBase):
                 if distance<self.primary_weapon.ai.range:
                     # maybe only when not in buildings??
                     if not self.prone:
-                        self.handle_prone_state_change()
+                        self.prone_state_change()
 
                     # out of ammo ?
                     ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
@@ -1317,6 +1349,8 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def update_task_enter_vehicle(self):
+        # Note - this task can also handle the player trying to enter a vehicle 
+
         vehicle=self.memory['task_enter_vehicle']['vehicle']
         destination=self.memory['task_enter_vehicle']['destination']
 
@@ -1329,7 +1363,7 @@ class AIHuman(AIBase):
             distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
             distance_to_destination=engine.math_2d.get_distance(self.owner.world_coords,destination)
 
-            if distance_to_destination<distance:
+            if distance_to_destination<distance and self.owner.is_player==False:
                 # -- vehicle is further than where we wanted to go --
 
                 # i think this should never happen??
@@ -1346,8 +1380,9 @@ class AIHuman(AIBase):
                     self.memory.pop('task_move_to_location',None)
             else:
                 # -- vehicle task still makes sense --
+                # -- OR we are the player--
 
-                if distance<self.max_distance_to_interact_with_object:
+                if distance<self.max_distance_to_interact_with_object or self.owner.is_player:
 
                     # no matter what at this point this task is complete
                     self.memory.pop('task_enter_vehicle',None)
@@ -1540,7 +1575,7 @@ class AIHuman(AIBase):
             distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
 
             if distance>200 and self.prone:
-                self.handle_prone_state_change()
+                self.prone_state_change()
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
             if distance>self.max_walk_distance:
@@ -1582,31 +1617,8 @@ class AIHuman(AIBase):
                     # -- pickup object --
                     # remove as we will be picking it up
                     remove_queue.append(b)
+                    self.pickup_object(b)
 
-                    if b.is_large_human_pickup:
-
-                        # need to make sure nobody else is already carrying it
-                        in_use=False
-                        for b in self.owner.world.wo_objects_human:
-                            if b.ai.large_pickup==b:
-                                in_use=True
-
-                        if in_use:
-                            engine.log.add_data('warn','Error large pick up is already picked up: '+b.name,True)
-                        else:
-                            self.large_pickup=b
-                    else:
-                        if b.is_gun:
-
-                            near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
-                            if len(near_magazines)>0:
-                                self.switch_task_pickup_objects(near_magazines)
-
-                        self.speak('Picking up a '+b.name)
-
-                        self.event_add_inventory(b)
-                        # remove from world
-                        self.owner.world.remove_queue.append(b)
                 elif distance>self.max_walk_distance:
                     # maybe should add a option to ignore this but for the most part you want to forget distant objects
                     remove_queue.append(b)
@@ -1817,6 +1829,27 @@ class AIHuman(AIBase):
                         self.think_vehicle_role_passenger()
                     else:
                         engine.log.add_data('error','unknown vehicle role: '+role,True)
+
+    #-----------------------------------------------------------------------
+    def use_medical_object(self,MEDICAL):
+        # MEDICAL - list of is_medical World Object(s)
+
+        # should eventually handle bandages, morphine, etc etc
+        # probably need attributes similar to consumables
+
+        # should select the correct medical item to fix whatever the issue is
+        selected = MEDICAL[0]
+        self.speak('Using medical '+selected.name)
+
+        self.bleeding=False
+
+        self.health+=selected.ai.health_effect
+        self.hunger+=selected.ai.hunger_effect
+        self.thirst_rate+=selected.ai.thirst_effect
+        self.fatigue+=selected.ai.fatigue_effect
+
+        # calling this by itself should remove all references to the object
+        self.event_remove_inventory(selected)
 
             
 
