@@ -5,7 +5,20 @@ TWE Project : Change Log
 August 17 2024
 - more world_menu compatibility changes 
 - added event_speak to replace the 'react_to' functions
- 
+- lots of bug fixes 
+
+the new code seems to be more or less working - for a couple minutes at least. 
+it needs more debugging to understand if its roughly up to par with the old ai code or not. 
+
+on the positive side the new code doesn't seem to have hurt the frame rate. 
+
+i encountered a new buy where if the kubelwagen and the ju88 were both on the screen the mouse 
+would always select the ju88, but when i zoom in so the ju88 is offscreen i can then select the kubelwagen.
+not sure what that means - maybe a inherent flaw in the selection code?
+
+things that need to be implemented
+- a way to ask ai drivers to wait 
+
 ----------------------------------
 August 16 2024
 - making world_menu compatible with the new human_ai 

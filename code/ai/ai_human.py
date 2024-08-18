@@ -25,16 +25,20 @@ class AIHuman(AIBase):
         super().__init__(owner)
 
         self.task_map={
-            'task_player_control':update_task_player_control,
-            'task_enter_vehicle':update_task_enter_vehicle,
-            'task_exit_vehicle':update_task_exit_vehicle,
-            'task_move_to_location':update_task_move_to_location,
-            'task_vehicle_crew':update_task_vehicle_crew,
-            'task_engage_enemy':update_task_engage_enemy,
-            'task_pickup_objects':update_task_pickup_objects
+            'task_player_control':self.update_task_player_control,
+            'task_enter_vehicle':self.update_task_enter_vehicle,
+            'task_exit_vehicle':self.update_task_exit_vehicle,
+            'task_move_to_location':self.update_task_move_to_location,
+            'task_vehicle_crew':self.update_task_vehicle_crew,
+            'task_engage_enemy':self.update_task_engage_enemy,
+            'task_pickup_objects':self.update_task_pickup_objects,
+            'task_think':self.update_task_think,
+            'task_squad_leader':self.update_task_squad_leader,
+            'task_loot_container':self.update_task_loot_container
         }
 
         self.memory={}
+        self.memory['current_task']='task_think'
 
         # -- health stuff --
         self.health=100
@@ -275,12 +279,12 @@ class AIHuman(AIBase):
             if self.memory['current_task']=='task_vehicle_crew':
                 # not sure what to do here yet
                 engine.log.add_data('warn','close enemy while in vehicle. not handled',True)
-        else:
-            if self.primary_weapon!=None:
-                if self.check_ammo_bool(self.primary_weapon):
-                    self.switch_task_engage_enemy(closest_object)
             else:
-                engine.log.add_data('warn','close enemy and no primary weapon. not handled',True)
+                if self.primary_weapon!=None:
+                    if self.check_ammo_bool(self.primary_weapon):
+                        self.switch_task_engage_enemy(closest_object)
+                else:
+                    engine.log.add_data('warn','close enemy and no primary weapon. not handled. faction:'+self.squad.faction,True)
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
@@ -610,93 +614,7 @@ class AIHuman(AIBase):
                 self.reload_weapon()
             elif self.memory['current_task']=='task_vehicle_crew':
                 self.reload_turret()
-    #---------------------------------------------------------------------------
-    def prone_state_change(self):
-        '''if prone, stand up. If standing, go prone'''
 
-        # reverse state
-        self.prone=not self.prone
-
-        if self.prone:
-            self.owner.image_index=1
-        else: 
-            self.owner.image_index=0
-
-        # good to do this as it changed
-        self.owner.reset_image=True
-
-        # add some fatigue, not sure how much
-        self.fatigue+=15
-    #-----------------------------------------------------------------------
-    def reload_weapon(self,weapon):
-        '''reload weapon'''
-        self.speak('reloading!')
-        if weapon.is_gun:
-            # first get the current magazine
-            old_magazine=None
-            if weapon.ai.magazine!=None:
-                if weapon.ai.magazine.ai.removable:
-                    old_magazine=weapon.ai.magazine
-
-            # find a new magazine, sorting by size
-            new_magazine=None
-            biggest=0
-            for b in self.inventory:
-                if b.is_gun_magazine:
-                    if weapon.name in b.ai.compatible_guns:
-                        if len(b.ai.projectiles)>biggest:
-                            new_magazine=b
-                            biggest=len(b.ai.projectiles)
-
-            # remove old magazine ONLY if we have a new magazine
-            if old_magazine!=None and new_magazine!=None:
-                self.event_add_inventory(old_magazine)
-                weapon.ai.magazine=None
-            # add a new magazine (either the old magazine was removed, or was never there)
-            if new_magazine!=None:
-                self.event_remove_inventory(new_magazine)
-                weapon.ai.magazine=new_magazine
-            else:
-                self.speak("I'm out of ammo!")
-
-        # at this point we should do a ai_mode change with a timer to simulate the 
-        # reload time
-        
-    #-----------------------------------------------------------------------
-    def reload_turret(self):
-        if self.vehicle_turret!=None:
-            if self.vehicle_turret.ai.vehicle!=None and self.vehicle_turret.ai.primary_weapon!=None:
-                weapon=self.vehicle_turret.ai.primary_weapon
-                # first get the current magazine
-                old_magazine=None
-                if weapon.ai.magazine!=None:
-                    if weapon.ai.magazine.ai.removable:
-                        old_magazine=weapon.ai.magazine
-
-                # find a new magazine, sorting by size
-                new_magazine=None
-                biggest=0
-                for b in self.vehicle.ai.inventory:
-                    if b.is_gun_magazine:
-                        if weapon.name in b.ai.compatible_guns:
-                            if len(b.ai.projectiles)>biggest:
-                                new_magazine=b
-                                biggest=len(b.ai.projectiles)
-
-                # perform the swap 
-                if old_magazine!=None:
-                    self.vehicle.ai.event_add_inventory(old_magazine)
-                    weapon.ai.magazine=None
-                if new_magazine!=None:
-                    self.vehicle.ai.event_remove_inventory(new_magazine)
-                    weapon.ai.magazine=new_magazine
-                else:
-                    self.speak("This turret is out of ammo!")
-
-        # at this point we should do a ai_mode change with a timer to simulate the 
-        # reload time
-        
-        self.speak('reloading!')
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords):
@@ -806,6 +724,93 @@ class AIHuman(AIBase):
         elif role=='passenger':
             self.memory['task_vehicle_crew']['role']='passenger'
 
+    #---------------------------------------------------------------------------
+    def prone_state_change(self):
+        '''if prone, stand up. If standing, go prone'''
+
+        # reverse state
+        self.prone=not self.prone
+
+        if self.prone:
+            self.owner.image_index=1
+        else: 
+            self.owner.image_index=0
+
+        # good to do this as it changed
+        self.owner.reset_image=True
+
+        # add some fatigue, not sure how much
+        self.fatigue+=15
+    #-----------------------------------------------------------------------
+    def reload_weapon(self,weapon):
+        '''reload weapon'''
+        self.speak('reloading!')
+        if weapon.is_gun:
+            # first get the current magazine
+            old_magazine=None
+            if weapon.ai.magazine!=None:
+                if weapon.ai.magazine.ai.removable:
+                    old_magazine=weapon.ai.magazine
+
+            # find a new magazine, sorting by size
+            new_magazine=None
+            biggest=0
+            for b in self.inventory:
+                if b.is_gun_magazine:
+                    if weapon.name in b.ai.compatible_guns:
+                        if len(b.ai.projectiles)>biggest:
+                            new_magazine=b
+                            biggest=len(b.ai.projectiles)
+
+            # remove old magazine ONLY if we have a new magazine
+            if old_magazine!=None and new_magazine!=None:
+                self.event_add_inventory(old_magazine)
+                weapon.ai.magazine=None
+            # add a new magazine (either the old magazine was removed, or was never there)
+            if new_magazine!=None:
+                self.event_remove_inventory(new_magazine)
+                weapon.ai.magazine=new_magazine
+            else:
+                self.speak("I'm out of ammo!")
+
+        # at this point we should do a ai_mode change with a timer to simulate the 
+        # reload time
+        
+    #-----------------------------------------------------------------------
+    def reload_turret(self):
+        if self.vehicle_turret!=None:
+            if self.vehicle_turret.ai.vehicle!=None and self.vehicle_turret.ai.primary_weapon!=None:
+                weapon=self.vehicle_turret.ai.primary_weapon
+                # first get the current magazine
+                old_magazine=None
+                if weapon.ai.magazine!=None:
+                    if weapon.ai.magazine.ai.removable:
+                        old_magazine=weapon.ai.magazine
+
+                # find a new magazine, sorting by size
+                new_magazine=None
+                biggest=0
+                for b in self.vehicle.ai.inventory:
+                    if b.is_gun_magazine:
+                        if weapon.name in b.ai.compatible_guns:
+                            if len(b.ai.projectiles)>biggest:
+                                new_magazine=b
+                                biggest=len(b.ai.projectiles)
+
+                # perform the swap 
+                if old_magazine!=None:
+                    self.vehicle.ai.event_add_inventory(old_magazine)
+                    weapon.ai.magazine=None
+                if new_magazine!=None:
+                    self.vehicle.ai.event_remove_inventory(new_magazine)
+                    weapon.ai.magazine=new_magazine
+                else:
+                    self.speak("This turret is out of ammo!")
+
+        # at this point we should do a ai_mode change with a timer to simulate the 
+        # reload time
+        
+        self.speak('reloading!')
 
     #---------------------------------------------------------------------------
     def speak(self,WHAT):
@@ -845,7 +850,7 @@ class AIHuman(AIBase):
         self.memory[task_name]=task_details
         self.memory['current_task']=task_name
 
-        if self.squad.squad_lead==self.owner:
+        if self.squad.squad_leader==self.owner:
             self.give_squad_transportation_orders(destination)
 
     #---------------------------------------------------------------------------
@@ -927,9 +932,19 @@ class AIHuman(AIBase):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_squad_lead(self):
+    def switch_task_player_control(self):
         '''switch task'''
-        task_name='task_squad_lead'
+        task_name='task_player_control'
+        task_details = {
+        }
+
+        self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_squad_leader(self):
+        '''switch task'''
+        task_name='task_squad_leader'
 
         if task_name in self.memory:
             # something here eventually?
@@ -1011,7 +1026,7 @@ class AIHuman(AIBase):
                 if vehicle==b.ai.memory['task_enter_vehicle']['vehicle']:
                     new_passengers+=1
         
-        distance=engine.math_2d.get_distance(self.owner.world_coords,self.ai_vehicle_destination)
+        distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
         
         if distance<20 or new_passengers>0:
             self.vehicle.ai.brake_power=1
@@ -1059,14 +1074,14 @@ class AIHuman(AIBase):
 
             if distance<150:
                 # apply brakes. bot will only exit when speed is zero
-                self.vehicle.ai.throttle=0
-                self.vehicle.ai.brake_power=1
+                vehicle.ai.throttle=0
+                vehicle.ai.brake_power=1
             elif distance<500:
-                self.vehicle.ai.throttle=0.5
-                self.vehicle.ai.brake_power=0
+                vehicle.ai.throttle=0.5
+                vehicle.ai.brake_power=0
             else:
-                self.vehicle.ai.throttle=1
-                self.vehicle.ai.brake_power=0
+                vehicle.ai.throttle=1
+                vehicle.ai.brake_power=0
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
@@ -1415,7 +1430,7 @@ class AIHuman(AIBase):
                         #   self.handle_squad_transportation_orders()
 
                         # this will decide crew position as well
-                        self.switch_task_vehicle_crew(vehicle)
+                        self.switch_task_vehicle_crew(vehicle,destination)
                 else:
                     # -- too far away to enter, what do we do --
                     if distance<self.max_walk_distance:
@@ -1679,15 +1694,15 @@ class AIHuman(AIBase):
             self.time_since_player_interact=0
 
     #---------------------------------------------------------------------------
-    def update_task_squad_lead(self):
+    def update_task_squad_leader(self):
 
-        last_think_time=self.memory['task_squad_lead']['last_think_time']
-        think_interval=self.memory['task_squad_lead']['think_interval']
+        last_think_time=self.memory['task_squad_leader']['last_think_time']
+        think_interval=self.memory['task_squad_leader']['think_interval']
 
         
         if self.owner.world.world_seconds-last_think_time>think_interval:
             # reset time
-            self.memory['task_move_to_location']['last_think_time']=self.owner.world.world_seconds
+            self.memory['task_squad_leader']['last_think_time']=self.owner.world.world_seconds
 
             # -- do the longer thing ---
             action=False
@@ -1705,9 +1720,12 @@ class AIHuman(AIBase):
             
         else:
             # -- do the shorter thing --
+            # this would be better as a task_do_random_thing
             # go for a walk
-            coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
-            self.switch_task_move_to_location(coords)
+            decision=random.randint(1,100)
+            if decision==1:
+                coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
+                self.switch_task_move_to_location(coords)
 
     #---------------------------------------------------------------------------
     def update_task_think(self):
@@ -1723,31 +1741,37 @@ class AIHuman(AIBase):
 
         # health - maybe this should be all done by update_health?
 
-        # primary weapon
-        if self.primary_weapon==None:
-            # need to get a gun
-            distance=4000
-            if self.near_targets>0:
-                distance=200
-            elif self.mid_targets>0:
-                distance=400
-            elif self.far_targets>0:
-                distance=900
+        if self.owner.is_player:
+            self.switch_task_player_control()
+            action=True
 
-            if distance<4000:
-                gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+        if action==False:
+            # primary weapon
+            if self.primary_weapon==None:
+                # need to get a gun
+                distance=4000
+                if len(self.near_targets)>0:
+                    distance=200
+                elif len(self.mid_targets)>0:
+                    distance=400
+                elif len(self.far_targets)>0:
+                    distance=900
 
-            if gun!=None:
-                self.switch_task_pickup_objects([gun])
-                action=True
-        else:
-            # -- we have a gun. is it usable? --
-            if self.check_ammo_bool==False:
-                # need to get ammo. check for nearby magazines
-                near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
-                if len(near_magazines)>0:
-                    self.switch_task_pickup_objects(near_magazines)
-                    action=True
+                # this also means that humans without any targets will not get a gun
+                if distance<4000:
+                    gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+
+                    if gun!=None:
+                        self.switch_task_pickup_objects([gun])
+                        action=True
+            else:
+                # -- we have a gun. is it usable? --
+                if self.check_ammo_bool==False:
+                    # need to get ammo. check for nearby magazines
+                    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
+                    if len(near_magazines)>0:
+                        self.switch_task_pickup_objects(near_magazines)
+                        action=True
         
         # -- check if we have older tasks to resume --
         # this is important for compound tasks 
@@ -1769,14 +1793,14 @@ class AIHuman(AIBase):
                 self.squad.squad_leader=self.owner
 
             if self.squad.squad_leader==self.owner:
-                self.switch_task_squad_lead()
+                self.switch_task_squad_leader()
                 action=True
             else:
                 # being in a squad wwhen we aren't lead basically just means staying close to the squad lead
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_lead.world_coords)
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
                 # are we close enough to squad?
                 if distance>self.squad_max_distance:
-                    self.switch_task_move_to_location(self.squad.squad_lead.world_coords)
+                    self.switch_task_move_to_location(self.squad.squad_leader.world_coords)
                     action=True
 
         # -- ok now we've really run out of things to do. do things that don't matter

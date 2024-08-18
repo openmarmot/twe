@@ -613,7 +613,7 @@ class World_Menu(object):
             d2='no squad lead'
             if self.selected_object.ai.squad.squad_leader!=None:
                 d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords,True)
-
+            self.world.graphic_engine.menu_text_queue.append('current task: '+self.selected_object.ai.memory['current_task'])
             self.world.graphic_engine.menu_text_queue.append('Distance from player: '+str(d))
             self.world.graphic_engine.menu_text_queue.append('Distance from squad: '+str(d2))
             self.world.graphic_engine.menu_text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
