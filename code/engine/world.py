@@ -224,8 +224,8 @@ class World(object):
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
         if collided !=None:
             if collided.is_human:
-                if collided.ai.in_vehicle:
-                    collided=collided.ai.vehicle
+                if collided.ai.memory['current_task']=='task_vehicle_crew':
+                    collided=collided.ai.memory['task_vehicle_crew']['vehicle']
                 else:
                     # check if object misses due to prone
                     if consider_prone:
@@ -305,10 +305,10 @@ class World(object):
                 pass
             elif OBJ.is_soldier:
                 pass
-            if OBJ.ai.in_vehicle:
+            if OBJ.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
-                ignore_list.append(OBJ.ai.vehicle)
-                for b in OBJ.ai.vehicle.turrets:
+                ignore_list.append(OBJ.ai.memory['task_vehicle_crew']['vehicle'])
+                for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
                     ignore_list.append(b)
 
             if OBJ.ai.in_building:
@@ -319,27 +319,6 @@ class World(object):
             ignore_list.append(OBJ.ai.vehicle)
 
         return ignore_list
-
-    #---------------------------------------------------------------------------
-    def get_closest_gun(self, WORLD_COORDS):
-        ''' returns the closest gun. spawns one if there are none '''
-        best_object=self.get_closest_object(WORLD_COORDS,self.wo_objects_guns,5000)
-        if best_object==None:
-            # spawn a new gun and return it
-
-            # first lets get a random building
-            b=self.get_random_object(self.wo_objects_building)
-
-            # randomize the coords a bit 
-            w=[b.world_coords[0]+float(random.randint(-20,20)),b.world_coords[1]+float(random.randint(-20,20))]
-
-            # spawn a ppk
-            engine.world_builder.spawn_object(self,w,'ppk',True)
-            # hmm we don't have the object reference, so lets just run this method again
-            # does this make sense? am i insane? HA HA HAHAHAHA
-            return self.get_closest_gun(WORLD_COORDS)
-        else : 
-            return best_object
 
     #---------------------------------------------------------------------------
     def get_closest_object(self, WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
@@ -380,6 +359,15 @@ class World(object):
                     best_object=b
 
         return best_object
+
+    #---------------------------------------------------------------------------
+    def get_compatible_magazines_within_range(self,world_coords,gun,max_distance):
+        compatible_magazines=[]
+        for b in self.wo_objects_gun_magazines:
+            if gun.name in b.ai.compatible_guns:
+                if engine.math_2d.get_distance(world_coords,b.world_coords)<max_distance:
+                    compatible_magazines.append(b)
+        return compatible_magazines
 
     #---------------------------------------------------------------------------
     def get_random_object(self,OBJECT_LIST):
@@ -607,7 +595,7 @@ class World(object):
         for b in self.graphic_engine.renderlists:
             for c in b:
                 # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c!=self.player.ai.vehicle and c.is_turret==False:
+                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False:
                     possible_objects.append(c)
 
         #-- first pass - filter for desirable objects
@@ -673,6 +661,7 @@ class World(object):
 
         if spawned:
             self.player.is_player=True
+            self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
         else:
             print('ERROR : player spawn failed')
@@ -698,7 +687,7 @@ class World(object):
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
 
-            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
+            #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
             engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
     #---------------------------------------------------------------------------

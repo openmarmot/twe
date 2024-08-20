@@ -126,7 +126,7 @@ def create_standard_squad(world,faction_tactial,world_coords,squad_type):
         s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
         s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
         s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.starting_vehicles.append(spawn_object(world,world_coords,'dodge_g505_wc',False))
+        spawn_object(world,world_coords,'dodge_g505_wc',True)
     elif squad_type=='soviet 1944 submachine gun':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -161,7 +161,7 @@ def create_standard_squad(world,faction_tactial,world_coords,squad_type):
         s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
         s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
         s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        s.starting_vehicles.append(spawn_object(world,world_coords,'sd_kfz_251',False))
+        spawn_object(world,world_coords,'sd_kfz_251',True)
     elif squad_type=='german 1944 volksgrenadier fire group':
         s.faction='german'
         # ref : https://www.battleorder.org/volksgrenadiers-1944

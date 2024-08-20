@@ -88,7 +88,7 @@ def checkCollisionCircleMouse(mouse_coords, collision_list):
 
 		distance=get_distance(mouse_coords,b.screen_coords)
 
-		if distance < (b.collision_radius*2):
+		if distance < (b.collision_radius):
 			collided=b
 			break
 	return collided
@@ -162,8 +162,6 @@ def get_distance(coords1, coords2,round_number=False):
 	else:
 		return distance
 	
-
-
 #------------------------------------------------------------------------------
 def get_heading_vector(location,destination):
 	''' normalized vector representing the heading (direction) to a target'''

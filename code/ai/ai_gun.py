@@ -27,8 +27,8 @@ class AIGun(AIBase):
         # The magazine that is loaded in the gun
         self.magazine=None
 
-        #time since last fired
-        self.fire_time_passed=0. 
+        #time last fired
+        self.last_fired_time=0
 
         # 60/rate of fire
         self.rate_of_fire=0.
@@ -70,11 +70,8 @@ class AIGun(AIBase):
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
-
-        # note - ai human calls update for its primary weapon
-
-        self.fire_time_passed+=self.owner.world.graphic_engine.time_passed_seconds
-
+        pass
+    
     #---------------------------------------------------------------------------
     def fire(self):
         ''' fire the gun. returns True/False as to whether the gun fired '''
@@ -82,8 +79,8 @@ class AIGun(AIBase):
         # check that we have a magazine loaded
         if self.magazine!=None:
             # check fire rate hasn't been exceeded
-            if(self.fire_time_passed>self.rate_of_fire):
-                self.fire_time_passed=0.
+            if(self.owner.world.world_seconds-self.last_fired_time>self.rate_of_fire):
+                self.last_fired_time=self.owner.world.world_seconds
                 # start by ruling out empty mag 
                 
                 # if we have bullets left

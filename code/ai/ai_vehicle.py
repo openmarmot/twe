@@ -230,7 +230,7 @@ class AIVehicle(AIBase):
         elif event=='remove_inventory':
             self.event_remove_inventory(event_data)
         else:
-            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
+            print('Error: '+self.owner.name+' cannot handle event '+event)
 
     #---------------------------------------------------------------------------
     def handle_flaps_down(self):
@@ -385,6 +385,21 @@ class AIVehicle(AIBase):
                 total_engine_force,self.owner.rolling_resistance,
                 self.owner.drag_coefficient,self.owner.world.air_density,
                 self.owner.frontal_area,self.owner.weight)
+            
+    #---------------------------------------------------------------------------
+    def update_child_position_rotation(self):
+
+        # update passenger rotation and position
+        for b in self.passengers:
+            # coordinates + altitude
+            b.world_coords=copy.copy(self.owner.world_coords)
+            b.altitude=self.owner.altitude
+
+            # rotate to match vehicle heading
+            if self.open_top:
+                if b.rotation_angle!=self.owner.rotation_angle:
+                    b.rotation_angle=self.owner.rotation_angle
+                    b.reset_image=True
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
@@ -503,8 +518,9 @@ class AIVehicle(AIBase):
         if self.current_speed>0:
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
             
-
-    
+        # update the relative position and rotation of child objects
+        if self.current_speed>0 or heading_changed:
+            self.update_child_position_rotation()
     #---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):
 

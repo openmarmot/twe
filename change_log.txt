@@ -2,6 +2,121 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 19 2024
+- a ton of bug fixing with the new ai code 
+- fixed squad vehicle spawning (broken since july 16th ?)
+- updated mouse select code to reduce the effect of the massive ju88 collision circle. had 
+ negative effect of making tiny things harder to select 
+
+things that need to be fixed 
+- when you enter a vehicle there is a screen jump as soon as the vehicle moves - like you have been repositioned.
+    - this seems to be new as of the new ai code.
+- bicycle riders occasionally go prone and appear to surf when under fire. no idea why 
+
+general todo
+- rewrite mouse select to just be a closest distance of all objects on screen 
+
+i might need to look at a way to make movement more precise. there is an issue with small movement being < the fuzzy threshold 
+where a movement is considered 'done'. kind of a tolerance stacking issue 
+
+i am real close to just deleting ai_squad and making it a memory instead. 
+
+something happened with small blood spots, they are much more of a trail now. I think I'll leave it for now. 
+--
+I'm going to go ahead and merge this. There are certainly some bugs waiting to be discovered but it seems to be mostly 
+stable, and the new AI seems to be at least as amusing as the old one was. There seems to be some regression in vehicle 
+use but on the flip side enemy awareness seems to be a lot better from the couple fire fights i've seen. 
+
+----------------------------------
+August 17 2024
+- more world_menu compatibility changes 
+- added event_speak to replace the 'react_to' functions
+- lots of bug fixes 
+
+the new code seems to be more or less working - for a couple minutes at least. 
+it needs more debugging to understand if its roughly up to par with the old ai code or not. 
+
+on the positive side the new code doesn't seem to have hurt the frame rate. 
+
+i encountered a new bug where if the kubelwagen and the ju88 were both on the screen the mouse 
+would always select the ju88, but when i zoom in so the ju88 is offscreen i can then select the kubelwagen.
+not sure what that means - maybe a inherent flaw in the selection code?
+
+things that need to be implemented
+- a way to ask ai drivers to wait 
+
+----------------------------------
+August 16 2024
+- making world_menu compatible with the new human_ai 
+
+----------------------------------
+August 14 2024
+- added basic support for antitank and grenade throws to the new ai
+- added eating as a random action 
+- wrote more of the engage enemy task 
+- sprinkled in some prone/not prone decision code 
+
+I was planning on doing away with primary_weapon/throwable/antitank but will keep them for now 
+and save that for a future re-write. 
+
+main todo items before trying to run this mess 
+- need a way to have the vehicle drivers wait for close passengers 
+- review what (if any) 'react to' functions need to be recreated 
+- world_menu is probably hilariously broken. probably need to go through it line by line and reimplement stuff
+
+----------------------------------
+August 13 2024
+- more ai rewrite 
+- started world_menu updates for the new ai 
+
+old ai stuff that isn't implemented yet 
+- eating 
+- react_to* system 
+- most prone/un-prone decisions 
+- grenade throwing 
+- anti-tank weapon usage 
+- panic state
+
+I think the ai rewrite is within a 2-4 updates of being playable so i'll switch 
+back to detailed change logs in the next update. 
+
+----------------------------------
+August 12 2024
+- more ai rewrite
+
+still making progress i promise 
+
+----------------------------------
+August 11 2024
+- more ai rewrite
+
+----------------------------------
+August 10 2024
+- more ai rewrite 
+
+----------------------------------
+August 08 2024
+-yup more ai rewrite
+
+----------------------------------
+August 07 2024
+more ai rewrite
+
+----------------------------------
+August 06 2024
+more ai rewrite
+
+----------------------------------
+August 05 2024
+- starting massive human ai rewrite 
+- guns no longer need to have their update function called 
+- vehicles now update the passengers positions (rather than the other way around)
+- added a logging utility
+
+the game is going to be broken in the dev branch for a pretty long time I think. 
+i'm doing pretty much a complete ai rewrite
+
+----------------------------------
 August 01 2024
 - added radios to the kubelwagen and sdkfz251
 - minor adjustment to the kubelwagen loadout

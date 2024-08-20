@@ -34,10 +34,6 @@ class AISquad(object):
         # however if the squad is busy it might take a minute
         self.squad_leader=None
 
-        # vehicles that the squad spawned with. 
-        self.starting_vehicles=[]
-
-
         # faction - german/soviet/american/civilian
         self.faction='none'
 
