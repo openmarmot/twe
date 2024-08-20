@@ -230,7 +230,7 @@ class AIVehicle(AIBase):
         elif event=='remove_inventory':
             self.event_remove_inventory(event_data)
         else:
-            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
+            print('Error: '+self.owner.name+' cannot handle event '+event)
 
     #---------------------------------------------------------------------------
     def handle_flaps_down(self):

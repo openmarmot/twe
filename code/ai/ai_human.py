@@ -113,7 +113,7 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def aim_and_fire_weapon(self,weapon,target):
         ''' handles special aiming and firing code for various targets'''
-        aim_coords=self.target_object.world_coords
+        aim_coords=target.world_coords
         # guess how long it will take for the bullet to arrive
         time_passed=random.uniform(0.8,1.5)
         if target.is_vehicle:
@@ -127,7 +127,7 @@ class AIHuman(AIBase):
                     aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
             else:
                 if target.ai.memory['current_task']=='task_move_to_location':
-                    destination=target.ai.memory['task_move_to_location']['destination']   
+                    destination=target.ai.memory['task_move_to_location']['destination']
                     aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
 
         self.fire(aim_coords,weapon)
@@ -987,10 +987,11 @@ class AIHuman(AIBase):
         if role==None:
             if vehicle.ai.driver==None:
                 role='driver'
+                vehicle.ai.driver=self.owner
                 self.speak("Taking over driving")
 
             if role==None:
-                for b in self.vehicle.ai.turrets:
+                for b in vehicle.ai.turrets:
                     if b.ai.gunner==None:
                         self.speak("Taking over gunner position")
                         b.ai.gunner=self.owner
@@ -1028,9 +1029,13 @@ class AIHuman(AIBase):
         
         distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
         
-        if distance<20 or new_passengers>0:
-            self.vehicle.ai.brake_power=1
-            self.vehicle.ai.throtte=0
+        if distance<120 and vehicle.ai.current_speed<1:
+            self.switch_task_exit_vehicle(vehicle)
+        elif new_passengers>0:
+            # wait for new passengers
+            vehicle.ai.brake_power=1
+            vehicle.ai.throtte=0
+
         else:
 
             # we want a tighter and more uniform time interval because we are 
@@ -1203,11 +1208,11 @@ class AIHuman(AIBase):
             
             # drop primary weapon 
             if self.primary_weapon!=None:
-                ammo=self.handle_check_ammo(self.primary_weapon)
+                ammo,ammo_inventory,magazines=self.check_ammo(self.primary_weapon)
                 dm+=('\n  - weapon: '+self.primary_weapon.name)
-                dm+=('\n  -- ammo in gun: '+str(ammo[0]))
-                dm+=('\n  -- ammo in inventory: '+str(ammo[1]))
-                dm+=('\n  -- magazine count: '+str(ammo[2]))
+                dm+=('\n  -- ammo in gun: '+str(ammo))
+                dm+=('\n  -- ammo in inventory: '+str(ammo_inventory))
+                dm+=('\n  -- magazine count: '+str(magazines))
 
                 self.drop_object(self.primary_weapon)
 
@@ -1307,6 +1312,7 @@ class AIHuman(AIBase):
         enemy=self.memory['task_engage_enemy']['enemy']
         if enemy.ai.health<1:
             self.memory.pop('task_engage_enemy',None)
+            self.switch_task_think()
         else:
             last_think_time=self.memory['task_engage_enemy']['last_think_time']
             think_interval=self.memory['task_engage_enemy']['think_interval']
@@ -1350,8 +1356,9 @@ class AIHuman(AIBase):
                     # distance is > gun range
                     if distance>1800:
                         self.memory.pop('task_engage_enemy',None)
+                        self.switch_task_think()
                     else:
-                        if self.near_targets+self.mid_targets>0:
+                        if len(self.near_targets)+len(self.mid_targets)>0:
                             # probably a closer enemy to engage
                             self.switch_task_engage_enemy(self.get_target())
                         else:
@@ -1372,6 +1379,7 @@ class AIHuman(AIBase):
         if self.owner.world.check_object_exists(vehicle)==False:
             self.speak('Where did that '+vehicle.name+' go?')
             self.memory.pop('task_enter_vehicle',None)
+            self.switch_task_think()
         else:
             # -- vehicle still exists --
 
@@ -1386,6 +1394,7 @@ class AIHuman(AIBase):
 
                 # first cancel the task
                 self.memory.pop('task_enter_vehicle',None)
+                self.switch_task_think()
                 
                 # double check its walkable
                 if distance_to_destination<self.max_walk_distance:
@@ -1393,6 +1402,7 @@ class AIHuman(AIBase):
                 else:
                     # this is probably a loop at this point, lets just cancel the original task
                     self.memory.pop('task_move_to_location',None)
+                    self.switch_task_think()
             else:
                 # -- vehicle task still makes sense --
                 # -- OR we are the player--
@@ -1401,6 +1411,7 @@ class AIHuman(AIBase):
 
                     # no matter what at this point this task is complete
                     self.memory.pop('task_enter_vehicle',None)
+                    self.switch_task_think()
 
                     precheck=True
                     if vehicle.ai.max_occupants<=len(vehicle.ai.passengers):
@@ -1438,6 +1449,7 @@ class AIHuman(AIBase):
                     else:
                         # vehicle is way too far away, just cancel task
                         self.memory.pop('task_enter_vehicle',None)
+                        self.switch_task_think()
                         engine.log.add_data('warn','enter vehicle task canceled as vehicle is too far',True)
 
     #---------------------------------------------------------------------------
@@ -1456,24 +1468,27 @@ class AIHuman(AIBase):
         if vehicle.ai.driver==self.owner:
             vehicle.ai.driver=None
             # turn on the brakes to prevent roll away
-            self.vehicle.ai.brake_power=1
+            vehicle.ai.brake_power=1
 
         # make sure we are visible again
         self.owner.render=True
 
         # delete vehicle role memory 
-        self.memory.pop('task_player_vehicle_control',None)
         self.memory.pop('task_vehicle_crew',None)
 
         # delete this task as it is now complete
         self.memory.pop('task_exit_vehicle',None)
 
         # maybe grab your large pick up if you put it in the trunk
+
+        # tell everyone else to GTFO
+        for b in vehicle.ai.passengers:
+            b.ai.switch_task_exit_vehicle(vehicle)
             
         self.speak('Jumping out')
 
         # move slightly
-        coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
+        coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
         self.switch_task_move_to_location(coords)
 
     #---------------------------------------------------------------------------
@@ -1483,11 +1498,13 @@ class AIHuman(AIBase):
 
         if self.owner.world.check_object_exists(container)==False:
             self.memory.pop('task_loot_container',None)
+            self.switch_task_think()
         else:
             distance=engine.math_2d.get_distance(self.owner.world_coords,container.world_coords)
             if distance<self.max_distance_to_interact_with_object:
                 # done with this task
                 self.memory.pop('task_loot_container',None)
+                self.switch_task_think()
 
                 # -- loot container --
                 need_medical=True
@@ -1569,6 +1586,7 @@ class AIHuman(AIBase):
                 # maybe should add a option to ignore this but for the most part you want to forget distant objects
                 # done with this task
                 self.memory.pop('task_loot_container',None)
+                self.switch_task_think()
             else:
                 # the distance is intermediate. we still want to pick the item up
                 self.switch_task_move_to_location(container.world_coords)
@@ -1608,6 +1626,7 @@ class AIHuman(AIBase):
             elif distance<self.max_distance_to_interact_with_object:
                 # we've arrived ! 
                 self.memory.pop('task_move_to_location',None)
+                self.switch_task_think()
         
         else:
             # -- walk --
@@ -1809,7 +1828,7 @@ class AIHuman(AIBase):
             decision=random.randint(0,10)
             if decision==1:
                 # go for a walk
-                coords=[self.owner.world_coords[0]+random.randint(-5,5),self.owner.world_coords[1]+random.randint(-5,5)]
+                coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
                 self.switch_task_move_to_location(coords)
             elif decision==2:
                 # check containers
@@ -1843,7 +1862,7 @@ class AIHuman(AIBase):
                 if self.owner.world.world_seconds-last_think_time>think_interval:
                     # reset time
                     self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
-                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,1.5)
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
 
                     if role=='driver':
                         self.think_vehicle_role_driver()

@@ -425,7 +425,7 @@ class World_Menu(object):
         # print out the basic menu
         self.world.graphic_engine.menu_text_queue=[]
         self.world.graphic_engine.menu_text_queue.append('-- Engine Menu --')
-        self.world.graphic_engine.menu_text_queue.append('Engine / Turned On')
+        self.world.graphic_engine.menu_text_queue.append('Engine Status')
         
         selectable_objects=vehicle.ai.engines
         selection_key=1
@@ -643,7 +643,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('1 - [Speak] What are you up to ?')
             self.world.graphic_engine.menu_text_queue.append('2 - Manage Inventory')
             self.world.graphic_engine.menu_text_queue.append('3 - [Speak] Can you upgrade your gear?')
-            if self.world.player.ai.in_vehicle:
+            if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
                 self.world.graphic_engine.menu_text_queue.append('4 - [Speak] Climb aboard!')
             if Key=='1':
                 self.selected_object.ai.speak('status')
@@ -965,11 +965,12 @@ class World_Menu(object):
                 else:
                     self.world.graphic_engine.menu_text_queue.append('---- driver info -------------------')
                     self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
-                    self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
-                    self.world.graphic_engine.menu_text_queue.append('Name/Faction')
-                    for b in self.selected_object.ai.passengers:
-                        self.world.graphic_engine.menu_text_queue.append(b.name + '/'+b.ai.squad.faction)
-                    self.world.graphic_engine.menu_text_queue.append('------------------------------------')
+                # passenger info
+                self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
+                self.world.graphic_engine.menu_text_queue.append('Name/Faction/Role')
+                for b in self.selected_object.ai.passengers:
+                    self.world.graphic_engine.menu_text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                self.world.graphic_engine.menu_text_queue.append('------------------------------------')
 
             if distance<self.max_menu_distance:
                 self.world.graphic_engine.menu_text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))

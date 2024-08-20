@@ -88,7 +88,7 @@ def checkCollisionCircleMouse(mouse_coords, collision_list):
 
 		distance=get_distance(mouse_coords,b.screen_coords)
 
-		if distance < (b.collision_radius*2):
+		if distance < (b.collision_radius):
 			collided=b
 			break
 	return collided

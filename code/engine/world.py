@@ -224,8 +224,8 @@ class World(object):
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
         if collided !=None:
             if collided.is_human:
-                if collided.ai.in_vehicle:
-                    collided=collided.ai.vehicle
+                if collided.ai.memory['current_task']=='task_vehicle_crew':
+                    collided=collided.ai.memory['task_vehicle_crew']['vehicle']
                 else:
                     # check if object misses due to prone
                     if consider_prone:
@@ -305,10 +305,10 @@ class World(object):
                 pass
             elif OBJ.is_soldier:
                 pass
-            if OBJ.ai.in_vehicle:
+            if OBJ.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
-                ignore_list.append(OBJ.ai.vehicle)
-                for b in OBJ.ai.vehicle.turrets:
+                ignore_list.append(OBJ.ai.memory['task_vehicle_crew']['vehicle'])
+                for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
                     ignore_list.append(b)
 
             if OBJ.ai.in_building:
@@ -661,6 +661,7 @@ class World(object):
 
         if spawned:
             self.player.is_player=True
+            self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
         else:
             print('ERROR : player spawn failed')
@@ -686,7 +687,7 @@ class World(object):
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
 
-            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
+            #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
             engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
     #---------------------------------------------------------------------------
