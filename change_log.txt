@@ -6,6 +6,8 @@ August 20 2024
 - fixed a bug where you could end up with a None object for a enemy if 
 everyone in your enemy list was dead
 - some world menu updates to add debug data 
+- added weight to containers for dead humans/vehicles which should mean you 
+can't pick them up anymore. 
 
 notes to follow up on 
 - player altitude goes >0 when in a accelerating vehicle 
