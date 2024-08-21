@@ -1359,8 +1359,15 @@ class AIHuman(AIBase):
                         self.switch_task_think()
                     else:
                         if len(self.near_targets)+len(self.mid_targets)>0:
-                            # probably a closer enemy to engage
-                            self.switch_task_engage_enemy(self.get_target())
+                            # see if there is a better enemy to engage
+                            new_enemy=self.get_target()
+                            if new_enemy==None:
+                                # this should be rare. can only happen if the enemies
+                                # in the arrays are already dead
+                                self.memory.pop('task_engage_enemy',None)
+                                self.switch_task_think()
+                            else:
+                                self.switch_task_engage_enemy(new_enemy)
                         else:
                             self.switch_task_move_to_location(enemy.world_coords)
 
@@ -1431,6 +1438,10 @@ class AIHuman(AIBase):
                             self.large_pickup=None
 
                         vehicle.ai.passengers.append(self.owner)
+
+                        # reset the position for all passengers and turrets. only really 
+                        # need to do it for this ai but there is no way to narrow it down
+                        vehicle.ai.update_child_position_rotation()
                         
                         if vehicle.ai.open_top==False:
                             # human is hidden by top of vehicle so don't render

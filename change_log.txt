@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+----------------------------------
+August 20 2024
+- fixed position jump when a vehicle you entered moves for the first time 
+- fixed a bug where you could end up with a None object for a enemy if 
+everyone in your enemy list was dead
+- some world menu updates to add debug data 
+- added weight to containers for dead humans/vehicles which should mean you 
+can't pick them up anymore. 
+
+notes to follow up on 
+- player altitude goes >0 when in a accelerating vehicle 
+- sometimes vehicles stop when they are full. waiting on someone who is far away??
+    - need to add some sanity checks 
+- driver destinations need to be sanity checked every once in awhile. especially when the driver changes 
 
 ----------------------------------
 August 19 2024
