@@ -965,6 +965,8 @@ class World_Menu(object):
                 else:
                     self.world.graphic_engine.menu_text_queue.append('---- driver info -------------------')
                     self.world.graphic_engine.menu_text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                    vehicle_destination_distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.memory['task_vehicle_crew']['destination'])
+                    self.world.graphic_engine.menu_text_queue.append('distance to driver destination: '+str(vehicle_destination_distance))
                 # passenger info
                 self.world.graphic_engine.menu_text_queue.append('---- passenger info -------------------')
                 self.world.graphic_engine.menu_text_queue.append('Name/Faction/Role')

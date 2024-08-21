@@ -708,6 +708,7 @@ def spawn_container(name,world_object,image_index):
     z.ai.inventory=world_object.ai.inventory
     z.world_builder_identity='skip'
     z.volume=world_object.volume
+    z.weight=world_object.weight
     z.collision_radius=world_object.collision_radius
     z.wo_start()
 
