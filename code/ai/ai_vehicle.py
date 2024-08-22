@@ -453,6 +453,15 @@ class AIVehicle(AIBase):
 
 
     #---------------------------------------------------------------------------
+    def update_heading(self):
+        '''normalize rotation and update heading'''
+        # mostly called by update_physics when rotation changes, but also
+        # needed when the the rotation angle of the vehicle has to be fixed externally
+        self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
+        self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+        self.owner.reset_image=True
+
+    #---------------------------------------------------------------------------
     def update_physics(self):
         time_passed=self.owner.world.graphic_engine.time_passed_seconds
 
@@ -508,10 +517,7 @@ class AIVehicle(AIBase):
         
         #  reset image if heading has changed 
         if heading_changed:
-            # normalize angles 
-            self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
-            self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-            self.owner.reset_image=True
+            self.update_heading()
 
 
         # move along vector
