@@ -611,7 +611,7 @@ class AIHuman(AIBase):
         # controls for vehicles and walking 
         if key=='r':
             if self.memory['current_task']=='task_player_control':
-                self.reload_weapon()
+                self.reload_weapon(self.primary_weapon)
             elif self.memory['current_task']=='task_vehicle_crew':
                 self.reload_turret()
 
@@ -813,28 +813,28 @@ class AIHuman(AIBase):
         self.speak('reloading!')
 
     #---------------------------------------------------------------------------
-    def speak(self,WHAT):
+    def speak(self,what):
         ''' say something if the ai is close to the player '''
 
         # simple way of preventing repeats
-        if WHAT !=self.last_speak:
-            self.last_speak=WHAT
+        if what !=self.last_speak:
+            self.last_speak=what
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
             if distance<400:
                 s='['+self.owner.name+'] '
 
-                if WHAT=='status':
+                if what=='status':
                     s+=' what?'
-                elif WHAT=='bandage':
+                elif what=='bandage':
                     s+=' applying bandage'
-                elif WHAT=='joined squad':
+                elif what=='joined squad':
                     s+=' joined squad'
-                elif WHAT=='react to being shot':
+                elif what=='react to being shot':
                     s+=" Aagh! I'm hit !!"
-                elif WHAT=='scream':
+                elif what=='scream':
                     s+='Aaaaaaaaaaaah!!!'
                 else:
-                    s+=WHAT
+                    s+=what
 
                 self.owner.world.graphic_engine.add_text(s)
           
@@ -844,7 +844,7 @@ class AIHuman(AIBase):
         task_name='task_enter_vehicle'
         task_details = {
             'vehicle': vehicle,
-            'destination': destination
+            'destination': copy.copy(destination)
         }
 
         self.memory[task_name]=task_details
@@ -899,7 +899,7 @@ class AIHuman(AIBase):
         # destination : this is a world_coords
         task_name='task_move_to_location'
         task_details = {
-            'destination': destination,
+            'destination': copy.copy(destination),
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1006,7 +1006,7 @@ class AIHuman(AIBase):
             'vehicle': vehicle,
             'role': role,
             'turret': turret,
-            'destination': destination,
+            'destination': copy.copy(destination),
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1029,7 +1029,7 @@ class AIHuman(AIBase):
         
         distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
         
-        if distance<120 and vehicle.ai.current_speed<1:
+        if distance<150 and vehicle.ai.current_speed<1:
             self.switch_task_exit_vehicle(vehicle)
         elif new_passengers>0:
             # wait for new passengers
@@ -1037,10 +1037,6 @@ class AIHuman(AIBase):
             vehicle.ai.throtte=0
 
         else:
-
-            # we want a tighter and more uniform time interval because we are 
-            # actually driving here
-            #self.ai_think_rate=0.1
 
             # turn engines on
             # could do smarter checks here once engines have more stats
@@ -1054,34 +1050,36 @@ class AIHuman(AIBase):
             # get the rotation to the destination 
             r = engine.math_2d.get_rotation(vehicle.world_coords,destination)
 
-            # compare that with the current vehicle rotation.. somehow?
             v = vehicle.rotation_angle
 
             if r>v:
                 vehicle.ai.handle_steer_left()
-                #self.ai_think_rate=0.01
+
             if r<v:
                 vehicle.ai.handle_steer_right()
-                #self.ai_think_rate=0.01
+
             
             # if its close just set it equal
-            if r>v-1 and r<v+1:
+            if r>v-3 and r<v+3:
                 # neutral out steering 
                 vehicle.ai.handle_steer_neutral()
-                #self.vehicle.rotation_angle=r
-                vehicle.reset_image=True
+                vehicle.rotation_angle=r
+                vehicle.ai.update_heading()
 
             if (r>355 and v<5) or (r<5 and v>355):
                 # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
                 vehicle.ai.handle_steer_neutral()
                 vehicle.rotation_angle=r
+                vehicle.ai.update_heading()
                 engine.log.add_data('warn','fixing 360 vehicle steering issue',True)
 
-            if distance<150:
+            if distance<140:
                 # apply brakes. bot will only exit when speed is zero
+                # note this number should be < the minimum distance to jump out
+                # or you can end up with drivers stuck in the vehicle if they slow down fast
                 vehicle.ai.throttle=0
                 vehicle.ai.brake_power=1
-            elif distance<500:
+            elif distance<300:
                 vehicle.ai.throttle=0.5
                 vehicle.ai.brake_power=0
             else:
@@ -1418,7 +1416,10 @@ class AIHuman(AIBase):
 
                     # no matter what at this point this task is complete
                     self.memory.pop('task_enter_vehicle',None)
+                    # reset current task if we don't end up doing anything else
                     self.switch_task_think()
+
+                    # remove this as well so we don't end up wanting to go back to where the vehicle was
 
                     precheck=True
                     if vehicle.ai.max_occupants<=len(vehicle.ai.passengers):
@@ -1481,6 +1482,10 @@ class AIHuman(AIBase):
             # turn on the brakes to prevent roll away
             vehicle.ai.brake_power=1
 
+            # tell everyone else to GTFO
+            for b in vehicle.ai.passengers:
+                b.ai.switch_task_exit_vehicle(vehicle)
+
         # make sure we are visible again
         self.owner.render=True
 
@@ -1491,11 +1496,7 @@ class AIHuman(AIBase):
         self.memory.pop('task_exit_vehicle',None)
 
         # maybe grab your large pick up if you put it in the trunk
-
-        # tell everyone else to GTFO
-        for b in vehicle.ai.passengers:
-            b.ai.switch_task_exit_vehicle(vehicle)
-            
+    
         self.speak('Jumping out')
 
         # move slightly
@@ -1873,13 +1874,17 @@ class AIHuman(AIBase):
                 if self.owner.world.world_seconds-last_think_time>think_interval:
                     # reset time
                     self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
-                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
+                    
 
                     if role=='driver':
+                        # driver needs a fast refresh for smooth vehicle controls
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.1)
                         self.think_vehicle_role_driver()
                     elif role=='gunner':
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
                         self.think_vehicle_role_gunner()
                     elif role=='passenger':
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
                         self.think_vehicle_role_passenger()
                     else:
                         engine.log.add_data('error','unknown vehicle role: '+role,True)

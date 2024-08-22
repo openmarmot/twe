@@ -1,5 +1,29 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 21 2024
+- lots of tweaks to ai driving 
+- fixed a pass by reference logical flaw 
+- fixed player reloading
+- added some weight to the buildings so they can't be picked up 
+
+there was a large issue with driving that i think was caused by world_coords 
+accidentally being passed as a reference - a mistake that i'm likely making in other areas.
+
+I also made some other adjustments to make it less likely for a driver to be paused/stuck, 
+and fixed some drifting vehicle rotation glitches. 
+
+vehicle use is a bit more odd with this new ai. i'm not sure what is happening. possibly vehicles are 
+getting people from different squads. i need to give squads names to be able to identify when this is happening.
+
+i think i'm more or less at feature parity with the previous ai version so i think i can move on to some new stuff 
+and leave the ai tuning to another time. next up may be rewriting squad so that it is a memory. 
+
+some todo things 
+- finally add a german half track engine 
+- add back in badage usage (if its not there)
+
 ----------------------------------
 August 20 2024
 - fixed position jump when a vehicle you entered moves for the first time 

@@ -804,12 +804,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['warehouse-outside','warehouse-inside'],AIBuilding)
         z.name='warehouse'
         z.collision_radius=200
+        z.weight=10000
         z.is_building=True
 
     elif OBJECT_TYPE=='square_building':
         z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
         z.collision_radius=60
+        z.weight=10000
         z.is_building=True
 
     elif OBJECT_TYPE=='green_apple':
