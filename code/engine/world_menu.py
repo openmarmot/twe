@@ -375,7 +375,7 @@ class World_Menu(object):
             self.world.graphic_engine.menu_text_queue.append('--Debug -> Spawn Menu -> Misc --')
             self.world.graphic_engine.menu_text_queue.append('1 - smoke cloud  ')
             self.world.graphic_engine.menu_text_queue.append('2 - Feldfunk radio and charger ')
-            self.world.graphic_engine.menu_text_queue.append('3 - ?')
+            self.world.graphic_engine.menu_text_queue.append('3 - Maybach HL42')
             self.world.graphic_engine.menu_text_queue.append('4 - ?')
             if Key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
@@ -385,7 +385,7 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'radio_feldfu_b',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+60,self.world.player.world_coords[1]],'feldfunk_battery_charger',True)
             elif Key=='3':
-                pass
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'maybach_hl42_engine',True)
             elif Key=='4':
                 pass
 

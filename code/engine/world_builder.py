@@ -1536,7 +1536,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
         z.ai.fuel_tanks[0].volume=114
         fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(world,world_coords,"chrysler_flathead_straight_6_engine",False))
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
         z.ai.engines[0].ai.exhaust_position_offset=[75,10]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
@@ -1813,6 +1813,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='chrysler_flathead_straight_6_engine':
         z=WorldObject(world,['volkswagen_type_82_engine'],AIEngine)
         z.name='Chrysler Flathead Straight 6 Engine'
+        z.ai.fuel_type=['gas_80_octane']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=93022.91
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250
+    elif OBJECT_TYPE=='maybach_hl42_engine':
+        z=WorldObject(world,['maybach_hl42'],AIEngine)
+        z.name='Maybach HL42 Engine'
         z.ai.fuel_type=['gas_80_octane']
         z.ai.fuel_consumption_rate=0.0033
         z.ai.max_engine_force=93022.91
