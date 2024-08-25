@@ -4,9 +4,10 @@ TWE Project : Change Log
 August 25 2024
 - maybach hl42 engine art for the sd.kfz 251
 - maybach hl42 engine object and switched sd.kfz over to it
+- fixed two possibilties where the player could accidentally switch to ai control 
+- added code to remove dead humans from vehicles (this was missed in the ai rewrite)
 
-note 
-- noticed that when player is hit they lose control and it switches to AI. need to fix 
+i'd like to leave dead bodies in vehicle inventories , but would need to handle opentops like bicycles.
 
 ----------------------------------
 August 21 2024
