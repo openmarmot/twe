@@ -301,14 +301,14 @@ class AIHuman(AIBase):
                 self.last_collision_description+=(' from '+event_data.ai.shooter.name)
 
                 if event_data.ai.shooter.is_human:
-
-                    if event_data.ai.shooter.ai.squad != None:
-                        if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
-                            # not sure if this is the best way to do this.
-                            # this used to be where the shooter was added to personal_enemies
-                            if self.primary_weapon!=None:
-                                if self.check_ammo_bool(self.primary_weapon):
-                                    self.switch_task_engage_enemy(event_data.ai.shooter)
+                    if self.owner.is_player==False:
+                        if event_data.ai.shooter.ai.squad != None:
+                            if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
+                                # not sure if this is the best way to do this.
+                                # this used to be where the shooter was added to personal_enemies
+                                if self.primary_weapon!=None:
+                                    if self.check_ammo_bool(self.primary_weapon):
+                                        self.switch_task_engage_enemy(event_data.ai.shooter)
 
                     # kill tracking
 
@@ -329,19 +329,20 @@ class AIHuman(AIBase):
                 # other way to get here is if its not a projectile
                 print('or its not a projectile')
             
-            destination=[0,0]
-            if self.owner.is_civilian:
-                # civilian runs further
-                destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
-            else:
-                # soldier just repositions to get away from the fire
-                destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-            if self.memory['current_task']!='task_vehicle_crew':
-                if self.prone==False:
-                    self.prone_state_change()
-                self.switch_task_move_to_location(destination)
-            else:
-                engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
+            if self.owner.is_player==False:
+                destination=[0,0]
+                if self.owner.is_civilian:
+                    # civilian runs further
+                    destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
+                else:
+                    # soldier just repositions to get away from the fire
+                    destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
+                if self.memory['current_task']!='task_vehicle_crew':
+                    if self.prone==False:
+                        self.prone_state_change()
+                    self.switch_task_move_to_location(destination)
+                else:
+                    engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
 
         elif event_data.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything
@@ -1216,6 +1217,10 @@ class AIHuman(AIBase):
 
             if self.large_pickup!=None:
                 self.drop_object(self.large_pickup)
+
+            if self.memory['current_task']=='task_vehicle_crew':
+                # re-use this function to exit the vehicle cleanly
+                self.update_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
 
             # remove from squad 
             if self.squad != None:
