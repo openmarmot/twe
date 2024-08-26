@@ -8,6 +8,7 @@ August 25 2024
 - added code to remove dead humans from vehicles (this was missed in the ai rewrite)
 
 i'd like to leave dead bodies in vehicle inventories , but would need to handle opentops like bicycles.
+need to add some things to make bodies tell more of a story. probably bring over more details 
 
 ----------------------------------
 August 21 2024
