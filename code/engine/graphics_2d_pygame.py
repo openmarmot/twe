@@ -133,7 +133,7 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    self.world.select_with_mouse(self.get_mouse_screen_coords())
+                    self.world.select_closest_object_with_mouse(self.get_mouse_screen_coords())
                 # middle button click
                 if event.button==2:
                     pass

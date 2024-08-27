@@ -1767,12 +1767,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='blood_splatter':
         z=WorldObject(world,['blood_splatter'],AINone)
         z.name='blood_splatter'
-        z.rotation_angle=float(random.randint(0,359))  
+        z.rotation_angle=float(random.randint(0,359))
+        z.can_be_deleted=True 
 
     elif OBJECT_TYPE=='small_blood':
         z=WorldObject(world,['small_blood'],AINone)
         z.name='small_blood'
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+        z.can_be_deleted=True 
            
     elif OBJECT_TYPE=='dirt':
         z=WorldObject(world,['small_dirt'],AINone)

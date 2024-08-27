@@ -89,7 +89,7 @@ esc - exit the current menu
 
 I recommend choosing 'civilian' as a start. 
 - wander around a bit 
-- try to find a vehicle as walking is tedious 
+- try to find a vehicle as walking is tedious. A bicycle is a good option.
 - investigate crates for items 
 - click on a couple other civilians and ask them to join you 
 - head to the middle of the map and watch the main factions fight 
