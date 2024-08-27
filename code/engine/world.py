@@ -19,6 +19,7 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 from engine.world_menu import World_Menu
 import engine.math_2d
 import engine.world_builder
+import engine.log
 from ai.ai_faction_tactical import AIFactionTactical
 
 
@@ -150,7 +151,6 @@ class World(object):
                 self.world_menu.activate_menu(in_vehicle)
         else:
             self.world_menu.deactivate_menu()
-
 
     #---------------------------------------------------------------------------
     def add_object(self, WORLD_OBJECT):
@@ -570,70 +570,34 @@ class World(object):
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         
-
     #---------------------------------------------------------------------------
     def render(self):
         self.graphic_engine.render()
 
-
     #---------------------------------------------------------------------------
-    def select_with_mouse(self, mouse_screen_coords):
-        '''
-        return a object that is 'under' the mouse cursor
-
-        called by graphics_2d_pygame on mouse down event currently 
-        '''
-        
+    def select_closest_object_with_mouse(self,mouse_coords):
         possible_objects=[]
-        check_objects=[]
 
-        # this has been reworked to favor selecting items over humans/vehicles/storage
-
-        temp=None
-
-        # add all rendered objects to an array
+        # sort through the objects that are rendered (visible)
         for b in self.graphic_engine.renderlists:
             for c in b:
                 # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False:
+                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
                     possible_objects.append(c)
 
-        #-- first pass - filter for desirable objects
+        object_distance=50
+        closest_object=None
+
         for b in possible_objects:
-            if (b.is_gun or b.is_consumable or b.is_handheld_antitank or b.is_throwable or b.is_gun_magazine):
-                check_objects.append(b)
-
-        if len(check_objects)>0:
-            temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,check_objects)
-
-        #-- second pass - check for less desirable objects
-        if temp==None:
-            # first remove the objects we already checked
-            for b in check_objects:
-                possible_objects.remove(b)
-            check_objects=[]
-
-            # build a list of less desirable objects
-            for b in possible_objects:
-                if (b.is_human or b.is_container or b.is_vehicle or b.is_airplane
-                    or b.is_ammo_container or b.is_furniture or b.is_large_human_pickup):
-                    check_objects.append(b)
-            if len(check_objects)>0:
-                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,check_objects)
-
-        #-- third pass - check everything that is left
-        if temp==None:
-            # first remove the objects we already checked
-            for b in check_objects:
-                possible_objects.remove(b)
-            check_objects=[]
-
-            # check everything that is left
-            if len(possible_objects)>0:
-                temp=engine.math_2d.checkCollisionCircleMouse(mouse_screen_coords,possible_objects)
-
-        if temp != None:
-            self.world_menu.activate_menu(temp)
+            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
+            if distance<object_distance:
+                object_distance=distance
+                closest_object=b
+        
+        if closest_object != None:
+            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
+            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
+            self.world_menu.activate_menu(closest_object)
 
     #---------------------------------------------------------------------------
     def spawn_player(self, FACTION):
@@ -666,7 +630,6 @@ class World(object):
         else:
             print('ERROR : player spawn failed')
 
-
     #---------------------------------------------------------------------------
     def toggle_map(self):
         ''' enable/disable map features '''
@@ -697,7 +660,6 @@ class World(object):
     #---------------------------------------------------------------------------
     def unload_map(self):
         pass
-
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -768,7 +730,6 @@ class World(object):
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
 
-
         # world area data
         for b in self.world_areas:
             self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
@@ -777,13 +738,14 @@ class World(object):
     def update_vehicle_text(self):
         self.vehicle_text_queue=[]
 
-        if self.player.ai.in_vehicle:
-            self.vehicle_text_queue.append('Vehicle: '+self.player.ai.vehicle.name)
+        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+            self.vehicle_text_queue.append('Vehicle: '+vehicle.name)
 
-            for b in self.player.ai.vehicle.ai.engines:
+            for b in vehicle.ai.engines:
                 self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
 
-            for b in self.player.ai.vehicle.ai.fuel_tanks:
+            for b in vehicle.ai.fuel_tanks:
                 fuel=0
                 if len(b.ai.inventory)>0:
                     if 'gas' in b.ai.inventory[0].name:
@@ -791,28 +753,18 @@ class World(object):
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-            self.vehicle_text_queue.append('max speed | current speed: '+str(round(self.player.ai.vehicle.ai.max_speed,1))+
-                ' | '+str(round(self.player.ai.vehicle.ai.current_speed,1)))
-            self.vehicle_text_queue.append('acceleration: '+str(self.player.ai.vehicle.ai.acceleration))
-            self.vehicle_text_queue.append('throttle: '+str(self.player.ai.vehicle.ai.throttle))
-            self.vehicle_text_queue.append('brake: '+str(self.player.ai.vehicle.ai.brake_power))
-            self.vehicle_text_queue.append('wheel steering: '+str(self.player.ai.vehicle.ai.wheel_steering))
+            self.vehicle_text_queue.append('max speed | current speed: '+str(round(vehicle.ai.max_speed,1))+
+                ' | '+str(round(vehicle.ai.current_speed,1)))
+            self.vehicle_text_queue.append('acceleration: '+str(vehicle.ai.acceleration))
+            self.vehicle_text_queue.append('throttle: '+str(vehicle.ai.throttle))
+            self.vehicle_text_queue.append('brake: '+str(vehicle.ai.brake_power))
+            self.vehicle_text_queue.append('wheel steering: '+str(vehicle.ai.wheel_steering))
 
             # airplane specific 
-            if self.player.ai.vehicle.is_airplane:
-                self.vehicle_text_queue.append('altitude: '+str(round(self.player.ai.vehicle.altitude,1)))
-                self.vehicle_text_queue.append('rate of climb: '+str(round(self.player.ai.vehicle.ai.rate_of_climb,1)))
-                self.vehicle_text_queue.append('ailerons: '+str(round(self.player.ai.vehicle.ai.ailerons,1)))
-                self.vehicle_text_queue.append('elevator: '+str(round(self.player.ai.vehicle.ai.elevator,1)))
-                self.vehicle_text_queue.append('rudder: '+str(round(self.player.ai.vehicle.ai.rudder,1)))
-                self.vehicle_text_queue.append('flaps: '+str(round(self.player.ai.vehicle.ai.flaps,1)))
-
-
-
-
-
-
-
-
-
-
+            if vehicle.is_airplane:
+                self.vehicle_text_queue.append('altitude: '+str(round(vehicle.altitude,1)))
+                self.vehicle_text_queue.append('rate of climb: '+str(round(vehicle.ai.rate_of_climb,1)))
+                self.vehicle_text_queue.append('ailerons: '+str(round(vehicle.ai.ailerons,1)))
+                self.vehicle_text_queue.append('elevator: '+str(round(vehicle.ai.elevator,1)))
+                self.vehicle_text_queue.append('rudder: '+str(round(vehicle.ai.rudder,1)))
+                self.vehicle_text_queue.append('flaps: '+str(round(vehicle.ai.flaps,1)))

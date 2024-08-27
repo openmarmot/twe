@@ -1220,7 +1220,8 @@ class AIHuman(AIBase):
 
             if self.memory['current_task']=='task_vehicle_crew':
                 # re-use this function to exit the vehicle cleanly
-                self.update_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                self.update_task_exit_vehicle()
 
             # remove from squad 
             if self.squad != None:
@@ -1234,7 +1235,7 @@ class AIHuman(AIBase):
                     print('!! Error : '+self.owner.name+' not in squad somehow')
 
             # spawn body
-            engine.world_builder.spawn_container('body: ',self.owner,2)
+            engine.world_builder.spawn_container('body: '+self.owner.name,self.owner,2)
 
             # remove from world
             self.owner.world.remove_queue.append(self.owner)
@@ -1895,25 +1896,25 @@ class AIHuman(AIBase):
                         engine.log.add_data('error','unknown vehicle role: '+role,True)
 
     #-----------------------------------------------------------------------
-    def use_medical_object(self,MEDICAL):
-        # MEDICAL - list of is_medical World Object(s)
+    def use_medical_object(self,medical):
+        # MEDICAL - a medical object
 
         # should eventually handle bandages, morphine, etc etc
         # probably need attributes similar to consumables
 
         # should select the correct medical item to fix whatever the issue is
-        selected = MEDICAL[0]
-        self.speak('Using medical '+selected.name)
+
+        self.speak('Using medical '+medical.name)
 
         self.bleeding=False
 
-        self.health+=selected.ai.health_effect
-        self.hunger+=selected.ai.hunger_effect
-        self.thirst_rate+=selected.ai.thirst_effect
-        self.fatigue+=selected.ai.fatigue_effect
+        self.health+=medical.ai.health_effect
+        self.hunger+=medical.ai.hunger_effect
+        self.thirst_rate+=medical.ai.thirst_effect
+        self.fatigue+=medical.ai.fatigue_effect
 
         # calling this by itself should remove all references to the object
-        self.event_remove_inventory(selected)
+        self.event_remove_inventory(medical)
 
             
 

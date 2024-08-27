@@ -61,7 +61,6 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
 
 	return acceleration
 
-
 #------------------------------------------------------------------------------
 def calculate_relative_position(coords,rotation,offset):
 	''' calculate a position based on a offset and a given coordinate and rotation'''
@@ -76,32 +75,12 @@ def calculate_relative_position(coords,rotation,offset):
 	return [coords[0]+dx_new,coords[1]+dy_new]
 
 #------------------------------------------------------------------------------
-def checkCollisionCircleMouse(mouse_coords, collision_list):
-	''' collision check modified for mouse screen coords'''
-	# modified collision check for screen coords 
-	# radius is used for both objects because screen coords perspective 
-	# is scaled based on zoom 
-	# called by world.select_with_mouse at the moment
-
-	collided=None
-	for b in collision_list:
-
-		distance=get_distance(mouse_coords,b.screen_coords)
-
-		if distance < (b.collision_radius):
-			collided=b
-			break
-	return collided
-
-
-#------------------------------------------------------------------------------
 def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 	# wo - (worldobject)the object possibly doing the colliding 
 	# collision_list - (list[worldobject] a list of all possible objects that 
 	# list of objects to ignore (should include wo)
 
 	# returns the first result only
-
 
 	collided=None
 	for b in collision_list:
@@ -125,32 +104,6 @@ def collision_sort(runs,wo_objects):
                 #collided. lets move the building in a super intelligent way
 				a.world_coords[0]+=float(random.randint(-100,100))
 				a.world_coords[1]+=float(random.randint(-100,100))
-
-# #------------------------------------------------------------------------------
-# def checkCollisionSquareOneResult(wo, collision_list, ignore_list):
-# 	# wo - (worldobject)the object possibly doing the colliding 
-# 	# collision_list - (list[worldobject] a list of all possible objects that 
-# 	# list of objects to ignore (should include wo)
-# 	# 
-
-# 	# checks collision based on a bounding box style check where the box is made
-# 	# with the collision radius (so its a square)
-
-# 	# returns the first result only
-
-# 	# !!! NOTE - this has a big error. this is meant to use width and height
-# 	#  instead it uses radius twice - resulting in errors 
-
-# 	collided=None
-# 	for b in collision_list:
-# 		if wo.world_coords[0]+wo.collision_radius > b.world_coords[0]:
-# 			if wo.world_coords[0] < b.world_coords[0]+b.collision_radius:
-# 				if wo.world_coords[1]+wo.collision_radius > b.world_coords[1]:
-# 					if wo.world_coords[1] < b.world_coords[1]+b.collision_radius:
-# 						if wo!=b and (b not in ignore_list):
-# 							collided=b
-# 							break
-# 	return collided
 
 #------------------------------------------------------------------------------
 def get_distance(coords1, coords2,round_number=False):
@@ -243,7 +196,6 @@ def get_transfer_results(source_amount, destination_amount, destination_maximum)
 
 	return source_amount, destination_amount
 
-
 #------------------------------------------------------------------------------
 def get_vector_addition(first_vec,second_vec):
 	'''add together two vector 2s'''
@@ -261,7 +213,6 @@ def moveAlongVector(speed,location,heading,time_passed):
 	travel_distance=speed*time_passed
 	change=[heading[0]*travel_distance,heading[1]*travel_distance]
 	return get_round_vector_2([location[0]+change[0],location[1]+change[1]])
-
 
 #------------------------------------------------------------------------------
 def moveTowardsTarget(speed,location,destination, time_passed):

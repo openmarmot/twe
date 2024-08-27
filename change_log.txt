@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 26 2024
+- bodies now have names 
+- fixed a bug with removing dead humans from vehicles from the last update 
+- made a SIGNIFICANTLY better mouse select function 
+- minor cleanup
+- fixed an error with the medical menu thats probably been there forever 
+- gave blood the can_be_deleted attribute so it will be cleaned up if necessary 
+- fixed vehicle HUD 
+
+I think most of the functionality is fixed and is relatively back to the level it was 
+at before the AI rewrite. The new AI seems significantly better at being aware of danger - 
+which was one of the biggest issues with the old system. 
+
+I think I want to do something different next. possibly add a animal.
+
+I'd like to work on the strategic layer because the 3d version of TWE never got there and 
+it feels like althoug i've done a ton of work in the last year or so, the game is still basically 
+just a small skirmish when it is meant to be so much more. 
+
+One thing that would probably help would be to come up with some sort of documented roadmap.
+
+----------------------------------
 August 25 2024
 - maybach hl42 engine art for the sd.kfz 251
 - maybach hl42 engine object and switched sd.kfz over to it
