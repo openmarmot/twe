@@ -15,7 +15,7 @@ import copy
 
 
 #import custom packages
-from engine.graphics_2d_pygame import Graphics_2D_Pygame
+
 from engine.world_menu import World_Menu
 import engine.math_2d
 import engine.world_builder
@@ -28,7 +28,7 @@ from ai.ai_faction_tactical import AIFactionTactical
 
 class World(object):
     #---------------------------------------------------------------------------
-    def __init__(self,SCREEN_SIZE):
+    def __init__(self):
         
         # tactical AIs
         self.german_ai=AIFactionTactical(self,'german')
@@ -91,7 +91,7 @@ class World(object):
         self.last_map_check=0
         self.exited_object_count=0
 
-        self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
+        
         self.world_menu=World_Menu(self)
 
         self.player=None
@@ -128,6 +128,9 @@ class World(object):
         # seconds that the world has existed for 
         # can be used by other classes for time keeping
         self.world_seconds=0
+
+        # seconds between the last update. updated by self.update()
+        self.time_passed_seconds=0
 
 
         # number of objects over which the world starts to cleanup un-needed objects
@@ -397,10 +400,6 @@ class World(object):
         #print('key ',KEY)
         if KEY==96:
             self.world_menu.handle_input("tilde")
-        elif KEY==91: # [
-            self.graphic_engine.zoom_out()
-        elif KEY==93: # ]
-            self.graphic_engine.zoom_in()
         elif KEY==48:
             self.world_menu.handle_input("0")
         elif KEY==49:
@@ -570,34 +569,8 @@ class World(object):
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         
-    #---------------------------------------------------------------------------
-    def render(self):
-        self.graphic_engine.render()
 
-    #---------------------------------------------------------------------------
-    def select_closest_object_with_mouse(self,mouse_coords):
-        possible_objects=[]
-
-        # sort through the objects that are rendered (visible)
-        for b in self.graphic_engine.renderlists:
-            for c in b:
-                # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
-                    possible_objects.append(c)
-
-        object_distance=50
-        closest_object=None
-
-        for b in possible_objects:
-            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
-            if distance<object_distance:
-                object_distance=distance
-                closest_object=b
-        
-        if closest_object != None:
-            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
-            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
-            self.world_menu.activate_menu(closest_object)
+    
 
     #---------------------------------------------------------------------------
     def spawn_player(self, FACTION):
@@ -662,11 +635,11 @@ class World(object):
         pass
 
     #---------------------------------------------------------------------------
-    def update(self):
-        self.graphic_engine.update()
+    def update(self,time_passed_seconds):
+        self.time_passed_seconds=time_passed_seconds
 
         if self.is_paused==False:
-            self.world_seconds+=self.graphic_engine.time_passed_seconds
+            self.world_seconds+=self.time_passed_seconds
             self.process_reinforcements()
 
             for b in self.wo_objects:
@@ -710,10 +683,7 @@ class World(object):
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
-        self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
-        self.debug_text_queue.append('World scale: '+str(self.graphic_engine.scale))
         self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
-        self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))

@@ -1191,9 +1191,9 @@ class AIHuman(AIBase):
 
             # -- body attribute stuff --
             if self.fatigue>0:
-                self.fatigue-=self.fatigue_remove_rate*self.owner.world.graphic_engine.time_passed_seconds
-            self.hunger+=self.hunger_rate*self.owner.world.graphic_engine.time_passed_seconds
-            self.thirst+=self.thirst_rate*self.owner.world.graphic_engine.time_passed_seconds
+                self.fatigue-=self.fatigue_remove_rate*self.owner.world.time_passed_seconds
+            self.hunger+=self.hunger_rate*self.owner.world.time_passed_seconds
+            self.thirst+=self.thirst_rate*self.owner.world.time_passed_seconds
     
         else:
             # -- handle death --
@@ -1378,7 +1378,7 @@ class AIHuman(AIBase):
             else:
                 # -- fire --
                 self.aim_and_fire_weapon(self.primary_weapon,enemy)
-                self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
+                self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
 
     #---------------------------------------------------------------------------
     def update_task_enter_vehicle(self):
@@ -1650,9 +1650,9 @@ class AIHuman(AIBase):
             # -- walk --
             # move
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),
-                self.owner.world_coords,destination,self.owner.world.graphic_engine.time_passed_seconds)
+                self.owner.world_coords,destination,self.owner.world.time_passed_seconds)
             # add some fatigue
-            self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
 
     #---------------------------------------------------------------------------
     def update_task_pickup_objects(self):
@@ -1701,22 +1701,22 @@ class AIHuman(AIBase):
         action=False
         speed=self.get_calculated_speed()
         if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=speed*self.owner.world.graphic_engine.time_passed_seconds
+            self.owner.world_coords[1]-=speed*self.owner.world.time_passed_seconds
             self.owner.rotation_angle=0
             self.owner.reset_image=True
             action=True
         if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=speed*self.owner.world.graphic_engine.time_passed_seconds
+            self.owner.world_coords[1]+=speed*self.owner.world.time_passed_seconds
             self.owner.rotation_angle=180
             self.owner.reset_image=True
             action=True
         if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=speed*self.owner.world.graphic_engine.time_passed_seconds
+            self.owner.world_coords[0]-=speed*self.owner.world.time_passed_seconds
             self.owner.rotation_angle=90
             self.owner.reset_image=True
             action=True
         if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=speed*self.owner.world.graphic_engine.time_passed_seconds
+            self.owner.world_coords[0]+=speed*self.owner.world.time_passed_seconds
             self.owner.rotation_angle=270
             self.owner.reset_image=True
             action=True
@@ -1727,7 +1727,7 @@ class AIHuman(AIBase):
             action=True
 
         if action:
-            self.fatigue+=self.fatigue_add_rate*self.owner.world.graphic_engine.time_passed_seconds
+            self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
             self.time_since_player_interact=0
 
     #---------------------------------------------------------------------------

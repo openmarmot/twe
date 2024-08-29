@@ -197,7 +197,7 @@ class WorldObject(object):
         # gravity 
         if self.altitude>0:
             self.render_level=5
-            self.altitude+=(engine.math_2d.GRAVITY*self.world.graphic_engine.time_passed_seconds)
+            self.altitude+=(engine.math_2d.GRAVITY*self.world.time_passed_seconds)
             if self.altitude<=0:
                 self.altitude=0
                 self.reset_render_level()

@@ -285,7 +285,7 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_throttle_up(self):
         '''adjust the throttle a bit over time'''
-        self.throttle+=1*self.owner.world.graphic_engine.time_passed_seconds
+        self.throttle+=1*self.owner.world.time_passed_seconds
         if self.throttle>1:
             self.throttle=1
 
@@ -295,7 +295,7 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_throttle_down(self):
         '''adjust the throttle a bit over time'''
-        self.throttle-=1*self.owner.world.graphic_engine.time_passed_seconds
+        self.throttle-=1*self.owner.world.time_passed_seconds
         if self.throttle<0:
             self.throttle=0
 
@@ -307,7 +307,7 @@ class AIVehicle(AIBase):
         ''' return controls to neutral over time'''
 
         # controls should return to neutral over time 
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        time_passed=self.owner.world.time_passed_seconds
 
         #return wheel to neutral
         self.wheel_steering=engine.math_2d.regress_to_zero(self.wheel_steering,time_passed)
@@ -409,7 +409,7 @@ class AIVehicle(AIBase):
             b.update()
         
         #electrical units are in hours for whatever reason. gotta get the conversion
-        time_passed_hours=self.owner.world.graphic_engine.time_passed_seconds/3600
+        time_passed_hours=self.owner.world.time_passed_seconds/3600
 
         charge=self.alternator_amps*time_passed_hours # I think the result of this is amp hours ?
         
@@ -463,7 +463,7 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def update_physics(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        time_passed=self.owner.world.time_passed_seconds
 
         heading_changed = False
 

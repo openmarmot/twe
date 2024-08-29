@@ -214,7 +214,7 @@ class AIFactionTactical(object):
     
     #---------------------------------------------------------------------------
     def update(self):
-        time_passed=self.world.graphic_engine.time_passed_seconds
+        time_passed=self.world.time_passed_seconds
         self.time_since_update+=time_passed
 
         # run the update for each squad

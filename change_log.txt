@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 30 2024
+- started working on the strategic map. 
+- working on moving graphic_engine out from world to stand on its own, and removing calls to it
+
+still thinking about how the whole strategic side works. for now i realized that i need 
+to decouple graphic engine from world, so working on that. graphic engine is the new top level, 
+and will eventually have/use a new top level menu. world menu will be for in-world stuff only 
+
+todo 
+- finish removing references to graphic_engine from everything 
+- maybe rewrite graphic_engine so it is no longer a class ? 
+
+----------------------------------
 August 26 2024
 - bodies now have names 
 - fixed a bug with removing dead humans from vehicles from the last update 

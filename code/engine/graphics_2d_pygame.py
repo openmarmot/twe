@@ -4,11 +4,9 @@ module : module_template.py
 language : Python 3.x
 email : andrew@openmarmot.com
 notes :
-This class should hold as much of the pygame specifc code as possibe.
+This should hold as much of the pygame specifc code as possibe.
 The idea is to keep the graphics engine seperate from the rest of the code,
  so it is portable to different graphics engines
-
-currently instantiated by the world class
 
  ref:
  # pygame.key.get_pressed() and general input theory
@@ -17,13 +15,17 @@ currently instantiated by the world class
 
 
 #import built in modules
-import pygame
-from pygame.locals import *
-import pygame.freetype
 from itertools import islice
 import os 
 
+# import pip packages
+import pygame
+from pygame.locals import *
+import pygame.freetype
+
 #import custom packages
+import engine.math_2d
+
 
 
 class Graphics_2D_Pygame(object):
@@ -81,10 +83,6 @@ class Graphics_2D_Pygame(object):
         self.text_queue_display_size=5
         self.time_since_last_text_clear=0
 
-        # used for the menu system. no limits enforced by this class
-        self.menu_text_queue=[]
-
-
         # draw collision circles
         self.draw_collision=False
 
@@ -93,7 +91,6 @@ class Graphics_2D_Pygame(object):
 
         # will cause everything to exit
         self.quit=False
-
 
         # max_fps max frames for every second.
         self.max_fps=60
@@ -128,12 +125,18 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 # logic for handling these keys has been shifted to world
-                self.world.handle_keydown(event.key)
+
+                if event.key==91: # [
+                    self.zoom_out()
+                elif event.key==93: # ]
+                    self.zoom_in()
+                else:
+                    self.world.handle_keydown(event.key)
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    self.world.select_closest_object_with_mouse(self.get_mouse_screen_coords())
+                    self.select_closest_object_with_mouse(self.get_mouse_screen_coords())
                 # middle button click
                 if event.button==2:
                     pass
@@ -239,9 +242,6 @@ class Graphics_2D_Pygame(object):
         
         print('Image loading complete')
 
-
-
-
 #------------------------------------------------------------------------------
     def render(self):
         self.update_render_info()
@@ -271,7 +271,7 @@ class Graphics_2D_Pygame(object):
             self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
         self.h+=20
-        for b in self.menu_text_queue:
+        for b in self.world.menu_text_queue:
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
@@ -298,6 +298,31 @@ class Graphics_2D_Pygame(object):
         for b in self.world.wo_objects:
             b.reset_image=True
 
+#---------------------------------------------------------------------------
+    def select_closest_object_with_mouse(self,mouse_coords):
+        possible_objects=[]
+
+        # sort through the objects that are rendered (visible)
+        for b in self.renderlists:
+            for c in b:
+                # filter out a couple things we don't want to click on
+                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                    possible_objects.append(c)
+
+        object_distance=50
+        closest_object=None
+
+        for b in possible_objects:
+            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
+            if distance<object_distance:
+                object_distance=distance
+                closest_object=b
+        
+        if closest_object != None:
+            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
+            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
+            self.world.world_menu.activate_menu(closest_object)
+
 #------------------------------------------------------------------------------
     def update(self):
         '''
@@ -316,7 +341,15 @@ class Graphics_2D_Pygame(object):
             if len(self.text_queue)>0:
                 self.text_queue.pop(0)
 
+        
 
+        self.world.update(self.time_passed_seconds)
+
+        # insert graphic engine specific debug text (after world.update populated it)
+        if self.world.debug_mode:
+            self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.graphic_engine.clock.get_fps())))
+            self.world.debug_text_queue.insert(1,'World scale: '+str(self.graphic_engine.scale))
+            self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.graphic_engine.renderCount))
 
 #------------------------------------------------------------------------------
     def update_render_info(self):

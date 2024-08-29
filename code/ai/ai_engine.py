@@ -62,9 +62,9 @@ class AIEngine(AIBase):
     def consume_fuel(self):
         if self.engine_on:
             if self.throttle_control>0:
-                self.fuel_consumed+=self.fuel_consumption_rate*self.throttle_control*self.owner.world.graphic_engine.time_passed_seconds
+                self.fuel_consumed+=self.fuel_consumption_rate*self.throttle_control*self.owner.world.time_passed_seconds
             else:
-                self.fuel_consumed+=self.idle_fuel_consumption_rate*self.owner.world.graphic_engine.time_passed_seconds
+                self.fuel_consumed+=self.idle_fuel_consumption_rate*self.owner.world.time_passed_seconds
 
             if self.fuel_consumed>self.fuel_reservoir:
                 # we are now out of fuel
