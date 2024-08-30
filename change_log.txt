@@ -1,7 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
-August 30 2024
+August 29 2024
+- more work on seperating graphic_engine from everything else 
+
+----------------------------------
+August 28 2024
 - started working on the strategic map. 
 - working on moving graphic_engine out from world to stand on its own, and removing calls to it
 

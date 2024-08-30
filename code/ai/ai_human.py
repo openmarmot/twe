@@ -178,7 +178,7 @@ class AIHuman(AIBase):
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
             if self.owner.is_player:
-                self.owner.world.graphic_engine.text_queue.insert(0,'You are hit and begin to bleed')
+                self.owner.world.text_queue.insert(0,'You are hit and begin to bleed')
 
         self.speak('react to being shot')
 
@@ -390,13 +390,13 @@ class AIHuman(AIBase):
                         # drop the current obj and pick up the new one
                         self.drop_object(self.primary_weapon)
                     if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                        self.owner.world.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.primary_weapon=event_data
                     event_data.ai.equipper=self.owner
                 elif event_data.is_throwable :
                     if self.throwable==None:
                         if self.owner.is_player :
-                            self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                            self.owner.world.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                         self.throwable=event_data
                         event_data.ai.equipper=self.owner
                 elif event_data.is_handheld_antitank :
@@ -404,7 +404,7 @@ class AIHuman(AIBase):
                         # drop the current obj and pick up the new one
                         self.drop_object(self.antitank)
                     if self.owner.is_player :
-                        self.owner.world.graphic_engine.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
+                        self.owner.world.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                     self.antitank=event_data
                     event_data.ai.equipper=self.owner
 
@@ -477,11 +477,11 @@ class AIHuman(AIBase):
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
     #---------------------------------------------------------------------------
-    def fire(self,target_coords,weapon):
+    def fire(self,target_coords,weapon,mouse_screen_coords=None,player_screen_coords=None):
         ''' fires a weapon '''
         if self.owner.is_player :
             # do computations based off of where the mouse is. TARGET_COORDS is ignored
-            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+            weapon.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
 
         else :
             weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
@@ -588,37 +588,9 @@ class AIHuman(AIBase):
         else:
             print('Error: '+self.owner.name+' cannot handle event '+EVENT)
 
-    #-----------------------------------------------------------------------
-    def handle_keydown(self,key):
-        ''' handle keydown passed from world.handle_keydown'''
-        # this is a one off key press, not press and hold
-        # world.handle_keydown will pass the key as the actual keyboard letter
-
-        if self.memory['current_task']=='task_vehicle_crew':
-            if self.memory['task_vehicle_crew']['vehicle'].is_airplane:
-                if key=='p':
-                    self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
-                    self.speak('bailing out!')
-                    # note - physics needs to be udpdate to handle falling
-        else:
-            # controls for when you are walking about
-            if key=='g':
-                self.throw([])
-            elif key=='p':
-                self.prone_state_change()
-            elif key=='t':
-                self.launch_antitank([])
-
-        # controls for vehicles and walking 
-        if key=='r':
-            if self.memory['current_task']=='task_player_control':
-                self.reload_weapon(self.primary_weapon)
-            elif self.memory['current_task']=='task_vehicle_crew':
-                self.reload_turret()
-
 
     #---------------------------------------------------------------------------
-    def launch_antitank(self,target_coords):
+    def launch_antitank(self,target_coords,mouse_screen_coords=None,player_screen_coords=None):
         ''' launch antitank ''' 
 
         # standup. kneel would be better if it becomes an option later
@@ -628,7 +600,7 @@ class AIHuman(AIBase):
         if self.antitank!=None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
 
             else :
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
@@ -837,7 +809,7 @@ class AIHuman(AIBase):
                 else:
                     s+=what
 
-                self.owner.world.graphic_engine.add_text(s)
+                self.owner.world.text_queue.insert(0,s)
           
     #---------------------------------------------------------------------------
     def switch_task_enter_vehicle(self,vehicle,destination):
@@ -1096,7 +1068,7 @@ class AIHuman(AIBase):
         pass
 
     #---------------------------------------------------------------------------
-    def throw(self,TARGET_COORDS):
+    def throw(self,TARGET_COORDS,mouse_screen_coords=None,player_screen_coords=None):
         ''' throw like you know the thing. cmon man '''   
         # stand up
         if self.prone:
@@ -1109,8 +1081,8 @@ class AIHuman(AIBase):
             # set rotation and heading
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
-                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world.graphic_engine.get_player_screen_coords(),self.owner.world.graphic_engine.get_mouse_screen_coords())
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
+                self.throwable.heading=engine.math_2d.get_heading_vector(player_screen_coords,mouse_screen_coords)
             else :
                 self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
                 self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
@@ -1249,64 +1221,6 @@ class AIHuman(AIBase):
         
             #print death message
             print(dm)
-
-    #---------------------------------------------------------------------------
-    def update_player_vehicle_controls(self,vehicle,role,turret):
-        '''update player vehicle controls'''
-        if role=='driver':
-
-            if vehicle.is_airplane:
-                # ---- controls for airplanes ------------
-                if(self.owner.world.graphic_engine.keyPressed('w')):
-                    vehicle.ai.handle_elevator_up()
-                if(self.owner.world.graphic_engine.keyPressed('s')):
-                    vehicle.ai.handle_elevator_down()
-                    if self.owner.altitude<1:
-                        vehicle.ai.brake_power=1
-                if(self.owner.world.graphic_engine.keyPressed('a')):
-                    vehicle.ai.handle_aileron_left()
-                    vehicle.ai.handle_rudder_left()
-                    if self.owner.altitude<1:
-                        vehicle.ai.handle_steer_left()
-                if(self.owner.world.graphic_engine.keyPressed('d')):
-                    vehicle.ai.handle_aileron_right()
-                    vehicle.ai.handle_rudder_right()
-                    if self.owner.altitude<1:
-                        vehicle.ai.handle_steer_right()
-                if(self.owner.world.graphic_engine.keyPressed('up')):
-                    print('up')
-                if(self.owner.world.graphic_engine.keyPressed('down')):
-                    print('down')
-                if(self.owner.world.graphic_engine.keyPressed('left')):
-                    vehicle.ai.handle_throttle_down()
-                if(self.owner.world.graphic_engine.keyPressed('right')):
-                    vehicle.ai.handle_throttle_up()
-            else:
-                # ---- controls for ground vehicles ------------
-
-                if(self.owner.world.graphic_engine.keyPressed('w')):
-                    vehicle.ai.throttle=1
-                    vehicle.ai.brake_power=0
-
-                if(self.owner.world.graphic_engine.keyPressed('s')):
-                    vehicle.ai.brake_power=1
-                    vehicle.ai.throttle=0
-
-                if(self.owner.world.graphic_engine.keyPressed('a')):
-                    vehicle.ai.handle_steer_left()
-
-                if(self.owner.world.graphic_engine.keyPressed('d')):
-                    vehicle.ai.handle_steer_right()
-
-        elif role=='gunner':
-            if(self.owner.world.graphic_engine.keyPressed('a')):
-                turret.ai.handle_rotate_left()
-
-            if(self.owner.world.graphic_engine.keyPressed('d')):
-                turret.ai.handle_rotate_right()
-
-            if(self.owner.world.graphic_engine.keyPressed('f')):
-                turret.ai.handle_fire()
 
     #---------------------------------------------------------------------------
     def update_task_engage_enemy(self):
@@ -1691,44 +1605,8 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
         '''update player control task'''
-        
-        # graphic_engine.keyPressed works for keys that need to be held down
-        # keys that should trigger an event only when they keydown (once) are handled 
-        # by world.handle_keydown()
-
-        # ---- controls for walking around ------------
-
-        action=False
-        speed=self.get_calculated_speed()
-        if(self.owner.world.graphic_engine.keyPressed('w')):
-            self.owner.world_coords[1]-=speed*self.owner.world.time_passed_seconds
-            self.owner.rotation_angle=0
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('s')):
-            self.owner.world_coords[1]+=speed*self.owner.world.time_passed_seconds
-            self.owner.rotation_angle=180
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('a')):
-            self.owner.world_coords[0]-=speed*self.owner.world.time_passed_seconds
-            self.owner.rotation_angle=90
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('d')):
-            self.owner.world_coords[0]+=speed*self.owner.world.time_passed_seconds
-            self.owner.rotation_angle=270
-            self.owner.reset_image=True
-            action=True
-        if(self.owner.world.graphic_engine.keyPressed('f')):
-            # fire the gun
-            if self.primary_weapon!=None:
-                self.fire(self.owner.world.graphic_engine.get_mouse_world_coords(),self.primary_weapon)
-            action=True
-
-        if action:
-            self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
-            self.time_since_player_interact=0
+        # controls got moved to world. nothing left over here for now
+        pass
 
     #---------------------------------------------------------------------------
     def update_task_squad_leader(self):
@@ -1872,7 +1750,8 @@ class AIHuman(AIBase):
             turret=self.memory['task_vehicle_crew']['turret']
 
             if self.owner.is_player:
-                self.update_player_vehicle_controls(vehicle,role,turret)
+                # not sure what we need to to do here. controls are now handled by world
+                pass
             else:
                 last_think_time=self.memory['task_vehicle_crew']['last_think_time']
                 think_interval=self.memory['task_vehicle_crew']['think_interval']

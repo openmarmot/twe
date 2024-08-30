@@ -285,7 +285,7 @@ class World_Menu(object):
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - none')
-            self.text_queue.append('5 - toggle collision circle visual')
+            self.text_queue.append('5 - none')
             self.text_queue.append('6 - none')
 
             if Key=='1':
@@ -298,7 +298,7 @@ class World_Menu(object):
             elif Key=='4':
                 pass
             elif Key=='5':
-                self.world.graphic_engine.draw_collision = not self.world.graphic_engine.draw_collision
+                print('boop')
             elif Key=='6':
                 pass
         if self.menu_state=='spawn':
@@ -712,7 +712,7 @@ class World_Menu(object):
             self.text_queue.append('4 - Tight formation (not implemented)')
 
             if Key=='1':
-                self.world.graphic_engine.add_text('[ Squad disbanded ]')
+                self.world.text_que.append('[ Squad disbanded ]')
                 # note - this will remove everyone but the player from the player's squad
                 # and put them in a new squad
                 members=[]
@@ -992,7 +992,7 @@ class World_Menu(object):
                     self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
-                    self.world.graphic_engine.add_text('[ You climb into the vehicle ]')
+                    self.world.text_que.append('[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 if Key=='3':
                     # pull up the storage/container menu
@@ -1030,7 +1030,7 @@ class World_Menu(object):
                 # exit the vehicle
                 self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle'])
                 self.world.display_vehicle_text=False
-                self.world.graphic_engine.text_queue.insert(0, '[ You exit the vehicle ]')
+                self.world.text_queue.append('[ You exit the vehicle ]')
                 self.deactivate_menu()
             if Key=='3':
                 self.change_menu('engine_menu')

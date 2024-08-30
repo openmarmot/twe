@@ -33,20 +33,20 @@ def run():
 
     graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE)
 
-    #world = World(SCREEN_SIZE)
+    world = World()
 
     # fake player that is only used until the player actually spawns via the menu
     # required because the game engine needs to know the player position
-    #p=engine.world_builder.spawn_object(world, [50.,50.],'player',False)
+    p=engine.world_builder.spawn_object(world, [50.,50.],'player',False)
     
 
     #-- launch start menu ---
-    #world.world_menu.active_menu='start'
-    #world.world_menu.menu_state='none'
+    world.world_menu.active_menu='start'
+    world.world_menu.menu_state='none'
     # fake input to get the text added
-    #world.world_menu.handle_input('none')
+    world.world_menu.handle_input('none')
 
-
+    graphic_engine.world=world
 
     # main game loop
     while graphic_engine.quit==False:

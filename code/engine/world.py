@@ -109,6 +109,13 @@ class World(object):
         # debug info queue
         self.debug_text_queue=[]
 
+        # general text queue
+        self.text_queue=[]
+        # used for temporary text. call add_text to add 
+        self.text_queue_clear_rate=4
+        self.text_queue_display_size=5
+        self.time_since_last_text_clear=0
+
         #bool
         self.map_enabled=False
 
@@ -389,7 +396,7 @@ class World(object):
         return near_objects
 
     #---------------------------------------------------------------------------
-    def handle_keydown(self,KEY):
+    def handle_keydown(self,key,mouse_screen_coords=None,player_screen_coords=None):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
         #KEY is a key number
@@ -398,42 +405,147 @@ class World(object):
         # the menu or the player
 
         #print('key ',KEY)
-        if KEY==96:
+        if key==96:
             self.world_menu.handle_input("tilde")
-        elif KEY==48:
+        elif key==48:
             self.world_menu.handle_input("0")
-        elif KEY==49:
+        elif key==49:
             self.world_menu.handle_input("1")
-        elif KEY==50:
+        elif key==50:
             self.world_menu.handle_input("2")
-        elif KEY==51:
+        elif key==51:
             self.world_menu.handle_input("3")
-        elif KEY==52:
+        elif key==52:
             self.world_menu.handle_input("4")
-        elif KEY==53:
+        elif key==53:
             self.world_menu.handle_input("5")
-        elif KEY==54:
+        elif key==54:
             self.world_menu.handle_input("6")
-        elif KEY==55:
+        elif key==55:
             self.world_menu.handle_input("7")
-        elif KEY==56:
+        elif key==56:
             self.world_menu.handle_input("8")
-        elif KEY==57:
+        elif key==57:
             self.world_menu.handle_input("9")
-        elif KEY==27:
+        elif key==27:
             self.world_menu.handle_input("esc")
-        elif KEY==9: #tab
+        elif key==9: #tab
             self.activate_context_menu()
-        elif KEY==112: #p
-            self.player.ai.handle_keydown('p')
-        elif KEY==116: #t
-            self.player.ai.handle_keydown('t')
-        elif KEY==103: #g
-            self.player.ai.handle_keydown('g')
-        elif KEY==98: #b
-            self.player.ai.handle_keydown('b')
-        elif KEY==114: #r
-            self.player.ai.handle_keydown('r')
+
+        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.player.ai.memory['task_vehicle_crew']['vehicle'].is_airplane:
+                if key==112: #p
+                    self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle'])
+                    self.player.ai.speak('bailing out!')
+                    # note - physics needs to be udpdate to handle falling
+        else:
+            # controls for when you are walking about
+            if key==103: #g
+                self.player.ai.throw([],mouse_screen_coords,player_screen_coords)
+            elif key==112: #p
+                self.player.ai.prone_state_change()
+            elif key==116: #t
+                self.player.ai.launch_antitank([],mouse_screen_coords,player_screen_coords)
+
+        # controls for vehicles and walking 
+        if key==114: #r
+            if self.player.ai.memory['current_task']=='task_player_control':
+                self.player.ai.reload_weapon(self.player.ai.primary_weapon)
+            elif self.player.ai.memory['current_task']=='task_vehicle_crew':
+                self.player.ai.reload_turret()
+
+    #---------------------------------------------------------------------------
+    def handle_key_press(self,key,mouse_screen_coords=None,player_screen_coords=None):
+        '''handle key press'''
+        # key press is when a key is held down
+        # key - string  example 'w'
+        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+            role=self.player.ai.memory['task_vehicle_crew']['role']
+            turret=self.player.ai.memory['task_vehicle_crew']['turret']
+
+            if role=='driver':
+
+                if vehicle.is_airplane:
+                    # ---- controls for airplanes ------------
+                    if key=='w':
+                        vehicle.ai.handle_elevator_up()
+                    elif key=='s':
+                        vehicle.ai.handle_elevator_down()
+                        if self.owner.altitude<1:
+                            vehicle.ai.brake_power=1
+                    elif key=='a':
+                        vehicle.ai.handle_aileron_left()
+                        vehicle.ai.handle_rudder_left()
+                        if self.owner.altitude<1:
+                            vehicle.ai.handle_steer_left()
+                    elif key=='d':
+                        vehicle.ai.handle_aileron_right()
+                        vehicle.ai.handle_rudder_right()
+                        if self.owner.altitude<1:
+                            vehicle.ai.handle_steer_right()
+                    elif key=='up':
+                        pass
+                    elif key=='down':
+                        pass
+                    elif key=='left':
+                        vehicle.ai.handle_throttle_down()
+                    elif key=='right':
+                        vehicle.ai.handle_throttle_up()
+                else:
+                    # ---- controls for ground vehicles ------------
+
+                    if key=='w':
+                        vehicle.ai.throttle=1
+                        vehicle.ai.brake_power=0
+                    elif key=='s':
+                        vehicle.ai.brake_power=1
+                        vehicle.ai.throttle=0
+                    elif key=='a':
+                        vehicle.ai.handle_steer_left()
+                    elif key=='d':
+                        vehicle.ai.handle_steer_right()
+
+            elif role=='gunner':
+                if key=='a':
+                    turret.ai.handle_rotate_left()
+                elif key=='d':
+                    turret.ai.handle_rotate_right()
+                elif key=='f':
+                    turret.ai.handle_fire()
+        else:
+            # ---- controls for walking around ------------
+            action=False
+            speed=self.player.ai.get_calculated_speed()
+            if key=='w':
+                self.player.world_coords[1]-=speed*self.time_passed_seconds
+                self.player.rotation_angle=0
+                self.player.reset_image=True
+                action=True
+            elif key=='s':
+                self.player.world_coords[1]+=speed*self.time_passed_seconds
+                self.player.rotation_angle=180
+                self.player.reset_image=True
+                action=True
+            elif key=='a':
+                self.player.world_coords[0]-=speed*self.time_passed_seconds
+                self.player.rotation_angle=90
+                self.player.reset_image=True
+                action=True
+            elif key=='d':
+                self.player.world_coords[0]+=speed*self.time_passed_seconds
+                self.player.rotation_angle=270
+                self.player.reset_image=True
+                action=True
+            elif key=='f':
+                # fire the gun
+                if self.player.ai.primary_weapon!=None:
+                    self.player.ai.fire([],self.player.ai.primary_weapon,mouse_screen_coords,player_screen_coords)
+                action=True
+
+            if action:
+                self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
+
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -641,6 +753,13 @@ class World(object):
         if self.is_paused==False:
             self.world_seconds+=self.time_passed_seconds
             self.process_reinforcements()
+
+            # cycle the text queue
+            self.time_since_last_text_clear+=self.time_passed_seconds
+            if self.time_since_last_text_clear>self.text_queue_clear_rate:
+                self.time_since_last_text_clear=0
+                if len(self.text_queue)>0:
+                    self.text_queue.pop(0)
 
             for b in self.wo_objects:
                 b.update()

@@ -31,7 +31,7 @@ import engine.math_2d
 class Graphics_2D_Pygame(object):
     ''' 2D Graphics Engine using PyGame '''
 
-    def __init__(self,Screen_size,world):
+    def __init__(self,Screen_size):
         # called by World.__init__
 
         self.images=dict()
@@ -62,7 +62,7 @@ class Graphics_2D_Pygame(object):
         # count of rendered objects
         self.renderCount=0
 
-        self.world=world
+        self.world=None
         
         # time stuff
         self.clock=pygame.time.Clock()
@@ -77,11 +77,7 @@ class Graphics_2D_Pygame(object):
 
         self.menu_color=('#394B32')
 
-        # used for temporary text. call add_text to add 
-        self.text_queue=[]
-        self.text_queue_clear_rate=4
-        self.text_queue_display_size=5
-        self.time_since_last_text_clear=0
+        
 
         # draw collision circles
         self.draw_collision=False
@@ -107,12 +103,6 @@ class Graphics_2D_Pygame(object):
         # load all images
         self.load_all_images('images')
 
-#------------------------------------------------------------------------------
-    def add_text(self,text):
-        ''' add text to the text queue'''
-        self.text_queue.append(text)
-        if len(self.text_queue)<4:
-            self.time_since_last_text_clear=-1
 
 #------------------------------------------------------------------------------
     def handleInput(self):
@@ -131,7 +121,7 @@ class Graphics_2D_Pygame(object):
                 elif event.key==93: # ]
                     self.zoom_in()
                 else:
-                    self.world.handle_keydown(event.key)
+                    self.world.handle_keydown(event.key,self.get_mouse_screen_coords(),self.get_player_screen_coords())
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -146,87 +136,50 @@ class Graphics_2D_Pygame(object):
             if event.type==pygame.MOUSEMOTION:
                 #print(str(event.pos))
                 pass
-        #print(self.keyPressed('w'))
-
-#------------------------------------------------------------------------------
-    def keyPressed(self, KEY):
-        # returns bool as to whether keyPressed is KEY
-        # the point of this is to translate pygame methods into generic keys 
-        # in order to keep all pygame references in this class 
-        # used by ai_player for movement
-
-        # mouse support - returns list of three bools [left, middle, right]
-       # print(str(pygame.mouse.get_pressed()))
-
+        
+        # handle key press
+        # i think more than one can be down at once, that is why we don't do if/elif
         keys=pygame.key.get_pressed()
-        if KEY=='w':
-            if keys[pygame.K_w]:
-                return True
-            else:
-                return False
-        elif KEY=='s':
-            if keys[pygame.K_s]:
-                return True
-            else:
-                return False
-        elif KEY=='a':
-            if keys[pygame.K_a]:
-                return True
-            else:
-                return False
-        elif KEY=='d':
-            if keys[pygame.K_d]:
-                return True
-            else:
-                return False
-        elif KEY=='f':
-            if keys[pygame.K_f]:
-                return True
-            else:
-                return False
-        elif KEY=='g':
-            if keys[pygame.K_g]:
-                return True
-            else:
-                return False
-        elif KEY=='t':
-            if keys[pygame.K_t]:
-                return True
-            else:
-                return False
-        elif KEY=='b':
-            if keys[pygame.K_b]:
-                return True
-            else:
-                return False
-        elif KEY=='p':
-            if keys[pygame.K_p]:
-                return True
-            else:
-                return False
-        elif KEY=='up':
-            if keys[pygame.K_UP]:
-                return True
-            else:
-                return False
-        elif KEY=='down':
-            if keys[pygame.K_DOWN]:
-                return True
-            else:
-                return False
-        elif KEY=='left':
-            if keys[pygame.K_LEFT]:
-                return True
-            else:
-                return False
-        elif KEY=='right':
-            if keys[pygame.K_RIGHT]:
-                return True
-            else:
-                return False
-        else:
-            print('keydown error, key is not recognized: ',KEY)
-            return False
+
+        if keys[pygame.K_w]:
+            self.world.handle_key_press('w')
+
+        if keys[pygame.K_s]:
+            self.world.handle_key_press('s')
+
+        if keys[pygame.K_a]:
+            self.world.handle_key_press('a')
+
+        if keys[pygame.K_d]:
+            self.world.handle_key_press('d')
+
+        if keys[pygame.K_f]:
+            self.world.handle_key_press('f',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+
+        if keys[pygame.K_g]:
+            self.world.handle_key_press('g',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+
+        if keys[pygame.K_t]:
+            self.world.handle_key_press('t',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+
+        if keys[pygame.K_b]:
+            self.world.handle_key_press('b')
+
+        if keys[pygame.K_p]:
+            self.world.handle_key_press('p')
+
+        if keys[pygame.K_UP]:
+            self.world.handle_key_press('up')
+
+        if keys[pygame.K_DOWN]:
+            self.world.handle_key_press('down')
+
+        if keys[pygame.K_LEFT]:
+            self.world.handle_key_press('left')
+
+        if keys[pygame.K_RIGHT]:
+            self.world.handle_key_press('right')
+
 
 #------------------------------------------------------------------------------
     def load_all_images(self,folder_path):
@@ -266,12 +219,12 @@ class Graphics_2D_Pygame(object):
 
         # text stuff 
         self.h=0
-        for b in islice(self.text_queue,self.text_queue_display_size):
+        for b in islice(self.world.text_queue,self.world.text_queue_display_size):
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
         self.h+=20
-        for b in self.world.menu_text_queue:
+        for b in self.world.world_menu.text_queue:
             self.h+=15
             self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
 
@@ -306,7 +259,7 @@ class Graphics_2D_Pygame(object):
         for b in self.renderlists:
             for c in b:
                 # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                if c.is_player==False and c!=self.world.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
                     possible_objects.append(c)
 
         object_distance=50
@@ -334,12 +287,7 @@ class Graphics_2D_Pygame(object):
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
-        # cycle the text queue
-        self.time_since_last_text_clear+=self.time_passed_seconds
-        if self.time_since_last_text_clear>self.text_queue_clear_rate:
-            self.time_since_last_text_clear=0
-            if len(self.text_queue)>0:
-                self.text_queue.pop(0)
+        
 
         
 
