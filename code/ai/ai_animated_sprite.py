@@ -46,7 +46,7 @@ class AIAnimatedSprite(AIBase):
     def update(self):
         
         if self.alive:
-            time_passed=self.owner.world.graphic_engine.time_passed_seconds
+            time_passed=self.owner.world.time_passed_seconds
 
             self.alive_time+=time_passed
 

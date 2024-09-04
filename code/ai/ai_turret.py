@@ -66,7 +66,7 @@ class AITurret(AIBase):
 
         if self.rotation_change!=0:
             # controls should return to neutral over time 
-            time_passed=self.owner.world.graphic_engine.time_passed_seconds
+            time_passed=self.owner.world.time_passed_seconds
 
             #return wheel to neutral
             self.rotation_change=engine.math_2d.regress_to_zero(self.rotation_change,time_passed)
@@ -84,7 +84,7 @@ class AITurret(AIBase):
 
     #---------------------------------------------------------------------------
     def update_physics(self):
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        time_passed=self.owner.world.time_passed_seconds
         moved=False
 
         if self.rotation_change!=0:

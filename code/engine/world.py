@@ -15,7 +15,7 @@ import copy
 
 
 #import custom packages
-from engine.graphics_2d_pygame import Graphics_2D_Pygame
+
 from engine.world_menu import World_Menu
 import engine.math_2d
 import engine.world_builder
@@ -28,7 +28,7 @@ from ai.ai_faction_tactical import AIFactionTactical
 
 class World(object):
     #---------------------------------------------------------------------------
-    def __init__(self,SCREEN_SIZE):
+    def __init__(self):
         
         # tactical AIs
         self.german_ai=AIFactionTactical(self,'german')
@@ -91,7 +91,7 @@ class World(object):
         self.last_map_check=0
         self.exited_object_count=0
 
-        self.graphic_engine=Graphics_2D_Pygame(SCREEN_SIZE,self)
+        
         self.world_menu=World_Menu(self)
 
         self.player=None
@@ -108,6 +108,13 @@ class World(object):
 
         # debug info queue
         self.debug_text_queue=[]
+
+        # general text queue
+        self.text_queue=[]
+        # used for temporary text. call add_text to add 
+        self.text_queue_clear_rate=4
+        self.text_queue_display_size=5
+        self.time_since_last_text_clear=0
 
         #bool
         self.map_enabled=False
@@ -128,6 +135,9 @@ class World(object):
         # seconds that the world has existed for 
         # can be used by other classes for time keeping
         self.world_seconds=0
+
+        # seconds between the last update. updated by self.update()
+        self.time_passed_seconds=0
 
 
         # number of objects over which the world starts to cleanup un-needed objects
@@ -386,55 +396,127 @@ class World(object):
         return near_objects
 
     #---------------------------------------------------------------------------
-    def handle_keydown(self,KEY):
+    def handle_keydown(self,key,mouse_screen_coords=None,player_screen_coords=None):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
-        #KEY is a key number
-
-        # for now just figure out if we are routing it to 
-        # the menu or the player
 
         #print('key ',KEY)
-        if KEY==96:
-            self.world_menu.handle_input("tilde")
-        elif KEY==91: # [
-            self.graphic_engine.zoom_out()
-        elif KEY==93: # ]
-            self.graphic_engine.zoom_in()
-        elif KEY==48:
-            self.world_menu.handle_input("0")
-        elif KEY==49:
-            self.world_menu.handle_input("1")
-        elif KEY==50:
-            self.world_menu.handle_input("2")
-        elif KEY==51:
-            self.world_menu.handle_input("3")
-        elif KEY==52:
-            self.world_menu.handle_input("4")
-        elif KEY==53:
-            self.world_menu.handle_input("5")
-        elif KEY==54:
-            self.world_menu.handle_input("6")
-        elif KEY==55:
-            self.world_menu.handle_input("7")
-        elif KEY==56:
-            self.world_menu.handle_input("8")
-        elif KEY==57:
-            self.world_menu.handle_input("9")
-        elif KEY==27:
-            self.world_menu.handle_input("esc")
-        elif KEY==9: #tab
-            self.activate_context_menu()
-        elif KEY==112: #p
-            self.player.ai.handle_keydown('p')
-        elif KEY==116: #t
-            self.player.ai.handle_keydown('t')
-        elif KEY==103: #g
-            self.player.ai.handle_keydown('g')
-        elif KEY==98: #b
-            self.player.ai.handle_keydown('b')
-        elif KEY==114: #r
-            self.player.ai.handle_keydown('r')
+        self.world_menu.handle_input(key)
+
+        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.player.ai.memory['task_vehicle_crew']['vehicle'].is_airplane:
+                if key=='p':
+                    self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle'])
+                    self.player.ai.speak('bailing out!')
+                    # note - physics needs to be udpdate to handle falling
+        else:
+            # controls for when you are walking about
+            if key=='g':
+                self.player.ai.throw([],mouse_screen_coords,player_screen_coords)
+            elif key=='p':
+                self.player.ai.prone_state_change()
+            elif key=='t':
+                self.player.ai.launch_antitank([],mouse_screen_coords,player_screen_coords)
+
+        # controls for vehicles and walking 
+        if key=='r':
+            if self.player.ai.memory['current_task']=='task_player_control':
+                self.player.ai.reload_weapon(self.player.ai.primary_weapon)
+            elif self.player.ai.memory['current_task']=='task_vehicle_crew':
+                self.player.ai.reload_turret()
+
+    #---------------------------------------------------------------------------
+    def handle_key_press(self,key,mouse_screen_coords=None,player_screen_coords=None):
+        '''handle key press'''
+        # key press is when a key is held down
+        # key - string  example 'w'
+        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+            role=self.player.ai.memory['task_vehicle_crew']['role']
+            turret=self.player.ai.memory['task_vehicle_crew']['turret']
+
+            if role=='driver':
+
+                if vehicle.is_airplane:
+                    # ---- controls for airplanes ------------
+                    if key=='w':
+                        vehicle.ai.handle_elevator_up()
+                    elif key=='s':
+                        vehicle.ai.handle_elevator_down()
+                        if self.owner.altitude<1:
+                            vehicle.ai.brake_power=1
+                    elif key=='a':
+                        vehicle.ai.handle_aileron_left()
+                        vehicle.ai.handle_rudder_left()
+                        if self.owner.altitude<1:
+                            vehicle.ai.handle_steer_left()
+                    elif key=='d':
+                        vehicle.ai.handle_aileron_right()
+                        vehicle.ai.handle_rudder_right()
+                        if self.owner.altitude<1:
+                            vehicle.ai.handle_steer_right()
+                    elif key=='up':
+                        pass
+                    elif key=='down':
+                        pass
+                    elif key=='left':
+                        vehicle.ai.handle_throttle_down()
+                    elif key=='right':
+                        vehicle.ai.handle_throttle_up()
+                else:
+                    # ---- controls for ground vehicles ------------
+
+                    if key=='w':
+                        vehicle.ai.throttle=1
+                        vehicle.ai.brake_power=0
+                    elif key=='s':
+                        vehicle.ai.brake_power=1
+                        vehicle.ai.throttle=0
+                    elif key=='a':
+                        vehicle.ai.handle_steer_left()
+                    elif key=='d':
+                        vehicle.ai.handle_steer_right()
+
+            elif role=='gunner':
+                if key=='a':
+                    turret.ai.handle_rotate_left()
+                elif key=='d':
+                    turret.ai.handle_rotate_right()
+                elif key=='f':
+                    turret.ai.handle_fire()
+        else:
+            # ---- controls for walking around ------------
+            action=False
+            speed=self.player.ai.get_calculated_speed()
+            if key=='w':
+                self.player.world_coords[1]-=speed*self.time_passed_seconds
+                self.player.rotation_angle=0
+                self.player.reset_image=True
+                action=True
+            elif key=='s':
+                self.player.world_coords[1]+=speed*self.time_passed_seconds
+                self.player.rotation_angle=180
+                self.player.reset_image=True
+                action=True
+            elif key=='a':
+                self.player.world_coords[0]-=speed*self.time_passed_seconds
+                self.player.rotation_angle=90
+                self.player.reset_image=True
+                action=True
+            elif key=='d':
+                self.player.world_coords[0]+=speed*self.time_passed_seconds
+                self.player.rotation_angle=270
+                self.player.reset_image=True
+                action=True
+            elif key=='f':
+                # fire the gun
+                if self.player.ai.primary_weapon!=None:
+                    self.player.ai.fire([],self.player.ai.primary_weapon,mouse_screen_coords,player_screen_coords)
+                action=True
+
+            if action:
+                self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
+
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -570,34 +652,8 @@ class World(object):
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         
-    #---------------------------------------------------------------------------
-    def render(self):
-        self.graphic_engine.render()
 
-    #---------------------------------------------------------------------------
-    def select_closest_object_with_mouse(self,mouse_coords):
-        possible_objects=[]
-
-        # sort through the objects that are rendered (visible)
-        for b in self.graphic_engine.renderlists:
-            for c in b:
-                # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
-                    possible_objects.append(c)
-
-        object_distance=50
-        closest_object=None
-
-        for b in possible_objects:
-            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
-            if distance<object_distance:
-                object_distance=distance
-                closest_object=b
-        
-        if closest_object != None:
-            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
-            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
-            self.world_menu.activate_menu(closest_object)
+    
 
     #---------------------------------------------------------------------------
     def spawn_player(self, FACTION):
@@ -662,12 +718,19 @@ class World(object):
         pass
 
     #---------------------------------------------------------------------------
-    def update(self):
-        self.graphic_engine.update()
+    def update(self,time_passed_seconds):
+        self.time_passed_seconds=time_passed_seconds
 
         if self.is_paused==False:
-            self.world_seconds+=self.graphic_engine.time_passed_seconds
+            self.world_seconds+=self.time_passed_seconds
             self.process_reinforcements()
+
+            # cycle the text queue
+            self.time_since_last_text_clear+=self.time_passed_seconds
+            if self.time_since_last_text_clear>self.text_queue_clear_rate:
+                self.time_since_last_text_clear=0
+                if len(self.text_queue)>0:
+                    self.text_queue.pop(0)
 
             for b in self.wo_objects:
                 b.update()
@@ -710,10 +773,7 @@ class World(object):
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue=[]
-        self.debug_text_queue.append('FPS: '+str(int(self.graphic_engine.clock.get_fps())))
-        self.debug_text_queue.append('World scale: '+str(self.graphic_engine.scale))
         self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
-        self.debug_text_queue.append('Rendered Objects: '+ str(self.graphic_engine.renderCount))
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
@@ -725,6 +785,7 @@ class World(object):
         self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
+        self.debug_text_queue.append('Player Screen Coords'+str(self.player.screen_coords))
         self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))

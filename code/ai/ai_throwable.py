@@ -53,7 +53,7 @@ class AIThrowable(AIBase):
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
-        time_passed=self.owner.world.graphic_engine.time_passed_seconds
+        time_passed=self.owner.world.time_passed_seconds
 
 
 

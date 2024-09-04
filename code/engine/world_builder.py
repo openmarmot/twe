@@ -19,8 +19,7 @@ the idea is this static class holds the standard way for creating objects
 
 
 #import built in modules
-from ai.ai_vehicle import AIVehicle
-from ai.ai_human import AIHuman
+
 import math
 import random
 import copy 
@@ -29,7 +28,8 @@ import os
 #import custom packages
 import engine.math_2d
 import engine.name_gen
-
+from ai.ai_vehicle import AIVehicle
+from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 
@@ -599,8 +599,9 @@ def load_test_environment(world,scenario):
         # trucks 
         spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
 
+    # do this no matter what to spawn everything
+    world.process_add_remove_queue()
 
-  
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
