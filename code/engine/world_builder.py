@@ -599,6 +599,9 @@ def load_test_environment(world,scenario):
         # trucks 
         spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
 
+    # do this no matter what to spawn everything
+    world.process_add_remove_queue()
+
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):

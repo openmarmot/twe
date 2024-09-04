@@ -399,56 +399,27 @@ class World(object):
     def handle_keydown(self,key,mouse_screen_coords=None,player_screen_coords=None):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
-        #KEY is a key number
-
-        # for now just figure out if we are routing it to 
-        # the menu or the player
 
         #print('key ',KEY)
-        if key==96:
-            self.world_menu.handle_input("tilde")
-        elif key==48:
-            self.world_menu.handle_input("0")
-        elif key==49:
-            self.world_menu.handle_input("1")
-        elif key==50:
-            self.world_menu.handle_input("2")
-        elif key==51:
-            self.world_menu.handle_input("3")
-        elif key==52:
-            self.world_menu.handle_input("4")
-        elif key==53:
-            self.world_menu.handle_input("5")
-        elif key==54:
-            self.world_menu.handle_input("6")
-        elif key==55:
-            self.world_menu.handle_input("7")
-        elif key==56:
-            self.world_menu.handle_input("8")
-        elif key==57:
-            self.world_menu.handle_input("9")
-        elif key==27:
-            self.world_menu.handle_input("esc")
-        elif key==9: #tab
-            self.activate_context_menu()
+        self.world_menu.handle_input(key)
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
             if self.player.ai.memory['task_vehicle_crew']['vehicle'].is_airplane:
-                if key==112: #p
+                if key=='p':
                     self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle'])
                     self.player.ai.speak('bailing out!')
                     # note - physics needs to be udpdate to handle falling
         else:
             # controls for when you are walking about
-            if key==103: #g
+            if key=='g':
                 self.player.ai.throw([],mouse_screen_coords,player_screen_coords)
-            elif key==112: #p
+            elif key=='p':
                 self.player.ai.prone_state_change()
-            elif key==116: #t
+            elif key=='t':
                 self.player.ai.launch_antitank([],mouse_screen_coords,player_screen_coords)
 
         # controls for vehicles and walking 
-        if key==114: #r
+        if key=='r':
             if self.player.ai.memory['current_task']=='task_player_control':
                 self.player.ai.reload_weapon(self.player.ai.primary_weapon)
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
@@ -814,6 +785,7 @@ class World(object):
         self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
+        self.debug_text_queue.append('Player Screen Coords'+str(self.player.screen_coords))
         self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))

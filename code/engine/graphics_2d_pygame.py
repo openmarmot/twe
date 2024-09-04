@@ -1,6 +1,6 @@
 
 '''
-module : module_template.py
+module : graphics_2d_pygame.py
 language : Python 3.x
 email : andrew@openmarmot.com
 notes :
@@ -25,17 +25,20 @@ import pygame.freetype
 
 #import custom packages
 import engine.math_2d
+from engine.game_menu import Game_Menu
+from engine.world import World
+
 
 
 
 class Graphics_2D_Pygame(object):
     ''' 2D Graphics Engine using PyGame '''
 
-    def __init__(self,Screen_size):
+    def __init__(self,screen_size):
         # called by World.__init__
 
         self.images=dict()
-        self.screen_size=Screen_size
+        self.screen_size=screen_size
         pygame.init()
 
         # this seems to significantly improve visual quality when on 
@@ -47,7 +50,15 @@ class Graphics_2D_Pygame(object):
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
-        
+
+        self.mode=0
+        # 0 - game menu
+        # 1 - world 
+
+        self.game_menu=Game_Menu(self)
+        self.world=World()
+
+
         # render level kind of a 'z' layer
         # 0 - ground cover
         # 1 - man made ground cover (cement, building insides)
@@ -62,7 +73,7 @@ class Graphics_2D_Pygame(object):
         # count of rendered objects
         self.renderCount=0
 
-        self.world=None
+        
         
         # time stuff
         self.clock=pygame.time.Clock()
@@ -114,14 +125,51 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                # logic for handling these keys has been shifted to world
+                translated_key='none'
+                if event.key==96:
+                    translated_key="tilde"
+                elif event.key==48:
+                    translated_key="0"
+                elif event.key==49:
+                    translated_key="1"
+                elif event.key==50:
+                    translated_key="2"
+                elif event.key==51:
+                    translated_key="3"
+                elif event.key==52:
+                    translated_key="4"
+                elif event.key==53:
+                    translated_key="5"
+                elif event.key==54:
+                    translated_key="6"
+                elif event.key==55:
+                    translated_key="7"
+                elif event.key==56:
+                    translated_key="8"
+                elif event.key==57:
+                    translated_key="9"
+                elif event.key==27:
+                    translated_key="esc"
+                elif event.key==9: #tab
+                    self.activate_context_menu()
+                elif event.key==112:
+                    translated_key='p'
+                elif event.key==116:
+                    translated_key='t'
+                elif event.key==103:
+                    translated_key='g'
+                elif event.key==114:
+                    translated_key='r'
 
-                if event.key==91: # [
-                    self.zoom_out()
-                elif event.key==93: # ]
-                    self.zoom_in()
-                else:
-                    self.world.handle_keydown(event.key,self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                if self.mode==0:
+                    self.game_menu.handle_input(translated_key)
+                elif self.mode==1:
+                    if event.key==91: # [
+                        self.zoom_out()
+                    elif event.key==93: # ]
+                        self.zoom_in()
+                    else:
+                        self.world.handle_keydown(translated_key,self.get_mouse_screen_coords(),self.get_player_screen_coords())
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -139,46 +187,47 @@ class Graphics_2D_Pygame(object):
         
         # handle key press
         # i think more than one can be down at once, that is why we don't do if/elif
-        keys=pygame.key.get_pressed()
+        if self.mode==1:
+            keys=pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
-            self.world.handle_key_press('w')
+            if keys[pygame.K_w]:
+                self.world.handle_key_press('w')
 
-        if keys[pygame.K_s]:
-            self.world.handle_key_press('s')
+            if keys[pygame.K_s]:
+                self.world.handle_key_press('s')
 
-        if keys[pygame.K_a]:
-            self.world.handle_key_press('a')
+            if keys[pygame.K_a]:
+                self.world.handle_key_press('a')
 
-        if keys[pygame.K_d]:
-            self.world.handle_key_press('d')
+            if keys[pygame.K_d]:
+                self.world.handle_key_press('d')
 
-        if keys[pygame.K_f]:
-            self.world.handle_key_press('f',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+            if keys[pygame.K_f]:
+                self.world.handle_key_press('f',self.get_mouse_screen_coords(),self.get_player_screen_coords())
 
-        if keys[pygame.K_g]:
-            self.world.handle_key_press('g',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+            if keys[pygame.K_g]:
+                self.world.handle_key_press('g',self.get_mouse_screen_coords(),self.get_player_screen_coords())
 
-        if keys[pygame.K_t]:
-            self.world.handle_key_press('t',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+            if keys[pygame.K_t]:
+                self.world.handle_key_press('t',self.get_mouse_screen_coords(),self.get_player_screen_coords())
 
-        if keys[pygame.K_b]:
-            self.world.handle_key_press('b')
+            if keys[pygame.K_b]:
+                self.world.handle_key_press('b')
 
-        if keys[pygame.K_p]:
-            self.world.handle_key_press('p')
+            if keys[pygame.K_p]:
+                self.world.handle_key_press('p')
 
-        if keys[pygame.K_UP]:
-            self.world.handle_key_press('up')
+            if keys[pygame.K_UP]:
+                self.world.handle_key_press('up')
 
-        if keys[pygame.K_DOWN]:
-            self.world.handle_key_press('down')
+            if keys[pygame.K_DOWN]:
+                self.world.handle_key_press('down')
 
-        if keys[pygame.K_LEFT]:
-            self.world.handle_key_press('left')
+            if keys[pygame.K_LEFT]:
+                self.world.handle_key_press('left')
 
-        if keys[pygame.K_RIGHT]:
-            self.world.handle_key_press('right')
+            if keys[pygame.K_RIGHT]:
+                self.world.handle_key_press('right')
 
 
 #------------------------------------------------------------------------------
@@ -217,28 +266,34 @@ class Graphics_2D_Pygame(object):
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
 
-        # text stuff 
-        self.h=0
-        for b in islice(self.world.text_queue,self.world.text_queue_display_size):
-            self.h+=15
-            self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
-
-        self.h+=20
-        for b in self.world.world_menu.text_queue:
-            self.h+=15
-            self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
-
-        if(self.world.debug_mode):
+        # text stuff
+        if self.mode==0:
             self.h=0
-            for b in self.world.debug_text_queue:
+            for b in self.game_menu.text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (900, self.h), b,self.menu_color )
-
-        if(self.world.display_vehicle_text):
+                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+        elif self.mode==1: 
             self.h=0
-            for b in self.world.vehicle_text_queue:
+            for b in islice(self.world.text_queue,self.world.text_queue_display_size):
                 self.h+=15
-                self.small_font.render_to(self.screen, (500, self.h), b, self.menu_color)
+                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+
+            self.h+=20
+            for b in self.world.world_menu.text_queue:
+                self.h+=15
+                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+
+            if(self.world.debug_mode):
+                self.h=0
+                for b in self.world.debug_text_queue:
+                    self.h+=15
+                    self.small_font.render_to(self.screen, (900, self.h), b,self.menu_color )
+
+            if(self.world.display_vehicle_text):
+                self.h=0
+                for b in self.world.vehicle_text_queue:
+                    self.h+=15
+                    self.small_font.render_to(self.screen, (500, self.h), b, self.menu_color)
 
         if self.double_buffering:
             pygame.display.flip()
@@ -287,17 +342,16 @@ class Graphics_2D_Pygame(object):
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
-        
+        if self.mode==0:
+            self.game_menu.update(self.time_passed_seconds)
+        elif self.mode==1:
+            self.world.update(self.time_passed_seconds)
 
-        
-
-        self.world.update(self.time_passed_seconds)
-
-        # insert graphic engine specific debug text (after world.update populated it)
-        if self.world.debug_mode:
-            self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.graphic_engine.clock.get_fps())))
-            self.world.debug_text_queue.insert(1,'World scale: '+str(self.graphic_engine.scale))
-            self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.graphic_engine.renderCount))
+            # insert graphic engine specific debug text (after world.update populated it)
+            if self.world.debug_mode:
+                self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
+                self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
+                self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
 
 #------------------------------------------------------------------------------
     def update_render_info(self):
@@ -309,43 +363,50 @@ class Graphics_2D_Pygame(object):
         # note - i wonder if computing this is slower than just rendering everything
         # should add an ability to toggle this once i get a FPS count setup
 
-        viewrange_x=((self.world.player.world_coords[0]+
-            self.screen_size[0]+self.view_adjust), (self.world.player.world_coords[0]-
-            self.screen_size[0]-self.view_adjust))
-        viewrange_y=((self.world.player.world_coords[1]+
-            self.screen_size[1]+self.view_adjust), (self.world.player.world_coords[1]-
-            self.screen_size[1])-self.view_adjust)
-
+        
         #clear out the render levels
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
-        translation=self.get_translation()
-
         self.renderCount=0
-        for b in self.world.wo_objects:
+        if self.mode==0:
+            pass
+        elif self.mode==1:
 
-            if b.render:
-                
-                # check if the relative scale of the object is enough to make it visible
-                if (self.scale+b.scale_modifier)>self.minimum_visible_scale:
+            viewrange_x=((self.world.player.world_coords[0]+
+                self.screen_size[0]+self.view_adjust), (self.world.player.world_coords[0]-
+                self.screen_size[0]-self.view_adjust))
+            viewrange_y=((self.world.player.world_coords[1]+
+                self.screen_size[1]+self.view_adjust), (self.world.player.world_coords[1]-
+                self.screen_size[1])-self.view_adjust)
+            
+            translation=self.get_translation()
+
+            for b in self.world.wo_objects:
+
+                if b.render:
                     
-                    #determine whether object 'b' world_coords are within
-                    #the viewport bounding box
-                    if(b.world_coords[0]<viewrange_x[0] and
-                        b.world_coords[0]>viewrange_x[1]):
-                        if(b.world_coords[1]<viewrange_y[0] and
-                            b.world_coords[1]>viewrange_y[1]):
-                            #object is within the viewport, add it to the render list
-                            self.renderlists[b.render_level].append(b)
-                            self.renderCount+=1
-                            #apply transform to generate screen coords
+                    # check if the relative scale of the object is enough to make it visible
+                    if (self.scale+b.scale_modifier)>self.minimum_visible_scale:
+                        
+                        #determine whether object 'b' world_coords are within
+                        #the viewport bounding box
+                        if(b.world_coords[0]<viewrange_x[0] and
+                            b.world_coords[0]>viewrange_x[1]):
+                            if(b.world_coords[1]<viewrange_y[0] and
+                                b.world_coords[1]>viewrange_y[1]):
+                                #object is within the viewport, add it to the render list
+                                self.renderlists[b.render_level].append(b)
+                                self.renderCount+=1
+                                #apply transform to generate screen coords
 
-                            b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
-                            b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
+                                # player screen coords are set by get_translation
+                                if b.is_player==False:
+                                    b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
+                                    b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
 
-                            # honestly can't tell if this is better or not
-                            if self.smooth_jitter:
-                                b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
+                                # honestly can't tell if this is better or not
+                                if self.smooth_jitter:
+                                    b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
 
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
@@ -415,6 +476,8 @@ class Graphics_2D_Pygame(object):
         player_x=self.world.player.world_coords[0]*self.scale
         player_y=self.world.player.world_coords[1]*self.scale
         
+        self.world.player.screen_coords=[center_x,center_y]
+
         translate=[center_x-player_x,center_y-player_y]
         return translate
 
