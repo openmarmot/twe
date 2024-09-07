@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+september 07 2024
+- work on adding strategic mode 
+
+graphics_2d_pygame is becoming the central class whether i wanted it or not (i didn't).
+it was meant to be independent but it is the one thing that needs to touch everything.
+
+Note - dev is going to be broken for awhile first. I want to get the strategic map interface 
+up and running 
+
+----------------------------------
 September 03 2024
 - added game_menu
 - rewrite/refactor of a bunch of stuff to handle game state changes better 

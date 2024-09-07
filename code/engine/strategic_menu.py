@@ -1,5 +1,5 @@
 '''
-module : game_menu.py
+module : strategic_menu.py
 language : Python 3.x
 email : andrew@openmarmot.com
 notes :
@@ -20,19 +20,23 @@ import engine.math_2d
 #global variables
 
 
-class GameMenu(object):
+class StrategicMenu(object):
     ''' in game menu '''
 
     #---------------------------------------------------------------------------
-    def __init__(self,graphics_engine):
+    def __init__(self,strategic_map):
         # called/created by world.__init__
 
         self.active_menu='start' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
         
+        # variables that handle when a menu should be cleared from the screen
+        self.time_since_input=0
+        self.max_menu_idle_time=25 # how long a menu should be up before its closed/cleared
+        
         self.text_queue=[]
 
-        self.graphics_engine=graphics_engine
+        self.strategic_map=strategic_map
 
         # get the initial text going
         self.start_menu('none')
@@ -79,19 +83,17 @@ class GameMenu(object):
             self.text_queue=[]
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
-            self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (not working)')
-            self.text_queue.append('2 - Load Campaign (not working)')
-            self.text_queue.append('3 - Quick Battle')
-            #self.text_queue.append('4 - Nothing') 
+            self.text_queue.append('Pick a Test Scenario to Load')
+            self.text_queue.append('1 - Meeting Engagement : German vs Soviet')
+            self.text_queue.append('2 -  ')
+            self.text_queue.append('3 - ')
+            #self.text_queue.append('4 - Nothing')
 
-            if key=='1':
-                pass
-            elif key=='2':
-                pass
-            elif key=='3':
+            if key=='1' or key=='2' or key=='3':
+                key='1'
                 self.menu_state='faction_select'
-                key='none'
+                engine.world_builder.load_test_environment(self.graphics_engine.world,key)
+                key=None
 
         if self.menu_state=='faction_select':
             self.text_queue=[]
@@ -154,10 +156,7 @@ class GameMenu(object):
 
         # should maybe check if a menu is active first. no need for this to be constantly running
         # make the menu auto close after a period of time
-
-        pass
-
-        #self.time_since_input+=time_passed_seconds
-        #if self.time_since_input>self.max_menu_idle_time and self.active_menu!='start':
-        #    self.deactivate_menu()
+        self.time_since_input+=time_passed_seconds
+        if self.time_since_input>self.max_menu_idle_time and self.active_menu!='start':
+            self.deactivate_menu()
 

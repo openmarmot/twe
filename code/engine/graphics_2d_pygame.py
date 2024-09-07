@@ -25,8 +25,11 @@ import pygame.freetype
 
 #import custom packages
 import engine.math_2d
-from engine.game_menu import Game_Menu
+from engine.game_menu import GameMenu
 from engine.world import World
+from engine.strategic_map import StrategicMap
+import engine.log
+
 
 
 
@@ -54,9 +57,11 @@ class Graphics_2D_Pygame(object):
         self.mode=0
         # 0 - game menu
         # 1 - world 
+        # 2 - strategic_map
 
-        self.game_menu=Game_Menu(self)
+        self.game_menu=GameMenu(self)
         self.world=World()
+        self.strategic_map=StrategicMap(self)
 
 
         # render level kind of a 'z' layer
@@ -170,6 +175,10 @@ class Graphics_2D_Pygame(object):
                         self.zoom_in()
                     else:
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                elif self.mode==2:
+                    self.strategic_map.handle_keydown(translated_key)
+                else:
+                    engine.log.add_data('error','graphic_engine.mode unknown '+str(self.mode),True)
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -295,6 +304,12 @@ class Graphics_2D_Pygame(object):
                     self.h+=15
                     self.small_font.render_to(self.screen, (500, self.h), b, self.menu_color)
 
+        elif self.mode==2:
+            self.h=0
+            for b in self.strategic_map.strategic_menu.text_queue:
+                self.h+=15
+                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+
         if self.double_buffering:
             pygame.display.flip()
         else:
@@ -343,15 +358,19 @@ class Graphics_2D_Pygame(object):
         self.time_passed_seconds=self.time_passed / 1000.0
 
         if self.mode==0:
-            self.game_menu.update(self.time_passed_seconds)
+            pass
+            #self.game_menu.update(self.time_passed_seconds)
         elif self.mode==1:
             self.world.update(self.time_passed_seconds)
-
             # insert graphic engine specific debug text (after world.update populated it)
             if self.world.debug_mode:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
+        elif self.mode==2:
+            self.strategic_map.update()
+
+            
 
 #------------------------------------------------------------------------------
     def update_render_info(self):
@@ -407,6 +426,9 @@ class Graphics_2D_Pygame(object):
                                 # honestly can't tell if this is better or not
                                 if self.smooth_jitter:
                                     b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
+        elif self.mode==2:
+            for b in self.strategic_map.map_squares:
+                self.renderlists[0].append(b)
 
 #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
