@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+september 10 2024
+- work on adding strategic mode 
+- fixed bug with new 'quick battle' menu option 
+- added some colored square images for the map 
+
+color scheme is going to be 
+grey-german 
+red-soviet
+blue-neutral 
+----------------------------------
 september 07 2024
 - work on adding strategic mode 
 

@@ -33,4 +33,7 @@ class StrategicMap(object):
         #print('key ',KEY)
         self.strategic_menu.handle_input(key)
 
+    #---------------------------------------------------------------------------
+    def update(self):
+        pass
 

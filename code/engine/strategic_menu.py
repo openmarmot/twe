@@ -81,19 +81,18 @@ class StrategicMenu(object):
         if self.menu_state=='none':
             #self.graphics_engine.world.is_paused=False
             self.text_queue=[]
-            self.text_queue.append('TWE: To Whatever End')
+            self.text_queue.append('Situation Map')
             self.text_queue.append('---------------')
-            self.text_queue.append('Pick a Test Scenario to Load')
-            self.text_queue.append('1 - Meeting Engagement : German vs Soviet')
+            self.text_queue.append('Something')
+            self.text_queue.append('1 -')
             self.text_queue.append('2 -  ')
             self.text_queue.append('3 - ')
             #self.text_queue.append('4 - Nothing')
 
             if key=='1' or key=='2' or key=='3':
-                key='1'
-                self.menu_state='faction_select'
-                engine.world_builder.load_test_environment(self.graphics_engine.world,key)
-                key=None
+                #self.menu_state='faction_select'
+                #key='none'
+                pass
 
         if self.menu_state=='faction_select':
             self.text_queue=[]
