@@ -16,8 +16,15 @@ notes :
 class MapSquare(object):
 
     def __init__(self, world,IMAGE_LIST,AI):
-
+        self.name=''
         self.map_coords=[0,0]
+        self.screen_coords=[0,0]
+        self.scale_modifier=1
+        self.image=None
+        self.image_index=0
+        self.image_list=['map_blue','map_red','map_grey']
+        self.image_size=None
+        self.rotation_angle=0
 
 
     #---------------------------------------------------------------------------

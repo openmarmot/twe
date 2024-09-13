@@ -37,3 +37,14 @@ class StrategicMap(object):
     def update(self):
         pass
 
+    #---------------------------------------------------------------------------
+    def create_map_squares(self):
+        '''create the map squares and screen positions'''
+
+        # get all the table names from the database
+        # sort names
+        # create map squares
+        # - table name
+        # - screen coords 
+        # - figure out who owns it
+        pass
