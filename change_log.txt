@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+september 13 2024
+- working on new save creation 
+
+----------------------------------
 september 12 2024
 - work on getting the map tiles displayed 
 

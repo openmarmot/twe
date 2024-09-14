@@ -87,6 +87,7 @@ class GameMenu(object):
 
             if key=='1':
                 self.graphics_engine.mode=2
+                self.graphics_engine.strategic_map.start_new_campaign()
                 self.deactivate_menu()
             elif key=='2':
                 pass
