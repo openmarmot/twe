@@ -161,11 +161,6 @@ class WorldObject(object):
     #---------------------------------------------------------------------------
     def remove_inventory(self, ITEM):
         self.ai.handle_event('remove_inventory',ITEM)
-
-    #---------------------------------------------------------------------------
-    def render_pass_2(self):
-        ''' only override if the object needs special additional rendering'''
-        pass
     
     #---------------------------------------------------------------------------
     def reset_render_level(self):

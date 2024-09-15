@@ -1,6 +1,48 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+september 14 2024
+- more strategic map work
+
+got the map grid created and loaded from save games.
+
+next step is to spawn the initial units. 
+
+I feel like I should have a central database utility file instead of scattering 
+functions all over the place.
+
+----------------------------------
+september 13 2024
+- working on new save creation 
+
+----------------------------------
+september 12 2024
+- work on getting the map tiles displayed 
+
+still trying to figure out how this all will work. not much progress
+
+----------------------------------
+september 10 2024
+- work on adding strategic mode 
+- fixed bug with new 'quick battle' menu option 
+- added some colored square images for the map 
+
+color scheme is going to be 
+grey-german 
+red-soviet
+blue-neutral 
+----------------------------------
+september 07 2024
+- work on adding strategic mode 
+
+graphics_2d_pygame is becoming the central class whether i wanted it or not (i didn't).
+it was meant to be independent but it is the one thing that needs to touch everything.
+
+Note - dev is going to be broken for awhile first. I want to get the strategic map interface 
+up and running 
+
 ----------------------------------
 September 03 2024
 - added game_menu
