@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+september 14 2024
+- more strategic map work
 ----------------------------------
 september 13 2024
 - working on new save creation 
