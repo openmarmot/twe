@@ -10,9 +10,11 @@ notes :
 import random
 import string
 import sqlite3
+import math
 
 #import custom packages
 from engine.strategic_menu import StrategicMenu
+from engine.map_square import MapSquare
 
 #global variables
 
@@ -28,16 +30,48 @@ class StrategicMap(object):
         self.map_squares=[]
 
     #---------------------------------------------------------------------------
-    def create_map_squares(self,map_size):
+    def create_map_squares(self,save_file_name):
         '''create the map squares and screen positions'''
 
         # get all the table names from the database
-        # sort names
-        # create map squares
-        # - table name
-        # - screen coords 
-        # - figure out who owns it
-        pass
+        map_names=self.get_table_names(save_file_name)
+            # Determine the number of squares per row (round up if it's not a perfect square)
+        grid_size = math.ceil(math.sqrt(len(map_names)))
+
+        # Create a 2D list to hold the grid squares
+        grid = [[None for _ in range(grid_size)] for _ in range(grid_size)]
+        
+        # Create grid square objects and assign them to grid positions
+        for index, name in enumerate(map_names):
+            x = index % grid_size
+            y = index // grid_size
+            spacing=70
+            grid_square = MapSquare(name,[x*spacing+250, y*spacing+150])
+            grid[y][x] = grid_square
+        
+        # Assign neighbors (above, below, left, right)
+        for y in range(grid_size):
+            for x in range(grid_size):
+                grid_square = grid[y][x]
+                if grid_square is None:
+                    continue  # Skip empty grid spaces if map_names does not fill entire grid
+                
+                # Above
+                if y > 0:
+                    grid_square.north = grid[y - 1][x]
+                # Below
+                if y < grid_size - 1 and grid[y + 1][x] is not None:
+                    grid_square.south = grid[y + 1][x]
+                # Left
+                if x > 0:
+                    grid_square.west = grid[y][x - 1]
+                # Right
+                if x < grid_size - 1 and grid[y][x + 1] is not None:
+                    grid_square.east = grid[y][x + 1]
+
+        # Flatten the grid and return the list of GridSquare objects
+        self.map_squares=[square for row in grid for square in row if square is not None]
+    
 
     #------------------------------------------------------------------------------
     def create_new_save_file(self,save_file_name,map_size):
@@ -67,7 +101,6 @@ class StrategicMap(object):
                     cursor.execute(create_table_sql)
                     # Commit the transaction
                     conn.commit()
-                    print(f"Table '{table_name}' created successfully with an auto-incrementing ID.")
                 except sqlite3.Error as e:
                     print(f"An error occurred: {e}")
                     # If an error occurs, rollback any changes
@@ -84,6 +117,32 @@ class StrategicMap(object):
         random_part = ''.join(random.choice(chars) for _ in range(length))
         # Combine with 'save' prefix
         return f"saves/save_{random_part}.sqlite"
+    
+    #---------------------------------------------------------------------------
+    def get_table_names(self,db_file_path):
+        # Connect to the SQLite database
+        connection = sqlite3.connect(db_file_path)
+        
+        # Create a cursor object to execute SQL commands
+        cursor = connection.cursor()
+        
+        # SQL query to get all table names
+        # This query looks at the sqlite_master table where type is 'table'
+        cursor.execute("""
+        SELECT name FROM sqlite_master 
+        WHERE type='table' 
+        AND name NOT LIKE 'sqlite_%';
+        """)
+        
+        # Fetch all results
+        tables = cursor.fetchall()
+        
+        # Extract table names from the tuples returned by fetchall
+        table_names = [table[0] for table in tables]
+        
+        # Close the connection
+        connection.close()
+        return table_names
 
     #---------------------------------------------------------------------------
     def handle_keydown(self,key):

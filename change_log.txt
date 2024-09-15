@@ -5,6 +5,14 @@ TWE Project : Change Log
 ----------------------------------
 september 14 2024
 - more strategic map work
+
+got the map grid created and loaded from save games.
+
+next step is to spawn the initial units. 
+
+I feel like I should have a central database utility file instead of scattering 
+functions all over the place.
+
 ----------------------------------
 september 13 2024
 - working on new save creation 

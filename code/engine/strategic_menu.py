@@ -40,6 +40,25 @@ class StrategicMenu(object):
 
         # get the initial text going
         self.start_menu('none')
+
+    #---------------------------------------------------------------------------
+    def activate_menu(self, selected_object):
+        ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
+
+        self.time_since_input=0
+        
+        # clear any current menu
+        self.deactivate_menu()
+
+        # set selected object
+        self.selected_object=selected_object
+
+        # at the moment the only clickable thing is a map square
+        self.active_menu='map_square'
+        self.map_square_menu(None)
+            
+
+
     #---------------------------------------------------------------------------
     def handle_input(self,key):
         # called by graphics_2d_pygame when there is a suitable key press
@@ -75,6 +94,17 @@ class StrategicMenu(object):
         self.active_menu='none'
         self.menu_state='none'
         self.text_queue=[]
+
+    #---------------------------------------------------------------------------            
+    def map_square_menu(self, key):
+
+        # print out the basic menu
+        self.text_queue=[]
+        self.text_queue.append('-- Map Square ' + self.selected_object.name + ' --')
+        self.text_queue.append('North: '+(self.selected_object.north.name if self.selected_object.north is not None else 'None'))
+        self.text_queue.append('South: '+(self.selected_object.south.name if self.selected_object.south is not None else 'None'))
+        self.text_queue.append('West: '+(self.selected_object.west.name if self.selected_object.west is not None else 'None'))
+        self.text_queue.append('East '+(self.selected_object.east.name if self.selected_object.east is not None else 'None'))
 
     #---------------------------------------------------------------------------
     def start_menu(self, key):

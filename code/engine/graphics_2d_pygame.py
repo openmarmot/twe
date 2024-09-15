@@ -269,8 +269,6 @@ class Graphics_2D_Pygame(object):
                     #c.image=self.get_rotated_scaled_image_v2(self.images[c.image_list[c.image_index]],self.scale,c.rotation_angle)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
 
-                c.render_pass_2()
-
                 if(self.draw_collision):
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
@@ -328,8 +326,14 @@ class Graphics_2D_Pygame(object):
         # sort through the objects that are rendered (visible)
         for b in self.renderlists:
             for c in b:
-                # filter out a couple things we don't want to click on
-                if c.is_player==False and c!=self.world.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                if self.mode==0:
+                    pass
+                elif self.mode==1:
+                    # filter out a couple things we don't want to click on
+                    if c.is_player==False and c!=self.world.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                        possible_objects.append(c)
+                elif self.mode==2:
+                    # for strategic map we want everything
                     possible_objects.append(c)
 
         object_distance=50
@@ -344,7 +348,13 @@ class Graphics_2D_Pygame(object):
         if closest_object != None:
             #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
             #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
-            self.world.world_menu.activate_menu(closest_object)
+
+            if self.mode==0:
+                pass
+            elif self.mode==1:
+                self.world.world_menu.activate_menu(closest_object)
+            elif self.mode==2:
+                self.strategic_map.strategic_menu.activate_menu(closest_object)
 
 #------------------------------------------------------------------------------
     def update(self):
