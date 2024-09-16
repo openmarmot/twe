@@ -15,6 +15,7 @@ import math
 #import custom packages
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
+from ai.ai_faction_strategic import AIFactionStrategic
 
 #global variables
 
@@ -28,6 +29,13 @@ class StrategicMap(object):
         self.strategic_menu=StrategicMenu(self)
 
         self.map_squares=[]
+
+        # strategic AIs
+        self.strategic_ai=[]
+        self.strategic_ai.append(AIFactionStrategic(self,'german'))
+        self.strategic_ai.append(AIFactionStrategic(self,'soviet'))
+        self.strategic_ai.append(AIFactionStrategic(self,'american'))
+        self.strategic_ai.append(AIFactionStrategic(self,'civilian'))
 
     #---------------------------------------------------------------------------
     def create_map_squares(self,save_file_name):
@@ -187,6 +195,8 @@ class StrategicMap(object):
         self.create_map_squares(save_file)
 
         # generate initial troops
+        for b in self.strategic_ai:
+            b.set_initial_units()
 
         # save all maps
 

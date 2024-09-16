@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 
+----------------------------------
+september 15 2024
+- starting work on ai_faction_strategic 
+
+I always pictured strategic mode as being really really big, but 
+at the moment it is shaping up to be kinda smaller feeling. I guess I haven't measured 
+the relationship between in game units and distance yet so I'm not sure how big a map is. 
+
+I think the maps will be pretty large, but if they get too big it is going to be super 
+annoying to travel to the end of them - maybe fast travel is needed 
 
 ----------------------------------
 september 14 2024
