@@ -3,6 +3,36 @@ TWE Project : Change Log
 
 
 ----------------------------------
+september 17 2024
+- added random initial assignment of rail_yards and airports 
+- rail_yards (R) and airports (A) get a letter on their map square
+- flipped the x/y of the grid so letters are columns
+
+Amusingly I noticed that letters are rows when I envisioned them to be columns.
+Fortunately all I had to do was flip the x/y coordinates. This is not the first 
+time this has happened - I think there is something fundamentally backwards about my 
+game engine.
+
+currently rail_yard and airport don't actually do anything. I'm thinking they will be origins for 
+reinforcements, as well as having a lot of unique map objects 
+
+todo next 
+- assign initial faction squares
+- make squares the correct color for their faction 
+- initial unit assignment (this is a big task)
+
+----------------------------------
+september 15 2024
+- starting work on ai_faction_strategic 
+
+I always pictured strategic mode as being really really big, but 
+at the moment it is shaping up to be kinda smaller feeling. I guess I haven't measured 
+the relationship between in game units and distance yet so I'm not sure how big a map is. 
+
+I think the maps will be pretty large, but if they get too big it is going to be super 
+annoying to travel to the end of them - maybe fast travel is needed 
+
+----------------------------------
 september 14 2024
 - more strategic map work
 

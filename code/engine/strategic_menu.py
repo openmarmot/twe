@@ -104,7 +104,9 @@ class StrategicMenu(object):
         self.text_queue.append('North: '+(self.selected_object.north.name if self.selected_object.north is not None else 'None'))
         self.text_queue.append('South: '+(self.selected_object.south.name if self.selected_object.south is not None else 'None'))
         self.text_queue.append('West: '+(self.selected_object.west.name if self.selected_object.west is not None else 'None'))
-        self.text_queue.append('East '+(self.selected_object.east.name if self.selected_object.east is not None else 'None'))
+        self.text_queue.append('East: '+(self.selected_object.east.name if self.selected_object.east is not None else 'None'))
+        self.text_queue.append('Airport: '+str(self.selected_object.airport))
+        self.text_queue.append('Rail yard: '+str(self.selected_object.rail_yard))
 
     #---------------------------------------------------------------------------
     def start_menu(self, key):

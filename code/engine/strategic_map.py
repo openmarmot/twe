@@ -15,6 +15,7 @@ import math
 #import custom packages
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
+from ai.ai_faction_strategic import AIFactionStrategic
 
 #global variables
 
@@ -28,6 +29,13 @@ class StrategicMap(object):
         self.strategic_menu=StrategicMenu(self)
 
         self.map_squares=[]
+
+        # strategic AIs
+        self.strategic_ai=[]
+        self.strategic_ai.append(AIFactionStrategic(self,'german'))
+        self.strategic_ai.append(AIFactionStrategic(self,'soviet'))
+        self.strategic_ai.append(AIFactionStrategic(self,'american'))
+        self.strategic_ai.append(AIFactionStrategic(self,'civilian'))
 
     #---------------------------------------------------------------------------
     def create_map_squares(self,save_file_name):
@@ -43,8 +51,8 @@ class StrategicMap(object):
         
         # Create grid square objects and assign them to grid positions
         for index, name in enumerate(map_names):
-            x = index % grid_size
-            y = index // grid_size
+            y = index % grid_size
+            x = index // grid_size
             spacing=70
             grid_square = MapSquare(name,[x*spacing+250, y*spacing+150])
             grid[y][x] = grid_square
@@ -119,6 +127,43 @@ class StrategicMap(object):
         return f"saves/save_{random_part}.sqlite"
     
     #---------------------------------------------------------------------------
+    def generate_initial_map_features(self,map_size):
+        '''generate map feature placement'''
+
+        # i think we also need to generate the features themselves
+        # after that they get saved automatically when the map is saved?
+        # and then maybe the list of objects for the map gets checked on 
+        # load for airports or whatever and the bools get flipped to true?
+
+        west_column=[]
+        east_column=[]
+        north_row=self.map_squares[:map_size]
+        south_row=self.map_squares[-map_size:]
+
+        for b in self.map_squares:
+            if b.name[0]=='A':
+                west_column.append(b)
+            # this needs to be fixed for bigger maps
+            if b.name[0]=='J':
+                east_column.append(b)
+
+
+
+        # airports
+        random.choice(west_column).airport=True
+        random.choice(east_column).airport=True
+        random.choice(self.map_squares).airport=True
+
+        # rail yards
+        random.choice(west_column).rail_yard=True
+        random.choice(east_column).rail_yard=True
+        random.choice(north_row).rail_yard=True
+        random.choice(south_row).rail_yard=True
+
+
+
+    
+    #---------------------------------------------------------------------------
     def get_table_names(self,db_file_path):
         # Connect to the SQLite database
         connection = sqlite3.connect(db_file_path)
@@ -186,10 +231,15 @@ class StrategicMap(object):
         # create map squares
         self.create_map_squares(save_file)
 
+        # generate initial map features
+        self.generate_initial_map_features(map_size)
+
         # generate initial troops
+        for b in self.strategic_ai:
+            b.set_initial_units()
 
         # save all maps
-
+            
     
     #---------------------------------------------------------------------------
     def update(self):
