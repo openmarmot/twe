@@ -80,9 +80,9 @@ class GameMenu(object):
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (not working)')
-            self.text_queue.append('2 - Load Campaign (not working)')
-            self.text_queue.append('3 - Quick Battle <-- choose this')
+            self.text_queue.append('1 - New Campaign (work in progress. not playable)')
+            self.text_queue.append('2 - Load Campaign (not implemented)')
+            self.text_queue.append('3 - Quick Battle (<-- choose this)')
             #self.text_queue.append('4 - Nothing') 
 
             if key=='1':
@@ -101,7 +101,7 @@ class GameMenu(object):
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('Pick a Faction')
-            self.text_queue.append('1 - American')
+            self.text_queue.append('1 - American (not implemented)')
             self.text_queue.append('2 - German')
             self.text_queue.append('3 - Soviet')
             self.text_queue.append('4 - Civilian/Neutral')

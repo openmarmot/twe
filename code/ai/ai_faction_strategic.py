@@ -23,6 +23,9 @@ class AIFactionStrategic(object):
         # faction - german/soviet/american/civilian
         self.faction=faction
 
+        
+        
+
     #---------------------------------------------------------------------------
     def set_initial_units(self):
 

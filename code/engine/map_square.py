@@ -32,6 +32,10 @@ class MapSquare(object):
         self.west=None
         self.east=None
 
+        # some big deal map features 
+        self.rail_yard=False
+        self.airport=False
+
 
     #---------------------------------------------------------------------------
     def add_inventory(self, ITEM):

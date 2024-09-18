@@ -272,6 +272,13 @@ class Graphics_2D_Pygame(object):
                 if(self.draw_collision):
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
+                if self.mode==2:
+                    # special text stuff for map mode
+
+                    if c.airport:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.menu_color)
+                    if c.rail_yard:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.menu_color)
 
         # text stuff
         if self.mode==0:
