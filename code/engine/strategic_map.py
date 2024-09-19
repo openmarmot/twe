@@ -161,6 +161,14 @@ class StrategicMap(object):
         random.choice(south_row).rail_yard=True
 
 
+        # set inital map control 
+        # german
+        for b in west_column:
+            b.image_index=2
+        # soviet
+        for b in east_column:
+            b.image_index=1
+
 
     
     #---------------------------------------------------------------------------

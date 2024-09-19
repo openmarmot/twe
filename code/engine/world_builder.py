@@ -80,28 +80,20 @@ list_medical_rare=['german_officer_first_aid_kit']
 list_medical_ultra_rare=[]
 #----------------------------------------------------------------
 
+# ------ variables that get pulled from sqlite -----------------------------------
+loaded=False
+soviet_squad_data={}
+german_squad_data={}
+
 #------------------------------------------------------------------------------
 def create_standard_squad(world,faction_tactial,world_coords,squad_type):
     ''' creates and spawns a standardized squad '''
-    # radomize location a little so everything isn't on top of each other 
-    world_coords=[world_coords[0]+float(random.randint(-200,200)),world_coords[1]+float(random.randint(-200,200))]
-
-    s=AISquad(world)
-    s.faction_tactical=faction_tactial
-    s.destination=world_coords
+    
 
     if squad_type=='soviet 1943 rifle':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1943
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
+        
     elif squad_type=='soviet 1944 rifle':
         s.faction='soviet'
         # ref : https://www.battleorder.org/ussr-rifle-co-1944
@@ -212,11 +204,7 @@ def create_standard_squad(world,faction_tactial,world_coords,squad_type):
     else:
         print('!! Error : squad type not recognized : '+squad_type)
 
-    # set the squad variable
-    s.reset_squad_variable()
-
-    # add to faction tactial
-    faction_tactial.squads.append(s)
+    
         
         
 #------------------------------------------------------------------------------
@@ -530,6 +518,48 @@ def load_magazine(world,magazine):
         magazine.ai.projectiles.append(z)
 
         count+=1
+
+#------------------------------------------------------------------------------
+def load_sqlite_data():
+    ''' load a bunch of data that i put in sqlite '''
+    global loaded
+    global soviet_squad_data
+    global german_squad_data
+    
+
+    if loaded==False:
+
+        # Connect to the SQLite database
+        conn = sqlite3.connect('data/data.sqlite')
+
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM squad_data WHERE faction='soviet'")
+        # Fetch all column names
+        column_names = [description[0] for description in cursor.description]
+
+        # Fetch all rows from the table
+        rows = cursor.fetchall()
+
+        # Convert rows to dictionary, excluding the 'id' field
+        for row in rows:
+            row_dict = {column_names[i]: row[i] for i in range(len(column_names)) if column_names[i] != 'id'}
+            key = row_dict.pop('name')
+            soviet_squad_data[key] = row_dict
+
+        print('soviet_squad_data',soviet_squad_data)
+
+        # Close the database connection
+        conn.close()
+
+        
+
+        print('world_builder data load complete')
+        loaded=True
+
+    else:
+        print('Error : Projectile data is already loaded')
 
 #------------------------------------------------------------------------------
 def load_test_environment(world,scenario):
@@ -2070,6 +2100,9 @@ def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAM
 #------------------------------------------------------------------------------
 def spawn_soldiers(world,SOLDIER_TYPE,world_coords):
     ''' return a soldier with full kit '''
+
+    # note  i think this should be moved under spawn_object. no need to be seperate 
+
     # --------- german types ---------------------------------
     if SOLDIER_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',True)
@@ -2260,4 +2293,7 @@ def spawn_soldiers(world,SOLDIER_TYPE,world_coords):
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
-        return z   
+        return z
+
+# init 
+load_sqlite_data()

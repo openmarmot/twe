@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 
+----------------------------------
+september 18 2024
+- set inital map square faction ownership 
+- started working on replacing the pre-build squad system 
+- started creating squad_data database table 
+
+realizing that saving pre-build squads is not really going to work. 
+they would have to be reformed after every battle to balance out losses so i 
+really just need to organize squads AFTER everything spawns into the world.
+This means going back to the old squad creation method.
+
+todo next
+- finish writing world_builder.load_sqlite_data
+- finish populating squad_data table 
+- remove the old squad system and shift over to creating squads on world launch 
+- have the strategic ai pick random squads to put on the map
+
+Note - lots of changes here. dev will probably be broken for a couple updates 
 
 ----------------------------------
 september 17 2024
