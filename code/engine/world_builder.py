@@ -19,11 +19,11 @@ the idea is this static class holds the standard way for creating objects
 
 
 #import built in modules
-
 import math
 import random
 import copy 
 import os
+import sqlite3
 
 #import custom packages
 import engine.math_2d
@@ -84,6 +84,8 @@ list_medical_ultra_rare=[]
 loaded=False
 soviet_squad_data={}
 german_squad_data={}
+american_squad_data=[]
+civilian_squad_data={}
 
 #------------------------------------------------------------------------------
 def create_standard_squad(world,faction_tactial,world_coords,squad_type):
@@ -525,46 +527,51 @@ def load_sqlite_data():
     global loaded
     global soviet_squad_data
     global german_squad_data
+    global american_squad_data
+    global civilian_squad_data
     
-
     if loaded==False:
-
-        # Connect to the SQLite database
-        conn = sqlite3.connect('data/data.sqlite')
-
-        # Create a cursor object
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM squad_data WHERE faction='soviet'")
-        # Fetch all column names
-        column_names = [description[0] for description in cursor.description]
-
-        # Fetch all rows from the table
-        rows = cursor.fetchall()
-
-        # Convert rows to dictionary, excluding the 'id' field
-        for row in rows:
-            row_dict = {column_names[i]: row[i] for i in range(len(column_names)) if column_names[i] != 'id'}
-            key = row_dict.pop('name')
-            soviet_squad_data[key] = row_dict
-
-        print('soviet_squad_data',soviet_squad_data)
-
-        # Close the database connection
-        conn.close()
-
-        
-
-        print('world_builder data load complete')
-        loaded=True
+        soviet_squad_data=load_sqlite_squad_data('soviet')
+        german_squad_data=load_sqlite_squad_data('german')
+        american_squad_data=load_sqlite_squad_data('american')
+        civilian_squad_data=load_sqlite_data('civilian')
 
     else:
         print('Error : Projectile data is already loaded')
 
 #------------------------------------------------------------------------------
+def load_sqlite_squad_data(faction):
+    '''builds a squad_data dictionary from sqlite data'''
+
+    squad_data={}
+
+    conn = sqlite3.connect('data/data.sqlite')
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM squad_data WHERE faction=?",(faction,))
+    
+    # Fetch all column names
+    column_names = [description[0] for description in cursor.description]
+    # Fetch all rows from the table
+    rows = cursor.fetchall()
+
+    # Convert rows to dictionary, excluding the 'id' field
+    for row in rows:
+        row_dict = {column_names[i]: row[i] for i in range(len(column_names)) if column_names[i] != 'id'}
+        key = row_dict.pop('name')
+        squad_data[key] = row_dict
+
+    # Close the database connection
+    conn.close()
+
+    return squad_data
+
+#------------------------------------------------------------------------------
 def load_test_environment(world,scenario):
     ''' test environment. not a normal map load '''
 
+    # ! note this whole thing is legacy and should go away at some point
 
     if scenario=='1':
         # add some world areas

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+september 20 2024
+- finished world_builder.load_sqlite_data (for now)
+
 ----------------------------------
 september 18 2024
 - set inital map square faction ownership 
