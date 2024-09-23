@@ -3,6 +3,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+september 22 2024
+- finished squad data to the sqlite database 
+
+----------------------------------
 september 20 2024
 - finished world_builder.load_sqlite_data (for now)
 
