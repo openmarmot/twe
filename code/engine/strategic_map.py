@@ -14,6 +14,7 @@ import math
 
 #import custom packages
 import engine.math_2d
+import engine.world_builder
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
 from ai.ai_faction_strategic import AIFactionStrategic
@@ -189,8 +190,20 @@ class StrategicMap(object):
             coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,map_area_count)
 
             if map.rail_yard:
+                coords=coord_list.pop()
+                name='Rail Yard' # should generate a interessting name
+                map.map_objects+=engine.world_builder.generate_world_area(coords,'rail_yard',name)
+            if map.airport:
+                coords=coord_list.pop()
+                name='Airport' # should generate a interessting name
+                map.map_objects+=engine.world_builder.generate_world_area(coords,'airport',name)
+            if map.town:
+                coords=coord_list.pop()
+                name='Town' # should generate a interessting name
+                map.map_objects+=engine.world_builder.generate_world_area(coords,'town',name)
 
-
+            # generate clutter
+            
 
 
     

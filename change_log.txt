@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+september 24 2024
+- more work on map feature generation 
+
+----------------------------------
 september 23 2024
 - work on world_object save/load to map_object 
 - work on map feature generation

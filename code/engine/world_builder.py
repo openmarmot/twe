@@ -343,27 +343,27 @@ def generate_civilians_and_civilan_spawns(world):
         create_standard_squad(world,world.civilian_ai,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'big cheese')
 
 #------------------------------------------------------------------------------
-def generate_world_area(world_coords,type,name):
+def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
-    # TYPE town, airport, bunkers, field_depot, train_depot 
+    # area_type town, airport, bunkers, field_depot, train_depot 
     map_objects=[]
-    if type=='town':
+    if area_type=='town':
         map_objects=generate_world_area_town(world_coords)
-    elif type=='airport':
+    elif area_type=='airport':
         map_objects=generate_world_area_airport(world_coords)
-    elif type=='rail_yard':
+    elif area_type=='rail_yard':
         map_objects=generate_world_area_rail_yard(world_coords)
-    elif type=='fuel_dump':
+    elif area_type=='fuel_dump':
         count=random.randint(11,157)
         diameter=20
         rotation=0
         map_objects=generate_world_area_simple(world_coords,count,diameter,'55_gallon_drum','fuel drum',rotation)
-    elif type=='german_ammo_dump':
+    elif area_type=='german_ammo_dump':
         count=random.randint(11,157)
         diameter=20
         rotation=0
         map_objects=generate_world_area_simple(world_coords,count,diameter,'german_mg_ammo_can','German Ammo Can',rotation)
-    elif type=='german_fuel_can_dump':
+    elif area_type=='german_fuel_can_dump':
         count=random.randint(11,157)
         diameter=20
         rotation=0
@@ -486,12 +486,6 @@ def load_test_environment(world,scenario):
     # ! note this whole thing is legacy and should go away at some point
 
     if scenario=='1':
-        # add some world areas
-        generate_world_area(world,[-2000,2000],'town','Alfa')
-        generate_world_area(world,[2000,-2000],'town','Bravo')
-        generate_world_area(world,[2000,2000],'town','Charlie')
-        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
-        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
 
         # generate clutter after world areas are created
         generate_clutter(world)
@@ -510,22 +504,14 @@ def load_test_environment(world,scenario):
             world.reinforcements.append([time,'civilian',world.spawn_north,'shovel man'])
 
 
-        # add germans
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 volksgrenadier fire group')
+
         
         # add german reinforcements
         time=random.randint(120,500)
         world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
         world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
 
-        # add soviets
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
+
 
 
         # add soviet reinforcements
