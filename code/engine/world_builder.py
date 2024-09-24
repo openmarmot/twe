@@ -28,10 +28,12 @@ import sqlite3
 #import custom packages
 import engine.math_2d
 import engine.name_gen
+import engine.log
 from ai.ai_vehicle import AIVehicle
 from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
+from engine.map_object import MapObject
 
 
 # load AI 
@@ -87,124 +89,7 @@ german_squad_data={}
 american_squad_data=[]
 civilian_squad_data={}
 
-#------------------------------------------------------------------------------
-def create_standard_squad(world,faction_tactial,world_coords,squad_type):
-    ''' creates and spawns a standardized squad '''
-    
 
-    if squad_type=='soviet 1943 rifle':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1943
-        
-    elif squad_type=='soviet 1944 rifle':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-    elif squad_type=='soviet 1944 rifle motorized':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        spawn_object(world,world_coords,'dodge_g505_wc',True)
-    elif squad_type=='soviet 1944 submachine gun':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-    elif squad_type=='german 1944 rifle':
-        s.faction='german'
-        s.members.append(spawn_soldiers(world,'german_mp40',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mp40',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-    elif squad_type=='german 1944 panzergrenadier':
-        s.faction='german'
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        spawn_object(world,world_coords,'sd_kfz_251',True)
-    elif squad_type=='german 1944 volksgrenadier fire group':
-        s.faction='german'
-        # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) # ammo bearer
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) # ammo bearer 
-    elif squad_type=='german 1944 volksgrenadier storm group':
-        s.faction='german'
-        # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-    elif squad_type=='german 1944 fallschirmjager':
-        s.faction='german'
-        # ref : 
-        s.members.append(spawn_soldiers(world,'german_fg42-type2',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_fg42-type2',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) #  mg
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  asst mg
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  medic
-    elif squad_type=='civilian small random':
-        s.faction='civilian'
-        amount=random.randint(1,3)
-        for c in range(amount):
-            s.members.append(spawn_civilians(world,'default',world_coords))
-    elif squad_type=='big cheese':
-        s.faction='civilian'
-        s.members.append(spawn_civilians(world,'big_cheese',world_coords))
-    elif squad_type=='shovel man':
-        s.faction='civilian'
-        s.members.append(spawn_civilians(world,'shovel_man',world_coords))
-    else:
-        print('!! Error : squad type not recognized : '+squad_type)
 
     
         
@@ -458,33 +343,76 @@ def generate_civilians_and_civilan_spawns(world):
         create_standard_squad(world,world.civilian_ai,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'big cheese')
 
 #------------------------------------------------------------------------------
-def generate_world_area(world,world_coords,TYPE,NAME):
+def generate_world_area(world_coords,type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # TYPE town, airport, bunkers, field_depot, train_depot 
-    group=[]
-    if TYPE=='town':
-        count=random.randint(1,5)
-        grid_spawn(world,world_coords,'warehouse',1150,count)
-        count=random.randint(2,15)
-        grid_spawn(world,world_coords,'square_building',250,count)
-    elif TYPE=='fuel_dump':
+    map_objects=[]
+    if type=='town':
+        map_objects=generate_world_area_town(world_coords)
+    elif type=='airport':
+        map_objects=generate_world_area_airport(world_coords)
+    elif type=='rail_yard':
+        map_objects=generate_world_area_rail_yard(world_coords)
+    elif type=='fuel_dump':
         count=random.randint(11,157)
-        grid_spawn(world,world_coords,'55_gallon_drum',20,count)
-    elif TYPE=='german_ammo_dump':
-        count=random.randint(11,45)
-        grid_spawn(world,world_coords,'german_mg_ammo_can',30,count)
-    elif TYPE=='german_fuel_can_dump':
-        count=random.randint(21,75)
-        grid_spawn(world,world_coords,'german_fuel_can',20,count)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'55_gallon_drum','fuel drum',rotation)
+    elif type=='german_ammo_dump':
+        count=random.randint(11,157)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_mg_ammo_can','German Ammo Can',rotation)
+    elif type=='german_fuel_can_dump':
+        count=random.randint(11,157)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_fuel_can','German Fuel Can',rotation)
+    else:
+        engine.log.add_data('error','worldbuilder.generate_world_area type '+type+' not recognized',True)
 
-    # make the corresponding WorldArea object
-    w=WorldArea(world)
-    w.world_coords=copy.copy(world_coords)
-    w.name=NAME
-    w.type=TYPE
+    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
+    world_area=MapObject('world_area_'+type,name,world_coords,0,[])
+    map_objects.append(world_area)
 
-    # register with world 
-    world.world_areas.append(w)
+    return map_objects
+
+#------------------------------------------------------------------------------
+def generate_world_area_airport(world_coords):
+    engine.log.add_data('warn','world_builder.generate_world_area_airport: not implemented')
+    return []
+
+#------------------------------------------------------------------------------
+def generate_world_area_simple(world_coords,count,diameter,world_builder_identity,name,rotation):
+    '''generates a simple one object type world area '''
+    # count: int
+    # diameter : int - rough size of the object
+    coords=engine.math_2d.get_grid_coords(world_coords,diameter,count)
+    map_objects=[]
+    for _ in range(count):
+        map_objects.append(MapObject(world_builder_identity,name,coords.pop(),rotation,[]))
+    
+    return map_objects
+
+#------------------------------------------------------------------------------
+def generate_world_area_rail_yard(world_coords):
+    engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented')
+    return []
+
+#------------------------------------------------------------------------------
+def generate_world_area_town(world_coords):
+    count_warehouse=random.randint(1,5)
+    count_building=random.randint(2,14)
+    coords=engine.math_2d.get_grid_coords(world_coords,1150,count_warehouse+count_building)
+    map_objects=[]
+    rotation=random.randint(1,359)
+    for _ in range(count_warehouse):
+        map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
+    
+    for _ in range(count_building):
+        map_objects.append(MapObject('warehouse','some sort of building',coords.pop(),rotation,[]))
+
+    return map_objects
 
 #------------------------------------------------------------------------------
 def get_random_from_list(world,world_coords,OBJECT_LIST,SPAWN):
@@ -493,22 +421,6 @@ def get_random_from_list(world,world_coords,OBJECT_LIST,SPAWN):
     # spawn_object function
     index=random.randint(0,len(OBJECT_LIST)-1)
     return spawn_object(world,world_coords,OBJECT_LIST[index],SPAWN)
-
-#------------------------------------------------------------------------------
-def grid_spawn(world,world_coords,OBJECT_STRING,DIAMETER,COUNT):
-    ''' spawn in a grid pattern '''
-    last_coord=world_coords
-    # this needs to be better
-    column_max=engine.math_2d.get_optimal_column_count(COUNT)*DIAMETER
-
-    for x in range(COUNT):
-        
-        if last_coord[0]>world_coords[0]+column_max:
-            last_coord[0]=world_coords[0]
-            last_coord[1]+=DIAMETER
-        last_coord=[last_coord[0]+DIAMETER,last_coord[1]+0]
-        spawn_object(world,last_coord,OBJECT_STRING,True)
-
 
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):

@@ -362,13 +362,17 @@ class World_Menu(object):
             self.text_queue.append('3 - Soviet 1944 Rifle')
             self.text_queue.append('4 - Soviet 1944 Submachine Gun')
             if key=='1':
-                engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 rifle')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 rifle')
             elif key=='2':
-                engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 volksgrenadier storm group')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 volksgrenadier storm group')
             elif key=='3':
-                engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 rifle')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 rifle')
             elif key=='4':
-                engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 submachine gun')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 submachine gun')
         if self.menu_state=='spawn_misc':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Misc --')

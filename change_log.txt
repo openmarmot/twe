@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
+----------------------------------
+september 23 2024
+- work on world_object save/load to map_object 
+- work on map feature generation
+- added towns as a 'big deal map feature' and to map as 'T'
+- world_build.grid_spawn -> math_2d.get_grid_coords
 
+todo next
+- finish feature generation
+- work on saving mechanism
+- work on loading mechanism
+- remove the old squad system and shift over to creating squads on world launch 
+- have the strategic ai pick random squads to put on the map
+- rewrite world.process_reinforcements
+- rewrite world_menu.debug_menu -> spawn squads 
 
 ----------------------------------
 september 22 2024

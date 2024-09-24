@@ -9,6 +9,7 @@ notes :
 #import built in modules
 
 #import custom packages
+from engine.map_object import MapObject
 
 #global variables
 
@@ -35,10 +36,13 @@ class MapSquare(object):
         # some big deal map features 
         self.rail_yard=False
         self.airport=False
+        self.town=False
+
+        # array of MapObject(s) for this map
+        # a MapObject is a world_object in a compressed form that is used for saving and loading
+        self.map_objects=[]
 
 
-    #---------------------------------------------------------------------------
-    def add_inventory(self, ITEM):
-        self.ai.handle_event('add_inventory',ITEM)
 
 
+        

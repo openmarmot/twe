@@ -13,6 +13,7 @@ import sqlite3
 import math
 
 #import custom packages
+import engine.math_2d
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
 from ai.ai_faction_strategic import AIFactionStrategic
@@ -160,6 +161,9 @@ class StrategicMap(object):
         random.choice(north_row).rail_yard=True
         random.choice(south_row).rail_yard=True
 
+        # towns 
+        for _ in range(20):
+            random.choice(self.map_squares).town=True
 
         # set inital map control 
         # german
@@ -168,6 +172,25 @@ class StrategicMap(object):
         # soviet
         for b in east_column:
             b.image_index=1
+
+    #---------------------------------------------------------------------------
+    def generate_initial_map_objects(self):
+        '''generate objects for the map features'''
+
+        for map in self.map_squares:
+            map_area_count=0
+            if map.rail_yard:
+                map_areas+=1
+            if map.airport:
+                map_areas+=1
+            if map.town:
+                map_areas+=1
+
+            coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,map_area_count)
+
+            if map.rail_yard:
+
+
 
 
     
@@ -207,9 +230,9 @@ class StrategicMap(object):
 
     #------------------------------------------------------------------------------
     def load_world(self,map_coords,save_file):
-        # get the current data for the map square
+        # load the map_objects for the square from sqlite
 
-        # send to world_builder to spawn
+        # send to world_builder to convert map_objects to world_objects (this spawns them)
 
         pass
 
@@ -242,11 +265,17 @@ class StrategicMap(object):
         # generate initial map features
         self.generate_initial_map_features(map_size)
 
-        # generate initial troops
+        # generate map objects for the features
+        self.generate_initial_map_objects()
+
+        # decide on and place initial troops
         for b in self.strategic_ai:
             b.set_initial_units()
 
         # save all maps
+            
+        
+        # load specific map player is in 
             
     
     #---------------------------------------------------------------------------

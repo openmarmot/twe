@@ -579,13 +579,17 @@ class World(object):
             self.reinforcements.remove(b)
             print('spawning reinforcements',b[1])
             if b[1]=='german':
-                engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
             elif b[1]=='american':
-                engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
             elif b[1]=='soviet':
-                engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
             elif b[1]=='civilian':
-                engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
             else:
                 print('Error - faction not recognized in process_reinforements: ',b[1])
 

@@ -279,6 +279,8 @@ class Graphics_2D_Pygame(object):
                         self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.menu_color)
                     if c.rail_yard:
                         self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.menu_color)
+                    if c.town:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.menu_color)
 
         # text stuff
         if self.mode==0:
