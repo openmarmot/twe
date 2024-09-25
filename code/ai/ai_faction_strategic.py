@@ -33,12 +33,9 @@ class AIFactionStrategic(object):
         self.square_objectives_owned=[]
         self.square_objectives_not_owned=[]
 
-        
-        
-
     #---------------------------------------------------------------------------
     def set_initial_units(self):
-        # update what we know about the map squares
+        self.update_map_square_data()
 
         # determine what squares if any are at risk
 
@@ -61,6 +58,7 @@ class AIFactionStrategic(object):
         for map_square in self.strategic_map.map_squares:
             if self.faction==map_square.faction:
                 self.squares_owned.append(map_square)
+                if map_square.
 
                 # check if it borders a enemy square 
-                
+

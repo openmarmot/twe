@@ -101,6 +101,7 @@ class MapSquare(object):
                 # we could either reset to neutral or just do nothing here
                 pass
 
+
     
 
             

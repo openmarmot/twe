@@ -269,6 +269,10 @@ class StrategicMap(object):
         for b in self.map_squares:
             b.update_map_control()
 
+        # once the map control is updated everywhere, update hostile count 
+        for b in self.map_squares:
+            b.update_hostile_count()
+
     #------------------------------------------------------------------------------
     def load_world(self,map_coords,save_file):
         # handles the hand off from strategic map to world mode
