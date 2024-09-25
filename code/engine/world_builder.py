@@ -265,60 +265,55 @@ def fill_container(world,CONTAINER,FILL_NAME):
 
 
 #------------------------------------------------------------------------------
-def generate_clutter(world):
+def generate_clutter(map_objects):
     '''generates and auto places small objects around the map'''
-    # this should be called after buildings are placed
+    # map_objects - array of map_objects
+    # returns array of map_objects
+    clutter=[]
 
-    # make sure anything pending is added/removed
-    world.process_add_remove_queue()
+    for b in map_objects:
 
-    # building related clutter
-    # need to smart position this in the future
-    for b in world.wo_objects_building:
-        chance=random.randint(0,15)
-        coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-        coords2=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-        if chance==0 or chance==1:
-            spawn_crate(world,coords,'random_consumables_common')
-        elif chance==2:
-            spawn_crate(world,coords,'random_consumables_rare')
-        elif chance==3:
-            spawn_crate(world,coords,'random_consumables_ultra_rare')
-        elif chance==4:
-            spawn_object(world,coords,'red_bicycle',True)
-        elif chance==5 or chance==6:
-            spawn_object(world,coords,'brown_chair',True)
-        elif chance==7 or chance==8:
-            spawn_object(world,coords,'cupboard',True)
-        elif chance==9:
-            spawn_aligned_pile(world,coords,coords2,'wood_log',6,5)
-        elif chance==10:
-            spawn_object(world,coords,'barrel',True)
+        # industrial clutter
+        if b.world_builder_identity=='warehouse':
+            chance=random.randint(1,15)
+            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+            rotation=random.randint(0,359)
+            if chance==1 or chance==2:
+                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
+            if chance==1 or chance==3 or chance==4:
+                # some overlap
+                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
+            if chance==5:
+                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
+            if chance==6:
+                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
+            if chance==7:
+                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
 
-    # supply drop 
-    chance=random.randint(0,10)
-    if chance==0:
-        print('supply drop spawned')
-        spawn_drop_canister(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'mixed_supply')
+        # house clutter 
+        elif b.world_builder_identity=='square_building':
+            chance=random.randint(1,15)
+            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+            rotation=random.randint(0,359)
+            if chance==1 or chance==2:
+                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
+            if chance==1 or chance==3 or chance==4:
+                # some overlap
+                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
+            if chance==5:
+                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
+            if chance==6:
+                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
+            if chance==7:
+                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
 
-    # weapon crates 
-    chance=random.randint(0,10)
-    if chance==0:
-        spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
-    if chance==1:
-        spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
+    # add some crates 
+                
+    # add some vehicles 
+                
+    return clutter
 
-    # kubelwagens
-    chance=random.randint(0,10)
-    if chance==0:
-        k1=spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k1=spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
 
-    # make sure there are a couple vehicles at least 
-    if len(world.wo_objects_vehicle)<4:
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
 
 #------------------------------------------------------------------------------
 def generate_civilians_and_civilan_spawns(world):
@@ -410,7 +405,7 @@ def generate_world_area_town(world_coords):
         map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
     
     for _ in range(count_building):
-        map_objects.append(MapObject('warehouse','some sort of building',coords.pop(),rotation,[]))
+        map_objects.append(MapObject('square_building','some sort of building',coords.pop(),rotation,[]))
 
     return map_objects
 

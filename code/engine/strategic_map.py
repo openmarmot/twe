@@ -203,10 +203,8 @@ class StrategicMap(object):
                 map.map_objects+=engine.world_builder.generate_world_area(coords,'town',name)
 
             # generate clutter
-            
+            map.map_objects+=engine.world_builder.generate_clutter(map.map_objects)
 
-
-    
     #---------------------------------------------------------------------------
     def get_table_names(self,db_file_path):
         # Connect to the SQLite database
