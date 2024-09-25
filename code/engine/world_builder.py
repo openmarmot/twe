@@ -90,10 +90,6 @@ american_squad_data=[]
 civilian_squad_data={}
 
 
-
-    
-        
-        
 #------------------------------------------------------------------------------
 def create_squads_from_human_list(world,HUMANS,FACTION):
     ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
@@ -316,27 +312,26 @@ def generate_clutter(map_objects):
 
 
 #------------------------------------------------------------------------------
-def generate_civilians_and_civilan_spawns(world):
-    '''generates civilans and civilan spawn points'''
-    # this should be called after buildings are placed
+def generate_civilians(map_objects):
+    '''generates and returns a array of civilian map_objects'''
+    civilians=[]
 
-    # make sure anything pending is added/removed
-    world.process_add_remove_queue()
+    for b in map_objects:
+        if b.world_builder_identity=='warehouse':
+            count=random.randint(0,10)
+            for _ in range(count):
+                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+                rotation=random.randint(0,359)
+                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
-    for b in world.wo_objects_building:
-        # add a random amount of civilians
-        amount=random.randint(0,3)
-        if amount>0:
-            create_standard_squad(world,world.civilian_ai,b.world_coords,'civilian small random')
+        elif b.world_builder_identity=='square_building':
+            count=random.randint(1,3)
+            for _ in range(count):
+                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+                rotation=random.randint(0,359)
+                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
-    # special case if there are no buildings
-    if len(world.wo_objects_building)==0:
-        print('WARN : No buildings')
-
-    if random.randint(0,10)==10:
-        print('big cheese!!')
-        create_standard_squad(world,world.civilian_ai,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'big cheese')
-
+ 
 #------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
@@ -482,11 +477,6 @@ def load_test_environment(world,scenario):
 
     if scenario=='1':
 
-        # generate clutter after world areas are created
-        generate_clutter(world)
-
-        # generate civilians and civilan spawns
-        generate_civilians_and_civilan_spawns(world)
 
         # some civilian reinforcements
         time=random.randint(120,800)
@@ -646,6 +636,8 @@ def spawn_container(name,world_object,image_index):
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords,CRATE_TYPE):
     ''' generates different crate types with contents'''
+
+    # !!!! outdated. this should all be integrated into spawn_objects
 
     if CRATE_TYPE=='mp40':
         z=spawn_object(world,world_coords,'crate',True)

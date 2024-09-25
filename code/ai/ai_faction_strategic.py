@@ -18,17 +18,25 @@ import engine.world_builder
 #global variables
 
 class AIFactionStrategic(object):
-    def __init__(self,world,faction):
+    def __init__(self,strategic_map,faction):
 
         # faction - german/soviet/american/civilian
         self.faction=faction
+
+        # ref to the strategic map
+        self.strategic_map=strategic_map
+
+        # square data
+        self.squares_owned=[]
+        self.squares_owned_at_risk=[]
+        
 
         
         
 
     #---------------------------------------------------------------------------
-    def set_initial_units(self):
-
+    def set_initial_units(map_squares):
+        # map_squares
         # things we should already know :
         # - which column? or squares are ours
         # - which squares are the enemy

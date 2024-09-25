@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+september 25 2024
+- working on civilian spawn generation
+- working through all the code needed for starting a new campaign
+
+----------------------------------
 september 24 2024
 - more work on map feature generation 
 

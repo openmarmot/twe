@@ -17,6 +17,7 @@ import engine.math_2d
 import engine.world_builder
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
+from engine.map_object import MapObject
 from ai.ai_faction_strategic import AIFactionStrategic
 
 #global variables
@@ -129,6 +130,24 @@ class StrategicMap(object):
         return f"saves/save_{random_part}.sqlite"
     
     #---------------------------------------------------------------------------
+    def generate_initial_civilians(self):
+
+        for map in self.map_squares:
+            map.map_objects+=engine.world_builder.generate_world_area(map.map_objects)
+
+        # -- add some unique one offs --
+
+        # big_cheese
+        coords=[random.randint(-2000,2000),random.randint(-2000,2000)]
+        rotation=random.randint(0,359)
+        random.choice(self.map_squares).map_objects.append(MapObject('big_cheese','big_cheese',coords,rotation,[]))
+
+        # shovel_man
+        coords=[random.randint(-2000,2000),random.randint(-2000,2000)]
+        rotation=random.randint(0,359)
+        random.choice(self.map_squares).map_objects.append(MapObject('shovel_man','shovel_man',coords,rotation,[]))
+    
+    #---------------------------------------------------------------------------
     def generate_initial_map_features(self,map_size):
         '''generate map feature placement'''
 
@@ -170,9 +189,11 @@ class StrategicMap(object):
         # german
         for b in west_column:
             b.image_index=2
+            b.map_control='german'
         # soviet
         for b in east_column:
             b.image_index=1
+            b.map_control='soviet'
 
     #---------------------------------------------------------------------------
     def generate_initial_map_objects(self):
@@ -240,11 +261,24 @@ class StrategicMap(object):
         self.strategic_menu.handle_input(key)
 
     #------------------------------------------------------------------------------
+    def load_all_maps(self,save_file):
+
+        # load all maps and map_objects in from save file
+
+        # once all map objects are loaded, update the map control
+        for b in self.map_squares:
+            b.update_map_control()
+
+    #------------------------------------------------------------------------------
     def load_world(self,map_coords,save_file):
-        # load the map_objects for the square from sqlite
+        # handles the hand off from strategic map to world mode
 
         # send to world_builder to convert map_objects to world_objects (this spawns them)
 
+        pass
+
+    #------------------------------------------------------------------------------
+    def save_all_maps(self,save_file):
         pass
 
     #------------------------------------------------------------------------------
@@ -279,12 +313,15 @@ class StrategicMap(object):
         # generate map objects for the features
         self.generate_initial_map_objects()
 
+        # generate initial civilian pop
+        self.generate_civilians()
+
         # decide on and place initial troops
         for b in self.strategic_ai:
             b.set_initial_units()
 
         # save all maps
-            
+        self.save_all_maps(save_file)   
         
         # load specific map player is in 
             
