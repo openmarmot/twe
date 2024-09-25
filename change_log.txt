@@ -5,6 +5,10 @@ september 25 2024
 - working on civilian spawn generation
 - working through all the code needed for starting a new campaign
 
+I kinda underestimated how much of a slog it would be to get to the point 
+where the strategic layer was working. I feel like I've done a lot but there 
+is a lot more to do. 
+
 ----------------------------------
 september 24 2024
 - more work on map feature generation 

@@ -29,18 +29,16 @@ class AIFactionStrategic(object):
         # square data
         self.squares_owned=[]
         self.squares_owned_at_risk=[]
-        
+        self.square_objectives=[]
+        self.square_objectives_owned=[]
+        self.square_objectives_not_owned=[]
 
         
         
 
     #---------------------------------------------------------------------------
-    def set_initial_units(map_squares):
-        # map_squares
-        # things we should already know :
-        # - which column? or squares are ours
-        # - which squares are the enemy
-        # - how many points we have to spend
+    def set_initial_units(self):
+        # update what we know about the map squares
 
         # determine what squares if any are at risk
 
@@ -49,4 +47,20 @@ class AIFactionStrategic(object):
         # initial deployment can be deployed on any owned grid ssuare
         # after that reinforcements show up at rail yards
 
-        pass
+        
+
+    #---------------------------------------------------------------------------
+    def update_map_square_data(self):
+        # zero out everything
+        self.squares_owned=[]
+        self.squares_owned_at_risk=[]
+        self.square_objectives=[]
+        self.square_objectives_owned=[]
+        self.square_objectives_not_owned=[]
+
+        for map_square in self.strategic_map.map_squares:
+            if self.faction==map_square.faction:
+                self.squares_owned.append(map_square)
+
+                # check if it borders a enemy square 
+                

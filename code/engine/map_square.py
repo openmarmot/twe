@@ -43,12 +43,32 @@ class MapSquare(object):
         # 'german'/'soviet'/'neutral'
         self.map_control='none'
 
+        # a count of how many neigbhoring squares are hostile. 0-4
+        self.hostile_count=0
+
         # array of MapObject(s) for this map
         # a MapObject is a world_object in a compressed form that is used for saving and loading
         self.map_objects=[]
 
+    # ---------------------------------------------------------------------------
+    def update_hostile_count(self):
+        '''returns a count of how many hostile squares border the square'''
+        self.hostile_count=0
+        if self.north!=None:
+            if self.north.map_control != 'neutral' and self.north.map_control !=self.map_control:
+                self.hostile_count+=1
+        if self.south!=None:
+            if self.south.map_control != 'neutral' and self.south.map_control !=self.map_control:
+                self.hostile_count+=1
+        if self.west!=None:
+            if self.west.map_control != 'neutral' and self.west.map_control !=self.map_control:
+                self.hostile_count+=1
+        if self.east!=None:
+            if self.east.map_control != 'neutral' and self.east.map_control !=self.map_control:
+                self.hostile_count+=1
 
 
+    #---------------------------------------------------------------------------
     def update_map_control(self):
         ''' check who controls the map and update the map image'''
 
@@ -80,6 +100,8 @@ class MapSquare(object):
             elif american_count==0 and german_count==0 and soviet_count==0:
                 # we could either reset to neutral or just do nothing here
                 pass
+
+    
 
             
 
