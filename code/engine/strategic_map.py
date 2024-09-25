@@ -226,6 +226,29 @@ class StrategicMap(object):
             # generate clutter
             map.map_objects+=engine.world_builder.generate_clutter(map.map_objects)
 
+    #------------------------------------------------------------------------------
+    def generate_initial_units(self):
+        '''generate and place the inital units for each side'''
+        
+        # might eventually move this data out to sqlite
+        for b in self.strategic_ai:
+            if b.faction=='german':
+                squads=['German 1944 Rifle'] * 40
+                squads+=['German 1944 Panzergrenadier Mech'] * 20
+                squads+=['German 1944 Fallschirmjager'] * 5
+
+                b.set_initial_units(squads)
+            elif b.faction=='soviet':
+                squads=['Soviet 1943 Rifle'] * 60
+                squads+=['Soviet 1944 SMG'] * 5
+                squads+=['Soviet 1944 Rifle Motorized'] * 5
+
+                b.set_initial_units(squads)
+            elif b.faction=='american':
+                # not setup to handle this yet
+                pass
+
+
     #---------------------------------------------------------------------------
     def get_table_names(self,db_file_path):
         # Connect to the SQLite database
@@ -321,8 +344,7 @@ class StrategicMap(object):
         self.generate_civilians()
 
         # decide on and place initial troops
-        for b in self.strategic_ai:
-            b.set_initial_units()
+        self.generate_initial_units()
 
         # save all maps
         self.save_all_maps(save_file)   
