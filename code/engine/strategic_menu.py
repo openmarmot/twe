@@ -114,11 +114,16 @@ class StrategicMenu(object):
             #self.graphics_engine.world.is_paused=False
             self.text_queue=[]
             self.text_queue.append('Situation Map')
-            self.text_queue.append('---------------')
-            self.text_queue.append('Something')
-            self.text_queue.append('1 -')
-            self.text_queue.append('2 -  ')
-            self.text_queue.append('3 - ')
+            self.text_queue.append('--- Map Key ---')
+            self.text_queue.append('A:Airport')
+            self.text_queue.append('R:Rail Yard')
+            self.text_queue.append('T:Town')
+            self.text_queue.append('Grey Square : German controlled')
+            self.text_queue.append('Blue Square : Neutral')
+            self.text_queue.append('Red Square : Soviet Controlled')
+            self.text_queue.append('-----------')
+            self.text_queue.append('Selecct a Map Square for more info..')
+
             #self.text_queue.append('4 - Nothing')
 
             if key=='1' or key=='2' or key=='3':

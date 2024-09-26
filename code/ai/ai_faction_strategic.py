@@ -40,6 +40,7 @@ class AIFactionStrategic(object):
         '''convert a squad to individual members and then add them to a map as a map_object'''
         members=[]
         if 'German' in squad_name:
+            #print(engine.world_builder.german_squad_data)
             members=engine.world_builder.german_squad_data[squad_name]['members'].split(',')
         elif 'Soviet' in squad_name:
             members=engine.world_builder.soviet_squad_data[squad_name]['members'].split(',')
@@ -78,13 +79,13 @@ class AIFactionStrategic(object):
         self.square_objectives_not_owned=[]
 
         for map_square in self.strategic_map.map_squares:
-            if self.faction==map_square.faction:
+            if self.faction==map_square.map_control:
                 self.squares_owned.append(map_square)
                 if map_square.hostile_count>0:
                     self.squares_owned_at_risk.append(map_square)
 
             if map_square.rail_yard or map_square.airport or map_square.town:
-                if self.faction==map_square.faction:
+                if self.faction==map_square.map_control:
                     self.square_objectives_owned.append(map_square)
                 else:
                     self.square_objectives_not_owned.append(map_square)

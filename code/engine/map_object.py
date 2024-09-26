@@ -18,4 +18,4 @@ class MapObject(object):
         self.name=name # string
         self.world_coords=world_coords # [x,y]
         self.rotation=rotation #float
-        self.inventory=inventory # array of world_builder_identity
+        self.inventory=inventory # array of world_builder_identity strings

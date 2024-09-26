@@ -11,6 +11,7 @@ import random
 import string
 import sqlite3
 import math
+from datetime import datetime
 
 #import custom packages
 import engine.math_2d
@@ -40,6 +41,10 @@ class StrategicMap(object):
         self.strategic_ai.append(AIFactionStrategic(self,'american'))
         self.strategic_ai.append(AIFactionStrategic(self,'civilian'))
 
+        # map offset 
+        self.map_offset_x=400
+        self.map_offset_y=150
+
     #---------------------------------------------------------------------------
     def create_map_squares(self,save_file_name):
         '''create the map squares and screen positions'''
@@ -57,7 +62,7 @@ class StrategicMap(object):
             y = index % grid_size
             x = index // grid_size
             spacing=70
-            grid_square = MapSquare(name,[x*spacing+250, y*spacing+150])
+            grid_square = MapSquare(name,[x*spacing+self.map_offset_x, y*spacing+self.map_offset_y])
             grid[y][x] = grid_square
         
         # Assign neighbors (above, below, left, right)
@@ -99,7 +104,7 @@ class StrategicMap(object):
                 create_table_sql = f'''
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    world_builder_identity INTEGER,
+                    world_builder_identity TEXT,
                     name TEXT NOT NULL,
                     world_coords TEXT,
                     rotation TEXT,
@@ -126,14 +131,20 @@ class StrategicMap(object):
         chars = string.ascii_letters + string.digits
         # Generate random part of the filename
         random_part = ''.join(random.choice(chars) for _ in range(length))
-        # Combine with 'save' prefix
-        return f"saves/save_{random_part}.sqlite"
+        
+        # Get current date and time
+        now = datetime.now()
+        # Format the timestamp as YYYYMMDD_HHMMSS
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        
+        # Combine with 'save' prefix, timestamp, and random part
+        return f"saves/save_{timestamp}_{random_part}.sqlite"
     
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
 
         for map in self.map_squares:
-            map.map_objects+=engine.world_builder.generate_world_area(map.map_objects)
+            map.map_objects+=engine.world_builder.generate_civilians(map.map_objects)
 
         # -- add some unique one offs --
 
@@ -202,26 +213,27 @@ class StrategicMap(object):
         for map in self.map_squares:
             map_area_count=0
             if map.rail_yard:
-                map_areas+=1
+                map_area_count+=1
             if map.airport:
-                map_areas+=1
+                map_area_count+=1
             if map.town:
-                map_areas+=1
+                map_area_count+=1
 
-            coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,map_area_count)
+            if map_area_count>0:
+                coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,map_area_count)
 
-            if map.rail_yard:
-                coords=coord_list.pop()
-                name='Rail Yard' # should generate a interessting name
-                map.map_objects+=engine.world_builder.generate_world_area(coords,'rail_yard',name)
-            if map.airport:
-                coords=coord_list.pop()
-                name='Airport' # should generate a interessting name
-                map.map_objects+=engine.world_builder.generate_world_area(coords,'airport',name)
-            if map.town:
-                coords=coord_list.pop()
-                name='Town' # should generate a interessting name
-                map.map_objects+=engine.world_builder.generate_world_area(coords,'town',name)
+                if map.rail_yard:
+                    coords=coord_list.pop()
+                    name='Rail Yard' # should generate a interessting name
+                    map.map_objects+=engine.world_builder.generate_world_area(coords,'rail_yard',name)
+                if map.airport:
+                    coords=coord_list.pop()
+                    name='Airport' # should generate a interessting name
+                    map.map_objects+=engine.world_builder.generate_world_area(coords,'airport',name)
+                if map.town:
+                    coords=coord_list.pop()
+                    name='Town' # should generate a interessting name
+                    map.map_objects+=engine.world_builder.generate_world_area(coords,'town',name)
 
             # generate clutter
             map.map_objects+=engine.world_builder.generate_clutter(map.map_objects)
@@ -306,7 +318,63 @@ class StrategicMap(object):
 
     #------------------------------------------------------------------------------
     def save_all_maps(self,save_file):
-        pass
+        ''' save all maps to sqlite'''
+
+        conn = sqlite3.connect(save_file)
+        cursor = conn.cursor()
+        
+        # iterate through each map and save map_objects to sqlite
+        for map in self.map_squares:
+
+            table_name=map.name
+
+            # clear table data first 
+            # SQL to delete all rows from the table
+            delete_sql = '''
+            DELETE FROM {table};
+            '''.format(table=table_name)
+
+            cursor.execute(delete_sql)
+            conn.commit()
+            
+            # build the data list from map_objects
+            data_list=[]
+            for b in map.map_objects:
+
+                # string conversions
+                world_coords= ', '.join(str(item) for item in b.world_coords)
+                rotation=str(b.rotation)
+                inventory=', '.join(str(item) for item in b.inventory)
+                data_list.append(
+                    {
+                        'world_builder_identity': b.world_builder_identity,
+                        'name': b.name,
+                        'world_coords': world_coords,
+                        'rotation': rotation,
+                        'inventory': inventory
+                    }
+                )
+            if len(data_list)>0:
+                # SQL command to insert multiple rows
+                insert_sql = '''
+                INSERT INTO {table} (world_builder_identity, name, world_coords, rotation, inventory)
+                VALUES (?, ?, ?, ?, ?)
+                '''.format(table=table_name)
+
+                # Preparing data for executemany
+                rows = [(item['world_builder_identity'], item['name'], item['world_coords'], 
+                        item['rotation'], item['inventory']) for item in data_list]
+
+                cursor.executemany(insert_sql, rows)
+                conn.commit()
+
+                # Print how many rows were inserted
+                print(f"{cursor.rowcount} rows were inserted into {table_name}")
+
+        # Close the connection
+        conn.close()
+    
+
 
     #------------------------------------------------------------------------------
     def save_world(self,world,save_file):
@@ -341,7 +409,7 @@ class StrategicMap(object):
         self.generate_initial_map_objects()
 
         # generate initial civilian pop
-        self.generate_civilians()
+        self.generate_initial_civilians()
 
         # decide on and place initial troops
         self.generate_initial_units()

@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+september 26 2024
+- working on saving to sqlite
+- bug fixes
+- updated *Grenadier to *grenadier 
+- strategic map menu updates 
+
+----------------------------------
 september 25 2024
 - working on civilian spawn generation
 - working through all the code needed for starting a new campaign

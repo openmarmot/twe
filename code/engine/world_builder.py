@@ -331,7 +331,8 @@ def generate_civilians(map_objects):
                 rotation=random.randint(0,359)
                 civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
- 
+    return civilians
+
 #------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
@@ -359,17 +360,17 @@ def generate_world_area(world_coords,area_type,name):
         rotation=0
         map_objects=generate_world_area_simple(world_coords,count,diameter,'german_fuel_can','German Fuel Can',rotation)
     else:
-        engine.log.add_data('error','worldbuilder.generate_world_area type '+type+' not recognized',True)
+        engine.log.add_data('error','worldbuilder.generate_world_area type '+area_type+' not recognized',True)
 
     # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
-    world_area=MapObject('world_area_'+type,name,world_coords,0,[])
+    world_area=MapObject('world_area_'+area_type,name,world_coords,0,[])
     map_objects.append(world_area)
 
     return map_objects
 
 #------------------------------------------------------------------------------
 def generate_world_area_airport(world_coords):
-    engine.log.add_data('warn','world_builder.generate_world_area_airport: not implemented')
+    engine.log.add_data('warn','world_builder.generate_world_area_airport: not implemented',True)
     return []
 
 #------------------------------------------------------------------------------
@@ -386,7 +387,7 @@ def generate_world_area_simple(world_coords,count,diameter,world_builder_identit
 
 #------------------------------------------------------------------------------
 def generate_world_area_rail_yard(world_coords):
-    engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented')
+    engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented',True)
     return []
 
 #------------------------------------------------------------------------------
@@ -436,7 +437,7 @@ def load_sqlite_data():
         soviet_squad_data=load_sqlite_squad_data('soviet')
         german_squad_data=load_sqlite_squad_data('german')
         american_squad_data=load_sqlite_squad_data('american')
-        civilian_squad_data=load_sqlite_data('civilian')
+        civilian_squad_data=load_sqlite_squad_data('civilian')
 
     else:
         print('Error : Projectile data is already loaded')
