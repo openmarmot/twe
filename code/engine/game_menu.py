@@ -80,9 +80,9 @@ class GameMenu(object):
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (work in progress. not playable)')
+            self.text_queue.append('1 - New Campaign (choose this)')
             self.text_queue.append('2 - Load Campaign (not implemented)')
-            self.text_queue.append('3 - Quick Battle (<-- choose this)')
+            self.text_queue.append('3 - Quick Battle (this is temporarily broken)')
             #self.text_queue.append('4 - Nothing') 
 
             if key=='1':
@@ -92,9 +92,10 @@ class GameMenu(object):
             elif key=='2':
                 pass
             elif key=='3':
-                engine.world_builder.load_test_environment(self.graphics_engine.world,"1")
-                self.menu_state='faction_select'
-                key='none'
+                pass
+                #engine.world_builder.load_test_environment(self.graphics_engine.world,"1")
+                #self.menu_state='faction_select'
+                #key='none'
 
         if self.menu_state=='faction_select':
             self.text_queue=[]
