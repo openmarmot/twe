@@ -73,6 +73,10 @@ class StrategicMenu(object):
 
         if self.active_menu=='start':
             self.start_menu(key)
+        elif self.active_menu=='spawn':
+            self.spawn_menu(key)
+        elif self.active_menu=='map_square':
+            self.map_square_menu(key)
 
         else:
             print('Error : active menu not recognized ',self.active_menu)
@@ -107,7 +111,47 @@ class StrategicMenu(object):
         self.text_queue.append('East: '+(self.selected_object.east.name if self.selected_object.east is not None else 'None'))
         self.text_queue.append('Airport: '+str(self.selected_object.airport))
         self.text_queue.append('Rail yard: '+str(self.selected_object.rail_yard))
+        self.text_queue.append('Town: '+str(self.selected_object.town))
 
+        self.text_queue.append('German Units: '+str(self.selected_object.german_count))
+        self.text_queue.append('Soviet Units: '+str(self.selected_object.soviet_count))
+        self.text_queue.append('American Units: '+str(self.selected_object.american_count))
+        self.text_queue.append('Civilians: '+str(self.selected_object.civilian_count))
+
+        if (self.selected_object.german_count+self.selected_object.soviet_count+self.selected_object.american_count+self.selected_object.civilian_count)>0:
+            self.text_queue.append('1 - Spawn')
+            if key=='1':
+                self.change_menu('spawn')
+
+    #---------------------------------------------------------------------------
+    def spawn_menu(self,key):
+        self.text_queue=[]
+        self.text_queue.append('Spawn on map '+self.selected_object.name)
+
+        if self.selected_object.german_count>0:
+            self.text_queue.append('1 - Spawn German')
+            if key=='1':
+                self.strategic_map.load_world(self.selected_object,'german')
+                self.deactivate_menu()
+                return
+        if self.selected_object.soviet_count>0:
+            self.text_queue.append('2 - Spawn Soviet')
+            if key=='2':
+                self.strategic_map.load_world(self.selected_object,'soviet')
+                self.deactivate_menu()
+                return
+        if self.selected_object.american_count>0:
+            self.text_queue.append('3 - Spawn American')
+            if key=='3':
+                self.strategic_map.load_world(self.selected_object,'american')
+                self.deactivate_menu()
+                return
+        if self.selected_object.civilian_count>0:
+            self.text_queue.append('4 - Spawn Civilian')
+            if key=='4':
+                self.strategic_map.load_world(self.selected_object,'civilian')
+                self.deactivate_menu()
+                return
     #---------------------------------------------------------------------------
     def start_menu(self, key):
         if self.menu_state=='none':
@@ -130,60 +174,6 @@ class StrategicMenu(object):
                 #self.menu_state='faction_select'
                 #key='none'
                 pass
-
-        if self.menu_state=='faction_select':
-            self.text_queue=[]
-            self.text_queue.append('TWE: To Whatever End')
-            self.text_queue.append('---------------')
-            self.text_queue.append('Pick a Faction')
-            self.text_queue.append('1 - American')
-            self.text_queue.append('2 - German')
-            self.text_queue.append('3 - Soviet')
-            self.text_queue.append('4 - Civilian/Neutral')
-            spawned=False
-            faction='none'
-            if key=='1':
-                if len(self.graphics_engine.world.wo_objects_american)>0:
-                    self.graphics_engine.world.spawn_player('american')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='2':
-                if len(self.graphics_engine.world.wo_objects_german)>0:
-                    self.graphics_engine.world.spawn_player('german')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='3':
-                if len(self.graphics_engine.world.wo_objects_soviet)>0:
-                    self.graphics_engine.world.spawn_player('soviet')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='4':
-                if len(self.graphics_engine.world.wo_objects_civilian)>0:
-                    self.graphics_engine.world.spawn_player('civilian')
-                    spawned=True
-
-                    # disband player squad, as they are super annoying
-                    squad=self.graphics_engine.world.player.ai.squad
-                    members=[]
-                    for b in squad.members:
-                        if b.is_player==False:
-                            members.append(b)
-                    squad.faction_tactical.split_squad(members)
-
-
-                else:
-                    print('No bots of this type available')
-            
-            if spawned:
-                # eventually load other menus
-                #self.graphics_engine.world.is_paused=False
-                self.graphics_engine.mode=1
-                self.deactivate_menu()
-                
- 
 
 
 

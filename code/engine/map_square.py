@@ -42,6 +42,10 @@ class MapSquare(object):
         # when this is updated the image_index should also be updated
         # 'german'/'soviet'/'neutral'
         self.map_control='none'
+        self.german_count=0
+        self.soviet_count=0
+        self.american_count=0
+        self.civilian_count=0
 
         # a count of how many neigbhoring squares are hostile. 0-4
         self.hostile_count=0
@@ -74,30 +78,33 @@ class MapSquare(object):
 
         # if we have no map objects we won't update the map control
         if len(self.map_objects)>0:
-            german_count=0
-            american_count=0
-            soviet_count=0
+            self.german_count=0
+            self.american_count=0
+            self.soviet_count=0
+            self.civilian_count=0
 
             for b in self.map_objects:
                 if 'german' in b.world_builder_identity:
-                    german_count+=1
+                    self.german_count+=1
                 elif 'soviet' in b.world_builder_identity:
-                    soviet_count+=1
+                    self.soviet_count+=1
                 elif 'american' in b.world_builder_identity:
-                    american_count+=1
+                    self.american_count+=1
+                elif 'civilian' in b.world_builder_identity:
+                    self.civilian_count+=1
 
-            if german_count>0 and soviet_count==0 and american_count==0:
+            if self.german_count>0 and self.soviet_count==0 and self.american_count==0:
                 self.map_control='german'
                 self.image_index=2
-            elif soviet_count>0 and german_count==0 and american_count==0:
+            elif self.soviet_count>0 and self.german_count==0 and self.american_count==0:
                 self.map_control='soviet'
                 self.image_index=1
-            elif american_count>0 and german_count==0 and soviet_count==0:
+            elif self.american_count>0 and self.german_count==0 and self.soviet_count==0:
                 self.map_control='american'
                 self.image_index=0 # need a american map color 
                 # engine is not really setup for 3v3 yet
                 engine.log.add_data('warn','map_square.update_map_control - square is american. not ready for this')
-            elif american_count==0 and german_count==0 and soviet_count==0:
+            elif self.american_count==0 and self.german_count==0 and self.soviet_count==0:
                 # we could either reset to neutral or just do nothing here
                 pass
 

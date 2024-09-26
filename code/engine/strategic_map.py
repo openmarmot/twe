@@ -300,21 +300,18 @@ class StrategicMap(object):
 
         # load all maps and map_objects in from save file
 
-        # once all map objects are loaded, update the map control
-        for b in self.map_squares:
-            b.update_map_control()
-
-        # once the map control is updated everywhere, update hostile count 
-        for b in self.map_squares:
-            b.update_hostile_count()
+        # once all map objects are loaded, update the map control, hostile count, and unit counts
+        self.update_map_data()
 
     #------------------------------------------------------------------------------
-    def load_world(self,map_coords,save_file):
-        # handles the hand off from strategic map to world mode
+    def load_world(self,map_square,spawn_faction):
+        '''handles handoff from strategic map to world mode and loads a map->world'''
+
+        print('boop')
 
         # send to world_builder to convert map_objects to world_objects (this spawns them)
 
-        pass
+        
 
     #------------------------------------------------------------------------------
     def save_all_maps(self,save_file):
@@ -369,7 +366,7 @@ class StrategicMap(object):
                 conn.commit()
 
                 # Print how many rows were inserted
-                print(f"{cursor.rowcount} rows were inserted into {table_name}")
+                #print(f"{cursor.rowcount} rows were inserted into {table_name}")
 
         # Close the connection
         conn.close()
@@ -414,6 +411,9 @@ class StrategicMap(object):
         # decide on and place initial troops
         self.generate_initial_units()
 
+        # update map data
+        self.update_map_data()
+
         # save all maps
         self.save_all_maps(save_file)   
         
@@ -423,3 +423,14 @@ class StrategicMap(object):
     #---------------------------------------------------------------------------
     def update(self):
         pass
+    
+    #---------------------------------------------------------------------------
+    def update_map_data(self):
+        '''update map_square data that is map_object dependent'''
+        # once all map objects are loaded, update the map control
+        for b in self.map_squares:
+            b.update_map_control()
+
+        # once the map control is updated everywhere, update hostile count 
+        for b in self.map_squares:
+            b.update_hostile_count()
