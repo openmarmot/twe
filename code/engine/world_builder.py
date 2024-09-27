@@ -309,8 +309,6 @@ def generate_clutter(map_objects):
                 
     return clutter
 
-
-
 #------------------------------------------------------------------------------
 def generate_civilians(map_objects):
     '''generates and returns a array of civilian map_objects'''
@@ -523,6 +521,18 @@ def load_test_environment(world,scenario):
     # do this no matter what to spawn everything
     world.process_add_remove_queue()
 
+#------------------------------------------------------------------------------
+def load_world(world,map_objects,spawn_faction):
+    '''coverts map_objects to world_objects and does everything necessary to load the world'''
+
+    # convert map_objects to world_objects
+
+    # generation squads 
+
+    # spawn everything 
+
+    # spawn player
+
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
@@ -556,65 +566,6 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
             x.heading=heading
             x.world_coords=current_coords
 
-
-
-
-#------------------------------------------------------------------------------
-def spawn_civilians(world,CIVILIAN_TYPE,world_coords):
-    ''' return a civilian with full kit '''
-    # --------- german types ---------------------------------
-    if CIVILIAN_TYPE=='default':
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        return z
-    elif CIVILIAN_TYPE=='pistol':
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.add_inventory(spawn_object(world,world_coords,'ppk',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppk_magazine',False))
-        return z
-    elif CIVILIAN_TYPE=='big_cheese':
-        '''goofy unique civilain. don't mess with big cheese'''
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.ai.health*=2
-        z.name='big cheese'
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    elif CIVILIAN_TYPE=='shovel_man':
-        '''goofy unique civilain. '''
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.ai.health*=2
-        z.name='Mr. Shovel'
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
-        z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))
-        z.add_inventory(spawn_object(world,world_coords,'german_field_shovel',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        return z
 #------------------------------------------------------------------------------
 # currently used for wrecks and bodies
 def spawn_container(name,world_object,image_index):
@@ -1621,6 +1572,234 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_soldier=True
         z.is_soviet=True
 
+    elif OBJECT_TYPE=='german_kar98k':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        
+    elif OBJECT_TYPE=='german_kar98k_panzerfaust':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        
+    elif OBJECT_TYPE=='german_k43':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_k43'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        
+    elif OBJECT_TYPE=='german_g41w':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_g41w'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        
+    elif OBJECT_TYPE=='german_mp40':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mp40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        
+    elif OBJECT_TYPE=='german_mg34':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mg34'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        
+    elif OBJECT_TYPE=='german_stg44':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        
+    elif OBJECT_TYPE=='german_stg44_panzerfaust':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        
+    elif OBJECT_TYPE=='german_fg42-type2':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_fg42-type2'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42-type2',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        
+
+    # --------- soviet types ----------------------------------------
+    elif OBJECT_TYPE=='soviet_mosin_nagant':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_mosin_nagant'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_nagant',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_svt40':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_svt40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_ppsh43':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_ppsh43'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_dp28':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_dp28'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_tt33':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_tt33'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
+        
+    elif OBJECT_TYPE=='big_cheese':
+        # big cheese!
+        z=spawn_object(world,world_coords,'civilian_man',False)
+        z.ai.health*=2
+        z.name='big cheese'
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+    
+    elif OBJECT_TYPE=='shovel_man':
+        # a shovel enthusiast
+        z=spawn_object(world,world_coords,'civilian_man',False)
+        z.ai.health*=2
+        z.name='Mr. Shovel'
+        z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
+        z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))
+        z.add_inventory(spawn_object(world,world_coords,'german_field_shovel',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
+    
     elif OBJECT_TYPE=='brass':
         z=WorldObject(world,['brass'],AIAnimatedSprite)
         z.world_coords=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -1882,7 +2061,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.wo_start()
     return z
 
-
 #------------------------------------------------------------------------------
 def spawn_map_pointer(world,TARGET_COORDS,TYPE):
     if TYPE=='normal':
@@ -1903,8 +2081,6 @@ def spawn_map_pointer(world,TARGET_COORDS,TYPE):
         z.render_level=4
         z.is_map_pointer=True
         z.wo_start()
-
-
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
@@ -1954,7 +2130,6 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
     ''' spawn smoke cloud '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
 
-
     for x in range(amount):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_smoke',True)
@@ -1969,7 +2144,6 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
 def spawn_sparks(world,world_coords,amount=30):
     ''' spawn spark '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
-
 
     for x in range(amount):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
@@ -1989,204 +2163,6 @@ def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAM
         target_coords=[float(random.randint(-5,5))+TARGET_COORDS[0],float(random.randint(-5,5))+TARGET_COORDS[1]]
         spawn_shrapnel(world,world_coords,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR,WEAPON_NAME)
 
-
-#------------------------------------------------------------------------------
-def spawn_soldiers(world,SOLDIER_TYPE,world_coords):
-    ''' return a soldier with full kit '''
-
-    # note  i think this should be moved under spawn_object. no need to be seperate 
-
-    # --------- german types ---------------------------------
-    if SOLDIER_TYPE=='german_kar98k':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_kar98k'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_kar98k_panzerfaust':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_kar98k'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    if SOLDIER_TYPE=='german_k43':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_k43'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_g41w':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_g41w'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_mp40':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_mp40'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_mg34':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_mg34'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_stg44':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_stg44'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_stg44_panzerfaust':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_stg44'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    if SOLDIER_TYPE=='german_fg42-type2':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_fg42-type2'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42-type2',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        return z
-
-    # --------- soviet types ----------------------------------------
-    if SOLDIER_TYPE=='soviet_mosin_nagant':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_mosin_nagant'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_nagant',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        return z
-    if SOLDIER_TYPE=='soviet_svt40':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_svt40'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        return z
-    if SOLDIER_TYPE=='soviet_ppsh43':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_ppsh43'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        return z 
-    if SOLDIER_TYPE=='soviet_dp28':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_dp28'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        return z 
-    if SOLDIER_TYPE=='soviet_tt33':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_tt33'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
-        return z
 
 # init 
 load_sqlite_data()

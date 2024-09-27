@@ -6,6 +6,8 @@ september 26 2024
 - bug fixes
 - updated *Grenadier to *grenadier 
 - strategic map menu updates 
+- working on world loading
+- rewriting worldbuilder code to work with the new world loading 
 
 ----------------------------------
 september 25 2024

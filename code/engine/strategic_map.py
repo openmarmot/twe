@@ -16,6 +16,7 @@ from datetime import datetime
 #import custom packages
 import engine.math_2d
 import engine.world_builder
+from engine.world import World
 from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
 from engine.map_object import MapObject
@@ -307,11 +308,16 @@ class StrategicMap(object):
     def load_world(self,map_square,spawn_faction):
         '''handles handoff from strategic map to world mode and loads a map->world'''
 
-        print('boop')
+        # create a fresh world 
+        self.graphics_engine.world=World()
 
         # send to world_builder to convert map_objects to world_objects (this spawns them)
+        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects,spawn_faction)
 
-        
+        # clear maps?
+
+        # switch to world mode
+        self.graphics_engine.mode=1
 
     #------------------------------------------------------------------------------
     def save_all_maps(self,save_file):
