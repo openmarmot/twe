@@ -30,11 +30,19 @@ class World(object):
     #---------------------------------------------------------------------------
     def __init__(self):
         
+        # spawn locations
+        self.spawn_center=[0.,0.]
+        self.spawn_north=[0.,-4000.]
+        self.spawn_south=[0.,4000.]
+        self.spawn_west=[-4000.,0.]
+        self.spawn_east=[4000.,0.]
+        self.spawn_far_east=[10000.,0.]
+
         # tactical AIs
-        self.german_ai=AIFactionTactical(self,'german')
-        self.soviet_ai=AIFactionTactical(self,'soviet')
-        self.american_ai=AIFactionTactical(self,'american')
-        self.civilian_ai=AIFactionTactical(self,'civilian')
+        self.german_ai=AIFactionTactical(self,'german',self.spawn_west)
+        self.soviet_ai=AIFactionTactical(self,'soviet'self.spawn_east)
+        self.american_ai=AIFactionTactical(self,'american',self.spawn_north)
+        self.civilian_ai=AIFactionTactical(self,'civilian'self.spawn_center)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -77,13 +85,7 @@ class World(object):
         #world areas
         self.world_areas=[]
 
-        # spawn locations
-        self.spawn_center=[0.,0.]
-        self.spawn_north=[0.,-4000.]
-        self.spawn_south=[0.,4000.]
-        self.spawn_west=[-4000.,0.]
-        self.spawn_east=[4000.,0.]
-        self.spawn_far_east=[10000.,0.]
+        
 
         # size of the map in every direction from 0,0
         self.map_size=100000
@@ -292,6 +294,14 @@ class World(object):
 
         print('Cleanup function removing '+str(len(remove_list))+' objects')
         self.remove_queue+=remove_list
+
+    #------------------------------------------------------------------------------
+    def create_squads(self):
+        self.german_ai.create_squads(copy.copy(self.wo_objects_german))
+        self.soviet_ai.create_squads(copy.copy(self.wo_objects_soviet))
+        self.american_ai.create_squads(copy.copy(self.wo_objects_american))
+        self.civilian_ai.create_squads(copy.copy(self.wo_objects_civilian))
+
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,OBJ):
         ''' generates a ignore list for collision checking'''

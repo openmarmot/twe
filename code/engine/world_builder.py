@@ -68,11 +68,17 @@ list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
 
-list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15']
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15','fg42-type1','fg42-type2']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w']
 list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911','mg15']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
+
+list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
+list_guns_smg=['mp40','ppsh43']
+list_guns_assault_rifles=['stg44']
+list_guns_machine_guns=['mg34','dp28','mg15','fg42-type1','fg42-type2']
+list_guns_pistols=['1911','ppk','tt33']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
@@ -89,163 +95,47 @@ german_squad_data={}
 american_squad_data=[]
 civilian_squad_data={}
 
-
 #------------------------------------------------------------------------------
-def create_squads_from_human_list(world,HUMANS,FACTION):
-    ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+def convert_map_objects_to_world_objects(world,map_objects):
+    '''handles converting map_objects to world_objects and spawns them'''
 
-    # !! Note - this function is  not used at the moment and will probably need to be updated
-    # to be used in the future
-    print('warn! old function create_squads_from_human_list used')
+    # note - unsure whether it is best to spawn the objects at this time or not.
+    # for now i'm going to spawn them here
 
-    # automatically adds the created squads to the correct faction tactical AI
-    assault_rifles=[]
-    rifles=[]
-    semiauto_rifles=[]
-    subguns=[]
-    machineguns=[]
-    pistols=[]
-    antitank=[]
-    unidentified_human=[]
-    unarmed_human=[]
-    unarmed_vehicle=[]
-    armed_vehicle=[]
-    tank=[]
-    airplane=[]
+    for map_object in map_objects:
+        
+        # world_area_ is a special case object
+        if map_object.world_builder_identity.startswith('world_area'):
+            # make the corresponding WorldArea object
+            w=WorldArea(world)
+            w.world_coords=map_object.world_coords
+            w.name=map_object.name
+            w.type=map_object.world_builder_identity.split('world_area_')[1]
 
-    # categorize 
-    for b in HUMANS:
-        if b.ai.primary_weapon==None:
-            unarmed_human.append(b)
-        elif b.ai.primary_weapon.name=='kar98k':
-            rifles.append(b)
-        elif b.ai.primary_weapon.name=='stg44':
-            assault_rifles.append(b)
-        elif b.ai.primary_weapon.name=='mp40':
-            subguns.append(b)
-        elif b.ai.primary_weapon.name=='mg34':
-            machineguns.append(b)
-        elif b.ai.primary_weapon.name=='mosin_nagant':
-            rifles.append(b)
-        elif b.ai.primary_weapon.name=='ppsh43':
-            subguns.append(b)
-        elif b.ai.primary_weapon.name=='dp28':
-            machineguns.append(b)
-        elif b.ai.primary_weapon.name=='1911':
-            pistols.append(b)
-        elif b.ai.primary_weapon.name=='ppk':
-            pistols.append(b)
-        elif b.ai.primary_weapon.name=='tt33':
-            pistols.append(b)
+            # register with world 
+            world.world_areas.append(w)
         else:
-            print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
 
-    squad_list=[]
+            wo=spawn_object(world,map_object.world_coords,map_object.world_builder_identity,True)
+            
+            wo.rotation_angle=map_object.rotation
+            
+            if map_object.name !='none' and map_object.name !='':
+                wo.name=map_object.name
+            
+            # add in the saved inventory
+            # remember that map_object.inventory is a array of world_builder_identity names
+            if len(map_object.inventory)>0:
+                # need to prevent duplicates. this could be better
+                for a in map_object.inventory:
+                    already_exists=False
+                    for b in wo.ai.inventory:
+                        if b.name==a:
+                            already_exists=True
+                            break
+                    if already_exists==False:
+                        wo.ai.inventory.append(spawn_object(world,[0,0],a,False))
 
-    buildsquads=True 
-
-    while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human)<1:
-            buildsquads=False
-        else :
-            s=AISquad(world)
-            s.faction=FACTION
-
-            # -- build a rifle squad --
-            if len(rifles)>7 :
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-
-                # mg ?
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-
-                # squad lead 
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                elif len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                elif len(pistols)>0:
-                    s.members.append(pistols.pop())
-            # -- assault squad --
-            elif len(assault_rifles)>4 :
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-            # -- erstaz groups --
-            else :
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-
-
-                # lets do it again
-
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-
-                # and maybe one more time
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())               
-
-            squad_list.append(s)
-
-    return squad_list
 
 #------------------------------------------------------------------------------
 def fill_container(world,CONTAINER,FILL_NAME):
@@ -526,10 +416,11 @@ def load_world(world,map_objects,spawn_faction):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
 
     # convert map_objects to world_objects
+    # note - this also spawns them and creates the world_area objects
+    convert_map_objects_to_world_objects(map_objects)
 
     # generation squads 
-
-    # spawn everything 
+    world.create_squads()
 
     # spawn player
 

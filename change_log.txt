@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+september 27 2024
+- working on strategic mode -> world mode transition 
+- created squad_builder.py 
+
+----------------------------------
 september 26 2024
 - working on saving to sqlite
 - bug fixes

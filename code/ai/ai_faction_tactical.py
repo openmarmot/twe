@@ -12,6 +12,7 @@ import random
 import copy 
 
 #import custom packages
+import engine.squad_builder
 import engine.math_2d
 import copy
 from ai.ai_squad import AISquad
@@ -20,12 +21,13 @@ import engine.world_builder
 #global variables
 
 class AIFactionTactical(object):
-    def __init__(self,world,faction):
+    def __init__(self,world,faction,spawn_location):
 
 
         # squads in the faction who are present on this map
         self.squads=[] 
 
+        self.spawn_location=spawn_location
 
         # general map goal (attack/defend/scout ?)
 
@@ -41,6 +43,18 @@ class AIFactionTactical(object):
 
         # faction - german/soviet/american/civilian
         self.faction=faction
+
+    #---------------------------------------------------------------------------
+    def create_squads(self,humans):
+        self.squads=engine.squad_builder.create_squads_from_human_list(self.world,humans,self)
+
+        # reset spawn locations.
+        # civilians have world_coords set when they are generated, but after that they should be 
+        # reset. hmmm
+        if self.faction!='civilian':
+            for b in self.squads:
+                for c in self.squads.members:
+                    c.world_coords=copy.copy(self.spawn_location)
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):
