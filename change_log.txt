@@ -4,6 +4,29 @@ TWE Project : Change Log
 september 27 2024
 - working on strategic mode -> world mode transition 
 - created squad_builder.py 
+- fixed bugs 
+
+unfortunately the carefully researched squads I had created have mostly been replaced 
+with the old auto squad generation system. squads just didn't make sense past the world 
+level because you would wnat to rebalance them after every fight, and it would have been 
+complicated to jam it into the map_object saving system. The old squads are still used for 
+placing initial troops, but once the world is loaded the troops will be auto-sorted into new 
+squads.
+
+you should now be able to start a new campaign, choose a map with units, and spawn as one 
+of the units now (in dev branch). 
+
+A TON of code has changed so the world doesn't look like it used to. Town generation has 
+changed for the worse - I created a new grid system which means buildings aren't overlapping 
+anymore but it looks terrible. needs a rework. 
+
+the campaign maps are pretty empty and dull right now. that is one area that needs a ton of work. 
+
+the campaign also can't progress - there is no way for troops to move maps - so there will never 
+be any conflict. this needs to be fied but its a big feature - will probably wait for a bit.
+
+I'd really like to merge this but I think I need to create a 'quick battle' system first to 
+mimic what we have in main.  
 
 ----------------------------------
 september 26 2024
