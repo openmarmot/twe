@@ -155,6 +155,10 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())               
 
+            # give every squad member a link back to the squad
+            for member in s.members:
+                member.ai.squad=s
+
             squad_list.append(s)
 
     return squad_list

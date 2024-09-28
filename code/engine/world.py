@@ -40,9 +40,9 @@ class World(object):
 
         # tactical AIs
         self.german_ai=AIFactionTactical(self,'german',self.spawn_west)
-        self.soviet_ai=AIFactionTactical(self,'soviet'self.spawn_east)
+        self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east)
         self.american_ai=AIFactionTactical(self,'american',self.spawn_north)
-        self.civilian_ai=AIFactionTactical(self,'civilian'self.spawn_center)
+        self.civilian_ai=AIFactionTactical(self,'civilian',self.spawn_center)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -529,6 +529,16 @@ class World(object):
 
 
     #---------------------------------------------------------------------------
+    def log_world_data(self):
+        '''print out a bunch of world info'''
+
+        engine.log.add_data('debug','wo_objects : '+str(len(self.wo_objects)),True)
+        engine.log.add_data('debug','wo_objects_german : '+str(len(self.wo_objects_german)),True)
+        engine.log.add_data('debug','wo_objects_soviet : '+str(len(self.wo_objects_soviet)),True)
+        engine.log.add_data('debug','wo_objects_american : '+str(len(self.wo_objects_american)),True)
+        engine.log.add_data('debug','wo_objects_civilian : '+str(len(self.wo_objects_civilian)),True)
+
+    #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
         if len(self.add_queue)>0:
             for b in self.add_queue:
@@ -677,21 +687,29 @@ class World(object):
                 b=random.randint(0,len(self.wo_objects_german)-1)
                 self.player=self.wo_objects_german[b]
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as german but zero german objects available',True)
         elif FACTION=='soviet':
             if len(self.wo_objects_soviet)>0:
                 b=random.randint(0,len(self.wo_objects_soviet)-1)
                 self.player=self.wo_objects_soviet[b]
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as soviet but zero soviet objects available',True)
         elif FACTION=='american':
             if len(self.wo_objects_american)>0:
                 b=random.randint(0,len(self.wo_objects_american)-1)
                 self.player=self.wo_objects_american[b]
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as american but zero american objects available',True)
         elif FACTION=='civilian':
             if len(self.wo_objects_civilian)>0:
                 b=random.randint(0,len(self.wo_objects_civilian)-1)
                 self.player=self.wo_objects_civilian[b]
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as civilian but zero civilian objects available',True)
 
         if spawned:
             self.player.is_player=True
@@ -723,13 +741,6 @@ class World(object):
             #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
             engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
-    #---------------------------------------------------------------------------
-    def load_map(self):
-        pass
-
-    #---------------------------------------------------------------------------
-    def unload_map(self):
-        pass
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):

@@ -713,7 +713,7 @@ class World_Menu(object):
             self.text_queue.append('4 - Tight formation (not implemented)')
 
             if key=='1':
-                self.world.text_que.append('[ Squad disbanded ]')
+                self.world.text_queue.append('[ Squad disbanded ]')
                 # note - this will remove everyone but the player from the player's squad
                 # and put them in a new squad
                 members=[]
@@ -923,7 +923,7 @@ class World_Menu(object):
                     self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
-                    self.world.text_que.append('[ You climb into the vehicle ]')
+                    self.world.text_queue.append('[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 if key=='3':
                     # pull up the storage/container menu

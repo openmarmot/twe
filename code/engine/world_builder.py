@@ -136,6 +136,9 @@ def convert_map_objects_to_world_objects(world,map_objects):
                     if already_exists==False:
                         wo.ai.inventory.append(spawn_object(world,[0,0],a,False))
 
+    # this is needed to flush all the new objects out of the queue and into the world
+    world.process_add_remove_queue()
+
 
 #------------------------------------------------------------------------------
 def fill_container(world,CONTAINER,FILL_NAME):
@@ -417,13 +420,16 @@ def load_world(world,map_objects,spawn_faction):
 
     # convert map_objects to world_objects
     # note - this also spawns them and creates the world_area objects
-    convert_map_objects_to_world_objects(map_objects)
+    convert_map_objects_to_world_objects(world,map_objects)
 
     # generation squads 
     world.create_squads()
 
-    # spawn player
+    # print debug info
+    world.log_world_data()
 
+    # spawn player
+    world.spawn_player(spawn_faction)
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):

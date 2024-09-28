@@ -53,7 +53,7 @@ class AIFactionTactical(object):
         # reset. hmmm
         if self.faction!='civilian':
             for b in self.squads:
-                for c in self.squads.members:
+                for c in b.members:
                     c.world_coords=copy.copy(self.spawn_location)
 
     #---------------------------------------------------------------------------
