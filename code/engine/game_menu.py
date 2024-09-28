@@ -92,10 +92,8 @@ class GameMenu(object):
             elif key=='2':
                 pass
             elif key=='3':
-                pass
-                #engine.world_builder.load_test_environment(self.graphics_engine.world,"1")
-                #self.menu_state='faction_select'
-                #key='none'
+                self.menu_state='faction_select'
+                key='none'
 
         if self.menu_state=='faction_select':
             self.text_queue=[]
@@ -120,7 +118,6 @@ class GameMenu(object):
                     faction='civilian'
 
                 engine.world_builder.load_quick_battle(self.graphics_engine.world,faction)
-                self.graphics_engine.world.load_quick_battle(self.graphics_engine.world,faction)
 
                 self.graphics_engine.mode=1
                 self.deactivate_menu()

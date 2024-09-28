@@ -82,6 +82,11 @@ list_guns_pistols=['1911','ppk','tt33']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
+list_vehicles_german=['kubelwagen','sd_kfz_251']
+list_vehicles_soviet=['dodge_g505_wc']
+list_vehicles_american=[]
+list_vehicles_civilian=[]
+
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
 list_medical_rare=['german_officer_first_aid_kit']
@@ -348,10 +353,10 @@ def load_quick_battle(world,spawn_faction):
         map_objects+=generate_world_area(coords,'town',name)
 
     # generate clutter
-    map_objects+=generate_clutter(map.map_objects)
+    map_objects+=generate_clutter(map_objects)
 
     # generate civilians
-    map_objects+=generate_civilians(map.map_objects)
+    map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
     squads=[]
@@ -476,6 +481,9 @@ def load_world(world,map_objects,spawn_faction):
 
     # generation squads 
     world.create_squads()
+
+    # give the vehicles initial positions
+    world.position_vehicles()
 
     # print debug info
     world.log_world_data()

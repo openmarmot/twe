@@ -156,7 +156,7 @@ class Graphics_2D_Pygame(object):
                 elif event.key==27:
                     translated_key="esc"
                 elif event.key==9: #tab
-                    self.activate_context_menu()
+                    translated_key='tab'
                 elif event.key==112:
                     translated_key='p'
                 elif event.key==116:

@@ -435,6 +435,9 @@ class World(object):
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
                 self.player.ai.reload_turret()
 
+        if key=='tab':
+            self.activate_context_menu()
+
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None,player_screen_coords=None):
         '''handle key press'''
@@ -537,6 +540,20 @@ class World(object):
         engine.log.add_data('debug','wo_objects_soviet : '+str(len(self.wo_objects_soviet)),True)
         engine.log.add_data('debug','wo_objects_american : '+str(len(self.wo_objects_american)),True)
         engine.log.add_data('debug','wo_objects_civilian : '+str(len(self.wo_objects_civilian)),True)
+
+    #------------------------------------------------------------------------------
+    def position_vehicles(self):
+        ''' position vehicles at spawn points'''
+
+        # kind of a hack as humans get positions when the squads are created, but vehicles don't
+
+        for v in self.wo_objects_vehicle:
+            if v.name in engine.world_builder.list_vehicles_german:
+                v.world_coords=self.german_ai.spawn_location
+            elif v.name in engine.world_builder.list_vehicles_soviet:
+                v.world_coords=self.soviet_ai.spawn_location
+            elif v.name in engine.world_builder.list_vehicles_american:
+                v.world_coords=self.american_ai.spawn_location
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
