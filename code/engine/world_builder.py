@@ -305,6 +305,24 @@ def get_random_from_list(world,world_coords,OBJECT_LIST,SPAWN):
     return spawn_object(world,world_coords,OBJECT_LIST[index],SPAWN)
 
 #------------------------------------------------------------------------------
+def get_squad_map_objects(squad_name):
+    '''get a list of map objects that make up a squad'''
+    members=[]
+    if 'German' in squad_name:
+        members=german_squad_data[squad_name]['members'].split(',')
+    elif 'Soviet' in squad_name:
+        members=soviet_squad_data[squad_name]['members'].split(',')
+    else:
+        engine.log.add_data('error','ai_faction_strategic.deploy_squad_to_map squad_name '+squad_name+' not recognized',True)
+
+    # convert each member to a map_object
+    map_objects=[]
+    for b in members:
+        map_objects.append(MapObject(b,'none',[0,0],0,[]))
+    
+    return map_objects
+
+#------------------------------------------------------------------------------
 def load_magazine(world,magazine):
     '''loads a magazine with bullets'''
     count=len(magazine.ai.projectiles)
@@ -314,6 +332,40 @@ def load_magazine(world,magazine):
         magazine.ai.projectiles.append(z)
 
         count+=1
+
+#------------------------------------------------------------------------------
+def load_quick_battle(world,spawn_faction):
+    ''' load quick battle. called by game menu'''
+
+    map_objects=[]
+
+    # generate towns
+    town_count=3
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,town_count)
+    for _ in range(town_count):
+        coords=coord_list.pop()
+        name='Town' # should generate a interessting name
+        map_objects+=generate_world_area(coords,'town',name)
+
+    # generate clutter
+    map_objects+=generate_clutter(map.map_objects)
+
+    # generate civilians
+    map_objects+=generate_civilians(map.map_objects)
+
+    # -- initial troops --
+    squads=[]
+    squads+=['German 1944 Rifle'] * 2
+    squads+=['German 1944 Panzergrenadier Mech'] * 2
+    squads+=['German 1944 Fallschirmjager'] * 1
+    squads+=['Soviet 1943 Rifle'] * 2
+    squads+=['Soviet 1944 SMG'] * 1
+    squads+=['Soviet 1944 Rifle Motorized'] * 2
+
+    for squad in squads:
+        map_objects+=get_squad_map_objects(squad)
+
+    load_world(world,map_objects,spawn_faction)
 
 #------------------------------------------------------------------------------
 def load_sqlite_data():

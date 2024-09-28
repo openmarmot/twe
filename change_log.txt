@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+
+----------------------------------
+september 28 2024
+- working on 'quick battle' mode 
+
 ----------------------------------
 september 27 2024
 - working on strategic mode -> world mode transition 

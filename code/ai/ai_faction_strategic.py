@@ -36,23 +36,6 @@ class AIFactionStrategic(object):
         self.square_objectives_not_owned=[]
 
     #---------------------------------------------------------------------------
-    def deploy_squad_to_map(self,squad_name,map_square):
-        '''convert a squad to individual members and then add them to a map as a map_object'''
-        members=[]
-        if 'German' in squad_name:
-            #print(engine.world_builder.german_squad_data)
-            members=engine.world_builder.german_squad_data[squad_name]['members'].split(',')
-        elif 'Soviet' in squad_name:
-            members=engine.world_builder.soviet_squad_data[squad_name]['members'].split(',')
-        else:
-            engine.log.add_data('error','ai_faction_strategic.deploy_squad_to_map squad_name '+squad_name+' not recognized',True)
-
-        # convert each member to a map_object and add to map
-        for b in members:
-            map_square.map_objects.append(MapObject(b,'none',[0,0],0,[]))
-        
-
-    #---------------------------------------------------------------------------
     def set_initial_units(self,squads):
         # get the most recent data 
         self.update_map_square_data()
@@ -63,11 +46,13 @@ class AIFactionStrategic(object):
         # just evenly spread everything for now
         while len(squads)>len(self.squares_owned):
             for b in self.squares_owned:
-                self.deploy_squad_to_map(squads.pop(),b)
+                b.map_objects+=engine.world_builder.get_squad_map_objects(squads.pop())
 
         # plop the rest of them out randomly
         while len(squads)>0:
-            self.deploy_squad_to_map(squads.pop(),random.choice(self.squares_owned))
+            map=random.choice(self.squares_owned)
+            map.map_objects+=engine.world_builder.get_squad_map_objects(squads.pop())
+
 
     #---------------------------------------------------------------------------
     def update_map_square_data(self):
