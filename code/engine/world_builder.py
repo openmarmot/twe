@@ -19,19 +19,21 @@ the idea is this static class holds the standard way for creating objects
 
 
 #import built in modules
-
 import math
 import random
 import copy 
 import os
+import sqlite3
 
 #import custom packages
 import engine.math_2d
 import engine.name_gen
+import engine.log
 from ai.ai_vehicle import AIVehicle
 from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
+from engine.map_object import MapObject
 
 
 # load AI 
@@ -66,13 +68,24 @@ list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
 
-list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15']
+list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43','svt40','svt40-sniper','mg15','fg42-type1','fg42-type2']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w']
 list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911','mg15']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
 
+list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
+list_guns_smg=['mp40','ppsh43']
+list_guns_assault_rifles=['stg44']
+list_guns_machine_guns=['mg34','dp28','mg15','fg42-type1','fg42-type2']
+list_guns_pistols=['1911','ppk','tt33']
+
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
+
+list_vehicles_german=['kubelwagen','sd_kfz_251']
+list_vehicles_soviet=['dodge_g505_wc']
+list_vehicles_american=[]
+list_vehicles_civilian=[]
 
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
@@ -80,301 +93,57 @@ list_medical_rare=['german_officer_first_aid_kit']
 list_medical_ultra_rare=[]
 #----------------------------------------------------------------
 
+# ------ variables that get pulled from sqlite -----------------------------------
+loaded=False
+soviet_squad_data={}
+german_squad_data={}
+american_squad_data=[]
+civilian_squad_data={}
+
 #------------------------------------------------------------------------------
-def create_standard_squad(world,faction_tactial,world_coords,squad_type):
-    ''' creates and spawns a standardized squad '''
-    # radomize location a little so everything isn't on top of each other 
-    world_coords=[world_coords[0]+float(random.randint(-200,200)),world_coords[1]+float(random.randint(-200,200))]
+def convert_map_objects_to_world_objects(world,map_objects):
+    '''handles converting map_objects to world_objects and spawns them'''
 
-    s=AISquad(world)
-    s.faction_tactical=faction_tactial
-    s.destination=world_coords
+    # note - unsure whether it is best to spawn the objects at this time or not.
+    # for now i'm going to spawn them here
 
-    if squad_type=='soviet 1943 rifle':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1943
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-    elif squad_type=='soviet 1944 rifle':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-    elif squad_type=='soviet 1944 rifle motorized':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_mosin_nagant',world_coords))
-        spawn_object(world,world_coords,'dodge_g505_wc',True)
-    elif squad_type=='soviet 1944 submachine gun':
-        s.faction='soviet'
-        # ref : https://www.battleorder.org/ussr-rifle-co-1944
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # squad lead 
-        s.members.append(spawn_soldiers(world,'soviet_svt40',world_coords)) # asst squad lead could hav svt_40
-        s.members.append(spawn_soldiers(world,'soviet_dp28',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-        s.members.append(spawn_soldiers(world,'soviet_ppsh43',world_coords))
-    elif squad_type=='german 1944 rifle':
-        s.faction='german'
-        s.members.append(spawn_soldiers(world,'german_mp40',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mp40',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-    elif squad_type=='german 1944 panzergrenadier':
-        s.faction='german'
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-        s.members.append(spawn_soldiers(world,'german_k43',world_coords))
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords))
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords))
-        spawn_object(world,world_coords,'sd_kfz_251',True)
-    elif squad_type=='german 1944 volksgrenadier fire group':
-        s.faction='german'
-        # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) # machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # asst machine gunner
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) # ammo bearer
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) # ammo bearer 
-    elif squad_type=='german 1944 volksgrenadier storm group':
-        s.faction='german'
-        # ref : https://www.battleorder.org/volksgrenadiers-1944
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_stg44',world_coords)) #  rifle man
-    elif squad_type=='german 1944 fallschirmjager':
-        s.faction='german'
-        # ref : 
-        s.members.append(spawn_soldiers(world,'german_fg42-type2',world_coords)) #squad lead
-        s.members.append(spawn_soldiers(world,'german_fg42-type2',world_coords)) # deputy squad lead
-        s.members.append(spawn_soldiers(world,'german_mg34',world_coords)) #  mg
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  asst mg
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k_panzerfaust',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  rifle man
-        s.members.append(spawn_soldiers(world,'german_kar98k',world_coords)) #  medic
-    elif squad_type=='civilian small random':
-        s.faction='civilian'
-        amount=random.randint(1,3)
-        for c in range(amount):
-            s.members.append(spawn_civilians(world,'default',world_coords))
-    elif squad_type=='big cheese':
-        s.faction='civilian'
-        s.members.append(spawn_civilians(world,'big_cheese',world_coords))
-    elif squad_type=='shovel man':
-        s.faction='civilian'
-        s.members.append(spawn_civilians(world,'shovel_man',world_coords))
-    else:
-        print('!! Error : squad type not recognized : '+squad_type)
-
-    # set the squad variable
-    s.reset_squad_variable()
-
-    # add to faction tactial
-    faction_tactial.squads.append(s)
+    for map_object in map_objects:
         
-        
-#------------------------------------------------------------------------------
-def create_squads_from_human_list(world,HUMANS,FACTION):
-    ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
+        # world_area_ is a special case object
+        if map_object.world_builder_identity.startswith('world_area'):
+            # make the corresponding WorldArea object
+            w=WorldArea(world)
+            w.world_coords=map_object.world_coords
+            w.name=map_object.name
+            w.type=map_object.world_builder_identity.split('world_area_')[1]
 
-    # !! Note - this function is  not used at the moment and will probably need to be updated
-    # to be used in the future
-    print('warn! old function create_squads_from_human_list used')
-
-    # automatically adds the created squads to the correct faction tactical AI
-    assault_rifles=[]
-    rifles=[]
-    semiauto_rifles=[]
-    subguns=[]
-    machineguns=[]
-    pistols=[]
-    antitank=[]
-    unidentified_human=[]
-    unarmed_human=[]
-    unarmed_vehicle=[]
-    armed_vehicle=[]
-    tank=[]
-    airplane=[]
-
-    # categorize 
-    for b in HUMANS:
-        if b.ai.primary_weapon==None:
-            unarmed_human.append(b)
-        elif b.ai.primary_weapon.name=='kar98k':
-            rifles.append(b)
-        elif b.ai.primary_weapon.name=='stg44':
-            assault_rifles.append(b)
-        elif b.ai.primary_weapon.name=='mp40':
-            subguns.append(b)
-        elif b.ai.primary_weapon.name=='mg34':
-            machineguns.append(b)
-        elif b.ai.primary_weapon.name=='mosin_nagant':
-            rifles.append(b)
-        elif b.ai.primary_weapon.name=='ppsh43':
-            subguns.append(b)
-        elif b.ai.primary_weapon.name=='dp28':
-            machineguns.append(b)
-        elif b.ai.primary_weapon.name=='1911':
-            pistols.append(b)
-        elif b.ai.primary_weapon.name=='ppk':
-            pistols.append(b)
-        elif b.ai.primary_weapon.name=='tt33':
-            pistols.append(b)
+            # register with world 
+            world.world_areas.append(w)
         else:
-            print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
 
-    squad_list=[]
+            wo=spawn_object(world,map_object.world_coords,map_object.world_builder_identity,True)
+            
+            wo.rotation_angle=map_object.rotation
+            
+            if map_object.name !='none' and map_object.name !='':
+                wo.name=map_object.name
+            
+            # add in the saved inventory
+            # remember that map_object.inventory is a array of world_builder_identity names
+            if len(map_object.inventory)>0:
+                # need to prevent duplicates. this could be better
+                for a in map_object.inventory:
+                    already_exists=False
+                    for b in wo.ai.inventory:
+                        if b.name==a:
+                            already_exists=True
+                            break
+                    if already_exists==False:
+                        wo.ai.inventory.append(spawn_object(world,[0,0],a,False))
 
-    buildsquads=True 
+    # this is needed to flush all the new objects out of the queue and into the world
+    world.process_add_remove_queue()
 
-    while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human)<1:
-            buildsquads=False
-        else :
-            s=AISquad(world)
-            s.faction=FACTION
-
-            # -- build a rifle squad --
-            if len(rifles)>7 :
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-
-                # mg ?
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-
-                # squad lead 
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                elif len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                elif len(pistols)>0:
-                    s.members.append(pistols.pop())
-            # -- assault squad --
-            elif len(assault_rifles)>4 :
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-            # -- erstaz groups --
-            else :
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-
-
-                # lets do it again
-
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-
-                # and maybe one more time
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())               
-
-            squad_list.append(s)
-
-    return squad_list
 
 #------------------------------------------------------------------------------
 def fill_container(world,CONTAINER,FILL_NAME):
@@ -390,111 +159,147 @@ def fill_container(world,CONTAINER,FILL_NAME):
 
 
 #------------------------------------------------------------------------------
-def generate_clutter(world):
+def generate_clutter(map_objects):
     '''generates and auto places small objects around the map'''
-    # this should be called after buildings are placed
+    # map_objects - array of map_objects
+    # returns array of map_objects
+    clutter=[]
 
-    # make sure anything pending is added/removed
-    world.process_add_remove_queue()
+    for b in map_objects:
 
-    # building related clutter
-    # need to smart position this in the future
-    for b in world.wo_objects_building:
-        chance=random.randint(0,15)
-        coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-        coords2=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-        if chance==0 or chance==1:
-            spawn_crate(world,coords,'random_consumables_common')
-        elif chance==2:
-            spawn_crate(world,coords,'random_consumables_rare')
-        elif chance==3:
-            spawn_crate(world,coords,'random_consumables_ultra_rare')
-        elif chance==4:
-            spawn_object(world,coords,'red_bicycle',True)
-        elif chance==5 or chance==6:
-            spawn_object(world,coords,'brown_chair',True)
-        elif chance==7 or chance==8:
-            spawn_object(world,coords,'cupboard',True)
-        elif chance==9:
-            spawn_aligned_pile(world,coords,coords2,'wood_log',6,5)
-        elif chance==10:
-            spawn_object(world,coords,'barrel',True)
+        # industrial clutter
+        if b.world_builder_identity=='warehouse':
+            chance=random.randint(1,15)
+            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+            rotation=random.randint(0,359)
+            if chance==1 or chance==2:
+                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
+            if chance==1 or chance==3 or chance==4:
+                # some overlap
+                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
+            if chance==5:
+                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
+            if chance==6:
+                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
+            if chance==7:
+                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
 
-    # supply drop 
-    chance=random.randint(0,10)
-    if chance==0:
-        print('supply drop spawned')
-        spawn_drop_canister(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'mixed_supply')
+        # house clutter 
+        elif b.world_builder_identity=='square_building':
+            chance=random.randint(1,15)
+            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+            rotation=random.randint(0,359)
+            if chance==1 or chance==2:
+                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
+            if chance==1 or chance==3 or chance==4:
+                # some overlap
+                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
+            if chance==5:
+                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
+            if chance==6:
+                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
+            if chance==7:
+                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
 
-    # weapon crates 
-    chance=random.randint(0,10)
-    if chance==0:
-        spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"panzerfaust")
-    if chance==1:
-        spawn_crate(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],"random_one_gun_type")
-
-    # kubelwagens
-    chance=random.randint(0,10)
-    if chance==0:
-        k1=spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-        k1=spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'kubelwagen',True)
-
-    # make sure there are a couple vehicles at least 
-    if len(world.wo_objects_vehicle)<4:
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
-        spawn_object(world,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'red_bicycle',True)
+    # add some crates 
+                
+    # add some vehicles 
+                
+    return clutter
 
 #------------------------------------------------------------------------------
-def generate_civilians_and_civilan_spawns(world):
-    '''generates civilans and civilan spawn points'''
-    # this should be called after buildings are placed
+def generate_civilians(map_objects):
+    '''generates and returns a array of civilian map_objects'''
+    civilians=[]
 
-    # make sure anything pending is added/removed
-    world.process_add_remove_queue()
+    for b in map_objects:
+        if b.world_builder_identity=='warehouse':
+            count=random.randint(0,10)
+            for _ in range(count):
+                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+                rotation=random.randint(0,359)
+                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
-    for b in world.wo_objects_building:
-        # add a random amount of civilians
-        amount=random.randint(0,3)
-        if amount>0:
-            create_standard_squad(world,world.civilian_ai,b.world_coords,'civilian small random')
+        elif b.world_builder_identity=='square_building':
+            count=random.randint(1,3)
+            for _ in range(count):
+                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
+                rotation=random.randint(0,359)
+                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
-    # special case if there are no buildings
-    if len(world.wo_objects_building)==0:
-        print('WARN : No buildings')
-
-    if random.randint(0,10)==10:
-        print('big cheese!!')
-        create_standard_squad(world,world.civilian_ai,[float(random.randint(-2500,2500)),float(random.randint(-2500,2500))],'big cheese')
+    return civilians
 
 #------------------------------------------------------------------------------
-def generate_world_area(world,world_coords,TYPE,NAME):
+def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
-    # TYPE town, airport, bunkers, field_depot, train_depot 
-    group=[]
-    if TYPE=='town':
-        count=random.randint(1,5)
-        grid_spawn(world,world_coords,'warehouse',1150,count)
-        count=random.randint(2,15)
-        grid_spawn(world,world_coords,'square_building',250,count)
-    elif TYPE=='fuel_dump':
+    # area_type town, airport, bunkers, field_depot, train_depot 
+    map_objects=[]
+    if area_type=='town':
+        map_objects=generate_world_area_town(world_coords)
+    elif area_type=='airport':
+        map_objects=generate_world_area_airport(world_coords)
+    elif area_type=='rail_yard':
+        map_objects=generate_world_area_rail_yard(world_coords)
+    elif area_type=='fuel_dump':
         count=random.randint(11,157)
-        grid_spawn(world,world_coords,'55_gallon_drum',20,count)
-    elif TYPE=='german_ammo_dump':
-        count=random.randint(11,45)
-        grid_spawn(world,world_coords,'german_mg_ammo_can',30,count)
-    elif TYPE=='german_fuel_can_dump':
-        count=random.randint(21,75)
-        grid_spawn(world,world_coords,'german_fuel_can',20,count)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'55_gallon_drum','fuel drum',rotation)
+    elif area_type=='german_ammo_dump':
+        count=random.randint(11,157)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_mg_ammo_can','German Ammo Can',rotation)
+    elif area_type=='german_fuel_can_dump':
+        count=random.randint(11,157)
+        diameter=20
+        rotation=0
+        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_fuel_can','German Fuel Can',rotation)
+    else:
+        engine.log.add_data('error','worldbuilder.generate_world_area type '+area_type+' not recognized',True)
 
-    # make the corresponding WorldArea object
-    w=WorldArea(world)
-    w.world_coords=copy.copy(world_coords)
-    w.name=NAME
-    w.type=TYPE
+    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
+    world_area=MapObject('world_area_'+area_type,name,world_coords,0,[])
+    map_objects.append(world_area)
 
-    # register with world 
-    world.world_areas.append(w)
+    return map_objects
+
+#------------------------------------------------------------------------------
+def generate_world_area_airport(world_coords):
+    engine.log.add_data('warn','world_builder.generate_world_area_airport: not implemented',True)
+    return []
+
+#------------------------------------------------------------------------------
+def generate_world_area_simple(world_coords,count,diameter,world_builder_identity,name,rotation):
+    '''generates a simple one object type world area '''
+    # count: int
+    # diameter : int - rough size of the object
+    coords=engine.math_2d.get_grid_coords(world_coords,diameter,count)
+    map_objects=[]
+    for _ in range(count):
+        map_objects.append(MapObject(world_builder_identity,name,coords.pop(),rotation,[]))
+    
+    return map_objects
+
+#------------------------------------------------------------------------------
+def generate_world_area_rail_yard(world_coords):
+    engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented',True)
+    return []
+
+#------------------------------------------------------------------------------
+def generate_world_area_town(world_coords):
+    count_warehouse=random.randint(1,5)
+    count_building=random.randint(2,14)
+    coords=engine.math_2d.get_grid_coords(world_coords,1150,count_warehouse+count_building)
+    map_objects=[]
+    rotation=random.randint(1,359)
+    for _ in range(count_warehouse):
+        map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
+    
+    for _ in range(count_building):
+        map_objects.append(MapObject('square_building','some sort of building',coords.pop(),rotation,[]))
+
+    return map_objects
 
 #------------------------------------------------------------------------------
 def get_random_from_list(world,world_coords,OBJECT_LIST,SPAWN):
@@ -505,20 +310,22 @@ def get_random_from_list(world,world_coords,OBJECT_LIST,SPAWN):
     return spawn_object(world,world_coords,OBJECT_LIST[index],SPAWN)
 
 #------------------------------------------------------------------------------
-def grid_spawn(world,world_coords,OBJECT_STRING,DIAMETER,COUNT):
-    ''' spawn in a grid pattern '''
-    last_coord=world_coords
-    # this needs to be better
-    column_max=engine.math_2d.get_optimal_column_count(COUNT)*DIAMETER
+def get_squad_map_objects(squad_name):
+    '''get a list of map objects that make up a squad'''
+    members=[]
+    if 'German' in squad_name:
+        members=german_squad_data[squad_name]['members'].split(',')
+    elif 'Soviet' in squad_name:
+        members=soviet_squad_data[squad_name]['members'].split(',')
+    else:
+        engine.log.add_data('error','ai_faction_strategic.deploy_squad_to_map squad_name '+squad_name+' not recognized',True)
 
-    for x in range(COUNT):
-        
-        if last_coord[0]>world_coords[0]+column_max:
-            last_coord[0]=world_coords[0]
-            last_coord[1]+=DIAMETER
-        last_coord=[last_coord[0]+DIAMETER,last_coord[1]+0]
-        spawn_object(world,last_coord,OBJECT_STRING,True)
-
+    # convert each member to a map_object
+    map_objects=[]
+    for b in members:
+        map_objects.append(MapObject(b,'none',[0,0],0,[]))
+    
+    return map_objects
 
 #------------------------------------------------------------------------------
 def load_magazine(world,magazine):
@@ -532,23 +339,93 @@ def load_magazine(world,magazine):
         count+=1
 
 #------------------------------------------------------------------------------
+def load_quick_battle(world,spawn_faction):
+    ''' load quick battle. called by game menu'''
+
+    map_objects=[]
+
+    # generate towns
+    town_count=3
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,4000,town_count)
+    for _ in range(town_count):
+        coords=coord_list.pop()
+        name='Town' # should generate a interessting name
+        map_objects+=generate_world_area(coords,'town',name)
+
+    # generate clutter
+    map_objects+=generate_clutter(map_objects)
+
+    # generate civilians
+    map_objects+=generate_civilians(map_objects)
+
+    # -- initial troops --
+    squads=[]
+    squads+=['German 1944 Rifle'] * 2
+    squads+=['German 1944 Panzergrenadier Mech'] * 2
+    squads+=['German 1944 Fallschirmjager'] * 1
+    squads+=['Soviet 1943 Rifle'] * 2
+    squads+=['Soviet 1944 SMG'] * 1
+    squads+=['Soviet 1944 Rifle Motorized'] * 2
+
+    for squad in squads:
+        map_objects+=get_squad_map_objects(squad)
+
+    load_world(world,map_objects,spawn_faction)
+
+#------------------------------------------------------------------------------
+def load_sqlite_data():
+    ''' load a bunch of data that i put in sqlite '''
+    global loaded
+    global soviet_squad_data
+    global german_squad_data
+    global american_squad_data
+    global civilian_squad_data
+    
+    if loaded==False:
+        soviet_squad_data=load_sqlite_squad_data('soviet')
+        german_squad_data=load_sqlite_squad_data('german')
+        american_squad_data=load_sqlite_squad_data('american')
+        civilian_squad_data=load_sqlite_squad_data('civilian')
+
+    else:
+        print('Error : Projectile data is already loaded')
+
+#------------------------------------------------------------------------------
+def load_sqlite_squad_data(faction):
+    '''builds a squad_data dictionary from sqlite data'''
+
+    squad_data={}
+
+    conn = sqlite3.connect('data/data.sqlite')
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM squad_data WHERE faction=?",(faction,))
+    
+    # Fetch all column names
+    column_names = [description[0] for description in cursor.description]
+    # Fetch all rows from the table
+    rows = cursor.fetchall()
+
+    # Convert rows to dictionary, excluding the 'id' field
+    for row in rows:
+        row_dict = {column_names[i]: row[i] for i in range(len(column_names)) if column_names[i] != 'id'}
+        key = row_dict.pop('name')
+        squad_data[key] = row_dict
+
+    # Close the database connection
+    conn.close()
+
+    return squad_data
+
+#------------------------------------------------------------------------------
 def load_test_environment(world,scenario):
     ''' test environment. not a normal map load '''
 
+    # ! note this whole thing is legacy and should go away at some point
 
     if scenario=='1':
-        # add some world areas
-        generate_world_area(world,[-2000,2000],'town','Alfa')
-        generate_world_area(world,[2000,-2000],'town','Bravo')
-        generate_world_area(world,[2000,2000],'town','Charlie')
-        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_ammo_dump','german ammo dump')
-        generate_world_area(world,[float(random.randint(-3500,3500)),float(random.randint(-3500,3500))],'german_fuel_can_dump','german fuel dump')
 
-        # generate clutter after world areas are created
-        generate_clutter(world)
-
-        # generate civilians and civilan spawns
-        generate_civilians_and_civilan_spawns(world)
 
         # some civilian reinforcements
         time=random.randint(120,800)
@@ -561,22 +438,14 @@ def load_test_environment(world,scenario):
             world.reinforcements.append([time,'civilian',world.spawn_north,'shovel man'])
 
 
-        # add germans
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 rifle')
-        create_standard_squad(world,world.german_ai,world.spawn_west,'german 1944 volksgrenadier fire group')
+
         
         # add german reinforcements
         time=random.randint(120,500)
         world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
         world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
 
-        # add soviets
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
-        create_standard_squad(world,world.soviet_ai,world.spawn_far_east,'soviet 1944 rifle motorized')
+
 
 
         # add soviet reinforcements
@@ -602,6 +471,25 @@ def load_test_environment(world,scenario):
     # do this no matter what to spawn everything
     world.process_add_remove_queue()
 
+#------------------------------------------------------------------------------
+def load_world(world,map_objects,spawn_faction):
+    '''coverts map_objects to world_objects and does everything necessary to load the world'''
+
+    # convert map_objects to world_objects
+    # note - this also spawns them and creates the world_area objects
+    convert_map_objects_to_world_objects(world,map_objects)
+
+    # generation squads 
+    world.create_squads()
+
+    # give the vehicles initial positions
+    world.position_vehicles()
+
+    # print debug info
+    world.log_world_data()
+
+    # spawn player
+    world.spawn_player(spawn_faction)
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
@@ -635,65 +523,6 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
             x.heading=heading
             x.world_coords=current_coords
 
-
-
-
-#------------------------------------------------------------------------------
-def spawn_civilians(world,CIVILIAN_TYPE,world_coords):
-    ''' return a civilian with full kit '''
-    # --------- german types ---------------------------------
-    if CIVILIAN_TYPE=='default':
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        return z
-    elif CIVILIAN_TYPE=='pistol':
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.add_inventory(spawn_object(world,world_coords,'ppk',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppk_magazine',False))
-        return z
-    elif CIVILIAN_TYPE=='big_cheese':
-        '''goofy unique civilain. don't mess with big cheese'''
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.ai.health*=2
-        z.name='big cheese'
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    elif CIVILIAN_TYPE=='shovel_man':
-        '''goofy unique civilain. '''
-        z=spawn_object(world,world_coords,'civilian_man',True)
-        z.ai.health*=2
-        z.name='Mr. Shovel'
-        z.world_builder_identity='civilian_default'
-        z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
-        z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))
-        z.add_inventory(spawn_object(world,world_coords,'german_field_shovel',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
-        return z
 #------------------------------------------------------------------------------
 # currently used for wrecks and bodies
 def spawn_container(name,world_object,image_index):
@@ -716,6 +545,8 @@ def spawn_container(name,world_object,image_index):
 #------------------------------------------------------------------------------
 def spawn_crate(world,world_coords,CRATE_TYPE):
     ''' generates different crate types with contents'''
+
+    # !!!! outdated. this should all be integrated into spawn_objects
 
     if CRATE_TYPE=='mp40':
         z=spawn_object(world,world_coords,'crate',True)
@@ -1698,6 +1529,234 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_soldier=True
         z.is_soviet=True
 
+    elif OBJECT_TYPE=='german_kar98k':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        
+    elif OBJECT_TYPE=='german_kar98k_panzerfaust':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_kar98k'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        
+    elif OBJECT_TYPE=='german_k43':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_k43'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
+        
+    elif OBJECT_TYPE=='german_g41w':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_g41w'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
+        
+    elif OBJECT_TYPE=='german_mp40':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mp40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        
+    elif OBJECT_TYPE=='german_mg34':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mg34'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        
+    elif OBJECT_TYPE=='german_stg44':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        
+    elif OBJECT_TYPE=='german_stg44_panzerfaust':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_stg44'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        
+    elif OBJECT_TYPE=='german_fg42-type2':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_fg42-type2'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42-type2',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
+        
+
+    # --------- soviet types ----------------------------------------
+    elif OBJECT_TYPE=='soviet_mosin_nagant':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_mosin_nagant'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_nagant',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_svt40':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_svt40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_ppsh43':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_ppsh43'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_dp28':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_dp28'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
+        
+    elif OBJECT_TYPE=='soviet_tt33':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_tt33'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
+        
+    elif OBJECT_TYPE=='big_cheese':
+        # big cheese!
+        z=spawn_object(world,world_coords,'civilian_man',False)
+        z.ai.health*=2
+        z.name='big cheese'
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'camembert-cheese',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+    
+    elif OBJECT_TYPE=='shovel_man':
+        # a shovel enthusiast
+        z=spawn_object(world,world_coords,'civilian_man',False)
+        z.ai.health*=2
+        z.name='Mr. Shovel'
+        z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
+        z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))
+        z.add_inventory(spawn_object(world,world_coords,'german_field_shovel',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables_common,False))
+    
     elif OBJECT_TYPE=='brass':
         z=WorldObject(world,['brass'],AIAnimatedSprite)
         z.world_coords=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -1959,7 +2018,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.wo_start()
     return z
 
-
 #------------------------------------------------------------------------------
 def spawn_map_pointer(world,TARGET_COORDS,TYPE):
     if TYPE=='normal':
@@ -1980,8 +2038,6 @@ def spawn_map_pointer(world,TARGET_COORDS,TYPE):
         z.render_level=4
         z.is_map_pointer=True
         z.wo_start()
-
-
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
@@ -2031,7 +2087,6 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
     ''' spawn smoke cloud '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
 
-
     for x in range(amount):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_smoke',True)
@@ -2046,7 +2101,6 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
 def spawn_sparks(world,world_coords,amount=30):
     ''' spawn spark '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
-
 
     for x in range(amount):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
@@ -2067,197 +2121,5 @@ def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAM
         spawn_shrapnel(world,world_coords,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR,WEAPON_NAME)
 
 
-#------------------------------------------------------------------------------
-def spawn_soldiers(world,SOLDIER_TYPE,world_coords):
-    ''' return a soldier with full kit '''
-    # --------- german types ---------------------------------
-    if SOLDIER_TYPE=='german_kar98k':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_kar98k'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_kar98k_panzerfaust':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_kar98k'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    if SOLDIER_TYPE=='german_k43':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_k43'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'k43_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_g41w':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_g41w'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'g41w_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_mp40':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_mp40'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_mg34':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_mg34'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_stg44':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_stg44'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        return z
-    if SOLDIER_TYPE=='german_stg44_panzerfaust':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_stg44'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
-        return z
-    if SOLDIER_TYPE=='german_fg42-type2':
-        z=spawn_object(world,world_coords,'german_soldier',True)
-        z.world_builder_identity='german_fg42-type2'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42-type2',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'fg42_type2_magazine',False))
-        return z
-
-    # --------- soviet types ----------------------------------------
-    if SOLDIER_TYPE=='soviet_mosin_nagant':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_mosin_nagant'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_nagant',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'mosin_magazine',False))
-        return z
-    if SOLDIER_TYPE=='soviet_svt40':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_svt40'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'svt40_magazine',False))
-        return z
-    if SOLDIER_TYPE=='soviet_ppsh43':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_ppsh43'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
-        return z 
-    if SOLDIER_TYPE=='soviet_dp28':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_dp28'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'dp28_magazine',False))
-        return z 
-    if SOLDIER_TYPE=='soviet_tt33':
-        z=spawn_object(world,world_coords,'soviet_soldier',True)
-        z.world_builder_identity='soviet_tt33'
-        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
-        return z   
+# init 
+load_sqlite_data()

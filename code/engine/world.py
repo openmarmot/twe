@@ -30,11 +30,19 @@ class World(object):
     #---------------------------------------------------------------------------
     def __init__(self):
         
+        # spawn locations
+        self.spawn_center=[0.,0.]
+        self.spawn_north=[0.,-4000.]
+        self.spawn_south=[0.,4000.]
+        self.spawn_west=[-4000.,0.]
+        self.spawn_east=[4000.,0.]
+        self.spawn_far_east=[10000.,0.]
+
         # tactical AIs
-        self.german_ai=AIFactionTactical(self,'german')
-        self.soviet_ai=AIFactionTactical(self,'soviet')
-        self.american_ai=AIFactionTactical(self,'american')
-        self.civilian_ai=AIFactionTactical(self,'civilian')
+        self.german_ai=AIFactionTactical(self,'german',self.spawn_west)
+        self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east)
+        self.american_ai=AIFactionTactical(self,'american',self.spawn_north)
+        self.civilian_ai=AIFactionTactical(self,'civilian',self.spawn_center)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -77,13 +85,7 @@ class World(object):
         #world areas
         self.world_areas=[]
 
-        # spawn locations
-        self.spawn_center=[0.,0.]
-        self.spawn_north=[0.,-4000.]
-        self.spawn_south=[0.,4000.]
-        self.spawn_west=[-4000.,0.]
-        self.spawn_east=[4000.,0.]
-        self.spawn_far_east=[10000.,0.]
+        
 
         # size of the map in every direction from 0,0
         self.map_size=100000
@@ -292,6 +294,14 @@ class World(object):
 
         print('Cleanup function removing '+str(len(remove_list))+' objects')
         self.remove_queue+=remove_list
+
+    #------------------------------------------------------------------------------
+    def create_squads(self):
+        self.german_ai.create_squads(copy.copy(self.wo_objects_german))
+        self.soviet_ai.create_squads(copy.copy(self.wo_objects_soviet))
+        self.american_ai.create_squads(copy.copy(self.wo_objects_american))
+        self.civilian_ai.create_squads(copy.copy(self.wo_objects_civilian))
+
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,OBJ):
         ''' generates a ignore list for collision checking'''
@@ -425,98 +435,128 @@ class World(object):
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
                 self.player.ai.reload_turret()
 
+        if key=='tab':
+            self.activate_context_menu()
+
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None,player_screen_coords=None):
         '''handle key press'''
-        # key press is when a key is held down
-        # key - string  example 'w'
-        if self.player.ai.memory['current_task']=='task_vehicle_crew':
-            vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
-            role=self.player.ai.memory['task_vehicle_crew']['role']
-            turret=self.player.ai.memory['task_vehicle_crew']['turret']
+        # stop player from moving when dead
+        if self.player.ai.health>0:
+            # key press is when a key is held down
+            # key - string  example 'w'
+            if self.player.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+                role=self.player.ai.memory['task_vehicle_crew']['role']
+                turret=self.player.ai.memory['task_vehicle_crew']['turret']
 
-            if role=='driver':
+                if role=='driver':
 
-                if vehicle.is_airplane:
-                    # ---- controls for airplanes ------------
-                    if key=='w':
-                        vehicle.ai.handle_elevator_up()
-                    elif key=='s':
-                        vehicle.ai.handle_elevator_down()
-                        if self.owner.altitude<1:
+                    if vehicle.is_airplane:
+                        # ---- controls for airplanes ------------
+                        if key=='w':
+                            vehicle.ai.handle_elevator_up()
+                        elif key=='s':
+                            vehicle.ai.handle_elevator_down()
+                            if self.owner.altitude<1:
+                                vehicle.ai.brake_power=1
+                        elif key=='a':
+                            vehicle.ai.handle_aileron_left()
+                            vehicle.ai.handle_rudder_left()
+                            if self.owner.altitude<1:
+                                vehicle.ai.handle_steer_left()
+                        elif key=='d':
+                            vehicle.ai.handle_aileron_right()
+                            vehicle.ai.handle_rudder_right()
+                            if self.owner.altitude<1:
+                                vehicle.ai.handle_steer_right()
+                        elif key=='up':
+                            pass
+                        elif key=='down':
+                            pass
+                        elif key=='left':
+                            vehicle.ai.handle_throttle_down()
+                        elif key=='right':
+                            vehicle.ai.handle_throttle_up()
+                    else:
+                        # ---- controls for ground vehicles ------------
+
+                        if key=='w':
+                            vehicle.ai.throttle=1
+                            vehicle.ai.brake_power=0
+                        elif key=='s':
                             vehicle.ai.brake_power=1
-                    elif key=='a':
-                        vehicle.ai.handle_aileron_left()
-                        vehicle.ai.handle_rudder_left()
-                        if self.owner.altitude<1:
+                            vehicle.ai.throttle=0
+                        elif key=='a':
                             vehicle.ai.handle_steer_left()
-                    elif key=='d':
-                        vehicle.ai.handle_aileron_right()
-                        vehicle.ai.handle_rudder_right()
-                        if self.owner.altitude<1:
+                        elif key=='d':
                             vehicle.ai.handle_steer_right()
-                    elif key=='up':
-                        pass
-                    elif key=='down':
-                        pass
-                    elif key=='left':
-                        vehicle.ai.handle_throttle_down()
-                    elif key=='right':
-                        vehicle.ai.handle_throttle_up()
-                else:
-                    # ---- controls for ground vehicles ------------
 
-                    if key=='w':
-                        vehicle.ai.throttle=1
-                        vehicle.ai.brake_power=0
-                    elif key=='s':
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-                    elif key=='a':
-                        vehicle.ai.handle_steer_left()
+                elif role=='gunner':
+                    if key=='a':
+                        turret.ai.handle_rotate_left()
                     elif key=='d':
-                        vehicle.ai.handle_steer_right()
-
-            elif role=='gunner':
-                if key=='a':
-                    turret.ai.handle_rotate_left()
+                        turret.ai.handle_rotate_right()
+                    elif key=='f':
+                        turret.ai.handle_fire()
+            else:
+                # ---- controls for walking around ------------
+                action=False
+                speed=self.player.ai.get_calculated_speed()
+                if key=='w':
+                    self.player.world_coords[1]-=speed*self.time_passed_seconds
+                    self.player.rotation_angle=0
+                    self.player.reset_image=True
+                    action=True
+                elif key=='s':
+                    self.player.world_coords[1]+=speed*self.time_passed_seconds
+                    self.player.rotation_angle=180
+                    self.player.reset_image=True
+                    action=True
+                elif key=='a':
+                    self.player.world_coords[0]-=speed*self.time_passed_seconds
+                    self.player.rotation_angle=90
+                    self.player.reset_image=True
+                    action=True
                 elif key=='d':
-                    turret.ai.handle_rotate_right()
+                    self.player.world_coords[0]+=speed*self.time_passed_seconds
+                    self.player.rotation_angle=270
+                    self.player.reset_image=True
+                    action=True
                 elif key=='f':
-                    turret.ai.handle_fire()
-        else:
-            # ---- controls for walking around ------------
-            action=False
-            speed=self.player.ai.get_calculated_speed()
-            if key=='w':
-                self.player.world_coords[1]-=speed*self.time_passed_seconds
-                self.player.rotation_angle=0
-                self.player.reset_image=True
-                action=True
-            elif key=='s':
-                self.player.world_coords[1]+=speed*self.time_passed_seconds
-                self.player.rotation_angle=180
-                self.player.reset_image=True
-                action=True
-            elif key=='a':
-                self.player.world_coords[0]-=speed*self.time_passed_seconds
-                self.player.rotation_angle=90
-                self.player.reset_image=True
-                action=True
-            elif key=='d':
-                self.player.world_coords[0]+=speed*self.time_passed_seconds
-                self.player.rotation_angle=270
-                self.player.reset_image=True
-                action=True
-            elif key=='f':
-                # fire the gun
-                if self.player.ai.primary_weapon!=None:
-                    self.player.ai.fire([],self.player.ai.primary_weapon,mouse_screen_coords,player_screen_coords)
-                action=True
+                    # fire the gun
+                    if self.player.ai.primary_weapon!=None:
+                        self.player.ai.fire([],self.player.ai.primary_weapon,mouse_screen_coords,player_screen_coords)
+                    action=True
 
-            if action:
-                self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
+                if action:
+                    self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
 
+
+    #---------------------------------------------------------------------------
+    def log_world_data(self):
+        '''print out a bunch of world info'''
+
+        engine.log.add_data('debug','wo_objects : '+str(len(self.wo_objects)),True)
+        engine.log.add_data('debug','wo_objects_german : '+str(len(self.wo_objects_german)),True)
+        engine.log.add_data('debug','wo_objects_soviet : '+str(len(self.wo_objects_soviet)),True)
+        engine.log.add_data('debug','wo_objects_american : '+str(len(self.wo_objects_american)),True)
+        engine.log.add_data('debug','wo_objects_civilian : '+str(len(self.wo_objects_civilian)),True)
+
+    #------------------------------------------------------------------------------
+    def position_vehicles(self):
+        ''' position vehicles at spawn points'''
+
+        # kind of a hack as humans get positions when the squads are created, but vehicles don't
+
+        for v in self.wo_objects_vehicle:
+            print(v.name)
+            if v.world_builder_identity in engine.world_builder.list_vehicles_german:
+                v.world_coords=self.german_ai.spawn_location
+            elif v.world_builder_identity in engine.world_builder.list_vehicles_soviet:
+                v.world_coords=self.soviet_ai.spawn_location
+            elif v.world_builder_identity in engine.world_builder.list_vehicles_american:
+                v.world_coords=self.american_ai.spawn_location
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -579,26 +619,21 @@ class World(object):
             self.reinforcements.remove(b)
             print('spawning reinforcements',b[1])
             if b[1]=='german':
-                engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
             elif b[1]=='american':
-                engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
             elif b[1]=='soviet':
-                engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
             elif b[1]=='civilian':
-                engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
+                print('process reinforcements needs a rewrite')
+                #engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
             else:
                 print('Error - faction not recognized in process_reinforements: ',b[1])
 
-    #---------------------------------------------------------------------------
-    def random_player_spawn(self):
-        if len(self.wo_objects_human)>0:
-            b=random.randint(0,len(self.wo_objects_human)-1)
-            self.player=self.wo_objects_human[b]
-            self.player.is_player=True
-            print('You are now '+self.player.name)
-        else:
-            print('player spawn error : no humans left on the map')
-            # maybe spawn a new civilian ??
+
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
@@ -660,24 +695,34 @@ class World(object):
         spawned=False
         if FACTION=='german':
             if len(self.wo_objects_german)>0:
-                b=random.randint(0,len(self.wo_objects_german)-1)
-                self.player=self.wo_objects_german[b]
+                self.player=random.choice(self.wo_objects_german)
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as german but zero german objects available',True)
         elif FACTION=='soviet':
             if len(self.wo_objects_soviet)>0:
-                b=random.randint(0,len(self.wo_objects_soviet)-1)
-                self.player=self.wo_objects_soviet[b]
+                self.player=random.choice(self.wo_objects_soviet)
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as soviet but zero soviet objects available',True)
         elif FACTION=='american':
             if len(self.wo_objects_american)>0:
-                b=random.randint(0,len(self.wo_objects_american)-1)
-                self.player=self.wo_objects_american[b]
+                self.player=random.choice(self.wo_objects_american)
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as american but zero american objects available',True)
         elif FACTION=='civilian':
             if len(self.wo_objects_civilian)>0:
-                b=random.randint(0,len(self.wo_objects_civilian)-1)
-                self.player=self.wo_objects_civilian[b]
+                self.player=random.choice(self.wo_objects_civilian)
                 spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player spawn as civilian but zero civilian objects available',True)
+        elif FACTION=='random':
+            if len(self.wo_objects_human)>0:
+                self.player=random.choice(self.wo_objects_human)
+                spawned=True
+            else:
+                engine.log.add_data('error','world.spawn_player but there are no humans left in the world',True)
 
         if spawned:
             self.player.is_player=True
@@ -709,13 +754,6 @@ class World(object):
             #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
             engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
-    #---------------------------------------------------------------------------
-    def load_map(self):
-        pass
-
-    #---------------------------------------------------------------------------
-    def unload_map(self):
-        pass
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):
@@ -793,7 +831,7 @@ class World(object):
 
         # world area data
         for b in self.world_areas:
-            self.debug_text_queue.append('Area '+b.name+' is controlled by : '+b.faction)
+            self.debug_text_queue.append('Area '+b.name+' '+str(b.world_coords)+' is controlled by : '+b.faction)
 
     #------------------------------------------------------------------------------
     def update_vehicle_text(self):

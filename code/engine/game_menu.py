@@ -80,9 +80,9 @@ class GameMenu(object):
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (work in progress. not playable)')
+            self.text_queue.append('1 - New Campaign (preview: work in progess)')
             self.text_queue.append('2 - Load Campaign (not implemented)')
-            self.text_queue.append('3 - Quick Battle (<-- choose this)')
+            self.text_queue.append('3 - Quick Battle (choose this)')
             #self.text_queue.append('4 - Nothing') 
 
             if key=='1':
@@ -92,7 +92,6 @@ class GameMenu(object):
             elif key=='2':
                 pass
             elif key=='3':
-                engine.world_builder.load_test_environment(self.graphics_engine.world,"1")
                 self.menu_state='faction_select'
                 key='none'
 
@@ -105,46 +104,21 @@ class GameMenu(object):
             self.text_queue.append('2 - German')
             self.text_queue.append('3 - Soviet')
             self.text_queue.append('4 - Civilian/Neutral')
-            spawned=False
-            faction='none'
-            if key=='1':
-                if len(self.graphics_engine.world.wo_objects_american)>0:
-                    self.graphics_engine.world.spawn_player('american')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='2':
-                if len(self.graphics_engine.world.wo_objects_german)>0:
-                    self.graphics_engine.world.spawn_player('german')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='3':
-                if len(self.graphics_engine.world.wo_objects_soviet)>0:
-                    self.graphics_engine.world.spawn_player('soviet')
-                    spawned=True
-                else:
-                    print('No bots of this type available')
-            elif key=='4':
-                if len(self.graphics_engine.world.wo_objects_civilian)>0:
-                    self.graphics_engine.world.spawn_player('civilian')
-                    spawned=True
-
-                    # disband player squad, as they are super annoying
-                    squad=self.graphics_engine.world.player.ai.squad
-                    members=[]
-                    for b in squad.members:
-                        if b.is_player==False:
-                            members.append(b)
-                    squad.faction_tactical.split_squad(members)
-
-
-                else:
-                    print('No bots of this type available')
             
-            if spawned:
-                # eventually load other menus
-                #self.graphics_engine.world.is_paused=False
+            # note 1 is missing as americans are not implemented
+            if key in ['2','3','4']:
+                faction=''
+                if key=='1':
+                    faction='american'
+                elif key=='2':
+                    faction='german'
+                elif key=='3':
+                    faction='soviet'
+                elif key=='4':
+                    faction='civilian'
+
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,faction)
+
                 self.graphics_engine.mode=1
                 self.deactivate_menu()
                 

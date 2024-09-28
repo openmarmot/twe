@@ -267,7 +267,7 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if key=='1':
-                self.world.random_player_spawn()
+                self.world.spawn_player('random')
                 self.world.is_paused=False
                 self.deactivate_menu()
 
@@ -362,13 +362,17 @@ class World_Menu(object):
             self.text_queue.append('3 - Soviet 1944 Rifle')
             self.text_queue.append('4 - Soviet 1944 Submachine Gun')
             if key=='1':
-                engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 rifle')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 rifle')
             elif key=='2':
-                engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 volksgrenadier storm group')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 volksgrenadier storm group')
             elif key=='3':
-                engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 rifle')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 rifle')
             elif key=='4':
-                engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 submachine gun')
+                print('this needs a rewrite')
+                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 submachine gun')
         if self.menu_state=='spawn_misc':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Misc --')
@@ -709,7 +713,7 @@ class World_Menu(object):
             self.text_queue.append('4 - Tight formation (not implemented)')
 
             if key=='1':
-                self.world.text_que.append('[ Squad disbanded ]')
+                self.world.text_queue.append('[ Squad disbanded ]')
                 # note - this will remove everyone but the player from the player's squad
                 # and put them in a new squad
                 members=[]
@@ -919,7 +923,7 @@ class World_Menu(object):
                     self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
-                    self.world.text_que.append('[ You climb into the vehicle ]')
+                    self.world.text_queue.append('[ You climb into the vehicle ]')
                     self.deactivate_menu()
                 if key=='3':
                     # pull up the storage/container menu

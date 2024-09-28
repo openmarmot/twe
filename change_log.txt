@@ -1,6 +1,123 @@
 TWE Project : Change Log
 
 
+----------------------------------
+september 28 2024
+- working on 'quick battle' mode 
+- general bug fix 
+
+well quick battle is now working. It is similar to the the old 'quick battle' option, which was really 'load test scenario'.
+However now it is using the auto world_area generation which seems significantly worse than the old town generation, and 
+town placement. 
+
+town generation needs to be tweaked heavily, and it seems there needss to be more world_areas for the tactical ai to work 
+properly. Right now the battles are not good at all, just a pile of troops basically colliding with each other. 
+
+it has been about two weeks since i last merged into main, and now that the new campaign mode and quick battle options both 
+"work" i think i will get this merged. 
+
+note - campaign mode isn't playable as there is no way to advance between maps. just available as a preview
+
+new bugs 
+- sometimes the player character is ai controlled for unknown reasons 
+- death screen has issues with the debug text scrolling
+
+todo 
+- update town generation so the buildings are closer together 
+- add more world_areas 
+
+----------------------------------
+september 27 2024
+- working on strategic mode -> world mode transition 
+- created squad_builder.py 
+- fixed bugs 
+
+unfortunately the carefully researched squads I had created have mostly been replaced 
+with the old auto squad generation system. squads just didn't make sense past the world 
+level because you would wnat to rebalance them after every fight, and it would have been 
+complicated to jam it into the map_object saving system. The old squads are still used for 
+placing initial troops, but once the world is loaded the troops will be auto-sorted into new 
+squads.
+
+you should now be able to start a new campaign, choose a map with units, and spawn as one 
+of the units now (in dev branch). 
+
+A TON of code has changed so the world doesn't look like it used to. Town generation has 
+changed for the worse - I created a new grid system which means buildings aren't overlapping 
+anymore but it looks terrible. needs a rework. 
+
+the campaign maps are pretty empty and dull right now. that is one area that needs a ton of work. 
+
+the campaign also can't progress - there is no way for troops to move maps - so there will never 
+be any conflict. this needs to be fied but its a big feature - will probably wait for a bit.
+
+I'd really like to merge this but I think I need to create a 'quick battle' system first to 
+mimic what we have in main.  
+
+----------------------------------
+september 26 2024
+- working on saving to sqlite
+- bug fixes
+- updated *Grenadier to *grenadier 
+- strategic map menu updates 
+- working on world loading
+- rewriting worldbuilder code to work with the new world loading 
+
+----------------------------------
+september 25 2024
+- working on civilian spawn generation
+- working through all the code needed for starting a new campaign
+
+I kinda underestimated how much of a slog it would be to get to the point 
+where the strategic layer was working. I feel like I've done a lot but there 
+is a lot more to do. 
+
+----------------------------------
+september 24 2024
+- more work on map feature generation 
+
+----------------------------------
+september 23 2024
+- work on world_object save/load to map_object 
+- work on map feature generation
+- added towns as a 'big deal map feature' and to map as 'T'
+- world_build.grid_spawn -> math_2d.get_grid_coords
+
+todo next
+- finish feature generation
+- work on saving mechanism
+- work on loading mechanism
+- remove the old squad system and shift over to creating squads on world launch 
+- have the strategic ai pick random squads to put on the map
+- rewrite world.process_reinforcements
+- rewrite world_menu.debug_menu -> spawn squads 
+
+----------------------------------
+september 22 2024
+- finished squad data to the sqlite database 
+
+----------------------------------
+september 20 2024
+- finished world_builder.load_sqlite_data (for now)
+
+----------------------------------
+september 18 2024
+- set inital map square faction ownership 
+- started working on replacing the pre-build squad system 
+- started creating squad_data database table 
+
+realizing that saving pre-build squads is not really going to work. 
+they would have to be reformed after every battle to balance out losses so i 
+really just need to organize squads AFTER everything spawns into the world.
+This means going back to the old squad creation method.
+
+todo next
+- finish writing world_builder.load_sqlite_data
+- finish populating squad_data table 
+- remove the old squad system and shift over to creating squads on world launch 
+- have the strategic ai pick random squads to put on the map
+
+Note - lots of changes here. dev will probably be broken for a couple updates 
 
 ----------------------------------
 september 17 2024
