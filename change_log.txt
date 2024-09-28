@@ -4,6 +4,27 @@ TWE Project : Change Log
 ----------------------------------
 september 28 2024
 - working on 'quick battle' mode 
+- general bug fix 
+
+well quick battle is now working. It is similar to the the old 'quick battle' option, which was really 'load test scenario'.
+However now it is using the auto world_area generation which seems significantly worse than the old town generation, and 
+town placement. 
+
+town generation needs to be tweaked heavily, and it seems there needss to be more world_areas for the tactical ai to work 
+properly. Right now the battles are not good at all, just a pile of troops basically colliding with each other. 
+
+it has been about two weeks since i last merged into main, and now that the new campaign mode and quick battle options both 
+"work" i think i will get this merged. 
+
+note - campaign mode isn't playable as there is no way to advance between maps. just available as a preview
+
+new bugs 
+- sometimes the player character is ai controlled for unknown reasons 
+- death screen has issues with the debug text scrolling
+
+todo 
+- update town generation so the buildings are closer together 
+- add more world_areas 
 
 ----------------------------------
 september 27 2024

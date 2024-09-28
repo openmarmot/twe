@@ -346,7 +346,7 @@ def load_quick_battle(world,spawn_faction):
 
     # generate towns
     town_count=3
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,town_count)
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,4000,town_count)
     for _ in range(town_count):
         coords=coord_list.pop()
         name='Town' # should generate a interessting name

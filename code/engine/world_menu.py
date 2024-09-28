@@ -267,7 +267,7 @@ class World_Menu(object):
             self.menu_state='base'
         if self.menu_state=='base':
             if key=='1':
-                self.world.random_player_spawn()
+                self.world.spawn_player('random')
                 self.world.is_paused=False
                 self.deactivate_menu()
 
