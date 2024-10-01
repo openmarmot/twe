@@ -32,10 +32,10 @@ class World(object):
         
         # spawn locations
         self.spawn_center=[0.,0.]
-        self.spawn_north=[0.,-4000.]
-        self.spawn_south=[0.,4000.]
-        self.spawn_west=[-4000.,0.]
-        self.spawn_east=[4000.,0.]
+        self.spawn_north=[0.,-8000.]
+        self.spawn_south=[0.,8000.]
+        self.spawn_west=[-8000.,0.]
+        self.spawn_east=[8000.,0.]
         self.spawn_far_east=[10000.,0.]
 
         # tactical AIs
@@ -550,13 +550,15 @@ class World(object):
         # kind of a hack as humans get positions when the squads are created, but vehicles don't
 
         for v in self.wo_objects_vehicle:
-            print(v.name)
             if v.world_builder_identity in engine.world_builder.list_vehicles_german:
                 v.world_coords=self.german_ai.spawn_location
             elif v.world_builder_identity in engine.world_builder.list_vehicles_soviet:
                 v.world_coords=self.soviet_ai.spawn_location
             elif v.world_builder_identity in engine.world_builder.list_vehicles_american:
                 v.world_coords=self.american_ai.spawn_location
+
+            # randomize position
+            engine.math_2d.randomize_position_and_rotation(v,250)
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -821,6 +823,7 @@ class World(object):
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
+        self.debug_text_queue.append('Player memory current task: '+self.player.ai.memory['current_task'])
         self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
         self.debug_text_queue.append('Player Screen Coords'+str(self.player.screen_coords))
