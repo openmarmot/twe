@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+september 31 2024
+- fixes for edge cases where the ai could accidentally take control of the player 
+- randomized spawn position a bit to reduce clumping 
+- randomized the squad destinations a bit so squads aren't stacking up on each other
+- set squads initial destination to the spawn point, fixing the odd [0,0] battles that were happening 
+
+turns out the squads all has a default destination of [0,0] which wasn't being updated, so they all 
+went there which is why everything was walking/fighting/dying in a straight line.
+
+civilians used to be in squads of 2-3 and are now in squads of around 6. will have to think which i prefer. 
+also need to look at the code again and see how much civilians use the squad system 
+
+----------------------------------
 september 30 2024
 - fixed debug text issue on death
 - minor code cleanup 

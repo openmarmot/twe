@@ -46,15 +46,26 @@ class AIFactionTactical(object):
 
     #---------------------------------------------------------------------------
     def create_squads(self,humans):
+        '''sort a list of humans into squads and initialize them'''
         self.squads=engine.squad_builder.create_squads_from_human_list(self.world,humans,self)
 
         # reset spawn locations.
         # civilians have world_coords set when they are generated, but after that they should be 
         # reset. hmmm
-        if self.faction!='civilian':
+        if self.faction=='civilian':
             for b in self.squads:
+                # civilians start all over, so just making sure they are idle right away
+                b.destination=copy.copy(b.members[0].world_coords)
+        else:
+            for b in self.squads:
+
+                # initially set the squad destination to be th espawn location
+                b.destination=engine.math_2d.randomize_coordinates(self.spawn_location,200)
+                # set the detination for the members as well
                 for c in b.members:
                     c.world_coords=copy.copy(self.spawn_location)
+                    # randomize position a bit
+                    engine.math_2d.randomize_position_and_rotation(c,170)
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):
@@ -158,19 +169,19 @@ class AIFactionTactical(object):
             if choice==1:
                 troop_count=0
                 for b in idle_squads:
-                    b.destination=most_troops.world_coords
+                    b.destination=engine.math_2d.randomize_coordinates(most_troops.world_coords,200)
                     troop_count+=len(b.members)
 
                 # check if we have numerical superiority
                 if (self.get_area_friendly_count(most_troops)+troop_count)<self.get_area_enemy_count(most_troops):
                     # lets send in the busy squads as well. this is a dangerous decision.
                     for b in busy_squads:
-                        b.destination=most_troops.world_coords
+                        b.destination=engine.math_2d.randomize_coordinates(most_troops.world_coords,200)
             
             # shore up the weakest area
             elif choice==2:
                 for b in idle_squads:
-                    b.destination=least_troops.world_coords
+                    b.destination=engine.math_2d.randomize_coordinates(least_troops.world_coords,200)
 
             # do nothing
             elif choice==3:
@@ -198,19 +209,19 @@ class AIFactionTactical(object):
             if choice==1:
                 troop_count=0
                 for b in idle_squads:
-                    b.destination=least_enemies.world_coords
+                    b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
                     troop_count+=len(b.members)
 
                 # check if we have numerical superiority
                 if (self.get_area_friendly_count(least_enemies)+troop_count)<self.get_area_enemy_count(least_enemies):
                     # lets send in the busy squads as well. this is a dangerous decision.
                     for b in busy_squads:
-                        b.destination=least_enemies.world_coords
+                        b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
             
-            # smaller attach on the weak area
+            # smaller attack on the weak area
             elif choice==2:
                 for b in idle_squads:
-                    b.destination=least_enemies.world_coords
+                    b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
 
             # do nothing
             elif choice==3:
@@ -220,10 +231,8 @@ class AIFactionTactical(object):
             # no contested areas, no enemy held areas
 
             # just send the idle squads all over
-
-            for b in self.world.world_areas:
-                if len(idle_squads)>0:
-                    idle_squads.pop().destination=b.world_coords
+            for b in idle_squads:
+                b.destination=engine.math_2d.randomize_coordinates(random.choice(self.world.world_areas).world_coords,200)
 
     
     #---------------------------------------------------------------------------

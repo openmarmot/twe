@@ -558,13 +558,20 @@ class AIHuman(AIBase):
 
             while occupants<b.ai.max_occupants:
                 if len(near_squad)>0:
-                    if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
-                        #already in a vehicle, so no further action needed
+
+                    # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
+                    if near_squad[0].is_player:
+                        self.speak('Get in the vehicle')
                         near_squad.pop(0)
                     else:
-                        near_squad[0].ai.switch_task_enter_vehicle(b,destination)
-                        occupants+=1
-                        near_squad.pop(0)
+
+                        if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
+                            #already in a vehicle, so no further action needed
+                            near_squad.pop(0)
+                        else:
+                            near_squad[0].ai.switch_task_enter_vehicle(b,destination)
+                            occupants+=1
+                            near_squad.pop(0)
                 else:
                     break
     
@@ -1134,8 +1141,8 @@ class AIHuman(AIBase):
         # update health 
         self.update_health()
 
-        # identify and categorize targets
-        if self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate:
+        # identify and categorize targets. should not be run for the player as it can result in new current_task
+        if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player==False:
             self.last_target_eval_time=self.owner.world.world_seconds
             self.target_eval_rate=random.uniform(0.8,6.5)
             self.evaluate_targets()

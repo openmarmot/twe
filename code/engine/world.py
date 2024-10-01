@@ -557,6 +557,9 @@ class World(object):
             elif v.world_builder_identity in engine.world_builder.list_vehicles_american:
                 v.world_coords=self.american_ai.spawn_location
 
+            # randomize position
+            engine.math_2d.randomize_position_and_rotation(v,250)
+
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
         if len(self.add_queue)>0:
@@ -820,6 +823,7 @@ class World(object):
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
+        self.debug_text_queue.append('Player memory current task: '+self.player.ai.memory['current_task'])
         self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
         self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
         self.debug_text_queue.append('Player Screen Coords'+str(self.player.screen_coords))

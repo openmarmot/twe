@@ -312,6 +312,11 @@ def moveTowardsTarget(speed,location,destination, time_passed):
     return get_round_vector_2([location[0]+change[0],location[1]+change[1]])
 
 #------------------------------------------------------------------------------
+def randomize_coordinates(coords,amount):
+    '''randomize a set of coordinates [x,y] and return the results'''
+    return [coords[0]+float(random.randint(-amount,amount)),coords[1]+float(random.randint(-amount,amount))]
+
+#------------------------------------------------------------------------------
 def randomize_position_and_rotation(worldobj,amount=15,):
     ''' takes a world object and randomizes the rotation and position'''
     w=worldobj.world_coords
