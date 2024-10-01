@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+----------------------------------
+september 30 2024
+- fixed debug text issue on death
+- minor code cleanup 
+- added 4000 to all starting positions to give a little more spacing 
+- some town generation tuning 
+
+had fun playing in tactical mode again. i'm not 100% sure why but battles always start with both sides 
+bee-lining for the town that is usually at [0,0], resulting in a huge mess as they robotically walk right 
+into fire. i think on the previous quick battle setup there were a bunch more objectives and the germans didn't 
+get vehicles at the start so the action was more gradual. 
+
+I do need to do something to randomize the coordinates that squads go to a little. otherwise it looks silly.. 
+also needs to write in some code to early eject from vehicles when the enemy has already taken a point. driving direct in 
+if you have a unarmored truck is a disaster. the armored half tracks have other issues as they are one of the few things in the 
+game that is bullet proof to small arms. 
+
+todo 
+- need to fix issue where the ai sometimes controls the player character 
 
 ----------------------------------
 september 28 2024

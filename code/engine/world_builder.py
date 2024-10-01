@@ -290,7 +290,7 @@ def generate_world_area_rail_yard(world_coords):
 def generate_world_area_town(world_coords):
     count_warehouse=random.randint(1,5)
     count_building=random.randint(2,14)
-    coords=engine.math_2d.get_grid_coords(world_coords,1150,count_warehouse+count_building)
+    coords=engine.math_2d.get_grid_coords(world_coords,600,count_warehouse+count_building)
     map_objects=[]
     rotation=random.randint(1,359)
     for _ in range(count_warehouse):
@@ -345,8 +345,8 @@ def load_quick_battle(world,spawn_faction):
     map_objects=[]
 
     # generate towns
-    town_count=3
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,4000,town_count)
+    town_count=4
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],6000,5000,town_count)
     for _ in range(town_count):
         coords=coord_list.pop()
         name='Town' # should generate a interessting name

@@ -221,7 +221,7 @@ class StrategicMap(object):
                 map_area_count+=1
 
             if map_area_count>0:
-                coord_list=engine.math_2d.get_random_constrained_coords([0,0],5000,2000,map_area_count)
+                coord_list=engine.math_2d.get_random_constrained_coords([0,0],6000,5000,map_area_count)
 
                 if map.rail_yard:
                     coords=coord_list.pop()

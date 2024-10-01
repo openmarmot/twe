@@ -32,10 +32,10 @@ class World(object):
         
         # spawn locations
         self.spawn_center=[0.,0.]
-        self.spawn_north=[0.,-4000.]
-        self.spawn_south=[0.,4000.]
-        self.spawn_west=[-4000.,0.]
-        self.spawn_east=[4000.,0.]
+        self.spawn_north=[0.,-8000.]
+        self.spawn_south=[0.,8000.]
+        self.spawn_west=[-8000.,0.]
+        self.spawn_east=[8000.,0.]
         self.spawn_far_east=[10000.,0.]
 
         # tactical AIs
@@ -550,7 +550,6 @@ class World(object):
         # kind of a hack as humans get positions when the squads are created, but vehicles don't
 
         for v in self.wo_objects_vehicle:
-            print(v.name)
             if v.world_builder_identity in engine.world_builder.list_vehicles_german:
                 v.world_coords=self.german_ai.spawn_location
             elif v.world_builder_identity in engine.world_builder.list_vehicles_soviet:

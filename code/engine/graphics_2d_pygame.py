@@ -382,7 +382,7 @@ class Graphics_2D_Pygame(object):
         elif self.mode==1:
             self.world.update(self.time_passed_seconds)
             # insert graphic engine specific debug text (after world.update populated it)
-            if self.world.debug_mode:
+            if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
