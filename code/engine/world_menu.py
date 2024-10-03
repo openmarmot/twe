@@ -101,6 +101,8 @@ class World_Menu(object):
             self.engine_menu(key)
         elif self.active_menu=='radio_menu':
             self.radio_menu(key)
+        elif self.active_menu=='exit_world':
+            self.exit_world_menu(key)
         else:
             if self.active_menu!='none':
                 print('Error : active menu not recognized ',self.active_menu)
@@ -446,6 +448,25 @@ class World_Menu(object):
             vehicle.ai.handle_stop_engines()
             self.engine_menu(None)
 
+    #---------------------------------------------------------------------------
+    def exit_world_menu(self,key):
+        '''handle exiting the world -> strategic map'''
+        # print out the basic menu
+        self.text_queue=[]
+        self.text_queue.append('-- Exit World Menu --')
+        self.text_queue.append('Current coordinates '+str(engine.math_2d.get_round_vector_2(self.world.player.world_coords)))
+
+        if self.world.map_square_name==None:
+            self.text_queue.append('Exiting the map not enabled for quick battles')
+        else:
+            self.text_queue.append('Current Map: '+self.world.map_square_name)
+
+            self.text_queue.append('1 - Exit World')
+            if key=='1':
+                self.world.exit_world=True
+                self.deactivate_menu()
+
+            # check which exit zone the player is in (if any)
 
     #---------------------------------------------------------------------------            
     def first_aid_menu(self, key):
@@ -628,9 +649,10 @@ class World_Menu(object):
             self.text_queue.append('2 - Squad Menu')
             self.text_queue.append('3 - Eat/Drink')
             self.text_queue.append('4 - First Aid')
+            self.text_queue.append('5 - Exit World')
             if self.selected_object.ai.large_pickup!=None:
-                self.text_queue.append('5 - Drop '+self.selected_object.ai.large_pickup.name)
-                if key=='5':
+                self.text_queue.append('6 - Drop '+self.selected_object.ai.large_pickup.name)
+                if key=='6':
                     self.selected_object.ai.drop_object(self.selected_object.ai.large_pickup)
                     self.deactivate_menu()
             if key=='1':
@@ -641,6 +663,8 @@ class World_Menu(object):
                 self.change_menu('eat_drink')
             if key=='4':
                 self.change_menu('first_aid')
+            if key=='5':
+                self.change_menu('exit_world')
             
         elif self.menu_state == 'squad_member_menu':
             self.text_queue.append('1 - [Speak] What are you up to ?')

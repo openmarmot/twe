@@ -14,6 +14,7 @@ import math
 from datetime import datetime
 
 #import custom packages
+import engine.log
 import engine.math_2d
 import engine.world_builder
 from engine.world import World
@@ -46,12 +47,15 @@ class StrategicMap(object):
         self.map_offset_x=400
         self.map_offset_y=150
 
+        # save file name
+        self.save_file_name=None
+
     #---------------------------------------------------------------------------
-    def create_map_squares(self,save_file_name):
+    def create_map_squares(self):
         '''create the map squares and screen positions'''
 
         # get all the table names from the database
-        map_names=self.get_table_names(save_file_name)
+        map_names=self.get_table_names(self.save_file_name)
             # Determine the number of squares per row (round up if it's not a perfect square)
         grid_size = math.ceil(math.sqrt(len(map_names)))
 
@@ -91,11 +95,11 @@ class StrategicMap(object):
     
 
     #------------------------------------------------------------------------------
-    def create_new_save_file(self,save_file_name,map_size):
+    def create_new_save_file(self,map_size):
         '''generate a map and create save file'''
         map_name=['A','B','C','D','E','F','G','H','I','J','K']
         # create the database
-        conn = sqlite3.connect(save_file_name)
+        conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
         # generate the tables
         for a in range(map_size):
@@ -297,7 +301,7 @@ class StrategicMap(object):
         self.strategic_menu.handle_input(key)
 
     #------------------------------------------------------------------------------
-    def load_all_maps(self,save_file):
+    def load_all_maps(self):
 
         # load all maps and map_objects in from save file
 
@@ -311,6 +315,9 @@ class StrategicMap(object):
         # create a fresh world 
         self.graphics_engine.world=World()
 
+        # set the map name so we can unload it to the correct map when we are done playing
+        self.graphics_engine.world.map_square_name=map_square.name
+
         # send to world_builder to convert map_objects to world_objects (this spawns them)
         engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects,spawn_faction)
 
@@ -320,10 +327,10 @@ class StrategicMap(object):
         self.graphics_engine.mode=1
 
     #------------------------------------------------------------------------------
-    def save_all_maps(self,save_file):
+    def save_all_maps(self):
         ''' save all maps to sqlite'''
 
-        conn = sqlite3.connect(save_file)
+        conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
         
         # iterate through each map and save map_objects to sqlite
@@ -377,33 +384,31 @@ class StrategicMap(object):
         # Close the connection
         conn.close()
     
-
-
     #------------------------------------------------------------------------------
-    def save_world(self,world,save_file):
-        '''saves the current world data'''
+    def save_and_exit_game(self):
+        '''saves all maps and exits game'''
 
+        # by the time you get here the world is already unloaded.
 
-        # distribute objects that left the map to the appropriate map_square tables
+        # one more save all
+        self.save_all_maps()
 
-        # clear the current map square table
+        print('----------------------')
+        print('Good Bye!')
 
-        # save existing world objects to the current map square
-
-        # world.reset() to wipe all the world array data
-
-        pass
+        # exit
+        self.graphics_engine.quit=True
 
     #---------------------------------------------------------------------------
     def start_new_campaign(self):
         map_size=10
-        save_file=self.generate_save_filename()
+        self.save_file_name=self.generate_save_filename()
 
         # create the sql database file
-        self.create_new_save_file(save_file,map_size)
+        self.create_new_save_file(map_size)
 
         # create map squares
-        self.create_map_squares(save_file)
+        self.create_map_squares()
 
         # generate initial map features
         self.generate_initial_map_features(map_size)
@@ -421,10 +426,43 @@ class StrategicMap(object):
         self.update_map_data()
 
         # save all maps
-        self.save_all_maps(save_file)   
+        self.save_all_maps()   
         
         # load specific map player is in 
-            
+
+    #------------------------------------------------------------------------------
+    def unload_world(self):  
+        '''unload world to the correct map_square and make the transition to the strategic map'''
+        
+        # determine what map_square was represented by the loaded world
+        map_square=None
+        for b in self.map_squares:
+            if b.name==self.graphics_engine.world.map_square_name:
+                map_square=b
+                break
+                
+        if map_square==None:
+            engine.log.add_data('error','strategic_map.unload_world: world.map_square_name unknown: '+
+                self.graphics_engine.world.map_square_name,True)
+        else:
+            # unload world objects into the map square
+            engine.world_builder.convert_world_objects_to_map_objects(self.graphics_engine.world,map_square)
+
+            # process objects that left the map
+
+            # update map data everywhere
+            self.update_map_data()
+
+            # save everything
+            self.save_all_maps()
+
+            # reset strategic menus
+            self.strategic_menu.change_menu('start')
+
+            # switch to strategic mode
+            self.graphics_engine.mode=2
+
+
     
     #---------------------------------------------------------------------------
     def update(self):

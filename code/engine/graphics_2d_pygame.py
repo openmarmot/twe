@@ -386,6 +386,10 @@ class Graphics_2D_Pygame(object):
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
+            
+            if self.world.exit_world:
+                self.strategic_map.unload_world()
+                self.mode=2
         elif self.mode==2:
             self.strategic_map.update()
 

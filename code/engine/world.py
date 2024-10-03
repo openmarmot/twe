@@ -29,6 +29,13 @@ from ai.ai_faction_tactical import AIFactionTactical
 class World(object):
     #---------------------------------------------------------------------------
     def __init__(self):
+
+        # name of the map square that world was loaded from. set by strategic_map.load_world()
+        # this is None for a quick battle
+        self.map_square_name=None
+
+        # triggers a unload of the world and the transition to strategic_map
+        self.exit_world=False
         
         # spawn locations
         self.spawn_center=[0.,0.]

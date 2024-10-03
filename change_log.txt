@@ -1,7 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
-september 31 2024
+October 3 2024
+- working on the world -> strategic map transition
+- added some options to exit the game
+
+the transition between world and strategic map now 
+works in both directions.
+
+----------------------------------
+October 1 2024
 - fixes for edge cases where the ai could accidentally take control of the player 
 - randomized spawn position a bit to reduce clumping 
 - randomized the squad destinations a bit so squads aren't stacking up on each other
