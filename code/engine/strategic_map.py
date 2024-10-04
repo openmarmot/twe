@@ -325,7 +325,8 @@ class StrategicMap(object):
                 # Convert stored string data into correct formats
                 world_coords = [float(world_coords.split(',')[0]),float(world_coords.split(',')[1])]
                 rotation = float(rotation)
-                inventory = inventory.split(',')
+                # inventory will be '' in the db when it is empty. we want it to be [] not [''] 
+                inventory = inventory.split(',') if inventory is not '' else []
 
                 # Create a new MapObject instance
                 map_object = MapObject(world_builder_identity, name, world_coords, rotation, inventory)
@@ -507,6 +508,10 @@ class StrategicMap(object):
         for b in self.map_squares:
             b.update_map_control()
 
-        # once the map control is updated everywhere, update hostile count 
+        # it is important that map_control is updated on all maps before this is run
         for b in self.map_squares:
             b.update_hostile_count()
+
+        # update the map features that result in letters being added to the map squares
+        for b in self.map_squares:
+            b.update_map_features()

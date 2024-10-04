@@ -6,8 +6,14 @@ October 4 2024
 - removed extra spaces from save data 
 - added turrets to the list of things that don't get saved 
 
+saving and loading campaigns technically works now as far as i can tell. 
+save/load is turned off for quick battles. i think eventually the quick battles will be just 
+a pre-baked campaign saved at the point where a fight is going on, but for now it is different 
+enough that it is not worth setting up save/load for it. 
+
 todo 
-- recognize world_areas when loading maps 
+- rewrite how objects exiting the map are handled (currently they are removed from wo_objects, so they are not saved)
+- 'turns' on the strategic map 
 
 ----------------------------------
 October 3 2024

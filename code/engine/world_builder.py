@@ -131,6 +131,7 @@ def convert_map_objects_to_world_objects(world,map_objects):
             # add in the saved inventory
             # remember that map_object.inventory is a array of world_builder_identity names
             if len(map_object.inventory)>0:
+                #print('inventory',map_object.inventory)
                 # need to prevent duplicates. this could be better
                 for a in map_object.inventory:
                     already_exists=False

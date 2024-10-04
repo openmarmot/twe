@@ -34,7 +34,7 @@ class MapSquare(object):
         self.west=None
         self.east=None
 
-        # some big deal map features 
+        # large world areas that are visible on the map interface
         self.rail_yard=False
         self.airport=False
         self.town=False
@@ -107,6 +107,29 @@ class MapSquare(object):
             elif self.american_count==0 and self.german_count==0 and self.soviet_count==0:
                 # we could either reset to neutral or just do nothing here
                 pass
+
+    #---------------------------------------------------------------------------
+    def update_map_features(self):
+        '''update the map features based on world_area in map objects'''
+
+        # reset everything to false
+        self.rail_yard=False
+        self.airport=False
+        self.town=False
+
+        for b in self.map_objects:
+            if b.world_builder_identity.startswith('world_area_'):
+                # split out the actual type from the name
+                area_type=b.world_builder_identity.split('world_area_')[1]
+
+                if area_type=='rail_yard':
+                    self.rail_yard=True
+                elif area_type=='town':
+                    self.town=True
+                elif area_type=='airport':
+                    self.airport=True
+                else:
+                    engine.log.add_data('error','map_square.update_map_features - area unknown: '+area_type,True)
 
 
     
