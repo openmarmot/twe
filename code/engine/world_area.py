@@ -45,7 +45,7 @@ class WorldArea(object):
 
         # helps AI determine how to interact with it
         # town / fuel_dump / 
-        self.type='none'
+        self.area_type='none'
 
         # True if more than one faction is present
         self.is_contested=False

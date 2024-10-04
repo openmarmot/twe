@@ -83,7 +83,7 @@ class GameMenu(object):
             self.text_queue.append('1 - New Campaign (preview: work in progess)')
             self.text_queue.append('2 - Load Campaign (not implemented)')
             self.text_queue.append('3 - Quick Battle (choose this)')
-            #self.text_queue.append('4 - Nothing') 
+            self.text_queue.append('4 - Exit') 
 
             if key=='1':
                 self.graphics_engine.mode=2
@@ -94,6 +94,10 @@ class GameMenu(object):
             elif key=='3':
                 self.menu_state='faction_select'
                 key='none'
+            elif key=='4':
+                print('----------------------')
+                print('Good Bye!')
+                self.graphics_engine.quit=True
 
         if self.menu_state=='faction_select':
             self.text_queue=[]

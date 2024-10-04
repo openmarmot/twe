@@ -115,7 +115,7 @@ def convert_map_objects_to_world_objects(world,map_objects):
             w=WorldArea(world)
             w.world_coords=map_object.world_coords
             w.name=map_object.name
-            w.type=map_object.world_builder_identity.split('world_area_')[1]
+            w.area_type=map_object.world_builder_identity.split('world_area_')[1]
 
             # register with world 
             world.world_areas.append(w)
@@ -143,6 +143,37 @@ def convert_map_objects_to_world_objects(world,map_objects):
 
     # this is needed to flush all the new objects out of the queue and into the world
     world.process_add_remove_queue()
+
+#------------------------------------------------------------------------------
+def convert_world_objects_to_map_objects(world,map_square):
+    '''converts all world objects to map objects'''
+
+    # clear old map objects
+    map_square.map_objects=[]
+
+    # convert world areas to map objects
+    for b in world.world_areas:
+        temp=MapObject('world_area_'+b.area_type,b.name,b.world_coords,0,[])
+        map_square.map_objects.append(temp)
+
+    # convert world objects to map objects
+    for b in world.wo_objects:
+        # a couple objects we don't want to save
+        if (b.is_projectile==False and b.is_map_pointer==False and
+            b.can_be_deleted==False and b.is_particle_effect==False):
+            # assemble inventory name list
+            inventory=[]
+            if hasattr(b.ai,'inventory'):
+                for i in b.ai.inventory:
+                    inventory.append(i.world_builder_identity)
+            temp=MapObject(b.world_builder_identity,b.name,b.world_coords,0,inventory)
+            map_square.map_objects.append(temp)
+
+
+
+    # handle objects that exited the map
+
+
 
 
 #------------------------------------------------------------------------------

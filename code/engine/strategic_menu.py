@@ -68,7 +68,8 @@ class StrategicMenu(object):
         self.time_since_input=0
 
         if key=='esc':
-            pass
+            self.deactivate_menu()
+            self.change_menu('start')
 
 
         if self.active_menu=='start':
@@ -118,6 +119,8 @@ class StrategicMenu(object):
         self.text_queue.append('American Units: '+str(self.selected_object.american_count))
         self.text_queue.append('Civilians: '+str(self.selected_object.civilian_count))
 
+        self.text_queue.append('Esc - back to main menu')
+
         if (self.selected_object.german_count+self.selected_object.soviet_count+self.selected_object.american_count+self.selected_object.civilian_count)>0:
             self.text_queue.append('1 - Spawn')
             if key=='1':
@@ -127,6 +130,9 @@ class StrategicMenu(object):
     def spawn_menu(self,key):
         self.text_queue=[]
         self.text_queue.append('Spawn on map '+self.selected_object.name)
+        self.text_queue.append('-----------')
+        self.text_queue.append('Esc - back to main menu')
+        
 
         if self.selected_object.german_count>0:
             self.text_queue.append('1 - Spawn German')
@@ -166,14 +172,20 @@ class StrategicMenu(object):
             self.text_queue.append('Blue Square : Neutral')
             self.text_queue.append('Red Square : Soviet Controlled')
             self.text_queue.append('-----------')
-            self.text_queue.append('Selecct a Map Square for more info..')
+            self.text_queue.append('[Select a Map Square to spawn on that map.]')
+            self.text_queue.append('-----------')
+            self.text_queue.append('1 - Advance time one turn (not implemented)')
+            self.text_queue.append('2 - Advance until combat (not implemented)')
+            self.text_queue.append('3 - Save and exit ')
 
             #self.text_queue.append('4 - Nothing')
 
-            if key=='1' or key=='2' or key=='3':
-                #self.menu_state='faction_select'
-                #key='none'
+            if key=='1':
                 pass
+            elif key=='2':
+                pass
+            elif key=='3':
+                self.strategic_map.save_and_exit_game()
 
 
 
