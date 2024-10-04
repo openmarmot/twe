@@ -160,7 +160,8 @@ def convert_world_objects_to_map_objects(world,map_square):
     for b in world.wo_objects:
         # a couple objects we don't want to save
         if (b.is_projectile==False and b.is_map_pointer==False and
-            b.can_be_deleted==False and b.is_particle_effect==False):
+            b.can_be_deleted==False and b.is_particle_effect==False 
+            and b.is_turret==False):
             # assemble inventory name list
             inventory=[]
             if hasattr(b.ai,'inventory'):

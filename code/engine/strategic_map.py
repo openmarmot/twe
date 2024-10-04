@@ -58,7 +58,7 @@ class StrategicMap(object):
         '''create the map squares and screen positions'''
 
         # get all the table names from the database
-        map_names=self.get_table_names(self.save_file_name)
+        map_names=self.get_table_names()
             # Determine the number of squares per row (round up if it's not a perfect square)
         grid_size = math.ceil(math.sqrt(len(map_names)))
 
@@ -269,9 +269,9 @@ class StrategicMap(object):
         return f"saves/save_{timestamp}_{random_part}.sqlite"
 
     #---------------------------------------------------------------------------
-    def get_table_names(self,db_file_path):
+    def get_table_names(self):
         # Connect to the SQLite database
-        connection = sqlite3.connect(db_file_path)
+        connection = sqlite3.connect(self.save_file_name)
         
         # Create a cursor object to execute SQL commands
         cursor = connection.cursor()
@@ -307,15 +307,38 @@ class StrategicMap(object):
         '''load a campaign from file and initialize strategic map'''
         self.save_file_name=save_file_name
 
-        print(save_file_name)
-
         # create map squares
-        #self.create_map_squares()
+        self.create_map_squares()
+        
+        for map_square in self.map_squares:
+            conn = sqlite3.connect(self.save_file_name)
+            cursor = conn.cursor()
 
-        # load in map_objects from sql
+            select_all_sql = f"SELECT * FROM {map_square.name};"
+            cursor.execute(select_all_sql)
+            rows = cursor.fetchall()
+
+            # Iterate through each row and create a new MapObject
+            for row in rows:
+                id, world_builder_identity, name, world_coords, rotation, inventory = row
+
+                # Convert stored string data into correct formats
+                world_coords = [float(world_coords.split(',')[0]),float(world_coords.split(',')[1])]
+                rotation = float(rotation)
+                inventory = inventory.split(',')
+
+                # Create a new MapObject instance
+                map_object = MapObject(world_builder_identity, name, world_coords, rotation, inventory)
+
+                # Add the MapObject instance to the list
+                map_square.map_objects.append(map_object)
+
+            # Close the connection
+            conn.close()
+
 
         # update map data
-        #self.update_map_data()
+        self.update_map_data()
 
          
     #------------------------------------------------------------------------------
@@ -362,9 +385,9 @@ class StrategicMap(object):
             for b in map.map_objects:
 
                 # string conversions
-                world_coords= ', '.join(str(item) for item in b.world_coords)
+                world_coords= ','.join(str(item) for item in b.world_coords)
                 rotation=str(b.rotation)
-                inventory=', '.join(str(item) for item in b.inventory)
+                inventory=','.join(str(item) for item in b.inventory)
                 data_list.append(
                     {
                         'world_builder_identity': b.world_builder_identity,

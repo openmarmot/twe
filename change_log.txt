@@ -3,6 +3,11 @@ TWE Project : Change Log
 ----------------------------------
 October 4 2024
 - working on loading saves 
+- removed extra spaces from save data 
+- added turrets to the list of things that don't get saved 
+
+todo 
+- recognize world_areas when loading maps 
 
 ----------------------------------
 October 3 2024
