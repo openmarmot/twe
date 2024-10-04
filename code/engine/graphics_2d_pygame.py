@@ -130,6 +130,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
+                #print(event.key)
                 translated_key='none'
                 if event.key==96:
                     translated_key="tilde"
@@ -155,7 +156,7 @@ class Graphics_2D_Pygame(object):
                     translated_key="9"
                 elif event.key==27:
                     translated_key="esc"
-                elif event.key==9: #tab
+                elif event.key==9:
                     translated_key='tab'
                 elif event.key==112:
                     translated_key='p'
@@ -165,6 +166,10 @@ class Graphics_2D_Pygame(object):
                     translated_key='g'
                 elif event.key==114:
                     translated_key='r'
+                elif event.key==45:
+                    translated_key='-'
+                elif event.key==61:
+                    translated_key='+'
 
                 if self.mode==0:
                     self.game_menu.handle_input(translated_key)

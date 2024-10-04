@@ -132,21 +132,6 @@ class StrategicMap(object):
 
         # Close the connection
         conn.close()
-
-    #---------------------------------------------------------------------------
-    def generate_save_filename(self,length=8):
-        # Characters to choose from
-        chars = string.ascii_letters + string.digits
-        # Generate random part of the filename
-        random_part = ''.join(random.choice(chars) for _ in range(length))
-        
-        # Get current date and time
-        now = datetime.now()
-        # Format the timestamp as YYYYMMDD_HHMMSS
-        timestamp = now.strftime("%Y%m%d_%H%M%S")
-        
-        # Combine with 'save' prefix, timestamp, and random part
-        return f"saves/save_{timestamp}_{random_part}.sqlite"
     
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
@@ -268,6 +253,20 @@ class StrategicMap(object):
                 # not setup to handle this yet
                 pass
 
+    #---------------------------------------------------------------------------
+    def generate_save_filename(self,length=8):
+        # Characters to choose from
+        chars = string.ascii_letters + string.digits
+        # Generate random part of the filename
+        random_part = ''.join(random.choice(chars) for _ in range(length))
+        
+        # Get current date and time
+        now = datetime.now()
+        # Format the timestamp as YYYYMMDD_HHMMSS
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        
+        # Combine with 'save' prefix, timestamp, and random part
+        return f"saves/save_{timestamp}_{random_part}.sqlite"
 
     #---------------------------------------------------------------------------
     def get_table_names(self,db_file_path):
@@ -308,13 +307,15 @@ class StrategicMap(object):
         '''load a campaign from file and initialize strategic map'''
         self.save_file_name=save_file_name
 
+        print(save_file_name)
+
         # create map squares
-        self.create_map_squares()
+        #self.create_map_squares()
 
         # load in map_objects from sql
 
         # update map data
-        self.update_map_data()
+        #self.update_map_data()
 
          
     #------------------------------------------------------------------------------

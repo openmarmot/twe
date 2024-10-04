@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 4 2024
+- working on loading saves 
+
+----------------------------------
 October 3 2024
 - working on the world -> strategic map transition
 - added some options to exit the game
