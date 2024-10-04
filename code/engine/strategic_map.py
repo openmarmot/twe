@@ -50,6 +50,9 @@ class StrategicMap(object):
         # save file name
         self.save_file_name=None
 
+        # map size
+        self.map_size=10
+
     #---------------------------------------------------------------------------
     def create_map_squares(self):
         '''create the map squares and screen positions'''
@@ -95,15 +98,15 @@ class StrategicMap(object):
     
 
     #------------------------------------------------------------------------------
-    def create_new_save_file(self,map_size):
+    def create_new_save_file(self):
         '''generate a map and create save file'''
         map_name=['A','B','C','D','E','F','G','H','I','J','K']
         # create the database
         conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
         # generate the tables
-        for a in range(map_size):
-            for b in range(map_size):
+        for a in range(self.map_size):
+            for b in range(self.map_size):
                 table_name=map_name[a]+str(b)
                 # create table
                 create_table_sql = f'''
@@ -164,7 +167,7 @@ class StrategicMap(object):
         random.choice(self.map_squares).map_objects.append(MapObject('shovel_man','shovel_man',coords,rotation,[]))
     
     #---------------------------------------------------------------------------
-    def generate_initial_map_features(self,map_size):
+    def generate_initial_map_features(self):
         '''generate map feature placement'''
 
         # i think we also need to generate the features themselves
@@ -174,8 +177,8 @@ class StrategicMap(object):
 
         west_column=[]
         east_column=[]
-        north_row=self.map_squares[:map_size]
-        south_row=self.map_squares[-map_size:]
+        north_row=self.map_squares[:self.map_size]
+        south_row=self.map_squares[-self.map_size:]
 
         for b in self.map_squares:
             if b.name[0]=='A':
@@ -300,14 +303,20 @@ class StrategicMap(object):
         #print('key ',KEY)
         self.strategic_menu.handle_input(key)
 
-    #------------------------------------------------------------------------------
-    def load_all_maps(self):
+    #---------------------------------------------------------------------------
+    def load_campaign_from_save(self,save_file_name):
+        '''load a campaign from file and initialize strategic map'''
+        self.save_file_name=save_file_name
 
-        # load all maps and map_objects in from save file
+        # create map squares
+        self.create_map_squares()
 
-        # once all map objects are loaded, update the map control, hostile count, and unit counts
+        # load in map_objects from sql
+
+        # update map data
         self.update_map_data()
 
+         
     #------------------------------------------------------------------------------
     def load_world(self,map_square,spawn_faction):
         '''handles handoff from strategic map to world mode and loads a map->world'''
@@ -401,17 +410,16 @@ class StrategicMap(object):
 
     #---------------------------------------------------------------------------
     def start_new_campaign(self):
-        map_size=10
         self.save_file_name=self.generate_save_filename()
 
         # create the sql database file
-        self.create_new_save_file(map_size)
+        self.create_new_save_file()
 
         # create map squares
         self.create_map_squares()
 
         # generate initial map features
-        self.generate_initial_map_features(map_size)
+        self.generate_initial_map_features()
 
         # generate map objects for the features
         self.generate_initial_map_objects()

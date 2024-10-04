@@ -4,6 +4,7 @@ TWE Project : Change Log
 October 3 2024
 - working on the world -> strategic map transition
 - added some options to exit the game
+- started work on campaign loading 
 
 the transition between world and strategic map now 
 works in both directions.
