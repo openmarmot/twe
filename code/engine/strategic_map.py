@@ -32,7 +32,7 @@ class StrategicMap(object):
 
         self.graphics_engine=graphics_engine
 
-        self.strategic_menu=StrategicMenu(self)
+        
 
         self.map_squares=[]
 
@@ -52,13 +52,72 @@ class StrategicMap(object):
 
         # map size
         self.map_size=10
+        
+        self.strategic_menu=StrategicMenu(self)
+
+    #---------------------------------------------------------------------------
+    def advance_turn(self):
+        '''have all the strategic ai take one turn and then update the map'''
+
+        for b in self.strategic_ai:
+            b.advance_turn()
+            self.update_map_data()
+
+    #---------------------------------------------------------------------------
+    def auto_resolve_battles(self):
+        
+        self.update_map_data()
+
+        for map in self.map_squares:
+            if map.map_control=='contested':
+                germans_to_remove=0
+                soviets_to_remove=0
+                if map.german_count>map.soviet_count:
+                    soviets_to_remove=map.soviet_count
+                    germans_to_remove=random.randint(0,map.german_count)
+                elif map.soviet_count>map.german_count:
+                    germans_to_remove=map.german_count
+                    soviets_to_remove=random.randint(0,map.soviet_count)
+                else:
+                    germans_to_remove=map.german_count
+                    soviets_to_remove=map.soviet_count
+                
+                troops_to_remove=[]
+                german_removed=0
+                soviet_removed=0
+                for b in map.map_objects:
+                    if b.world_builder_identity.startswith('german') and german_removed<germans_to_remove:
+                        troops_to_remove.append(b)
+                        german_removed+=1
+                    if b.world_builder_identity.startswith('soviet') and soviet_removed<soviets_to_remove:
+                        troops_to_remove.append(b)
+                        soviet_removed+=1
+
+                for b in troops_to_remove:
+                    map.map_objects.remove(b)
+
+
+                if german_removed!=germans_to_remove or soviet_removed!=soviets_to_remove:
+                    print('----')
+                    print('troops to remove',len(troops_to_remove))
+                    print('germans to remove',germans_to_remove)
+                    print('german_removed',german_removed)
+                    print('soviets to remove',soviets_to_remove)
+                    print('soviet_removed',soviet_removed)
+                    print('----')
+                    for b in map.map_objects:
+                        print('identity',b.world_builder_identity,'name: ',b.name)
+
+                
+        self.update_map_data()
+            
 
     #---------------------------------------------------------------------------
     def create_map_squares(self):
         '''create the map squares and screen positions'''
 
         # get all the table names from the database
-        map_names=self.get_table_names(self.save_file_name)
+        map_names=self.get_table_names()
             # Determine the number of squares per row (round up if it's not a perfect square)
         grid_size = math.ceil(math.sqrt(len(map_names)))
 
@@ -132,21 +191,6 @@ class StrategicMap(object):
 
         # Close the connection
         conn.close()
-
-    #---------------------------------------------------------------------------
-    def generate_save_filename(self,length=8):
-        # Characters to choose from
-        chars = string.ascii_letters + string.digits
-        # Generate random part of the filename
-        random_part = ''.join(random.choice(chars) for _ in range(length))
-        
-        # Get current date and time
-        now = datetime.now()
-        # Format the timestamp as YYYYMMDD_HHMMSS
-        timestamp = now.strftime("%Y%m%d_%H%M%S")
-        
-        # Combine with 'save' prefix, timestamp, and random part
-        return f"saves/save_{timestamp}_{random_part}.sqlite"
     
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
@@ -268,11 +312,25 @@ class StrategicMap(object):
                 # not setup to handle this yet
                 pass
 
+    #---------------------------------------------------------------------------
+    def generate_save_filename(self,length=8):
+        # Characters to choose from
+        chars = string.ascii_letters + string.digits
+        # Generate random part of the filename
+        random_part = ''.join(random.choice(chars) for _ in range(length))
+        
+        # Get current date and time
+        now = datetime.now()
+        # Format the timestamp as YYYYMMDD_HHMMSS
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+        
+        # Combine with 'save' prefix, timestamp, and random part
+        return f"saves/save_{timestamp}_{random_part}.sqlite"
 
     #---------------------------------------------------------------------------
-    def get_table_names(self,db_file_path):
+    def get_table_names(self):
         # Connect to the SQLite database
-        connection = sqlite3.connect(db_file_path)
+        connection = sqlite3.connect(self.save_file_name)
         
         # Create a cursor object to execute SQL commands
         cursor = connection.cursor()
@@ -310,8 +368,34 @@ class StrategicMap(object):
 
         # create map squares
         self.create_map_squares()
+        
+        for map_square in self.map_squares:
+            conn = sqlite3.connect(self.save_file_name)
+            cursor = conn.cursor()
 
-        # load in map_objects from sql
+            select_all_sql = f"SELECT * FROM {map_square.name};"
+            cursor.execute(select_all_sql)
+            rows = cursor.fetchall()
+
+            # Iterate through each row and create a new MapObject
+            for row in rows:
+                id, world_builder_identity, name, world_coords, rotation, inventory = row
+
+                # Convert stored string data into correct formats
+                world_coords = [float(world_coords.split(',')[0]),float(world_coords.split(',')[1])]
+                rotation = float(rotation)
+                # inventory will be '' in the db when it is empty. we want it to be [] not [''] 
+                inventory = inventory.split(',') if inventory != '' else []
+
+                # Create a new MapObject instance
+                map_object = MapObject(world_builder_identity, name, world_coords, rotation, inventory)
+
+                # Add the MapObject instance to the list
+                map_square.map_objects.append(map_object)
+
+            # Close the connection
+            conn.close()
+
 
         # update map data
         self.update_map_data()
@@ -361,9 +445,9 @@ class StrategicMap(object):
             for b in map.map_objects:
 
                 # string conversions
-                world_coords= ', '.join(str(item) for item in b.world_coords)
+                world_coords= ','.join(str(item) for item in b.world_coords)
                 rotation=str(b.rotation)
-                inventory=', '.join(str(item) for item in b.inventory)
+                inventory=','.join(str(item) for item in b.inventory)
                 data_list.append(
                     {
                         'world_builder_identity': b.world_builder_identity,
@@ -483,6 +567,10 @@ class StrategicMap(object):
         for b in self.map_squares:
             b.update_map_control()
 
-        # once the map control is updated everywhere, update hostile count 
+        # it is important that map_control is updated on all maps before this is run
         for b in self.map_squares:
             b.update_hostile_count()
+
+        # update the map features that result in letters being added to the map squares
+        for b in self.map_squares:
+            b.update_map_features()

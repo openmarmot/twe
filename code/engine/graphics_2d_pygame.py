@@ -92,6 +92,7 @@ class Graphics_2D_Pygame(object):
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
         self.menu_color=('#394B32')
+        self.color_black=('#000000')
 
         
 
@@ -130,6 +131,7 @@ class Graphics_2D_Pygame(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
+                #print(event.key)
                 translated_key='none'
                 if event.key==96:
                     translated_key="tilde"
@@ -155,7 +157,7 @@ class Graphics_2D_Pygame(object):
                     translated_key="9"
                 elif event.key==27:
                     translated_key="esc"
-                elif event.key==9: #tab
+                elif event.key==9:
                     translated_key='tab'
                 elif event.key==112:
                     translated_key='p'
@@ -165,6 +167,10 @@ class Graphics_2D_Pygame(object):
                     translated_key='g'
                 elif event.key==114:
                     translated_key='r'
+                elif event.key==45:
+                    translated_key='-'
+                elif event.key==61:
+                    translated_key='+'
 
                 if self.mode==0:
                     self.game_menu.handle_input(translated_key)
@@ -281,6 +287,12 @@ class Graphics_2D_Pygame(object):
                         self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.menu_color)
                     if c.town:
                         self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.menu_color)
+
+                    # german count 
+                    if c.german_count>0:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]-25,c.screen_coords[1]+20), str(c.german_count), self.color_black)
+                    if c.soviet_count>0:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]+15,c.screen_coords[1]+20), str(c.soviet_count), self.color_black)
 
         # text stuff
         if self.mode==0:

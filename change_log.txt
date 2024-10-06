@@ -1,6 +1,39 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 5 2024
+- added advance turn on strategic map 
+- added auto resolve battle 
+- added in some dynamic invisible world areas so that there is something to fight over on 
+empty maps. 
+
+empty maps are an issue. i need to start adding some plants and terrain so maps without towns aren't so boring.
+
+the algorithm for strategic map moves isn't very interesting. it probably needs to be smarter, and 
+we might need more map squares. it is a good start anyways 
+
+the auto battle ressolver is terrible. it is just a place holder until i get around to making something 
+that makes sense. 
+
+once i add in the ability for the strategic ai to buy and place new units the map control will probably 
+get better. 
+
+----------------------------------
+October 4 2024
+- working on loading saves 
+- removed extra spaces from save data 
+- added turrets to the list of things that don't get saved 
+
+saving and loading campaigns technically works now as far as i can tell. 
+save/load is turned off for quick battles. i think eventually the quick battles will be just 
+a pre-baked campaign saved at the point where a fight is going on, but for now it is different 
+enough that it is not worth setting up save/load for it. 
+
+todo 
+- rewrite how objects exiting the map are handled (currently they are removed from wo_objects, so they are not saved)
+- 'turns' on the strategic map 
+
+----------------------------------
 October 3 2024
 - working on the world -> strategic map transition
 - added some options to exit the game

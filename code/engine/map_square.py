@@ -23,7 +23,7 @@ class MapSquare(object):
         self.scale_modifier=0.5
         self.image=None
         self.image_index=0
-        self.image_list=['map_blue','map_red','map_grey']
+        self.image_list=['map_blue','map_red','map_grey','map_contested']
         self.image_size=None
         self.rotation_angle=0
         self.reset_image=True
@@ -34,7 +34,7 @@ class MapSquare(object):
         self.west=None
         self.east=None
 
-        # some big deal map features 
+        # large world areas that are visible on the map interface
         self.rail_yard=False
         self.airport=False
         self.town=False
@@ -77,20 +77,21 @@ class MapSquare(object):
         ''' check who controls the map and update the map image'''
 
         # if we have no map objects we won't update the map control
-        if len(self.map_objects)>0:
-            self.german_count=0
-            self.american_count=0
-            self.soviet_count=0
-            self.civilian_count=0
+        
+        self.german_count=0
+        self.american_count=0
+        self.soviet_count=0
+        self.civilian_count=0
 
+        if len(self.map_objects)>0:
             for b in self.map_objects:
-                if 'german' in b.world_builder_identity:
+                if b.world_builder_identity.startswith('german'):
                     self.german_count+=1
-                elif 'soviet' in b.world_builder_identity:
+                elif b.world_builder_identity.startswith('soviet'):
                     self.soviet_count+=1
-                elif 'american' in b.world_builder_identity:
+                elif b.world_builder_identity.startswith('american'):
                     self.american_count+=1
-                elif 'civilian' in b.world_builder_identity:
+                elif b.world_builder_identity.startswith('civilian'):
                     self.civilian_count+=1
 
             if self.german_count>0 and self.soviet_count==0 and self.american_count==0:
@@ -105,8 +106,44 @@ class MapSquare(object):
                 # engine is not really setup for 3v3 yet
                 engine.log.add_data('warn','map_square.update_map_control - square is american. not ready for this')
             elif self.american_count==0 and self.german_count==0 and self.soviet_count==0:
-                # we could either reset to neutral or just do nothing here
-                pass
+                self.map_control='neutral'
+                self.image_index=0
+                self.reset_image=True
+            elif self.german_count>0 and self.soviet_count>0:
+                self.map_control='contested'
+                self.image_index=3
+
+            # tell graphic_engine to reset
+            self.reset_image=True
+        else:
+            # no map objects. if in conflict set it back to neutral
+            if self.map_control=='contested':
+                self.map_control='neutral'
+                self.image_index=0
+                self.reset_image=True
+
+    #---------------------------------------------------------------------------
+    def update_map_features(self):
+        '''update the map features based on world_area in map objects'''
+
+        # reset everything to false
+        self.rail_yard=False
+        self.airport=False
+        self.town=False
+
+        for b in self.map_objects:
+            if b.world_builder_identity.startswith('world_area_'):
+                # split out the actual type from the name
+                area_type=b.world_builder_identity.split('world_area_')[1]
+
+                if area_type=='rail_yard':
+                    self.rail_yard=True
+                elif area_type=='town':
+                    self.town=True
+                elif area_type=='airport':
+                    self.airport=True
+                else:
+                    engine.log.add_data('error','map_square.update_map_features - area unknown: '+area_type,True)
 
 
     
