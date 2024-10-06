@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 5 2024
+- added advance turn on strategic map 
+- added auto resolve battle 
+- added in some dynamic invisible world areas so that there is something to fight over on 
+empty maps. 
+
+empty maps are an issue. i need to start adding some plants and terrain so maps without towns aren't so boring.
+
+the algorithm for strategic map moves isn't very interesting. it probably needs to be smarter, and 
+we might need more map squares. it is a good start anyways 
+
+the auto battle ressolver is terrible. it is just a place holder until i get around to making something 
+that makes sense. 
+
+once i add in the ability for the strategic ai to buy and place new units the map control will probably 
+get better. 
+
+----------------------------------
 October 4 2024
 - working on loading saves 
 - removed extra spaces from save data 

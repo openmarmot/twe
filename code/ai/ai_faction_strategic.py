@@ -36,6 +36,132 @@ class AIFactionStrategic(object):
         self.square_objectives_not_owned=[]
 
     #---------------------------------------------------------------------------
+    def advance_turn(self):
+        '''take a strategic map turn'''
+
+        self.update_map_square_data()
+
+        # buy units with income
+
+
+        # place units
+
+        # move existing units 
+        if self.faction!='civilian':
+            self.move_units()
+
+
+    #---------------------------------------------------------------------------
+    def evaluate_neighbor(self,current_square, neighbor):
+        '''evaluate a neighboring map square'''
+        if neighbor is None:
+            return -1, 0  # Can't move there
+
+        # Troop counts on the neighbor square
+        enemy_troop_count = (neighbor.german_count + neighbor.soviet_count + neighbor.american_count) - getattr(neighbor, f"{self.faction}_count")
+        our_troop_count = getattr(neighbor, f"{self.faction}_count")
+        moving_troops = getattr(current_square, f"{self.faction}_count")
+        total_our_troops_after_moving = our_troop_count + moving_troops
+
+        # Check for resources
+        resource_present = neighbor.rail_yard or neighbor.airport or neighbor.town
+
+        priority_score = 0
+        moving_troops_needed = 0
+
+        if resource_present:
+            priority_score+=0.8
+            if enemy_troop_count == 0 and our_troop_count == 0:
+                # Priority 1: Unoccupied resource
+                priority_score += 3
+                moving_troops_needed = int(moving_troops*0.5)
+            elif enemy_troop_count==0 and our_troop_count>0:
+                priority_score+=0.5
+                moving_troops_needed = int(moving_troops*0.5)
+
+            else:
+                # Troops needed to outnumber enemy troops
+                required_troops_to_outnumber = enemy_troop_count - our_troop_count + 1
+                if moving_troops + our_troop_count >= enemy_troop_count + 1:
+                    # Priority 2: Outnumber enemy troops
+                    moving_troops_needed = min(required_troops_to_outnumber, moving_troops)
+                    priority_score += 2
+
+        else:
+            # Not a resource square
+            priority_score = 0
+            moving_troops_needed=int(moving_troops*.75)
+            if enemy_troop_count>0 and moving_troops>enemy_troop_count:
+                priority_score+=0.5
+
+        # Avoid moving to squares where we would be outnumbered
+        if total_our_troops_after_moving < enemy_troop_count:
+            priority_score -= -1
+
+        # Add bonus for preferred direction
+        if self.faction == 'german' and neighbor == current_square.east:
+            priority_score += 1.5
+        if self.faction == 'soviet' and neighbor == current_square.west:
+            priority_score += 1.5
+
+        return priority_score, moving_troops_needed
+    
+    #---------------------------------------------------------------------------
+    def move_units(self):
+        movement_orders = []
+
+        # figure out the best movements
+        for square in self.squares_owned:
+
+            faction_count = getattr(square, f"{self.faction}_count")
+            if faction_count > 0:
+                neighbors = {
+                    'north': square.north,
+                    'south': square.south,
+                    'east': square.east,
+                    'west': square.west
+                }
+                best_score = -1
+                best_move = None
+                moving_troops_needed = 0
+
+                # Evaluate all neighbors
+                for direction, neighbor in neighbors.items():
+                    priority_score, troops_needed = self.evaluate_neighbor(square, neighbor)
+                    if priority_score > best_score:
+                        best_score = priority_score
+                        best_move = neighbor
+                        moving_troops_needed = troops_needed
+
+                # Create movement order if a valid move is found
+                if best_score > 0 and moving_troops_needed > 0:
+                    movement_orders.append({
+                        'from': square,
+                        'to': best_move,
+                        'troops': moving_troops_needed
+                    })
+                    # Update the current square's troop count
+                    setattr(square, f"{self.faction}_count", faction_count - moving_troops_needed)
+
+        # Apply movement orders
+        for order in movement_orders:
+            from_square = order['from']
+            to_square = order['to']
+            troops_needed = order['troops']
+
+            # get the troops
+            troops_to_move=[]
+            for b in from_square.map_objects:
+                if b.world_builder_identity.startswith(self.faction) and len(troops_to_move)<troops_needed:
+                    troops_to_move.append(b)
+
+            # move the troops
+            for b in troops_to_move:
+                to_square.map_objects.append(b)
+                from_square.map_objects.remove(b)
+
+
+    #---------------------------------------------------------------------------
     def set_initial_units(self,squads):
         # get the most recent data 
         self.update_map_square_data()

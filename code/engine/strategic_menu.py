@@ -56,8 +56,6 @@ class StrategicMenu(object):
         # at the moment the only clickable thing is a map square
         self.active_menu='map_square'
         self.map_square_menu(None)
-            
-
 
     #---------------------------------------------------------------------------
     def handle_input(self,key):
@@ -174,17 +172,27 @@ class StrategicMenu(object):
             self.text_queue.append('-----------')
             self.text_queue.append('[Select a Map Square to spawn on that map.]')
             self.text_queue.append('-----------')
-            self.text_queue.append('1 - Advance time one turn (not implemented)')
-            self.text_queue.append('2 - Advance until combat (not implemented)')
+
+            conflict=0
+            for b in self.strategic_map.map_squares:
+                if b.map_control=='contested':
+                    conflict+=1
+            if conflict>0:
+                self.text_queue.append(str(conflict)+' squares in conflict')
+                self.text_queue.append('2 - Auto resolve battles')
+                if key=='2':
+                    self.strategic_map.auto_resolve_battles()
+                    self.start_menu('none')
+                    return
+            else:
+                self.text_queue.append('1 - Advance time one turn')
+                if key=='1':
+                    self.strategic_map.advance_turn()
+                    self.start_menu('none')
+                    return
+
             self.text_queue.append('3 - Save and exit ')
-
-            #self.text_queue.append('4 - Nothing')
-
-            if key=='1':
-                pass
-            elif key=='2':
-                pass
-            elif key=='3':
+            if key=='3':
                 self.strategic_map.save_and_exit_game()
 
 

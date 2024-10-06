@@ -154,8 +154,10 @@ def convert_world_objects_to_map_objects(world,map_square):
 
     # convert world areas to map objects
     for b in world.world_areas:
-        temp=MapObject('world_area_'+b.area_type,b.name,b.world_coords,0,[])
-        map_square.map_objects.append(temp)
+        # we don't save the dynamic ones, they are generated each time
+        if b.area_type!='dynamic':
+            temp=MapObject('world_area_'+b.area_type,b.name,b.world_coords,0,[])
+            map_square.map_objects.append(temp)
 
     # convert world objects to map objects
     for b in world.wo_objects:
@@ -261,6 +263,39 @@ def generate_civilians(map_objects):
                 civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
 
     return civilians
+
+#------------------------------------------------------------------------------
+def generate_dynamic_world_areas(world):
+    # create some world areas after the world loaded
+    # combat ai needs arount 5 or so world_areas to be interesting
+
+    # first some directional ones
+
+    w=WorldArea(world)
+    w.world_coords=[-5000,0]
+    w.name='west'
+    w.area_type='dynamic'
+    world.world_areas.append(w)
+
+    w=WorldArea(world)
+    w.world_coords=[5000,0]
+    w.name='east'
+    w.area_type='dynamic'
+    world.world_areas.append(w)
+
+    w=WorldArea(world)
+    w.world_coords=[0,-5000]
+    w.name='north'
+    w.area_type='dynamic'
+    world.world_areas.append(w)
+
+    w=WorldArea(world)
+    w.world_coords=[0,5000]
+    w.name='south'
+    w.area_type='dynamic'
+    world.world_areas.append(w)
+
+    # now generate a couple based on the world objects
 
 #------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
@@ -511,6 +546,9 @@ def load_world(world,map_objects,spawn_faction):
     # convert map_objects to world_objects
     # note - this also spawns them and creates the world_area objects
     convert_map_objects_to_world_objects(world,map_objects)
+
+    # generate some minor world areas for battle flow
+    generate_dynamic_world_areas(world)
 
     # generation squads 
     world.create_squads()

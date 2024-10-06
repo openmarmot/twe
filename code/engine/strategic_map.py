@@ -32,7 +32,7 @@ class StrategicMap(object):
 
         self.graphics_engine=graphics_engine
 
-        self.strategic_menu=StrategicMenu(self)
+        
 
         self.map_squares=[]
 
@@ -52,6 +52,65 @@ class StrategicMap(object):
 
         # map size
         self.map_size=10
+        
+        self.strategic_menu=StrategicMenu(self)
+
+    #---------------------------------------------------------------------------
+    def advance_turn(self):
+        '''have all the strategic ai take one turn and then update the map'''
+
+        for b in self.strategic_ai:
+            b.advance_turn()
+            self.update_map_data()
+
+    #---------------------------------------------------------------------------
+    def auto_resolve_battles(self):
+        
+        self.update_map_data()
+
+        for map in self.map_squares:
+            if map.map_control=='contested':
+                germans_to_remove=0
+                soviets_to_remove=0
+                if map.german_count>map.soviet_count:
+                    soviets_to_remove=map.soviet_count
+                    germans_to_remove=random.randint(0,map.german_count)
+                elif map.soviet_count>map.german_count:
+                    germans_to_remove=map.german_count
+                    soviets_to_remove=random.randint(0,map.soviet_count)
+                else:
+                    germans_to_remove=map.german_count
+                    soviets_to_remove=map.soviet_count
+                
+                troops_to_remove=[]
+                german_removed=0
+                soviet_removed=0
+                for b in map.map_objects:
+                    if b.world_builder_identity.startswith('german') and german_removed<germans_to_remove:
+                        troops_to_remove.append(b)
+                        german_removed+=1
+                    if b.world_builder_identity.startswith('soviet') and soviet_removed<soviets_to_remove:
+                        troops_to_remove.append(b)
+                        soviet_removed+=1
+
+                for b in troops_to_remove:
+                    map.map_objects.remove(b)
+
+
+                if german_removed!=germans_to_remove or soviet_removed!=soviets_to_remove:
+                    print('----')
+                    print('troops to remove',len(troops_to_remove))
+                    print('germans to remove',germans_to_remove)
+                    print('german_removed',german_removed)
+                    print('soviets to remove',soviets_to_remove)
+                    print('soviet_removed',soviet_removed)
+                    print('----')
+                    for b in map.map_objects:
+                        print('identity',b.world_builder_identity,'name: ',b.name)
+
+                
+        self.update_map_data()
+            
 
     #---------------------------------------------------------------------------
     def create_map_squares(self):
@@ -326,7 +385,7 @@ class StrategicMap(object):
                 world_coords = [float(world_coords.split(',')[0]),float(world_coords.split(',')[1])]
                 rotation = float(rotation)
                 # inventory will be '' in the db when it is empty. we want it to be [] not [''] 
-                inventory = inventory.split(',') if inventory is not '' else []
+                inventory = inventory.split(',') if inventory != '' else []
 
                 # Create a new MapObject instance
                 map_object = MapObject(world_builder_identity, name, world_coords, rotation, inventory)

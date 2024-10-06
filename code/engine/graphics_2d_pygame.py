@@ -92,6 +92,7 @@ class Graphics_2D_Pygame(object):
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
         self.menu_color=('#394B32')
+        self.color_black=('#000000')
 
         
 
@@ -286,6 +287,12 @@ class Graphics_2D_Pygame(object):
                         self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.menu_color)
                     if c.town:
                         self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.menu_color)
+
+                    # german count 
+                    if c.german_count>0:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]-25,c.screen_coords[1]+20), str(c.german_count), self.color_black)
+                    if c.soviet_count>0:
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]+15,c.screen_coords[1]+20), str(c.soviet_count), self.color_black)
 
         # text stuff
         if self.mode==0:
