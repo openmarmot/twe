@@ -486,58 +486,7 @@ def load_sqlite_squad_data(faction):
 
     return squad_data
 
-#------------------------------------------------------------------------------
-def load_test_environment(world,scenario):
-    ''' test environment. not a normal map load '''
 
-    # ! note this whole thing is legacy and should go away at some point
-
-    if scenario=='1':
-
-
-        # some civilian reinforcements
-        time=random.randint(120,800)
-        world.reinforcements.append([time,'civilian',world.spawn_north,'civilian small random'])
-        world.reinforcements.append([time,'civilian',world.spawn_north,'civilian small random'])
-
-        # shovel man !
-        if random.randint(0,10)==10:
-            time=random.randint(120,500)
-            world.reinforcements.append([time,'civilian',world.spawn_north,'shovel man'])
-
-
-
-        
-        # add german reinforcements
-        time=random.randint(120,500)
-        world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
-        world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
-
-
-
-
-        # add soviet reinforcements
-        time=random.randint(120,500)
-        world.reinforcements.append([time,'soviet',world.spawn_north,'soviet 1943 rifle'])
-        time=random.randint(60,600)
-        world.reinforcements.append([time,'soviet',world.spawn_south,'soviet 1943 rifle'])
-        time=random.randint(120,700)
-        world.reinforcements.append([time,'soviet',world.spawn_east,'soviet 1943 rifle'])
-
-        # add ju88
-        spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
-
-        # add a pile of bombs
-        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'bomb_sc250',15,4,False)
-
-        # bikes 
-        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-
-        # trucks 
-        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
-
-    # do this no matter what to spawn everything
-    world.process_add_remove_queue()
 
 #------------------------------------------------------------------------------
 def load_world(world,map_objects,spawn_faction):

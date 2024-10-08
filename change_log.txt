@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 7 2024
+- working on buying and placing new units in the strategic turn 
+
+----------------------------------
 October 5 2024
 - added advance turn on strategic map 
 - added auto resolve battle 

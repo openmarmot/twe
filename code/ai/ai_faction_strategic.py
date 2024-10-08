@@ -42,13 +42,47 @@ class AIFactionStrategic(object):
         self.update_map_square_data()
 
         # buy units with income
+        self.buy_and_place_units(100)
+        
 
-
-        # place units
+        # something else?
 
         # move existing units 
         if self.faction!='civilian':
             self.move_units()
+
+    #---------------------------------------------------------------------------
+    def buy_and_place_units(self,funds):
+        '''buy and place units at the beginning of a turn'''
+
+        squad_options=getattr(engine.world_builder,f"{self.faction}_squad_data")
+
+        squad_names=list(squad_options.keys())
+
+        # just randomly grab some squads for now
+        cost=0
+        squads=[]
+        while cost<funds:
+            squad=random.choice(squad_names)
+            cost+=squad_options[squad]['cost']
+            squads.append(squad)
+
+        # after the initial turn troops can only appear at a rail head
+        rail_yards=[]
+        for b in self.square_objectives_owned:
+            if b.rail_yard:
+                rail_yards.append(b)
+
+        if len(rail_yards)>0:
+            # plop the rest of them out randomly
+            while len(squads)>0:
+                map=random.choice(rail_yards)
+                map.map_objects+=engine.world_builder.get_squad_map_objects(squads.pop())
+        else:
+            # not sure what to do here yet. having no rail yards means the faction loses i guess
+            engine.log.add_data('error','no rail yards for'+self.faction,True)
+
+
 
 
     #---------------------------------------------------------------------------
