@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 8 2024
+- fix for possibility that there is no squad data 
+
+----------------------------------
 October 7 2024
 - working on buying and placing new units in the strategic turn 
 
