@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 9 2024
+- minor code cleanup 
+- fixed civilian names being overwritten 
+- added back in a chance to spawn unique civilians big_cheese and shovel_man
+- added a civilian squad so civilians can replenish if there happens to be a 
+neutral square with a rail head 
+- fixed repeating text bug with human storage_menu
+- added random consumables crates back into clutter generation 
+
+----------------------------------
+October 8 2024
+- fix for possibility that there is no squad data 
+
+----------------------------------
+October 7 2024
+- working on buying and placing new units in the strategic turn 
+
+----------------------------------
 October 5 2024
 - added advance turn on strategic map 
 - added auto resolve battle 

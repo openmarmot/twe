@@ -218,6 +218,8 @@ def generate_clutter(map_objects):
                 clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
             if chance==7:
                 clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
+            if chance==8 or chance==9:
+                clutter.append(MapObject('crate_random_consumables','crate',coords,rotation,[]))
 
         # house clutter 
         elif b.world_builder_identity=='square_building':
@@ -253,14 +255,28 @@ def generate_civilians(map_objects):
             for _ in range(count):
                 coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
                 rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
+                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
 
         elif b.world_builder_identity=='square_building':
             count=random.randint(1,3)
             for _ in range(count):
                 coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
                 rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
+                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
+
+    # unique civilian big cheese
+    if random.randint(1,100)<5:
+        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
+        rotation=random.randint(0,359)
+        civilians.append(MapObject('big_cheese','',coords,rotation,[]))
+        engine.log.add_data('note','big_cheese added to map',True)
+
+    # unique civilian shovel_man
+    if random.randint(1,100)<5:
+        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
+        rotation=random.randint(0,359)
+        civilians.append(MapObject('shovel_man','',coords,rotation,[]))
+        engine.log.add_data('note','shovel_man added to map',True)
 
     return civilians
 
@@ -486,58 +502,7 @@ def load_sqlite_squad_data(faction):
 
     return squad_data
 
-#------------------------------------------------------------------------------
-def load_test_environment(world,scenario):
-    ''' test environment. not a normal map load '''
 
-    # ! note this whole thing is legacy and should go away at some point
-
-    if scenario=='1':
-
-
-        # some civilian reinforcements
-        time=random.randint(120,800)
-        world.reinforcements.append([time,'civilian',world.spawn_north,'civilian small random'])
-        world.reinforcements.append([time,'civilian',world.spawn_north,'civilian small random'])
-
-        # shovel man !
-        if random.randint(0,10)==10:
-            time=random.randint(120,500)
-            world.reinforcements.append([time,'civilian',world.spawn_north,'shovel man'])
-
-
-
-        
-        # add german reinforcements
-        time=random.randint(120,500)
-        world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
-        world.reinforcements.append([time,'german',world.spawn_west,'german 1944 panzergrenadier'])
-
-
-
-
-        # add soviet reinforcements
-        time=random.randint(120,500)
-        world.reinforcements.append([time,'soviet',world.spawn_north,'soviet 1943 rifle'])
-        time=random.randint(60,600)
-        world.reinforcements.append([time,'soviet',world.spawn_south,'soviet 1943 rifle'])
-        time=random.randint(120,700)
-        world.reinforcements.append([time,'soviet',world.spawn_east,'soviet 1943 rifle'])
-
-        # add ju88
-        spawn_object(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],'ju88',True)
-
-        # add a pile of bombs
-        spawn_aligned_pile(world,[float(random.randint(-500,500)),float(random.randint(-500,500))],[float(random.randint(-500,500)),float(random.randint(-500,500))],'bomb_sc250',15,4,False)
-
-        # bikes 
-        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-1500,1500))],'red_bicycle',True)
-
-        # trucks 
-        spawn_object(world,[float(random.randint(-1500,1500)),float(random.randint(-4500,4500))],'dodge_g505_wc',True)
-
-    # do this no matter what to spawn everything
-    world.process_add_remove_queue()
 
 #------------------------------------------------------------------------------
 def load_world(world,map_objects,spawn_faction):
@@ -613,60 +578,6 @@ def spawn_container(name,world_object,image_index):
     z.collision_radius=world_object.collision_radius
     z.wo_start()
 
-#------------------------------------------------------------------------------
-def spawn_crate(world,world_coords,CRATE_TYPE):
-    ''' generates different crate types with contents'''
-
-    # !!!! outdated. this should all be integrated into spawn_objects
-
-    if CRATE_TYPE=='mp40':
-        z=spawn_object(world,world_coords,'crate',True)
-        z.ai.inventory.append(spawn_object(world,world_coords,'mp40',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'mp40',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'mp40',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'mp40',False))
-    elif CRATE_TYPE=="random_consumables":
-        z=spawn_object(world,world_coords,'small_crate',True)
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables,False))
-    elif CRATE_TYPE=="random_consumables_common":
-        z=spawn_object(world,world_coords,'small_crate',True)
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-    elif CRATE_TYPE=="random_consumables_rare":
-        z=spawn_object(world,world_coords,'small_crate',True)
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_rare,False))
-    elif CRATE_TYPE=="random_consumables_ultra_rare":
-        z=spawn_object(world,world_coords,'small_crate',True)
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_ultra_rare,False))
-    elif CRATE_TYPE=="random_guns":
-        z=spawn_object(world,world_coords,'crate',True)
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_guns,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_guns,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_guns,False))
-        z.ai.inventory.append(get_random_from_list(world,world_coords,list_guns,False))
-    elif CRATE_TYPE=='panzerfaust':
-        z=spawn_object(world,world_coords,'crate',True)
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
-    elif CRATE_TYPE=='random_one_gun_type':
-        z=spawn_object(world,world_coords,'crate',True)
-        index=random.randint(0,len(list_guns)-1)
-        amount= random.randint(1,6)
-        for x in range(amount):
-             z.ai.inventory.append(spawn_object(world,world_coords,list_guns[index],False))
 
 #------------------------------------------------------------------------------
 def spawn_drop_canister(world,world_coords,CRATE_TYPE):
@@ -921,6 +832,35 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='crate'
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
+    
+    elif OBJECT_TYPE=='crate_mp40':
+        z=spawn_object(world,world_coords,'crate',False)
+        z.world_builder_identity='crate_mp40'
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+
+    elif OBJECT_TYPE=='crate_random_consumables':
+        z=spawn_object(world,world_coords,'small_crate',False)
+        z.world_builder_identity='crate_random_consumables'
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+
 
     elif OBJECT_TYPE=='small_crate':
         z=WorldObject(world,['small_crate'],AIContainer)
@@ -1563,16 +1503,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.engines[0].ai.exhaust_position_offset=[-10,65]
         z.ai.engines[1].ai.exhaust_position_offset=[-10,-75]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_24v",False))
-
-    # this is only used briefly until the player picks a spawn type
-    # this is required because a lot of stuff in the game references the player object.
-    elif OBJECT_TYPE=='player':
-        z=WorldObject(world,['man','civilian_prone','civilian_dead'],AIHuman)
-        z.name='player'
-        z.ai.speed=50.
-        z.is_player=True
-        z.is_human=True
-        world.player=z
 
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
