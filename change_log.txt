@@ -7,7 +7,10 @@ October 9 2024
 - added back in a chance to spawn unique civilians big_cheese and shovel_man
 - added a civilian squad so civilians can replenish if there happens to be a 
 neutral square with a rail head 
+- fixed repeating text bug with human storage_menu
 
+todo 
+- add crates back into world gen 
 
 ----------------------------------
 October 8 2024

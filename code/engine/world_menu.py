@@ -381,7 +381,9 @@ class World_Menu(object):
             self.text_queue.append('1 - smoke cloud  ')
             self.text_queue.append('2 - Feldfunk radio and charger ')
             self.text_queue.append('3 - Maybach HL42')
-            self.text_queue.append('4 - ?')
+            self.text_queue.append('4 - Pickle Jar')
+            self.text_queue.append('5 - Pickle ')
+            self.text_queue.append('6 - crate_mp40')
             if key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
                 engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
@@ -392,7 +394,11 @@ class World_Menu(object):
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'maybach_hl42_engine',True)
             elif key=='4':
-                pass
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle_jar',True)
+            elif key=='5':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle',True)
+            elif key=='6':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'crate_mp40',True)
 
 
     #---------------------------------------------------------------------------            
@@ -760,6 +766,7 @@ class World_Menu(object):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
+            self.text_queue=[]
             self.text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
 
             if distance<self.max_menu_distance:  
