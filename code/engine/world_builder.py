@@ -253,14 +253,28 @@ def generate_civilians(map_objects):
             for _ in range(count):
                 coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
                 rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
+                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
 
         elif b.world_builder_identity=='square_building':
             count=random.randint(1,3)
             for _ in range(count):
                 coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
                 rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','civilian_man',coords,rotation,[]))
+                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
+
+    # unique civilian big cheese
+    if random.randint(1,100)<5:
+        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
+        rotation=random.randint(0,359)
+        civilians.append(MapObject('big_cheese','',coords,rotation,[]))
+        engine.log.add_data('note','big_cheese added to map',True)
+
+    # unique civilian shovel_man
+    if random.randint(1,100)<5:
+        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
+        rotation=random.randint(0,359)
+        civilians.append(MapObject('shovel_man','',coords,rotation,[]))
+        engine.log.add_data('note','shovel_man added to map',True)
 
     return civilians
 
@@ -1512,16 +1526,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.engines[0].ai.exhaust_position_offset=[-10,65]
         z.ai.engines[1].ai.exhaust_position_offset=[-10,-75]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_24v",False))
-
-    # this is only used briefly until the player picks a spawn type
-    # this is required because a lot of stuff in the game references the player object.
-    elif OBJECT_TYPE=='player':
-        z=WorldObject(world,['man','civilian_prone','civilian_dead'],AIHuman)
-        z.name='player'
-        z.ai.speed=50.
-        z.is_player=True
-        z.is_human=True
-        world.player=z
 
     elif OBJECT_TYPE=='civilian_man':
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)

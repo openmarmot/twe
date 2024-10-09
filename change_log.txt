@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 9 2024
+- minor code cleanup 
+- fixed civilian names being overwritten 
+- added back in a chance to spawn unique civilians big_cheese and shovel_man
+- added a civilian squad so civilians can replenish if there happens to be a 
+neutral square with a rail head 
+
+
+----------------------------------
 October 8 2024
 - fix for possibility that there is no squad data 
 
