@@ -218,6 +218,8 @@ def generate_clutter(map_objects):
                 clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
             if chance==7:
                 clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
+            if chance==8 or chance==9:
+                clutter.append(MapObject('crate_random_consumables','crate',coords,rotation,[]))
 
         # house clutter 
         elif b.world_builder_identity=='square_building':
@@ -846,6 +848,19 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+
+    elif OBJECT_TYPE=='crate_random_consumables':
+        z=spawn_object(world,world_coords,'small_crate',False)
+        z.world_builder_identity='crate_random_consumables'
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+        z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
+
 
     elif OBJECT_TYPE=='small_crate':
         z=WorldObject(world,['small_crate'],AIContainer)

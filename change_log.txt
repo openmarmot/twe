@@ -8,9 +8,7 @@ October 9 2024
 - added a civilian squad so civilians can replenish if there happens to be a 
 neutral square with a rail head 
 - fixed repeating text bug with human storage_menu
-
-todo 
-- add crates back into world gen 
+- added random consumables crates back into clutter generation 
 
 ----------------------------------
 October 8 2024
