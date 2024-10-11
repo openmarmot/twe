@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 11 2024
+- fixed a bug with the grid spawn system 
+- added a concrete square 
+- working on a column spawn for runways 
+
+----------------------------------
 October 9 2024
 - minor code cleanup 
 - fixed civilian names being overwritten 

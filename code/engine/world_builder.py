@@ -1928,6 +1928,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='water'
         z.is_liquid=True
         z.is_solid=False
+    elif OBJECT_TYPE=='concrete_square':
+        z=WorldObject(world,['concrete_square'],AINone)
+        z.name='concrete_square'
+        z.rotation_angle=0
     elif OBJECT_TYPE=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'
