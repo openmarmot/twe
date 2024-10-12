@@ -215,17 +215,25 @@ def get_normalized_angle(degrees):
  
 #------------------------------------------------------------------------------
 def get_optimal_column_count(amount):
-    '''calculates an optimal column count that balances columns and rows'''
+    '''Calculates an optimal column count that balances columns and rows'''
+    
+    if amount <= 0:
+        return 1  # Return 1 for zero or negative amounts for practical reasons
+    
+    optimal_columns = 1
+    min_diff = float('inf')
+    
+    for columns in range(1, amount + 1):
+        rows = -(-amount // columns)  # Ceiling division to get the number of rows
+        diff = abs(columns - rows)
+        if diff < min_diff:
+            min_diff = diff
+            optimal_columns = columns
+        elif diff == min_diff and columns > optimal_columns:
+            optimal_columns = columns  # Prefer more columns if the difference is the same
+            
+    return optimal_columns
 
-    if amount == 0:
-        return 0
-    columns = int(amount ** 0.5)
-    while columns > 0:
-        rows = amount / columns
-        if abs(rows - columns) <= 1:
-            return columns
-        columns -= 1
-    return 1  # Fallback to 1 column
 
 #------------------------------------------------------------------------------
 def get_random_constrained_coords(starting_coordinate, max_size, minimum_separation, count):

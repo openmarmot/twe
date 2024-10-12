@@ -91,7 +91,7 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.menu_color=('#394B32')
+        self.menu_color=('#ffffff')
         self.color_black=('#000000')
 
         
@@ -299,7 +299,7 @@ class Graphics_2D_Pygame(object):
             self.h=0
             for b in self.game_menu.text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+                self.small_font.render_to(self.screen, (40, self.h), b, self.color_black)
         elif self.mode==1: 
             self.h=0
             for b in islice(self.world.text_queue,self.world.text_queue_display_size):
@@ -327,7 +327,7 @@ class Graphics_2D_Pygame(object):
             self.h=0
             for b in self.strategic_map.strategic_menu.text_queue:
                 self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+                self.small_font.render_to(self.screen, (40, self.h), b, self.color_black)
 
         if self.double_buffering:
             pygame.display.flip()
@@ -552,6 +552,9 @@ class Graphics_2D_Pygame(object):
         if self.scale<1.1:
             self.scale=round(self.scale+0.1,1)
             self.view_adjust-=500
+            # otherwise stuff starts getting clipped when its <0
+            if self.view_adjust<0:
+                self.view_adjust=0
             #print('zoom in',self.scale)
             self.reset_all()
 

@@ -5,6 +5,19 @@ October 11 2024
 - fixed a bug with the grid spawn system 
 - added a concrete square 
 - working on a column spawn for runways 
+- improved the code that finds optimal column counts 
+- added some concrete squares near warehouses with a random chance 
+- towns are now generated at a 90 degree angle 
+- minimum view_adjust is now zero
+- added a really hacky ground_texture system 
+- updated menu text to white in world mode 
+
+need to maybe add another z level to differentiate between the concrete and buildings 
+
+todo:
+- write a better texture system
+- zooming in and out has a huge lag spike now. I'm guessing resizing the large ground textures must 
+be slow. this needs to be optimized. can probably do one and re-use 
 
 ----------------------------------
 October 9 2024

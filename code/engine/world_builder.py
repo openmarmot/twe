@@ -56,6 +56,7 @@ from ai.ai_wearable import AIWearable
 from ai.ai_battery import AIBattery
 from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
+from ai.ai_ground_cover import AIGroundCover
 
 #global variables
 
@@ -220,6 +221,14 @@ def generate_clutter(map_objects):
                 clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
             if chance==8 or chance==9:
                 clutter.append(MapObject('crate_random_consumables','crate',coords,rotation,[]))
+            if chance==10 or chance==11:
+                coords[0]+=random.randint(-50,50)
+                coords[1]+=random.randint(-50,50)
+                count=random.randint(1,6)
+                rotation=random.choice([0,80,180,270])
+                coord_list=engine.math_2d.get_column_coords(coords,80,count,rotation,2)
+                for _ in range(count):
+                    clutter.append(MapObject('concrete_square','concrete_square',coord_list.pop(),rotation,[]))
 
         # house clutter 
         elif b.world_builder_identity=='square_building':
@@ -376,7 +385,7 @@ def generate_world_area_town(world_coords):
     count_building=random.randint(2,14)
     coords=engine.math_2d.get_grid_coords(world_coords,600,count_warehouse+count_building)
     map_objects=[]
-    rotation=random.randint(1,359)
+    rotation=random.choice([0,90,180,270])
     for _ in range(count_warehouse):
         map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
     
@@ -526,6 +535,15 @@ def load_world(world,map_objects,spawn_faction):
 
     # spawn player
     world.spawn_player(spawn_faction)
+
+    # add ground cover. this will eventually go somewhere else
+    count=81
+    coords=engine.math_2d.get_grid_coords([0,0],1015,count)
+    for _ in range(count):
+        temp=spawn_object(world,world.player.world_coords,'ground_cover',True)
+        temp.ai.position_offset=coords.pop()
+        temp.ai.reset_offset()
+        temp.rotation_angle=random.choice([0,90,180,270])
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
@@ -1931,6 +1949,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='concrete_square':
         z=WorldObject(world,['concrete_square'],AINone)
         z.name='concrete_square'
+        z.rotation_angle=0
+    elif OBJECT_TYPE=='ground_cover':
+        z=WorldObject(world,['ground_dirt_vlarge'],AIGroundCover)
+        z.name='ground_dirt_vlarge'
+        z.is_ground_texture=True
         z.rotation_angle=0
     elif OBJECT_TYPE=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
