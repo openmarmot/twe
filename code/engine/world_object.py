@@ -115,6 +115,7 @@ class WorldObject(object):
         self.is_building=False
         self.is_map_pointer=False
         self.is_furniture=False
+        self.is_ground_texture=False
 
         # state of matter
         self.is_liquid=False
@@ -177,6 +178,8 @@ class WorldObject(object):
             self.render_level=4
         elif self.is_turret:
             self.render_level=4
+        elif self.is_ground_texture:
+            self.render_level=0
         else:
             self.render_level=2
             

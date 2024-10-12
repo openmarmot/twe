@@ -116,21 +116,70 @@ def get_distance(coords1, coords2,round_number=False):
         return round(distance,1)
     else:
         return distance
-    
+
 #------------------------------------------------------------------------------
-def get_grid_coords(initial_coords,diameter,count):
-    # returns a array of world_coords to grid spawn a 'count' of objects.
-    grid_coords=[]
-    column_max=get_optimal_column_count(count)*diameter
-    last_coord=copy.copy(initial_coords)
+def get_column_coords(initial_coords, diameter, count, rotation_degrees, width):
+    """
+    Returns an array of world coordinates to arrange 'count' of objects in columns.
+    The columns are rotated by 'rotation_degrees' and have 'width' number of objects wide.
+
+    Parameters:
+    - initial_coords: [x, y], the starting coordinates.
+    - diameter: float, spacing between objects.
+    - count: int, total number of objects.
+    - rotation_degrees: float, rotation of the columns in degrees.
+    - width: int, number of objects wide.
+
+    Returns:
+    - coords: list of [x, y] coordinates.
+    """
+    coords = []
+    x = count // width  # Number of rows needed
+    x_remaining = count % width  # Remaining objects for the last row if any
+
+    # Convert rotation to radians for math functions
+    theta = math.radians(rotation_degrees)
+    cos_theta = math.cos(theta)
+    sin_theta = math.sin(theta)
+
+    x0, y0 = initial_coords
+
+    for i in range(count):
+        # Compute column (x) and row (y) indices
+        col = i % width
+        row = i // width
+
+        # Position in unrotated grid
+        x_grid = col * diameter
+        y_grid = row * diameter
+
+        # Apply rotation
+        x_rotated = x_grid * cos_theta - y_grid * sin_theta
+        y_rotated = x_grid * sin_theta + y_grid * cos_theta
+
+        # Translate back to initial coordinates
+        x_x_final = x0 + x_rotated
+        y_final = y0 + y_rotated
+
+        coords.append([x_x_final, y_final])
+
+    return coords
+
+#------------------------------------------------------------------------------
+def get_grid_coords(initial_coords, diameter, count):
+    # returns an array of world_coords to grid spawn a 'count' of objects.
+    grid_coords = []
+    column_count = get_optimal_column_count(count)
+    column_max = initial_coords[0] + (column_count - 1) * diameter
+    last_coord = copy.copy(initial_coords)
 
     for _ in range(count):
-        if last_coord[0] >= initial_coords[0] + column_max:
+        grid_coords.append(last_coord.copy())  # Append first, then increment
+        if last_coord[0] >= column_max:
             last_coord[0] = initial_coords[0]
             last_coord[1] += diameter
         else:
             last_coord[0] += diameter
-        grid_coords.append(last_coord.copy())  # Append a copy to ensure separate lists
     return grid_coords
     
 #------------------------------------------------------------------------------
@@ -166,17 +215,25 @@ def get_normalized_angle(degrees):
  
 #------------------------------------------------------------------------------
 def get_optimal_column_count(amount):
-    '''calculates an optimal column count that balances columns and rows'''
+    '''Calculates an optimal column count that balances columns and rows'''
+    
+    if amount <= 0:
+        return 1  # Return 1 for zero or negative amounts for practical reasons
+    
+    optimal_columns = 1
+    min_diff = float('inf')
+    
+    for columns in range(1, amount + 1):
+        rows = -(-amount // columns)  # Ceiling division to get the number of rows
+        diff = abs(columns - rows)
+        if diff < min_diff:
+            min_diff = diff
+            optimal_columns = columns
+        elif diff == min_diff and columns > optimal_columns:
+            optimal_columns = columns  # Prefer more columns if the difference is the same
+            
+    return optimal_columns
 
-    if amount == 0:
-        return 0
-    columns = int(amount ** 0.5)
-    while columns > 0:
-        rows = amount / columns
-        if abs(rows - columns) <= 1:
-            return columns
-        columns -= 1
-    return 1  # Fallback to 1 column
 
 #------------------------------------------------------------------------------
 def get_random_constrained_coords(starting_coordinate, max_size, minimum_separation, count):

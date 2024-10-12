@@ -384,6 +384,9 @@ class World_Menu(object):
             self.text_queue.append('4 - Pickle Jar')
             self.text_queue.append('5 - Pickle ')
             self.text_queue.append('6 - crate_mp40')
+            self.text_queue.append('7 - concrete_square')
+            self.text_queue.append('8 - ground cover')
+
             if key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
                 engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
@@ -399,6 +402,20 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'crate_mp40',True)
+            elif key=='7':
+                #engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'concrete_square',True)
+                count=30
+                #coords=engine.math_2d.get_grid_coords(self.world.player.world_coords,50,count)
+                #rotation=random.randint(0,360)
+                rotation=270
+                coords=engine.math_2d.get_column_coords(self.world.player.world_coords,80,count,rotation,2)
+                for _ in range(count):
+                    temp=engine.world_builder.spawn_object(self.world,coords.pop(),'concrete_square',True)
+                    #temp.rotation_angle=random.choice([0,90,180,270])
+                    temp.rotation_angle=rotation
+            elif key=='8':
+                pass
+
 
 
     #---------------------------------------------------------------------------            
