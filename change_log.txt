@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 13 2024
+- added a image cache 
+
+the image cache gets huge because there are so many possible rotation angles.
+i could cut rotation down to one number after the decimal instead of two, but I play tested 
+for a bit and the image cache got up to 50,000 without any noticeable negative effect. 
+I imagine the key hash search even at that size is still a lot faster than reszing and rotating 
+an image.
+
+the image cache does fix the lag issue with large images, and it seemed to smooth out frame rate a bit.
+
+i tried a couple different ways to rotate and scale images, but none of them worked right so 
+i'm stuck with the clipped corners of the current setup for now. 
+
+i noticed that the terrain still bugs out a bit at the closest zoom level. terrain needs some love,
+and probably the zoom levels need some love as well 
+
+----------------------------------
 October 11 2024
 - fixed a bug with the grid spawn system 
 - added a concrete square 

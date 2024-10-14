@@ -41,6 +41,10 @@ class Graphics_2D_Pygame(object):
         # called by World.__init__
 
         self.images=dict()
+        self.image_cache={}
+        # This offers a large benefit for larger images
+        self.image_cache_enabled=True
+
         self.screen_size=screen_size
         pygame.init()
 
@@ -98,9 +102,6 @@ class Graphics_2D_Pygame(object):
 
         # draw collision circles
         self.draw_collision=False
-
-        # converts things to int to try and smooth jitter 
-        self.smooth_jitter=False
 
         # will cause everything to exit
         self.quit=False
@@ -267,12 +268,7 @@ class Graphics_2D_Pygame(object):
         for b in self.renderlists:
             for c in b:
                 if c.reset_image:
-                    c.reset_image=False
-                    obj_scale=self.scale+c.scale_modifier
-                    c.image_size=self.images[c.image_list[c.image_index]].get_size()
-                    c.image_size=[int(c.image_size[0]*obj_scale),int(c.image_size[1]*obj_scale)]
-                    c.image=self.get_rotated_scaled_image(self.images[c.image_list[c.image_index]],c.image_size,c.rotation_angle)
-                    #c.image=self.get_rotated_scaled_image_v2(self.images[c.image_list[c.image_index]],self.scale,c.rotation_angle)
+                    self.reset_pygame_image(c)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
 
                 if(self.draw_collision):
@@ -398,6 +394,7 @@ class Graphics_2D_Pygame(object):
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
+                self.world.debug_text_queue.insert(3,'Image Cache: '+str(len(self.image_cache)))
             
             if self.world.exit_world:
                 self.strategic_map.unload_world()
@@ -458,9 +455,6 @@ class Graphics_2D_Pygame(object):
                                     b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
                                     b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
 
-                                # honestly can't tell if this is better or not
-                                if self.smooth_jitter:
-                                    b.screen_coords=[int(b.screen_coords[0]),int(b.screen_coords[1])]
         elif self.mode==2:
             for b in self.strategic_map.map_squares:
                 self.renderlists[0].append(b)
@@ -483,48 +477,7 @@ class Graphics_2D_Pygame(object):
     def get_player_screen_coords(self):
         ''' return player screen coordinates'''
         return [self.screen_size[0]/2,self.screen_size[1]/2]
-
-#------------------------------------------------------------------------------
-    def get_rotated_scaled_image(self, image, image_size, angle):
-        """
-        rotate an image while keeping its center and size
-        image must be square
-        adapted from : http://pygame.org/wiki/RotateCenter?parent=
-
-        new : also scale image
-
-        note : this method can cause the corners of images to be clipped
-         this is a result of using subsurface
-
-        """
-        # not sure if i should rotate or resize first
-
-        orig_rect = image.get_rect()
-        rot_image = pygame.transform.rotate(image, angle)
-        rot_rect = orig_rect.copy()
-        rot_rect.center = rot_image.get_rect().center
-        rot_image = rot_image.subsurface(rot_rect).copy()
-        resize_image=pygame.transform.scale(rot_image,image_size)
-        return resize_image
     
-#------------------------------------------------------------------------------
-    def get_rotated_scaled_image_v2(self, image, scale, angle):
-        """
-        this doesn't work but should. the image grows and shrinks as it rotates
-        """
-        padding = max(image.get_width(), image.get_height())
-        padded_surface = pygame.Surface((padding*2, padding*2), pygame.SRCALPHA)
-
-        # Blit the original surface onto the padded surface with an offset
-        offset = ((padding*2 - image.get_width()) // 2, (padding*2 - image.get_height()) // 2)
-        padded_surface.blit(image, offset)
-
-        # Rotate the padded surface
-        rotated_surface = pygame.transform.rotate(padded_surface, angle)
-
-        # Scale the image
-        scaled_image = pygame.transform.scale(rotated_surface, (int(image.get_width() * scale), int(image.get_height() * scale)))
-        return scaled_image
 #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
@@ -537,6 +490,35 @@ class Graphics_2D_Pygame(object):
 
         translate=[center_x-player_x,center_y-player_y]
         return translate
+    
+#------------------------------------------------------------------------------
+    def reset_pygame_image(self, wo):
+        '''reset the image for a world object'''
+        wo.reset_image=False
+        obj_scale=self.scale+wo.scale_modifier
+        wo.image_size=self.images[wo.image_list[wo.image_index]].get_size()
+        wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
+        
+        # check if the correct image is already in the cache
+        key = wo.image_list[wo.image_index]+str(wo.image_size)+str(wo.rotation_angle)
+        if self.image_cache_enabled:    
+            if key in self.image_cache:
+                wo.image=self.image_cache[key]
+                #print('cache hit')
+                return
+
+        image=self.images[wo.image_list[wo.image_index]]
+        orig_rect = image.get_rect()
+        rot_image = pygame.transform.rotate(image, wo.rotation_angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        resize_image=pygame.transform.scale(rot_image,wo.image_size)
+        wo.image=resize_image
+
+        if self.image_cache_enabled:
+            self.image_cache[key]=resize_image
+            #print('cache miss ',key)
 
 #------------------------------------------------------------------------------
     def zoom_out(self):
