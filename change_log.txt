@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 14 2024
+- remade small_dirt to make it visible with the new background
+- remade panzerfaust warhead to make it visible with the new background 
+- fixed error when you reload (r) with no weapon 
+- fixed incorrect 80 degree angle for concrete square (should have been 90)
+
+Some of the textures will need to be done now that there is terrain texture - however 
+this is not a high priority as the terrain texture system is kind of a hacky placeholder 
+and will need a complete rewrite when i feel like it - almost certainly resulting in some 
+different ground cover colors.
+
+
+----------------------------------
 October 13 2024
 - added a image cache 
 

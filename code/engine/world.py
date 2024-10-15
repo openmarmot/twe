@@ -438,7 +438,8 @@ class World(object):
         # controls for vehicles and walking 
         if key=='r':
             if self.player.ai.memory['current_task']=='task_player_control':
-                self.player.ai.reload_weapon(self.player.ai.primary_weapon)
+                if self.player.ai.primary_weapon!=None:
+                    self.player.ai.reload_weapon(self.player.ai.primary_weapon)
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
                 self.player.ai.reload_turret()
 

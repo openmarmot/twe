@@ -225,7 +225,7 @@ def generate_clutter(map_objects):
                 coords[0]+=random.randint(-50,50)
                 coords[1]+=random.randint(-50,50)
                 count=random.randint(1,6)
-                rotation=random.choice([0,80,180,270])
+                rotation=random.choice([0,90,180,270])
                 coord_list=engine.math_2d.get_column_coords(coords,80,count,rotation,2)
                 for _ in range(count):
                     clutter.append(MapObject('concrete_square','concrete_square',coord_list.pop(),rotation,[]))
