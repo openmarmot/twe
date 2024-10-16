@@ -1,6 +1,35 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 15 2024
+- adjusted the minimum view adjustment so terrain tiles don't pop in and out of view 
+at the default zoom level.
+- rewrote the terrain system to just be brute force. no more weird jumps and resets
+- rounded cache keys to one decimal point instead of two to increase cache effectiveness 
+
+The terrain ends at about 24000 in any direction currently. I can probably bump that 
+out a bit but eventually the engine just has too many objects in it and begins to 
+bog down doing simple things. 
+
+At some point I will want to create some sort of oct tree so that I only have to render 
+cells that are near the player, although once object count gets up around the 20k range 
+I'm guessing even just cycling through a for loop will start dipping under 60 frames a second.
+
+I could also look at splitting rendering and updates into seperate threads, although in python 
+I'm not sure if that is helpful or not 
+
+for the cache - i need to look into whether whole numbers are good enough for rotation visually.
+the actual numbers are generally two decimal digits - which is probably plenty for rotation calculations 
+unless if you are aiming at something far away. i went to one decimal digit and it seems fine, but one 
+digit after the decimal still means 360*10 images that need to be cached for each image at each zoom level.
+
+to some degree the cache works just because when a object is moving and NOT changing rotation the image gets 
+cached the first time its needed and another image isn't needed until the object rotates, which could be some time. 
+
+so i either need to take the image cache down to whole numbers, or maybe just reset it when it gets too big - but 
+how big is too big? idk. It gets over 20k fairly easily 
+
+----------------------------------- 
 October 14 2024
 - remade small_dirt to make it visible with the new background
 - remade panzerfaust warhead to make it visible with the new background 
@@ -11,7 +40,6 @@ Some of the textures will need to be done now that there is terrain texture - ho
 this is not a high priority as the terrain texture system is kind of a hacky placeholder 
 and will need a complete rewrite when i feel like it - almost certainly resulting in some 
 different ground cover colors.
-
 
 ----------------------------------
 October 13 2024

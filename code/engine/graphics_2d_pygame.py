@@ -115,8 +115,10 @@ class Graphics_2D_Pygame(object):
         self.minimum_visible_scale=0.1 
 
 
-        # adjustment to viewing area
-        self.view_adjust=0
+        # adjustment to viewing area. > == more visible
+        # 100 seems to be about the minimum where there is no popping in and out of objects
+        self.view_adjust_minimum=100
+        self.view_adjust=self.view_adjust_minimum
 
         # load all images
         self.load_all_images('images')
@@ -393,8 +395,9 @@ class Graphics_2D_Pygame(object):
             if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
-                self.world.debug_text_queue.insert(2,'Rendered Objects: '+ str(self.renderCount))
-                self.world.debug_text_queue.insert(3,'Image Cache: '+str(len(self.image_cache)))
+                self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
+                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.renderCount))
+                self.world.debug_text_queue.insert(4,'Image Cache: '+str(len(self.image_cache)))
             
             if self.world.exit_world:
                 self.strategic_map.unload_world()
@@ -500,7 +503,11 @@ class Graphics_2D_Pygame(object):
         wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
         
         # check if the correct image is already in the cache
-        key = wo.image_list[wo.image_index]+str(wo.image_size)+str(wo.rotation_angle)
+        
+        # rounding the angle should massively reduce the amount of images we need to hash 
+        # without much of a visual loss, and zero angle math lass as we are only doing it for 
+        # the key
+        key = wo.image_list[wo.image_index]+str(wo.image_size)+str(round(wo.rotation_angle,1))
         if self.image_cache_enabled:    
             if key in self.image_cache:
                 wo.image=self.image_cache[key]
@@ -518,7 +525,7 @@ class Graphics_2D_Pygame(object):
 
         if self.image_cache_enabled:
             self.image_cache[key]=resize_image
-            #print('cache miss ',key)
+            print('cache miss ',key)
 
 #------------------------------------------------------------------------------
     def zoom_out(self):
@@ -535,8 +542,8 @@ class Graphics_2D_Pygame(object):
             self.scale=round(self.scale+0.1,1)
             self.view_adjust-=500
             # otherwise stuff starts getting clipped when its <0
-            if self.view_adjust<0:
-                self.view_adjust=0
+            if self.view_adjust<self.view_adjust_minimum:
+                self.view_adjust=self.view_adjust_minimum
             #print('zoom in',self.scale)
             self.reset_all()
 

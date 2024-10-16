@@ -56,7 +56,6 @@ from ai.ai_wearable import AIWearable
 from ai.ai_battery import AIBattery
 from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
-from ai.ai_ground_cover import AIGroundCover
 
 #global variables
 
@@ -537,12 +536,12 @@ def load_world(world,map_objects,spawn_faction):
     world.spawn_player(spawn_faction)
 
     # add ground cover. this will eventually go somewhere else
-    count=81
-    coords=engine.math_2d.get_grid_coords([0,0],1015,count)
-    for _ in range(count):
-        temp=spawn_object(world,world.player.world_coords,'ground_cover',True)
-        temp.ai.position_offset=coords.pop()
-        temp.ai.reset_offset()
+    # 50 results in about 24,000 world coords in any direction
+    count=50
+    size=1015
+    coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
+    for _ in range(count*count):
+        temp=spawn_object(world,coords.pop(),'ground_cover',True)
         temp.rotation_angle=random.choice([0,90,180,270])
 
 #------------------------------------------------------------------------------
@@ -1951,7 +1950,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='concrete_square'
         z.rotation_angle=0
     elif OBJECT_TYPE=='ground_cover':
-        z=WorldObject(world,['ground_dirt_vlarge'],AIGroundCover)
+        z=WorldObject(world,['ground_dirt_vlarge'],AINone)
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0
