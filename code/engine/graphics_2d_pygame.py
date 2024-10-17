@@ -525,7 +525,7 @@ class Graphics_2D_Pygame(object):
 
         if self.image_cache_enabled:
             self.image_cache[key]=resize_image
-            print('cache miss ',key)
+            #print('cache miss ',key)
 
 #------------------------------------------------------------------------------
     def zoom_out(self):

@@ -23,6 +23,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - spawn as a civilian and try to survive the cross fire
 - explore in a kubelwagen or a bicycle
 - check cupboards for the elusive pickle jar item. eat pickles!
+- check out the (very early) campaign mode
 
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
@@ -56,4 +57,4 @@ See gameplay_instructions.txt for a full list
 but when I have copied code I will try to include references from where I got it
 
 
-![screenshot](/screenshots/twe-june-12-2024.png "TWE screenshot")
+![screenshot](/screenshots/twe-oct-16-2024.png "TWE screenshot")
