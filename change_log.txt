@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+
+----------------------------------
+October 19 2024
+- toned down concrete squares a bit to reduce tiling effect 
+- added a basic runway for airport tiles 
+- changed strategic mode tile decorators back to black text 
+
 ----------------------------------
 October 16 2024
 - readme updates

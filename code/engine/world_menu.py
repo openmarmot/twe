@@ -414,8 +414,8 @@ class World_Menu(object):
                 coords=engine.math_2d.get_column_coords(self.world.player.world_coords,80,count,rotation,2)
                 for _ in range(count):
                     temp=engine.world_builder.spawn_object(self.world,coords.pop(),'concrete_square',True)
-                    #temp.rotation_angle=random.choice([0,90,180,270])
-                    temp.rotation_angle=rotation
+                    temp.rotation_angle=random.choice([0,90,180,270])
+                    #temp.rotation_angle=rotation
             elif key=='8':
                 pass
 
