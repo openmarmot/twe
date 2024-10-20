@@ -59,6 +59,8 @@ class StrategicMap(object):
     def advance_turn(self):
         '''have all the strategic ai take one turn and then update the map'''
 
+        self.update_faction_budgets()
+
         for b in self.strategic_ai:
             b.advance_turn()
             self.update_map_data()
@@ -554,12 +556,33 @@ class StrategicMap(object):
             # switch to strategic mode
             self.graphics_engine.mode=2
 
-
     
     #---------------------------------------------------------------------------
     def update(self):
         pass
-    
+
+    #---------------------------------------------------------------------------
+    def update_faction_budgets(self):
+        # apply per faction stuff 
+        for b in self.strategic_ai:
+            if b.faction=='german':
+                b.budget+=10
+            elif b.faction=='soviet':
+                b.budget+=12
+            elif b.faction=='american':
+                b.budget+=20
+            elif b.faction=='civilian':
+                b.budget+=1
+
+        # sort all soldiers 
+                
+        # subtract maintenance for each soldier 
+                
+        # add budget for strategic resources
+                
+
+        
+
     #---------------------------------------------------------------------------
     def update_map_data(self):
         '''update map_square data that is map_object dependent'''

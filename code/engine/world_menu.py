@@ -305,7 +305,7 @@ class World_Menu(object):
             self.text_queue.append('--Debug -> Spawn Menu --')
             self.text_queue.append('1 - Vehicles ')
             self.text_queue.append('2 - Weapons ')
-            self.text_queue.append('3 - Squads ')
+            self.text_queue.append('3 - Squads (disabled) ')
             self.text_queue.append('4 - Misc')
  
             if key=='1':
@@ -315,8 +315,9 @@ class World_Menu(object):
                 self.menu_state='spawn_weapons'
                 key=None
             elif key=='3':
-                self.menu_state='spawn_squads'
-                key=None   
+                #self.menu_state='spawn_squads'
+                #key=None
+                pass   
             elif key=='4':
                 self.menu_state='spawn_misc'
                 key=None

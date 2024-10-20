@@ -6,6 +6,22 @@ October 19 2024
 - toned down concrete squares a bit to reduce tiling effect 
 - added a basic runway for airport tiles 
 - changed strategic mode tile decorators back to black text 
+- fixed issue with civilian squad list 
+- minor cleanup
+- added the concept of a budget to the strategic mode ai 
+
+maybe instead of a 'next turn' button in strategic mode, time 
+passes when you exit/enter a map. that would make things play out 
+at a better pace. 
+
+also instead of battles auto resolving completely they could just partially resolve 
+and take several turns to finish 
+
+todo 
+- need to create a hangar for the airport 
+- need to create some railway tracks 
+- check whether civilians will move from rail yards. they should probably move randomly, or 
+maybe just migrate to towns 
 
 ----------------------------------
 October 16 2024

@@ -516,8 +516,6 @@ def load_sqlite_squad_data(faction):
 
     return squad_data
 
-
-
 #------------------------------------------------------------------------------
 def load_world(world,map_objects,spawn_faction):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
