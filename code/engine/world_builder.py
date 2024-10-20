@@ -358,8 +358,14 @@ def generate_world_area(world_coords,area_type,name):
 
 #------------------------------------------------------------------------------
 def generate_world_area_airport(world_coords):
-    engine.log.add_data('warn','world_builder.generate_world_area_airport: not implemented',True)
-    return []
+    map_objects=[]
+    # create a long runway 
+    count=120
+    coords=engine.math_2d.get_column_coords(world_coords,80,count,270,2)
+    for _ in range(count):
+        map_objects.append(MapObject('concrete_square','',coords.pop(),random.choice([0,90,180,270]),[]))
+
+    return map_objects
 
 #------------------------------------------------------------------------------
 def generate_world_area_simple(world_coords,count,diameter,world_builder_identity,name,rotation):
@@ -509,8 +515,6 @@ def load_sqlite_squad_data(faction):
     conn.close()
 
     return squad_data
-
-
 
 #------------------------------------------------------------------------------
 def load_world(world,map_objects,spawn_faction):

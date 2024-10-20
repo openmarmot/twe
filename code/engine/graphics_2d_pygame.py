@@ -280,11 +280,11 @@ class Graphics_2D_Pygame(object):
                     # special text stuff for map mode
 
                     if c.airport:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.menu_color)
+                        self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.color_black)
                     if c.rail_yard:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.menu_color)
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.color_black)
                     if c.town:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.menu_color)
+                        self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.color_black)
 
                     # german count 
                     if c.german_count>0:

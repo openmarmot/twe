@@ -305,7 +305,7 @@ class World_Menu(object):
             self.text_queue.append('--Debug -> Spawn Menu --')
             self.text_queue.append('1 - Vehicles ')
             self.text_queue.append('2 - Weapons ')
-            self.text_queue.append('3 - Squads ')
+            self.text_queue.append('3 - Squads (disabled) ')
             self.text_queue.append('4 - Misc')
  
             if key=='1':
@@ -315,8 +315,9 @@ class World_Menu(object):
                 self.menu_state='spawn_weapons'
                 key=None
             elif key=='3':
-                self.menu_state='spawn_squads'
-                key=None   
+                #self.menu_state='spawn_squads'
+                #key=None
+                pass   
             elif key=='4':
                 self.menu_state='spawn_misc'
                 key=None
@@ -414,8 +415,8 @@ class World_Menu(object):
                 coords=engine.math_2d.get_column_coords(self.world.player.world_coords,80,count,rotation,2)
                 for _ in range(count):
                     temp=engine.world_builder.spawn_object(self.world,coords.pop(),'concrete_square',True)
-                    #temp.rotation_angle=random.choice([0,90,180,270])
-                    temp.rotation_angle=rotation
+                    temp.rotation_angle=random.choice([0,90,180,270])
+                    #temp.rotation_angle=rotation
             elif key=='8':
                 pass
 

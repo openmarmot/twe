@@ -35,6 +35,9 @@ class AIFactionStrategic(object):
         self.square_objectives_owned=[]
         self.square_objectives_not_owned=[]
 
+        # how many 'units' can be spent
+        self.budget=0
+
     #---------------------------------------------------------------------------
     def advance_turn(self):
         '''take a strategic map turn'''
@@ -42,7 +45,9 @@ class AIFactionStrategic(object):
         self.update_map_square_data()
 
         # buy units with income
-        self.buy_and_place_units(100)
+        # eventually we will want to not spent the entire budget on new troops 
+        # so maybe 50% in the future
+        self.buy_and_place_units(self.budget)
         
 
         # something else?
@@ -81,7 +86,7 @@ class AIFactionStrategic(object):
                     map.map_objects+=engine.world_builder.get_squad_map_objects(squads.pop())
             else:
                 # not sure what to do here yet. having no rail yards means the faction loses i guess
-                engine.log.add_data('error','no rail yards for'+self.faction,True)
+                engine.log.add_data('error','no rail yards for '+self.faction,True)
         else:
             # missing squad lists
             engine.log.add_data('warn','ai_faction_strategic.buy_and_place_units, faction '+self.faction+' has no squad data',True)
