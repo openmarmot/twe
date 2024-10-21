@@ -1940,12 +1940,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=350.
         z.is_projectile=True
     elif OBJECT_TYPE=='gas_80_octane':
-        z=WorldObject(world,['small_clear_spill'],AIProjectile)
+        z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='gas_80_octane'
         z.is_liquid=True
         z.is_solid=False
     elif OBJECT_TYPE=='water':
-        z=WorldObject(world,['small_clear_spill'],AIProjectile)
+        z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='water'
         z.is_liquid=True
         z.is_solid=False
