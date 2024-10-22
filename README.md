@@ -7,7 +7,7 @@ Sometime in 2010 I lost all the code when I accidentally erased the NAS where it
 
 I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress. 
 
-![screenshot](/screenshots/twe-may-23-2021.png "TWE screenshot")
+![screenshot](/screenshots/twe-oct-22-2024.png "TWE screenshot")
 
 
 ### General Concepts
