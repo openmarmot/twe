@@ -466,17 +466,17 @@ class World(object):
                             vehicle.ai.handle_elevator_up()
                         elif key=='s':
                             vehicle.ai.handle_elevator_down()
-                            if self.owner.altitude<1:
+                            if vehicle.altitude<1:
                                 vehicle.ai.brake_power=1
                         elif key=='a':
                             vehicle.ai.handle_aileron_left()
                             vehicle.ai.handle_rudder_left()
-                            if self.owner.altitude<1:
+                            if vehicle.altitude<1:
                                 vehicle.ai.handle_steer_left()
                         elif key=='d':
                             vehicle.ai.handle_aileron_right()
                             vehicle.ai.handle_rudder_right()
-                            if self.owner.altitude<1:
+                            if vehicle.altitude<1:
                                 vehicle.ai.handle_steer_right()
                         elif key=='up':
                             pass

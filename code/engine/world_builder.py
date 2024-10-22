@@ -360,10 +360,15 @@ def generate_world_area(world_coords,area_type,name):
 def generate_world_area_airport(world_coords):
     map_objects=[]
     # create a long runway 
-    count=120
-    coords=engine.math_2d.get_column_coords(world_coords,80,count,270,2)
+    count=400
+    coords=engine.math_2d.get_column_coords(world_coords,80,count,270,4)
     for _ in range(count):
         map_objects.append(MapObject('concrete_square','',coords.pop(),random.choice([0,90,180,270]),[]))
+
+    # add hangars
+    map_objects.append(MapObject('hangar','',[world_coords[0]+1500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('hangar','',[world_coords[0]+2500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('hangar','',[world_coords[0]+3500,world_coords[1]+600],0,[]))
 
     return map_objects
 
@@ -646,6 +651,13 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)
         z.name='square building'
         z.collision_radius=60
+        z.weight=10000
+        z.is_building=True
+    
+    elif OBJECT_TYPE=='hangar':
+        z=WorldObject(world,['hangar_outside','hangar_inside'],AIBuilding)
+        z.name='hangar'
+        z.collision_radius=600
         z.weight=10000
         z.is_building=True
 

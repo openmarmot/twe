@@ -388,8 +388,8 @@ class World_Menu(object):
             self.text_queue.append('4 - Pickle Jar')
             self.text_queue.append('5 - Pickle ')
             self.text_queue.append('6 - crate_mp40')
-            self.text_queue.append('7 - concrete_square')
-            self.text_queue.append('8 - ground cover')
+            self.text_queue.append('7 - concrete runway')
+            self.text_queue.append('8 - hangar')
 
             if key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
@@ -418,7 +418,8 @@ class World_Menu(object):
                     temp.rotation_angle=random.choice([0,90,180,270])
                     #temp.rotation_angle=rotation
             elif key=='8':
-                pass
+                temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'hangar',True)
+                temp.rotation_angle=0
 
 
 

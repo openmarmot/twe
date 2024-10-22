@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+----------------------------------
+October 22 2024
+- added hangar art and object 
+- added hangars to airfield generation 
+- resized runway in airfield generation
+- fixed some errors with the airplane controls 
 
 ----------------------------------
 October 21 2024
