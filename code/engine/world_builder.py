@@ -34,6 +34,7 @@ from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
+import engine.world_radio
 
 
 # load AI 
@@ -531,6 +532,9 @@ def load_world(world,map_objects,spawn_faction):
 
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
+
+    # init radio
+    engine.world_radio.load(world)
 
     # generation squads 
     world.create_squads()

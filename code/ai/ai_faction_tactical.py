@@ -21,7 +21,7 @@ import engine.world_builder
 #global variables
 
 class AIFactionTactical(object):
-    def __init__(self,world,faction,spawn_location):
+    def __init__(self,world,faction,spawn_location,radio_frequency):
 
 
         # squads in the faction who are present on this map
@@ -43,6 +43,9 @@ class AIFactionTactical(object):
 
         # faction - german/soviet/american/civilian
         self.faction=faction
+
+        # radio frequency
+        self.radio_frequency=radio_frequency
 
     #---------------------------------------------------------------------------
     def create_squads(self,humans):

@@ -741,10 +741,37 @@ class World_Menu(object):
                 return
 
         self.text_queue.append('2 - Toggle power')
-
         if key=='2':
-            self.selected_object.ai.power_on= not self.selected_object.ai.power_on
+            if self.selected_object.ai.power_on:
+                self.selected_object.ai.turn_power_off()
+            else:
+                self.selected_object.ai.turn_power_on()
+
             self.radio_menu(None)
+
+        self.text_queue.append('3 - Frequency Up')
+        if key=='3':
+            if self.selected_object.ai.current_frequency<self.selected_object.ai.frequency_range[1]:
+                self.selected_object.ai.current_frequency+=1
+                self.radio_menu(None)
+
+        self.text_queue.append('4 - Frequency Down')
+        if key=='4':
+            if self.selected_object.ai.current_frequency>self.selected_object.ai.frequency_range[0]:
+                self.selected_object.ai.current_frequency-=1
+                self.radio_menu(None)
+
+        self.text_queue.append('5 - Volume Up')
+        if key=='5':
+            if self.selected_object.ai.volume<self.selected_object.ai.volume_range[1]:
+                self.selected_object.ai.volume+=1
+                self.radio_menu(None)
+        
+        self.text_queue.append('6 - Volume Down')
+        if key=='6':
+            if self.selected_object.ai.volume>self.selected_object.ai.volume_range[0]:
+                self.selected_object.ai.volume-=1
+                self.radio_menu(None)
             
 
     #---------------------------------------------------------------------------
