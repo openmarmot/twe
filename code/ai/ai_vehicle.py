@@ -352,6 +352,7 @@ class AIVehicle(AIBase):
 
         # update radio
         if self.radio!=None:
+            self.radio.world_coords=copy.copy(self.owner.world_coords)
             self.radio.update()
 
         if self.throttle>0:

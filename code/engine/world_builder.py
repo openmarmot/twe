@@ -34,6 +34,7 @@ from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
+import engine.world_radio
 
 
 # load AI 
@@ -531,6 +532,9 @@ def load_world(world,map_objects,spawn_faction):
 
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
+
+    # init radio
+    engine.world_radio.load(world)
 
     # generation squads 
     world.create_squads()
@@ -2035,7 +2039,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_radio=True
         z.weight=15
         z.is_large_human_pickup=True
-        z.ai.frequency_range=[90.57,109.45]
+        #z.ai.frequency_range=[90.57,109.45]
+        z.ai.frequency_range=[0,10]
         z.ai.battery=spawn_object(world,world_coords,"battery_feldfunk_2v",False)
         z.rotation_angle=float(random.randint(0,359)) 
     elif OBJECT_TYPE=='feldfunk_battery_charger':

@@ -21,6 +21,7 @@ import engine.math_2d
 import engine.world_builder
 import engine.log
 from ai.ai_faction_tactical import AIFactionTactical
+import engine.world_radio
 
 
 #global variables
@@ -46,10 +47,10 @@ class World(object):
         self.spawn_far_east=[10000.,0.]
 
         # tactical AIs
-        self.german_ai=AIFactionTactical(self,'german',self.spawn_west)
-        self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east)
-        self.american_ai=AIFactionTactical(self,'american',self.spawn_north)
-        self.civilian_ai=AIFactionTactical(self,'civilian',self.spawn_center)
+        self.german_ai=AIFactionTactical(self,'german',self.spawn_west,3)
+        self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east,5)
+        self.american_ai=AIFactionTactical(self,'american',self.spawn_north,10)
+        self.civilian_ai=AIFactionTactical(self,'civilian',self.spawn_center,12)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -88,6 +89,7 @@ class World(object):
         self.wo_objects_container=[]
         self.wo_objects_furniture=[]
         self.wo_objects_cleanup=[]
+        self.wo_objects_radio=[]
 
         #world areas
         self.world_areas=[]
@@ -227,6 +229,8 @@ class World(object):
                 self.wo_objects_gun_magazines.append(WORLD_OBJECT)
             if WORLD_OBJECT.can_be_deleted:
                 self.wo_objects_cleanup.append(WORLD_OBJECT)
+            if WORLD_OBJECT.is_radio:
+                self.wo_objects_radio.append(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' already in world.wo_objects. Add fails !!')
         
@@ -694,6 +698,8 @@ class World(object):
                 self.wo_objects_cleanup.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_gun_magazine:
                 self.wo_objects_gun_magazines.remove(WORLD_OBJECT)
+            if WORLD_OBJECT.is_radio:
+                self.wo_objects_radio.remove(WORLD_OBJECT)
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         

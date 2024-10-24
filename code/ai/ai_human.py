@@ -671,7 +671,7 @@ class AIHuman(AIBase):
             found_turret=False
 
             # search for an empty turret
-            for b in self.vehicle.ai.turrets:
+            for b in vehicle.ai.turrets:
                 if b.ai.gunner==None:
                     self.speak("Taking over gunner position")
                     b.ai.gunner=self.owner
@@ -682,7 +682,7 @@ class AIHuman(AIBase):
             
             # didn't find one. can we boot someone out?
             if found_turret==False:
-                for b in self.vehicle.ai.turrets:
+                for b in vehicle.ai.turrets:
                     if b.ai.gunner!=None:
 
                         # reassign gunner
@@ -697,8 +697,9 @@ class AIHuman(AIBase):
                         break
 
             # still didn't find one somehow?
-            self.memory['task_vehicle_crew']['role']='passenger'
-            engine.log.add_data('warn','player change role to gunner failed',True)   
+            if found_turret==False:
+                self.memory['task_vehicle_crew']['role']='passenger'
+                engine.log.add_data('warn','player change role to gunner failed',True)   
 
 
         elif role=='passenger':
@@ -758,9 +759,12 @@ class AIHuman(AIBase):
         
     #-----------------------------------------------------------------------
     def reload_turret(self):
-        if self.vehicle_turret!=None:
-            if self.vehicle_turret.ai.vehicle!=None and self.vehicle_turret.ai.primary_weapon!=None:
-                weapon=self.vehicle_turret.ai.primary_weapon
+        # called by world.handle_keydown()
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        turret=self.memory['task_vehicle_crew']['turret']
+        if turret!=None:
+            if turret.ai.vehicle!=None and turret.ai.primary_weapon!=None:
+                weapon=turret.ai.primary_weapon
                 # first get the current magazine
                 old_magazine=None
                 if weapon.ai.magazine!=None:
@@ -770,7 +774,7 @@ class AIHuman(AIBase):
                 # find a new magazine, sorting by size
                 new_magazine=None
                 biggest=0
-                for b in self.vehicle.ai.inventory:
+                for b in vehicle.ai.inventory:
                     if b.is_gun_magazine:
                         if weapon.name in b.ai.compatible_guns:
                             if len(b.ai.projectiles)>biggest:
@@ -779,19 +783,18 @@ class AIHuman(AIBase):
 
                 # perform the swap 
                 if old_magazine!=None:
-                    self.vehicle.ai.event_add_inventory(old_magazine)
+                    vehicle.ai.event_add_inventory(old_magazine)
                     weapon.ai.magazine=None
                 if new_magazine!=None:
-                    self.vehicle.ai.event_remove_inventory(new_magazine)
+                    vehicle.ai.event_remove_inventory(new_magazine)
                     weapon.ai.magazine=new_magazine
+                    self.speak("I've reloaded the "+weapon.name+" in the turret")
                 else:
-                    self.speak("This turret is out of ammo!")
+                    self.speak("The "+weapon.name+" in the turret is out of ammo!")
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
         
-        self.speak('reloading!')
-
     #---------------------------------------------------------------------------
     def speak(self,what):
         ''' say something if the ai is close to the player '''
