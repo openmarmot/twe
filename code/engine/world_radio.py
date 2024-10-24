@@ -17,14 +17,17 @@ def add_radio(frequency,radio):
     # this is called by ai_radio
     global channels
     remove_radio(radio)
-    channels[frequency].append(radio)
+    if frequency in channels:
+        channels[frequency].append(radio)
+    else:
+        engine.log.add_data('warn','world_radio.add_radio frequency channel '+str(frequency)+' does not exist',True)
 
 #---------------------------------------------------------------------------
 def remove_radio(radio):
     '''remove a radio from all channels'''
     # this is called by ai_radio
     global channels
-    for f,r in channels:
+    for r in channels.values():
         if radio in r:
             r.remove(radio)
 

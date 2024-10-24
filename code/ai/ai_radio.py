@@ -19,7 +19,7 @@ class AIRadio(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
-        self.frequency_range = [0,0]  # [20.0, 60.0] MHz
+        self.frequency_range = [0,10]  # [20.0, 60.0] MHz
         self.current_frequency = 0
         self.battery = None # option for a single battery
         self.transmisson_power_range=[0,10]
@@ -50,6 +50,18 @@ class AIRadio(AIBase):
         if self.power_on:
             self.last_message=message
             engine.world_radio.send_message(self.current_frequency,message)
+
+    #---------------------------------------------------------------------------
+    def turn_frequency_down(self):
+        if self.current_frequency>self.frequency_range[0]:
+            self.current_frequency-=1
+            self.turn_power_on()
+
+    #---------------------------------------------------------------------------
+    def turn_frequency_up(self):
+        if self.current_frequency<self.frequency_range[1]:
+            self.current_frequency+=1
+            self.turn_power_on()
 
     #---------------------------------------------------------------------------
     def turn_power_on(self):
