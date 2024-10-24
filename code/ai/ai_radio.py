@@ -43,6 +43,7 @@ class AIRadio(AIBase):
             if message!=self.last_message:
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
                 if distance<(50*self.volume):
+                    self.owner.world.text_queue.append('[radio] '+message)
                     print(message)
 
     #---------------------------------------------------------------------------

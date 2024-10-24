@@ -18,6 +18,7 @@ import random
 #import custom packages
 import engine.world_builder 
 import engine.math_2d
+import engine.world_radio
 
 #global variables
 
@@ -283,7 +284,7 @@ class World_Menu(object):
             self.text_queue.append('1 - toggle map ')
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
-            self.text_queue.append('4 - none')
+            self.text_queue.append('4 - send test radio messages')
             self.text_queue.append('5 - none')
             self.text_queue.append('6 - none')
 
@@ -295,7 +296,12 @@ class World_Menu(object):
                 self.menu_state='spawn'
                 key=None
             elif key=='4':
-                pass
+                self.world.german_ai.send_radio_comms_check()
+                self.world.soviet_ai.send_radio_comms_check()
+                self.world.american_ai.send_radio_comms_check()
+                self.world.civilian_ai.send_radio_comms_check()
+                print('comms check sent on all tactical ai channels')
+
             elif key=='5':
                 print('boop')
             elif key=='6':

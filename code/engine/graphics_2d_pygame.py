@@ -30,10 +30,6 @@ from engine.world import World
 from engine.strategic_map import StrategicMap
 import engine.log
 
-
-
-
-
 class Graphics_2D_Pygame(object):
     ''' 2D Graphics Engine using PyGame '''
 

@@ -47,6 +47,13 @@ class AIFactionTactical(object):
         # radio frequency
         self.radio_frequency=radio_frequency
 
+        # radio - needed to get and send radio transmissions
+        self.radio=engine.world_builder.spawn_object(world,[0,0],'radio_feldfu_b',False)
+        self.radio.ai.current_frequency=self.radio_frequency
+        self.radio.ai.turn_power_on()
+        # no need to radio.update at the moment.
+
+
     #---------------------------------------------------------------------------
     def create_squads(self,humans):
         '''sort a list of humans into squads and initialize them'''
@@ -94,7 +101,9 @@ class AIFactionTactical(object):
         else:
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
-    
+    #---------------------------------------------------------------------------
+    def send_radio_comms_check(self):
+        self.radio.ai.send_message('This is '+self.faction+' HQ. Sending a comms check')
     #---------------------------------------------------------------------------
     def split_squad(self,members):
         '''removes members from their current squad and puts them in a new squad'''
@@ -116,6 +125,9 @@ class AIFactionTactical(object):
 
     #---------------------------------------------------------------------------
     def tactical_order(self):
+        
+        # randomize think_rate a bit 
+        self.think_rate=random.randint(60,400)
 
         idle_squads=[] # these are squads that are near their current squad destination
         busy_squads=[]
