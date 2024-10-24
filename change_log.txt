@@ -4,11 +4,16 @@ TWE Project : Change Log
 ----------------------------------
 October 24 2024
 - gave faction tactical ai a radio 
+- radios discharge battery when turned on now 
 
 puzzling over how to get the factional tactical hooked into 
 radio comms and the easiest way was to just give it an actual 
 radio object. I have a feeling once human ai can use a radio i'll 
 end up just giving tactical ai a human to operate the radio. 
+
+todo
+- electric battery charging 
+- vehicle electric system info display 
 
 ----------------------------------
 October 23 2024

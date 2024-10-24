@@ -31,13 +31,18 @@ class AIRadio(AIBase):
         self.signal_strength = 0  # Signal strength of received signal
         self.encryption = False  # Encryption status
         self.operational_status = True  # True if functional, False if damaged
+        
+        # ampere-hour
+        self.ah_discharge_rate=1.336
 
+        # human ai assigned to work the radio
         self.radio_operator=None
 
+        # used to prevent echoing 
         self.last_message=''
 
     #---------------------------------------------------------------------------
-    def recieve_message(self,message):
+    def receive_message(self,message):
         if self.power_on:
             # prevents echos. we don't want to receive our own message
             if message!=self.last_message:
@@ -77,11 +82,16 @@ class AIRadio(AIBase):
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
         
-        # draw electric power from ?? 
+        if self.battery!=None:
+            if self.power_on:
+                time_passed_hours=self.owner.world.time_passed_seconds / 3600  
+                self.battery.ai.discharge(self.ah_discharge_rate*time_passed_hours)
+                
+                if self.battery.ai.state_of_charge<1:
+                    self.turn_power_off
+            self.battery.update()
 
-        # update battery
-        self.battery.update()
-
+        
 
     #---------------------------------------------------------------------------
     def update(self):

@@ -736,6 +736,9 @@ class World_Menu(object):
         self.text_queue.append('Frequency: '+str(self.selected_object.ai.current_frequency))
         self.text_queue.append('Volume: '+str(self.selected_object.ai.volume))
         self.text_queue.append('Transmission Power: '+str(self.selected_object.ai.transmission_power))
+        if self.selected_object.ai.battery!=None:
+            self.text_queue.append('Battery State of Charge: '+str(round(self.selected_object.ai.battery.ai.state_of_charge,2))
+                +'/'+str(self.selected_object.ai.battery.ai.max_capacity))
         
 
         if self.world.check_object_exists(self.selected_object):
