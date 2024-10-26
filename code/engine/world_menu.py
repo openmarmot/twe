@@ -974,6 +974,15 @@ class World_Menu(object):
             self.text_queue.append('Vehicle : '+self.selected_object.name)
             self.text_queue.append('Health : '+str(self.selected_object.ai.health))
 
+            for b in self.selected_object.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+
+            
             # -- add debug info --
             if self.world.debug_mode==True:
                 self.text_queue.append('--debug info --')
@@ -1040,6 +1049,15 @@ class World_Menu(object):
                 self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
             if len(self.selected_object.ai.engines)>0:
                 self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
+
+            for b in self.selected_object.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+
             self.text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.text_queue.append('1 - change role')
             self.text_queue.append('2 - exit vehicle ')

@@ -1,10 +1,13 @@
 TWE Project : Change Log
 
+----------------------------------
+October 26 2024
+- added fuel tank data to internal vehicle menu 
+
 
 ----------------------------------
 October 25 2024
 - added battery info to vehicle engine menu 
-
 
 ----------------------------------
 October 24 2024
