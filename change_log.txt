@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ----------------------------------
+October 25 2024
+- added battery info to vehicle engine menu 
+
+
+----------------------------------
 October 24 2024
 - gave faction tactical ai a radio 
 - radios discharge battery when turned on now 

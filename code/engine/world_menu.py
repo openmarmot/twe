@@ -466,11 +466,11 @@ class World_Menu(object):
         self.text_queue.append('-- Engine Menu --')
         self.text_queue.append('Engine Status')
         
-        selectable_objects=vehicle.ai.engines
-        selection_key=1
-        for b in selectable_objects:
-            self.text_queue.append(str(selection_key) + ': ' + b.name + ' ' + str(b.ai.engine_on))
-            selection_key+=1
+        for b in vehicle.ai.engines:
+            self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
+
+        for b in vehicle.ai.batteries:
+            self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
 
         self.text_queue.append('1 - Start Engines')
         self.text_queue.append('2 - Stop Engines')
