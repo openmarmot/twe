@@ -38,7 +38,6 @@ class AISquad(object):
         self.faction='none'
 
         # a link back to the parent faction tactical
-        # set in ai_faction_tactical.process_spawn_queue()
         self.faction_tactical=None
 
         # whether the squad is connected to a radio or not

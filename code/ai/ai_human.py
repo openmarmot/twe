@@ -965,6 +965,8 @@ class AIHuman(AIBase):
         '''switch task to vehicle crew and determine role'''
         # this should always overwrite if it exists
         # A player can go through this if they enter a vehicle
+        # this can also be used by a ai in a vehicle already that wants to change role
+        # role should be NONE in most cases. 
 
         # pick a role
         if role==None:
@@ -981,6 +983,13 @@ class AIHuman(AIBase):
                         turret=b
                         role='gunner'
                         break
+
+            if role==None:
+                if vehicle.ai.radio!=None:
+                    if vehicle.ai.radio.ai.radio_operator==None:
+                        role='radio_operator'
+                        vehicle.ai.radio.ai.radio_operator=self.owner
+
             if role==None:
                 role='passenger'
 
@@ -1076,6 +1085,36 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         pass
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_radio_operator(self):
+        # note radio.ai.radio_operator set by switch_task_vehicle_crew
+        # not a ton that we really need to do here atm
+
+
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        radio=vehicle.ai.radio
+        if radio==None:
+            # radio dissapeared. get a different vehicle task
+            self.switch_task_vehicle_crew(vehicle,self.memory['task_vehicle_crew']['destination'])
+            
+        else:
+            if radio.ai.power_on==False:
+                radio.ai.current_frequency=self.squad.faction_tactical.radio_frequency
+                radio.ai.turn_power_on()
+
+                # should double check here that this worked.
+                # but what are the failure conditions?
+                # - bad battery 
+                # - no battery?
+            else:
+                # check the frequency
+                if radio.ai.current_frequency!=self.squad.faction_tactical.radio_frequency:
+                    radio.ai.current_frequency=self.squad.faction_tactical.radio_frequency
+                    # this is needed to reset frequency with world_radio
+                    radio.ai.turn_power_on()
+
+        
 
     #---------------------------------------------------------------------------
     def throw(self,TARGET_COORDS,mouse_screen_coords=None,player_screen_coords=None):
@@ -1415,6 +1454,11 @@ class AIHuman(AIBase):
             # tell everyone else to GTFO
             for b in vehicle.ai.passengers:
                 b.ai.switch_task_exit_vehicle(vehicle)
+
+        # remove yourself from radio
+        if vehicle.ai.radio!=None:
+            if vehicle.ai.radio.ai.radio_operator==self.owner:
+                vehicle.ai.radio.ai.radio_operator=None
 
         # make sure we are visible again
         self.owner.render=True
@@ -1781,6 +1825,9 @@ class AIHuman(AIBase):
                     elif role=='passenger':
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
                         self.think_vehicle_role_passenger()
+                    elif role=='radio_operator':
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
+                        self.think_vehicle_role_radio_operator()
                     else:
                         engine.log.add_data('error','unknown vehicle role: '+role,True)
 

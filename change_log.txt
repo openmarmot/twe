@@ -1,10 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+October 28 2024
+- added radio_operator role for human ai
+
+the radio operator role is fairly close to being done, just needs 
+the code for sending/recieving messages. recieving is really just 
+doing a bit of sorting and then forwarding on to the squad queue for 
+the squad lead to review.
+
+----------------------------------
 October 26 2024
 - added fuel tank data to internal vehicle menu 
-
-
 ----------------------------------
 October 25 2024
 - added battery info to vehicle engine menu 

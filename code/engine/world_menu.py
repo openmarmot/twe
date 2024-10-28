@@ -981,6 +981,8 @@ class World_Menu(object):
                         fuel=b.ai.inventory[0].volume
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+            if self.selected_object.ai.radio!=None:
+                self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
 
             
             # -- add debug info --
