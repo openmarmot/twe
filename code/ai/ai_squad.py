@@ -38,7 +38,6 @@ class AISquad(object):
         self.faction='none'
 
         # a link back to the parent faction tactical
-        # set in ai_faction_tactical.process_spawn_queue()
         self.faction_tactical=None
 
         # whether the squad is connected to a radio or not
@@ -47,7 +46,14 @@ class AISquad(object):
         self.radio_eval_rate=0 # updates after first check
 
         # incoming radio messages go here
-        self.radio_incoming_message_queue=[]
+        # radio operators will add messages to this queue
+        # team leaders will pop them and think about them
+        self.radio_receive_queue=[]
+
+        # outgoing messages go here
+        # radio operators will pop them and send them through their radios
+        self.radio_send_queue=[]
+
         # format [world.world_seconds,'message']
 
     #---------------------------------------------------------------------------

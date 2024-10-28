@@ -18,6 +18,7 @@ import random
 #import custom packages
 import engine.world_builder 
 import engine.math_2d
+import engine.world_radio
 
 #global variables
 
@@ -283,7 +284,7 @@ class World_Menu(object):
             self.text_queue.append('1 - toggle map ')
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
-            self.text_queue.append('4 - none')
+            self.text_queue.append('4 - send test radio messages')
             self.text_queue.append('5 - none')
             self.text_queue.append('6 - none')
 
@@ -295,7 +296,12 @@ class World_Menu(object):
                 self.menu_state='spawn'
                 key=None
             elif key=='4':
-                pass
+                self.world.german_ai.send_radio_comms_check()
+                self.world.soviet_ai.send_radio_comms_check()
+                self.world.american_ai.send_radio_comms_check()
+                self.world.civilian_ai.send_radio_comms_check()
+                print('comms check sent on all tactical ai channels')
+
             elif key=='5':
                 print('boop')
             elif key=='6':
@@ -460,11 +466,11 @@ class World_Menu(object):
         self.text_queue.append('-- Engine Menu --')
         self.text_queue.append('Engine Status')
         
-        selectable_objects=vehicle.ai.engines
-        selection_key=1
-        for b in selectable_objects:
-            self.text_queue.append(str(selection_key) + ': ' + b.name + ' ' + str(b.ai.engine_on))
-            selection_key+=1
+        for b in vehicle.ai.engines:
+            self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
+
+        for b in vehicle.ai.batteries:
+            self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
 
         self.text_queue.append('1 - Start Engines')
         self.text_queue.append('2 - Stop Engines')
@@ -730,6 +736,9 @@ class World_Menu(object):
         self.text_queue.append('Frequency: '+str(self.selected_object.ai.current_frequency))
         self.text_queue.append('Volume: '+str(self.selected_object.ai.volume))
         self.text_queue.append('Transmission Power: '+str(self.selected_object.ai.transmission_power))
+        if self.selected_object.ai.battery!=None:
+            self.text_queue.append('Battery State of Charge: '+str(round(self.selected_object.ai.battery.ai.state_of_charge,2))
+                +'/'+str(self.selected_object.ai.battery.ai.max_capacity))
         
 
         if self.world.check_object_exists(self.selected_object):
@@ -965,6 +974,17 @@ class World_Menu(object):
             self.text_queue.append('Vehicle : '+self.selected_object.name)
             self.text_queue.append('Health : '+str(self.selected_object.ai.health))
 
+            for b in self.selected_object.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+            if self.selected_object.ai.radio!=None:
+                self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
+
+            
             # -- add debug info --
             if self.world.debug_mode==True:
                 self.text_queue.append('--debug info --')
@@ -1031,6 +1051,15 @@ class World_Menu(object):
                 self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
             if len(self.selected_object.ai.engines)>0:
                 self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
+
+            for b in self.selected_object.ai.fuel_tanks:
+                fuel=0
+                if len(b.ai.inventory)>0:
+                    if 'gas' in b.ai.inventory[0].name:
+                        fuel=b.ai.inventory[0].volume
+                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+
             self.text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
             self.text_queue.append('1 - change role')
             self.text_queue.append('2 - exit vehicle ')
