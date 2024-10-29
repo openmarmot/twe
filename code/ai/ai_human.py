@@ -998,6 +998,7 @@ class AIHuman(AIBase):
             'vehicle': vehicle,
             'role': role,
             'turret': turret,
+            'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
             'last_think_time': 0,
             'think_interval': 0.5
@@ -1114,6 +1115,20 @@ class AIHuman(AIBase):
                     # this is needed to reset frequency with world_radio
                     radio.ai.turn_power_on()
 
+                # -- receive radio messages --
+                if len(self.memory['task_vehicle_crew']['radio_recieve_queue'])>0:
+                    message=self.memory['task_vehicle_crew']['radio_recieve_queue'].pop()
+                    
+                    # avoid duplicates from other radio operators
+                    if message not in self.squad.radio_receive_queue:
+                        # ideally do some processing here 
+                        self.squad.radio_recieve_queue.append(message)
+
+                # -- send radio messages --
+                if len(self.squad.radio_send_queue)>0:
+                    message=self.squad.radio_send_queue.pop()
+                    vehicle.ai.radio.ai.send_message(message)
+                    # maybe speak something here?
         
 
     #---------------------------------------------------------------------------

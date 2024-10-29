@@ -7,6 +7,7 @@ notes : handles the radio simulation
 
 import engine.log
 
+# this gets wiped on world.init to prevent stale objects from previous worlds
 channels={}
 # key : frequency
 # value : [] array of radios
@@ -20,7 +21,8 @@ def add_radio(frequency,radio):
     if frequency in channels:
         channels[frequency].append(radio)
     else:
-        engine.log.add_data('warn','world_radio.add_radio frequency channel '+str(frequency)+' does not exist',True)
+        channels[frequency]=[radio]
+        engine.log.add_data('note','world_radio.add_radio frequency channel '+str(frequency)+' does not exist. creating..',True)
 
 #---------------------------------------------------------------------------
 def remove_radio(radio):
@@ -32,17 +34,11 @@ def remove_radio(radio):
             r.remove(radio)
 
 #---------------------------------------------------------------------------
-def load(world):
+def reset_world_radio():
+    '''reset to defaults'''
+    # used when doing world.init so there are no old radio references
     global channels
     channels={}
-    channels[world.german_ai.radio_frequency]=[]
-    channels[world.soviet_ai.radio_frequency]=[]
-    channels[world.american_ai.radio_frequency]=[]
-    channels[world.civilian_ai.radio_frequency]=[]
-
-    # I think eventually vehicles and squads may split out?
-    # germans definitely had a different frequency for tanks
-
 
 #---------------------------------------------------------------------------
 def send_message(frequency,message):

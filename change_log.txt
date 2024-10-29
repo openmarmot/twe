@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+
+----------------------------------
+October 29 2024
+- added the rest of the code for sending/receiving radio messages 
+with the radio_operator vehicle role 
+- reshuffled how world_radio channels are created due to a chicken-egg issue
+
+radio flow is 
+if you want to send a radio message drop it in the squad send queue. 
+A radio operator will grab it and send it 
+
+if you want to receive a radio message just monitor the squad receive queue 
+the radio operator monitors the radio and drops messages there 
+
+note - tactical AI can't receive at the moment. it needs a radio operator i guess 
+
 ----------------------------------
 October 28 2024
 - added radio_operator role for human ai

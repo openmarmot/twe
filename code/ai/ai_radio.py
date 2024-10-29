@@ -50,6 +50,10 @@ class AIRadio(AIBase):
                 if distance<(50*self.volume):
                     self.owner.world.text_queue.append('[radio] '+message)
                     print(message)
+                if self.radio_operator!=None:
+                    # this should always be true
+                    if self.radio_operator.ai.memory['current_task']=='task_vehicle_crew':
+                        self.radio_operator.ai.memory['task_vehicle_crew']['radio_recieve_queue'].append(message)
 
     #---------------------------------------------------------------------------
     def send_message(self,message):
