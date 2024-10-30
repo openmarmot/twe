@@ -278,8 +278,12 @@ class AIHuman(AIBase):
         if closest_object!=None:
             if self.memory['current_task']=='task_vehicle_crew':
                 # not sure what to do here yet
-                engine.log.add_data('warn','close enemy while in vehicle. not handled',True)
+                pass
+                #engine.log.add_data('warn','close enemy while in vehicle. not handled',True)
             else:
+
+                # should we check to make sure we aren't trying to exit a vehicle first?
+
                 if self.primary_weapon!=None:
                     if self.check_ammo_bool(self.primary_weapon):
                         self.switch_task_engage_enemy(closest_object)
@@ -1085,7 +1089,14 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
-        pass
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        
+        if self.near_targets>0:
+            # check if we should be worried about small arms fire
+            # near targets will absolutely chew up a unarmored vehicle
+            if vehicle.ai.armor_thickness<5:
+                self.switch_task_exit_vehicle(vehicle)
+
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_radio_operator(self):
@@ -1701,6 +1712,8 @@ class AIHuman(AIBase):
             # coordinate with nearby squad lead?
                 
             # check in with HQ ?
+                
+            # read and reply to radio messages
             
         else:
             # -- do the shorter thing --

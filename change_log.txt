@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+----------------------------------
+Oct 30 2024
+- added some code to have vehicle passengers bail out 
+when they detect near enemies. for now driver/gunner/radio stay in 
+
+this one is going to be tough. what is optimal here? 
+I put in a armor check - no need to bail out of a half track as 
+their armor is rated against small arms (although probably won't stop a .50 
+- but those aren't in game yet).
+
+I need to observe more vehicle fights, might have to tune the quick battle 
+for that. 
 
 ----------------------------------
 October 29 2024
