@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 31 2024
+- working on vehicle gunner role 
+
+theoretically all the code needed for vehicle gunners to pick targets 
+and fire is in now. the code determining if the turret can actually rotate 
+enough to engage is probably wrong. 
+
+this is going to be hard to test and tweak so i'll put that off for future 
+andrew to deal with 
+
+----------------------------------
 Oct 30 2024
 - added some code to have vehicle passengers bail out 
 when they detect near enemies. for now driver/gunner/radio stay in 

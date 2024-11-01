@@ -57,7 +57,6 @@ class AITurret(AIBase):
     #---------------------------------------------------------------------------
     def handle_fire(self):
         self.primary_weapon.rotation_angle=self.owner.rotation_angle
-        #self.primary_weapon.ai.fire()
         self.primary_weapon.ai.fire()
 
     #---------------------------------------------------------------------------

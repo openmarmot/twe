@@ -111,6 +111,25 @@ class AIHuman(AIBase):
         self.last_speak=''
 
     #---------------------------------------------------------------------------
+    def action_vehicle_gunner_engage_target(self):
+        # this is the action the vehicle gunner takes when it is NOT thinking
+        # and has a target that is not None
+        target=self.memory['task_vehicle_crew']['target']
+        turret=self.memory['task_vehicle_crew']['turret']
+
+        # check actual turret rotation angle against angle to target
+        needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
+        
+        # probably need to do some rounding here
+        if needed_rotation!=turret.rotation_angle:
+            if needed_rotation>turret.rotation_angle:
+                turret.ai.handle_rotate_left()
+            else:
+                turret.ai.handle_rotate_right()
+        else:
+            turret.ai.handle_fire()
+
+    #---------------------------------------------------------------------------
     def aim_and_fire_weapon(self,weapon,target):
         ''' handles special aiming and firing code for various targets'''
         aim_coords=target.world_coords
@@ -213,6 +232,24 @@ class AIHuman(AIBase):
             return True
         else:
             return False  
+        
+    #---------------------------------------------------------------------------
+    def check_vehicle_turret_rotation_real_angle(self,rotation_angle,turret):
+        '''checks whether a vehicle turret can rotate to match a world angle'''
+        # this checks whether a turret can rotate to match a angle given the turrets restraints
+        # this is here because it is a human dead reckoning thing, not a function of the turret itself
+        # returns true if the turret can rotate to this angle
+        # reeturns false if it cannot
+        angle_ok=False
+        if rotation_angle>turret.ai.vehicle.rotation_angle+turret.ai.rotation_range[0]:
+            if rotation_angle<turret.vehicle.rotation_angle+turret.ai.rotation_range[1]:
+                angle_ok=True
+
+        # this also needs to check the turrets starting rotation.
+        # for example, some turrets may face forward, some may face backward 
+
+        return angle_ok
+
     #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
@@ -277,9 +314,15 @@ class AIHuman(AIBase):
 
         if closest_object!=None:
             if self.memory['current_task']=='task_vehicle_crew':
-                # not sure what to do here yet
-                pass
-                #engine.log.add_data('warn','close enemy while in vehicle. not handled',True)
+
+                if self.memory['task_vehicle_crew']['role']=='gunner':
+                    if self.memory['task_vehicle_crew']['target']==None:
+                        self.memory['task_vehicle_crew']['target']=closest_object
+                    else:
+                        # should probably compare the current target to closest 
+                        # and see if it makes sense to switch targets
+                        self.memory['task_vehicle_crew']['target']=closest_object
+
             else:
 
                 # should we check to make sure we aren't trying to exit a vehicle first?
@@ -1004,6 +1047,7 @@ class AIHuman(AIBase):
             'turret': turret,
             'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
+            'target': None, # target for tthe gunner role
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1085,7 +1129,40 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
-        pass
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        turret=self.memory['task_vehicle_crew']['turret']
+
+        # -- check if we need a new target --
+        need_target=True
+
+        if self.memory['task_vehicle_crew']['target']==None:
+            self.memory['task_vehicle_crew']['target']=self.get_target()
+            # no need to evaluate - we do that in the next step anyways
+
+        # we either already had a target, or we might have just got a new one
+        if self.memory['task_vehicle_crew']['target']!=None:
+            # check health
+            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                self.memory['task_vehicle_crew']['target']==None
+            else:    
+                # check rotation
+                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
+                    # lots of things we could do here.
+                    # we could have the driver rotate
+                    # for now just get rid of the target
+                    self.memory['task_vehicle_crew']['target']==None
+                else:
+                    # check distance
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,)
+                    if distance>turret.ai.primary_weapon.ai.range:
+                        # alternatively we could drive closer.
+                        self.memory['task_vehicle_crew']['target']==None
+
+
+        # if we get this far then we just fire at it
+                
+
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
@@ -1837,7 +1914,8 @@ class AIHuman(AIBase):
             else:
                 last_think_time=self.memory['task_vehicle_crew']['last_think_time']
                 think_interval=self.memory['task_vehicle_crew']['think_interval']
-        
+
+                # think
                 if self.owner.world.world_seconds-last_think_time>think_interval:
                     # reset time
                     self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
@@ -1858,6 +1936,14 @@ class AIHuman(AIBase):
                         self.think_vehicle_role_radio_operator()
                     else:
                         engine.log.add_data('error','unknown vehicle role: '+role,True)
+
+                else:
+                    # some roles will want to do something every update cycle
+
+                    if role=='gunner':
+                        if self.memory['task_vehicle_crew']['target']!=None:
+                            self.action_vehicle_gunner_engage_target()
+
 
     #-----------------------------------------------------------------------
     def use_medical_object(self,medical):
