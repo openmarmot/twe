@@ -77,6 +77,9 @@ class AIFactionTactical(object):
                     # randomize position a bit
                     engine.math_2d.randomize_position_and_rotation(c,170)
 
+        # reset time since think to issue some orders immediately
+        self.time_since_update+=self.think_rate
+
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):
         '''get a enemy count for a world_area'''

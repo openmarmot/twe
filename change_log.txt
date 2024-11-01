@@ -1,6 +1,32 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 1 2024
+- bugfix from the last couple updates 
+- rounding angles for vehicle gunner fire decision to make it more likely
+- added a tactical_ai think trigger at the end of squad creation, but it didn't seem to help 
+the slow start.
+- after some tweaks confirmed that turret gunners now work !!, although more often than 
+not it does not fire (angles?)
+
+for some reason it takes the germans a REALLY long time to get started.
+The Soviets consistently beat them out of spawn. idk why, it should be the same for both sides 
+
+i triggered a odd error when a mouse select somehow passed in a NONE to generic item menu (or selected_object.name was none),
+but that doesn't seem possible. was unable to reproduce 
+
+seeing the sd.kfz MG34 turret in action was pretty neat. the gunner doesn't communicate with the driver 
+at the moment, so I saw one sd.kfz do basically a driveby spraying down of a Soviet squad as it drove 
+through the middle of it.
+
+I'm not seeing as much turret movement or firing as I expected, I suspect the angle checking is 
+wrong in some way. I really need to make a vehicle with a bigger turret so this is visually easier 
+to troubleshoot. The sd.kfz turret is barely visible (i could probably adjust the art a bit)
+
+todo 
+- check if vehicle gunners can do a reload. probably needs to be added 
+
+----------------------------------
 Oct 31 2024
 - working on vehicle gunner role 
 

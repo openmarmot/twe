@@ -121,7 +121,7 @@ class AIHuman(AIBase):
         needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
         
         # probably need to do some rounding here
-        if needed_rotation!=turret.rotation_angle:
+        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
             if needed_rotation>turret.rotation_angle:
                 turret.ai.handle_rotate_left()
             else:
@@ -242,7 +242,7 @@ class AIHuman(AIBase):
         # reeturns false if it cannot
         angle_ok=False
         if rotation_angle>turret.ai.vehicle.rotation_angle+turret.ai.rotation_range[0]:
-            if rotation_angle<turret.vehicle.rotation_angle+turret.ai.rotation_range[1]:
+            if rotation_angle<turret.ai.vehicle.rotation_angle+turret.ai.rotation_range[1]:
                 angle_ok=True
 
         # this also needs to check the turrets starting rotation.
@@ -1154,7 +1154,7 @@ class AIHuman(AIBase):
                     self.memory['task_vehicle_crew']['target']==None
                 else:
                     # check distance
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,)
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
                     if distance>turret.ai.primary_weapon.ai.range:
                         # alternatively we could drive closer.
                         self.memory['task_vehicle_crew']['target']==None
@@ -1168,7 +1168,7 @@ class AIHuman(AIBase):
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         
-        if self.near_targets>0:
+        if len(self.near_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
             if vehicle.ai.armor_thickness<5:
