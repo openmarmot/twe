@@ -55,7 +55,7 @@ git clone https://github.com/openmarmot/twe.git
 cd twe/code
 python3 twe.py
 
-# --- Fedora 39 ---
+# --- Fedora 41 ---
 
 # instal pip 
 sudo dnf install python3-pip
@@ -69,6 +69,10 @@ git clone https://github.com/openmarmot/twe.git
 # cd to directory and run 
 cd twe/code
 python twe.py
+
+# NOTE - as of NOV 2024 you will want your display scale 
+# set to 100 as pygame does not support fractional scaling in wayland 
+# otherwise the pygame window will be tiny 
 
 
 # --- Pop!_OS (System76) ---

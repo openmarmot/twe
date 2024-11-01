@@ -46,7 +46,10 @@ class World(object):
         self.spawn_east=[8000.,0.]
         self.spawn_far_east=[10000.,0.]
 
-        # tactical AIs
+        # reset world_radio to defaults so there are no old radio objects from previous worlds
+        engine.world_radio.reset_world_radio()
+
+        # tactical AIs. This also adds radios !
         self.german_ai=AIFactionTactical(self,'german',self.spawn_west,3)
         self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east,5)
         self.american_ai=AIFactionTactical(self,'american',self.spawn_north,10)

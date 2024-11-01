@@ -533,9 +533,6 @@ def load_world(world,map_objects,spawn_faction):
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
 
-    # init radio
-    engine.world_radio.load(world)
-
     # generation squads 
     world.create_squads()
 

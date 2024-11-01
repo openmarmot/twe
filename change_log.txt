@@ -1,6 +1,71 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 1 2024
+- bugfix from the last couple updates 
+- rounding angles for vehicle gunner fire decision to make it more likely
+- added a tactical_ai think trigger at the end of squad creation, but it didn't seem to help 
+the slow start.
+- after some tweaks confirmed that turret gunners now work !!, although more often than 
+not it does not fire (angles?)
+
+for some reason it takes the germans a REALLY long time to get started.
+The Soviets consistently beat them out of spawn. idk why, it should be the same for both sides 
+
+i triggered a odd error when a mouse select somehow passed in a NONE to generic item menu (or selected_object.name was none),
+but that doesn't seem possible. was unable to reproduce 
+
+seeing the sd.kfz MG34 turret in action was pretty neat. the gunner doesn't communicate with the driver 
+at the moment, so I saw one sd.kfz do basically a driveby spraying down of a Soviet squad as it drove 
+through the middle of it.
+
+I'm not seeing as much turret movement or firing as I expected, I suspect the angle checking is 
+wrong in some way. I really need to make a vehicle with a bigger turret so this is visually easier 
+to troubleshoot. The sd.kfz turret is barely visible (i could probably adjust the art a bit)
+
+todo 
+- check if vehicle gunners can do a reload. probably needs to be added 
+
+----------------------------------
+Oct 31 2024
+- working on vehicle gunner role 
+
+theoretically all the code needed for vehicle gunners to pick targets 
+and fire is in now. the code determining if the turret can actually rotate 
+enough to engage is probably wrong. 
+
+this is going to be hard to test and tweak so i'll put that off for future 
+andrew to deal with 
+
+----------------------------------
+Oct 30 2024
+- added some code to have vehicle passengers bail out 
+when they detect near enemies. for now driver/gunner/radio stay in 
+
+this one is going to be tough. what is optimal here? 
+I put in a armor check - no need to bail out of a half track as 
+their armor is rated against small arms (although probably won't stop a .50 
+- but those aren't in game yet).
+
+I need to observe more vehicle fights, might have to tune the quick battle 
+for that. 
+
+----------------------------------
+October 29 2024
+- added the rest of the code for sending/receiving radio messages 
+with the radio_operator vehicle role 
+- reshuffled how world_radio channels are created due to a chicken-egg issue
+
+radio flow is 
+if you want to send a radio message drop it in the squad send queue. 
+A radio operator will grab it and send it 
+
+if you want to receive a radio message just monitor the squad receive queue 
+the radio operator monitors the radio and drops messages there 
+
+note - tactical AI can't receive at the moment. it needs a radio operator i guess 
+
+----------------------------------
 October 28 2024
 - added radio_operator role for human ai
 
