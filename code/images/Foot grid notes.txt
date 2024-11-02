@@ -1,0 +1,10 @@
+Foot grid notes
+
+In GIMP
+
+Vew->Show Grid
+
+Image-> configure grid
+set spacing to 8
+
+this lines up with my old foot grid image

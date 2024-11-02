@@ -1171,6 +1171,28 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif OBJECT_TYPE=='37mm_m1939_k61':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='37mm_m1939_k61'
+        z.is_gun=True
+        z.ai.magazine=spawn_object(world,world_coords,'37mm_m1939_k61_magazine',False)
+        z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=13
+        z.ai.flight_time=3.5
+        z.ai.range=850
+        z.ai.type='automatic cannon'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='37mm_m1939_k61_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='37mm_m1939_k61_magazine'
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['37mm_m1939_k61']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=5
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif OBJECT_TYPE=='mg15':
         z=WorldObject(world,['mg15'],AIGun)
         z.name='mg15'
@@ -1444,8 +1466,44 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Sd.Kfz.251 MG34 Turret'
         z.is_turret=True
         z.ai.position_offset=[-10,0]
+        z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='37mm_m1939_61k_aa_gun_carriage':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['zu_7_carriage','zu_7_carriage'],AIVehicle)
+        z.name='37mm_m1939_61k_aa_gun'
+        z.is_vehicle=True
+        z.ai.armor_thickness=0
+        z.ai.max_occupants=2
+        z.ai.max_speed=2
+        z.ai.open_top=True
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.rotation_angle=float(random.randint(0,359))
+        turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
+        for b in range(15):
+            z.add_inventory(spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False))
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+
+    elif OBJECT_TYPE=='37mm_m1939_61k_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['37mm_m1939_61k_turret','37mm_m1939_61k_turret'],AITurret)
+        z.name='37mm_m1939_61k_turret'
+        z.is_turret=True
+        z.ai.position_offset=[-10,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'37mm_m1939_k61',False)
+        z.ai.primary_weapon.ai.equipper=z
+
   
     elif OBJECT_TYPE=='kubelwagen':
         z=WorldObject(world,['kubelwagen','kubelwagen_destroyed'],AIVehicle)

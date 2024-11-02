@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 2 2024
+- working on adding a Soviet 37mm AA gun 
+
+I figured a towed gun would be a good next step. 
+
+towed guns are going to be a vehicle + a turret 
+so that limited traverse without moving the whole assembly 
+can be modeled. this also allows them to be crewed with minimal 
+changes to the vehicle_crew ai 
+
+----------------------------------
 Nov 1 2024
 - bugfix from the last couple updates 
 - rounding angles for vehicle gunner fire decision to make it more likely
