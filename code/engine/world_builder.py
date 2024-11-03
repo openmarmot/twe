@@ -1499,7 +1499,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['37mm_m1939_61k_turret','37mm_m1939_61k_turret'],AITurret)
         z.name='37mm_m1939_61k_turret'
         z.is_turret=True
-        z.ai.position_offset=[-10,0]
+        z.ai.position_offset=[0,0]
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'37mm_m1939_k61',False)
         z.ai.primary_weapon.ai.equipper=z

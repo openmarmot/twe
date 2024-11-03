@@ -1132,6 +1132,20 @@ class AIHuman(AIBase):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
+        # check gun ammo
+        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
+        if ammo_gun==0:
+            # this should be re-done to check for ammo in vehicle, and do something if there is none
+            self.reload_turret
+
+            #if ammo_inventory>0:
+            #    self.reload_turret()
+            #else:
+                # need ammo or new gun
+            #    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+            #    if len(near_magazines)>0:
+            #        self.switch_task_pickup_objects(near_magazines)
+
         # -- check if we need a new target --
         need_target=True
 

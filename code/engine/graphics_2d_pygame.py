@@ -69,10 +69,11 @@ class Graphics_2D_Pygame(object):
         # 1 - man made ground cover (cement, building insides)
         # 2 - objects laying on the ground (weapons,etc)
         # 3 - objects slightly elevated above ground (vehicles, animals??)
-        # 4 - objects that are slightly above object level 3 (humans who can ride in vehicles, vehicle turrets)
-        # 5 - objects above ground (birds, planes, clouds, etc)
+        # 4 - vehicle turrets
+        # 5 - humans
+        # 6 - objects above ground (birds, planes, clouds, etc)
         
-        self.render_level_count=6
+        self.render_level_count=10
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
         # count of rendered objects

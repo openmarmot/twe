@@ -1,4 +1,11 @@
 TWE Project : Change Log
+----------------------------------
+Nov 3 2024
+- bugfix 
+- adjusted render levels so turrets don't cover up humans in vehicles 
+- added a simple reload to vehicle gunner 
+
+
 
 ----------------------------------
 Nov 2 2024
