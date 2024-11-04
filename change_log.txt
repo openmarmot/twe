@@ -4,8 +4,16 @@ Nov 3 2024
 - bugfix 
 - adjusted render levels so turrets don't cover up humans in vehicles 
 - added a simple reload to vehicle gunner 
+- added two new projectile types for the soviet 37mm
 
+I need to add a couple contact damage types
+- frag for AA 
+- high explosive 
+- incendiary or maybe HEI 
 
+I need a way to give vehicles a mix of ammo types. currently there 
+is not a way to specify what ammo is in magazines. also need the ai to 
+be able to switch ammo and understand ammo (might be a bit of work)
 
 ----------------------------------
 Nov 2 2024

@@ -1188,7 +1188,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='37mm_m1939_k61_magazine'
         z.is_gun_magazine=True
         z.ai.compatible_guns=['37mm_m1939_k61']
-        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.compatible_projectiles=['37x252_Frag','37x252_AP-T']
         z.ai.capacity=5
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
