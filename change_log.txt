@@ -1,4 +1,11 @@
 TWE Project : Change Log
+
+----------------------------------
+Nov 4 2024
+- added soviet squad for the new 37mm auto-cannon 
+
+probably need to add 'type' and 'rarity' to the squad list 
+
 ----------------------------------
 Nov 3 2024
 - bugfix 
