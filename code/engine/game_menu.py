@@ -38,6 +38,9 @@ class GameMenu(object):
         # used for multiple page layouts
         self.current_page=0
 
+        # used in the quick_battle menu
+        self.faction=''
+
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -171,17 +174,31 @@ class GameMenu(object):
             
             # note 1 is missing as americans are not implemented
             if key in ['2','3','4']:
-                faction=''
                 if key=='1':
-                    faction='american'
+                    self.faction='american'
                 elif key=='2':
-                    faction='german'
+                    self.faction='german'
                 elif key=='3':
-                    faction='soviet'
+                    self.faction='soviet'
                 elif key=='4':
-                    faction='civilian'
+                    self.faction='civilian'
 
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,faction)
+                self.menu_state='battle_select'
+                key='none'
+
+        if self.menu_state=='battle_select':
+            self.text_queue=[]
+            self.text_queue.append('TWE: To Whatever End')
+            self.text_queue.append('---------------')
+            self.text_queue.append('Pick a Quick Battle Scenario')
+            self.text_queue.append('1 - Mixed forces ')
+            self.text_queue.append('2 - German Mech vs Soviet Moto')
+            self.text_queue.append('3 - Large Mix')
+            self.text_queue.append('4 - Ultra Large Mix') 
+
+            if key in ['1','2','3','4']:
+
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,self.faction,key)
 
                 self.graphics_engine.mode=1
                 self.deactivate_menu()

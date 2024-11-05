@@ -443,7 +443,7 @@ def load_magazine(world,magazine):
         count+=1
 
 #------------------------------------------------------------------------------
-def load_quick_battle(world,spawn_faction):
+def load_quick_battle(world,spawn_faction,battle_option):
     ''' load quick battle. called by game menu'''
 
     map_objects=[]
@@ -463,13 +463,34 @@ def load_quick_battle(world,spawn_faction):
     map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
-    squads=[]
-    squads+=['German 1944 Rifle'] * 2
-    squads+=['German 1944 Panzergrenadier Mech'] * 2
-    squads+=['German 1944 Fallschirmjager'] * 1
-    squads+=['Soviet 1943 Rifle'] * 2
-    squads+=['Soviet 1944 SMG'] * 1
-    squads+=['Soviet 1944 Rifle Motorized'] * 2
+    if battle_option=='1':
+        squads=[]
+        squads+=['German 1944 Rifle'] * 2
+        squads+=['German 1944 Panzergrenadier Mech'] * 2
+        squads+=['German 1944 Fallschirmjager'] * 1
+        squads+=['Soviet 1943 Rifle'] * 2
+        squads+=['Soviet 1944 SMG'] * 1
+        squads+=['Soviet 1944 Rifle Motorized'] * 2
+    elif battle_option=='2':
+        squads=[]
+        squads+=['German 1944 Panzergrenadier Mech'] * 5
+        squads+=['Soviet 1944 Rifle Motorized'] * 5
+    elif battle_option=='3':
+        squads=[]
+        squads+=['German 1944 Rifle'] * 3
+        squads+=['German 1944 Panzergrenadier Mech'] * 3
+        squads+=['German 1944 Fallschirmjager'] * 3
+        squads+=['Soviet 1943 Rifle'] * 3
+        squads+=['Soviet 1944 SMG'] * 3
+        squads+=['Soviet 1944 Rifle Motorized'] * 3
+    elif battle_option=='4':
+        squads=[]
+        squads+=['German 1944 Rifle'] * 6
+        squads+=['German 1944 Panzergrenadier Mech'] * 6
+        squads+=['German 1944 Fallschirmjager'] * 6
+        squads+=['Soviet 1943 Rifle'] * 6
+        squads+=['Soviet 1944 SMG'] * 6
+        squads+=['Soviet 1944 Rifle Motorized'] * 6
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)

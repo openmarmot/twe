@@ -3,8 +3,23 @@ TWE Project : Change Log
 ----------------------------------
 Nov 4 2024
 - added soviet squad for the new 37mm auto-cannon 
-
 probably need to add 'type' and 'rarity' to the squad list 
+- added several choices for the 'Quick Battle' menu option 
+
+The new ultra large quick battle is actually great.
+excitement guaranteed 
+
+todo notes from play test 
+- if a driver exits a vehicle nobody takes over 
+- human bodies should be large pickups - currently they are small pickups (?)
+- not positive that the ai turret gunner is reloading. seems like they are not 
+- maybe should get an option of who you want to spawn as when you die 
+- possibly make a render cache for each zoom level. render cache in my large 
+game is 89,000 objects 
+- task_engage_enemy with zero ammo seems to be a loop/freeze up.
+- need to check if the ai can stop bleeding 
+- reduce amount of sparks from hitting the sd.kfz.231 and speed them up a bit 
+- squad leader with zero ammo. might not scavenge gun ?
 
 ----------------------------------
 Nov 3 2024
