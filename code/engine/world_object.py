@@ -167,7 +167,7 @@ class WorldObject(object):
     def reset_render_level(self):
         '''reset render level to defaults based on object type '''
         if self.is_human:
-            self.render_level=4
+            self.render_level=5
         elif self.is_gun:
             self.render_level=2
         elif self.is_vehicle:
@@ -194,7 +194,7 @@ class WorldObject(object):
 
         # gravity 
         if self.altitude>0:
-            self.render_level=5
+            self.render_level=6
             self.altitude+=(engine.math_2d.GRAVITY*self.world.time_passed_seconds)
             if self.altitude<=0:
                 self.altitude=0

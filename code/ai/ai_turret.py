@@ -30,6 +30,7 @@ class AITurret(AIBase):
         # gunner requested rotation change
         self.rotation_change=0
 
+        # rotation range for the turret
         self.rotation_range=[-20,20]
 
         # speed of rotation
