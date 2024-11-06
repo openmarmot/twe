@@ -1136,7 +1136,7 @@ class AIHuman(AIBase):
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
         if ammo_gun==0:
             # this should be re-done to check for ammo in vehicle, and do something if there is none
-            self.reload_turret
+            self.reload_turret()
 
             #if ammo_inventory>0:
             #    self.reload_turret()
@@ -1145,9 +1145,6 @@ class AIHuman(AIBase):
             #    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
             #    if len(near_magazines)>0:
             #        self.switch_task_pickup_objects(near_magazines)
-
-        # -- check if we need a new target --
-        need_target=True
 
         if self.memory['task_vehicle_crew']['target']==None:
             self.memory['task_vehicle_crew']['target']=self.get_target()
@@ -1176,18 +1173,20 @@ class AIHuman(AIBase):
 
         # if we get this far then we just fire at it
                 
-
-
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
+
+        # for whatever reason sometimes a vehicle will have a driver jump out
+        # this will cause a passenger to take over. will also fill in any empty gunner spots
+        if vehicle.ai.driver==None:
+            self.switch_task_vehicle_crew(vehicle,self.squad.destination)
         
         if len(self.near_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
             if vehicle.ai.armor_thickness<5:
                 self.switch_task_exit_vehicle(vehicle)
-
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_radio_operator(self):
