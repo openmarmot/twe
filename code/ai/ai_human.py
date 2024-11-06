@@ -1326,6 +1326,13 @@ class AIHuman(AIBase):
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
                     self.health-=1+random.uniform(0,3)
 
+                    if random.randint(0,3)==0:
+                        for b in self.inventory:
+                            if b.is_medical:
+                                self.use_medical_object(b)
+                                break
+                # possibly have a random stop bleed even if you don't have medical
+
             # -- body attribute stuff --
             if self.fatigue>0:
                 self.fatigue-=self.fatigue_remove_rate*self.owner.world.time_passed_seconds

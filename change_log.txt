@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 5 2024
+- bodies are now large_human_pickup so you can move them.
+- passengers should now take over if driver goes mia for some reason 
+- fixed a error in the ai turret reload code 
+- added the use of medical items back in to human ai 
+
 ----------------------------------
 Nov 4 2024
 - added soviet squad for the new 37mm auto-cannon 
