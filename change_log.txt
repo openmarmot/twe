@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 6 2024
+- reduced the amount of sparks from armor non-penetration 
+- increased spark speed 
+
+----------------------------------
 Nov 5 2024
 - bodies are now large_human_pickup so you can move them.
 - passengers should now take over if driver goes mia for some reason 

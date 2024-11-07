@@ -2231,11 +2231,11 @@ def spawn_sparks(world,world_coords,amount=30):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'spark',True)
         z.heading=engine.math_2d.get_heading_from_rotation(z.rotation_angle)
-        z.ai.speed=random.uniform(60,70)
+        z.ai.speed=random.uniform(110,130)
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
-        z.ai.move_time_max=1
-        z.ai.alive_time_max=random.uniform(1.5,2)
+        z.ai.move_time_max=0.91
+        z.ai.alive_time_max=random.uniform(1.1,1.3)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
