@@ -1622,7 +1622,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
         z.name=engine.name_gen.get_name('civilian')
         z.ai.speed=float(random.randint(10,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_civilian=True
 
@@ -1630,7 +1630,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
         z.name=engine.name_gen.get_name('german')
         z.ai.speed=float(random.randint(20,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
@@ -1639,7 +1639,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
         z.name=engine.name_gen.get_name('soviet')
         z.ai.speed=float(random.randint(20,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
         z.is_soviet=True

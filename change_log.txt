@@ -2,6 +2,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 7 2024
+- switched to a multi layer image cache with a cache 
+for each zoom level to increase speed when the cache gets large 
+- bumped up human collision radius to 15 for more reasonable bullet collision 
+
+seeing a bunch of absurd misses so bumped human collision up a good bit and 
+now things that look like they will hit will hit, and misses will miss. 
+Note that prone still has a 50% miss chance 
+
+not sure that the multi level image cache actually makes a difference 
+but it was getting up to 90,000 objects on the new ultra large game 
+so it seems reasonable to think that its worth having one per zoom level.
+
+I also removed the option to disable the image cache. zero reason to disable 
+it. 
+
+
+----------------------------------
 Nov 6 2024
 - reduced the amount of sparks from armor non-penetration 
 - increased spark speed 
