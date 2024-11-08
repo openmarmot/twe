@@ -6,6 +6,8 @@ Nov 7 2024
 - switched to a multi layer image cache with a cache 
 for each zoom level to increase speed when the cache gets large 
 - bumped up human collision radius to 15 for more reasonable bullet collision 
+- added faction choices to the respawn menu
+- reduced possible wait time for tactical orders to try and speed up the start of the game 
 
 seeing a bunch of absurd misses so bumped human collision up a good bit and 
 now things that look like they will hit will hit, and misses will miss. 
@@ -18,6 +20,15 @@ so it seems reasonable to think that its worth having one per zoom level.
 I also removed the option to disable the image cache. zero reason to disable 
 it. 
 
+todo notes from playtest 
+- mp40 has a white outline that needs to be cleaned up 
+- saw a kubelwagen with a german and soviet in it. german was a radio officer
+    this should be impossible 
+- troops firing and bullet proof vehicles should be fixed 
+    - i don't want it to be zero because it looks cool, but they should have some 
+    armor penetration awareness 
+- when you spawn as a bot that is in a vehicle the ai memory needs to be adjusted to the correct vehicle player one 
+- human menu text needs some organization and cleanup 
 
 ----------------------------------
 Nov 6 2024

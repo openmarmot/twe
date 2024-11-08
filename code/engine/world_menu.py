@@ -263,16 +263,50 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('You Died')
             self.text_queue.append(self.world.player.ai.last_collision_description)
-            self.text_queue.append('1 - respawn as random existing bot')
-            #self.text_queue.append('3 - pick up')
-            #self.text_queue.append('3 - pick up')
 
-            self.menu_state='base'
-        if self.menu_state=='base':
+            german_count=len(self.world.wo_objects_german)
+            soviet_count=len(self.world.wo_objects_soviet)
+            american_count=len(self.world.wo_objects_american)
+            civilian_count=len(self.world.wo_objects_civilian)
+
+            self.text_queue.append('1 - respawn as random existing bot')
             if key=='1':
                 self.world.spawn_player('random')
                 self.world.is_paused=False
                 self.deactivate_menu()
+                return
+            
+            if german_count>0:
+                self.text_queue.append('2 - respawn as random German bot')
+                if key=='2':
+                    self.world.spawn_player('german')
+                    self.world.is_paused=False
+                    self.deactivate_menu()
+                    return
+                
+            if soviet_count>0:
+                self.text_queue.append('3 - respawn as random Soviet bot')
+                if key=='3':
+                    self.world.spawn_player('soviet')
+                    self.world.is_paused=False
+                    self.deactivate_menu()
+                    return
+                
+            if american_count>0:
+                self.text_queue.append('4 - respawn as random German bot')
+                if key=='4':
+                    self.world.spawn_player('american')
+                    self.world.is_paused=False
+                    self.deactivate_menu()
+                    return
+                
+            if civilian_count>0:
+                self.text_queue.append('5 - respawn as random Civilian bot')
+                if key=='5':
+                    self.world.spawn_player('civilian')
+                    self.world.is_paused=False
+                    self.deactivate_menu()
+                    return
 
     #---------------------------------------------------------------------------
     def debug_menu(self, key):
