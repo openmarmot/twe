@@ -672,14 +672,20 @@ class World_Menu(object):
 
         if distance<500:
             self.text_queue.append('')
-            self.text_queue.append('--- Squad Info ---')
-            if self.selected_object.ai.squad.squad_leader==self.selected_object:
-                self.text_queue.append('Squad Leader')
-            self.text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
+            self.text_queue.append('--- Stats ---')
             self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
             self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
             self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
+            self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
+            self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+            self.text_queue.append(self.selected_object.ai.last_collision_description)
+            self.text_queue.append('')
+            self.text_queue.append('--- Squad Info ---')
+            if self.selected_object.ai.squad.squad_leader==self.selected_object:
+                self.text_queue.append('Squad Leader')
+            self.text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
+            
             if self.selected_object.ai.primary_weapon != None:
                 self.text_queue.append('')
                 self.text_queue.append('--- Weapon Info ---')
@@ -692,10 +698,6 @@ class World_Menu(object):
 
             if self.selected_object.ai.throwable!=None:
                 self.text_queue.append('[throw] '+self.selected_object.ai.throwable.name)
-            self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
-            self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            self.text_queue.append(str(self.selected_object.ai.last_collision_description))
-
             self.text_queue.append('')
 
         if self.world.debug_mode==True:
@@ -713,6 +715,7 @@ class World_Menu(object):
             self.text_queue.append('')
 
         if self.menu_state == 'player_menu':
+            self.text_queue.append('--- Actions ---')
             self.text_queue.append('1 - Manage Inventory')
             self.text_queue.append('2 - Squad Menu')
             self.text_queue.append('3 - Eat/Drink')
