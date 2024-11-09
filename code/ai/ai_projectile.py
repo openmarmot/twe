@@ -93,10 +93,14 @@ class AIProjectile(AIBase):
                         # bullet has collided and exploded
                         self.contact_effect()
                     else:
-                        penetration=engine.penetration_calculator.calculate_penetration(self.owner,collide_obj)
-                        if penetration:
-                            collide_obj.ai.handle_event('collision',self.owner)
-                            # bullet has collided, check if it over penetrates and keeps going
+                        # tell the object that there has been a collision 
+                        collide_obj.ai.handle_event('collision',self.owner)
+
+                        if collide_obj.is_vehicle:
+                            # no passthrough on vehicles at the moment
+                            # remove projectile from the world
+                            self.owner.world.remove_queue.append(self.owner)
+                        else:
                             if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
                                 # add the collided object to ignore list so we don't hit it again
                                 # this is mostly to deal with buildings where we would hit it a ton of times
@@ -104,11 +108,6 @@ class AIProjectile(AIBase):
                             else:
                                 # bullet stuck in something. remove bullet from world
                                 self.owner.world.remove_queue.append(self.owner) 
-                        else:
-                            # penetration fails! 
-                            # should probably have some sort of non-penetration event
-                            #engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
-                            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,10))
-                            self.owner.world.remove_queue.append(self.owner) 
 
+                        
 

@@ -64,6 +64,24 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
     return acceleration
 
 #------------------------------------------------------------------------------
+def calculate_hit_side(vehicle_angle,projectile_angle):
+    '''determine what side of a vehicle is hit'''
+
+    # ! Note - this is very roughly accurate
+    # for example if you hit the side while in front of the vehicle 
+    # it will tend to record as front 
+
+    relative_angle = (projectile_angle - vehicle_angle) % 360
+    if 0 <= relative_angle < 45 or 315 <= relative_angle < 360:
+        return "rear"
+    elif 45 <= relative_angle < 135:
+        return "right"
+    elif 135 <= relative_angle < 225:
+        return "front"
+    else:  # 225 <= relative_angle < 315
+        return "left"
+
+#------------------------------------------------------------------------------
 def calculate_relative_position(coords,rotation,offset):
     ''' calculate a position based on a offset and a given coordinate and rotation'''
     # Rotate the offset

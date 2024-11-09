@@ -38,8 +38,6 @@ class Graphics_2D_Pygame(object):
 
         self.images=dict()
         self.image_cache={}
-        # This offers a large benefit for larger images
-        self.image_cache_enabled=True
 
         self.screen_size=screen_size
         pygame.init()
@@ -394,7 +392,8 @@ class Graphics_2D_Pygame(object):
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
                 self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.renderCount))
-                self.world.debug_text_queue.insert(4,'Image Cache: '+str(len(self.image_cache)))
+                for key, value in self.image_cache.items():
+                    self.world.debug_text_queue.insert(4,f"Image cache {key} - size: {len(value)}")
             
             if self.world.exit_world:
                 self.strategic_map.unload_world()
@@ -505,11 +504,13 @@ class Graphics_2D_Pygame(object):
         # without much of a visual loss, and zero angle math lass as we are only doing it for 
         # the key
         key = wo.image_list[wo.image_index]+str(wo.image_size)+str(round(wo.rotation_angle,1))
-        if self.image_cache_enabled:    
-            if key in self.image_cache:
-                wo.image=self.image_cache[key]
+        if self.scale in self.image_cache:
+            if key in self.image_cache[self.scale]:
+                wo.image=self.image_cache[self.scale][key]
                 #print('cache hit')
                 return
+        else:
+            self.image_cache[self.scale]={}
 
         image=self.images[wo.image_list[wo.image_index]]
         orig_rect = image.get_rect()
@@ -520,8 +521,7 @@ class Graphics_2D_Pygame(object):
         resize_image=pygame.transform.scale(rot_image,wo.image_size)
         wo.image=resize_image
 
-        if self.image_cache_enabled:
-            self.image_cache[key]=resize_image
+        self.image_cache[self.scale][key]=resize_image
             #print('cache miss ',key)
 
 #------------------------------------------------------------------------------

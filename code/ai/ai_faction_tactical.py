@@ -77,8 +77,8 @@ class AIFactionTactical(object):
                     # randomize position a bit
                     engine.math_2d.randomize_position_and_rotation(c,170)
 
-        # reset time since think to issue some orders immediately
-        self.time_since_update+=self.think_rate
+        # hand out tactical orders right away
+        self.tactical_order()
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):
@@ -130,7 +130,7 @@ class AIFactionTactical(object):
     def tactical_order(self):
         
         # randomize think_rate a bit 
-        self.think_rate=random.randint(60,400)
+        self.think_rate=random.randint(60,90)
 
         idle_squads=[] # these are squads that are near their current squad destination
         busy_squads=[]

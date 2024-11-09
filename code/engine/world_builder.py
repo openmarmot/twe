@@ -624,6 +624,7 @@ def spawn_container(name,world_object,image_index):
     z.volume=world_object.volume
     z.weight=world_object.weight
     z.collision_radius=world_object.collision_radius
+    z.is_large_human_pickup=True
     z.wo_start()
 
 
@@ -1415,7 +1416,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='dodge_g505_wc':
         # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
         # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
-        z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
+        z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc_destroyed'],AIVehicle)
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
         z.ai.max_occupants=10
@@ -1440,10 +1441,21 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
-        z=WorldObject(world,['sd_kfz_251','sd_kfz_251'],AIVehicle)
+        z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
-        z.ai.armor_thickness=13
+        z.ai.vehicle_armor['top']=13
+        z.ai.vehicle_armor['bottom']=13
+        z.ai.vehicle_armor['left']=13
+        z.ai.vehicle_armor['right']=13
+        z.ai.vehicle_armor['front']=13
+        z.ai.vehicle_armor['rear']=13
+        z.ai.passenger_compartment_armor['top']=0
+        z.ai.passenger_compartment_armor['bottom']=13
+        z.ai.passenger_compartment_armor['left']=13
+        z.ai.passenger_compartment_armor['right']=13
+        z.ai.passenger_compartment_armor['front']=13
+        z.ai.passenger_compartment_armor['rear']=13
         z.ai.max_occupants=10
         z.ai.max_speed=200
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1486,6 +1498,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
         z.name='Sd.Kfz.251 MG34 Turret'
         z.is_turret=True
+        z.ai.turret_armor['top']=0
+        z.ai.turret_armor['bottom']=13
+        z.ai.turret_armor['left']=13
+        z.ai.turret_armor['right']=13
+        z.ai.turret_armor['front']=13
+        z.ai.turret_armor['rear']=0
         z.ai.position_offset=[-10,0]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
@@ -1621,7 +1639,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
         z.name=engine.name_gen.get_name('civilian')
         z.ai.speed=float(random.randint(10,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_civilian=True
 
@@ -1629,7 +1647,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
         z.name=engine.name_gen.get_name('german')
         z.ai.speed=float(random.randint(20,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
@@ -1638,7 +1656,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
         z.name=engine.name_gen.get_name('soviet')
         z.ai.speed=float(random.randint(20,25))
-        z.collision_radius=10
+        z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
         z.is_soviet=True
@@ -2230,11 +2248,11 @@ def spawn_sparks(world,world_coords,amount=30):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'spark',True)
         z.heading=engine.math_2d.get_heading_from_rotation(z.rotation_angle)
-        z.ai.speed=random.uniform(60,70)
+        z.ai.speed=random.uniform(110,130)
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
-        z.ai.move_time_max=1
-        z.ai.alive_time_max=random.uniform(1.5,2)
+        z.ai.move_time_max=0.91
+        z.ai.alive_time_max=random.uniform(1.1,1.3)
 
 #------------------------------------------------------------------------------
 def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):

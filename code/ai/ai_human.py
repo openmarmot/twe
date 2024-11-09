@@ -1112,7 +1112,7 @@ class AIHuman(AIBase):
                 vehicle.ai.handle_steer_neutral()
                 vehicle.rotation_angle=r
                 vehicle.ai.update_heading()
-                engine.log.add_data('warn','fixing 360 vehicle steering issue',True)
+                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
 
             if distance<140:
                 # apply brakes. bot will only exit when speed is zero
@@ -1136,7 +1136,7 @@ class AIHuman(AIBase):
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
         if ammo_gun==0:
             # this should be re-done to check for ammo in vehicle, and do something if there is none
-            self.reload_turret
+            self.reload_turret()
 
             #if ammo_inventory>0:
             #    self.reload_turret()
@@ -1145,9 +1145,6 @@ class AIHuman(AIBase):
             #    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
             #    if len(near_magazines)>0:
             #        self.switch_task_pickup_objects(near_magazines)
-
-        # -- check if we need a new target --
-        need_target=True
 
         if self.memory['task_vehicle_crew']['target']==None:
             self.memory['task_vehicle_crew']['target']=self.get_target()
@@ -1176,18 +1173,23 @@ class AIHuman(AIBase):
 
         # if we get this far then we just fire at it
                 
-
-
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
+
+        # for whatever reason sometimes a vehicle will have a driver jump out
+        # this will cause a passenger to take over. will also fill in any empty gunner spots
+        if vehicle.ai.driver==None:
+            self.switch_task_vehicle_crew(vehicle,self.squad.destination)
         
         if len(self.near_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
-            if vehicle.ai.armor_thickness<5:
-                self.switch_task_exit_vehicle(vehicle)
 
+            # kind of a hack. left and right are likely symetric so its a good
+            # general guess
+            if vehicle.ai.passenger_compartment_armor['left']<5:
+                self.switch_task_exit_vehicle(vehicle)
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_radio_operator(self):
@@ -1326,6 +1328,13 @@ class AIHuman(AIBase):
                     self.last_bleed_time=self.owner.world.world_seconds+random.uniform(0,2)
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
                     self.health-=1+random.uniform(0,3)
+
+                    if random.randint(0,3)==0:
+                        for b in self.inventory:
+                            if b.is_medical:
+                                self.use_medical_object(b)
+                                break
+                # possibly have a random stop bleed even if you don't have medical
 
             # -- body attribute stuff --
             if self.fatigue>0:

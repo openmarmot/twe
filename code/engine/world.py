@@ -706,7 +706,28 @@ class World(object):
         else:
             print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
         
+    #---------------------------------------------------------------------------
+    def run_self_debug(self):
+        '''run self debug'''
+        # kind of a sanity check. 
+        # run a debug on everything in the world and print out results
 
+        print('------- Self Debug Report --------')
+
+        # -- world object count 
+        print('--- object count ---')
+        wo_list={}
+        for b in self.wo_objects:
+            if b.world_builder_identity in wo_list:
+                wo_list[b.world_builder_identity]+=1
+            else:
+                wo_list[b.world_builder_identity]=1
+
+        for key,value in wo_list.items():
+            print(key,'count:',value)
+        print('------')
+
+        print('------------------------------------')
     
 
     #---------------------------------------------------------------------------
