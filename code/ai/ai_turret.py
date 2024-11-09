@@ -12,6 +12,9 @@ import copy
 #import custom packages
 from ai.ai_base import AIBase
 import engine.math_2d
+import engine.log
+import engine.penetration_calculator
+import random
 
 
 #global variables
@@ -19,6 +22,17 @@ import engine.math_2d
 class AITurret(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
+
+        # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
+        self.turret_armor={}
+        self.turret_armor['top']=0
+        self.turret_armor['bottom']=0
+        self.turret_armor['left']=0
+        self.turret_armor['right']=0
+        self.turret_armor['front']=0
+        self.turret_armor['rear']=0
+
+        self.health=100
 
         # offset to position it correctly on a vehicle. vehicle specific 
         self.position_offset=[0,0]
@@ -46,6 +60,52 @@ class AITurret(AIBase):
         self.primary_weapon=None
         self.secondary_weapon=None
 
+    #---------------------------------------------------------------------------
+    def event_collision(self,EVENT_DATA):
+        
+
+        if EVENT_DATA.is_projectile:
+            projectile=EVENT_DATA
+            distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+            self.last_collision_description='Turret hit by '+projectile.name + ' at a distance of '+ str(distance)
+
+            side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+            penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
+
+            if penetration:
+                if self.gunner!=None:
+                    if random.randint(0,2)==2:
+                        self.gunner.ai.handle_event('collision',projectile)
+                
+                # should do component damage here
+                self.health-=random.randint(1,25)
+
+            else:
+                # no penetration, but maybe we can have some other effect?
+                pass
+
+        elif EVENT_DATA.is_grenade:
+            print('bonk')
+        else:
+            engine.log.add_data('error','ai_vehicle event_collision - unhandled collision type'+EVENT_DATA.name,True)
+
+    #---------------------------------------------------------------------------
+    def handle_event(self, event, event_data):
+        ''' overrides base handle_event'''
+        # EVENT - text describing event
+        # event_data - most likely a world_object but could be anything
+
+        # not sure what to do here yet. will have to think of some standard events
+        if event=='add_inventory':
+            engine.log.add_data('Error','ai_turret handle_event add_inventory not implemented',True)
+            #self.event_add_inventory(event_data)
+        elif event=='collision':
+            self.event_collision(event_data)
+        elif event=='remove_inventory':
+            engine.log.add_data('Error','ai_turret handle_event remove_inventory not implemented',True)
+            #self.event_remove_inventory(event_data)
+        else:
+            print('Error: '+self.owner.name+' cannot handle event '+event)
 
     #---------------------------------------------------------------------------
     def handle_rotate_left(self):

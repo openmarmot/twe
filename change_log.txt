@@ -2,6 +2,33 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 9 2024
+- added debug info for vehicle and human angles 
+- large collision / armor rewrite 
+- vehicle body armor added 
+- vehicle passenger compartment armor added 
+- turret armor added 
+- collisions determine what side you hit
+- added self_debug function to debug menu 
+
+the new collision side detection works well enough for now. 
+
+With the new changes there is a chance to hit the sd.kfz.231 turret and 
+if you hit it from the rear you will be able to shoot the gunner in it. 
+
+armor is now top/bottom/left/right/front/rear although top/bottom are not 
+used yet. armor is also split into vehicle/passenger compartment/turret 
+allowing the modeling of vehicles with unarmored passenger compartments 
+that still have some vehicle armor. what you hit is random for now.
+
+todo 
+- humans need to take into account helmets 
+
+----------------------------------
+Nov 8 2024
+- reorganized human menu text 
+
+----------------------------------
 Nov 7 2024
 - switched to a multi layer image cache with a cache 
 for each zoom level to increase speed when the cache gets large 

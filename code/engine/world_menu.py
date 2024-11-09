@@ -319,7 +319,7 @@ class World_Menu(object):
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - send test radio messages')
-            self.text_queue.append('5 - none')
+            self.text_queue.append('5 - start self debug')
             self.text_queue.append('6 - none')
 
             if key=='1':
@@ -337,7 +337,7 @@ class World_Menu(object):
                 print('comms check sent on all tactical ai channels')
 
             elif key=='5':
-                print('boop')
+                self.world.run_self_debug()
             elif key=='6':
                 pass
         if self.menu_state=='spawn':
@@ -703,6 +703,7 @@ class World_Menu(object):
         if self.world.debug_mode==True:
             self.text_queue.append('')
             self.text_queue.append('--- Debug Info ---')
+            self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
             d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords,True)
             d2='no squad lead'
             if self.selected_object.ai.squad.squad_leader!=None:
@@ -1021,35 +1022,11 @@ class World_Menu(object):
             if self.selected_object.ai.radio!=None:
                 self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
 
-            
-            # -- add debug info --
-            if self.world.debug_mode==True:
-                self.text_queue.append('--debug info --')
-                #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
-                #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
-                self.text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
-                self.text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
-                self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
-                self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
-                self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
-                self.text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
-                if self.selected_object.ai.driver==None:
-                    self.text_queue.append('driver: None')
-                else:
-                    self.text_queue.append('---- driver info -------------------')
-                    self.text_queue.append('driver: '+self.selected_object.ai.driver.name)
-                    vehicle_destination_distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.memory['task_vehicle_crew']['destination'])
-                    self.text_queue.append('distance to driver destination: '+str(vehicle_destination_distance))
-                # passenger info
-                self.text_queue.append('---- passenger info -------------------')
-                self.text_queue.append('Name/Faction/Role')
-                for b in self.selected_object.ai.passengers:
-                    self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
-                self.text_queue.append('------------------------------------')
-
             if distance<self.max_menu_distance:
                 self.text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
                 self.text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
+                self.text_queue.append('')
+                self.text_queue.append('-- Actions --')
                 self.text_queue.append('1 - info (not implemented) ')
                 self.text_queue.append('2 - enter vehicle ')
                 self.text_queue.append('3 - storage ')
@@ -1098,6 +1075,8 @@ class World_Menu(object):
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
             self.text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.text_queue.append('')
+            self.text_queue.append('-- Actions --')
             self.text_queue.append('1 - change role')
             self.text_queue.append('2 - exit vehicle ')
             self.text_queue.append('3 - engine menu')
@@ -1122,6 +1101,34 @@ class World_Menu(object):
             if key=='5' and radio:
                 self.selected_object=self.selected_object.ai.radio
                 self.change_menu('radio_menu')
+
+        # -- add debug info --
+        if self.world.debug_mode==True:
+            if self.selected_object!=None:
+                self.text_queue.append('')
+                self.text_queue.append('--debug info --')
+                self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
+                #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
+                #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
+                self.text_queue.append('throttle: '+str(self.selected_object.ai.throttle))
+                self.text_queue.append('brake power: '+str(self.selected_object.ai.brake_power))
+                self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
+                self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
+                self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
+                self.text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
+                if self.selected_object.ai.driver==None:
+                    self.text_queue.append('driver: None')
+                else:
+                    self.text_queue.append('---- driver info -------------------')
+                    self.text_queue.append('driver: '+self.selected_object.ai.driver.name)
+                    vehicle_destination_distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.memory['task_vehicle_crew']['destination'])
+                    self.text_queue.append('distance to driver destination: '+str(vehicle_destination_distance))
+                # passenger info
+                self.text_queue.append('---- passenger info -------------------')
+                self.text_queue.append('Name/Faction/Role')
+                for b in self.selected_object.ai.passengers:
+                    self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                self.text_queue.append('------------------------------------')
 
     #---------------------------------------------------------------------------
     def update(self):

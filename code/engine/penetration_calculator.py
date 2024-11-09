@@ -27,37 +27,19 @@ projectile_data={}
 
 
 #---------------------------------------------------------------------------
-def calculate_penetration(projectile,target):
+def calculate_penetration(projectile,distance,armor_type,armor_thickness):
     '''calculate penetration, return bool'''
-    penetration=False
-    distance=engine.math_2d.get_distance(projectile.ai.starting_coords,target.world_coords)
 
     # normalize distance to nearest 500
     distance=round(distance/500)*500
 
     # get penetration value for projectile at range
     max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
-
-    if target.is_human:
-        body_part=random.randint(1,3)
-        if body_part==1:
-            if target.ai.wearable_head==None:
-                penetration=True
-            else:
-                if max_penetration>=target.ai.wearable_head.ai.armor_thickness:
-                    penetration=True
-        else:
-            penetration=True
-    elif target.is_vehicle:
-        if max_penetration>=target.ai.armor_thickness:
-                penetration=True
-        else:
-            pass
-            # maybe do a redirect here 
-    else:
-        penetration=True
     
-    return penetration
+    if max_penetration>armor_thickness:
+        return True
+    else:
+        return False
 
 
 #---------------------------------------------------------------------------

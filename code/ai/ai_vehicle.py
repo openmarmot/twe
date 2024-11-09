@@ -16,6 +16,8 @@ import copy
 from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
+import engine.penetration_calculator
+import engine.log
 
 
 
@@ -28,8 +30,26 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        # armor grade steel. standard soft aluminum/steel is a 0-1
-        self.armor_thickness=0 # in mm
+        # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
+        # this is the main vehicle
+        self.vehicle_armor={}
+        self.vehicle_armor['top']=0
+        self.vehicle_armor['bottom']=0
+        self.vehicle_armor['left']=0
+        self.vehicle_armor['right']=0
+        self.vehicle_armor['front']=0
+        self.vehicle_armor['rear']=0
+
+
+        # specific armor for the passenger compartment
+        self.passenger_compartment_armor={}
+        self.passenger_compartment_armor['top']=0
+        self.passenger_compartment_armor['bottom']=0
+        self.passenger_compartment_armor['left']=0
+        self.passenger_compartment_armor['right']=0
+        self.passenger_compartment_armor['front']=0
+        self.passenger_compartment_armor['rear']=0
+
 
         # --- components ---
 
@@ -131,31 +151,84 @@ class AIVehicle(AIBase):
         self.last_collision_description=''
 
     #---------------------------------------------------------------------------
-    def calculate_projectile_damage(self,projectile):
-        '''calculate projectile related damage'''
-        # note this should be a lot better. 
-        # need armor/pen values 
+    def handle_passenger_compartment_projectile_hit(self,projectile):
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        self.last_collision_description='Passenger compartment hit by '+projectile.name + ' at a distance of '+ str(distance)
 
-        self.health-=random.randint(1,10)
-        temp=self.passengers
-        for b in temp:
-            if random.randint(1,4)==3:
-                b.ai.handle_event("collision",projectile)
-                print('debug - human in vehicle hit')
+        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
+
+        if penetration:
+            if len(self.passengers)>0:
+                passenger=random.choice(self.passengers)
+                passenger.ai.handle_event('collision',projectile)
+            else:
+                self.health-=random.randint(1,10)
+
+                if random.randint(0,2)==2:
+                    # extra shot at body damage
+                    self.handle_vehicle_body_projectile_hit(projectile)
+        else:
+            # no penetration, but maybe we can have some other effect?
+            pass
+
+
+    #---------------------------------------------------------------------------
+    def handle_vehicle_body_projectile_hit(self,projectile):
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        self.last_collision_description='Vehicle body hit by '+projectile.name + ' at a distance of '+ str(distance)
+
+        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
+
+        if penetration:
+            if self.driver!=None:
+                if random.randint(0,2)==2:
+                    self.driver.ai.handle_event('collision',projectile)
+            
+            # should do component damage here
+            self.health-=random.randint(1,25)
+
+        else:
+            # no penetration, but maybe we can have some other effect?
+            pass
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         
 
         if EVENT_DATA.is_projectile:
-            distance=engine.math_2d.get_distance(self.owner.world_coords,EVENT_DATA.ai.starting_coords,True)
-            self.last_collision_description='hit by '+EVENT_DATA.name + ' at a distance of '+ str(distance)
-            self.calculate_projectile_damage(EVENT_DATA)
+            
+            # -- determine what area the projectile hit --
+            area_hit='vehicle_body'
+            
+            if self.max_occupants>2:
+                hit=random.randint(0,1)
+                if hit==1:
+                    area_hit='passenger_compartment'
+            
+            if len(self.turrets)>0:
+                hit=random.randint(0,5)
+                if hit==5:
+                    area_hit='turret'
+
+            if area_hit=='vehicle_body':
+                self.handle_vehicle_body_projectile_hit(EVENT_DATA)
+            elif area_hit=='passenger_compartment':
+                self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
+            elif area_hit=='turret':
+                # pass it on for the turret to handle
+                turret=random.choice(self.turrets)
+                turret.ai.handle_event('collision',EVENT_DATA)
+            else:
+                engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
+
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
+            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,2))
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
         else:
-            print('Debug : unknown collision with vehicle - '+EVENT_DATA.name)
+            engine.log.add_data('error','ai_vehicle event_collision - unhandled collision type'+EVENT_DATA.name,True)
 
     #---------------------------------------------------------------------------
     def event_add_inventory(self,EVENT_DATA):

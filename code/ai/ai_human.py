@@ -1112,7 +1112,7 @@ class AIHuman(AIBase):
                 vehicle.ai.handle_steer_neutral()
                 vehicle.rotation_angle=r
                 vehicle.ai.update_heading()
-                engine.log.add_data('warn','fixing 360 vehicle steering issue',True)
+                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
 
             if distance<140:
                 # apply brakes. bot will only exit when speed is zero
@@ -1185,7 +1185,10 @@ class AIHuman(AIBase):
         if len(self.near_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
-            if vehicle.ai.armor_thickness<5:
+
+            # kind of a hack. left and right are likely symetric so its a good
+            # general guess
+            if vehicle.ai.passenger_compartment_armor['left']<5:
                 self.switch_task_exit_vehicle(vehicle)
 
     #---------------------------------------------------------------------------
