@@ -10,6 +10,8 @@ Nov 9 2024
 - turret armor added 
 - collisions determine what side you hit
 - added self_debug function to debug menu 
+- added 'destroyed' art for the truck and 231
+- added some dirt shading to the kubelwagen 
 
 the new collision side detection works well enough for now. 
 

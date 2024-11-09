@@ -1416,7 +1416,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='dodge_g505_wc':
         # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
         # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
-        z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc'],AIVehicle)
+        z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc_destroyed'],AIVehicle)
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
         z.ai.max_occupants=10
@@ -1441,7 +1441,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
-        z=WorldObject(world,['sd_kfz_251','sd_kfz_251'],AIVehicle)
+        z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
         z.ai.vehicle_armor['top']=13
