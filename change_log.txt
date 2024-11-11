@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 10 2024
+- added the t20 armored tractor 
+- modified vehicle armor pen so that only passengers can get 
+hit in the passenger compartment 
+- added t20 and the 37mm autocannon to some of the quick battles 
+- added t20 squad
+- started a art folder again for GIMP native files
+
+the T20 armored tractor has a open passenger compartment. 
+this is modeled, so the crew will get shot off easily if it gets into combat. 
+
+note - t20 engine isn't modeled yet. its performance needs to be adjusted 
+
+todo 
+- vehicle gunners arent checking range enough 
+- reduce player steering wheel sensitivity 
+- t20 tuning 
+- more detailed vehicle projectile hit data 
 
 ----------------------------------
 Nov 9 2024
