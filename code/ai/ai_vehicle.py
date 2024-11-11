@@ -159,12 +159,18 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
 
         if penetration:
+            self.health-=random.randint(1,3)
             if len(self.passengers)>0:
                 passenger=random.choice(self.passengers)
-                passenger.ai.handle_event('collision',projectile)
+                if 'task_vehicle_crew' in passenger.ai.memory:
+                    if passenger.ai.memory['task_vehicle_crew']['role']=='passenger':
+                        passenger.ai.handle_event('collision',projectile)
+                        print(' ! Vehicle passenger hit ! ')
+                else:
+                    # this has happened. not sure why yet
+                    engine.log.add_data('warn','ai_vehicle - passenger memory issue',True)
+                    print(passenger.ai.memory)
             else:
-                self.health-=random.randint(1,10)
-
                 if random.randint(0,2)==2:
                     # extra shot at body damage
                     self.handle_vehicle_body_projectile_hit(projectile)
