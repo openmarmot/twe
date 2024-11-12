@@ -78,7 +78,7 @@ class AIHuman(AIBase):
         # -- stats --
         self.confirmed_kills=0
         self.probable_kills=0
-        self.last_collision_description=''
+        self.collision_log=[]
 
         # -- firing pattern stuff
         # burst control keeps ai from shooting continuous streams
@@ -335,17 +335,16 @@ class AIHuman(AIBase):
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
-        self.last_collision_description=''
         if event_data.is_projectile:
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords,True)
-            self.last_collision_description='hit by '+event_data.name + ' at a distance of '+ str(distance)
+            collision_description='hit by '+event_data.name + ' at a distance of '+ str(distance)
             starting_health=self.health
 
             self.calculate_projectile_damage(event_data)
 
             # shrapnel from grenades and panzerfausts dont track ownership
             if event_data.ai.shooter !=None:
-                self.last_collision_description+=(' from '+event_data.ai.shooter.name)
+                collision_description+=(' from '+event_data.ai.shooter.name)
 
                 if event_data.ai.shooter.is_human:
                     if self.owner.is_player==False:
@@ -370,7 +369,9 @@ class AIHuman(AIBase):
                             print('collision on a dead human ai detected')
 
                     if event_data.ai.shooter.ai.primary_weapon!=None:
-                        self.last_collision_description+=("'s "+event_data.ai.weapon_name)
+                        collision_description+=("'s "+event_data.ai.weapon_name)
+
+                self.collision_log.append(collision_description)
             else:
                 print('Error - projectile '+event_data.name+' shooter is none')
                 # other way to get here is if its not a projectile
@@ -1350,7 +1351,10 @@ class AIHuman(AIBase):
             dm+=('\n  - faction: '+self.squad.faction)
             dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
             dm+=('\n  - probable kills: '+str(self.probable_kills))
-            dm+=('\n  - killed by : '+self.last_collision_description)
+            dm+=('\n  -- collision log --')
+            for b in self.collision_log:
+                dm+=('\n --'+b)
+            dm+=('\n  -------------------')
             
             # drop primary weapon 
             if self.primary_weapon!=None:

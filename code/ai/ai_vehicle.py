@@ -148,12 +148,12 @@ class AIVehicle(AIBase):
         self.first_update=True
 
         # used for death message 
-        self.last_collision_description=''
+        self.collision_log=[]
 
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-        self.last_collision_description='Passenger compartment hit by '+projectile.name + ' at a distance of '+ str(distance)
+        self.collision_log.append('Passenger compartment hit by '+projectile.name + ' at a distance of '+ str(distance))
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
@@ -182,7 +182,7 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-        self.last_collision_description='Vehicle body hit by '+projectile.name + ' at a distance of '+ str(distance)
+        self.collision_log.append('Vehicle body hit by '+projectile.name + ' at a distance of '+ str(distance))
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
@@ -278,7 +278,10 @@ class AIVehicle(AIBase):
         
         dm=''
         dm+=(self.owner.name+' died.')
-        dm+=('\n  - killed by : '+self.last_collision_description)
+        dm+=('\n  -- collision log --')
+        for b in self.collision_log:
+            dm+=('\n --'+b)
+        dm+=('\n  -------------------')
         
 
         print(dm)

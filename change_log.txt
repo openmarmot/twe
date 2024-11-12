@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 11 2024
+- implemented collision log for humans and vehicles 
+
 ----------------------------------
 Nov 10 2024
 - added the t20 armored tractor 

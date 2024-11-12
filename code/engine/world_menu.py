@@ -262,7 +262,9 @@ class World_Menu(object):
             self.world.is_paused=True
             self.text_queue=[]
             self.text_queue.append('You Died')
-            self.text_queue.append(self.world.player.ai.last_collision_description)
+            self.text_queue.append('Collision Log:')
+            for b in self.world.player.ai.collision_log:
+                self.text_queue.append(b)
 
             german_count=len(self.world.wo_objects_german)
             soviet_count=len(self.world.wo_objects_soviet)
@@ -682,7 +684,6 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            self.text_queue.append(self.selected_object.ai.last_collision_description)
             self.text_queue.append('')
             self.text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
