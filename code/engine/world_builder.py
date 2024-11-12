@@ -83,7 +83,7 @@ list_guns_pistols=['1911','ppk','tt33']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
-list_vehicles_german=['kubelwagen','sd_kfz_251']
+list_vehicles_german=['kubelwagen','sd_kfz_251','rso']
 list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage']
 list_vehicles_american=[]
 list_vehicles_civilian=[]
@@ -1443,6 +1443,32 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='rso':
+        # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
+        # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
+        z=WorldObject(world,['rso','rso_destroyed'],AIVehicle)
+        z.name='Raupenschlepper Ost'
+        z.is_vehicle=True
+        z.ai.max_occupants=10
+        z.ai.max_speed=100
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=2380
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"chrysler_flathead_straight_6_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
@@ -1644,7 +1670,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
         z.name='red_bicycle'
         z.is_vehicle=True
-        z.ai.max_speed=100
+        z.ai.max_speed=80
         z.ai.rotation_speed=50.
         z.ai.max_occupants=1
         z.ai.open_top=True

@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 12 2024
+- added the Raupenschlepper Ost (armored tractor )
+
+todo 
+- need to add specific engines for some recent vehicles 
+- need to figure out ingame speed vs real life speed and 
+then adjust all the vehicle speeds 
+
+----------------------------------
 Nov 11 2024
 - implemented collision log for humans and vehicles 
 
