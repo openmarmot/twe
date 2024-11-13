@@ -6,7 +6,14 @@ Nov 13 2024
 - added in error handling on world load for unrecognized objects 
 - added a target health check to the basic vehicle gunner action 
     - this will prevent the gunner from excessive fire in between think turns 
-- 
+- updated spawn code for when a player takes over a bot in a vehicle 
+- minor fixes / cleanup 
+- large storage_menu rewrite - now handles infinite items and is 
+less confusing 
+
+
+
+
 ----------------------------------
 Nov 12 2024
 - added the Raupenschlepper Ost (armored tractor )

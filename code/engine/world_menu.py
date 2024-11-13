@@ -13,7 +13,7 @@ a lot of game logic here
 
 #import built in modules
 import random
-
+import copy
 
 #import custom packages
 import engine.world_builder 
@@ -42,6 +42,12 @@ class World_Menu(object):
         
         # max distance at which you can select something (open a context menu)
         self.max_menu_distance=90
+
+        # used for multiple page layouts
+        self.current_page=0
+
+        # used by storage menu 
+        self.storage_menu_selection=None
 
         self.text_queue=[]
 
@@ -132,6 +138,8 @@ class World_Menu(object):
                 self.gun_menu(None)
             elif SELECTED_OBJECT.is_container:
                 self.active_menu='storage'
+                self.current_page=0
+                self.storage_menu_selection=None
                 self.storage_menu(None)
             elif SELECTED_OBJECT.is_human:
                 self.active_menu='human'
@@ -438,7 +446,7 @@ class World_Menu(object):
             self.text_queue.append('5 - Pickle ')
             self.text_queue.append('6 - crate_mp40')
             self.text_queue.append('7 - concrete runway')
-            self.text_queue.append('8 - 37mm')
+            self.text_queue.append('8 - german_fuel_can')
             self.text_queue.append('9 - grid 50 foot')
 
             if key=='1':
@@ -468,7 +476,7 @@ class World_Menu(object):
                     temp.rotation_angle=random.choice([0,90,180,270])
                     #temp.rotation_angle=rotation
             elif key=='8':
-                temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'37mm_m1939_61k_aa_gun_carriage',True)
+                temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'german_fuel_can',True)
                 temp.rotation_angle=0
             elif key=='9':
                 temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0],self.world.player.world_coords[1]],'grid_50_foot',True)
@@ -630,6 +638,7 @@ class World_Menu(object):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
             # print out the basic menu
+            self.text_queue=[]
             self.text_queue.append('-- '+self.selected_object.name+' --')
             if self.world.debug_mode==True:
                 self.text_queue.append('Distance: '+str(distance))
@@ -875,102 +884,143 @@ class World_Menu(object):
     #---------------------------------------------------------------------------            
     def storage_menu(self, key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+
+        # base storage menu
         if self.menu_state=='none':
             # print out the basic menu
             self.text_queue=[]
             self.text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
 
-            if distance<self.max_menu_distance:  
+            # determine if we can pickup the storage object itself
+            if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
+                self.text_queue.append('z - pickup '+self.selected_object.name)
+                if key=='z':
+                    self.world.player.ai.pickup_object(self.selected_object)
+                    self.deactivate_menu()
+                    # exit function
+                    return
+            if self.selected_object.is_player==False:
+                self.text_queue.append('x - add items')
+            
+            items=self.selected_object.ai.inventory
 
-                if self.selected_object.is_player==False:
-                    self.text_queue.append('1 - Add Items ')
-                    if key=='1':
+            files_per_page = 9
+            total_pages = (len(items) + files_per_page - 1) // files_per_page
+
+            start_index = self.current_page * files_per_page
+            end_index = min(start_index + files_per_page, len(items))
+
+            for index, wo in enumerate(items[start_index:end_index]):
+                self.text_queue.append(f"{index + 1} - {wo.name}")
+
+            if len(items) > files_per_page:
+                if self.current_page < total_pages - 1:
+                    self.text_queue.append("[+] - Next page")
+                if self.current_page > 0:
+                    self.text_queue.append("[-] - Previous page")
+
+
+            # Handle the key selection for more than 10 save files
+            if key is not None:
+                if key.isdigit():
+                    key_index = int(key) - 1
+                    if 0 <= key_index < len(items[start_index:end_index]):
+                        self.storage_menu_selection = items[start_index + key_index]
+                        self.menu_state='selected_object'
                         key=None
-                        self.menu_state='add'
-
-                self.text_queue.append('2 - Remove Items ')
-                if key=='2':
+                elif key == '+' and self.current_page < total_pages - 1:
+                    self.current_page += 1
+                    self.storage_menu('')
+                elif key == '-' and self.current_page > 0:
+                    self.current_page -= 1
+                    self.storage_menu('')
+                elif key== 'x':
+                    self.menu_state='add_object'
                     key=None
-                    self.menu_state='remove'
-                # should make this decision on max vol for pickup somewhere else
-                # 100 pounds is about 45 kilograms. thats about max that a normal human would carry
-                if self.selected_object.is_human==False and self.selected_object.volume<21 and self.selected_object.weight<50:
-                    self.text_queue.append('3 - Pick up '+self.selected_object.name)
-                    if key=='3':
+                    self.current_page=0
+
+        # interact with a selected object
+        if self.menu_state=='selected_object':
+            self.text_queue=[]
+            self.text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
+            self.text_queue.append(self.storage_menu_selection.name)
+            self.text_queue.append('z - back')
+            self.text_queue.append('1 - drop on ground')
+            if key=='1':
+                self.selected_object.remove_inventory(self.storage_menu_selection)
+                self.storage_menu_selection.world_coords=copy.copy(self.selected_object.world_coords)
+                engine.math_2d.randomize_position_and_rotation(self.storage_menu_selection)
+                self.world.add_queue.append(self.storage_menu_selection)
+                self.storage_menu_selection=None
+                self.current_page=0
+                self.menu_state='none'
+                self.storage_menu(None)
+                return
+            if self.selected_object.is_player==False:
+                self.text_queue.append('2 - add to your inventory')
+                if key=='2':
+                    self.selected_object.remove_inventory(self.storage_menu_selection)
+                    self.world.player.add_inventory(self.storage_menu_selection)
+                    self.current_page=0
+                    self.storage_menu_selection=None
+                    self.menu_state='none'
+                    self.storage_menu(None)
+                    return
+            if key=='z':
+                self.current_page=0
+                self.storage_menu_selection=None
+                self.menu_state='none'
+                self.storage_menu(None)
+                return
+
+        # add a object from the players inventory
+        if self.menu_state=='add_object':
+            self.text_queue=[]
+            self.text_queue.append('-- Select a object to add to : ' + self.selected_object.name + ' --')
+            self.text_queue.append('z - back')
+            items=self.world.player.ai.inventory
+
+            files_per_page = 9
+            total_pages = (len(items) + files_per_page - 1) // files_per_page
+
+            start_index = self.current_page * files_per_page
+            end_index = min(start_index + files_per_page, len(items))
+
+            for index, wo in enumerate(items[start_index:end_index]):
+                self.text_queue.append(f"{index + 1} - {wo.name}")
+
+            if len(items) > files_per_page:
+                if self.current_page < total_pages - 1:
+                    self.text_queue.append("[+] - Next page")
+                if self.current_page > 0:
+                    self.text_queue.append("[-] - Previous page")
+
+
+            # Handle the key selection for more than 10 save files
+            if key is not None:
+                if key.isdigit():
+                    key_index = int(key) - 1
+                    if 0 <= key_index < len(items[start_index:end_index]):
+                        temp=items[start_index + key_index]
+                        self.world.player.remove_inventory(temp)
+                        self.selected_object.add_inventory(temp)
+                        self.menu_state='none'
                         key=None
-                        self.world.player.ai.pickup_object(self.selected_object)
-                        self.deactivate_menu()
-                        # exit function
+                        self.current_page=None
+                        self.storage_menu(None)
                         return
-                
-                # print out contents
-                count=0
-                self.text_queue.append('------------- ')
-                for b in self.selected_object.ai.inventory:
-                    if count<6:
-                        if b.is_gun_magazine:
-                            self.text_queue.append(b.name+' '+str(len(b.ai.projectiles)))
-                        else:
-                            self.text_queue.append(b.name)
-                    else:
-                        self.text_queue.append('...')
-                        break
-                self.text_queue.append('------------- ')
-
-            else:
-                print('get closer')
-
-        if self.menu_state=='add':
-            self.text_queue=[]
-            self.text_queue.append('-- Add Inventory Menu --')
-
-            selectable_objects=[]
-            selection_key=1
-            for b in self.world.player.ai.inventory:
-                if selection_key<10:
-                    self.text_queue.append(str(selection_key)+' - '+b.name)
-                    selection_key+=1
-                    selectable_objects.append(b)
-
-            # get the array position corresponding to the key press
-            temp=self.translate_key_to_array_position(key)
-            if temp !=None:
-                if len(selectable_objects)>temp:
-                    self.world.player.remove_inventory(selectable_objects[temp])
-                    self.selected_object.add_inventory(selectable_objects[temp])
-
-                    # reset menu 
+                elif key == '+' and self.current_page < total_pages - 1:
+                    self.current_page += 1
+                    self.storage_menu('')
+                elif key == '-' and self.current_page > 0:
+                    self.current_page -= 1
+                    self.storage_menu('')
+                elif key == 'z':
+                    self.menu_state='none'
+                    key=None
+                    self.current_page=None
                     self.storage_menu(None)
-
-        if self.menu_state=='remove':
-            self.text_queue=[]
-            self.text_queue.append('-- Remove Inventory Menu --')
-
-            selectable_objects=[]
-            selection_key=1
-            for b in self.selected_object.ai.inventory:
-                if selection_key<10:
-                    self.text_queue.append(str(selection_key)+' - '+b.name)
-                    selection_key+=1
-                    selectable_objects.append(b)
-
-            # get the array position corresponding to the key press
-            temp=self.translate_key_to_array_position(key)
-            if temp !=None:
-                if len(selectable_objects)>temp:
-
-                    if self.selected_object.is_player:
-                        #player is looking at their own storage, so dump anything they remove on the ground
-                        self.world.player.ai.drop_object(selectable_objects[temp])
-                    else:
-                        # player is grabbing objects from some other object so put in players inventory
-                        # remove from the other object
-                        self.selected_object.remove_inventory(selectable_objects[temp])
-                        # add to the player
-                        self.world.player.add_inventory(selectable_objects[temp])
-                    # reset menu 
-                    self.storage_menu(None)
-
+                    return
 
 
     #--------------------------------------------------------------------------

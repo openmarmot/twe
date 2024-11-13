@@ -761,7 +761,7 @@ class World(object):
         print('--- human check ---')
         for b in self.wo_objects_human:
             error_found=False
-            
+
             # check for zombies
             if b.ai.health<1:
                 print(b.name,'is dead !!')
@@ -817,7 +817,11 @@ class World(object):
 
         if spawned:
             self.player.is_player=True
-            self.player.ai.memory['current_task']='task_player_control'
+            if 'vehicle' in self.player.ai.memory['current_task']:
+                # not sure if we have to do anything if in a vehicle 
+                pass
+            else:
+                self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
         else:
             print('ERROR : player spawn failed')
