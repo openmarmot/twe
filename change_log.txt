@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 13 2024
+- added in error handling on world load for unrecognized objects 
+- added a target health check to the basic vehicle gunner action 
+    - this will prevent the gunner from excessive fire in between think turns 
+- 
+----------------------------------
 Nov 12 2024
 - added the Raupenschlepper Ost (armored tractor )
 - adjusting all in-game speeds to more closely match 

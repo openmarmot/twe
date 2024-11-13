@@ -124,24 +124,28 @@ def convert_map_objects_to_world_objects(world,map_objects):
 
             wo=spawn_object(world,map_object.world_coords,map_object.world_builder_identity,True)
             
-            wo.rotation_angle=map_object.rotation
-            
-            if map_object.name !='none' and map_object.name !='':
-                wo.name=map_object.name
-            
-            # add in the saved inventory
-            # remember that map_object.inventory is a array of world_builder_identity names
-            if len(map_object.inventory)>0:
-                #print('inventory',map_object.inventory)
-                # need to prevent duplicates. this could be better
-                for a in map_object.inventory:
-                    already_exists=False
-                    for b in wo.ai.inventory:
-                        if b.name==a:
-                            already_exists=True
-                            break
-                    if already_exists==False:
-                        wo.ai.inventory.append(spawn_object(world,[0,0],a,False))
+            if wo==None:
+                # this means the world_builder_identity was not recognized by spawn_object
+                engine.log.add_data('error','world_builder.convert_map_objects_to_world_objects could not convert '+map_object.world_builder_identity,True)
+            else:
+                wo.rotation_angle=map_object.rotation
+                
+                if map_object.name !='none' and map_object.name !='':
+                    wo.name=map_object.name
+                
+                # add in the saved inventory
+                # remember that map_object.inventory is a array of world_builder_identity names
+                if len(map_object.inventory)>0:
+                    #print('inventory',map_object.inventory)
+                    # need to prevent duplicates. this could be better
+                    for a in map_object.inventory:
+                        already_exists=False
+                        for b in wo.ai.inventory:
+                            if b.name==a:
+                                already_exists=True
+                                break
+                        if already_exists==False:
+                            wo.ai.inventory.append(spawn_object(world,[0,0],a,False))
 
     # this is needed to flush all the new objects out of the queue and into the world
     world.process_add_remove_queue()

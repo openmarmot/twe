@@ -117,17 +117,20 @@ class AIHuman(AIBase):
         target=self.memory['task_vehicle_crew']['target']
         turret=self.memory['task_vehicle_crew']['turret']
 
-        # check actual turret rotation angle against angle to target
-        needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
-        
-        # probably need to do some rounding here
-        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            if needed_rotation>turret.rotation_angle:
-                turret.ai.handle_rotate_left()
+        if target.ai.health>0:
+            # check actual turret rotation angle against angle to target
+            needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
+            
+            # probably need to do some rounding here
+            if round(needed_rotation,1)!=round(turret.rotation_angle,1):
+                if needed_rotation>turret.rotation_angle:
+                    turret.ai.handle_rotate_left()
+                else:
+                    turret.ai.handle_rotate_right()
             else:
-                turret.ai.handle_rotate_right()
+                turret.ai.handle_fire()
         else:
-            turret.ai.handle_fire()
+            self.memory['task_vehicle_crew']['target']=None
 
     #---------------------------------------------------------------------------
     def aim_and_fire_weapon(self,weapon,target):
@@ -1143,27 +1146,26 @@ class AIHuman(AIBase):
 
         if self.memory['task_vehicle_crew']['target']==None:
             self.memory['task_vehicle_crew']['target']=self.get_target()
-            # no need to evaluate - we do that in the next step anyways
+        else:
+            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                self.memory['task_vehicle_crew']['target']=self.get_target()
 
         # we either already had a target, or we might have just got a new one
         if self.memory['task_vehicle_crew']['target']!=None:
-            # check health
-            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+ 
+            # check rotation
+            rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
+                # lots of things we could do here.
+                # we could have the driver rotate
+                # for now just get rid of the target
                 self.memory['task_vehicle_crew']['target']==None
-            else:    
-                # check rotation
-                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
-                    # lots of things we could do here.
-                    # we could have the driver rotate
-                    # for now just get rid of the target
+            else:
+                # check distance
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                if distance>turret.ai.primary_weapon.ai.range:
+                    # alternatively we could drive closer.
                     self.memory['task_vehicle_crew']['target']==None
-                else:
-                    # check distance
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                    if distance>turret.ai.primary_weapon.ai.range:
-                        # alternatively we could drive closer.
-                        self.memory['task_vehicle_crew']['target']==None
 
 
         # if we get this far then we just fire at it
@@ -1954,7 +1956,7 @@ class AIHuman(AIBase):
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.1)
                         self.think_vehicle_role_driver()
                     elif role=='gunner':
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
                         self.think_vehicle_role_gunner()
                     elif role=='passenger':
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
