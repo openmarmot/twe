@@ -45,10 +45,8 @@ class AIGun(AIBase):
         # muzzle velocity (not used)
         self.muzzle_velocity=0
 
-        # flight time - basically how long the bullet will stay in the air 
-        self.flight_time=0
-
-        # range - estimate of the distance a gun can hit out to. used by bot ai 
+        # range - how far the bullet will go before hitting the ground
+        # used by the ai and used to calculate projectile flight time
         self.range=0
 
         # spread
@@ -94,7 +92,7 @@ class AIGun(AIBase):
                     projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
                     projectile.world_coords=copy.copy(self.equipper.world_coords)
                     projectile.ai.starting_coords=copy.copy(self.equipper.world_coords)
-                    projectile.ai.maxTime=self.flight_time + random.uniform(0.01, 0.05)
+                    projectile.ai.maxTime=self.range/projectile.ai.speed
                     projectile.rotation_angle=self.owner.rotation_angle
                     projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
                     

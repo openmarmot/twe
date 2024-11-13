@@ -50,6 +50,10 @@ class WorldObject(object):
         # should probably never be negative unless if we start simulating uh holes in the ground
         self.scale_modifier=0
 
+        # if the object scale (world scale + scale_modifier) is under 
+        # this it won't be rendered
+        self.minimum_visible_scale=0.1
+
         # updated by the object AI
         self.world_coords=[0,0]
         

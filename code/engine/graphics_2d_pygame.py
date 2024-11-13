@@ -104,16 +104,18 @@ class Graphics_2D_Pygame(object):
         # max_fps max frames for every second.
         self.max_fps=60
 
-        # scale. normal is 1. this is set by the player with []
-        self.scale=1
-        # stuff under this doesn't get rendered
-        self.minimum_visible_scale=0.1 
+        # scale min/max limit 
+        #self.scale_limit=[0.2,1.1]
+        self.scale_limit=[0.1,1.5]
 
+        # scale. normal is 1. this is set by the player with []
+        self.scale=self.scale_limit[1]
 
         # adjustment to viewing area. > == more visible
         # 100 seems to be about the minimum where there is no popping in and out of objects
         self.view_adjust_minimum=100
         self.view_adjust=self.view_adjust_minimum
+        self.view_adjustment=400
 
         # load all images
         self.load_all_images('images')
@@ -436,7 +438,7 @@ class Graphics_2D_Pygame(object):
                 if b.render:
                     
                     # check if the relative scale of the object is enough to make it visible
-                    if (self.scale+b.scale_modifier)>self.minimum_visible_scale:
+                    if (self.scale+b.scale_modifier)>=b.minimum_visible_scale:
                         
                         #determine whether object 'b' world_coords are within
                         #the viewport bounding box
@@ -527,17 +529,17 @@ class Graphics_2D_Pygame(object):
 #------------------------------------------------------------------------------
     def zoom_out(self):
         '''zoom out'''
-        if self.scale>0.2:
+        if self.scale>self.scale_limit[0]:
             self.scale=round(self.scale-0.1,1)
-            self.view_adjust+=500
+            self.view_adjust+=self.view_adjustment
             #print('zoom out',self.scale)
             self.reset_all()
 #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
-        if self.scale<1.1:
+        if self.scale<self.scale_limit[1]:
             self.scale=round(self.scale+0.1,1)
-            self.view_adjust-=500
+            self.view_adjust-=self.view_adjustment
             # otherwise stuff starts getting clipped when its <0
             if self.view_adjust<self.view_adjust_minimum:
                 self.view_adjust=self.view_adjust_minimum

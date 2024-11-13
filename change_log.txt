@@ -1,5 +1,78 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 12 2024
+- added the Raupenschlepper Ost (armored tractor )
+- adjusting all in-game speeds to more closely match 
+real world speeds 
+- projectile flight time is now calcuated (range/speed)
+so it should more accurately reflect range 
+- adjusted all weapon ranges to match a realistic weapon 
+engagement range
+- projectile speed way up to 1000. this is about as fast 
+ as they can go and still reliably hit things 
+- added max_offroad_speed for vehicles 
+- made a update to ai_human update order to prevent actions after death
+- misc ai_human changes to try and fix any possible memory state bugs around vehicles
+- minimum visisble scale is now a per world_object variable 
+- most objects are no longer visible past 0.4 zoom 
+- added a couple of levels of zoom in and one level of zoom out 
+- game now starts at max zoom in 
+- expanding the world.run_self_debug code 
+- rewrote a lot of ai_human stuff around vehicles and projectile collision handling 
+- added 'game_unit_conversions.txt' with conversions for some game units to real world units 
+
+most small objects now have a minimum level to be rendered. 
+this means at high levels of zoom out a lot of the small objects aren't drawn, 
+which helps frame rate a lot. 
+
+all vehicles got real speeds - but that was way way too fast. 
+I realized that in reality offroad nothing is going faster than 
+about 15 mph (based on my experience when i had a jeep) so 
+everything is capped at 15mph offroad now - and everything 
+is currently considered offroad 
+
+I originally upped the rifles to 200 yards, but this range 
+exceeds the radius of the viewable area when zoomed out to the 
+max, so it would make the game unplayable. 
+
+the new ranges are (imo) practical ranges with iron sites 
+based on my own experience. Sure you can shoot with irons 
+out to 300 but past 100 or so a man sized target really gets 
+covered by your iron sights. Realistically WW2 era iron sights 
+were abysmal compared to modern alternatives.
+--
+rifle and mg : 100 yards 
+assault rifles : 75 yards 
+submachine guns : 50 yards 
+pistols : 25 yards  
+--
+
+projectile speed went up from about 300 to 1000. the difference is 
+astounding. firearms have a completely different feel now. bullets are 
+almost unavoidable and the vehicles with weapons are incredibly dangerous.
+
+todo 
+- need to add specific engines for some recent vehicles 
+- ai isn't engaging enough with the new distances. especially at mid and far 
+    -- this may be fixed with some late edits, need to test 
+    -- note seems to be still an issue with mid and far engagement 
+- persistent issues with dead humans not exiting vehicles
+    -- this may be fixed now. needs more play testing 
+- seems to be an issue with world_area control. 
+- vehicle gunner does not detect when a target is dead fast enough 
+- large amount of friendly fire - consider changing friendly fire settings 
+- need to look into what happens when trying to load a map object taht doesn't have a defined world_object 
+    -- example 'wreck'
+- need to add some variance to aiming. maybe based on skill level 
+- need to add bursts to automatic weapons (if that isn't in there anymore)
+- check cyclic rate - seems slow? 
+
+----------------------------------
+Nov 11 2024
+- implemented collision log for humans and vehicles 
+
 ----------------------------------
 Nov 10 2024
 - added the t20 armored tractor 

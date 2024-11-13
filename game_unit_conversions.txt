@@ -1,0 +1,36 @@
+
+# -- GIMP (image editor) Foot Grid --
+Vew->Show Grid
+
+Image-> configure grid
+set spacing to 8
+
+# -- game units --
+
+# distance 
+1 foot = 8.0608 game units 
+1 game unit - 0.124 feet 
+
+# speed 
+1 mile per hour = 11.84 game units per second 
+1 game unit per second = 0.08484 miles per hour 
+
+# max offroad speed for heavy vehicles 
+15 mph = 177.6
+
+# -- weapons --
+# effective distances compressed somewhat to keep the game playable 
+
+projectile flight time is auto calculated as range/projectile speed
+
+# rifles and machine guns 
+range : 100 yards = 300 feet = 2418 game units
+
+# assault rifles 
+range : 75 yards = 225 feet = 1813 game units
+
+# submachine guns
+range : 50 yards = 150 feet = 1209 game units
+
+# pistols
+range : 25 yards = 75 feet = 604 game units

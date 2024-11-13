@@ -60,6 +60,8 @@ class AITurret(AIBase):
         self.primary_weapon=None
         self.secondary_weapon=None
 
+        self.collision_log=[]
+
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         
@@ -67,7 +69,7 @@ class AITurret(AIBase):
         if EVENT_DATA.is_projectile:
             projectile=EVENT_DATA
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-            self.last_collision_description='Turret hit by '+projectile.name + ' at a distance of '+ str(distance)
+            self.collision_log.append('Turret hit by '+projectile.name + ' at a distance of '+ str(distance))
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])

@@ -19,6 +19,7 @@ import random
 import engine.world_builder 
 import engine.math_2d
 import engine.world_radio
+import engine.log
 
 #global variables
 
@@ -262,7 +263,9 @@ class World_Menu(object):
             self.world.is_paused=True
             self.text_queue=[]
             self.text_queue.append('You Died')
-            self.text_queue.append(self.world.player.ai.last_collision_description)
+            self.text_queue.append('Collision Log:')
+            for b in self.world.player.ai.collision_log:
+                self.text_queue.append(b)
 
             german_count=len(self.world.wo_objects_german)
             soviet_count=len(self.world.wo_objects_soviet)
@@ -370,6 +373,7 @@ class World_Menu(object):
             self.text_queue.append('4 - Dodge G505 Weapons Carrier ')
             self.text_queue.append('5 - sd_kfz_251 ')
             self.text_queue.append('6 - T20 armored tractor')
+            self.text_queue.append('7 - RSO')
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif key=='2':
@@ -382,6 +386,8 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'sd_kfz_251',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'t20',True)
+            elif key=='7':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'rso',True)
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
@@ -433,6 +439,7 @@ class World_Menu(object):
             self.text_queue.append('6 - crate_mp40')
             self.text_queue.append('7 - concrete runway')
             self.text_queue.append('8 - 37mm')
+            self.text_queue.append('9 - grid 50 foot')
 
             if key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
@@ -462,6 +469,9 @@ class World_Menu(object):
                     #temp.rotation_angle=rotation
             elif key=='8':
                 temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'37mm_m1939_61k_aa_gun_carriage',True)
+                temp.rotation_angle=0
+            elif key=='9':
+                temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0],self.world.player.world_coords[1]],'grid_50_foot',True)
                 temp.rotation_angle=0
 
 
@@ -682,7 +692,6 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            self.text_queue.append(self.selected_object.ai.last_collision_description)
             self.text_queue.append('')
             self.text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
@@ -1130,7 +1139,12 @@ class World_Menu(object):
                 self.text_queue.append('---- passenger info -------------------')
                 self.text_queue.append('Name/Faction/Role')
                 for b in self.selected_object.ai.passengers:
-                    self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                    if 'task_vehicle_crew' in b.ai.memory:
+                        self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                    else:
+                        # this bug is popping up occasionally
+                        engine.log.add_data('error','world_menu vehicle_menu bot in vehicle missing task_vehicle_crew',True)
+                        self.world.run_self_debug()
                 self.text_queue.append('------------------------------------')
 
     #---------------------------------------------------------------------------
