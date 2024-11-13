@@ -980,6 +980,21 @@ class World_Menu(object):
             self.text_queue.append('z - back')
             items=self.world.player.ai.inventory
 
+            # optionally put your large human pickup in there
+            if self.selected_object.is_player==False:
+                if self.world.player.ai.large_pickup!=None:
+                    self.text_queue.append('x - add '+self.world.player.ai.large_pickup.name)
+                    if key=='x':
+                        temp=self.world.player.ai.large_pickup
+                        self.world.player.ai.large_pickup=None
+                        self.world.remove_queue.append(temp)
+                        self.selected_object.add_inventory(temp)
+                        self.menu_state='none'
+                        key=None
+                        self.current_page=0
+                        self.storage_menu(None)
+                        return
+
             files_per_page = 9
             total_pages = (len(items) + files_per_page - 1) // files_per_page
 
@@ -1006,7 +1021,7 @@ class World_Menu(object):
                         self.selected_object.add_inventory(temp)
                         self.menu_state='none'
                         key=None
-                        self.current_page=None
+                        self.current_page=0
                         self.storage_menu(None)
                         return
                 elif key == '+' and self.current_page < total_pages - 1:
@@ -1018,7 +1033,7 @@ class World_Menu(object):
                 elif key == 'z':
                     self.menu_state='none'
                     key=None
-                    self.current_page=None
+                    self.current_page=0
                     self.storage_menu(None)
                     return
 

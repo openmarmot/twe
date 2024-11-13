@@ -10,9 +10,14 @@ Nov 13 2024
 - minor fixes / cleanup 
 - large storage_menu rewrite - now handles infinite items and is 
 less confusing 
+- you can now add large pickup items to storage 
 
+this update finally gets the storage menu up to the point where it 
+is actually decent if you have more than a couple items. 
 
-
+being able to put large pickups in storage means you can drive around 
+with a vehicle and grab a bunch of fuel cans or ammo boxes, which is a 
+nice role play feature.
 
 ----------------------------------
 Nov 12 2024
