@@ -301,11 +301,11 @@ class AIHuman(AIBase):
         for b in target_list:
             d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
-            if d<500:
+            if d<800:
                 self.near_targets.append(b)
-            elif d<850:
+            elif d<1500:
                 self.mid_targets.append(b)
-            elif d<1300:
+            elif d<2450:
                 self.far_targets.append(b)
 
             if d<closest_distance:
@@ -325,13 +325,13 @@ class AIHuman(AIBase):
 
             else:
 
-                # should we check to make sure we aren't trying to exit a vehicle first?
-
-                if self.primary_weapon!=None:
-                    if self.check_ammo_bool(self.primary_weapon):
-                        self.switch_task_engage_enemy(closest_object)
-                else:
-                    engine.log.add_data('warn','close enemy and no primary weapon. not handled. faction:'+self.squad.faction,True)
+                # don't want to over ride exiting a vehicle 
+                if self.memory['current_task']!='task_exit_vehicle':
+                    if self.primary_weapon!=None:
+                        if self.check_ammo_bool(self.primary_weapon):
+                            self.switch_task_engage_enemy(closest_object)
+                    else:
+                        engine.log.add_data('warn','close enemy and no primary weapon. not handled. faction:'+self.squad.faction,True)
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
@@ -342,22 +342,15 @@ class AIHuman(AIBase):
 
             self.calculate_projectile_damage(event_data)
 
-            # shrapnel from grenades and panzerfausts dont track ownership
+            # data collection
             if event_data.ai.shooter !=None:
                 collision_description+=(' from '+event_data.ai.shooter.name)
+                if event_data.ai.shooter.ai.primary_weapon!=None:
+                    collision_description+=("'s "+event_data.ai.weapon_name)
+                self.collision_log.append(collision_description)   
 
+                # kill tracking
                 if event_data.ai.shooter.is_human:
-                    if self.owner.is_player==False:
-                        if event_data.ai.shooter.ai.squad != None:
-                            if event_data.ai.shooter.ai.squad.faction != self.squad.faction or event_data.ai.shooter.is_player:
-                                # not sure if this is the best way to do this.
-                                # this used to be where the shooter was added to personal_enemies
-                                if self.primary_weapon!=None:
-                                    if self.check_ammo_bool(self.primary_weapon):
-                                        self.switch_task_engage_enemy(event_data.ai.shooter)
-
-                    # kill tracking
-
                     if self.health<30:
                         # protects from recording hits on something that was already dead
                         if starting_health>0:
@@ -367,30 +360,30 @@ class AIHuman(AIBase):
                                 event_data.ai.shooter.ai.probable_kills+=1
                         else:
                             print('collision on a dead human ai detected')
-
-                    if event_data.ai.shooter.ai.primary_weapon!=None:
-                        collision_description+=("'s "+event_data.ai.weapon_name)
-
-                self.collision_log.append(collision_description)
+                
             else:
+                engine.log.add_data('error', 'projectile '+event_data.name+' shooter is none',True)
                 print('Error - projectile '+event_data.name+' shooter is none')
-                # other way to get here is if its not a projectile
-                print('or its not a projectile')
-            
-            if self.owner.is_player==False:
-                destination=[0,0]
-                if self.owner.is_civilian:
-                    # civilian runs further
-                    destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
-                else:
-                    # soldier just repositions to get away from the fire
-                    destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                if self.memory['current_task']!='task_vehicle_crew':
+
+            # react 
+            if 'vehicle' in self.memory['current_task']:
+                # - we are in a vehicle - 
+                pass
+            else:
+                # - we are on foot -
+
+                if self.owner.is_player==False:
+                    destination=[0,0]
+                    if self.owner.is_civilian:
+                        # civilian runs further
+                        destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
+                    else:
+                        # soldier just repositions to get away from the fire
+                        destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                     if self.prone==False:
                         self.prone_state_change()
                     self.switch_task_move_to_location(destination)
-                else:
-                    engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
+
 
         elif event_data.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything
@@ -399,13 +392,14 @@ class AIHuman(AIBase):
             if random.randint(1,5)==1:
                 event_data.ai.redirect(event_data.ai.equipper.world_coords)
             else:
-                if self.memory['current_task']!='task_vehicle_crew':
+                if 'vehicle' in self.memory['current_task']:
+                    engine.log.add_data('warn','hit by a grenade while in a vehicle',True)
+                else:
+                    # - we are on foot - 
                     if self.prone==True:
                         self.prone_state_change()
                     destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
                     self.switch_task_move_to_location(destination)
-                else:
-                    engine.log.add_data('warn','hit by a projectile while in a vehicle',True)
 
         elif event_data.is_throwable:
             #throwable but not a grenade 
@@ -1288,36 +1282,35 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
-
-        # update the current task
-        if self.memory['current_task'] in self.memory:
-            if self.memory['current_task'] in self.task_map:
-                # call the associated update function for the current task
-                self.task_map[self.memory['current_task']]()
-            else:
-                engine.log.add_data('error','current task '+self.memory['current_task']+' not in task map',True)
-
-        else:
-            self.switch_task_think()
-
         # update health 
         self.update_health()
 
-        # identify and categorize targets. should not be run for the player as it can result in new current_task
-        if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player==False:
-            self.last_target_eval_time=self.owner.world.world_seconds
-            self.target_eval_rate=random.uniform(0.8,6.5)
-            self.evaluate_targets()
+        if self.health>0:
+            # update the current task
+            if self.memory['current_task'] in self.memory:
+                if self.memory['current_task'] in self.task_map:
+                    # call the associated update function for the current task
+                    self.task_map[self.memory['current_task']]()
+                else:
+                    engine.log.add_data('error','current task '+self.memory['current_task']+' not in task map',True)
 
-        # might be faster to have a bool we could check
-        if self.large_pickup!=None:
-            self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
-            
-        # building awareness stuff. ai and human need this
-        if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
-            self.last_building_check_time=self.owner.world.world_seconds
-            self.building_check()
+            else:
+                self.switch_task_think()
 
+            # identify and categorize targets. should not be run for the player as it can result in new current_task
+            if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player==False:
+                self.last_target_eval_time=self.owner.world.world_seconds
+                self.target_eval_rate=random.uniform(0.8,6.5)
+                self.evaluate_targets()
+
+            # might be faster to have a bool we could check
+            if self.large_pickup!=None:
+                self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
+                
+            # building awareness stuff. ai and human need this
+            if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
+                self.last_building_check_time=self.owner.world.world_seconds
+                self.building_check()
 
     #---------------------------------------------------------------------------
     def update_health(self):
@@ -1347,14 +1340,15 @@ class AIHuman(AIBase):
             # -- handle death --
             # construct death message
             dm=''
-            dm+=(self.owner.name+' died.')
+            dm+=('\n  -------------------')
+            dm+=('\n '+self.owner.name+' died.')
             dm+=('\n  - faction: '+self.squad.faction)
             dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
             dm+=('\n  - probable kills: '+str(self.probable_kills))
-            dm+=('\n  -- collision log --')
+            dm+=('\n  - collision log --')
             for b in self.collision_log:
-                dm+=('\n --'+b)
-            dm+=('\n  -------------------')
+                dm+=('\n  -- '+b)
+            
             
             # drop primary weapon 
             if self.primary_weapon!=None:
@@ -1365,13 +1359,18 @@ class AIHuman(AIBase):
                 dm+=('\n  -- magazine count: '+str(magazines))
 
                 self.drop_object(self.primary_weapon)
+            
+            dm+=('\n  -------------------')
 
+            # drop large pickup
             if self.large_pickup!=None:
                 self.drop_object(self.large_pickup)
 
             if self.memory['current_task']=='task_vehicle_crew':
                 # re-use this function to exit the vehicle cleanly
                 self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                self.update_task_exit_vehicle()
+            elif self.memory['current_task']=='task_exit_vehicle':
                 self.update_task_exit_vehicle()
 
             # remove from squad 
@@ -1441,7 +1440,7 @@ class AIHuman(AIBase):
                                 self.switch_task_pickup_objects(near_magazines)
 
                     # also check if we should chuck a grenade at it
-                    if distance<300 and distance>100 and self.throwable!=None:
+                    if distance<300 and distance>150 and self.throwable!=None:
                         self.throw(enemy.world_coords)
                         self.speak('Throwing Grenade !!!!')
 
@@ -1450,22 +1449,25 @@ class AIHuman(AIBase):
                         if self.antitank!=None and distance<800:
                             self.launch_antitank(self.target_object.world_coords)
                 else:
-                    # distance is > gun range
-                    if distance>1800:
-                        self.memory.pop('task_engage_enemy',None)
-                        self.switch_task_think()
-                    else:
-                        if len(self.near_targets)+len(self.mid_targets)>0:
-                            # see if there is a better enemy to engage
-                            new_enemy=self.get_target()
-                            if new_enemy==None:
-                                # this should be rare. can only happen if the enemies
-                                # in the arrays are already dead
-                                self.memory.pop('task_engage_enemy',None)
-                                self.switch_task_think()
-                            else:
-                                self.switch_task_engage_enemy(new_enemy)
+                    # target is beyond our gun range
+                    # first check if there is a closer target to engage       
+                    if len(self.near_targets)+len(self.mid_targets)>0:
+                        # see if there is a better enemy to engage
+                        new_enemy=self.get_target()
+                        if new_enemy==None:
+                            # this should be rare. can only happen if the enemies
+                            # in the arrays are already dead
+                            self.memory.pop('task_engage_enemy',None)
+                            self.switch_task_think()
                         else:
+                            self.switch_task_engage_enemy(new_enemy)
+                    else:
+                        # no closer targets. is the target really far out of range?
+                        if distance>(self.primary_weapon.ai.range+self.primary_weapon.ai.range*0.5):
+                            self.memory.pop('task_engage_enemy',None)
+                            self.switch_task_think()
+                        else:
+                            # note this should be rewritten to move just a bit towards the enemy, not the whole way
                             self.switch_task_move_to_location(enemy.world_coords)
 
             else:
@@ -1581,9 +1583,10 @@ class AIHuman(AIBase):
             # turn on the brakes to prevent roll away
             vehicle.ai.brake_power=1
 
-            # tell everyone else to GTFO
-            for b in vehicle.ai.passengers:
-                b.ai.switch_task_exit_vehicle(vehicle)
+            if self.health>0:
+                # tell everyone else to GTFO
+                for b in vehicle.ai.passengers:
+                    b.ai.switch_task_exit_vehicle(vehicle)
 
         # remove yourself from radio
         if vehicle.ai.radio!=None:
@@ -1600,12 +1603,12 @@ class AIHuman(AIBase):
         self.memory.pop('task_exit_vehicle',None)
 
         # maybe grab your large pick up if you put it in the trunk
-    
-        self.speak('Jumping out')
+        if self.health>0:
+            self.speak('Jumping out')
 
-        # move slightly
-        coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-        self.switch_task_move_to_location(coords)
+            # move slightly
+            coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
+            self.switch_task_move_to_location(coords)
 
     #---------------------------------------------------------------------------
     def update_task_loot_container(self):
@@ -1839,8 +1842,6 @@ class AIHuman(AIBase):
         action=False
         
         # -- priorities --
-
-        # health - maybe this should be all done by update_health?
 
         if self.owner.is_player:
             self.switch_task_player_control()

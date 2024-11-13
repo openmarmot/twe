@@ -715,6 +715,7 @@ class World(object):
         print('------- Self Debug Report --------')
 
         # -- world object count 
+        print('------------------------------------')
         print('--- object count ---')
         wo_list={}
         for b in self.wo_objects:
@@ -725,10 +726,60 @@ class World(object):
 
         for key,value in wo_list.items():
             print(key,'count:',value)
-        print('------')
+        print('------------------------------------')
 
         print('------------------------------------')
-    
+        print('--- vehicle crew check ---')
+        for b in self.wo_objects_vehicle:
+            for p in b.ai.passengers:
+                error_found=False
+                # check for passengers that are not in the world
+                # all passengers should also be in the world
+                if self.check_object_exists(p)==False:
+                    print(p.name+' is a passenger but is not in the world')
+                    error_found=True
+
+                # check for passengers that are missing the correct memory
+                if 'task_vehicle_crew' not in p.ai.memory:
+                    print(p.name,'missing task_vehicle_crew_memory')
+                    error_found=True
+
+                if error_found:
+                    print('---')
+                    print('name',p.name)
+                    print('exists in world',self.check_object_exists(p))
+                    print('health',p.ai.health)
+                    print('memory dump:')
+                    print(p.ai.memory)
+                    print('---')
+
+                # maybe also check faction against other passengers
+
+        print('------------------------------------')
+
+        print('------------------------------------')
+        print('--- human check ---')
+        for b in self.wo_objects_human:
+            error_found=False
+            
+            # check for zombies
+            if b.ai.health<1:
+                print(b.name,'is dead !!')
+                error_found=True
+            
+            # check for invisible people
+            if b.render==False and 'task_vehicle_crew' not in b.ai.memory:
+                print(b.name,'is invisible and does not have task_vehicle_crew memory')
+                error_found=True
+            
+            if error_found:
+                print('---')
+                print('name',b.name)
+                print('exists in world',self.check_object_exists(b))
+                print('health',b.ai.health)
+                print('memory dump:')
+                print(b.ai.memory)
+                print('---')
 
     #---------------------------------------------------------------------------
     def spawn_player(self, FACTION):

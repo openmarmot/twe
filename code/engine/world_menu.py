@@ -19,6 +19,7 @@ import random
 import engine.world_builder 
 import engine.math_2d
 import engine.world_radio
+import engine.log
 
 #global variables
 
@@ -438,6 +439,7 @@ class World_Menu(object):
             self.text_queue.append('6 - crate_mp40')
             self.text_queue.append('7 - concrete runway')
             self.text_queue.append('8 - 37mm')
+            self.text_queue.append('9 - grid 50 foot')
 
             if key=='1':
                 heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
@@ -467,6 +469,9 @@ class World_Menu(object):
                     #temp.rotation_angle=rotation
             elif key=='8':
                 temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'37mm_m1939_61k_aa_gun_carriage',True)
+                temp.rotation_angle=0
+            elif key=='9':
+                temp=engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0],self.world.player.world_coords[1]],'grid_50_foot',True)
                 temp.rotation_angle=0
 
 
@@ -1134,7 +1139,12 @@ class World_Menu(object):
                 self.text_queue.append('---- passenger info -------------------')
                 self.text_queue.append('Name/Faction/Role')
                 for b in self.selected_object.ai.passengers:
-                    self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                    if 'task_vehicle_crew' in b.ai.memory:
+                        self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
+                    else:
+                        # this bug is popping up occasionally
+                        engine.log.add_data('error','world_menu vehicle_menu bot in vehicle missing task_vehicle_crew',True)
+                        self.world.run_self_debug()
                 self.text_queue.append('------------------------------------')
 
     #---------------------------------------------------------------------------

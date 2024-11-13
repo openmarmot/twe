@@ -26,13 +26,13 @@ class AIProjectile(AIBase):
         # used for distance calculation for penetration testing
         self.starting_coords=None
 
-        # max flight time
+        # max flight time. set by gun when fired
         self.maxTime=5.
         self.ignore_list=[]
 
         # variables for collision checks
         self.last_collision_check=0
-        self.collision_check_interval=0.1
+        self.collision_check_interval=0.01
 
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
@@ -43,6 +43,7 @@ class AIProjectile(AIBase):
         # the equipper of the gun that fired the projectile. this can be a human or a turret
         self.shooter=None
 
+        # speed in game units per second
         self.speed=0
 
     #---------------------------------------------------------------------------

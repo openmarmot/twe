@@ -134,8 +134,14 @@ class AIVehicle(AIBase):
         # the current speed
         self.current_speed=0.
 
-        # max speed - this is in game terms and does not have a real world unit at the moment
+        # max speed - this is in game units
         self.max_speed=0 
+
+        # max offroad speed 
+        self.max_offroad_speed=0
+
+        # whether we are offroad or not
+        self.offroad=True
 
         # minimum speed needed to take off
 
@@ -569,9 +575,12 @@ class AIVehicle(AIBase):
                    
         # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
         if self.throttle>0:
-
-            if self.current_speed<self.max_speed:
-                self.current_speed+=(self.acceleration*self.throttle)*time_passed
+            if self.offroad:
+                if self.current_speed<self.max_offroad_speed:
+                    self.current_speed+=(self.acceleration*self.throttle)*time_passed
+            else:
+                if self.current_speed<self.max_speed:
+                    self.current_speed+=(self.acceleration*self.throttle)*time_passed
         else:
             # just in case the throttle went negative
             self.throttle=0
