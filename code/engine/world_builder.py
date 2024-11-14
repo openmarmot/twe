@@ -1038,8 +1038,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
-        z.ai.speed=112
-        z.ai.max_speed=112
+        z.ai.speed=175
+        z.ai.max_speed=175
         z.ai.maxTime=3.0
         z.rotation_angle=float(random.randint(0,359))
 

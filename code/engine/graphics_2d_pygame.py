@@ -184,7 +184,7 @@ class Graphics_2D_Pygame(object):
                     elif event.key==93: # ]
                         self.zoom_in()
                     else:
-                        self.world.handle_keydown(translated_key,self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                        self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
                 elif self.mode==2:
                     self.strategic_map.handle_keydown(translated_key)
                 else:
@@ -222,13 +222,13 @@ class Graphics_2D_Pygame(object):
                 self.world.handle_key_press('d')
 
             if keys[pygame.K_f]:
-                self.world.handle_key_press('f',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                self.world.handle_key_press('f',self.get_mouse_screen_coords())
 
             if keys[pygame.K_g]:
-                self.world.handle_key_press('g',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                self.world.handle_key_press('g',self.get_mouse_screen_coords())
 
             if keys[pygame.K_t]:
-                self.world.handle_key_press('t',self.get_mouse_screen_coords(),self.get_player_screen_coords())
+                self.world.handle_key_press('t',self.get_mouse_screen_coords())
 
             if keys[pygame.K_b]:
                 self.world.handle_key_press('b')
