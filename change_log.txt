@@ -3,6 +3,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 15 2024
+- misc ai_human changes around engaging enemies 
+- ai will now do a pen check 
+- targetting a human in a vehicle will now switch to targeting the vehicle 
+
+I thought the ai could target vehicles but I guess it was just shooting at humans in 
+the vehicles the whole time. whoops. this would explain why panzerfausts are never fired 
+
+I need to research soviet anti-tank weapons, especially hand held options 
+
+----------------------------------
 Nov 14 2024
 - firing code rewrite to reduce computation and complexity 
 - switched the terrain up to a light colored terrain, not sure which i prefer
@@ -16,6 +27,8 @@ todo
 enemies causing a decision loop overruling any get ammo function?)
 - consider having bullets ignore vehicles if they aren't targeting them to resolve the 
 invulnerable vehicles infinitely blocking bullets issue
+- consider replacing current terrain system with a flat background color + random distributed 
+random rotated semi transparent textures 
 
 ----------------------------------
 Nov 13 2024
