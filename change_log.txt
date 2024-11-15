@@ -12,6 +12,10 @@ perfectly. haven't seen enough engagements to know for sure yet
 
 todo 
 - soldiers don't seem to be engaging at mid->far ranges 
+- soldiers with task_engage_enemy who have run out of ammo just sit there ( maybe close 
+enemies causing a decision loop overruling any get ammo function?)
+- consider having bullets ignore vehicles if they aren't targeting them to resolve the 
+invulnerable vehicles infinitely blocking bullets issue
 
 ----------------------------------
 Nov 13 2024
