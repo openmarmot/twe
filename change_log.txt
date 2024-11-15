@@ -1,6 +1,40 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+Nov 14 2024
+- firing code rewrite to reduce computation and complexity 
+- switched the terrain up to a light colored terrain, not sure which i prefer
+
+theoretically the ai should now be able to lead moving targets 
+perfectly. haven't seen enough engagements to know for sure yet 
+
+todo 
+- soldiers don't seem to be engaging at mid->far ranges 
+- soldiers with task_engage_enemy who have run out of ammo just sit there ( maybe close 
+enemies causing a decision loop overruling any get ammo function?)
+- consider having bullets ignore vehicles if they aren't targeting them to resolve the 
+invulnerable vehicles infinitely blocking bullets issue
+
+----------------------------------
+Nov 13 2024
+- added in error handling on world load for unrecognized objects 
+- added a target health check to the basic vehicle gunner action 
+    - this will prevent the gunner from excessive fire in between think turns 
+- updated spawn code for when a player takes over a bot in a vehicle 
+- minor fixes / cleanup 
+- large storage_menu rewrite - now handles infinite items and is 
+less confusing 
+- you can now add large pickup items to storage 
+
+this update finally gets the storage menu up to the point where it 
+is actually decent if you have more than a couple items. 
+
+being able to put large pickups in storage means you can drive around 
+with a vehicle and grab a bunch of fuel cans or ammo boxes, which is a 
+nice role play feature.
+
 ----------------------------------
 Nov 12 2024
 - added the Raupenschlepper Ost (armored tractor )

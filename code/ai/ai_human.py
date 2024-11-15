@@ -117,39 +117,20 @@ class AIHuman(AIBase):
         target=self.memory['task_vehicle_crew']['target']
         turret=self.memory['task_vehicle_crew']['turret']
 
-        # check actual turret rotation angle against angle to target
-        needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
-        
-        # probably need to do some rounding here
-        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            if needed_rotation>turret.rotation_angle:
-                turret.ai.handle_rotate_left()
+        if target.ai.health>0:
+            # check actual turret rotation angle against angle to target
+            needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
+            
+            # probably need to do some rounding here
+            if round(needed_rotation,1)!=round(turret.rotation_angle,1):
+                if needed_rotation>turret.rotation_angle:
+                    turret.ai.handle_rotate_left()
+                else:
+                    turret.ai.handle_rotate_right()
             else:
-                turret.ai.handle_rotate_right()
+                turret.ai.handle_fire()
         else:
-            turret.ai.handle_fire()
-
-    #---------------------------------------------------------------------------
-    def aim_and_fire_weapon(self,weapon,target):
-        ''' handles special aiming and firing code for various targets'''
-        aim_coords=target.world_coords
-        # guess how long it will take for the bullet to arrive
-        time_passed=random.uniform(0.8,1.5)
-        if target.is_vehicle:
-            if target.ai.current_speed>0:
-                aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
-
-        if target.is_human:
-            if target.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
-                if vehicle.ai.current_speed>0:
-                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
-            else:
-                if target.ai.memory['current_task']=='task_move_to_location':
-                    destination=target.ai.memory['task_move_to_location']['destination']
-                    aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
-
-        self.fire(aim_coords,weapon)
+            self.memory['task_vehicle_crew']['target']=None
 
     #---------------------------------------------------------------------------
     def building_check(self):
@@ -519,22 +500,50 @@ class AIHuman(AIBase):
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
     #---------------------------------------------------------------------------
-    def fire(self,target_coords,weapon,mouse_screen_coords=None,player_screen_coords=None):
+    def fire(self,weapon,target):
         ''' fires a weapon '''
-        if self.owner.is_player :
-            # do computations based off of where the mouse is. TARGET_COORDS is ignored
-            weapon.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
 
-        else :
-            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+        if weapon.ai.check_if_can_fire():
 
-        if weapon.ai.fire():
+            aim_coords=target.world_coords
+            # guess how long it will take for the bullet to arrive
+            #time_passed=random.uniform(0.8,1.5)
+            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+            time_passed=distance/1000
+            if target.is_vehicle:
+                if target.ai.current_speed>0:
+                    aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
+
+            if target.is_human:
+                if target.ai.memory['current_task']=='task_vehicle_crew':
+                    vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
+                    if vehicle.ai.current_speed>0:
+                        aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
+                else:
+                    if target.ai.memory['current_task']=='task_move_to_location':
+                        destination=target.ai.memory['task_move_to_location']['destination']
+                        aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
+
+
+            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,aim_coords)
+            weapon.ai.fire()
+
             self.current_burst+=1
 
-        if self.current_burst>self.max_burst:
-            # stop firing, give the ai a chance to rethink and re-engage
-            self.current_burst=0
-            self.memory['current_task']='None'
+            if self.current_burst>self.max_burst:
+                # stop firing, give the ai a chance to rethink and re-engage
+                self.current_burst=0
+
+                # note - this may be detrimental. needs a rething - 11/14/24
+                self.memory['current_task']='None'
+    
+    #---------------------------------------------------------------------------
+    def fire_player(self,weapon,mouse_coords):
+        # mouse_coords - mouse screen coords
+        if weapon.ai.check_if_can_fire():
+            # do computations based off of where the mouse is. 
+            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_coords)
+            weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
@@ -639,7 +648,7 @@ class AIHuman(AIBase):
 
 
     #---------------------------------------------------------------------------
-    def launch_antitank(self,target_coords,mouse_screen_coords=None,player_screen_coords=None):
+    def launch_antitank(self,target_coords,mouse_screen_coords=None):
         ''' launch antitank ''' 
 
         # standup. kneel would be better if it becomes an option later
@@ -649,7 +658,8 @@ class AIHuman(AIBase):
         if self.antitank!=None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                self.antitank.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
+                print('poop')
 
             else :
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
@@ -1143,27 +1153,26 @@ class AIHuman(AIBase):
 
         if self.memory['task_vehicle_crew']['target']==None:
             self.memory['task_vehicle_crew']['target']=self.get_target()
-            # no need to evaluate - we do that in the next step anyways
+        else:
+            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                self.memory['task_vehicle_crew']['target']=self.get_target()
 
         # we either already had a target, or we might have just got a new one
         if self.memory['task_vehicle_crew']['target']!=None:
-            # check health
-            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+ 
+            # check rotation
+            rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
+                # lots of things we could do here.
+                # we could have the driver rotate
+                # for now just get rid of the target
                 self.memory['task_vehicle_crew']['target']==None
-            else:    
-                # check rotation
-                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
-                    # lots of things we could do here.
-                    # we could have the driver rotate
-                    # for now just get rid of the target
+            else:
+                # check distance
+                distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                if distance>turret.ai.primary_weapon.ai.range:
+                    # alternatively we could drive closer.
                     self.memory['task_vehicle_crew']['target']==None
-                else:
-                    # check distance
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                    if distance>turret.ai.primary_weapon.ai.range:
-                        # alternatively we could drive closer.
-                        self.memory['task_vehicle_crew']['target']==None
 
 
         # if we get this far then we just fire at it
@@ -1231,7 +1240,7 @@ class AIHuman(AIBase):
         
 
     #---------------------------------------------------------------------------
-    def throw(self,TARGET_COORDS,mouse_screen_coords=None,player_screen_coords=None):
+    def throw(self,TARGET_COORDS,mouse_screen_coords=None):
         ''' throw like you know the thing. cmon man '''   
         # stand up
         if self.prone:
@@ -1244,8 +1253,8 @@ class AIHuman(AIBase):
             # set rotation and heading
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                self.throwable.rotation_angle=engine.math_2d.get_rotation(player_screen_coords,mouse_screen_coords)
-                self.throwable.heading=engine.math_2d.get_heading_vector(player_screen_coords,mouse_screen_coords)
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.screen_coords,mouse_screen_coords)
             else :
                 self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
                 self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
@@ -1472,7 +1481,7 @@ class AIHuman(AIBase):
 
             else:
                 # -- fire --
-                self.aim_and_fire_weapon(self.primary_weapon,enemy)
+                self.fire(self.primary_weapon,enemy)
                 self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
 
     #---------------------------------------------------------------------------
@@ -1954,7 +1963,7 @@ class AIHuman(AIBase):
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.1)
                         self.think_vehicle_role_driver()
                     elif role=='gunner':
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
                         self.think_vehicle_role_gunner()
                     elif role=='passenger':
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.5)

@@ -420,7 +420,7 @@ class World(object):
         return near_objects
 
     #---------------------------------------------------------------------------
-    def handle_keydown(self,key,mouse_screen_coords=None,player_screen_coords=None):
+    def handle_keydown(self,key,mouse_screen_coords=None):
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
 
@@ -436,11 +436,11 @@ class World(object):
         else:
             # controls for when you are walking about
             if key=='g':
-                self.player.ai.throw([],mouse_screen_coords,player_screen_coords)
+                self.player.ai.throw([],mouse_screen_coords)
             elif key=='p':
                 self.player.ai.prone_state_change()
             elif key=='t':
-                self.player.ai.launch_antitank([],mouse_screen_coords,player_screen_coords)
+                self.player.ai.launch_antitank([],mouse_screen_coords)
 
         # controls for vehicles and walking 
         if key=='r':
@@ -454,7 +454,7 @@ class World(object):
             self.activate_context_menu()
 
     #---------------------------------------------------------------------------
-    def handle_key_press(self,key,mouse_screen_coords=None,player_screen_coords=None):
+    def handle_key_press(self,key,mouse_screen_coords=None):
         '''handle key press'''
         # stop player from moving when dead
         if self.player.ai.health>0:
@@ -541,7 +541,7 @@ class World(object):
                 elif key=='f':
                     # fire the gun
                     if self.player.ai.primary_weapon!=None:
-                        self.player.ai.fire([],self.player.ai.primary_weapon,mouse_screen_coords,player_screen_coords)
+                        self.player.ai.fire_player(self.player.ai.primary_weapon,mouse_screen_coords)
                     action=True
 
                 if action:
@@ -761,7 +761,7 @@ class World(object):
         print('--- human check ---')
         for b in self.wo_objects_human:
             error_found=False
-            
+
             # check for zombies
             if b.ai.health<1:
                 print(b.name,'is dead !!')
@@ -817,7 +817,11 @@ class World(object):
 
         if spawned:
             self.player.is_player=True
-            self.player.ai.memory['current_task']='task_player_control'
+            if 'vehicle' in self.player.ai.memory['current_task']:
+                # not sure if we have to do anything if in a vehicle 
+                pass
+            else:
+                self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
         else:
             print('ERROR : player spawn failed')
