@@ -2215,7 +2215,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='concrete_square'
         z.rotation_angle=0
     elif OBJECT_TYPE=='ground_cover':
-        z=WorldObject(world,['ground_dirt_vlarge'],AINone)
+        #z=WorldObject(world,['ground_dirt_vlarge'],AINone)
+        z=WorldObject(world,['terrain_light_sand'],AINone)
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0

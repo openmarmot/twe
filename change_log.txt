@@ -5,6 +5,7 @@ TWE Project : Change Log
 ----------------------------------
 Nov 14 2024
 - firing code rewrite to reduce computation and complexity 
+- switched the terrain up to a light colored terrain, not sure which i prefer
 
 theoretically the ai should now be able to lead moving targets 
 perfectly. haven't seen enough engagements to know for sure yet 
