@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 
+----------------------------------
+Nov 16 2024
+- added t34-76 model 1943 
+
+there is a growing backlog of vehicle stuff to do 
+- engines 
+- exhaust placement 
+- performance tuning 
+- specific gun / shell stuff 
 
 ----------------------------------
 Nov 15 2024
