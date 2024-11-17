@@ -17,6 +17,7 @@ from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 import engine.log
+import engine.penetration_calculator
 
 #global variables
 
@@ -282,12 +283,22 @@ class AIHuman(AIBase):
         for b in target_list:
             d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
+            target=b
+            if b.is_human:
+                if 'task_vehicle_crew' in b.ai.memory:
+                    target=b.ai.memory['task_vehicle_crew']['vehicle']
+
+                    # could do something further here to check armor pen
+
             if d<800:
-                self.near_targets.append(b)
+                if target not in self.near_targets:
+                    self.near_targets.append(target)
             elif d<1500:
-                self.mid_targets.append(b)
+                if target not in self.mid_targets:
+                    self.mid_targets.append(target)
             elif d<2450:
-                self.far_targets.append(b)
+                if target not in self.far_targets:
+                    self.far_targets.append(target)
 
             if d<closest_distance:
                 closest_distance=d
@@ -659,11 +670,11 @@ class AIHuman(AIBase):
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
-                print('poop')
 
             else :
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
             self.antitank.ai.fire()
+            self.owner.world.panzerfaust_launches+=1
 
             # drop the tube now that it is empty
             self.drop_object(self.antitank)
@@ -1443,10 +1454,10 @@ class AIHuman(AIBase):
                         if ammo_inventory>0:
                             self.reload_weapon(self.primary_weapon)
                         else:
-                            # need ammo or new gun
-                            near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
-                            if len(near_magazines)>0:
-                                self.switch_task_pickup_objects(near_magazines)
+                            # need ammo or new gun. hand it over to think to deal with this
+                            self.memory.pop('task_engage_enemy',None)
+                            self.switch_task_think()
+                            
 
                     # also check if we should chuck a grenade at it
                     if distance<300 and distance>150 and self.throwable!=None:
@@ -1455,29 +1466,37 @@ class AIHuman(AIBase):
 
                     # also check if we should launch antitank
                     if enemy.is_vehicle:
-                        if self.antitank!=None and distance<800:
+                        if self.antitank!=None and distance<1800:
                             self.launch_antitank(self.target_object.world_coords)
-                else:
-                    # target is beyond our gun range
-                    # first check if there is a closer target to engage       
-                    if len(self.near_targets)+len(self.mid_targets)>0:
-                        # see if there is a better enemy to engage
-                        new_enemy=self.get_target()
-                        if new_enemy==None:
-                            # this should be rare. can only happen if the enemies
-                            # in the arrays are already dead
-                            self.memory.pop('task_engage_enemy',None)
-                            self.switch_task_think()
                         else:
-                            self.switch_task_engage_enemy(new_enemy)
-                    else:
-                        # no closer targets. is the target really far out of range?
+                            # if we get this far the gun has a magazine and ammo
+
+                            # can we penetrate it in a best case scenario?
+                            penetration=False
+                            if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
+                                penetration=True
+                            if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
+                                penetration=True
+
+                            if penetration==False:
+                                self.memory.pop('task_engage_enemy',None)
+                                self.switch_task_think()
+                                
+                else:
+
+                    new_enemy=self.get_target()
+                    if new_enemy==None:
+
+                            # no closer targets. is the target really far out of range?
                         if distance>(self.primary_weapon.ai.range+self.primary_weapon.ai.range*0.5):
                             self.memory.pop('task_engage_enemy',None)
                             self.switch_task_think()
                         else:
                             # note this should be rewritten to move just a bit towards the enemy, not the whole way
                             self.switch_task_move_to_location(enemy.world_coords)
+                    else:
+                        self.switch_task_engage_enemy(new_enemy)
+                    
 
             else:
                 # -- fire --
@@ -1857,6 +1876,8 @@ class AIHuman(AIBase):
             action=True
 
         if action==False:
+
+
             # primary weapon
             if self.primary_weapon==None:
                 # need to get a gun
@@ -1883,6 +1904,14 @@ class AIHuman(AIBase):
                     if len(near_magazines)>0:
                         self.switch_task_pickup_objects(near_magazines)
                         action=True
+                    else:
+                        # check containers
+                        containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,500)
+                        if len(containers)>0:
+                            self.switch_task_loot_container(random.choice(containers))
+                        else:
+                            # set primary weapon to none - possibly causing the bot to pickup a new weapon
+                            self.primary_weapon=None
         
         # -- check if we have older tasks to resume --
         # this is important for compound tasks 

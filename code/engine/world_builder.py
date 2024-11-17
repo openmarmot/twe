@@ -84,7 +84,7 @@ list_guns_pistols=['1911','ppk','tt33']
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
 list_vehicles_german=['kubelwagen','sd_kfz_251','rso']
-list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage']
+list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage','t34_76_model_1943']
 list_vehicles_american=[]
 list_vehicles_civilian=[]
 
@@ -467,28 +467,37 @@ def load_quick_battle(world,spawn_faction,battle_option):
     map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
+
+    # infantry only
     if battle_option=='1':
         squads=[]
-        squads+=['German 1944 Rifle'] * 2
-        squads+=['German 1944 Panzergrenadier Mech'] * 2
+        squads+=['German 1944 Rifle'] * 4
+        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
         squads+=['German 1944 Fallschirmjager'] * 1
         squads+=['Soviet 1943 Rifle'] * 2
-        squads+=['Soviet 1944 SMG'] * 1
-        squads+=['Soviet 1944 Rifle Motorized'] * 2
-        squads+=['Soviet T20 Armored Tractor'] * 1
+        squads+=['Soviet 1944 SMG'] * 2
+        squads+=['Soviet 1944 Rifle'] * 3
+
+    # german mech vs soviet moto
     elif battle_option=='2':
         squads=[]
-        squads+=['German 1944 Panzergrenadier Mech'] * 5
-        squads+=['Soviet 1944 Rifle Motorized'] * 5
+        squads+=['German 1944 Panzergrenadier Mech'] * 7
+        squads+=['Soviet 1944 Rifle Motorized'] * 7
+    
+    # large mixed unit battle
     elif battle_option=='3':
         squads=[]
-        squads+=['German 1944 Rifle'] * 3
-        squads+=['German 1944 Panzergrenadier Mech'] * 3
+        squads+=['German 1944 Rifle'] * 4
+        squads+=['German 1944 Panzergrenadier Mech'] * 4
         squads+=['German 1944 Fallschirmjager'] * 3
+        squads+=['German 1944 Volksgrenadier Storm Group'] * 1
         squads+=['Soviet 1943 Rifle'] * 3
+        squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 2
+
+    # testing
     elif battle_option=='4':
         squads=[]
         squads+=['German 1944 Rifle'] * 6
@@ -499,6 +508,7 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['Soviet 1944 Rifle Motorized'] * 6
         squads+=['Soviet T20 Armored Tractor'] * 3
         squads+=['Soviet 37mm Auto-Cannon']
+        squads+=['Soviet T34-76 Model 1943']
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -1252,6 +1262,29 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    # https://en.wikipedia.org/wiki/76_mm_tank_gun_M1940_F-34
+    elif OBJECT_TYPE=='76mm_m1940_f34':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='76mm_m1940_f34'
+        z.is_gun=True
+        z.ai.magazine=spawn_object(world,world_coords,'76mm_m1940_f34_magazine',False)
+        z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=13
+        z.ai.range=2418
+        z.ai.type='cannon'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='76mm_m1940_f34_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='76mm_m1940_f34_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['76mm_m1940_f34']
+        z.ai.compatible_projectiles=['76x385_AP']
+        z.ai.capacity=1
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif OBJECT_TYPE=='mg15':
         z=WorldObject(world,['mg15'],AIGun)
         z.name='mg15'
@@ -1644,6 +1677,86 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.position_offset=[-25,9]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='t34_76_model_1943':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
+        z.name='T34-76 Model 1943'
+        z.is_vehicle=True
+        z.ai.vehicle_armor['top']=20
+        z.ai.vehicle_armor['bottom']=14
+        z.ai.vehicle_armor['left']=76
+        z.ai.vehicle_armor['right']=76
+        z.ai.vehicle_armor['front']=76
+        z.ai.vehicle_armor['rear']=51
+        z.ai.passenger_compartment_armor['top']=20
+        z.ai.passenger_compartment_armor['bottom']=14
+        z.ai.passenger_compartment_armor['left']=76
+        z.ai.passenger_compartment_armor['right']=76
+        z.ai.passenger_compartment_armor['front']=76
+        z.ai.passenger_compartment_armor['rear']=51
+        z.ai.max_occupants=3
+        z.ai.max_speed=367.04
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
+        main_turret=spawn_object(world,world_coords,'t34_76_model_1943_turret',True)
+        z.ai.turrets.append(main_turret)
+        main_turret.ai.vehicle=z
+        for b in range(6):
+            z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
+        for b in range(100):
+            z.add_inventory(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
+        
+    elif OBJECT_TYPE=='t34_hull_mg_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        z=WorldObject(world,['t34_hull_mg_turret','t34_hull_mg_turret'],AITurret)
+        z.name='T34 hull mg turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=20
+        z.ai.turret_armor['bottom']=14
+        z.ai.turret_armor['left']=50
+        z.ai.turret_armor['right']=50
+        z.ai.turret_armor['front']=50
+        z.ai.turret_armor['rear']=50
+        z.ai.position_offset=[-65,13]
+        z.ai.rotation_range=[-20,20]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='t34_76_model_1943_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        z=WorldObject(world,['t34_76_model_1943_turret','t34_76_model_1943_turret'],AITurret)
+        z.name='T43-76 Model 1943 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=20
+        z.ai.turret_armor['bottom']=14
+        z.ai.turret_armor['left']=158
+        z.ai.turret_armor['right']=158
+        z.ai.turret_armor['front']=204
+        z.ai.turret_armor['rear']=204
+        z.ai.position_offset=[-15,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='37mm_m1939_61k_aa_gun_carriage':

@@ -1,6 +1,41 @@
 TWE Project : Change Log
 
 
+----------------------------------
+Nov 17 2024
+- added a counter for panzerfaust launches
+- minor cleanup
+- fixed some extra spaces in squad data 
+- re-organized the quick battles 
+
+play test notes 
+- larger guns need to feel more significant 
+    - smoke ?
+    - need better effects when a vehicle is penetrated 
+    - larger caliber shells should do some actual damage 
+- need explosion as an effect 
+- need persistent smoke/fire 
+
+----------------------------------
+Nov 16 2024
+- added t34-76 model 1943 
+
+there is a growing backlog of vehicle stuff to do 
+- engines 
+- exhaust placement 
+- performance tuning 
+- specific gun / shell stuff 
+
+----------------------------------
+Nov 15 2024
+- misc ai_human changes around engaging enemies 
+- ai will now do a pen check 
+- targetting a human in a vehicle will now switch to targeting the vehicle 
+
+I thought the ai could target vehicles but I guess it was just shooting at humans in 
+the vehicles the whole time. whoops. this would explain why panzerfausts are never fired 
+
+I need to research soviet anti-tank weapons, especially hand held options 
 
 ----------------------------------
 Nov 14 2024
@@ -16,6 +51,8 @@ todo
 enemies causing a decision loop overruling any get ammo function?)
 - consider having bullets ignore vehicles if they aren't targeting them to resolve the 
 invulnerable vehicles infinitely blocking bullets issue
+- consider replacing current terrain system with a flat background color + random distributed 
+random rotated semi transparent textures 
 
 ----------------------------------
 Nov 13 2024
