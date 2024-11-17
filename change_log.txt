@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 17 2024
+- added a counter for panzerfaust launches
+- minor cleanup
+- fixed some extra spaces in squad data 
+- re-organized the quick battles 
+
+play test notes 
+- larger guns need to feel more significant 
+    - smoke ?
+    - need better effects when a vehicle is penetrated 
+    - larger caliber shells should do some actual damage 
+- need explosion as an effect 
+- need persistent smoke/fire 
+
+----------------------------------
 Nov 16 2024
 - added t34-76 model 1943 
 

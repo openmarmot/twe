@@ -48,8 +48,6 @@ class AIProjectile(AIBase):
 
     #---------------------------------------------------------------------------
     def contact_effect(self):
-        # kablooey!
-        print('kablooey!')
         # add the shrapnel
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
         shrapnel_count=engine.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']

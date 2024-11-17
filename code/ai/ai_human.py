@@ -670,11 +670,11 @@ class AIHuman(AIBase):
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
-                print('poop')
 
             else :
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
             self.antitank.ai.fire()
+            self.owner.world.panzerfaust_launches+=1
 
             # drop the tube now that it is empty
             self.drop_object(self.antitank)

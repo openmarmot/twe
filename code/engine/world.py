@@ -157,6 +157,10 @@ class World(object):
         # number of objects over which the world starts to cleanup un-needed objects
         self.cleanup_threshold=4000
 
+
+        # some stats 
+        self.panzerfaust_launches=0
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -914,6 +918,7 @@ class World(object):
         self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
         self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')
         self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
+        self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player memory current task: '+self.player.ai.memory['current_task'])

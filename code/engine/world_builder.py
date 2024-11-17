@@ -84,7 +84,7 @@ list_guns_pistols=['1911','ppk','tt33']
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
 list_vehicles_german=['kubelwagen','sd_kfz_251','rso']
-list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage']
+list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage','t34_76_model_1943']
 list_vehicles_american=[]
 list_vehicles_civilian=[]
 
@@ -467,28 +467,37 @@ def load_quick_battle(world,spawn_faction,battle_option):
     map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
+
+    # infantry only
     if battle_option=='1':
         squads=[]
-        squads+=['German 1944 Rifle'] * 2
-        squads+=['German 1944 Panzergrenadier Mech'] * 2
+        squads+=['German 1944 Rifle'] * 4
+        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
         squads+=['German 1944 Fallschirmjager'] * 1
         squads+=['Soviet 1943 Rifle'] * 2
-        squads+=['Soviet 1944 SMG'] * 1
-        squads+=['Soviet 1944 Rifle Motorized'] * 2
-        squads+=['Soviet T20 Armored Tractor'] * 1
+        squads+=['Soviet 1944 SMG'] * 2
+        squads+=['Soviet 1944 Rifle'] * 3
+
+    # german mech vs soviet moto
     elif battle_option=='2':
         squads=[]
-        squads+=['German 1944 Panzergrenadier Mech'] * 5
-        squads+=['Soviet 1944 Rifle Motorized'] * 5
+        squads+=['German 1944 Panzergrenadier Mech'] * 7
+        squads+=['Soviet 1944 Rifle Motorized'] * 7
+    
+    # large mixed unit battle
     elif battle_option=='3':
         squads=[]
-        squads+=['German 1944 Rifle'] * 3
-        squads+=['German 1944 Panzergrenadier Mech'] * 3
+        squads+=['German 1944 Rifle'] * 4
+        squads+=['German 1944 Panzergrenadier Mech'] * 4
         squads+=['German 1944 Fallschirmjager'] * 3
+        squads+=['German 1944 Volksgrenadier Storm Group'] * 1
         squads+=['Soviet 1943 Rifle'] * 3
+        squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 2
+
+    # testing
     elif battle_option=='4':
         squads=[]
         squads+=['German 1944 Rifle'] * 6
@@ -499,6 +508,7 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['Soviet 1944 Rifle Motorized'] * 6
         squads+=['Soviet T20 Armored Tractor'] * 3
         squads+=['Soviet 37mm Auto-Cannon']
+        squads+=['Soviet T34-76 Model 1943']
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
