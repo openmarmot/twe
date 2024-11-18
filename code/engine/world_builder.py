@@ -664,6 +664,49 @@ def spawn_drop_canister(world,world_coords,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
 
 #------------------------------------------------------------------------------
+def spawn_explosion_and_fire(world,world_coords):
+    heading=[0,0]
+    for x in range(1):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_fire',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(80,90)
+        z.ai.rotate_time_max=5
+        z.ai.move_time_max=5
+        z.ai.alive_time_max=random.uniform(3,4)
+
+    for x in range(5):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_flash',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=random.uniform(0.1,0.4)
+
+    for x in range(1):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_explosion',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=random.uniform(0.09,0.1)
+
+    for x in range(10):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_smoke',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(30,40)
+        z.ai.rotate_time_max=60
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=random.uniform(34,56)
+
+#------------------------------------------------------------------------------
 def spawn_flash(world,world_coords,heading,amount=2):
     ''' spawn smoke cloud '''
 
@@ -671,7 +714,7 @@ def spawn_flash(world,world_coords,heading,amount=2):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_flash',True)
         z.heading=heading
-        z.ai.speed=random.uniform(9,11)
+        z.ai.speed=random.uniform(1,2)
         z.ai.rotation_speed=random.randint(400,500)
         z.ai.rotate_time_max=1.8
         z.ai.move_time_max=3
@@ -2184,6 +2227,36 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.alive_time_max=3
         z.ai.self_remove=True
         z.can_be_deleted=True
+    elif OBJECT_TYPE=='small_fire':
+        z=WorldObject(world,['small_fire'],AIAnimatedSprite)
+        w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.name='small_fire'
+        z.minimum_visible_scale=0.3
+        z.is_particle_effect=True
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=15
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=3
+        z.ai.self_remove=True
+        z.can_be_deleted=True
+    elif OBJECT_TYPE=='small_explosion':
+        z=WorldObject(world,['small_explosion'],AIAnimatedSprite)
+        w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
+        z.world_coords=copy.copy(w)
+        z.name='small_explosion'
+        z.minimum_visible_scale=0.3
+        z.is_particle_effect=True
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=15
+        z.ai.rotation_speed=random.randint(400,500)
+        z.ai.rotate_time_max=1.8
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=3
+        z.ai.self_remove=True
+        z.can_be_deleted=True
     elif OBJECT_TYPE=='small_flash':
         z=WorldObject(world,['explosion_flash'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -2510,11 +2583,11 @@ def spawn_smoke_cloud(world,world_coords,heading,amount=30):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_smoke',True)
         z.heading=heading
-        z.ai.speed=random.uniform(9,11)
+        z.ai.speed=random.uniform(5,7)
         z.ai.rotation_speed=random.randint(400,500)
         z.ai.rotate_time_max=1.8
         z.ai.move_time_max=3
-        z.ai.alive_time_max=random.uniform(1.5,3)
+        z.ai.alive_time_max=random.uniform(2.5,3)
 
 #------------------------------------------------------------------------------
 def spawn_sparks(world,world_coords,amount=30):

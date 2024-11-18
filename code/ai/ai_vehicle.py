@@ -199,7 +199,7 @@ class AIVehicle(AIBase):
                     self.driver.ai.handle_event('collision',projectile)
             
             # should do component damage here
-            self.health-=random.randint(1,25)
+            self.health-=random.randint(20,75)
 
         else:
             # no penetration, but maybe we can have some other effect?
@@ -235,7 +235,7 @@ class AIVehicle(AIBase):
                 engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
 
             engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
-            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,2))
+            engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
@@ -281,6 +281,9 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_death(self):
         engine.world_builder.spawn_container('wreck',self.owner,1)
+
+        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords)
+
         
         dm=''
         dm+=(self.owner.name+' died.')

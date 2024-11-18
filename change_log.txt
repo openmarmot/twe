@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 18 2024
+- fixed typo in ai radio operator code 
+- added explosion and fire sprites 
+- vehicle death now has explosion/fire/flash/smoke combo 
+- bumped vehicle damage post penetration up significantly 
+- upped heat jet penetration. every vehicle will be vulnerable to it.
+
+I had planned on implementing a new vehicle damage model today, but I concluded that the 
+vehicle internal components are not finished enough yet. so for now its still a lot of random 
+damage. damage should also be based on projectile energy - but this may need some projectile data changes 
+
+----------------------------------
 Nov 17 2024
 - added a counter for panzerfaust launches
 - minor cleanup

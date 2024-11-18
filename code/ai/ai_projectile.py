@@ -55,7 +55,7 @@ class AIProjectile(AIBase):
         if contact_effect=='HEAT':
             engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
             engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,self.shooter,self.owner.name)
-            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,10))
+            engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
         else:
             print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 
