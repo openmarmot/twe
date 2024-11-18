@@ -1241,7 +1241,7 @@ class AIHuman(AIBase):
                     # avoid duplicates from other radio operators
                     if message not in self.squad.radio_receive_queue:
                         # ideally do some processing here 
-                        self.squad.radio_recieve_queue.append(message)
+                        self.squad.radio_receive_queue.append(message)
 
                 # -- send radio messages --
                 if len(self.squad.radio_send_queue)>0:
