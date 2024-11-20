@@ -419,7 +419,7 @@ class StrategicMap(object):
         # clear maps?
 
         # switch to world mode
-        self.graphics_engine.mode=1
+        self.graphics_engine.switch_mode(1)
 
     #------------------------------------------------------------------------------
     def save_all_maps(self):

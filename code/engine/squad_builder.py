@@ -38,16 +38,18 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
         if b.ai.primary_weapon==None:
             # should probably double check
             unarmed_human.append(b)
-        elif b.ai.primary_weapon.name in engine.world_builder.list_guns_rifles:
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_rifles:
             rifles.append(b)
-        elif b.ai.primary_weapon.name in engine.world_builder.list_guns_assault_rifles:
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_assault_rifles:
             assault_rifles.append(b)
-        elif b.ai.primary_weapon.name in engine.world_builder.list_guns_smg:
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_smg:
             subguns.append(b)
-        elif b.ai.primary_weapon.name in engine.world_builder.list_guns_machine_guns:
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_machine_guns:
             machineguns.append(b)
-        elif b.ai.primary_weapon.name in engine.world_builder.list_guns_pistols:
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_pistols:
             pistols.append(b)
+        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_at_rifles:
+            antitank.append(b)
         else:
             print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
 
