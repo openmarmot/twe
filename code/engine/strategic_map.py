@@ -44,8 +44,8 @@ class StrategicMap(object):
         self.strategic_ai.append(AIFactionStrategic(self,'civilian'))
 
         # map offset 
-        self.map_offset_x=400
-        self.map_offset_y=150
+        self.map_offset_x=350
+        self.map_offset_y=75
 
         # save file name
         self.save_file_name=None
@@ -130,7 +130,7 @@ class StrategicMap(object):
         for index, name in enumerate(map_names):
             y = index % grid_size
             x = index // grid_size
-            spacing=70
+            spacing=85
             grid_square = MapSquare(name,[x*spacing+self.map_offset_x, y*spacing+self.map_offset_y])
             grid[y][x] = grid_square
         

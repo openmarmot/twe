@@ -2,6 +2,22 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 19 2024
+- fixed strategic map square spacing 
+- load_magazine now supports specifying a ammo type 
+- added a larger projectile sprite for 15mm and up 
+- ignore list for projectiles now factors in turrets/vehicles/passengers
+- soviet 37mm now has 5 magazines of AP shells 
+
+i think the strategic map got broken by the new default zoom.
+
+the new projectile sprite is not super visibly different from the old one. 
+I guess it moves too fast 
+
+I managed to shoot myself while firing a mg turret in a moving vehicle. 
+I think this is fixed now 
+
+----------------------------------
 Nov 18 2024
 - fixed typo in ai radio operator code 
 - added explosion and fire sprites 

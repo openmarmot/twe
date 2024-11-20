@@ -35,6 +35,7 @@ from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
 import engine.world_radio
+import engine.penetration_calculator
 
 
 # load AI 
@@ -436,15 +437,29 @@ def get_squad_map_objects(squad_name):
     return map_objects
 
 #------------------------------------------------------------------------------
-def load_magazine(world,magazine):
+def load_magazine(world,magazine,projectile_type=None):
     '''loads a magazine with bullets'''
-    count=len(magazine.ai.projectiles)
-    while count<magazine.ai.capacity:
-        z=spawn_object(world,[0,0],'projectile',False)
-        z.ai.projectile_type=magazine.ai.compatible_projectiles[0]
-        magazine.ai.projectiles.append(z)
+    # wipe whatever is in there
+    magazine.ai.projectiles=[]
+    
+    # gives the option to specify the projectile to load
+    if projectile_type==None:
+        projectile_type=magazine.ai.compatible_projectiles[0]
 
-        count+=1
+    if projectile_type in magazine.ai.compatible_projectiles:
+        count=len(magazine.ai.projectiles)
+        while count<magazine.ai.capacity:
+            z=spawn_object(world,[0,0],'projectile',False)
+            z.ai.projectile_type=projectile_type
+
+            # change to a bigger projectile image. might make a couple more
+            if engine.penetration_calculator.projectile_data[projectile_type]['diameter'] >14:
+                z.image_list=['projectile_mid']
+            magazine.ai.projectiles.append(z)
+
+            count+=1
+    else:
+        engine.log.add_data('Error','world_builder.load_magazine incompatible projectile type: '+projectile_type,True)
 
 #------------------------------------------------------------------------------
 def load_quick_battle(world,spawn_faction,battle_option):
@@ -1821,8 +1836,13 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
-        for b in range(15):
+        for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False))
+        for b in range(5):
+            temp=spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False)
+            load_magazine(world,temp,'37x252_AP-T')
+            z.add_inventory(temp)
+            
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
 

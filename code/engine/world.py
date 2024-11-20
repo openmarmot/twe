@@ -327,6 +327,18 @@ class World(object):
         # this is for objects that use ai_human
         ignore_list=[OBJ]
 
+        # special ignore list for vehicles
+        if OBJ.is_turret:
+            if OBJ.ai.gunner!=None:
+                if OBJ.ai.vehicle!=None:
+                    ignore_list.append(OBJ.ai.vehicle)
+                    ignore_list+=OBJ.ai.vehicle.ai.passengers
+
+                # reset the OBJ to be human so the rest of the 
+                # ignore list is built
+                OBJ=OBJ.ai.gunner
+
+
         if OBJ.is_human:
             if self.friendly_fire==False:
                 if OBJ.is_german:
