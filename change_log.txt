@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 21 2024
+
+
+todo 
+- schurtzen
+- remote turrets 
+- armor slope 
+
+----------------------------------
 Nov 20 2024
 - added code to support different background colors for different game modes 
 - disabled terrain system for now

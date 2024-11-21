@@ -1849,6 +1849,86 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
 
+    elif OBJECT_TYPE=='jadgpanzer_38t_hetzer_chassis':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['jadgpanzer_38t_hetzer_chassis','jadgpanzer_38t_hetzer_chassis_destroyed'],AIVehicle)
+        z.name='Jadgpanzer 38t Hetzer'
+        z.is_vehicle=True
+        z.ai.vehicle_armor['top']=20
+        z.ai.vehicle_armor['bottom']=14
+        z.ai.vehicle_armor['left']=76
+        z.ai.vehicle_armor['right']=76
+        z.ai.vehicle_armor['front']=76
+        z.ai.vehicle_armor['rear']=51
+        z.ai.passenger_compartment_armor['top']=20
+        z.ai.passenger_compartment_armor['bottom']=14
+        z.ai.passenger_compartment_armor['left']=76
+        z.ai.passenger_compartment_armor['right']=76
+        z.ai.passenger_compartment_armor['front']=76
+        z.ai.passenger_compartment_armor['rear']=51
+        z.ai.max_occupants=3
+        z.ai.max_speed=367.04
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=26500
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"kharkiv_v2-34_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        mg_turret=spawn_object(world,world_coords,'remote_mg34_turret',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
+        main_turret=spawn_object(world,world_coords,'jagdpanzer_38t_main_gun',True)
+        z.ai.turrets.append(main_turret)
+        main_turret.ai.vehicle=z
+        for b in range(6):
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+        for b in range(100):
+            z.add_inventory(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
+        
+    elif OBJECT_TYPE=='remote_mg34_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        z=WorldObject(world,['remote_mg34_turret','remote_mg34_turret'],AITurret)
+        z.name='Remote MG34 Turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=0
+        z.ai.turret_armor['bottom']=0
+        z.ai.turret_armor['left']=15
+        z.ai.turret_armor['right']=15
+        z.ai.turret_armor['front']=15
+        z.ai.turret_armor['rear']=0
+        z.ai.position_offset=[-65,13]
+        z.ai.rotation_range=[-20,20]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
+        z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='jagdpanzer_38t_main_gun':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        z=WorldObject(world,['jagdpanzer_38t_main_gun','jagdpanzer_38t_main_gun'],AITurret)
+        z.name='T43-76 Model 1943 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=20
+        z.ai.turret_armor['bottom']=14
+        z.ai.turret_armor['left']=158
+        z.ai.turret_armor['right']=158
+        z.ai.turret_armor['front']=204
+        z.ai.turret_armor['rear']=204
+        z.ai.position_offset=[-15,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
+        z.ai.primary_weapon.ai.equipper=z
+
     elif OBJECT_TYPE=='37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['zu_7_carriage','zu_7_carriage'],AIVehicle)
