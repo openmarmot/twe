@@ -200,7 +200,7 @@ class GameMenu(object):
 
                 engine.world_builder.load_quick_battle(self.graphics_engine.world,self.faction,key)
 
-                self.graphics_engine.mode=1
+                self.graphics_engine.switch_mode(1)
                 self.deactivate_menu()
                 
  

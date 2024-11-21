@@ -35,6 +35,7 @@ from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
 import engine.world_radio
+import engine.penetration_calculator
 
 
 # load AI 
@@ -80,6 +81,7 @@ list_guns_smg=['mp40','ppsh43']
 list_guns_assault_rifles=['stg44']
 list_guns_machine_guns=['mg34','dp28','mg15','fg42-type1','fg42-type2']
 list_guns_pistols=['1911','ppk','tt33']
+list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
@@ -327,6 +329,17 @@ def generate_dynamic_world_areas(world):
     # now generate a couple based on the world objects
 
 #------------------------------------------------------------------------------
+def generate_terrain():
+    # add ground cover. this will eventually go somewhere else
+    # 50 results in about 24,000 world coords in any direction
+    count=50
+    size=1015
+    coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
+    for _ in range(count*count):
+        temp=spawn_object(world,coords.pop(),'ground_cover',True)
+        temp.rotation_angle=random.choice([0,90,180,270])
+
+#------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # area_type town, airport, bunkers, field_depot, train_depot 
@@ -436,15 +449,29 @@ def get_squad_map_objects(squad_name):
     return map_objects
 
 #------------------------------------------------------------------------------
-def load_magazine(world,magazine):
+def load_magazine(world,magazine,projectile_type=None):
     '''loads a magazine with bullets'''
-    count=len(magazine.ai.projectiles)
-    while count<magazine.ai.capacity:
-        z=spawn_object(world,[0,0],'projectile',False)
-        z.ai.projectile_type=magazine.ai.compatible_projectiles[0]
-        magazine.ai.projectiles.append(z)
+    # wipe whatever is in there
+    magazine.ai.projectiles=[]
+    
+    # gives the option to specify the projectile to load
+    if projectile_type==None:
+        projectile_type=magazine.ai.compatible_projectiles[0]
 
-        count+=1
+    if projectile_type in magazine.ai.compatible_projectiles:
+        count=len(magazine.ai.projectiles)
+        while count<magazine.ai.capacity:
+            z=spawn_object(world,[0,0],'projectile',False)
+            z.ai.projectile_type=projectile_type
+
+            # change to a bigger projectile image. might make a couple more
+            if engine.penetration_calculator.projectile_data[projectile_type]['diameter'] >14:
+                z.image_list=['projectile_mid']
+            magazine.ai.projectiles.append(z)
+
+            count+=1
+    else:
+        engine.log.add_data('Error','world_builder.load_magazine incompatible projectile type: '+projectile_type,True)
 
 #------------------------------------------------------------------------------
 def load_quick_battle(world,spawn_faction,battle_option):
@@ -496,6 +523,7 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 2
+        squads+=['Soviet PTRS-41 AT Squad']
 
     # testing
     elif battle_option=='4':
@@ -509,6 +537,7 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['Soviet T20 Armored Tractor'] * 3
         squads+=['Soviet 37mm Auto-Cannon']
         squads+=['Soviet T34-76 Model 1943']
+        squads+=['Soviet PTRS-41 AT Squad']
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -584,14 +613,9 @@ def load_world(world,map_objects,spawn_faction):
     # spawn player
     world.spawn_player(spawn_faction)
 
-    # add ground cover. this will eventually go somewhere else
-    # 50 results in about 24,000 world coords in any direction
-    count=50
-    size=1015
-    coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
-    for _ in range(count*count):
-        temp=spawn_object(world,coords.pop(),'ground_cover',True)
-        temp.rotation_angle=random.choice([0,90,180,270])
+    # generate the terrain tiles
+    #generate_terrain()
+    
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
@@ -1494,6 +1518,30 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.removable=False
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
+
+    elif OBJECT_TYPE=='ptrs_41':
+        z=WorldObject(world,['ptrs_41'],AIGun)
+        z.name='PTRS 41 Anti-Tank Rifle'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.magazine=spawn_object(world,world_coords,'ptrs_41_magazine',False)
+        z.ai.rate_of_fire=1.9
+        z.ai.reload_speed=11
+        z.ai.range=2418
+        z.ai.type='rifle'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='ptrs_41_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='ptrs_41_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['ptrs_41']
+        z.ai.compatible_projectiles=['14.5x114_B32']
+        z.ai.capacity=5
+        z.ai.removable=False
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
     
     elif OBJECT_TYPE=='svt40':
         z=WorldObject(world,['svt40'],AIGun)
@@ -1562,7 +1610,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='rso':
-        # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
+        # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
         # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
         z=WorldObject(world,['rso','rso_destroyed'],AIVehicle)
         z.name='Raupenschlepper Ost'
@@ -1573,14 +1621,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=2380
+        z.weight=2500
         z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
         z.ai.fuel_tanks[0].volume=114
-        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(world,world_coords,"chrysler_flathead_straight_6_engine",False))
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"deutz_diesel_65hp_engine",False))
         z.ai.engines[0].ai.exhaust_position_offset=[75,10]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
@@ -1660,9 +1708,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='t20':
-        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        # ref : https://en.wikipedia.org/wiki/Komsomolets_armored_tractor
         z=WorldObject(world,['t20','t20_destroyed'],AIVehicle)
-        z.name='T20 armored tractor'
+        z.name='T20 Komsomolets armored tractor'
         z.is_vehicle=True
         z.ai.vehicle_armor['top']=7
         z.ai.vehicle_armor['bottom']=7
@@ -1682,7 +1730,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=3500
         z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -1707,7 +1755,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='t20_turret':
         # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
-        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['t20_turret','t20_turret'],AITurret)
         z.name='T20 Turret Turret'
         z.is_turret=True
@@ -1745,14 +1792,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=26500
         z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
         z.ai.fuel_tanks[0].volume=114
-        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"kharkiv_v2-34_engine",False))
         z.ai.engines[0].ai.exhaust_position_offset=[75,10]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
@@ -1821,8 +1868,13 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
-        for b in range(15):
+        for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False))
+        for b in range(5):
+            temp=spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False)
+            load_magazine(world,temp,'37x252_AP-T')
+            z.add_inventory(temp)
+            
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
 
@@ -2146,7 +2198,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False)) 
+        z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
+
+    elif OBJECT_TYPE=='soviet_ptrs_41':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_ptrs_41'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'ptrs_41',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'ptrs_41_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ptrs_41_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ptrs_41_magazine',False))  
         
     elif OBJECT_TYPE=='big_cheese':
         # big cheese!
@@ -2332,7 +2395,24 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=112
         z.ai.max_speed=112
         z.ai.maxTime=2
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+    # https://en.wikipedia.org/wiki/Kharkiv_model_V-2
+    elif OBJECT_TYPE=='kharkiv_v2-34_engine':
+        z=WorldObject(world,['deutz_diesel_65hp_engine'],AIEngine)
+        z.name='Kharkiv V2-34 Engine'
+        z.ai.fuel_type=['diesel']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=505559.322
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250 
+    elif OBJECT_TYPE=='deutz_diesel_65hp_engine':
+        z=WorldObject(world,['deutz_diesel_65hp_engine'],AIEngine)
+        z.name='Deutz 65 HP Diesel Engine'
+        z.ai.fuel_type=['diesel']
+        z.ai.fuel_consumption_rate=0.0033
+        z.ai.max_engine_force=65722.7
+        z.rotation_angle=float(random.randint(0,359))
+        z.weight=250 
     elif OBJECT_TYPE=='volkswagen_type_82_engine':
         z=WorldObject(world,['volkswagen_type_82_engine'],AIEngine)
         z.name='Volkswagen Type 82 Engine'
@@ -2389,6 +2469,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='gas_80_octane':
         z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='gas_80_octane'
+        z.is_liquid=True
+        z.is_solid=False
+    elif OBJECT_TYPE=='diesel':
+        z=WorldObject(world,['small_clear_spill'],AINone)
+        z.name='diesel'
         z.is_liquid=True
         z.is_solid=False
     elif OBJECT_TYPE=='water':

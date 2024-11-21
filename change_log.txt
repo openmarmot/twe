@@ -2,6 +2,44 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 20 2024
+- added code to support different background colors for different game modes 
+- disabled terrain system for now
+- added diesel as a in game object
+- adjusted stats and added correct engines for several vehicles 
+- added ptrs-41 AT rifle, and soviet AT squad 
+- changes to squad builder and world_builder so ptrs-41 is recognized as a AT rifle 
+
+the RSO and t34 are now diesel. I've never run out of fuel but it is possible..
+
+terrain system will make a come back at some point
+my thought is to make the tiles semi transparent to add texture 
+and color, but with random rotation and placement so it doesn't create a pattern 
+
+ptrs-41 is the answer to the German armored half tracks. It penetrates them easily 
+and will destroy them in a 2-3 shots with the current damage system. 
+
+notes
+- consider whether fuel needs to be its own object type 
+- going to need some code to keep AT rifle soldiers from spending all their ammo on infantry 
+
+----------------------------------
+Nov 19 2024
+- fixed strategic map square spacing 
+- load_magazine now supports specifying a ammo type 
+- added a larger projectile sprite for 15mm and up 
+- ignore list for projectiles now factors in turrets/vehicles/passengers
+- soviet 37mm now has 5 magazines of AP shells 
+
+i think the strategic map got broken by the new default zoom.
+
+the new projectile sprite is not super visibly different from the old one. 
+I guess it moves too fast 
+
+I managed to shoot myself while firing a mg turret in a moving vehicle. 
+I think this is fixed now 
+
+----------------------------------
 Nov 18 2024
 - fixed typo in ai radio operator code 
 - added explosion and fire sprites 

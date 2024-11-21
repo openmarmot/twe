@@ -377,6 +377,24 @@ class Graphics_2D_Pygame(object):
                 self.strategic_map.strategic_menu.activate_menu(closest_object)
 
 #------------------------------------------------------------------------------
+    def switch_mode(self,desired_mode):
+        '''switch the graphic engine mode '''
+
+        if desired_mode==0:
+            self.mode=0
+            self.background.fill((255, 255, 255))
+        elif desired_mode==1:
+            self.mode=1
+            self.background.fill((220, 184, 156))
+        elif desired_mode==2:
+            self.mode=2
+            self.background.fill((255, 255, 255))
+        else:
+            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(mode),True)
+
+
+
+#------------------------------------------------------------------------------
     def update(self):
         '''
             any misc updating that needs to be done
@@ -406,7 +424,7 @@ class Graphics_2D_Pygame(object):
             
             if self.world.exit_world:
                 self.strategic_map.unload_world()
-                self.mode=2
+                self.switch_mode(2)
         elif self.mode==2:
             self.strategic_map.update()
 
