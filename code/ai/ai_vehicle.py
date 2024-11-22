@@ -30,25 +30,28 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
+        #[side][armor thickness,armor slope]
+        # 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         # this is the main vehicle
         self.vehicle_armor={}
-        self.vehicle_armor['top']=0
-        self.vehicle_armor['bottom']=0
-        self.vehicle_armor['left']=0
-        self.vehicle_armor['right']=0
-        self.vehicle_armor['front']=0
-        self.vehicle_armor['rear']=0
+        self.vehicle_armor['top']=[0,0]
+        self.vehicle_armor['bottom']=[0,0]
+        self.vehicle_armor['left']=[0,0]
+        self.vehicle_armor['right']=[0,0]
+        self.vehicle_armor['front']=[0,0]
+        self.vehicle_armor['rear']=[0,0]
 
-
+        #[side][armor thickness,armor slope]
+        # 0 degrees is vertical, 90 degrees is horizontal
         # specific armor for the passenger compartment
         self.passenger_compartment_armor={}
-        self.passenger_compartment_armor['top']=0
-        self.passenger_compartment_armor['bottom']=0
-        self.passenger_compartment_armor['left']=0
-        self.passenger_compartment_armor['right']=0
-        self.passenger_compartment_armor['front']=0
-        self.passenger_compartment_armor['rear']=0
+        self.passenger_compartment_armor['top']=[0,0]
+        self.passenger_compartment_armor['bottom']=[0,0]
+        self.passenger_compartment_armor['left']=[0,0]
+        self.passenger_compartment_armor['right']=[0,0]
+        self.passenger_compartment_armor['front']=[0,0]
+        self.passenger_compartment_armor['rear']=[0,0]
 
 
         # --- components ---
@@ -159,12 +162,12 @@ class AIVehicle(AIBase):
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-        self.collision_log.append('Passenger compartment hit by '+projectile.name + ' at a distance of '+ str(distance))
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
 
         if penetration:
+            self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
             self.health-=random.randint(1,3)
             if len(self.passengers)>0:
                 passenger=random.choice(self.passengers)
@@ -182,18 +185,18 @@ class AIVehicle(AIBase):
                     self.handle_vehicle_body_projectile_hit(projectile)
         else:
             # no penetration, but maybe we can have some other effect?
-            pass
+            self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
 
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-        self.collision_log.append('Vehicle body hit by '+projectile.name + ' at a distance of '+ str(distance))
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
 
         if penetration:
+            self.collision_log.append('[penetration] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
             if self.driver!=None:
                 if random.randint(0,2)==2:
                     self.driver.ai.handle_event('collision',projectile)
@@ -203,7 +206,7 @@ class AIVehicle(AIBase):
 
         else:
             # no penetration, but maybe we can have some other effect?
-            pass
+            self.collision_log.append('[bounce] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         

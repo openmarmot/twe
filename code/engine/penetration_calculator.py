@@ -27,16 +27,18 @@ projectile_data={}
 
 
 #---------------------------------------------------------------------------
-def calculate_penetration(projectile,distance,armor_type,armor_thickness):
+def calculate_penetration(projectile,distance,armor_type,armor):
     '''calculate penetration, return bool'''
-
+    armor_thickness=armor[0]
+    armor_slope=armor[1]
     # normalize distance to nearest 500
     distance=round(distance/500)*500
 
     # get penetration value for projectile at range
     max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
     
-    if max_penetration>armor_thickness:
+    # for now slope just adds to the armor
+    if max_penetration>(armor_thickness+armor_slope):
         return True
     else:
         return False
