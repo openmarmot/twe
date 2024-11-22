@@ -2,6 +2,36 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 21 2024
+- added jadgpanzer 38t "Hetzer"
+- armor now has thickness and slope 
+- changed reload code to use world_builder_identity as 'name' 
+for some objects is a display name 
+- updated collision log data to include projectile type 
+- made the background color a little darker 
+
+note - code that looks for things by name should use world_builder_identity 
+which is a game engine name, vs 'name' which is a pretty/display name 
+
+armor slope is too effective for some stuff at the moment. 
+The hetzer rear 20mm armor sloped at 60 is impenetrable to the t34 
+
+todo 
+- schurzen armor pen code 
+- remote mg turret code 
+- disable shell casings for internal weapons 
+- more sensible armor slope effects
+
+playtest notes 
+- still haven't seen any panzerfaust launches 
+- while driving player altitude is >zero 
+- should probably just remove the dirt piles from bullets. they slow the game down for little benefit 
+- human damage should be upped for large caliber shells. 
+- a unarmored truck bounced a 7.92 bullet at about 1700. need to think about whether we want this or not 
+- diesel fuel tanks are not displaying fuel levels correctly 
+
+
+----------------------------------
 Nov 20 2024
 - added code to support different background colors for different game modes 
 - disabled terrain system for now

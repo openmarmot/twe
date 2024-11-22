@@ -23,14 +23,16 @@ class AITurret(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
+        #[side][armor thickness,armor slope]
+        # 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         self.turret_armor={}
-        self.turret_armor['top']=0
-        self.turret_armor['bottom']=0
-        self.turret_armor['left']=0
-        self.turret_armor['right']=0
-        self.turret_armor['front']=0
-        self.turret_armor['rear']=0
+        self.turret_armor['top']=[0,0]
+        self.turret_armor['bottom']=[0,0]
+        self.turret_armor['left']=[0,0]
+        self.turret_armor['right']=[0,0]
+        self.turret_armor['front']=[0,0]
+        self.turret_armor['rear']=[0,0]
 
         self.health=100
 
@@ -69,12 +71,12 @@ class AITurret(AIBase):
         if EVENT_DATA.is_projectile:
             projectile=EVENT_DATA
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
-            self.collision_log.append('Turret hit by '+projectile.name + ' at a distance of '+ str(distance))
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
 
             if penetration:
+                self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
                 if self.gunner!=None:
                     if random.randint(0,2)==2:
                         self.gunner.ai.handle_event('collision',projectile)
@@ -84,7 +86,7 @@ class AITurret(AIBase):
 
             else:
                 # no penetration, but maybe we can have some other effect?
-                pass
+                self.collision_log.append('[bounce] Turret hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
 
         elif EVENT_DATA.is_grenade:
             print('bonk')

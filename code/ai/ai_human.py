@@ -329,7 +329,7 @@ class AIHuman(AIBase):
     def event_collision(self,event_data):
         if event_data.is_projectile:
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords,True)
-            collision_description='hit by '+event_data.name + ' at a distance of '+ str(distance)
+            collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.health
 
             self.calculate_projectile_damage(event_data)
@@ -801,7 +801,7 @@ class AIHuman(AIBase):
             biggest=0
             for b in self.inventory:
                 if b.is_gun_magazine:
-                    if weapon.name in b.ai.compatible_guns:
+                    if weapon.world_builder_identity in b.ai.compatible_guns:
                         if len(b.ai.projectiles)>biggest:
                             new_magazine=b
                             biggest=len(b.ai.projectiles)
@@ -839,7 +839,7 @@ class AIHuman(AIBase):
                 biggest=0
                 for b in vehicle.ai.inventory:
                     if b.is_gun_magazine:
-                        if weapon.name in b.ai.compatible_guns:
+                        if weapon.world_builder_identity in b.ai.compatible_guns:
                             if len(b.ai.projectiles)>biggest:
                                 new_magazine=b
                                 biggest=len(b.ai.projectiles)
@@ -1203,7 +1203,7 @@ class AIHuman(AIBase):
 
             # kind of a hack. left and right are likely symetric so its a good
             # general guess
-            if vehicle.ai.passenger_compartment_armor['left']<5:
+            if vehicle.ai.passenger_compartment_armor['left'][0]<5:
                 self.switch_task_exit_vehicle(vehicle)
 
     #---------------------------------------------------------------------------
