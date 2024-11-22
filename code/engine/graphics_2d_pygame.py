@@ -390,7 +390,7 @@ class Graphics_2D_Pygame(object):
             self.mode=2
             self.background.fill((255, 255, 255))
         else:
-            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(mode),True)
+            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
 
 
 

@@ -23,18 +23,21 @@ class AITurret(AIBase):
     def __init__(self, owner):
         super().__init__(owner)
 
-        #[side][armor thickness,armor slope]
-        # 0 degrees is vertical, 90 degrees is horizontal
+        #[side][armor thickness,armor slope,spaced_armor_thickness]
+        # slope 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         self.turret_armor={}
-        self.turret_armor['top']=[0,0]
-        self.turret_armor['bottom']=[0,0]
-        self.turret_armor['left']=[0,0]
-        self.turret_armor['right']=[0,0]
-        self.turret_armor['front']=[0,0]
-        self.turret_armor['rear']=[0,0]
+        self.turret_armor['top']=[0,0,0]
+        self.turret_armor['bottom']=[0,0,0]
+        self.turret_armor['left']=[0,0,0]
+        self.turret_armor['right']=[0,0,0]
+        self.turret_armor['front']=[0,0,0]
+        self.turret_armor['rear']=[0,0,0]
 
         self.health=100
+
+        # for remote operated machine guns - mostly german
+        self.remote_operated=False
 
         # offset to position it correctly on a vehicle. vehicle specific 
         self.position_offset=[0,0]
@@ -77,7 +80,8 @@ class AITurret(AIBase):
 
             if penetration:
                 self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
-                if self.gunner!=None:
+                # remote operated turrets mean that the gunner can't be hit by turret penetrations 
+                if self.gunner!=None and self.remote_operated==False:
                     if random.randint(0,2)==2:
                         self.gunner.ai.handle_event('collision',projectile)
                 

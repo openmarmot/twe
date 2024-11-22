@@ -30,28 +30,27 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        #[side][armor thickness,armor slope]
-        # 0 degrees is vertical, 90 degrees is horizontal
+        # 
+        #[side][armor thickness,armor slope,spaced_armor_thickness]
+        # slope 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         # this is the main vehicle
         self.vehicle_armor={}
-        self.vehicle_armor['top']=[0,0]
-        self.vehicle_armor['bottom']=[0,0]
-        self.vehicle_armor['left']=[0,0]
-        self.vehicle_armor['right']=[0,0]
-        self.vehicle_armor['front']=[0,0]
-        self.vehicle_armor['rear']=[0,0]
+        self.vehicle_armor['top']=[0,0,0]
+        self.vehicle_armor['bottom']=[0,0,0]
+        self.vehicle_armor['left']=[0,0,0]
+        self.vehicle_armor['right']=[0,0,0]
+        self.vehicle_armor['front']=[0,0,0]
+        self.vehicle_armor['rear']=[0,0,0]
 
-        #[side][armor thickness,armor slope]
-        # 0 degrees is vertical, 90 degrees is horizontal
         # specific armor for the passenger compartment
         self.passenger_compartment_armor={}
-        self.passenger_compartment_armor['top']=[0,0]
-        self.passenger_compartment_armor['bottom']=[0,0]
-        self.passenger_compartment_armor['left']=[0,0]
-        self.passenger_compartment_armor['right']=[0,0]
-        self.passenger_compartment_armor['front']=[0,0]
-        self.passenger_compartment_armor['rear']=[0,0]
+        self.passenger_compartment_armor['top']=[0,0,0]
+        self.passenger_compartment_armor['bottom']=[0,0,0]
+        self.passenger_compartment_armor['left']=[0,0,0]
+        self.passenger_compartment_armor['right']=[0,0,0]
+        self.passenger_compartment_armor['front']=[0,0,0]
+        self.passenger_compartment_armor['rear']=[0,0,0]
 
 
         # --- components ---

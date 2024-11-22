@@ -329,7 +329,7 @@ def generate_dynamic_world_areas(world):
     # now generate a couple based on the world objects
 
 #------------------------------------------------------------------------------
-def generate_terrain():
+def generate_terrain(world):
     # add ground cover. this will eventually go somewhere else
     # 50 results in about 24,000 world coords in any direction
     count=50
@@ -1660,18 +1660,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
-        z.ai.vehicle_armor['top']=[8,8]
-        z.ai.vehicle_armor['bottom']=[8,0]
-        z.ai.vehicle_armor['left']=[8,19]
-        z.ai.vehicle_armor['right']=[8,19]
-        z.ai.vehicle_armor['front']=[14.5,20]
-        z.ai.vehicle_armor['rear']=[8,31]
-        z.ai.passenger_compartment_armor['top']=[0,0]
-        z.ai.passenger_compartment_armor['bottom']=[8,0]
-        z.ai.passenger_compartment_armor['left']=[8,35]
-        z.ai.passenger_compartment_armor['right']=[8,35]
-        z.ai.passenger_compartment_armor['front']=[14.5,30]
-        z.ai.passenger_compartment_armor['rear']=[8,31]
+        z.ai.vehicle_armor['top']=[8,8,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[8,19,0]
+        z.ai.vehicle_armor['right']=[8,19,0]
+        z.ai.vehicle_armor['front']=[14.5,20,0]
+        z.ai.vehicle_armor['rear']=[8,31,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[8,35,0]
+        z.ai.passenger_compartment_armor['right']=[8,35,0]
+        z.ai.passenger_compartment_armor['front']=[14.5,30,0]
+        z.ai.passenger_compartment_armor['rear']=[8,31,0]
         z.ai.max_occupants=10
         z.ai.max_speed=385.9
         z.ai.max_offroad_speed=177.6
@@ -1715,12 +1715,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
         z.name='Sd.Kfz.251 MG34 Turret'
         z.is_turret=True
-        z.ai.turret_armor['top']=[0,0]
-        z.ai.turret_armor['bottom']=[13,0]
-        z.ai.turret_armor['left']=[6,22]
-        z.ai.turret_armor['right']=[6,22]
-        z.ai.turret_armor['front']=[6,36]
-        z.ai.turret_armor['rear']=[0,0]
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
         z.ai.position_offset=[-10,0]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
@@ -1732,18 +1732,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t20','t20_destroyed'],AIVehicle)
         z.name='T20 Komsomolets armored tractor'
         z.is_vehicle=True
-        z.ai.vehicle_armor['top']=[5,0]
-        z.ai.vehicle_armor['bottom']=[7,0]
-        z.ai.vehicle_armor['left']=[7,19]
-        z.ai.vehicle_armor['right']=[7,19]
-        z.ai.vehicle_armor['front']=[10,24]
-        z.ai.vehicle_armor['rear']=[7,42]
-        z.ai.passenger_compartment_armor['top']=[0,0]
-        z.ai.passenger_compartment_armor['bottom']=[5,0]
-        z.ai.passenger_compartment_armor['left']=[0,0]
-        z.ai.passenger_compartment_armor['right']=[0,0]
-        z.ai.passenger_compartment_armor['front']=[0,0]
-        z.ai.passenger_compartment_armor['rear']=[0,0]
+        z.ai.vehicle_armor['top']=[5,0,0]
+        z.ai.vehicle_armor['bottom']=[7,0,0]
+        z.ai.vehicle_armor['left']=[7,19,0]
+        z.ai.vehicle_armor['right']=[7,19,0]
+        z.ai.vehicle_armor['front']=[10,24,0]
+        z.ai.vehicle_armor['rear']=[7,42,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[5,0,0]
+        z.ai.passenger_compartment_armor['left']=[0,0,0]
+        z.ai.passenger_compartment_armor['right']=[0,0,0]
+        z.ai.passenger_compartment_armor['front']=[0,0,0]
+        z.ai.passenger_compartment_armor['rear']=[0,0,0]
         z.ai.max_occupants=8
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
@@ -1778,12 +1778,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t20_turret','t20_turret'],AITurret)
         z.name='T20 Turret Turret'
         z.is_turret=True
-        z.ai.turret_armor['top']=[5,31]
-        z.ai.turret_armor['bottom']=[5,31]
-        z.ai.turret_armor['left']=[5,31]
-        z.ai.turret_armor['right']=[5,31]
-        z.ai.turret_armor['front']=[5,31]
-        z.ai.turret_armor['rear']=[5,31]
+        z.ai.turret_armor['top']=[5,31,0]
+        z.ai.turret_armor['bottom']=[5,31,0]
+        z.ai.turret_armor['left']=[5,31,0]
+        z.ai.turret_armor['right']=[5,31,0]
+        z.ai.turret_armor['front']=[5,31,0]
+        z.ai.turret_armor['rear']=[5,31,0]
         z.ai.position_offset=[-25,9]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
@@ -1794,18 +1794,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
         z.name='T34-76 Model 1943'
         z.is_vehicle=True
-        z.ai.vehicle_armor['top']=[16,0]
-        z.ai.vehicle_armor['bottom']=[8,0]
-        z.ai.vehicle_armor['left']=[45,0]
-        z.ai.vehicle_armor['right']=[45,0]
-        z.ai.vehicle_armor['front']=[45,61]
-        z.ai.vehicle_armor['rear']=[40,47]
-        z.ai.passenger_compartment_armor['top']=[16,0]
-        z.ai.passenger_compartment_armor['bottom']=[8,0]
-        z.ai.passenger_compartment_armor['left']=[40,40]
-        z.ai.passenger_compartment_armor['right']=[40,40]
-        z.ai.passenger_compartment_armor['front']=[45,61]
-        z.ai.passenger_compartment_armor['rear']=[40,47]
+        z.ai.vehicle_armor['top']=[16,0,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[45,0,0]
+        z.ai.vehicle_armor['right']=[45,0,0]
+        z.ai.vehicle_armor['front']=[45,61,0]
+        z.ai.vehicle_armor['rear']=[40,47,0]
+        z.ai.passenger_compartment_armor['top']=[16,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[40,40,0]
+        z.ai.passenger_compartment_armor['right']=[40,40,0]
+        z.ai.passenger_compartment_armor['front']=[45,61,0]
+        z.ai.passenger_compartment_armor['rear']=[40,47,0]
         z.ai.max_occupants=3
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
@@ -1842,12 +1842,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t34_hull_mg_turret','t34_hull_mg_turret'],AITurret)
         z.name='T34 hull mg turret'
         z.is_turret=True
-        z.ai.turret_armor['top']=[15,0]
-        z.ai.turret_armor['bottom']=[8,0]
-        z.ai.turret_armor['left']=[53,21]
-        z.ai.turret_armor['right']=[53,21]
-        z.ai.turret_armor['front']=[53,20]
-        z.ai.turret_armor['rear']=[53,20]
+        z.ai.turret_armor['top']=[15,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[53,21,0]
+        z.ai.turret_armor['right']=[53,21,0]
+        z.ai.turret_armor['front']=[53,20,0]
+        z.ai.turret_armor['rear']=[53,20,0]
         z.ai.position_offset=[-65,13]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
@@ -1858,12 +1858,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t34_76_model_1943_turret','t34_76_model_1943_turret'],AITurret)
         z.name='T43-76 Model 1943 turret'
         z.is_turret=True
-        z.ai.turret_armor['top']=[15,0]
-        z.ai.turret_armor['bottom']=[8,0]
-        z.ai.turret_armor['left']=[53,21]
-        z.ai.turret_armor['right']=[53,21]
-        z.ai.turret_armor['front']=[53,20]
-        z.ai.turret_armor['rear']=[53,20]
+        z.ai.turret_armor['top']=[15,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[53,21,0]
+        z.ai.turret_armor['right']=[53,21,0]
+        z.ai.turret_armor['front']=[53,20,0]
+        z.ai.turret_armor['rear']=[53,20,0]
         z.ai.position_offset=[-65,13]
         z.ai.position_offset=[-15,0]
         z.ai.rotation_range=[-360,360]
@@ -1876,18 +1876,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['jagdpanzer_38t_hetzer_chassis','jagdpanzer_38t_hetzer_chassis_destroyed'],AIVehicle)
         z.name='Jadgpanzer 38t Hetzer'
         z.is_vehicle=True
-        z.ai.vehicle_armor['top']=[8,90]
-        z.ai.vehicle_armor['bottom']=[12,90]
-        z.ai.vehicle_armor['left']=[20,40]
-        z.ai.vehicle_armor['right']=[20,40]
-        z.ai.vehicle_armor['front']=[60,60]
-        z.ai.vehicle_armor['rear']=[20,14]
-        z.ai.passenger_compartment_armor['top']=[8,90]
-        z.ai.passenger_compartment_armor['bottom']=[12,90]
-        z.ai.passenger_compartment_armor['left']=[20,40]
-        z.ai.passenger_compartment_armor['right']=[20,40]
-        z.ai.passenger_compartment_armor['front']=[60,60]
-        z.ai.passenger_compartment_armor['rear']=[8,68]
+        z.ai.vehicle_armor['top']=[8,90,0]
+        z.ai.vehicle_armor['bottom']=[12,90,0]
+        z.ai.vehicle_armor['left']=[20,40,5]
+        z.ai.vehicle_armor['right']=[20,40,5]
+        z.ai.vehicle_armor['front']=[60,60,0]
+        z.ai.vehicle_armor['rear']=[20,14,0]
+        z.ai.passenger_compartment_armor['top']=[8,90,0]
+        z.ai.passenger_compartment_armor['bottom']=[12,90,0]
+        z.ai.passenger_compartment_armor['left']=[20,40,0]
+        z.ai.passenger_compartment_armor['right']=[20,40,0]
+        z.ai.passenger_compartment_armor['front']=[60,60,0]
+        z.ai.passenger_compartment_armor['rear']=[8,68,0]
         z.ai.max_occupants=3
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
@@ -1925,12 +1925,13 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['remote_mg34_turret','remote_mg34_turret'],AITurret)
         z.name='Remote MG34 Turret'
         z.is_turret=True
-        z.ai.turret_armor['top']=[0,0]
-        z.ai.turret_armor['bottom']=[0,0]
-        z.ai.turret_armor['left']=[15,60]
-        z.ai.turret_armor['right']=[15,60]
-        z.ai.turret_armor['front']=[15,60]
-        z.ai.turret_armor['rear']=[0,0]
+        z.ai.remote_operated=True
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[0,0,0]
+        z.ai.turret_armor['left']=[15,60,0]
+        z.ai.turret_armor['right']=[15,60,0]
+        z.ai.turret_armor['front']=[15,60,0]
+        z.ai.turret_armor['rear']=[0,0,0]
         # this weapon is shared, so set this when you add the turret
         #z.ai.position_offset=[-65,13] # Best to set this when you spawn per vehicle
         z.ai.rotation_range=[-360,360]
@@ -1942,12 +1943,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['jagdpanzer_38t_main_gun','jagdpanzer_38t_main_gun'],AITurret)
         z.name='Jagdpanzer 38t Main Gun'
         z.is_turret=True
-        z.ai.turret_armor['top']=[70,60]
-        z.ai.turret_armor['bottom']=[70,60]
-        z.ai.turret_armor['left']=[70,60]
-        z.ai.turret_armor['right']=[70,60]
-        z.ai.turret_armor['front']=[70,60]
-        z.ai.turret_armor['rear']=[70,60]
+        z.ai.turret_armor['top']=[70,60,0]
+        z.ai.turret_armor['bottom']=[70,60,0]
+        z.ai.turret_armor['left']=[70,60,0]
+        z.ai.turret_armor['right']=[70,60,0]
+        z.ai.turret_armor['front']=[70,60,0]
+        z.ai.turret_armor['rear']=[70,60,0]
         z.ai.position_offset=[-45,10]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'7.5cm_pak39_L48',False)
@@ -2363,8 +2364,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=1
-        z.can_be_deleted=True  
+        z.ai.alive_time_max=120
+        z.can_be_deleted=True
+        z.ai.self_remove=True  
     # steel bullet casing
     elif OBJECT_TYPE=='steel_case':
         z=WorldObject(world,['steel_case'],AIAnimatedSprite)
@@ -2377,8 +2379,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=1
+        z.ai.alive_time_max=120
         z.can_be_deleted=True
+        z.ai.self_remove=True
     elif OBJECT_TYPE=='small_smoke':
         z=WorldObject(world,['small_smoke'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -2455,24 +2458,45 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.can_be_deleted=True 
     
     elif OBJECT_TYPE=='blood_splatter':
-        z=WorldObject(world,['blood_splatter'],AINone)
+        z=WorldObject(world,['blood_splatter'],AIAnimatedSprite)
         z.name='blood_splatter'
-        z.minimum_visible_scale=0.4
+        z.minimum_visible_scale=0.3
+        z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
-        z.can_be_deleted=True 
+        z.ai.speed=0
+        z.ai.rotation_speed=0
+        z.ai.rotate_time_max=0
+        z.ai.move_time_max=0
+        z.ai.alive_time_max=120
+        z.ai.self_remove=True
+        z.can_be_deleted=True
 
     elif OBJECT_TYPE=='small_blood':
         z=WorldObject(world,['small_blood'],AINone)
         z.name='small_blood'
-        z.minimum_visible_scale=0.4
+        z.minimum_visible_scale=0.3
+        z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=0
+        z.ai.rotation_speed=0
+        z.ai.rotate_time_max=0
+        z.ai.move_time_max=0
+        z.ai.alive_time_max=120
+        z.ai.self_remove=True
         z.can_be_deleted=True 
            
     elif OBJECT_TYPE=='dirt':
-        z=WorldObject(world,['small_dirt'],AINone)
+        z=WorldObject(world,['small_dirt'],AIAnimatedSprite)
         z.name='dirt'
         z.minimum_visible_scale=0.4
+        z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=0
+        z.ai.rotation_speed=0
+        z.ai.rotate_time_max=0
+        z.ai.move_time_max=0
+        z.ai.alive_time_max=75
+        z.ai.self_remove=True
         z.can_be_deleted=True
     
     elif OBJECT_TYPE=='brown_chair':
