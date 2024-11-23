@@ -9,6 +9,12 @@ Nov 22 2024
 - dirt, blood, and shell casings now self remove after a period of time.
 - minor bug fix and cleanup
 - updates to ai_human target identification 
+- added a t34-85 (uses the t34 hull)
+
+the t34-85 turret does not feel like i have it centered right. 
+rotation is not perfect. 
+
+added the t34-85 pretty late so it is not play tested yet.
 
 dirt, shell casings, and to a lesser extent the blood sprites were really clogging 
 up the engine on large battles. instead now they self remove after 2 minutes or less.

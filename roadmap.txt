@@ -2,6 +2,7 @@ A roadmap / list of ideas
 
 
 
+(not a full list of what is in game )
 
 # german tanks / destroyers / assault guns
 - tiger 1
@@ -17,6 +18,6 @@ A roadmap / list of ideas
 - nashorn
 
 # soviet tanks / destroyers / assault guns
-- t34-85
+- (done) t34-85
 - IS-1
 - IS-2 
