@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 23 2024
+- updated vehicle display to show diesel volume 
+- turned the terrain system back on. defaults to a slighly different version now 
+
+currently the terrain is a 500x500 image that is mostly transparent with some semi-transparent 
+blotches.this image is added about 2500 times in a grid with each one having its location and 
+rotation randomized. this is ok but not a lot better than the old system of 1024x1024 solid 
+images in a grid. 
+
+not happy with the options for terrain. will have to come back to this
+
+----------------------------------
 Nov 22 2024
 - added remote_operated flag for turrets 
 - added extra human damage from large projectiles 
@@ -20,7 +32,7 @@ dirt, shell casings, and to a lesser extent the blood sprites were really cloggi
 up the engine on large battles. instead now they self remove after 2 minutes or less.
 that is still enough time that object cleanup might trigger, but it is less likely. 
 
-remote operated turrets do not result in the gunner being injkn mured on 
+remote operated turrets do not result in the gunner being injured on 
 penetration. they are pretty rare in ww2, mostly showing up on a couple 
 late war tanks such as the hetzer
 

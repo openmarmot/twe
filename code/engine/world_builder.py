@@ -330,14 +330,29 @@ def generate_dynamic_world_areas(world):
 
 #------------------------------------------------------------------------------
 def generate_terrain(world):
-    # add ground cover. this will eventually go somewhere else
+    ''' generate ground cover '''
+    
     # 50 results in about 24,000 world coords in any direction
-    count=50
-    size=1015
-    coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
-    for _ in range(count*count):
-        temp=spawn_object(world,coords.pop(),'ground_cover',True)
-        temp.rotation_angle=random.choice([0,90,180,270])
+
+    terrain_type=1
+
+    # full size 1000 pixel squares. full color
+    if terrain_type==0:
+        count=50
+        size=1015
+        coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
+        for _ in range(count*count):
+            temp=spawn_object(world,coords.pop(),'ground_cover',True)
+            temp.rotation_angle=random.choice([0,90,180,270])
+
+    # 500 pixel squares. transparent with semi-transparent textures. random location and rotation
+    if terrain_type==1:
+        count=50
+        size=1015
+        coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
+        for _ in range(count*count):
+            temp=spawn_object(world,coords.pop(),'terrain_mottled_transparent',True)
+            engine.math_2d.randomize_position_and_rotation(temp,1200)
 
 #------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
@@ -611,7 +626,7 @@ def load_world(world,map_objects,spawn_faction):
     world.spawn_player(spawn_faction)
 
     # generate the terrain tiles
-    #generate_terrain()
+    generate_terrain(world)
     
 
 #------------------------------------------------------------------------------
@@ -1344,7 +1359,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['7.5cm_pak39_L48']
-        z.ai.compatible_projectiles=['PzGr39']
+        z.ai.compatible_projectiles=['PzGr39_75_L48']
         z.ai.capacity=1
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
@@ -2702,6 +2717,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='ground_cover':
         #z=WorldObject(world,['ground_dirt_vlarge'],AINone)
         z=WorldObject(world,['terrain_light_sand'],AINone)
+        z.name='ground_dirt_vlarge'
+        z.is_ground_texture=True
+        z.rotation_angle=0
+    elif OBJECT_TYPE=='terrain_mottled_transparent':
+        z=WorldObject(world,['terrain_mottled_transparent'],AINone)
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0

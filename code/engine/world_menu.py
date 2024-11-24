@@ -1102,7 +1102,8 @@ class World_Menu(object):
             for b in self.selected_object.ai.fuel_tanks:
                 fuel=0
                 if len(b.ai.inventory)>0:
-                    if 'gas' in b.ai.inventory[0].name:
+                    print(b.ai.inventory[0].name)
+                    if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
                         fuel=b.ai.inventory[0].volume
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
