@@ -1645,6 +1645,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc_destroyed'],AIVehicle)
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.max_occupants=10
         z.ai.max_speed=651.2
         z.ai.max_offroad_speed=177.6
@@ -1672,6 +1673,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['rso','rso_destroyed'],AIVehicle)
         z.name='Raupenschlepper Ost'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.max_occupants=10
         z.ai.max_speed=224.96
         z.ai.max_offroad_speed=177.6
@@ -1698,6 +1700,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[8,19,0]
@@ -1770,6 +1773,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t20','t20_destroyed'],AIVehicle)
         z.name='T20 Komsomolets armored tractor'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.vehicle_armor['top']=[5,0,0]
         z.ai.vehicle_armor['bottom']=[7,0,0]
         z.ai.vehicle_armor['left']=[7,19,0]
@@ -1832,6 +1836,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
         z.name='T34-76 Model 1943'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1912,6 +1917,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
         z.name='T34-85'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1977,6 +1983,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['jagdpanzer_38t_hetzer_chassis','jagdpanzer_38t_hetzer_chassis_destroyed'],AIVehicle)
         z.name='Jadgpanzer 38t Hetzer'
         z.is_vehicle=True
+        z.is_towable=True
         z.ai.vehicle_armor['top']=[8,90,0]
         z.ai.vehicle_armor['bottom']=[12,90,0]
         z.ai.vehicle_armor['left']=[20,40,5]

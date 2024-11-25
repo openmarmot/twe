@@ -1102,7 +1102,6 @@ class World_Menu(object):
             for b in self.selected_object.ai.fuel_tanks:
                 fuel=0
                 if len(b.ai.inventory)>0:
-                    print(b.ai.inventory[0].name)
                     if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
                         fuel=b.ai.inventory[0].volume
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
@@ -1120,7 +1119,14 @@ class World_Menu(object):
                 self.text_queue.append('3 - storage ')
                 if fuel_option:
                     self.text_queue.append('4 - fuel ')
-
+                if distance<200 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                    vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                    self.text_queue.append('5 - Tow Vehicle')
+                    if key=='5':
+                        self.world.text_queue.append('[You attach the vehicle for towing]')
+                        vehicle.ai.attach_tow_object(self.selected_object)
+                        self.deactivate_menu()
+                        return
                 if key=='1':
                     pass
                 if key=='2':
@@ -1171,6 +1177,15 @@ class World_Menu(object):
             self.text_queue.append('4 - toggle HUD')
             if radio:
                 self.text_queue.append('5 - radio')
+
+            if self.selected_object.ai.towed_object!=None:
+                self.text_queue.append('6 - Stop Towing')
+                if key=='6':
+                    self.world.text_queue.append('[You detach the vehicle from the tow bar]')
+                    self.selected_object.ai.detach_tow_object()
+                    self.deactivate_menu()
+                    return
+
             if key=='1':
                 self.change_menu('change_vehicle_role')
             if key=='2':
@@ -1195,6 +1210,7 @@ class World_Menu(object):
             if self.selected_object!=None:
                 self.text_queue.append('')
                 self.text_queue.append('--debug info --')
+                self.text_queue.append('distance from player: '+str(distance))
                 self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
                 #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
                 #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
