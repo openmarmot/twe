@@ -174,6 +174,11 @@ class AIHuman(AIBase):
             # hands
             self.health-=random.randint(30,40)
             bleeding_hit=True
+
+        # extra damage from large caliber projectiles
+        if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>12:
+            self.health-=30
+            bleeding_hit=True
         
         if bleeding_hit:
             self.bleeding=True
@@ -287,7 +292,6 @@ class AIHuman(AIBase):
             if b.is_human:
                 if 'task_vehicle_crew' in b.ai.memory:
                     target=b.ai.memory['task_vehicle_crew']['vehicle']
-
                     # could do something further here to check armor pen
 
             if d<800:
@@ -302,7 +306,7 @@ class AIHuman(AIBase):
 
             if d<closest_distance:
                 closest_distance=d
-                closest_object=b
+                closest_object=target
 
         if closest_object!=None:
             if self.memory['current_task']=='task_vehicle_crew':
@@ -1367,7 +1371,8 @@ class AIHuman(AIBase):
             dm+=('\n  - probable kills: '+str(self.probable_kills))
             dm+=('\n  - collision log --')
             for b in self.collision_log:
-                dm+=('\n  -- '+b)
+                dm+=('\n     - '+b)
+            dm+=('\n  ------------------')
             
             
             # drop primary weapon 
@@ -1467,16 +1472,17 @@ class AIHuman(AIBase):
                     # also check if we should launch antitank
                     if enemy.is_vehicle:
                         if self.antitank!=None and distance<1800:
-                            self.launch_antitank(self.target_object.world_coords)
+                            self.launch_antitank(enemy.world_coords)
                         else:
                             # if we get this far the gun has a magazine and ammo
 
                             # can we penetrate it in a best case scenario?
                             penetration=False
-                            if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
-                                penetration=True
-                            if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
-                                penetration=True
+                            if ammo_gun>0:
+                                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
+                                    penetration=True
+                                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
+                                    penetration=True
 
                             if penetration==False:
                                 self.memory.pop('task_engage_enemy',None)

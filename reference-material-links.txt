@@ -3,7 +3,8 @@ helpful links for research
 https://tank-afv.com/ww2/germany/german-tanks-armored-vehicles.php
 
 
-# good source for armor / gun data 
+# good source for armor / gun data.
+# seems to more or less line up with what ive found from wikipedia or other sources
 https://wiki.warthunder.com/
 
 # great source for diagrams 

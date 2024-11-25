@@ -376,7 +376,7 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
-            self.text_queue.append('2 - Red Bicycle ')
+            self.text_queue.append('2 - t34-85')
             self.text_queue.append('3 - Ju88 ')
             self.text_queue.append('4 - Dodge G505 Weapons Carrier ')
             self.text_queue.append('5 - sd_kfz_251 ')
@@ -387,7 +387,7 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'red_bicycle',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'t34_85',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ju88',True)
             elif key=='4':
@@ -1102,7 +1102,7 @@ class World_Menu(object):
             for b in self.selected_object.ai.fuel_tanks:
                 fuel=0
                 if len(b.ai.inventory)>0:
-                    if 'gas' in b.ai.inventory[0].name:
+                    if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
                         fuel=b.ai.inventory[0].volume
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
@@ -1119,7 +1119,14 @@ class World_Menu(object):
                 self.text_queue.append('3 - storage ')
                 if fuel_option:
                     self.text_queue.append('4 - fuel ')
-
+                if distance<200 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                    vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                    self.text_queue.append('5 - Tow Vehicle')
+                    if key=='5':
+                        self.world.text_queue.append('[You attach the vehicle for towing]')
+                        vehicle.ai.attach_tow_object(self.selected_object)
+                        self.deactivate_menu()
+                        return
                 if key=='1':
                     pass
                 if key=='2':
@@ -1170,6 +1177,15 @@ class World_Menu(object):
             self.text_queue.append('4 - toggle HUD')
             if radio:
                 self.text_queue.append('5 - radio')
+
+            if self.selected_object.ai.towed_object!=None:
+                self.text_queue.append('6 - Stop Towing')
+                if key=='6':
+                    self.world.text_queue.append('[You detach the vehicle from the tow bar]')
+                    self.selected_object.ai.detach_tow_object()
+                    self.deactivate_menu()
+                    return
+
             if key=='1':
                 self.change_menu('change_vehicle_role')
             if key=='2':
@@ -1194,6 +1210,7 @@ class World_Menu(object):
             if self.selected_object!=None:
                 self.text_queue.append('')
                 self.text_queue.append('--debug info --')
+                self.text_queue.append('distance from player: '+str(distance))
                 self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
                 #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
                 #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))

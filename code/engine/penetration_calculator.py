@@ -9,6 +9,7 @@ notes : various penetration "calculations"
 #import built in modules
 import random
 import sqlite3
+import math
 
 #import custom packages
 import engine.math_2d
@@ -29,19 +30,33 @@ projectile_data={}
 #---------------------------------------------------------------------------
 def calculate_penetration(projectile,distance,armor_type,armor):
     '''calculate penetration, return bool'''
-    armor_thickness=armor[0]
-    armor_slope=armor[1]
+    # for slope 0 is vertical, whereas 90 is full horizontal armor
     # normalize distance to nearest 500
     distance=round(distance/500)*500
 
+    armor_thickness=armor[0]
+    armor_slope=armor[1]
+    spaced_armor=armor[2]
+
     # get penetration value for projectile at range
     max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
-    
-    # for now slope just adds to the armor
-    if max_penetration>(armor_thickness+armor_slope):
-        return True
-    else:
+
+    # fast check first
+    if max_penetration<(armor_thickness+spaced_armor):
         return False
+    else:
+        # more complicated penetration check
+
+        # calculate effective thickness
+        # here we could also take into account elevation differences between the shooter and the target
+        # to adjust the armor angle
+        # taking the cosine means that the slope is more beneficial as it approaches 90 degrees (full horizontal)
+        effective_thickness = (armor_thickness / math.cos(math.radians(armor_slope))) + spaced_armor
+        
+        if max_penetration>effective_thickness:
+            return True
+        else:
+            return False
 
 
 #---------------------------------------------------------------------------

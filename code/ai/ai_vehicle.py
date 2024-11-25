@@ -30,28 +30,27 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        #[side][armor thickness,armor slope]
-        # 0 degrees is vertical, 90 degrees is horizontal
+        # 
+        #[side][armor thickness,armor slope,spaced_armor_thickness]
+        # slope 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         # this is the main vehicle
         self.vehicle_armor={}
-        self.vehicle_armor['top']=[0,0]
-        self.vehicle_armor['bottom']=[0,0]
-        self.vehicle_armor['left']=[0,0]
-        self.vehicle_armor['right']=[0,0]
-        self.vehicle_armor['front']=[0,0]
-        self.vehicle_armor['rear']=[0,0]
+        self.vehicle_armor['top']=[0,0,0]
+        self.vehicle_armor['bottom']=[0,0,0]
+        self.vehicle_armor['left']=[0,0,0]
+        self.vehicle_armor['right']=[0,0,0]
+        self.vehicle_armor['front']=[0,0,0]
+        self.vehicle_armor['rear']=[0,0,0]
 
-        #[side][armor thickness,armor slope]
-        # 0 degrees is vertical, 90 degrees is horizontal
         # specific armor for the passenger compartment
         self.passenger_compartment_armor={}
-        self.passenger_compartment_armor['top']=[0,0]
-        self.passenger_compartment_armor['bottom']=[0,0]
-        self.passenger_compartment_armor['left']=[0,0]
-        self.passenger_compartment_armor['right']=[0,0]
-        self.passenger_compartment_armor['front']=[0,0]
-        self.passenger_compartment_armor['rear']=[0,0]
+        self.passenger_compartment_armor['top']=[0,0,0]
+        self.passenger_compartment_armor['bottom']=[0,0,0]
+        self.passenger_compartment_armor['left']=[0,0,0]
+        self.passenger_compartment_armor['right']=[0,0,0]
+        self.passenger_compartment_armor['front']=[0,0,0]
+        self.passenger_compartment_armor['rear']=[0,0,0]
 
 
         # --- components ---
@@ -112,12 +111,23 @@ class AIVehicle(AIBase):
         self.flaps=0
         self.rudder=0
 
+        # ---
+
+
+        # -- crew --
         # passengers - note that passengers are not removed from the world, so they are still updated
         self.passengers=[]
         self.max_occupants=4 # max people that can be in the vehicle, including driver
 
         # set when a world_object claims the driver position. ai_human checks this to determine behavior
         self.driver=None
+
+        # --
+
+        #
+        self.towed_object=None
+        self.tow_offset=[150,0]
+        self.in_tow=False # whether this vehicle is being towed currently
 
 
         # 
@@ -158,6 +168,25 @@ class AIVehicle(AIBase):
 
         # used for death message 
         self.collision_log=[]
+
+    #---------------------------------------------------------------------------
+    def attach_tow_object(self,tow_object):
+        '''attach an object for towing'''
+
+        if self.towed_object!=None:
+            self.detach_tow_object()
+        
+        self.towed_object=tow_object
+        if self.towed_object.is_vehicle:
+            self.towed_object.ai.in_tow=True
+
+    #---------------------------------------------------------------------------
+    def detach_tow_object(self):
+        '''detach an object that we are towing'''
+        if self.towed_object!=None:
+            if self.towed_object.is_vehicle:
+                self.towed_object.ai.in_tow=False
+            self.towed_object=None
 
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
@@ -286,6 +315,10 @@ class AIVehicle(AIBase):
         engine.world_builder.spawn_container('wreck',self.owner,1)
 
         engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords)
+
+        # get rid of the turrets
+        for b in self.turrets:
+            self.owner.world.remove_queue.append(b)
 
         
         dm=''
@@ -495,6 +528,13 @@ class AIVehicle(AIBase):
                 if b.rotation_angle!=self.owner.rotation_angle:
                     b.rotation_angle=self.owner.rotation_angle
                     b.reset_image=True
+
+        # update towed object
+        if self.towed_object!=None:
+            self.towed_object.world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,self.tow_offset)
+            if self.towed_object.rotation_angle!=self.owner.rotation_angle:
+                self.towed_object.rotation_angle=self.owner.rotation_angle
+                self.towed_object.reset_image=True
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):

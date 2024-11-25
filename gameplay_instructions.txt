@@ -69,12 +69,7 @@ esc - exit the current menu
     - it will then follow you when it doesn't have more important tasks 
 - you can disband your current squad from the player menu 
 
-# autoplay 
-- if you don't touch any controls for awhile the ai takes over. 
-- this will stop as soon as you hit a key 
-
-# to interact with an object you have to drop it from your inventory first 
-- this will probably be changing 
+# some object interaction requires dropping the object on the ground first
 
 # communication 
 - if you are near bots you will occasionally see things they are 
