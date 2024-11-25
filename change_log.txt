@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 25 2024
+- added a transmission to vehicles 
+
+gear selection is in the engine menu for now.
+I went with a very simple drive/neutral/reverse solution for now. 
+this is mostly for the player - reverse would be a tricky thing for 
+the ai to handle. 
+
+
 ----------------------------------
 Nov 24 2024
 - turrets are now deleted when the vehicle is destroyed 

@@ -30,7 +30,7 @@ class AIVehicle(AIBase):
         # --- health stuff ----
         self.health=100
 
-        # 
+        # --- armor ---
         #[side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
@@ -52,6 +52,14 @@ class AIVehicle(AIBase):
         self.passenger_compartment_armor['front']=[0,0,0]
         self.passenger_compartment_armor['rear']=[0,0,0]
 
+        # ---
+
+        # gears
+        self.transmission={}
+        self.current_gear='drive'
+        self.transmission['drive']=[1]
+        self.transmission['neutral']=[0]
+        self.transmission['reverse']=[-1]
 
         # --- components ---
 
@@ -645,9 +653,6 @@ class AIVehicle(AIBase):
                 if self.current_speed<5:
                     self.current_speed=0
 
-        
-        # apply ground "rolling' friction  
-
         # apply air drag
 
         # adjust altitude
@@ -660,7 +665,11 @@ class AIVehicle(AIBase):
 
         # move along vector
         if self.current_speed>0:
-            self.owner.world_coords=engine.math_2d.moveAlongVector(self.current_speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+            # apply gearbox
+            gear_velocity=self.current_speed*self.transmission[self.current_gear][0]
+
+            self.owner.world_coords=engine.math_2d.moveAlongVector(gear_velocity,self.owner.world_coords,self.owner.heading,time_passed)
             
         # update the relative position and rotation of child objects
         if self.current_speed>0 or heading_changed:
