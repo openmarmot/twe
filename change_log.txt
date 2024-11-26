@@ -2,6 +2,22 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 26 2024
+- fixed a crash when the player tries to change vehicle roles 
+while exiting 
+- added a flag for passenger compartment ammo racks 
+- minor vehicle damage adjustments 
+- minor cleanup
+
+passenger_compartment_ammo_racks is True for tanks. 
+This results in a chance of extra damage on a passenger compartment penetration
+
+play test notes 
+- confirmation of a 14.5mm hit taking out a sd.kfz.231 
+- confirmation of a HEAT hit (panzerfaust) taking out a T34-85
+
+
+----------------------------------
 Nov 25 2024
 - added a transmission to vehicles 
 
@@ -9,7 +25,6 @@ gear selection is in the engine menu for now.
 I went with a very simple drive/neutral/reverse solution for now. 
 this is mostly for the player - reverse would be a tricky thing for 
 the ai to handle. 
-
 
 ----------------------------------
 Nov 24 2024

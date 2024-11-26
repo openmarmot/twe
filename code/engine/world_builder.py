@@ -533,15 +533,17 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['German 1944 Panzergrenadier Mech'] * 4
         squads+=['German 1944 Fallschirmjager'] * 3
         squads+=['German 1944 Volksgrenadier Storm Group'] * 1
-        squads+=['German 1944 Volksgrenadier Fire Group']
-        squads+=['German Hetzer Squad'] * 2
+        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
+        squads+=['German Hetzer Squad'] * 5
+
         squads+=['Soviet 1943 Rifle'] * 3
         squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 2
         squads+=['Soviet PTRS-41 AT Squad']
-        squads+=['Soviet T34-76 Model 1943'] * 2
+        squads+=['Soviet T34-76 Model 1943'] * 3
+        squads+=['Soviet T34-85'] * 2
 
     # testing
     elif battle_option=='4':
@@ -1837,6 +1839,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='T34-76 Model 1943'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1918,6 +1921,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='T34-85'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1984,6 +1988,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Jadgpanzer 38t Hetzer'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[8,90,0]
         z.ai.vehicle_armor['bottom']=[12,90,0]
         z.ai.vehicle_armor['left']=[20,40,5]

@@ -52,6 +52,10 @@ class AIVehicle(AIBase):
         self.passenger_compartment_armor['front']=[0,0,0]
         self.passenger_compartment_armor['rear']=[0,0,0]
 
+        # results in a chance for high damage from a passenger compartment hit
+        # this is meant to be large caliber ammo - like tank shells
+        self.passenger_compartment_ammo_racks=False
+
         # ---
 
         # gears
@@ -206,12 +210,11 @@ class AIVehicle(AIBase):
         if penetration:
             self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
             self.health-=random.randint(1,3)
-            if len(self.passengers)>0:
+            if len(self.passengers)>1:
                 passenger=random.choice(self.passengers)
                 if 'task_vehicle_crew' in passenger.ai.memory:
                     if passenger.ai.memory['task_vehicle_crew']['role']=='passenger':
                         passenger.ai.handle_event('collision',projectile)
-                        print(' ! Vehicle passenger hit ! ')
                 else:
                     # this has happened. not sure why yet
                     engine.log.add_data('warn','ai_vehicle - passenger memory issue',True)
@@ -220,6 +223,11 @@ class AIVehicle(AIBase):
                 if random.randint(0,2)==2:
                     # extra shot at body damage
                     self.handle_vehicle_body_projectile_hit(projectile)
+
+            if self.passenger_compartment_ammo_racks:
+                if random.randint(0,3)==3:
+                    # ammo rack explosion
+                    self.health-=random.randint(50,75)
         else:
             # no penetration, but maybe we can have some other effect?
             self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
