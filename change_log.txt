@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 27 2024
+- started work on adding banks, bank accounts, and global exchange rates 
+- modified the save file format to hold more data than just maps 
+
+todo 
+- saving banks 
+- bank ui 
+- faction_strategic bank account + interaction 
 
 ----------------------------------
 Nov 26 2024

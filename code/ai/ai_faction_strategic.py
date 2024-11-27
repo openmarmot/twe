@@ -35,6 +35,10 @@ class AIFactionStrategic(object):
         self.square_objectives_owned=[]
         self.square_objectives_not_owned=[]
 
+        # treasury 
+        self.treasury_bank=None
+        self.treasury_account=None
+
         # how many 'units' can be spent
         self.budget=0
 

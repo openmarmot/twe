@@ -2209,6 +2209,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.is_human=True
         z.is_civilian=True
+        if random.randint(0,1)==1:
+            z.ai.wallet['Polish Zloty']=round(random.uniform(0.05,1.5),2)
+        if random.randint(0,1)==1:
+            z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
+        if random.randint(0,1)==1:
+            z.ai.wallet['German Reichsmark']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(world,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
@@ -2218,6 +2224,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
+        z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
+
 
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
@@ -2227,6 +2235,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_human=True
         z.is_soldier=True
         z.is_soviet=True
+        z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)

@@ -22,6 +22,7 @@ from engine.strategic_menu import StrategicMenu
 from engine.map_square import MapSquare
 from engine.map_object import MapObject
 from ai.ai_faction_strategic import AIFactionStrategic
+from ai.ai_bank import AIBank
 
 #global variables
 
@@ -35,6 +36,9 @@ class StrategicMap(object):
         
 
         self.map_squares=[]
+
+        #banks {'bank name':bank object}
+        self.banks={}
 
         # strategic AIs
         self.strategic_ai=[]
@@ -113,6 +117,77 @@ class StrategicMap(object):
                 
         self.update_map_data()
             
+    #---------------------------------------------------------------------------
+    def create_banks(self):
+        '''create banks for a new campaign'''
+
+        # -- central state banks --
+
+        bank=AIBank()
+        bank.name='US Federal Reserve'
+        bank.currencies_accepted=['US Dollar']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['american']
+        bank.exchange_markup=0
+        bank.accounts[0]={'US Dollar':1000000000}
+        self.banks[bank.name]=bank
+
+        bank=AIBank()
+        bank.name='Reichsbank'
+        bank.currencies_accepted=['German Reichsmark','German Military Script']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['german']
+        bank.exchange_markup=0
+        bank.accounts[0]={'German Reichsmark':1000000000}
+        self.banks[bank.name]=bank
+
+        bank=AIBank()
+        bank.name='Gosbank'
+        bank.currencies_accepted=['Soviet Ruble','Soviet Military Script']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['soviet']
+        bank.exchange_markup=0
+        bank.accounts[0]={'Soviet Ruble':1000000000}
+        self.banks[bank.name]=bank
+
+        # -- private or semi-private banks --
+
+        bank=AIBank()
+        bank.name='US Savings and Loan'
+        bank.currencies_accepted=['US Dollar']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['american','civilian']
+        bank.exchange_markup=0
+        bank.accounts[0]={'US Dollar':1000000000}
+        self.banks[bank.name]=bank
+
+        bank=AIBank()
+        bank.name='Volksbank'
+        bank.currencies_accepted=['German Reichsmark','German Military Script']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['german','civilian']
+        bank.exchange_markup=0
+        bank.accounts[0]={'German Reichsmark':1000000000}
+        self.banks[bank.name]=bank
+
+        bank=AIBank()
+        bank.name='Narodny Bank'
+        bank.currencies_accepted=['Soviet Ruble','Soviet Military Script']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['soviet','civilian']
+        bank.exchange_markup=0
+        bank.accounts[0]={'Soviet Ruble':1000000000}
+        self.banks[bank.name]=bank
+
+        # the swiss !
+        bank=AIBank()
+        bank.name='Alpen Kreditbank'
+        bank.currencies_accepted=['Soviet Ruble','German Reichsmark','US Dollar']
+        bank.commodities_accepted=[]
+        bank.factions_accepted=['german','soviet','civilian']
+        bank.exchange_markup=0
+        bank.accounts[0]={'Soviet Ruble':1000000000,'German Reichsmark':1000000000,'US Dollar':1000000000}
+        self.banks[bank.name]=bank
 
     #---------------------------------------------------------------------------
     def create_map_squares(self):
@@ -160,15 +235,18 @@ class StrategicMap(object):
 
     #------------------------------------------------------------------------------
     def create_new_save_file(self):
-        '''generate a map and create save file'''
+        '''create a new campaign save file '''
+
+
         map_name=['A','B','C','D','E','F','G','H','I','J','K']
         # create the database
         conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
-        # generate the tables
+
+        # generate the map tables
         for a in range(self.map_size):
             for b in range(self.map_size):
-                table_name=map_name[a]+str(b)
+                table_name='map_'+map_name[a]+str(b)
                 # create table
                 create_table_sql = f'''
                 CREATE TABLE IF NOT EXISTS {table_name} (
@@ -191,8 +269,56 @@ class StrategicMap(object):
                     # If an error occurs, rollback any changes
                     conn.rollback()
 
+        # - create the banks table -
+        table_name='banks'
+        create_table_sql = f'''
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            currencies_accepted TEXT,
+            commodities_accepted TEXT,
+            bank_internal_account TEXT,
+            account_increment TEXT,
+            exchange_markup TEXT,
+            factions_accepted TEXT
+        );
+        '''
+
+        # Execute the SQL command to create the table
+        try:
+            cursor.execute(create_table_sql)
+            # Commit the transaction
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            # If an error occurs, rollback any changes
+            conn.rollback()
+
+        # - create the bank_accounts table -
+        # currency_string 'currency1:amount,currency2:amount'
+        table_name='bank_accounts'
+        create_table_sql = f'''
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bank_name TEXT,
+            account_number TEXT,
+            currency_string TEXT
+        );
+        '''
+
+        # Execute the SQL command to create the table
+        try:
+            cursor.execute(create_table_sql)
+            # Commit the transaction
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            # If an error occurs, rollback any changes
+            conn.rollback()
+
         # Close the connection
         conn.close()
+
     
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
@@ -342,7 +468,7 @@ class StrategicMap(object):
         cursor.execute("""
         SELECT name FROM sqlite_master 
         WHERE type='table' 
-        AND name NOT LIKE 'sqlite_%';
+        AND name LIKE 'map_%';
         """)
         
         # Fetch all results
@@ -372,10 +498,11 @@ class StrategicMap(object):
         self.create_map_squares()
         
         for map_square in self.map_squares:
+            table_name='map_'+map_square.name
             conn = sqlite3.connect(self.save_file_name)
             cursor = conn.cursor()
 
-            select_all_sql = f"SELECT * FROM {map_square.name};"
+            select_all_sql = f"SELECT * FROM {table_name};"
             cursor.execute(select_all_sql)
             rows = cursor.fetchall()
 
@@ -431,7 +558,7 @@ class StrategicMap(object):
         # iterate through each map and save map_objects to sqlite
         for map in self.map_squares:
 
-            table_name=map.name
+            table_name='map_'+map.name
 
             # clear table data first 
             # SQL to delete all rows from the table

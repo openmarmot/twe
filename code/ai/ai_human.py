@@ -18,6 +18,7 @@ import engine.math_2d
 import engine.world_builder
 import engine.log
 import engine.penetration_calculator
+#import engine.global_exchange_rates
 
 #global variables
 
@@ -40,6 +41,13 @@ class AIHuman(AIBase):
 
         self.memory={}
         self.memory['current_task']='task_think'
+
+        # money !
+        # amount can be a float to account for coinage
+        # 'currency name',amount
+        self.wallet={}
+
+
 
         # -- health stuff --
         self.health=100
