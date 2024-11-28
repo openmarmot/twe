@@ -693,8 +693,7 @@ class StrategicMap(object):
                 '''
 
                 # Preparing data for executemany
-                rows = [(item['world_builder_identity'], item['name'], item['world_coords'], 
-                        item['rotation'], item['inventory']) for item in data_list]
+                rows = [(item['bank_name'], item['account_number'], item['holdings']) for item in data_list]
 
                 cursor.executemany(insert_sql, rows)
                 conn.commit()
