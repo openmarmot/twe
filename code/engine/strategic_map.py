@@ -302,7 +302,7 @@ class StrategicMap(object):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             bank_name TEXT,
             account_number TEXT,
-            currency_string TEXT
+            holdings TEXT
         );
         '''
 
@@ -529,6 +529,8 @@ class StrategicMap(object):
         # update map data
         self.update_map_data()
 
+        # load banks and bank accounts
+
          
     #------------------------------------------------------------------------------
     def load_world(self,map_square,spawn_faction):
@@ -621,6 +623,93 @@ class StrategicMap(object):
         # exit
         self.graphics_engine.quit=True
 
+    #------------------------------------------------------------------------------
+    def save_banks(self):
+        ''' save banks and bank accounts'''
+
+        conn = sqlite3.connect(self.save_file_name)
+        cursor = conn.cursor()
+        
+        # - clear the data from the tables -
+        tables_to_clear = ['banks', 'bank_accounts']
+        delete_sql = "DELETE FROM {};"
+
+        for table in tables_to_clear:
+            cursor.execute(delete_sql.format(table))
+
+        conn.commit()
+
+        # save the banks
+        for bank in self.banks.values():
+
+            # - save the bank data -
+            # data conversions. the table is all TEXT
+            data = {
+                'name': bank.name,
+                'currencies_accepted': ','.join(str(item) for item in bank.currencies_accepted),
+                'commodities_accepted': ','.join(str(item) for item in bank.commodities_accepted),
+                'bank_internal_account': str(bank.bank_internal_account),
+                'account_increment': str(bank.account_increment),
+                'exchange_markup': str(bank.exchange_markup),
+                'factions_accepted': ','.join(str(item) for item in bank.factions_accepted)
+            }
+
+            # Insert the data into the table
+            insert_sql = f'''
+            INSERT INTO {'banks'} 
+            (name, currencies_accepted, commodities_accepted, bank_internal_account, account_increment, exchange_markup, factions_accepted)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            '''
+
+            cursor.execute(insert_sql, (
+                data['name'], 
+                data['currencies_accepted'], 
+                data['commodities_accepted'], 
+                data['bank_internal_account'], 
+                data['account_increment'], 
+                data['exchange_markup'], 
+                data['factions_accepted']
+            ))
+
+            # Commit the changes
+            conn.commit()
+
+            # - save the account data -
+            data_list=[]
+            for account_number,data in bank.accounts.items():
+
+                # string conversions
+                holdings=','.join(key+':'+str(value) for key,value in data.items())
+                world_coords= ','.join(str(item) for item in b.world_coords)
+                rotation=str(b.rotation)
+                inventory=','.join(str(item) for item in b.inventory)
+                data_list.append(
+                    {
+                        'bank_name': bank.name
+                        'account_number': str(account_number),
+                        'holdings': world_coords
+                    }
+                )
+            if len(data_list)>0:
+                # SQL command to insert multiple rows
+                insert_sql = '''
+                INSERT INTO {table} (world_builder_identity, name, world_coords, rotation, inventory)
+                VALUES (?, ?, ?, ?, ?)
+                '''.format(table=table_name)
+
+                # Preparing data for executemany
+                rows = [(item['world_builder_identity'], item['name'], item['world_coords'], 
+                        item['rotation'], item['inventory']) for item in data_list]
+
+                cursor.executemany(insert_sql, rows)
+                conn.commit()
+
+                # Print how many rows were inserted
+                #print(f"{cursor.rowcount} rows were inserted into {table_name}")
+
+        # Close the connection
+        conn.close()
+
     #---------------------------------------------------------------------------
     def start_new_campaign(self):
         self.save_file_name=self.generate_save_filename()
@@ -630,6 +719,9 @@ class StrategicMap(object):
 
         # create map squares
         self.create_map_squares()
+
+        # create banks
+        self.create_banks()
 
         # generate initial map features
         self.generate_initial_map_features()

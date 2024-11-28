@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 28 2024
+- working on save/load of the bank code 
+
+----------------------------------
 Nov 27 2024
 - started work on adding banks, bank accounts, and global exchange rates 
 - modified the save file format to hold more data than just maps 
