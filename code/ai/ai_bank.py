@@ -10,14 +10,12 @@ notes : a bank.
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
-import twe.code.engine.global_finance
+import engine.global_finance
 
 #global variables
 
-class AIBank(AIBase):
-    def __init__(self, owner):
-        super().__init__(owner)
+class AIBank(object):
+    def __init__(self):
 
         # unique bank name
         self.name=''

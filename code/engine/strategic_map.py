@@ -494,14 +494,18 @@ class StrategicMap(object):
         '''load a campaign from file and initialize strategic map'''
         self.save_file_name=save_file_name
 
+        # sqlite connection
+        conn = sqlite3.connect(self.save_file_name)
+        cursor = conn.cursor()
+
+
         # create map squares
         self.create_map_squares()
         
+        # -- load map square data --
         for map_square in self.map_squares:
             table_name='map_'+map_square.name
-            conn = sqlite3.connect(self.save_file_name)
-            cursor = conn.cursor()
-
+            
             select_all_sql = f"SELECT * FROM {table_name};"
             cursor.execute(select_all_sql)
             rows = cursor.fetchall()
@@ -522,14 +526,48 @@ class StrategicMap(object):
                 # Add the MapObject instance to the list
                 map_square.map_objects.append(map_object)
 
-            # Close the connection
-            conn.close()
-
-
         # update map data
         self.update_map_data()
 
-        # load banks and bank accounts
+        # -- load bank data --
+        self.banks={}
+        cursor.execute("SELECT * FROM banks;")
+        rows=cursor.fetchall()
+        for row in rows:
+            (id,name,currencies_accepted,commodities_accepted
+             ,bank_internal_account,account_increment,exchange_markup
+             ,factions_accepted) = row
+            
+            bank=AIBank()
+            bank.name=name
+            bank.currencies_accepted=currencies_accepted.split(',')
+            bank.commodities_accepted=commodities_accepted.split(',')
+            bank.factions_accepted=factions_accepted.split(',')
+            bank.exchange_markup=float(exchange_markup)
+            bank.accounts={}
+            self.banks[bank.name]=bank
+
+        # -- load bank account data --
+        cursor.execute("SELECT * FROM bank_accounts;")
+        rows=cursor.fetchall()
+        for row in rows:
+            (id,bank_name,account_number,holdings) = row
+            # convert the string back to a dictionary
+            holdings_dict={}
+            for data in holdings.split(','):
+                data=data.split(':')
+                holdings_dict[data[0]]=float(data[1])
+
+            self.banks[bank_name].accounts[int(account_number)]=holdings_dict
+        
+        # -- strategic ai data ---
+            
+
+        
+        # close sqlite connection
+        conn.close()
+
+
 
          
     #------------------------------------------------------------------------------
@@ -615,7 +653,7 @@ class StrategicMap(object):
         # by the time you get here the world is already unloaded.
 
         # one more save all
-        self.save_all_maps()
+        self.save_everything()
 
         print('----------------------')
         print('Good Bye!')
@@ -705,6 +743,12 @@ class StrategicMap(object):
         conn.close()
 
     #---------------------------------------------------------------------------
+    def save_everything(self):
+        '''save all the campaign things'''
+        self.save_all_maps()
+        self.save_banks()
+
+    #---------------------------------------------------------------------------
     def start_new_campaign(self):
         self.save_file_name=self.generate_save_filename()
 
@@ -732,8 +776,8 @@ class StrategicMap(object):
         # update map data
         self.update_map_data()
 
-        # save all maps
-        self.save_all_maps()   
+        # save everything
+        self.save_everything()
         
         # load specific map player is in 
 
@@ -761,7 +805,7 @@ class StrategicMap(object):
             self.update_map_data()
 
             # save everything
-            self.save_all_maps()
+            self.save_everything()
 
             # reset strategic menus
             self.strategic_menu.change_menu('start')

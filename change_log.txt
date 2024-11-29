@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 29 2024
+- more save/load work
+- started work on a new kubelwagen model 
+- added new art for the kubelwagen
+- bug fix 
+
+I did a camo and no camo variant for the kubelwagen. 
+amusingly there are no squads with a kubelwagen at the moment, so it doesn't
+show up unless you spawn it.
+
+NOTE - campaign mode is broken at the moment 
+
+todo 
+- faction strategic ai save/load 
+- faction strategic ai bank account
+- add squads for rso and kubelwagen and anything else im forgetting  
+- fix error with new campaign creation
 ----------------------------------
 Nov 28 2024
 - working on save/load of the bank code 

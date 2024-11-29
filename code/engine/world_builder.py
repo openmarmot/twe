@@ -2138,6 +2138,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='kubelwagen_camo':
+        z=spawn_object(world,world_coords,'kubelwagen',False)
+        z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed_destroyed']
+        z.world_builder_identity='kubelwagen_camo'
+
     elif OBJECT_TYPE=='red_bicycle':
         # note second image is used for the wreck..
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
