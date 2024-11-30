@@ -194,7 +194,7 @@ class StrategicMap(object):
         '''create the map squares and screen positions'''
 
         # get all the table names from the database
-        map_names=self.get_table_names()
+        map_names=self.get_map_names_from_tables()
             # Determine the number of squares per row (round up if it's not a perfect square)
         grid_size = math.ceil(math.sqrt(len(map_names)))
 
@@ -456,7 +456,7 @@ class StrategicMap(object):
         return f"saves/save_{timestamp}_{random_part}.sqlite"
 
     #---------------------------------------------------------------------------
-    def get_table_names(self):
+    def get_map_names_from_tables(self):
         # Connect to the SQLite database
         connection = sqlite3.connect(self.save_file_name)
         
@@ -475,7 +475,8 @@ class StrategicMap(object):
         tables = cursor.fetchall()
         
         # Extract table names from the tuples returned by fetchall
-        table_names = [table[0] for table in tables]
+        # remove the 'map_' prefix
+        table_names = [table[0].replace('map_','') for table in tables]
         
         # Close the connection
         connection.close()

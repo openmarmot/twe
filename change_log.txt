@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 30 2024
+- fixed a error with table names in campaign creation
+
 
 ----------------------------------
 Nov 29 2024
