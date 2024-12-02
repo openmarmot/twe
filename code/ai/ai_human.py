@@ -18,6 +18,7 @@ import engine.math_2d
 import engine.world_builder
 import engine.log
 import engine.penetration_calculator
+#import engine.global_exchange_rates
 
 #global variables
 
@@ -40,6 +41,13 @@ class AIHuman(AIBase):
 
         self.memory={}
         self.memory['current_task']='task_think'
+
+        # money !
+        # amount can be a float to account for coinage
+        # 'currency name',amount
+        self.wallet={}
+
+
 
         # -- health stuff --
         self.health=100
@@ -716,61 +724,63 @@ class AIHuman(AIBase):
     def player_vehicle_role_change(self,role):
         'player changes vehicle roles'
         # this is called by world_menu
+        if self.memory['current_task']=='task_vehicle_crew':
+            vehicle=self.memory['task_vehicle_crew']['vehicle']
+            current_role=self.memory['task_vehicle_crew']['role']
+            turret=self.memory['task_vehicle_crew']['turret']
 
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
-        current_role=self.memory['task_vehicle_crew']['role']
-        turret=self.memory['task_vehicle_crew']['turret']
-
-        # remove from current role
-        if current_role=='driver':
-            vehicle.ai.driver=None
-        if current_role=='gunner':
-            pass
+            # remove from current role
+            if current_role=='driver':
+                vehicle.ai.driver=None
+            if current_role=='gunner':
+                pass
 
 
-        if role=='driver':
-            if vehicle.ai.driver!=None:
-                # reassign current driver
-                vehicle.ai.driver.ai.memory['task_vehicle_crew']['role']='passenger'
-            vehicle.ai.driver=self.owner
-            self.memory['task_vehicle_crew']['role']='driver'
-        elif role=='gunner':
-            found_turret=False
+            if role=='driver':
+                if vehicle.ai.driver!=None:
+                    # reassign current driver
+                    vehicle.ai.driver.ai.memory['task_vehicle_crew']['role']='passenger'
+                vehicle.ai.driver=self.owner
+                self.memory['task_vehicle_crew']['role']='driver'
+            elif role=='gunner':
+                found_turret=False
 
-            # search for an empty turret
-            for b in vehicle.ai.turrets:
-                if b.ai.gunner==None:
-                    self.speak("Taking over gunner position")
-                    b.ai.gunner=self.owner
-                    self.memory['task_vehicle_crew']['turret']=b
-                    self.memory['task_vehicle_crew']['role']='gunner'
-                    found_turret=True
-                    break
-            
-            # didn't find one. can we boot someone out?
-            if found_turret==False:
+                # search for an empty turret
                 for b in vehicle.ai.turrets:
-                    if b.ai.gunner!=None:
-
-                        # reassign gunner
-                        b.ai.gunner.ai.memory['task_vehicle_crew']['role']='passenger'
-
-                        # take over as normal
+                    if b.ai.gunner==None:
                         self.speak("Taking over gunner position")
                         b.ai.gunner=self.owner
                         self.memory['task_vehicle_crew']['turret']=b
                         self.memory['task_vehicle_crew']['role']='gunner'
                         found_turret=True
                         break
+                
+                # didn't find one. can we boot someone out?
+                if found_turret==False:
+                    for b in vehicle.ai.turrets:
+                        if b.ai.gunner!=None:
 
-            # still didn't find one somehow?
-            if found_turret==False:
+                            # reassign gunner
+                            b.ai.gunner.ai.memory['task_vehicle_crew']['role']='passenger'
+
+                            # take over as normal
+                            self.speak("Taking over gunner position")
+                            b.ai.gunner=self.owner
+                            self.memory['task_vehicle_crew']['turret']=b
+                            self.memory['task_vehicle_crew']['role']='gunner'
+                            found_turret=True
+                            break
+
+                # still didn't find one somehow?
+                if found_turret==False:
+                    self.memory['task_vehicle_crew']['role']='passenger'
+                    engine.log.add_data('warn','player change role to gunner failed',True)   
+
+
+            elif role=='passenger':
                 self.memory['task_vehicle_crew']['role']='passenger'
-                engine.log.add_data('warn','player change role to gunner failed',True)   
-
-
-        elif role=='passenger':
-            self.memory['task_vehicle_crew']['role']='passenger'
+        else:
+            engine.log.add_data('warn','ai_human.player_vehicle_role - current task is not task_vehicle_crew,'+str(self.memory['current_task']),True)
 
     #---------------------------------------------------------------------------
     def prone_state_change(self):

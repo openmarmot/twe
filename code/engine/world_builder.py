@@ -85,7 +85,7 @@ list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
-list_vehicles_german=['kubelwagen','sd_kfz_251','rso','jagdpanzer_38t_hetzer']
+list_vehicles_german=['kubelwagen','kubelwagen_camo','sd_kfz_251','rso','jagdpanzer_38t_hetzer']
 list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage','t34_76_model_1943','t34_85']
 list_vehicles_american=[]
 list_vehicles_civilian=[]
@@ -533,15 +533,19 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['German 1944 Panzergrenadier Mech'] * 4
         squads+=['German 1944 Fallschirmjager'] * 3
         squads+=['German 1944 Volksgrenadier Storm Group'] * 1
-        squads+=['German 1944 Volksgrenadier Fire Group']
-        squads+=['German Hetzer Squad'] * 2
-        squads+=['Soviet 1943 Rifle'] * 3
+        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
+        squads+=['German Hetzer Squad'] * 5
+        squads+=['German Aufklaren Kubelwagen'] * 2
+        squads+=['German RSO Vehicle'] * 2
+
+        squads+=['Soviet 1943 Rifle'] * 4
         squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
-        squads+=['Soviet T20 Armored Tractor'] * 2
+        squads+=['Soviet T20 Armored Tractor'] * 3
         squads+=['Soviet PTRS-41 AT Squad']
-        squads+=['Soviet T34-76 Model 1943'] * 2
+        squads+=['Soviet T34-76 Model 1943'] * 3
+        squads+=['Soviet T34-85'] * 2
 
     # testing
     elif battle_option=='4':
@@ -549,6 +553,8 @@ def load_quick_battle(world,spawn_faction,battle_option):
         squads+=['German 1944 Fallschirmjager']
         squads+=['Soviet 1944 Rifle']
         squads+=['Soviet T34-85']
+        squads+=['German Aufklaren Kubelwagen'] * 2
+        squads+=['German RSO Vehicle'] * 2
         
 
     for squad in squads:
@@ -1837,6 +1843,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='T34-76 Model 1943'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1918,6 +1925,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='T34-85'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[16,0,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
@@ -1984,6 +1992,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Jadgpanzer 38t Hetzer'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[8,90,0]
         z.ai.vehicle_armor['bottom']=[12,90,0]
         z.ai.vehicle_armor['left']=[20,40,5]
@@ -2133,6 +2142,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='kubelwagen_camo':
+        z=spawn_object(world,world_coords,'kubelwagen',False)
+        z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed_destroyed']
+        z.world_builder_identity='kubelwagen_camo'
+
     elif OBJECT_TYPE=='red_bicycle':
         # note second image is used for the wreck..
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
@@ -2204,6 +2218,12 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.is_human=True
         z.is_civilian=True
+        if random.randint(0,1)==1:
+            z.ai.wallet['Polish Zloty']=round(random.uniform(0.05,1.5),2)
+        if random.randint(0,1)==1:
+            z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
+        if random.randint(0,1)==1:
+            z.ai.wallet['German Reichsmark']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_soldier':
         z=WorldObject(world,['german_soldier','german_soldier_prone','german_dead'],AIHuman)
@@ -2213,6 +2233,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_human=True
         z.is_soldier=True
         z.is_german=True
+        z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
+
 
     elif OBJECT_TYPE=='soviet_soldier':
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
@@ -2222,6 +2244,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_human=True
         z.is_soldier=True
         z.is_soviet=True
+        z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -2293,6 +2316,21 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+
+    elif OBJECT_TYPE=='german_mp40_panzerfaust':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mp40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
         
     elif OBJECT_TYPE=='german_mg34':
         z=spawn_object(world,world_coords,'german_soldier',False)

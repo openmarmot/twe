@@ -1,6 +1,74 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 02 2024
+- added a german recon squad with the new kubelwagen 
+- added a squad for the RSO vehicle 
+- added 'type' field for squads (not used yet)
+- added some stuff to the roadmap 
+
+----------------------------------
+Nov 30 2024
+- fixed a error with table names in campaign creation
+
+----------------------------------
+Nov 29 2024
+- more save/load work
+- started work on a new kubelwagen model 
+- added new art for the kubelwagen
+- bug fix 
+
+I did a camo and no camo variant for the kubelwagen. 
+amusingly there are no squads with a kubelwagen at the moment, so it doesn't
+show up unless you spawn it.
+
+NOTE - campaign mode is broken at the moment 
+
+todo 
+- faction strategic ai save/load 
+- faction strategic ai bank account
+- add squads for rso and kubelwagen and anything else im forgetting  
+- fix error with new campaign creation
+----------------------------------
+Nov 28 2024
+- working on save/load of the bank code 
+
+----------------------------------
+Nov 27 2024
+- started work on adding banks, bank accounts, and global exchange rates 
+- modified the save file format to hold more data than just maps 
+
+todo 
+- saving banks 
+- bank ui 
+- faction_strategic bank account + interaction 
+
+----------------------------------
+Nov 26 2024
+- fixed a crash when the player tries to change vehicle roles 
+while exiting 
+- added a flag for passenger compartment ammo racks 
+- minor vehicle damage adjustments 
+- minor cleanup
+
+passenger_compartment_ammo_racks is True for tanks. 
+This results in a chance of extra damage on a passenger compartment penetration
+
+play test notes 
+- confirmation of a 14.5mm hit taking out a sd.kfz.231 
+- confirmation of a HEAT hit (panzerfaust) taking out a T34-85
+
+
+----------------------------------
+Nov 25 2024
+- added a transmission to vehicles 
+
+gear selection is in the engine menu for now.
+I went with a very simple drive/neutral/reverse solution for now. 
+this is mostly for the player - reverse would be a tricky thing for 
+the ai to handle. 
+
+----------------------------------
 Nov 24 2024
 - turrets are now deleted when the vehicle is destroyed 
 - added the ability for vehicles to tow other vehicles. 
