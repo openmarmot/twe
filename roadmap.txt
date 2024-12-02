@@ -1,8 +1,44 @@
-A roadmap / list of ideas
+A roadmap / list of ideas.
+this is not a full list of what is in game, it is just a way for me to keep track of ideas 
+
+# campaign mode 
+- follow an individual soldier 
+- bank accounts + bank interface 
+
+# tactical / world mode 
+
+- maps 
+    - map should be moved from debug to a real implementation 
+    - should have colors to represent who is owning what
+    - maybe only updates when you are in radio contact
+- binoculars 
+    - enables more zoom levels 
+- better vehicle hit tracking 
+    - able to turn on a mode that shows each hit 
+    - each hit has a line showing the angle 
+    - color of line indicates penetration or bounce 
+
+# people / units 
+- all humans probably need to be resized 
+- luftwaffe ground troops 
+- soviet tank / afv crew 
+- german tank / afv crew 
+- german ss camo uniforms 
+- more civilians 
+
+# weapons 
+- all weapons get resized 
+- german at handheld charg/mine/thing 
+    https://en.wikipedia.org/wiki/Hafthohlladung
+- german AP mine launchers for AFVs 
+    https://en.wikipedia.org/wiki/Nahverteidigungswaffe
+    https://en.wikipedia.org/wiki/Minenabwurfvorrichtung
+- p38 
+- po8 luger 
+- high power 
 
 
 
-(not a full list of what is in game )
 
 # german tanks / destroyers / assault guns
 - tiger 1

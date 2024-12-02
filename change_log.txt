@@ -1,9 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 02 2024
+- added a german recon squad with the new kubelwagen 
+- added a squad for the RSO vehicle 
+- added 'type' field for squads (not used yet)
+- added some stuff to the roadmap 
+
+----------------------------------
 Nov 30 2024
 - fixed a error with table names in campaign creation
-
 
 ----------------------------------
 Nov 29 2024
