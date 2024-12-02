@@ -568,9 +568,6 @@ class StrategicMap(object):
         # close sqlite connection
         conn.close()
 
-
-
-         
     #------------------------------------------------------------------------------
     def load_world(self,map_square,spawn_faction):
         '''handles handoff from strategic map to world mode and loads a map->world'''
