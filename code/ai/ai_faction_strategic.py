@@ -36,11 +36,9 @@ class AIFactionStrategic(object):
         self.square_objectives_not_owned=[]
 
         # treasury 
-        self.treasury_bank=None
-        self.treasury_account=None
+        self.treasury_bank_name=None # the name of the bank
+        self.treasury_account_number=None # the account number with the bank
 
-        # how many 'units' can be spent
-        self.budget=0
 
     #---------------------------------------------------------------------------
     def advance_turn(self):
@@ -48,10 +46,12 @@ class AIFactionStrategic(object):
 
         self.update_map_square_data()
 
+        # determine how much money we made/lost
+
         # buy units with income
         # eventually we will want to not spent the entire budget on new troops 
         # so maybe 50% in the future
-        self.buy_and_place_units(self.budget)
+        self.buy_and_place_units(500)
         
 
         # something else?

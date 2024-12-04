@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Dec 04 2024
+- working on save/load for strategic_ai data 
+- minor strategic_ai restructuring / updates 
+- added a larger variety of squads to the start of the strategic campaign
+- strategic ai now has bank accounts 
+
+I'm tending to replace arrays with dictionaries as I rewrite 
+code for things where i need to reference a specific item by a key 
+word. 
+
+todo 
+- add a economy/money growth aspect to ai_faction_strategic.advance_turn
+- rewrite world_builder squad_data to use dictionary 
+- rewrite ai_faction_strategic.buy_and_place_units to use bank accounts 
 ----------------------------------
 Dec 02 2024
 - added a german recon squad with the new kubelwagen 

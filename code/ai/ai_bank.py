@@ -47,6 +47,7 @@ class AIBank(object):
     def create_account(self):
         '''creates a new account. returns the account number'''
         self.account_increment+=1
+        self.accounts[self.account_increment]={}
         return self.account_increment
     
     #---------------------------------------------------------------------------
