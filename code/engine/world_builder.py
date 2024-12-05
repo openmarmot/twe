@@ -85,10 +85,6 @@ list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
 
-list_vehicles_german=['kubelwagen','kubelwagen_camo','sd_kfz_251','rso','jagdpanzer_38t_hetzer']
-list_vehicles_soviet=['dodge_g505_wc','t20','37mm_m1939_61k_aa_gun_carriage','t34_76_model_1943','t34_85']
-list_vehicles_american=[]
-list_vehicles_civilian=[]
 
 list_medical=['bandage','german_officer_first_aid_kit']
 list_medical_common=['bandage']
@@ -560,7 +556,7 @@ def load_quick_battle(world,spawn_faction,battle_option):
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
 
-    load_world(world,map_objects,spawn_faction)
+    load_world(world,map_objects)
 
 #------------------------------------------------------------------------------
 def load_sqlite_data():
@@ -609,7 +605,7 @@ def load_sqlite_squad_data(faction):
     return squad_data
 
 #------------------------------------------------------------------------------
-def load_world(world,map_objects,spawn_faction):
+def load_world(world,map_objects):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
 
     # convert map_objects to world_objects
@@ -618,21 +614,14 @@ def load_world(world,map_objects,spawn_faction):
 
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
-
-    # generation squads 
-    world.create_squads()
-
-    # give the vehicles initial positions
-    world.position_vehicles()
-
-    # print debug info
-    world.log_world_data()
-
-    # spawn player
-    world.spawn_player(spawn_faction)
-
+    
     # generate the terrain tiles
     generate_terrain(world)
+
+    # perform all world start tasks
+    world.start()
+
+    
     
 
 #------------------------------------------------------------------------------
@@ -1645,7 +1634,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.projectile_type='7.62x54_L'
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='dodge_g505_wc':
+    elif OBJECT_TYPE=='soviet_dodge_g505_wc':
         # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
         # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
         z=WorldObject(world,['dodge_g505_wc','dodge_g505_wc_destroyed'],AIVehicle)
@@ -1673,7 +1662,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='rso':
+    elif OBJECT_TYPE=='german_rso':
         # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
         # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
         z=WorldObject(world,['rso','rso_destroyed'],AIVehicle)
@@ -1701,7 +1690,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='sd_kfz_251':
+    elif OBJECT_TYPE=='german_sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
@@ -1773,7 +1762,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
 
-    elif OBJECT_TYPE=='t20':
+    elif OBJECT_TYPE=='soviet_t20':
         # ref : https://en.wikipedia.org/wiki/Komsomolets_armored_tractor
         # ref : https://wiki.warthunder.com/ZiS-30
         z=WorldObject(world,['t20','t20_destroyed'],AIVehicle)
@@ -1837,7 +1826,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
         z.ai.primary_weapon.ai.equipper=z
 
-    elif OBJECT_TYPE=='t34_76_model_1943':
+    elif OBJECT_TYPE=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
         z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
         z.name='T34-76 Model 1943'
@@ -1919,7 +1908,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
 
-    elif OBJECT_TYPE=='t34_85':
+    elif OBJECT_TYPE=='soviet_t34_85':
         # ref : https://wiki.warthunder.com/T-34-85
         z=WorldObject(world,['t34_chassis','t34_chassis_destroyed'],AIVehicle)
         z.name='T34-85'
@@ -1985,7 +1974,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_zis_s_53',False)
         z.ai.primary_weapon.ai.equipper=z
 
-    elif OBJECT_TYPE=='jagdpanzer_38t_hetzer':
+    elif OBJECT_TYPE=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
         # ref : https://en.wikipedia.org/wiki/Hetzer
         z=WorldObject(world,['jagdpanzer_38t_hetzer_chassis','jagdpanzer_38t_hetzer_chassis_destroyed'],AIVehicle)
@@ -2071,7 +2060,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'7.5cm_pak39_L48',False)
         z.ai.primary_weapon.ai.equipper=z
 
-    elif OBJECT_TYPE=='37mm_m1939_61k_aa_gun_carriage':
+    elif OBJECT_TYPE=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['zu_7_carriage','zu_7_carriage'],AIVehicle)
         z.name='37mm_m1939_61k_aa_gun'
@@ -2112,7 +2101,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon.ai.equipper=z
 
   
-    elif OBJECT_TYPE=='kubelwagen':
+    elif OBJECT_TYPE=='german_kubelwagen':
         z=WorldObject(world,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
         z.name='kubelwagen'
         z.is_vehicle=True
@@ -2142,10 +2131,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='kubelwagen_camo':
+    elif OBJECT_TYPE=='german_kubelwagen_camo':
         z=spawn_object(world,world_coords,'kubelwagen',False)
         z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed_destroyed']
-        z.world_builder_identity='kubelwagen_camo'
+        z.world_builder_identity='german_kubelwagen_camo'
 
     elif OBJECT_TYPE=='red_bicycle':
         # note second image is used for the wreck..
@@ -2168,7 +2157,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
             z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='ju88':
+    elif OBJECT_TYPE=='german_ju88':
         z=WorldObject(world,['ju88-winter-weathered','ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
         z.ai.max_speed=4736
@@ -2217,7 +2206,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
-        z.is_civilian=True
         if random.randint(0,1)==1:
             z.ai.wallet['Polish Zloty']=round(random.uniform(0.05,1.5),2)
         if random.randint(0,1)==1:
@@ -2232,7 +2220,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
-        z.is_german=True
         z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
 
 
@@ -2243,7 +2230,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.collision_radius=15
         z.is_human=True
         z.is_soldier=True
-        z.is_soviet=True
         z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_kar98k':
@@ -2924,15 +2910,13 @@ def spawn_shrapnel_cloud(world,world_coords,AMOUNT,ORIGINATOR,WEAPON_NAME):
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     ignore_list=[]
     if world.friendly_fire_explosive==False:
-        if ORIGINATOR.is_german:
-                ignore_list+=world.wo_objects_german
-        elif ORIGINATOR.is_soviet:
-            ignore_list+=world.wo_objects_soviet
-        elif ORIGINATOR.is_american:
-            ignore_list+=world.wo_objects_american
+        if ORIGINATOR.is_human:
+            ignore_list+=ORIGINATOR.ai.squad.faction_tactical.allied_humans
+
     elif world.friendly_fire_explosive_squad==False:
-        # just add the squad
-        ignore_list+=ORIGINATOR.ai.squad.members
+        if ORIGINATOR.is_human:
+            # just add the squad
+            ignore_list+=ORIGINATOR.ai.squad.members
 
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-150,150))+world_coords[0],float(random.randint(-150,150))+world_coords[1]]

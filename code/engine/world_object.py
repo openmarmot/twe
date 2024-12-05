@@ -93,11 +93,6 @@ class WorldObject(object):
         self.is_player=False
         self.is_human=False # something that has ai_human
         
-        self.is_civilian=False
-        self.is_german=False
-        self.is_soviet=False
-        self.is_american=False
-
         self.is_soldier=False
         self.is_vehicle=False
         self.is_airplane=False

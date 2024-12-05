@@ -50,10 +50,11 @@ class World(object):
         engine.world_radio.reset_world_radio()
 
         # tactical AIs. This also adds radios !
-        self.german_ai=AIFactionTactical(self,'german',self.spawn_west,3)
-        self.soviet_ai=AIFactionTactical(self,'soviet',self.spawn_east,5)
-        self.american_ai=AIFactionTactical(self,'american',self.spawn_north,10)
-        self.civilian_ai=AIFactionTactical(self,'civilian',self.spawn_center,12)
+        self.tactical_ai={}
+        self.tactical_ai['german']=AIFactionTactical(self,'german',[],['soviet'],self.spawn_west,3)
+        self.tactical_ai['soviet']=AIFactionTactical(self,'soviet',[],['german'],self.spawn_east,5)
+        self.tactical_ai['american']=AIFactionTactical(self,'american',[],[],self.spawn_north,10)
+        self.tactical_ai['civilian']=AIFactionTactical(self,'civilian',[],[],self.spawn_center,12)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -75,10 +76,6 @@ class World(object):
         self.wo_objects_human=[]
         self.wo_objects_guns=[]
         self.wo_objects_gun_magazines=[]
-        self.wo_objects_german=[]
-        self.wo_objects_soviet=[]
-        self.wo_objects_american=[]
-        self.wo_objects_civilian=[]
         self.wo_objects_vehicle=[]
         self.wo_objects_grenade=[]
         self.wo_objects_consumable=[]
@@ -109,6 +106,9 @@ class World(object):
         self.world_menu=World_Menu(self)
 
         self.player=None
+
+        # faction set for player. set when world is created
+        self.player_spawn_faction=''
 
         # a way to pause the action
         self.is_paused=False
@@ -200,12 +200,6 @@ class World(object):
                 self.wo_objects_human.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_gun:
                 self.wo_objects_guns.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_german:
-                self.wo_objects_german.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_soviet:
-                self.wo_objects_soviet.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_american:
-                self.wo_objects_american.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_vehicle:
                 self.wo_objects_vehicle.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_grenade:
@@ -220,8 +214,6 @@ class World(object):
                 self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_airplane:
                 self.wo_objects_airplane.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_civilian:
-                self.wo_objects_civilian.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_melee:
                 self.wo_objects_melee.append(WORLD_OBJECT)
             if WORLD_OBJECT.is_medical:
@@ -315,10 +307,8 @@ class World(object):
 
     #------------------------------------------------------------------------------
     def create_squads(self):
-        self.german_ai.create_squads(copy.copy(self.wo_objects_german))
-        self.soviet_ai.create_squads(copy.copy(self.wo_objects_soviet))
-        self.american_ai.create_squads(copy.copy(self.wo_objects_american))
-        self.civilian_ai.create_squads(copy.copy(self.wo_objects_civilian))
+        for ai in self.tactical_ai.values():
+            ai.create_squads()
 
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,OBJ):
@@ -341,12 +331,7 @@ class World(object):
 
         if OBJ.is_human:
             if self.friendly_fire==False:
-                if OBJ.is_german:
-                        ignore_list+=self.wo_objects_german
-                elif OBJ.is_soviet:
-                    ignore_list+=self.wo_objects_soviet
-                elif OBJ.is_american:
-                    ignore_list+=self.wo_objects_american
+                ignore_list+=OBJ.ai.squad.faction_tactical.allied_humans
             elif self.friendly_fire_squad==False:
                 # just add the squad
                 ignore_list+=OBJ.ai.squad.members
@@ -569,27 +554,8 @@ class World(object):
         '''print out a bunch of world info'''
 
         engine.log.add_data('debug','wo_objects : '+str(len(self.wo_objects)),True)
-        engine.log.add_data('debug','wo_objects_german : '+str(len(self.wo_objects_german)),True)
-        engine.log.add_data('debug','wo_objects_soviet : '+str(len(self.wo_objects_soviet)),True)
-        engine.log.add_data('debug','wo_objects_american : '+str(len(self.wo_objects_american)),True)
-        engine.log.add_data('debug','wo_objects_civilian : '+str(len(self.wo_objects_civilian)),True)
-
-    #------------------------------------------------------------------------------
-    def position_vehicles(self):
-        ''' position vehicles at spawn points'''
-
-        # kind of a hack as humans get positions when the squads are created, but vehicles don't
-
-        for v in self.wo_objects_vehicle:
-            if v.world_builder_identity in engine.world_builder.list_vehicles_german:
-                v.world_coords=self.german_ai.spawn_location
-            elif v.world_builder_identity in engine.world_builder.list_vehicles_soviet:
-                v.world_coords=self.soviet_ai.spawn_location
-            elif v.world_builder_identity in engine.world_builder.list_vehicles_american:
-                v.world_coords=self.american_ai.spawn_location
-
-            # randomize position
-            engine.math_2d.randomize_position_and_rotation(v,250)
+        engine.log.add_data('debug','wo_objects_human : '+str(len(self.wo_objects_human)),True)
+        engine.log.add_data('debug','wo_objects_vehicle : '+str(len(self.wo_objects_vehicle)),True)
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -650,21 +616,7 @@ class World(object):
                 process_queue.append(b)
         for b in process_queue:
             self.reinforcements.remove(b)
-            print('spawning reinforcements',b[1])
-            if b[1]=='german':
-                print('process reinforcements needs a rewrite')
-                #engine.world_builder.create_standard_squad(self,self.german_ai,b[2],b[3])
-            elif b[1]=='american':
-                print('process reinforcements needs a rewrite')
-                #engine.world_builder.create_standard_squad(self,self.american_ai,b[2],b[3])
-            elif b[1]=='soviet':
-                print('process reinforcements needs a rewrite')
-                #engine.world_builder.create_standard_squad(self,self.soviet_ai,b[2],b[3])
-            elif b[1]=='civilian':
-                print('process reinforcements needs a rewrite')
-                #engine.world_builder.create_standard_squad(self,self.civilian_ai,b[2],b[3])
-            else:
-                print('Error - faction not recognized in process_reinforements: ',b[1])
+            engine.log.add_data('error','world.process_reinforcements is disabled ! ',True)
 
 
 
@@ -681,12 +633,6 @@ class World(object):
                 self.wo_objects_human.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_gun:
                 self.wo_objects_guns.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_german:
-                self.wo_objects_german.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_soviet:
-                self.wo_objects_soviet.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_american:
-                self.wo_objects_american.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_vehicle:
                 self.wo_objects_vehicle.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_grenade:
@@ -701,8 +647,6 @@ class World(object):
                 self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_airplane:
                 self.wo_objects_airplane.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_civilian:
-                self.wo_objects_civilian.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_melee:
                 self.wo_objects_melee.remove(WORLD_OBJECT)
             if WORLD_OBJECT.is_medical:
@@ -798,40 +742,15 @@ class World(object):
                 print('---')
 
     #---------------------------------------------------------------------------
-    def spawn_player(self, FACTION):
-        spawned=False
-        if FACTION=='german':
-            if len(self.wo_objects_german)>0:
-                self.player=random.choice(self.wo_objects_german)
-                spawned=True
-            else:
-                engine.log.add_data('error','world.spawn_player spawn as german but zero german objects available',True)
-        elif FACTION=='soviet':
-            if len(self.wo_objects_soviet)>0:
-                self.player=random.choice(self.wo_objects_soviet)
-                spawned=True
-            else:
-                engine.log.add_data('error','world.spawn_player spawn as soviet but zero soviet objects available',True)
-        elif FACTION=='american':
-            if len(self.wo_objects_american)>0:
-                self.player=random.choice(self.wo_objects_american)
-                spawned=True
-            else:
-                engine.log.add_data('error','world.spawn_player spawn as american but zero american objects available',True)
-        elif FACTION=='civilian':
-            if len(self.wo_objects_civilian)>0:
-                self.player=random.choice(self.wo_objects_civilian)
-                spawned=True
-            else:
-                engine.log.add_data('error','world.spawn_player spawn as civilian but zero civilian objects available',True)
-        elif FACTION=='random':
-            if len(self.wo_objects_human)>0:
-                self.player=random.choice(self.wo_objects_human)
-                spawned=True
-            else:
-                engine.log.add_data('error','world.spawn_player but there are no humans left in the world',True)
+    def spawn_player(self):
+        '''spawns player'''
+        # ! note - this should be done after squads are created
+        candidates=[]
+        for squad in self.tactical_ai[self.player_spawn_faction]:
+            candidates+=squad.members
 
-        if spawned:
+        if len(candidates)>0:
+            self.player=random.choice(candidates)
             self.player.is_player=True
             if 'vehicle' in self.player.ai.memory['current_task']:
                 # not sure if we have to do anything if in a vehicle 
@@ -840,7 +759,21 @@ class World(object):
                 self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
         else:
-            print('ERROR : player spawn failed')
+            engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction',True)
+
+    #---------------------------------------------------------------------------
+    def start(self):
+        '''performs world tasks necessary for a new world to start'''
+        # called by world_builder.load_world()
+        
+        # generation squads
+        self.create_squads()
+
+        # print debug info
+        self.log_world_data()
+
+        # spawn player
+        self.spawn_player()
 
     #---------------------------------------------------------------------------
     def toggle_map(self):
@@ -888,11 +821,8 @@ class World(object):
             for b in self.world_areas:
                 b.update()
 
-            # update tactical AIs
-            self.german_ai.update()
-            self.soviet_ai.update()
-            self.american_ai.update()
-            self.civilian_ai.update()
+            for ai in self.tactical_ai.values():
+                ai.update()
 
             # update world menu -
             self.world_menu.update()
@@ -926,10 +856,10 @@ class World(object):
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
-        self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.german_ai.squads))+']')
-        self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.soviet_ai.squads))+']')
-        self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.american_ai.squads))+']')
-        self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.civilian_ai.squads))+']')
+        #self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.tactical_ai['german'].squads))+']')
+        #self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.tactical_ai['soviet'].squads))+']')
+        #self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.tactical_ai['american'].squads))+']')
+        #self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.tactical_ai['civilian'].squads))+']')
         self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)

@@ -52,7 +52,7 @@ class StrategicMap(object):
         self.save_file_name=None
 
         # map size
-        self.map_size=10
+        self.map_size=12
         
         self.strategic_menu=StrategicMenu(self)
 
@@ -200,7 +200,7 @@ class StrategicMap(object):
         for index, name in enumerate(map_names):
             y = index % grid_size
             x = index // grid_size
-            spacing=85
+            spacing=65
             grid_square = MapSquare(name,[x*spacing+self.map_offset_x, y*spacing+self.map_offset_y])
             grid[y][x] = grid_square
         
@@ -233,7 +233,7 @@ class StrategicMap(object):
         '''create a new campaign save file '''
 
 
-        map_name=['A','B','C','D','E','F','G','H','I','J','K']
+        map_name=['A','B','C','D','E','F','G','H','I','J','K','L']
         # create the database
         conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
@@ -391,7 +391,7 @@ class StrategicMap(object):
             if b.name[0]=='A':
                 west_column.append(b)
             # this needs to be fixed for bigger maps
-            if b.name[0]=='J':
+            if b.name[0]=='L':
                 east_column.append(b)
 
 
@@ -623,16 +623,19 @@ class StrategicMap(object):
 
     #------------------------------------------------------------------------------
     def load_world(self,map_square,spawn_faction):
-        '''handles handoff from strategic map to world mode and loads a map->world'''
+        '''called by strategic_menu. handles handoff from strategic map to world mode and loads a map->world'''
 
         # create a fresh world 
         self.graphics_engine.world=World()
+
+        # set spawn faction
+        self.graphics_engine.world.player_spawn_faction=spawn_faction
 
         # set the map name so we can unload it to the correct map when we are done playing
         self.graphics_engine.world.map_square_name=map_square.name
 
         # send to world_builder to convert map_objects to world_objects (this spawns them)
-        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects,spawn_faction)
+        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects)
 
         # clear maps?
 

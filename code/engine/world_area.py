@@ -76,13 +76,13 @@ class WorldArea(object):
         for b in self.world.wo_objects_human:
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
             if d < self.size:
-                if b.is_german:
+                if b.ai.squad.faction_tactical.faction=='german':
                     self.german_count+=1
-                elif b.is_soviet:
+                elif b.ai.squad.faction_tactical.faction=='soviet':
                     self.soviet_count+=1
-                elif b.is_american:
+                elif b.ai.squad.faction_tactical.faction=='american':
                     self.american_count+=1
-                elif b.is_civilian:
+                elif b.ai.squad.faction_tactical.faction=='civilian':
                     self.civilian_count+=1
                 else:
                     print('debug: world_area.update_control unidentified human object')

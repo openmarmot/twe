@@ -275,49 +275,18 @@ class World_Menu(object):
             for b in self.world.player.ai.collision_log:
                 self.text_queue.append(b)
 
-            german_count=len(self.world.wo_objects_german)
-            soviet_count=len(self.world.wo_objects_soviet)
-            american_count=len(self.world.wo_objects_american)
-            civilian_count=len(self.world.wo_objects_civilian)
 
-            self.text_queue.append('1 - respawn as random existing bot')
+
+            self.text_queue.append('1 - respawn as a random bot on your team')
             if key=='1':
-                self.world.spawn_player('random')
-                self.world.is_paused=False
-                self.deactivate_menu()
-                return
+                if self.world.spawn_player():
+                    self.world.is_paused=False
+                    self.deactivate_menu()
+                    return
+                else:
+                    self.text_queue.append('! No more humans left on your team')
             
-            if german_count>0:
-                self.text_queue.append('2 - respawn as random German bot')
-                if key=='2':
-                    self.world.spawn_player('german')
-                    self.world.is_paused=False
-                    self.deactivate_menu()
-                    return
-                
-            if soviet_count>0:
-                self.text_queue.append('3 - respawn as random Soviet bot')
-                if key=='3':
-                    self.world.spawn_player('soviet')
-                    self.world.is_paused=False
-                    self.deactivate_menu()
-                    return
-                
-            if american_count>0:
-                self.text_queue.append('4 - respawn as random German bot')
-                if key=='4':
-                    self.world.spawn_player('american')
-                    self.world.is_paused=False
-                    self.deactivate_menu()
-                    return
-                
-            if civilian_count>0:
-                self.text_queue.append('5 - respawn as random Civilian bot')
-                if key=='5':
-                    self.world.spawn_player('civilian')
-                    self.world.is_paused=False
-                    self.deactivate_menu()
-                    return
+
 
     #---------------------------------------------------------------------------
     def debug_menu(self, key):
@@ -341,11 +310,9 @@ class World_Menu(object):
                 self.menu_state='spawn'
                 key=None
             elif key=='4':
-                self.world.german_ai.send_radio_comms_check()
-                self.world.soviet_ai.send_radio_comms_check()
-                self.world.american_ai.send_radio_comms_check()
-                self.world.civilian_ai.send_radio_comms_check()
-                print('comms check sent on all tactical ai channels')
+                for ai in self.world.tactical_ai.values():
+                    ai.send_radio_comms_check()
+                engine.log.add_data('info','comms check sent on all tactical_ai channels',True)
 
             elif key=='5':
                 self.world.run_self_debug()
@@ -435,16 +402,12 @@ class World_Menu(object):
             self.text_queue.append('4 - Soviet 1944 Submachine Gun')
             if key=='1':
                 print('this needs a rewrite')
-                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 rifle')
             elif key=='2':
                 print('this needs a rewrite')
-                #engine.world_builder.create_standard_squad(self.world,self.world.german_ai,self.world.player.world_coords,'german 1944 volksgrenadier storm group')
             elif key=='3':
                 print('this needs a rewrite')
-                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 rifle')
             elif key=='4':
                 print('this needs a rewrite')
-                #engine.world_builder.create_standard_squad(self.world,self.world.soviet_ai,self.world.player.world_coords,'soviet 1944 submachine gun')
         if self.menu_state=='spawn_misc':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Misc --')

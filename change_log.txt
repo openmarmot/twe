@@ -2,6 +2,28 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 05 2024
+- updated map grid to be 12x12 from 10x10
+- updates to the strategic map unit movement code 
+- vehicles now get a faction prefix 
+- a ton of code restructuring 
+
+I made some initial moves to make factions more dynamic and less hard coded. 
+This could allow the introduction of more factions. 
+
+specific faction object lists were removed from world along with 
+is_[faction] flags from world_object 
+
+realized there is a problem indentifying what a map object is and who it belongs to. 
+will either need to add more data to map objects, or keep a list of 
+world_builder_identities for soldiers/vehicles/etc for each faction 
+
+todo 
+- handle what happens on death when there is no one left to spawn as 
+- add campaign specific data table 
+- add a permanent faction selection to the campaign 
+
+----------------------------------
 Dec 04 2024
 - working on save/load for strategic_ai data 
 - minor strategic_ai restructuring / updates 

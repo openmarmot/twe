@@ -196,11 +196,14 @@ class AIFactionStrategic(object):
             to_square = order['to']
             troops_needed = order['troops']
 
-            # get the troops
+            # get the troops. make sure we are only selecting humans and vehicles
             troops_to_move=[]
             for b in from_square.map_objects:
-                if b.world_builder_identity.startswith(self.faction) and len(troops_to_move)<troops_needed:
-                    troops_to_move.append(b)
+                if len(troops_to_move)<troops_needed:
+                    if b.world_builder_identity.startswith(self.faction):
+                        #! note this will also grab things like 'german_fuel_can'
+                        troops_to_move.append(b)
+
 
             # move the troops
             for b in troops_to_move:

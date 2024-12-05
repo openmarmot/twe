@@ -20,7 +20,7 @@ class MapSquare(object):
     def __init__(self,name,screen_coords):
         self.name=name
         self.screen_coords=screen_coords
-        self.scale_modifier=0.3
+        self.scale_modifier=0
         self.image=None
         self.image_index=0
         self.image_list=['map_blue','map_red','map_grey','map_contested']
