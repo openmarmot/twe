@@ -746,7 +746,7 @@ class World(object):
         '''spawns player'''
         # ! note - this should be done after squads are created
         candidates=[]
-        for squad in self.tactical_ai[self.player_spawn_faction]:
+        for squad in self.tactical_ai[self.player_spawn_faction].squads:
             candidates+=squad.members
 
         if len(candidates)>0:
@@ -758,8 +758,10 @@ class World(object):
             else:
                 self.player.ai.memory['current_task']='task_player_control'
             print('You are now '+self.player.name)
+            return True
         else:
             engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction',True)
+            return False
 
     #---------------------------------------------------------------------------
     def start(self):

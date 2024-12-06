@@ -485,7 +485,7 @@ def load_magazine(world,magazine,projectile_type=None):
         engine.log.add_data('Error','world_builder.load_magazine incompatible projectile type: '+projectile_type,True)
 
 #------------------------------------------------------------------------------
-def load_quick_battle(world,spawn_faction,battle_option):
+def load_quick_battle(world,battle_option):
     ''' load quick battle. called by game menu'''
 
     map_objects=[]
@@ -2132,8 +2132,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='german_kubelwagen_camo':
-        z=spawn_object(world,world_coords,'kubelwagen',False)
-        z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed_destroyed']
+        z=spawn_object(world,world_coords,'german_kubelwagen',False)
+        z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed']
         z.world_builder_identity='german_kubelwagen_camo'
 
     elif OBJECT_TYPE=='red_bicycle':

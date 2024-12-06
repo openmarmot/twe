@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 06 2024
+- fix a lot of bugs from the last session
+- fixed error with 'climb onboard' dialog action
+- fixed campaign load error with bank accounts
+- increased the amount of starting campaign forces
+- fixed spelling error with kubelwagen destroyed image 
+
+
+campaign needs so much work.
 
 ----------------------------------
 Dec 05 2024

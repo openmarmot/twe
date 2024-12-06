@@ -458,24 +458,24 @@ class StrategicMap(object):
         '''generate and place the inital units for each side'''
         # - german - 
         squads=[]
-        squads=['German 1944 Rifle'] * 40
-        squads+=['German 1944 Panzergrenadier Mech'] * 20
+        squads=['German 1944 Rifle'] * 200
+        squads+=['German 1944 Panzergrenadier Mech'] * 25
         squads+=['German 1944 Fallschirmjager'] * 5
-        squads+=['German 1944 Volksgrenadier Storm Group'] * 4
+        squads+=['German 1944 Volksgrenadier Storm Group'] * 8
         squads+=['German 1944 Volksgrenadier Fire Group'] * 4
-        squads+=['German RSO Vehicle'] * 5
-        squads+=['German Aufklaren Kubelwagen'] * 4
-        squads+=['German Hetzer Squad'] * 10
+        squads+=['German RSO Vehicle'] * 15
+        squads+=['German Aufklaren Kubelwagen'] * 14
+        squads+=['German Hetzer Squad'] * 50
         self.strategic_ai['german'].set_initial_units(squads)
         
         # - soviet -
         squads=[]
-        squads=['Soviet 1943 Rifle'] * 60
+        squads=['Soviet 1943 Rifle'] * 200
         squads+=['Soviet 1944 SMG'] * 5
-        squads+=['Soviet 1944 Rifle Motorized'] * 5
-        squads+=['Soviet T20 Armored Tractor'] * 3
-        squads+=['Soviet PTRS-41 AT Squad'] * 6
-        squads+=['Soviet T34-76 Model 1943'] * 6
+        squads+=['Soviet 1944 Rifle Motorized'] * 15
+        squads+=['Soviet T20 Armored Tractor'] * 23
+        squads+=['Soviet PTRS-41 AT Squad'] * 16
+        squads+=['Soviet T34-76 Model 1943'] * 50
         squads+=['Soviet T34-85'] * 2
         self.strategic_ai['soviet'].set_initial_units(squads)
 
@@ -601,7 +601,9 @@ class StrategicMap(object):
             holdings_dict={}
             for data in holdings.split(','):
                 data=data.split(':')
-                holdings_dict[data[0]]=float(data[1])
+                # catch empty accounts which are saved as ['']
+                if data[0]!='':
+                    holdings_dict[data[0]]=float(data[1])
 
             self.banks[bank_name].accounts[int(account_number)]=holdings_dict
         

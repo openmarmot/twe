@@ -352,23 +352,23 @@ class World_Menu(object):
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - jagdpanzer_38t_hetzer')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kubelwagen_camo',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen_camo',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ju88',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_ju88',True)
             elif key=='4':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'dodge_g505_wc',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_dodge_g505_wc',True)
             elif key=='5':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'sd_kfz_251',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251',True)
             elif key=='6':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'t20',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_t20',True)
             elif key=='7':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'rso',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_rso',True)
             elif key=='8':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'t34_76_model_1943',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_t34_76_model_1943',True)
             elif key=='9':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'jagdpanzer_38t_hetzer',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_jagdpanzer_38t_hetzer',True)
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
@@ -764,7 +764,8 @@ class World_Menu(object):
             if key=='3':
                 self.selected_object.ai.handle_event('speak',['ask to upgrade gear',None])
             if key=='4' and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
-                self.selected_object.ai.handle_event('speak',['task_enter_vehicle',self.world.player.ai.vehicle])
+                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                self.selected_object.ai.handle_event('speak',['task_enter_vehicle',vehicle])
         elif self.menu_state == 'non_squad_member_menu':
             self.text_queue.append('1 - What are you up to ?')
             self.text_queue.append('2 - Will you join my squad?')

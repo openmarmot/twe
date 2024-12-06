@@ -72,7 +72,7 @@ class AIFactionTactical(object):
 
         # don't use faction specific wo_ lists as we are trying to get rid of them
         for b in self.world.wo_objects:
-            if b.world_builder_identity.starts_with(self.faction):
+            if b.world_builder_identity.startswith(self.faction):
                 if b.is_human:
                     humans.append(b)
                 elif b.is_vehicle:
