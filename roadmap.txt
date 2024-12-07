@@ -1,12 +1,18 @@
 A roadmap / list of ideas.
 this is not a full list of what is in game, it is just a way for me to keep track of ideas 
 
-# campaign mode 
+
+# factions 
+- add minor factions 
+- make faction relationships dynamic. 
+- 'civilian' partisan factions
+
+# campaign mode specific
 - follow an individual soldier 
-- bank accounts + bank interface 
+- bank accounts + bank interface
+- lock spawning down to a specific faction that you choose 
 
-# tactical / world mode 
-
+# tactical / world mode specific 
 - maps 
     - map should be moved from debug to a real implementation 
     - should have colors to represent who is owning what

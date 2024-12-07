@@ -38,9 +38,6 @@ class GameMenu(object):
         # used for multiple page layouts
         self.current_page=0
 
-        # used in the quick_battle menu
-        self.faction=''
-
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -175,13 +172,13 @@ class GameMenu(object):
             # note 1 is missing as americans are not implemented
             if key in ['2','3','4']:
                 if key=='1':
-                    self.faction='american'
+                    self.graphics_engine.world.player_spawn_faction='american'
                 elif key=='2':
-                    self.faction='german'
+                    self.graphics_engine.world.player_spawn_faction='german'
                 elif key=='3':
-                    self.faction='soviet'
+                    self.graphics_engine.world.player_spawn_faction='soviet'
                 elif key=='4':
-                    self.faction='civilian'
+                    self.graphics_engine.world.player_spawn_faction='civilian'
 
                 self.menu_state='battle_select'
                 key='none'
@@ -198,7 +195,7 @@ class GameMenu(object):
 
             if key in ['1','2','3','4']:
 
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,self.faction,key)
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,key)
 
                 self.graphics_engine.switch_mode(1)
                 self.deactivate_menu()

@@ -41,11 +41,8 @@ class StrategicMap(object):
         self.banks={}
 
         # strategic AIs
-        self.strategic_ai=[]
-        self.strategic_ai.append(AIFactionStrategic(self,'german'))
-        self.strategic_ai.append(AIFactionStrategic(self,'soviet'))
-        self.strategic_ai.append(AIFactionStrategic(self,'american'))
-        self.strategic_ai.append(AIFactionStrategic(self,'civilian'))
+        self.strategic_ai={}
+        
 
         # map offset 
         self.map_offset_x=350
@@ -55,7 +52,7 @@ class StrategicMap(object):
         self.save_file_name=None
 
         # map size
-        self.map_size=10
+        self.map_size=12
         
         self.strategic_menu=StrategicMenu(self)
 
@@ -63,9 +60,7 @@ class StrategicMap(object):
     def advance_turn(self):
         '''have all the strategic ai take one turn and then update the map'''
 
-        self.update_faction_budgets()
-
-        for b in self.strategic_ai:
+        for b in self.strategic_ai.values():
             b.advance_turn()
             self.update_map_data()
 
@@ -205,7 +200,7 @@ class StrategicMap(object):
         for index, name in enumerate(map_names):
             y = index % grid_size
             x = index // grid_size
-            spacing=85
+            spacing=65
             grid_square = MapSquare(name,[x*spacing+self.map_offset_x, y*spacing+self.map_offset_y])
             grid[y][x] = grid_square
         
@@ -238,7 +233,7 @@ class StrategicMap(object):
         '''create a new campaign save file '''
 
 
-        map_name=['A','B','C','D','E','F','G','H','I','J','K']
+        map_name=['A','B','C','D','E','F','G','H','I','J','K','L']
         # create the database
         conn = sqlite3.connect(self.save_file_name)
         cursor = conn.cursor()
@@ -295,7 +290,6 @@ class StrategicMap(object):
             conn.rollback()
 
         # - create the bank_accounts table -
-        # currency_string 'currency1:amount,currency2:amount'
         table_name='bank_accounts'
         create_table_sql = f'''
         CREATE TABLE IF NOT EXISTS {table_name} (
@@ -316,9 +310,50 @@ class StrategicMap(object):
             # If an error occurs, rollback any changes
             conn.rollback()
 
+        # - create the strategic_ai table -
+        # currency_string 'currency1:amount,currency2:amount'
+        table_name='strategic_ai'
+        create_table_sql = f'''
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            faction TEXT,
+            treasury_bank_name TEXT,
+            treasury_account_number TEXT
+        );
+        '''
+
+        # Execute the SQL command to create the table
+        try:
+            cursor.execute(create_table_sql)
+            # Commit the transaction
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            # If an error occurs, rollback any changes
+            conn.rollback()
+
+
         # Close the connection
         conn.close()
 
+    #---------------------------------------------------------------------------
+    def create_strategic_ai(self):
+        self.strategic_ai['german']=AIFactionStrategic(self,'german')
+        self.strategic_ai['german'].treasury_bank_name='Reichsbank'
+        self.strategic_ai['german'].treasury_account_number=self.banks['Reichsbank'].create_account()
+
+        self.strategic_ai['soviet']=AIFactionStrategic(self,'soviet')
+        self.strategic_ai['soviet'].treasury_bank_name='Gosbank'
+        self.strategic_ai['soviet'].treasury_account_number=self.banks['Gosbank'].create_account()
+
+        self.strategic_ai['american']=AIFactionStrategic(self,'american')
+        self.strategic_ai['american'].treasury_bank_name='US Federal Reserve'
+        self.strategic_ai['american'].treasury_account_number=self.banks['US Federal Reserve'].create_account()
+
+        # representing a civilian government
+        self.strategic_ai['civilian']=AIFactionStrategic(self,'civilian')
+        self.strategic_ai['civilian'].treasury_bank_name='Alpen Kreditbank'
+        self.strategic_ai['civilian'].treasury_account_number=self.banks['Alpen Kreditbank'].create_account()
     
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
@@ -356,7 +391,7 @@ class StrategicMap(object):
             if b.name[0]=='A':
                 west_column.append(b)
             # this needs to be fixed for bigger maps
-            if b.name[0]=='J':
+            if b.name[0]=='L':
                 east_column.append(b)
 
 
@@ -421,24 +456,33 @@ class StrategicMap(object):
     #------------------------------------------------------------------------------
     def generate_initial_units(self):
         '''generate and place the inital units for each side'''
+        # - german - 
+        squads=[]
+        squads=['German 1944 Rifle'] * 200
+        squads+=['German 1944 Panzergrenadier Mech'] * 25
+        squads+=['German 1944 Fallschirmjager'] * 5
+        squads+=['German 1944 Volksgrenadier Storm Group'] * 8
+        squads+=['German 1944 Volksgrenadier Fire Group'] * 4
+        squads+=['German RSO Vehicle'] * 15
+        squads+=['German Aufklaren Kubelwagen'] * 14
+        squads+=['German Hetzer Squad'] * 50
+        self.strategic_ai['german'].set_initial_units(squads)
         
-        # might eventually move this data out to sqlite
-        for b in self.strategic_ai:
-            if b.faction=='german':
-                squads=['German 1944 Rifle'] * 40
-                squads+=['German 1944 Panzergrenadier Mech'] * 20
-                squads+=['German 1944 Fallschirmjager'] * 5
+        # - soviet -
+        squads=[]
+        squads=['Soviet 1943 Rifle'] * 200
+        squads+=['Soviet 1944 SMG'] * 5
+        squads+=['Soviet 1944 Rifle Motorized'] * 15
+        squads+=['Soviet T20 Armored Tractor'] * 23
+        squads+=['Soviet PTRS-41 AT Squad'] * 16
+        squads+=['Soviet T34-76 Model 1943'] * 50
+        squads+=['Soviet T34-85'] * 2
+        self.strategic_ai['soviet'].set_initial_units(squads)
 
-                b.set_initial_units(squads)
-            elif b.faction=='soviet':
-                squads=['Soviet 1943 Rifle'] * 60
-                squads+=['Soviet 1944 SMG'] * 5
-                squads+=['Soviet 1944 Rifle Motorized'] * 5
+        # - american -
 
-                b.set_initial_units(squads)
-            elif b.faction=='american':
-                # not setup to handle this yet
-                pass
+        # - civilian -
+
 
     #---------------------------------------------------------------------------
     def generate_save_filename(self,length=8):
@@ -557,12 +601,23 @@ class StrategicMap(object):
             holdings_dict={}
             for data in holdings.split(','):
                 data=data.split(':')
-                holdings_dict[data[0]]=float(data[1])
+                # catch empty accounts which are saved as ['']
+                if data[0]!='':
+                    holdings_dict[data[0]]=float(data[1])
 
             self.banks[bank_name].accounts[int(account_number)]=holdings_dict
         
-        # -- strategic ai data ---
-            
+        # -- load strategic ai data ---
+        self.strategic_ai={}
+        cursor.execute("SELECT * FROM strategic_ai;")
+        rows=cursor.fetchall()
+        for row in rows:
+            (id,faction,treasury_bank_name,treasury_account_number) = row
+            # convert the string back to a dictionary
+            ai=AIFactionStrategic(self,faction)
+            ai.treasury_bank_name=treasury_bank_name
+            ai.treasury_account_number=int(treasury_account_number)
+            self.strategic_ai[faction]=ai
 
         
         # close sqlite connection
@@ -570,16 +625,19 @@ class StrategicMap(object):
 
     #------------------------------------------------------------------------------
     def load_world(self,map_square,spawn_faction):
-        '''handles handoff from strategic map to world mode and loads a map->world'''
+        '''called by strategic_menu. handles handoff from strategic map to world mode and loads a map->world'''
 
         # create a fresh world 
         self.graphics_engine.world=World()
+
+        # set spawn faction
+        self.graphics_engine.world.player_spawn_faction=spawn_faction
 
         # set the map name so we can unload it to the correct map when we are done playing
         self.graphics_engine.world.map_square_name=map_square.name
 
         # send to world_builder to convert map_objects to world_objects (this spawns them)
-        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects,spawn_faction)
+        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects)
 
         # clear maps?
 
@@ -745,6 +803,46 @@ class StrategicMap(object):
         '''save all the campaign things'''
         self.save_all_maps()
         self.save_banks()
+        self.save_strategic_ai()
+
+    #------------------------------------------------------------------------------
+    def save_strategic_ai(self):
+        conn = sqlite3.connect(self.save_file_name)
+        cursor = conn.cursor()
+        
+        # - clear the data from the table -
+        cursor.execute("DELETE FROM strategic_ai;")
+        conn.commit()
+
+        # save the strategic ai data 
+        for ai in self.strategic_ai.values():
+
+            # - save the ai data -
+            # data conversions. the table is all TEXT
+            data = {
+                'faction': ai.faction,
+                'treasury_bank_name': ai.treasury_bank_name,
+                'treasury_account_number': str(ai.treasury_account_number)
+            }
+
+            # Insert the data into the table
+            insert_sql = '''
+            INSERT INTO strategic_ai 
+            (faction, treasury_bank_name, treasury_account_number)
+            VALUES (?, ?, ?);
+            '''
+
+            cursor.execute(insert_sql, (
+                data['faction'], 
+                data['treasury_bank_name'], 
+                data['treasury_account_number']
+            ))
+
+            # Commit the changes
+            conn.commit()
+
+        # Close the connection
+        conn.close()
 
     #---------------------------------------------------------------------------
     def start_new_campaign(self):
@@ -758,6 +856,9 @@ class StrategicMap(object):
 
         # create banks
         self.create_banks()
+
+        # create strategic ai 
+        self.create_strategic_ai()
 
         # generate initial map features
         self.generate_initial_map_features()
@@ -815,28 +916,6 @@ class StrategicMap(object):
     #---------------------------------------------------------------------------
     def update(self):
         pass
-
-    #---------------------------------------------------------------------------
-    def update_faction_budgets(self):
-        # apply per faction stuff 
-        for b in self.strategic_ai:
-            if b.faction=='german':
-                b.budget+=10
-            elif b.faction=='soviet':
-                b.budget+=12
-            elif b.faction=='american':
-                b.budget+=20
-            elif b.faction=='civilian':
-                b.budget+=1
-
-        # sort all soldiers 
-                
-        # subtract maintenance for each soldier 
-                
-        # add budget for strategic resources
-                
-
-        
 
     #---------------------------------------------------------------------------
     def update_map_data(self):

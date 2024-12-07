@@ -21,7 +21,7 @@ import engine.world_builder
 #global variables
 
 class AIFactionTactical(object):
-    def __init__(self,world,faction,spawn_location,radio_frequency):
+    def __init__(self,world,faction,allied_factions,hostile_factions,spawn_location,radio_frequency):
 
 
         # squads in the faction who are present on this map
@@ -44,6 +44,12 @@ class AIFactionTactical(object):
         # faction - german/soviet/american/civilian
         self.faction=faction
 
+        # allied faction list [string,string]
+        self.allied_factions=allied_factions
+
+        # hostile faction list [string,string]
+        self.hostile_factions=hostile_factions
+
         # radio frequency
         self.radio_frequency=radio_frequency
 
@@ -54,8 +60,27 @@ class AIFactionTactical(object):
         # no need to radio.update at the moment.
 
 
+
+        self.allied_humans=[]
+        self.hostile_humans=[]
+
+
     #---------------------------------------------------------------------------
-    def create_squads(self,humans):
+    def create_squads(self):
+        humans=[]
+        vehicles=[]
+
+        # don't use faction specific wo_ lists as we are trying to get rid of them
+        for b in self.world.wo_objects:
+            if b.world_builder_identity.startswith(self.faction):
+                if b.is_human:
+                    humans.append(b)
+                elif b.is_vehicle:
+                    vehicles.append(b)
+
+                # maybe some other stuff that should be positioned with the faction ??
+
+
         '''sort a list of humans into squads and initialize them'''
         self.squads=engine.squad_builder.create_squads_from_human_list(self.world,humans,self)
 
@@ -76,6 +101,13 @@ class AIFactionTactical(object):
                     c.world_coords=copy.copy(self.spawn_location)
                     # randomize position a bit
                     engine.math_2d.randomize_position_and_rotation(c,170)
+
+        # position the vehicles. in the future they may be added to squads
+        for b in vehicles:
+            b.world_coords=copy.copy(self.spawn_location)
+            # randomize position a bit
+            engine.math_2d.randomize_position_and_rotation(b,170)
+
 
         # hand out tactical orders right away
         self.tactical_order()
@@ -268,5 +300,21 @@ class AIFactionTactical(object):
                 #not sure if civilians will eventually have tactical orders or not
                 pass
             else:
+                self.update_human_lists()
+
+                # tactial order
                 if len(self.squads)>0:
                     self.tactical_order()
+
+    #---------------------------------------------------------------------------
+    def update_human_lists(self):
+        '''updates lists of humans that ai_faction_tactical keeps'''
+        self.allied_humans=[]
+        self.hostile_humans=[]
+
+        for b in self.world.wo_objects_human:
+            if b.ai.squad.faction==self.faction or b.ai.squad.faction in self.allied_factions:
+                self.allied_humans.append(b)
+            else:
+                if b.ai.squad.faction in self.hostile_factions:
+                    self.hostile_humans.append(b)

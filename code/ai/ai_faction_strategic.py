@@ -36,11 +36,9 @@ class AIFactionStrategic(object):
         self.square_objectives_not_owned=[]
 
         # treasury 
-        self.treasury_bank=None
-        self.treasury_account=None
+        self.treasury_bank_name=None # the name of the bank
+        self.treasury_account_number=None # the account number with the bank
 
-        # how many 'units' can be spent
-        self.budget=0
 
     #---------------------------------------------------------------------------
     def advance_turn(self):
@@ -48,10 +46,12 @@ class AIFactionStrategic(object):
 
         self.update_map_square_data()
 
+        # determine how much money we made/lost
+
         # buy units with income
         # eventually we will want to not spent the entire budget on new troops 
         # so maybe 50% in the future
-        self.buy_and_place_units(self.budget)
+        self.buy_and_place_units(500)
         
 
         # something else?
@@ -196,11 +196,14 @@ class AIFactionStrategic(object):
             to_square = order['to']
             troops_needed = order['troops']
 
-            # get the troops
+            # get the troops. make sure we are only selecting humans and vehicles
             troops_to_move=[]
             for b in from_square.map_objects:
-                if b.world_builder_identity.startswith(self.faction) and len(troops_to_move)<troops_needed:
-                    troops_to_move.append(b)
+                if len(troops_to_move)<troops_needed:
+                    if b.world_builder_identity.startswith(self.faction):
+                        #! note this will also grab things like 'german_fuel_can'
+                        troops_to_move.append(b)
+
 
             # move the troops
             for b in troops_to_move:

@@ -275,17 +275,6 @@ class AIHuman(AIBase):
     #---------------------------------------------------------------------------
     def evaluate_targets(self):
         '''find and categorize targets. react to close ones'''
-        target_list=[]
-        if self.squad.faction=='german':
-            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_american
-        elif self.squad.faction=='american':
-            target_list=self.owner.world.wo_objects_soviet+self.owner.world.wo_objects_german
-        elif self.squad.faction=='soviet':
-            target_list=self.owner.world.wo_objects_german+self.owner.world.wo_objects_american
-        elif self.squad.faction=='civilian':
-            pass
-        else:
-            print('error! unknown squad faction!')
 
         self.near_targets=[]
         self.mid_targets=[]
@@ -293,28 +282,31 @@ class AIHuman(AIBase):
 
         closest_distance=600
         closest_object=None
-        for b in target_list:
-            d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
-            target=b
-            if b.is_human:
+        # note we are using this list directly, this is ok because we aren't removing from it
+        for b in self.squad.faction_tactical.hostile_humans:
+            # quick check because this list isn't refreshed that often..
+            if b.ai.health>0:
+                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+
+                target=b
                 if 'task_vehicle_crew' in b.ai.memory:
                     target=b.ai.memory['task_vehicle_crew']['vehicle']
                     # could do something further here to check armor pen
 
-            if d<800:
-                if target not in self.near_targets:
-                    self.near_targets.append(target)
-            elif d<1500:
-                if target not in self.mid_targets:
-                    self.mid_targets.append(target)
-            elif d<2450:
-                if target not in self.far_targets:
-                    self.far_targets.append(target)
+                if d<800:
+                    if target not in self.near_targets:
+                        self.near_targets.append(target)
+                elif d<1500:
+                    if target not in self.mid_targets:
+                        self.mid_targets.append(target)
+                elif d<2450:
+                    if target not in self.far_targets:
+                        self.far_targets.append(target)
 
-            if d<closest_distance:
-                closest_distance=d
-                closest_object=target
+                if d<closest_distance:
+                    closest_distance=d
+                    closest_object=target
 
         if closest_object!=None:
             if self.memory['current_task']=='task_vehicle_crew':
@@ -378,7 +370,7 @@ class AIHuman(AIBase):
 
                 if self.owner.is_player==False:
                     destination=[0,0]
-                    if self.owner.is_civilian:
+                    if self.squad.faction_tactical.faction=='civilian':
                         # civilian runs further
                         destination=[self.owner.world_coords[0]+float(random.randint(-560,560)),self.owner.world_coords[1]+float(random.randint(-560,560))]
                     else:

@@ -1,6 +1,54 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 06 2024
+- fix a lot of bugs from the last session
+- fixed error with 'climb onboard' dialog action
+- fixed campaign load error with bank accounts
+- increased the amount of starting campaign forces
+- fixed spelling error with kubelwagen destroyed image 
+
+
+campaign needs so much work.
+
+----------------------------------
+Dec 05 2024
+- updated map grid to be 12x12 from 10x10
+- updates to the strategic map unit movement code 
+- vehicles now get a faction prefix 
+- a ton of code restructuring 
+
+I made some initial moves to make factions more dynamic and less hard coded. 
+This could allow the introduction of more factions. 
+
+specific faction object lists were removed from world along with 
+is_[faction] flags from world_object 
+
+realized there is a problem indentifying what a map object is and who it belongs to. 
+will either need to add more data to map objects, or keep a list of 
+world_builder_identities for soldiers/vehicles/etc for each faction 
+
+todo 
+- handle what happens on death when there is no one left to spawn as 
+- add campaign specific data table 
+- add a permanent faction selection to the campaign 
+
+----------------------------------
+Dec 04 2024
+- working on save/load for strategic_ai data 
+- minor strategic_ai restructuring / updates 
+- added a larger variety of squads to the start of the strategic campaign
+- strategic ai now has bank accounts 
+
+I'm tending to replace arrays with dictionaries as I rewrite 
+code for things where i need to reference a specific item by a key 
+word. 
+
+todo 
+- add a economy/money growth aspect to ai_faction_strategic.advance_turn
+- rewrite world_builder squad_data to use dictionary 
+- rewrite ai_faction_strategic.buy_and_place_units to use bank accounts 
+----------------------------------
 Dec 02 2024
 - added a german recon squad with the new kubelwagen 
 - added a squad for the RSO vehicle 
