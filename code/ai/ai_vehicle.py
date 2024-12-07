@@ -208,7 +208,8 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
 
         if penetration:
-            self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type +
+                'on the '+side+' at a distance of '+ str(distance))
             self.health-=random.randint(1,3)
             if len(self.passengers)>1:
                 passenger=random.choice(self.passengers)
@@ -230,8 +231,8 @@ class AIVehicle(AIBase):
                     self.health-=random.randint(50,75)
         else:
             # no penetration, but maybe we can have some other effect?
-            self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
-
+            self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type +
+                'on the '+side+' at a distance of '+ str(distance))
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
@@ -241,7 +242,8 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
 
         if penetration:
-            self.collision_log.append('[penetration] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[penetration] Vehicle body hit by '+projectile.ai.projectile_type +
+                'on the '+side+' at a distance of '+ str(distance))
             if self.driver!=None:
                 if random.randint(0,2)==2:
                     self.driver.ai.handle_event('collision',projectile)
@@ -251,7 +253,8 @@ class AIVehicle(AIBase):
 
         else:
             # no penetration, but maybe we can have some other effect?
-            self.collision_log.append('[bounce] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[bounce] Vehicle body hit by '+projectile.ai.projectile_type +
+                'on the '+side+' at a distance of '+ str(distance))
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         

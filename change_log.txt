@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Dec 07 2024
+- turrets now stop firing if they are at zero health 
+- vehicle penetration logs now include the side that was hit 
+
+In yesterdays playthrough i took a screenshot that appeared to have a turretless tank. 
+I thought this was a turret that had reached zero health and been removed from the game, 
+but there actually isn't any code to remove turrets, so it remains a mystery.
+
+
 ----------------------------------
 Dec 06 2024
 - fix a lot of bugs from the last session

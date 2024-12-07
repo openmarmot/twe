@@ -79,7 +79,8 @@ class AITurret(AIBase):
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
 
             if penetration:
-                self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+                self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + 
+                    'on the '+side+' at a distance of '+ str(distance))
                 # remote operated turrets mean that the gunner can't be hit by turret penetrations 
                 if self.gunner!=None and self.remote_operated==False:
                     if random.randint(0,2)==2:
@@ -90,7 +91,8 @@ class AITurret(AIBase):
 
             else:
                 # no penetration, but maybe we can have some other effect?
-                self.collision_log.append('[bounce] Turret hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+                self.collision_log.append('[bounce] Turret hit by '+projectile.ai.projectile_type + 
+                     'on the '+side+' at a distance of '+ str(distance))
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
@@ -125,8 +127,9 @@ class AITurret(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_fire(self):
-        self.primary_weapon.rotation_angle=self.owner.rotation_angle
-        self.primary_weapon.ai.fire()
+        if self.health>0:
+            self.primary_weapon.rotation_angle=self.owner.rotation_angle
+            self.primary_weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):
