@@ -702,15 +702,20 @@ class World_Menu(object):
                 self.text_queue.append('')
                 self.text_queue.append('--- Weapon Info ---')
                 ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon)
-                self.text_queue.append('weapon: '+self.selected_object.ai.primary_weapon.name)
+                self.text_queue.append('primary weapon: '+self.selected_object.ai.primary_weapon.name)
                 self.text_queue.append('- ammo in gun: '+str(ammo_gun))
                 self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
                 self.text_queue.append('- magazine count: '+str(magazine_count))
                 self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+                self.text_queue.append('')
 
             if self.selected_object.ai.throwable!=None:
-                self.text_queue.append('[throw] '+self.selected_object.ai.throwable.name)
-            self.text_queue.append('')
+                self.text_queue.append('throwing weapon: '+self.selected_object.ai.throwable.name)
+                self.text_queue.append('')
+
+            if self.selected_object.ai.antitank!=None:
+                self.text_queue.append('anti-tank weapon: '+self.selected_object.ai.antitank.name)
+                self.text_queue.append('')
 
         if self.world.debug_mode==True:
             self.text_queue.append('')

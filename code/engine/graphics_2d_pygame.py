@@ -69,7 +69,8 @@ class Graphics_2D_Pygame(object):
         # 3 - objects slightly elevated above ground (vehicles, animals??)
         # 4 - vehicle turrets
         # 5 - humans
-        # 6 - objects above ground (birds, planes, clouds, etc)
+        # 6 - roofs (custom building ai)
+        # 7 - objects above ground (birds, planes, clouds, etc)
         
         self.render_level_count=10
         self.renderlists=[[] for _ in range(self.render_level_count)]

@@ -166,20 +166,23 @@ class WorldObject(object):
     #---------------------------------------------------------------------------
     def reset_render_level(self):
         '''reset render level to defaults based on object type '''
-        if self.is_human:
-            self.render_level=5
+
+        if self.is_ground_texture:
+            self.render_level=0
+        elif self.is_building:
+            self.render_level=1
         elif self.is_gun:
             self.render_level=2
         elif self.is_vehicle:
             self.render_level=3
-        elif self.is_building:
-            self.render_level=1
+        elif self.is_container:
+            self.render_level=3
         elif self.is_particle_effect:
             self.render_level=4
         elif self.is_turret:
             self.render_level=4
-        elif self.is_ground_texture:
-            self.render_level=0
+        elif self.is_human:
+            self.render_level=5
         else:
             self.render_level=2
             
