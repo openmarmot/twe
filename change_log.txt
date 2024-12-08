@@ -1,5 +1,31 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Dec 08 2024
+- fixed a possible vehicle wreck duplication bug 
+- added human menu dialog for antitank weapon 
+- changed render level for blood splatter and container
+- gave buildings a dynamic render level 
+
+building now cover things that they logically should 
+
+todo 
+- make wrecks towable 
+
+----------------------------------
+Dec 07 2024
+- turrets now stop firing if they are at zero health 
+- vehicle penetration logs now include the side that was hit 
+- turrets now stay when the tank dies, but their health goes to zero 
+
+In yesterdays playthrough i took a screenshot that appeared to have a turretless tank. 
+I thought this was a turret that had reached zero health and been removed from the game, 
+but there actually isn't any code to remove turrets, so it remains a mystery.
+
+todo 
+- need a way to display dead turrets
+
 ----------------------------------
 Dec 06 2024
 - fix a lot of bugs from the last session

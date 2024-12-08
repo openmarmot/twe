@@ -208,7 +208,8 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
 
         if penetration:
-            self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[penetration] Passenger compartment hit by '+projectile.ai.projectile_type +
+                ' on the '+side+' at a distance of '+ str(distance))
             self.health-=random.randint(1,3)
             if len(self.passengers)>1:
                 passenger=random.choice(self.passengers)
@@ -230,8 +231,8 @@ class AIVehicle(AIBase):
                     self.health-=random.randint(50,75)
         else:
             # no penetration, but maybe we can have some other effect?
-            self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
-
+            self.collision_log.append('[bounce] Passenger compartment hit by '+projectile.ai.projectile_type +
+                ' on the '+side+' at a distance of '+ str(distance))
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
@@ -241,7 +242,8 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
 
         if penetration:
-            self.collision_log.append('[penetration] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[penetration] Vehicle body hit by '+projectile.ai.projectile_type +
+                ' on the '+side+' at a distance of '+ str(distance))
             if self.driver!=None:
                 if random.randint(0,2)==2:
                     self.driver.ai.handle_event('collision',projectile)
@@ -251,39 +253,45 @@ class AIVehicle(AIBase):
 
         else:
             # no penetration, but maybe we can have some other effect?
-            self.collision_log.append('[bounce] Vehicle body hit by '+projectile.ai.projectile_type + ' at a distance of '+ str(distance))
+            self.collision_log.append('[bounce] Vehicle body hit by '+projectile.ai.projectile_type +
+                ' on the '+side+' at a distance of '+ str(distance))
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         
 
         if EVENT_DATA.is_projectile:
+            # avoids hits on dead vehicles that haven't been removed from the game yet
+            if self.health>0:
             
-            # -- determine what area the projectile hit --
-            area_hit='vehicle_body'
-            
-            if self.max_occupants>2:
-                hit=random.randint(0,1)
-                if hit==1:
-                    area_hit='passenger_compartment'
-            
-            if len(self.turrets)>0:
-                hit=random.randint(0,5)
-                if hit==5:
-                    area_hit='turret'
+                # -- determine what area the projectile hit --
+                area_hit='vehicle_body'
+                
+                if self.max_occupants>2:
+                    hit=random.randint(0,1)
+                    if hit==1:
+                        area_hit='passenger_compartment'
+                
+                if len(self.turrets)>0:
+                    hit=random.randint(0,5)
+                    if hit==5:
+                        area_hit='turret'
 
-            if area_hit=='vehicle_body':
-                self.handle_vehicle_body_projectile_hit(EVENT_DATA)
-            elif area_hit=='passenger_compartment':
-                self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
-            elif area_hit=='turret':
-                # pass it on for the turret to handle
-                turret=random.choice(self.turrets)
-                turret.ai.handle_event('collision',EVENT_DATA)
-            else:
-                engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
+                if area_hit=='vehicle_body':
+                    self.handle_vehicle_body_projectile_hit(EVENT_DATA)
+                elif area_hit=='passenger_compartment':
+                    self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
+                elif area_hit=='turret':
+                    # pass it on for the turret to handle
+                    turret=random.choice(self.turrets)
+                    turret.ai.handle_event('collision',EVENT_DATA)
+                else:
+                    engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
 
-            engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
-            engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
+                engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
+                engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
+
+                if self.health<1:
+                    self.handle_death()
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
@@ -332,9 +340,12 @@ class AIVehicle(AIBase):
 
         engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords)
 
-        # get rid of the turrets
+        # this probably could be replaced with a custom container
         for b in self.turrets:
-            self.owner.world.remove_queue.append(b)
+            # leave in world but make inoperable
+            b.ai.vehicle=None
+            b.ai.health=0
+            #self.owner.world.remove_queue.append(b)
 
         
         dm=''
@@ -479,8 +490,7 @@ class AIVehicle(AIBase):
         ''' overrides base update '''
 
         # -- general stuff for all objects --
-        if self.health<1:
-            self.handle_death()
+        # health is check upon projectile collision 
 
         # update engines
         for b in self.engines:

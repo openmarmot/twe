@@ -2593,7 +2593,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['blood_splatter'],AIAnimatedSprite)
         z.name='blood_splatter'
         z.minimum_visible_scale=0.3
-        z.is_particle_effect=True
+        # not a particle effect so it gets positioned as a 
+        # default 2, which is under the bodies (containers)
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=0
         z.ai.rotation_speed=0

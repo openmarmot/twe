@@ -40,10 +40,12 @@ class AIBuilding(AIBase):
                 # show the inside
                 self.owner.image_index=1
                 self.owner.reset_image=True
+                self.owner.render_level=1
             else:
                 # show the outside
                 self.owner.image_index=0
                 self.owner.reset_image=True
+                self.owner.render_level=6
             
 
     #---------------------------------------------------------------------------
