@@ -2,13 +2,30 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 09 2024
+- added 7.63 Mauser projectile 
+- added 7.65 Browning (32 auto) projectile 
+- added C96 pistol 
+- added C96 "Red 9" pistol (9mm version)
+- added soviet rg-42 grenade 
+
+i drew the pistol by hand instead of using a diagram or photo  as i've done 
+with the other guns. Any new objects (including guns) are done to scale so 
+everything is going to kinda look like crap. The small items are just too small.
+
+I tried to research grenade and pistol usage and distribution in WW2 but 
+I didn't finy anything useful I generally get the impression that pistols 
+would have been fairly uncommon. truck drivers are probably more realistically 
+armed with a rifle. I'm unsure on grenade usage. Certainly a ton were produced
+
+----------------------------------
 Dec 08 2024
 - fixed a possible vehicle wreck duplication bug 
 - added human menu dialog for antitank weapon 
 - changed render level for blood splatter and container
 - gave buildings a dynamic render level 
 
-building now cover things that they logically should 
+buildings now cover things that they logically should 
 
 todo 
 - make wrecks towable 

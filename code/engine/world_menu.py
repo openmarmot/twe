@@ -378,6 +378,7 @@ class World_Menu(object):
             self.text_queue.append('4 - German Field Shovel')
             self.text_queue.append('5 - Dp28')
             self.text_queue.append('6 - ptrs-41')
+            self.text_queue.append('7 - c96')
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42-type2',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'fg42_type2_magazine',True)
@@ -393,6 +394,9 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'dp28',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ptrs_41',True)
+            elif key=='7':
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'c96',True)
+                
         if self.menu_state=='spawn_squads':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Squads --')
