@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 10 2024
+- working on adding a FA 223 Drache
+
+----------------------------------
 Dec 09 2024
 - added 7.63 Mauser projectile 
 - added 7.65 Browning (32 auto) projectile 
