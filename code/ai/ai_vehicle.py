@@ -70,6 +70,9 @@ class AIVehicle(AIBase):
         # turrets - these are spawned and are in world 
         self.turrets=[]
 
+        # for rotary wing .. vehicles
+        self.rotors=[]
+
         # array of engine objects
         self.engines=[]
 
