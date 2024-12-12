@@ -43,7 +43,9 @@ class AIRotor(AIBase):
         self.rotation_range=[-20,20]
 
         # speed of rotation
-        self.rotation_speed=200
+        self.current_rotation_speed=0
+        self.rotation_rate_of_change=8
+        self.max_rotation_speed=450
 
         self.vehicle=None
         self.last_vehicle_position=[0,0]
@@ -85,6 +87,7 @@ class AIRotor(AIBase):
     def neutral_controls(self):
         ''' return controls to neutral over time'''
 
+
         if self.rotation_change!=0:
             # controls should return to neutral over time 
             time_passed=self.owner.world.time_passed_seconds
@@ -98,16 +101,28 @@ class AIRotor(AIBase):
         
         self.update_physics()
 
-        self.neutral_controls()
+        #self.neutral_controls()
 
     #---------------------------------------------------------------------------
     def update_physics(self):
         time_passed=self.owner.world.time_passed_seconds
         moved=False
 
+        if self.engine.ai.engine_on:
+            self.rotation_change=-1
+            if self.current_rotation_speed<self.max_rotation_speed:
+                self.current_rotation_speed+=self.rotation_rate_of_change*time_passed
+        else:
+            if self.current_rotation_speed>0:
+                self.current_rotation_speed-=self.rotation_rate_of_change*0.5*time_passed
+            else:
+                self.rotation_change=0
+
         if self.rotation_change!=0:
             moved=True
-            self.rotor_rotation+=(self.rotation_change*self.rotation_speed*time_passed)
+            
+
+            self.rotor_rotation+=(self.rotation_change*self.current_rotation_speed*time_passed)
             
         if self.vehicle!=None:
             if self.last_vehicle_position!=self.vehicle.world_coords:

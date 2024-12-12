@@ -179,7 +179,7 @@ class WorldObject(object):
         elif self.is_container:
             self.render_level=3
         elif self.is_rotor:
-            self.render_level=3
+            self.render_level=4
         elif self.is_particle_effect:
             self.render_level=4
         elif self.is_turret:
