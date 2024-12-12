@@ -3,9 +3,10 @@ TWE Project : Change Log
 
 ----------------------------------
 Dec 11 2024
-- work on engine support for helicopters
+- work on support for helicopters
 - fixed a error with unique civilians that didn't follow the naming standard
 
+the drache can be spawned from the debug menu. the rotors spin when the engine is turned on. 
 
 ----------------------------------
 Dec 10 2024
