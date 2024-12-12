@@ -110,6 +110,7 @@ class WorldObject(object):
         self.is_medical=False # general medical objects. bandage / pain pills / etc
         self.is_particle_effect=False # smoke/whatever. used to set a higher z level
         self.is_turret=False
+        self.is_rotor=False
         self.is_towable=False # indicates whether a object can be towed by a vehicle
         
         self.is_building=False
@@ -177,6 +178,8 @@ class WorldObject(object):
             self.render_level=3
         elif self.is_container:
             self.render_level=3
+        elif self.is_rotor:
+            self.render_level=4
         elif self.is_particle_effect:
             self.render_level=4
         elif self.is_turret:
