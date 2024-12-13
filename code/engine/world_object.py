@@ -42,6 +42,8 @@ class WorldObject(object):
 
         # image width, height. set by graphics_engine
         self.image_size=None
+        # image center. calculated by graphics_engine
+        self.image_center=None
 
         # tell graphicsEngine to reset the image (need to rotate, etc)
         self.reset_image=True

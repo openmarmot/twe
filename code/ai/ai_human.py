@@ -469,14 +469,17 @@ class AIHuman(AIBase):
             if self.primary_weapon==event_data:
                 self.primary_weapon=None
                 event_data.ai.equipper=None
+                self.update_equipment_slots()
             elif self.throwable==event_data:
                 self.throwable=None
                 # equipper is used to figure out who threw the grenade
                 # need a better way to handle this in the future
                 #EVENT_DATA.ai.equipper=None
+                self.update_equipment_slots()
             elif self.antitank==event_data:
                 self.antitank=None
                 event_data.ai.equipper=None
+                self.update_equipment_slots()
             elif self.large_pickup==event_data:
                 print('ERROR - large pickup should not go through inventory functions')
             elif self.wearable_head==event_data:
@@ -1278,6 +1281,7 @@ class AIHuman(AIBase):
 
             self.drop_object(self.throwable)
 
+
     #---------------------------------------------------------------------------
     def transfer_liquid(self,FROM_OBJECT,TO_OBJECT):
         '''transfer liquid/ammo/??? from one object to another'''
@@ -1337,6 +1341,37 @@ class AIHuman(AIBase):
             if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
                 self.last_building_check_time=self.owner.world.world_seconds
                 self.building_check()
+
+    #---------------------------------------------------------------------------
+    def update_equipment_slots(self):
+        '''update any empty equipment slots'''
+
+        # primmary weapon
+        # could also take ammo into account here 
+        if self.primary_weapon==None:
+            for b in self.inventory:
+                if b.is_gun:
+                    self.primary_weapon=b
+                    b.ai.equipper=self.owner
+                    break
+
+        # secondary weapon
+
+        # throwable
+        if self.throwable==None:
+            for b in self.inventory:
+                if b.is_throwable:
+                    self.throwable=b
+                    b.ai.equipper=self.owner
+                    break
+
+        # anti-tank
+        if self.antitank==None:
+            for b in self.inventory:
+                if b.is_handheld_antitank:
+                    self.antitank=b
+                    b.ai.equipper=self.owner
+                    break
 
     #---------------------------------------------------------------------------
     def update_health(self):

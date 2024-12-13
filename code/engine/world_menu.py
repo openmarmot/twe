@@ -696,30 +696,26 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+            
+            self.text_queue.append('')
+            self.text_queue.append('--- Equipment Info ---')
+            if self.selected_object.ai.primary_weapon != None:
+                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon)
+                self.text_queue.append('[primary weapon]: '+self.selected_object.ai.primary_weapon.name)
+                self.text_queue.append('- ammo in gun: '+str(ammo_gun))
+                self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
+                self.text_queue.append('- magazine count: '+str(magazine_count))
+                self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+            if self.selected_object.ai.throwable!=None:
+                self.text_queue.append('[throwing weapon]: '+self.selected_object.ai.throwable.name)
+            if self.selected_object.ai.antitank!=None:
+                self.text_queue.append('[anti-tank weapon]: '+self.selected_object.ai.antitank.name)
+
             self.text_queue.append('')
             self.text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
                 self.text_queue.append('Squad Leader')
             self.text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
-            
-            if self.selected_object.ai.primary_weapon != None:
-                self.text_queue.append('')
-                self.text_queue.append('--- Weapon Info ---')
-                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon)
-                self.text_queue.append('primary weapon: '+self.selected_object.ai.primary_weapon.name)
-                self.text_queue.append('- ammo in gun: '+str(ammo_gun))
-                self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
-                self.text_queue.append('- magazine count: '+str(magazine_count))
-                self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
-                self.text_queue.append('')
-
-            if self.selected_object.ai.throwable!=None:
-                self.text_queue.append('throwing weapon: '+self.selected_object.ai.throwable.name)
-                self.text_queue.append('')
-
-            if self.selected_object.ai.antitank!=None:
-                self.text_queue.append('anti-tank weapon: '+self.selected_object.ai.antitank.name)
-                self.text_queue.append('')
 
         if self.world.debug_mode==True:
             self.text_queue.append('')
@@ -734,9 +730,8 @@ class World_Menu(object):
             self.text_queue.append('Distance from squad: '+str(d2))
             self.text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
 
-            self.text_queue.append('')
-
         if self.menu_state == 'player_menu':
+            self.text_queue.append('')
             self.text_queue.append('--- Actions ---')
             self.text_queue.append('1 - Manage Inventory')
             self.text_queue.append('2 - Squad Menu')

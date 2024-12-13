@@ -39,6 +39,8 @@ class AIThrowable(AIBase):
         # current speed
         self.speed=0
 
+        # objects to ignore for collision purposes
+        self.ignore_list=[]
 
         self.has_fuse=False
         self.fuse_active=False
@@ -83,10 +85,16 @@ class AIThrowable(AIBase):
         self.flightTime=0
         self.redirected=True
 
+        # clear the ignore list so it can collide with anything 
+        self.ignore_list=[]
+
     #---------------------------------------------------------------------------
     def throw(self):
         '''throw the object'''
-
+        if self.equipper!=None:
+            if self.equipper.is_human:
+                self.ignore_list=[]
+                self.ignore_list+=self.equipper.ai.squad.faction_tactical.allied_humans
         self.thrown=True
         self.flightTime=0
         self.speed=self.max_speed
@@ -122,12 +130,15 @@ class AIThrowable(AIBase):
                 # give it a little time to get away from the thrower 
                 if self.flightTime>0.1:
                     objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
-                    ignore=[self.equipper]
-                    if self.owner.world.check_collision_return_object(self.owner,ignore,objects,True) !=None:
+                    if self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True) !=None:
                         # just stop the grenade. maybe some spin or reverse movement?
                         if self.redirected==False:
                             self.speed=-20
                             self.flightTime=self.max_flight_time-1
+
+                            # clear the ignore list so it can collide with anything
+                            self.ignore_list=[]
+
                         else:
                             # basically give it another chance to collide
                             self.redirected=False

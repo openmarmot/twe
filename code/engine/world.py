@@ -858,10 +858,6 @@ class World(object):
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
-        #self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.tactical_ai['german'].squads))+']')
-        #self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.tactical_ai['soviet'].squads))+']')
-        #self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.tactical_ai['american'].squads))+']')
-        #self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.tactical_ai['civilian'].squads))+']')
         self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
@@ -873,6 +869,10 @@ class World(object):
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
+        self.debug_text_queue.append('----- Faction Stats ------')
+        for b in self.tactical_ai.values():
+            self.debug_text_queue.append(b.faction+': '+str(len(b.allied_humans)))
+
 
         # world area data
         for b in self.world_areas:

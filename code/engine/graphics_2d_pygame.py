@@ -273,7 +273,9 @@ class Graphics_2D_Pygame(object):
             for c in b:
                 if c.reset_image:
                     self.reset_pygame_image(c)
-                self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
+                    #self.reset_pygame_image_v2(c)
+                #self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
+                self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
                 if(self.draw_collision):
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
@@ -525,6 +527,7 @@ class Graphics_2D_Pygame(object):
         obj_scale=self.scale+wo.scale_modifier
         wo.image_size=self.images[wo.image_list[wo.image_index]].get_size()
         wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
+        wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
         
         # check if the correct image is already in the cache
         
@@ -539,18 +542,22 @@ class Graphics_2D_Pygame(object):
                 return
         else:
             self.image_cache[self.scale]={}
-
-        image=self.images[wo.image_list[wo.image_index]]
-        orig_rect = image.get_rect()
-        rot_image = pygame.transform.rotate(image, wo.rotation_angle)
-        rot_rect = orig_rect.copy()
-        rot_rect.center = rot_image.get_rect().center
-        rot_image = rot_image.subsurface(rot_rect).copy()
-        resize_image=pygame.transform.scale(rot_image,wo.image_size)
-        wo.image=resize_image
+        
+        try:
+            image=self.images[wo.image_list[wo.image_index]]
+            orig_rect = image.get_rect()
+            rot_image = pygame.transform.rotate(image, wo.rotation_angle)
+            rot_rect = orig_rect.copy()
+            rot_rect.center = rot_image.get_rect().center
+            rot_image = rot_image.subsurface(rot_rect).copy()
+            resize_image=pygame.transform.scale(rot_image,wo.image_size)
+            wo.image=resize_image
+        except:
+            engine.log.add_data('error','graphics_2d_pygame.reset_pygame_image: image transform error with image '+wo.image_list[wo.image_index],True)
 
         self.image_cache[self.scale][key]=resize_image
             #print('cache miss ',key)
+        
 
 #------------------------------------------------------------------------------
     def zoom_out(self):
