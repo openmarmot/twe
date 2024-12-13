@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 12 2024
+- grenades now have flight time and fuse time as seperate items 
+
+todo 
+- support having/using more than one grenade 
 
 ----------------------------------
 Dec 11 2024

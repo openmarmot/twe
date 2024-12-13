@@ -1124,9 +1124,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
-        z.ai.speed=175
-        z.ai.max_speed=175
-        z.ai.maxTime=4.0
+        z.ai.max_speed=150
+        z.ai.max_flight_time=2.0
+        z.ai.has_fuse=True
+        z.ai.fuse_max_time=4
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='rg_42_grenade':
@@ -1136,9 +1137,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
-        z.ai.speed=175
-        z.ai.max_speed=175
-        z.ai.maxTime=3.0
+        z.ai.max_speed=150
+        z.ai.max_flight_time=2.0
+        z.ai.has_fuse=True
+        z.ai.fuse_max_time=3
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='mp40':

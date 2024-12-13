@@ -1263,9 +1263,9 @@ class AIHuman(AIBase):
         if self.prone:
             self.prone_state_change() 
         if self.throwable!=None:
-            #self.throwable.ai.throw(TARGET_COORDS)
 
-            self.throwable.ai.thrown=True
+            # this does all the needed internal ai stuff for the throwable 
+            self.throwable.ai.throw()
 
             # set rotation and heading
             if self.owner.is_player :
