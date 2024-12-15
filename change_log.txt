@@ -8,10 +8,12 @@ Dec 14 2024
 - fixed new bug in graphics_engine image rotation handling 
 - fixed rg42 grenade image size
 
-
 I've been wanting to do hit markers for a long time. 
 I'll add more data to them in the future.
 
+todo 
+- vehicle collision logs should be copied over to wrecks 
+    - probably about time for wrecks to be custom objects 
 
 ----------------------------------
 Dec 13 2024
