@@ -109,7 +109,8 @@ class AIFactionTactical(object):
             engine.math_2d.randomize_position_and_rotation(b,170)
 
 
-        # hand out tactical orders right away
+        # update human lists and give out tactical orders right away
+        self.update_human_lists()
         self.tactical_order()
 
     #---------------------------------------------------------------------------
@@ -121,6 +122,8 @@ class AIFactionTactical(object):
             return area.german_count+area.american_count
         elif self.faction=='american':
             return area.german_count+area.soviet_count
+        elif self.faction=='civilian':
+            return 0
         else:
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
@@ -133,6 +136,8 @@ class AIFactionTactical(object):
             return area.soviet_count
         elif self.faction=='american':
             return area.american_count
+        elif self.faction=='civilian':
+            return 0
         else:
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
@@ -212,30 +217,34 @@ class AIFactionTactical(object):
                     least_troops=b
                     troops=count  
 
-            # make a tactics decision !
-            choice=random.randint(1,3)
-            
-            # overwhelming force !!
-            if choice==1:
-                troop_count=0
-                for b in idle_squads:
-                    b.destination=engine.math_2d.randomize_coordinates(most_troops.world_coords,200)
-                    troop_count+=len(b.members)
-
-                # check if we have numerical superiority
-                if (self.get_area_friendly_count(most_troops)+troop_count)<self.get_area_enemy_count(most_troops):
-                    # lets send in the busy squads as well. this is a dangerous decision.
-                    for b in busy_squads:
+            if most_troops!=None and least_troops!=None:
+                # make a tactics decision !
+                choice=random.randint(1,3)
+                
+                # overwhelming force !!
+                if choice==1:
+                    troop_count=0
+                    for b in idle_squads:
                         b.destination=engine.math_2d.randomize_coordinates(most_troops.world_coords,200)
-            
-            # shore up the weakest area
-            elif choice==2:
-                for b in idle_squads:
-                    b.destination=engine.math_2d.randomize_coordinates(least_troops.world_coords,200)
+                        troop_count+=len(b.members)
 
-            # do nothing
-            elif choice==3:
-                pass
+                    # check if we have numerical superiority
+                    if (self.get_area_friendly_count(most_troops)+troop_count)<self.get_area_enemy_count(most_troops):
+                        # lets send in the busy squads as well. this is a dangerous decision.
+                        for b in busy_squads:
+                            b.destination=engine.math_2d.randomize_coordinates(most_troops.world_coords,200)
+                
+                # shore up the weakest area
+                elif choice==2:
+                    for b in idle_squads:
+                        b.destination=engine.math_2d.randomize_coordinates(least_troops.world_coords,200)
+
+                # do nothing
+                elif choice==3:
+                    pass
+            else:
+                # hmm something went wrong. just send idle troops everywhere!
+                self.tactical_order_random_world_area(idle_squads)
         
         elif len(enemy_areas)>0:
             most_enemies=None
@@ -252,38 +261,45 @@ class AIFactionTactical(object):
                     least_enemies=b
                     troops=count  
 
-            # make a tactics decision !
-            choice=random.randint(1,3)
-            
-            # overwhelm the weak area !!
-            if choice==1:
-                troop_count=0
-                for b in idle_squads:
-                    b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
-                    troop_count+=len(b.members)
-
-                # check if we have numerical superiority
-                if (self.get_area_friendly_count(least_enemies)+troop_count)<self.get_area_enemy_count(least_enemies):
-                    # lets send in the busy squads as well. this is a dangerous decision.
-                    for b in busy_squads:
+            if most_enemies!=None and least_enemies!=None:
+                # make a tactics decision !
+                choice=random.randint(1,3)
+                
+                # overwhelm the weak area !!
+                if choice==1:
+                    troop_count=0
+                    for b in idle_squads:
                         b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
-            
-            # smaller attack on the weak area
-            elif choice==2:
-                for b in idle_squads:
-                    b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
+                        troop_count+=len(b.members)
 
-            # do nothing
-            elif choice==3:
-                pass
+                    # check if we have numerical superiority
+                    if (self.get_area_friendly_count(least_enemies)+troop_count)<self.get_area_enemy_count(least_enemies):
+                        # lets send in the busy squads as well. this is a dangerous decision.
+                        for b in busy_squads:
+                            b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
+                
+                # smaller attack on the weak area
+                elif choice==2:
+                    for b in idle_squads:
+                        b.destination=engine.math_2d.randomize_coordinates(least_enemies.world_coords,200)
+
+                # do nothing
+                elif choice==3:
+                    pass
+            else:
+                # hmm something went wrong. just send idle troops everywhere!
+                self.tactical_order_random_world_area(idle_squads)
         
         else:
             # no contested areas, no enemy held areas
-
             # just send the idle squads all over
-            for b in idle_squads:
-                b.destination=engine.math_2d.randomize_coordinates(random.choice(self.world.world_areas).world_coords,200)
+            self.tactical_order_random_world_area(idle_squads)
 
+    #---------------------------------------------------------------------------
+    def tactical_order_random_world_area(self,squads):
+        '''send the squads to a random world area'''
+        for b in squads:
+            b.destination=engine.math_2d.randomize_coordinates(random.choice(self.world.world_areas).world_coords,200)
     
     #---------------------------------------------------------------------------
     def update(self):
@@ -296,15 +312,12 @@ class AIFactionTactical(object):
 
         if self.time_since_update>self.think_rate:
             self.time_since_update=0
-            if self.faction=='civilian':
-                #not sure if civilians will eventually have tactical orders or not
-                pass
-            else:
-                self.update_human_lists()
 
-                # tactial order
-                if len(self.squads)>0:
-                    self.tactical_order()
+            self.update_human_lists()
+
+            # tactial order
+            if len(self.squads)>0:
+                self.tactical_order()
 
     #---------------------------------------------------------------------------
     def update_human_lists(self):
@@ -313,8 +326,9 @@ class AIFactionTactical(object):
         self.hostile_humans=[]
 
         for b in self.world.wo_objects_human:
-            if b.ai.squad.faction==self.faction or b.ai.squad.faction in self.allied_factions:
-                self.allied_humans.append(b)
-            else:
-                if b.ai.squad.faction in self.hostile_factions:
-                    self.hostile_humans.append(b)
+            if b.ai.squad!=None:
+                if b.ai.squad.faction==self.faction or b.ai.squad.faction in self.allied_factions:
+                    self.allied_humans.append(b)
+                else:
+                    if b.ai.squad.faction in self.hostile_factions:
+                        self.hostile_humans.append(b)

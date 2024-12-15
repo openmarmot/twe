@@ -82,17 +82,31 @@ def calculate_hit_side(vehicle_angle,projectile_angle):
         return "left"
 
 #------------------------------------------------------------------------------
+def calculate_offset_coords_and_rotation(base_coords,base_rotation,offset_obj_coords,offset_obj_rotation):
+    '''for when you have two objects, and want to get the coords and rotation of one relative to the other'''
+
+    # 1. calculate offset without taking into account the base rotation
+    rotation_affected_offset=[offset_obj_coords[0]-base_coords[0],offset_obj_coords[1]-base_coords[1]]
+
+    # apply rotation to get the true offset at zero rotation
+    #true_offset=get_vector_rotation(rotation_affected_offset,base_rotation)
+    true_offset=get_vector_rotation(rotation_affected_offset,base_rotation)
+
+    # get offset rotation
+    norm_base_rot=get_normalized_angle(base_rotation)
+    norm_offset_rot=get_normalized_angle(offset_obj_rotation)
+    true_offset_rot=norm_offset_rot-norm_base_rot
+    true_offset_rot=get_normalized_angle(true_offset_rot)
+
+    return true_offset,true_offset_rot
+
+
+#------------------------------------------------------------------------------
 def calculate_relative_position(coords,rotation,offset):
     ''' calculate a position based on a offset and a given coordinate and rotation'''
-    # Rotate the offset
-    # Convert angle from degrees to radians
-    angle_radians = math.radians(rotation)
-    # Calculate the new offset after rotation
-    # note y and x are flopped for this to work. my coordinates must be backwards
-    dy_new = offset[0] * math.cos(angle_radians) - offset[1] * math.sin(angle_radians)
-    dx_new = offset[0] * math.sin(angle_radians) + offset[1] * math.cos(angle_radians)
-
-    return [coords[0]+dx_new,coords[1]+dy_new]
+    rotated_offset=get_vector_rotation(offset,rotation)
+    relative_position=get_vector_addition(coords,rotated_offset)
+    return relative_position
 
 #------------------------------------------------------------------------------
 def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
@@ -368,6 +382,18 @@ def get_vector_addition(first_vec,second_vec):
 def get_vector_length(vec2):
     return math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
 
+#------------------------------------------------------------------------------
+def get_vector_rotation(vector,angle_degrees):
+    # note this is adjusted to match how in game coordinates work
+    # in the original code x and y were flipped
+    # Convert angle to radians
+    angle_rad = math.radians(angle_degrees)
+    
+    # Rotation matrix applied to vector
+    y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
+    x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
+    
+    return [x, y]    
 
 #------------------------------------------------------------------------------
 def moveAlongVector(speed,location,heading,time_passed):

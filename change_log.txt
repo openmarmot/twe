@@ -1,5 +1,61 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 14 2024
+- large rewrite of vehicle collision logs to support more data 
+- you can now turn on hit markers from the debug menu 
+- added a debug option to kill all other bots (very useful for testing)
+- fixed new bug in graphics_engine image rotation handling 
+- fixed rg42 grenade image size
+
+I've been wanting to do hit markers for a long time. 
+I'll add more data to them in the future.
+
+todo 
+- vehicle collision logs should be copied over to wrecks 
+    - probably about time for wrecks to be custom objects 
+
+----------------------------------
+Dec 13 2024
+- ai_human now refills equipment slots from inventory when equipment is dropped 
+- optimized human menu 
+- grenades now have a limited collision ignore list on the initial throw 
+- enabled tactical ai tactical orders for civilian squads 
+    - not sure what impact if any this will have 
+- added more error handling and fall back options to ai_tactical tactical orders 
+- per render image center calculation replaced by wo.image_center - which is also rounded to one sd 
+- added a try except block to catch a uncommon image rotation exception 
+
+current event_add_inventory will drop your current anti-tank or gun if you 
+pick up a new one. I will have to think if it would be better to allow 
+multiples of these in inventory. 
+
+grenades now should be less likely to deal team damage as they will pass through 
+(throw over) nearby team mates. However with the short throw distance collateral damage is 
+still likely. 
+
+getting more errors from tactical ai now. i think it is because civilian ai 
+gets tactical orders now - but it has exposed some logic issues that i had to add 
+catches for. the tactical ai tactical orders sysem is honestly not bad - i just need 
+to add some data explaining wtf it is doing to the human 
+
+made another attempt to rewrite image rotation to not use subsurface, but once again it was not working. 
+I had gotten a crash with a image subsurface error. I will have to check the new images, maybe one of them is 
+not square. For now a try/except block is a good idea. 
+
+todo 
+- tactical orders should only go out over radio 
+- squads need a unique name to identify them (this then needs to be incorporated in radio orders)
+- using money for transactions 
+- human spawning 
+- add more functionality to the logging function 
+
+----------------------------------
+Dec 12 2024
+- grenades now have flight time and fuse time as seperate items 
+
+todo 
+- support having/using more than one grenade 
 
 ----------------------------------
 Dec 11 2024

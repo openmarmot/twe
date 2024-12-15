@@ -31,13 +31,21 @@ class AIThrowable(AIBase):
         # time in flight
         self.flightTime=0
         # max flight time, basically the fuse length
-        self.maxTime=5.
+        self.max_flight_time=3.
 
         # default speed
         self.max_speed=0
 
         # current speed
         self.speed=0
+
+        # objects to ignore for collision purposes
+        self.ignore_list=[]
+
+        self.has_fuse=False
+        self.fuse_active=False
+        self.fuse_active_time=0
+        self.fuse_max_time=5
 
         # does this object explode?
         self.explosive=False
@@ -49,39 +57,6 @@ class AIThrowable(AIBase):
         self.equipper=None
 
         self.redirected=False
-
-    #---------------------------------------------------------------------------
-    def update(self):
-        ''' overrides base update '''
-        time_passed=self.owner.world.time_passed_seconds
-
-
-
-        if self.thrown:
-            self.flightTime+=time_passed
-            if(self.flightTime>self.maxTime):
-                if self.explosive:
-                    self.explode()
-                else:
-                    # reset. should stop movement
-                    self.thrown=False
-                    self.flightTime=0
-                    self.speed=self.max_speed
-            # move along path
-            self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
-
-            # give it a little time to get away from the thrower 
-            if self.flightTime>0.1:
-                objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
-                ignore=[self.equipper]
-                if self.owner.world.check_collision_return_object(self.owner,ignore,objects,True) !=None:
-                    # just stop the grenade. maybe some spin or reverse movement?
-                    if self.redirected==False:
-                        self.speed=-20
-                        self.flightTime=self.maxTime-1
-                    else:
-                        # basically give it another chance to collide
-                        self.redirected=False
 
     #---------------------------------------------------------------------------
     def explode(self):
@@ -109,4 +84,64 @@ class AIThrowable(AIBase):
         self.maxTime-=0.5 
         self.flightTime=0
         self.redirected=True
+
+        # clear the ignore list so it can collide with anything 
+        self.ignore_list=[]
+
+    #---------------------------------------------------------------------------
+    def throw(self):
+        '''throw the object'''
+        if self.equipper!=None:
+            if self.equipper.is_human:
+                self.ignore_list=[]
+                self.ignore_list+=self.equipper.ai.squad.faction_tactical.allied_humans
+        self.thrown=True
+        self.flightTime=0
+        self.speed=self.max_speed
+        
+        if self.has_fuse:
+            self.fuse_active=True
+            self.fuse_active_time=0
+
+    #---------------------------------------------------------------------------
+    def update(self):
+        ''' overrides base update '''
+        time_passed=self.owner.world.time_passed_seconds
+
+        if self.has_fuse:
+            if self.fuse_active:
+                self.fuse_active_time+=time_passed
+
+                if self.fuse_active_time>self.fuse_max_time:
+                    if self.explosive:
+                        self.explode()
+
+        if self.thrown:
+            self.flightTime+=time_passed
+            if(self.flightTime>self.max_flight_time):
+                # reset. should stop movement
+                self.thrown=False
+                self.flightTime=0
+                self.speed=self.max_speed
+            else:
+                # move along path
+                self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+                # give it a little time to get away from the thrower 
+                if self.flightTime>0.1:
+                    objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
+                    if self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True) !=None:
+                        # just stop the grenade. maybe some spin or reverse movement?
+                        if self.redirected==False:
+                            self.speed=-20
+                            self.flightTime=self.max_flight_time-1
+
+                            # clear the ignore list so it can collide with anything
+                            self.ignore_list=[]
+
+                        else:
+                            # basically give it another chance to collide
+                            self.redirected=False
+
+
 

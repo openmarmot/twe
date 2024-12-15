@@ -161,6 +161,9 @@ class World(object):
         # some stats 
         self.panzerfaust_launches=0
 
+        # whether hit markers exist or not
+        self.hit_markers=False
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -548,6 +551,12 @@ class World(object):
                 if action:
                     self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
 
+    #---------------------------------------------------------------------------
+    def kill_all_nonplayer_humans(self):
+        for b in self.wo_objects_human:
+            if b.is_player==False:
+                b.ai.health-=500
+        engine.log.add_data('note','world.kill_all_nonplayer_humans executed',True)
 
     #---------------------------------------------------------------------------
     def log_world_data(self):
@@ -618,7 +627,12 @@ class World(object):
             self.reinforcements.remove(b)
             engine.log.add_data('error','world.process_reinforcements is disabled ! ',True)
 
-
+    #---------------------------------------------------------------------------
+    def remove_hit_markers(self):
+        # if this is slow we could create our own wo_ category for hit markers
+        for b in self.wo_objects:
+            if b.is_hit_marker:
+                self.remove_queue.append(b)
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
@@ -742,6 +756,12 @@ class World(object):
                 print('---')
 
     #---------------------------------------------------------------------------
+    def spawn_hit_markers(self):
+        for vehicle in self.wo_objects_vehicle:
+            for hit in vehicle.ai.collision_log:
+                marker=engine.world_builder.spawn_object(self,vehicle.world_coords,'hit_marker',True)
+                marker.ai.setup(vehicle,hit)
+    #---------------------------------------------------------------------------
     def spawn_player(self):
         '''spawns player'''
         # ! note - this should be done after squads are created
@@ -776,6 +796,19 @@ class World(object):
 
         # spawn player
         self.spawn_player()
+
+    #---------------------------------------------------------------------------
+    def toggle_hit_markers(self):
+        '''enable/disable hit markers'''
+        if self.hit_markers:
+            self.hit_markers=False
+            self.remove_hit_markers()
+            engine.log.add_data('note','Removed hit markers',True)
+        else:
+            self.hit_markers=True
+            self.spawn_hit_markers()
+            engine.log.add_data('note','Spawned hit markers',True)
+
 
     #---------------------------------------------------------------------------
     def toggle_map(self):
@@ -858,10 +891,6 @@ class World(object):
         self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
-        #self.debug_text_queue.append('Germans: '+ '[units: '+str(len(self.wo_objects_german))+'] [squads: '+ str(len(self.tactical_ai['german'].squads))+']')
-        #self.debug_text_queue.append('Soviets: '+ '[units: '+str(len(self.wo_objects_soviet))+'] [squads: '+ str(len(self.tactical_ai['soviet'].squads))+']')
-        #self.debug_text_queue.append('Americans: '+ '[units: '+str(len(self.wo_objects_american))+'] [squads: '+ str(len(self.tactical_ai['american'].squads))+']')
-        #self.debug_text_queue.append('Civilians: '+ '[units: '+str(len(self.wo_objects_civilian))+'] [squads: '+ str(len(self.tactical_ai['civilian'].squads))+']')
         self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
@@ -873,6 +902,10 @@ class World(object):
         self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
         self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
+        self.debug_text_queue.append('----- Faction Stats ------')
+        for b in self.tactical_ai.values():
+            self.debug_text_queue.append(b.faction+': '+str(len(b.allied_humans)))
+
 
         # world area data
         for b in self.world_areas:
