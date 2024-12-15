@@ -59,6 +59,7 @@ from ai.ai_battery import AIBattery
 from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
 from ai.ai_rotor import AIRotor
+from ai.ai_hit_marker import AIHitMarker
 
 #global variables
 
@@ -2949,7 +2950,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Feldfunk battery charger'
         z.weight=15
         z.is_large_human_pickup=True
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+    elif OBJECT_TYPE=='hit_marker':
+        z=WorldObject(world,['hit_green','hit_orange'],AIHitMarker)
+        z.name='Hit marker'
+        z.is_hit_marker=True
 
     else:
         print('!! Spawn Error: '+OBJECT_TYPE+' is not recognized.')  

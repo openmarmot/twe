@@ -161,6 +161,9 @@ class World(object):
         # some stats 
         self.panzerfaust_launches=0
 
+        # whether hit markers exist or not
+        self.hit_markers=False
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -548,6 +551,12 @@ class World(object):
                 if action:
                     self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
 
+    #---------------------------------------------------------------------------
+    def kill_all_nonplayer_humans(self):
+        for b in self.wo_objects_human:
+            if b.is_player==False:
+                b.ai.health-=500
+        engine.log.add_data('note','world.kill_all_nonplayer_humans executed',True)
 
     #---------------------------------------------------------------------------
     def log_world_data(self):
@@ -618,7 +627,12 @@ class World(object):
             self.reinforcements.remove(b)
             engine.log.add_data('error','world.process_reinforcements is disabled ! ',True)
 
-
+    #---------------------------------------------------------------------------
+    def remove_hit_markers(self):
+        # if this is slow we could create our own wo_ category for hit markers
+        for b in self.wo_objects:
+            if b.is_hit_marker:
+                self.remove_queue.append(b)
 
     #---------------------------------------------------------------------------
     def remove_object(self, WORLD_OBJECT):
@@ -742,6 +756,12 @@ class World(object):
                 print('---')
 
     #---------------------------------------------------------------------------
+    def spawn_hit_markers(self):
+        for vehicle in self.wo_objects_vehicle:
+            for hit in vehicle.ai.collision_log:
+                marker=engine.world_builder.spawn_object(self,vehicle.world_coords,'hit_marker',True)
+                marker.ai.setup(vehicle,hit)
+    #---------------------------------------------------------------------------
     def spawn_player(self):
         '''spawns player'''
         # ! note - this should be done after squads are created
@@ -776,6 +796,19 @@ class World(object):
 
         # spawn player
         self.spawn_player()
+
+    #---------------------------------------------------------------------------
+    def toggle_hit_markers(self):
+        '''enable/disable hit markers'''
+        if self.hit_markers:
+            self.hit_markers=False
+            self.remove_hit_markers()
+            engine.log.add_data('note','Removed hit markers',True)
+        else:
+            self.hit_markers=True
+            self.spawn_hit_markers()
+            engine.log.add_data('note','Spawned hit markers',True)
+
 
     #---------------------------------------------------------------------------
     def toggle_map(self):

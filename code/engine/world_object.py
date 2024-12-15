@@ -120,6 +120,8 @@ class WorldObject(object):
         self.is_furniture=False
         self.is_ground_texture=False
 
+        self.is_hit_marker=False
+
         # state of matter
         self.is_liquid=False
         self.is_solid=True
@@ -188,6 +190,8 @@ class WorldObject(object):
             self.render_level=4
         elif self.is_human:
             self.render_level=5
+        elif self.is_hit_marker:
+            self.render_level=6
         else:
             self.render_level=2
             

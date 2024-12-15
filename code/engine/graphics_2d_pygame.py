@@ -552,11 +552,9 @@ class Graphics_2D_Pygame(object):
             rot_image = rot_image.subsurface(rot_rect).copy()
             resize_image=pygame.transform.scale(rot_image,wo.image_size)
             wo.image=resize_image
+            self.image_cache[self.scale][key]=resize_image
         except:
             engine.log.add_data('error','graphics_2d_pygame.reset_pygame_image: image transform error with image '+wo.image_list[wo.image_index],True)
-
-        self.image_cache[self.scale][key]=resize_image
-            #print('cache miss ',key)
         
 
 #------------------------------------------------------------------------------

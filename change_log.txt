@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 14 2024
+- large rewrite of vehicle collision logs to support more data 
+- you can now turn on hit markers from the debug menu 
+- added a debug option to kill all other bots (very useful for testing)
+- fixed new bug in graphics_engine image rotation handling 
+- fixed rg42 grenade image size
+
+
+I've been wanting to do hit markers for a long time. 
+I'll add more data to them in the future.
+
+
+----------------------------------
 Dec 13 2024
 - ai_human now refills equipment slots from inventory when equipment is dropped 
 - optimized human menu 

@@ -111,6 +111,8 @@ class World_Menu(object):
             self.radio_menu(key)
         elif self.active_menu=='exit_world':
             self.exit_world_menu(key)
+        elif self.activate_menu=='hit_marker':
+            self.hit_marker_menu(key)
         else:
             if self.active_menu!='none':
                 print('Error : active menu not recognized ',self.active_menu)
@@ -153,6 +155,9 @@ class World_Menu(object):
             elif SELECTED_OBJECT.is_radio:
                 self.active_menu='radio_menu'
                 self.radio_menu(None)
+            elif SELECTED_OBJECT.is_hit_marker:
+                self.active_menu='hit_marker'
+                self.hit_marker_menu(None)
             else :
                 print('warn - generic menu activated')
                 # just dump everything else in here for now
@@ -300,12 +305,15 @@ class World_Menu(object):
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - send test radio messages')
             self.text_queue.append('5 - start self debug')
-            self.text_queue.append('6 - none')
+            self.text_queue.append('6 - toggle_hit_markers')
+            self.text_queue.append('7 - kill all humans except for the player')
 
             if key=='1':
                 self.world.toggle_map()
+                return
             elif key=='2':
                 self.world.debug_mode=not self.world.debug_mode
+                return
             elif key=='3':
                 self.menu_state='spawn'
                 key=None
@@ -317,7 +325,11 @@ class World_Menu(object):
             elif key=='5':
                 self.world.run_self_debug()
             elif key=='6':
-                pass
+                self.world.toggle_hit_markers()
+                return
+            elif key=='7':
+                self.world.kill_all_nonplayer_humans()
+                return
         if self.menu_state=='spawn':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu --')
@@ -645,6 +657,21 @@ class World_Menu(object):
             if key=='1':
                 self.world.player.ai.pickup_object(self.selected_object)
                 self.deactivate_menu()
+
+        #---------------------------------------------------------------------------
+    def hit_marker_menu(self, key):
+
+        # print out the basic menu
+        self.text_queue=[]
+        self.text_queue.append('-- hit marker --')
+        self.text_queue.append('object: ' +self.selected_object.ai.hit_data.hit_object_name)
+        self.text_queue.append('projectile: ' +self.selected_object.ai.hit_data.projectile_name)
+        self.text_queue.append('penetration: ' +str(self.selected_object.ai.hit_data.penetrated))
+        self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
+        self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
+
+
+
 
     #---------------------------------------------------------------------------
     def human_menu(self, key):
