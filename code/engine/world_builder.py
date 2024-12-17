@@ -60,6 +60,7 @@ from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
 from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
+from ai.ai_vehicle_wreck import AIVehicleWreck
 
 #global variables
 
@@ -170,7 +171,8 @@ def convert_world_objects_to_map_objects(world,map_square):
         # a couple objects we don't want to save
         if (b.is_projectile==False and b.is_map_pointer==False and
             b.can_be_deleted==False and b.is_particle_effect==False 
-            and b.is_turret==False):
+            and b.is_turret==False and b.is_hit_marker==False 
+            and b.is_body==False and b.is_vehicle_wreck==False):
             # assemble inventory name list
             inventory=[]
             if hasattr(b.ai,'inventory'):
@@ -660,9 +662,8 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
             x.world_coords=current_coords
 
 #------------------------------------------------------------------------------
-# currently used for wrecks and bodies
-def spawn_container(name,world_object,image_index):
-    '''spawns a custom container'''
+def spawn_container_body(name,world_object,image_index):
+    '''spawns a custom container for a body'''
     # name 
     # world_object - the world_object that is being replaced
     # image_index - index of the image to be used - from the world object
@@ -677,6 +678,28 @@ def spawn_container(name,world_object,image_index):
     z.weight=world_object.weight
     z.collision_radius=world_object.collision_radius
     z.is_large_human_pickup=True
+    z.is_body=True
+    z.wo_start()
+
+#------------------------------------------------------------------------------
+# currently used for wrecks and bodies
+def spawn_container_vehicle_wreck(name,world_object,image_index):
+    '''spawns a custom container for a vehicle wreck'''
+    # name 
+    # world_object - the world_object that is being replaced
+    # image_index - index of the image to be used - from the world object
+    z=WorldObject(world_object.world,[world_object.image_list[image_index]],AIVehicleWreck)
+    z.is_container=True
+    z.name=name
+    z.world_coords=world_object.world_coords
+    z.rotation_angle=world_object.rotation_angle
+    z.ai.inventory=world_object.ai.inventory
+    z.ai.collision_log=world_object.ai.collision_log
+    z.world_builder_identity='wreck'
+    z.volume=world_object.volume
+    z.weight=world_object.weight
+    z.collision_radius=world_object.collision_radius
+    z.is_vehicle_wreck=True
     z.wo_start()
 
 

@@ -1447,7 +1447,7 @@ class AIHuman(AIBase):
                     print('!! Error : '+self.owner.name+' not in squad somehow')
 
             # spawn body
-            engine.world_builder.spawn_container('body: '+self.owner.name,self.owner,2)
+            engine.world_builder.spawn_container_body('body: '+self.owner.name,self.owner,2)
 
             # remove from world
             self.owner.world.remove_queue.append(self.owner)

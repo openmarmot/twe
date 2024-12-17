@@ -757,10 +757,11 @@ class World(object):
 
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
-        for vehicle in self.wo_objects_vehicle:
-            for hit in vehicle.ai.collision_log:
-                marker=engine.world_builder.spawn_object(self,vehicle.world_coords,'hit_marker',True)
-                marker.ai.setup(vehicle,hit)
+        for b in self.wo_objects:
+            if b.is_vehicle or b.is_vehicle_wreck:
+                for hit in b.ai.collision_log:
+                    marker=engine.world_builder.spawn_object(self,b.world_coords,'hit_marker',True)
+                    marker.ai.setup(b,hit)
     #---------------------------------------------------------------------------
     def spawn_player(self):
         '''spawns player'''
