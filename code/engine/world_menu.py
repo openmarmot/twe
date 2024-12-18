@@ -431,7 +431,7 @@ class World_Menu(object):
             self.text_queue.append('2 - Feldfunk radio and charger ')
             self.text_queue.append('3 - Maybach HL42')
             self.text_queue.append('4 - Pickle Jar')
-            self.text_queue.append('5 - Pickle ')
+            self.text_queue.append('5 - wine ')
             self.text_queue.append('6 - hangar')
             self.text_queue.append('7 - concrete runway')
             self.text_queue.append('8 - german_fuel_can')
@@ -450,7 +450,7 @@ class World_Menu(object):
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle_jar',True)
             elif key=='5':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'wine',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'hangar',True)
             elif key=='7':

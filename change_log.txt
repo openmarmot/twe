@@ -2,11 +2,20 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 18 2024
+- added tools/image_tool.py
+- started work on visible passenger positions for vehicles 
+
+image_tool is a stand alone utility that will make it easier to position objects 
+and get relative positions 
+
+
+----------------------------------
 Dec 17 2024
 - minor cleanup and fixes 
 - hit markers now get transferred to vehicle wrecks on vehicle death 
 
-
+noted that bandage/medical usage is automatic for the player 
 
 ----------------------------------
 Dec 15 2024
