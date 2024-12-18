@@ -4,11 +4,13 @@ TWE Project : Change Log
 ----------------------------------
 Dec 18 2024
 - added tools/image_tool.py
-- started work on visible passenger positions for vehicles 
+- large rewrite of vehicle crew handling 
+- misc minor changes 
 
 image_tool is a stand alone utility that will make it easier to position objects 
 and get relative positions 
 
+note - not finished with the work on this one so this code is broken 
 
 ----------------------------------
 Dec 17 2024

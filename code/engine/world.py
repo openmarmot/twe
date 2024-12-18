@@ -173,7 +173,7 @@ class World(object):
             in_vehicle=None
             vlist=self.wo_objects_vehicle+self.wo_objects_airplane
             for b in vlist:
-                if self.player in b.ai.passengers:
+                if b.check_if_human_in_vehicle(self.player):
                     in_vehicle=b
             
             if in_vehicle==None:
@@ -323,13 +323,10 @@ class World(object):
         # special ignore list for vehicles
         if OBJ.is_turret:
             if OBJ.ai.gunner!=None:
-                if OBJ.ai.vehicle!=None:
-                    ignore_list.append(OBJ.ai.vehicle)
-                    ignore_list+=OBJ.ai.vehicle.ai.passengers
-
-                # reset the OBJ to be human so the rest of the 
-                # ignore list is built
+                # reset ai to gunner so that a human ignore list is built
                 OBJ=OBJ.ai.gunner
+            else:
+                engine.log.add_data('error','world.generate_ignore_liist turret does not have gunner!!',True)
 
 
         if OBJ.is_human:
@@ -349,12 +346,17 @@ class World(object):
                 for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
                     ignore_list.append(b)
 
+                # add the vehicle crew
+                for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.vehicle_crew.values():
+                    if b[0]==True:
+                        ignore_list.append(b[1])
+
             if OBJ.ai.in_building:
                 # add possible buildings the equipper is in.
                 # assuming they are shooting out windows so should not hit the building
                 ignore_list+=OBJ.ai.building_list
-        elif OBJ.is_turret:
-            ignore_list.append(OBJ.ai.vehicle)
+        else:
+            engine.log.add_data('error','world.generate_ignore_list OBJ is not human'+OBJ.name,True)
 
         return ignore_list
 
@@ -380,17 +382,25 @@ class World(object):
         best_object=None
         for b in self.wo_objects_vehicle:
             acceptable=True
-
-            # don't return airplanes if not a pilot
-            if b.is_airplane and human.ai.is_pilot==False:
+            
+            # first check if its full
+            if b.check_if_vehicle_is_full==True:
                 acceptable=False
 
-            if b.ai.driver!=None:
-                if b.ai.driver.ai.squad.faction!=human.ai.squad.faction:
+            # check if we can drive it
+            if acceptable:
+                if b.is_airplane and human.ai.is_pilot==False:
                     acceptable=False
 
-            # check if its full first
-            if acceptable and len(b.ai.passengers)<b.ai.max_occupants:
+            # check factions
+            if acceptable:
+                for value in b.ai.vehicle_crew.values():
+                    if value[0]==True:
+                        if value[1].ai.squad.faction!=human.ai.squad.faction:
+                            acceptable=False
+
+
+            if acceptable:
                 d=engine.math_2d.get_distance(human.world_coords,b.world_coords)
                 if d<best_distance:
                     best_distance=d 
@@ -600,10 +610,11 @@ class World(object):
             elif b.is_vehicle:
                 # tell all the passengers to get out
                 # kind of a fail safe as they are likely already in the list
-                if len(b.ai.passengers)>0:
-                    temp=copy.copy(b.ai.passengers)
-                    for c in temp:
-                        c.ai.handle_exit_vehicle()
+                temp=copy.copy(b.ai.vehicle_crew.values())
+                for b in temp:
+                    if b[0]==True:
+                        b[1].ai.handle_exit_vehicle()
+
 
 
             print(message)
@@ -705,29 +716,30 @@ class World(object):
         print('------------------------------------')
         print('--- vehicle crew check ---')
         for b in self.wo_objects_vehicle:
-            for p in b.ai.passengers:
-                error_found=False
-                # check for passengers that are not in the world
-                # all passengers should also be in the world
-                if self.check_object_exists(p)==False:
-                    print(p.name+' is a passenger but is not in the world')
-                    error_found=True
+            for key,value in b.ai.vehicle_crew.items():
+                if value[0]==True:
+                    error_found=False
+                    # check for passengers that are not in the world
+                    # all passengers should also be in the world
+                    if self.check_object_exists(value[1])==False:
+                        print(value[1].name+' is a passenger but is not in the world')
+                        error_found=True
 
-                # check for passengers that are missing the correct memory
-                if 'task_vehicle_crew' not in p.ai.memory:
-                    print(p.name,'missing task_vehicle_crew_memory')
-                    error_found=True
+                    # check for passengers that are missing the correct memory
+                    if 'task_vehicle_crew' not in p.ai.memory:
+                        print(value[1].name,'missing task_vehicle_crew_memory')
+                        error_found=True
 
-                if error_found:
-                    print('---')
-                    print('name',p.name)
-                    print('exists in world',self.check_object_exists(p))
-                    print('health',p.ai.health)
-                    print('memory dump:')
-                    print(p.ai.memory)
-                    print('---')
+                    if error_found:
+                        print('---')
+                        print('name',value[1].name)
+                        print('exists in world',self.check_object_exists(value[1]))
+                        print('health',value[1].ai.health)
+                        print('memory dump:')
+                        print(value[1].ai.memory)
+                        print('---')
 
-                # maybe also check faction against other passengers
+                    # maybe also check faction against other passengers
 
         print('------------------------------------')
 

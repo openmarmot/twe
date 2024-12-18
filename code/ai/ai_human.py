@@ -619,13 +619,19 @@ class AIHuman(AIBase):
             if len(near_squad)==0:
                 break
             # calculate occupants
-            occupants=len(b.ai.passengers)
+            occupants=0
+
+            # count the occupants already in the vehicle
+            for c in b.ai.vehicle_crew.values():
+                if c[0]==True:
+                    occupants+=1
+
             for c in self.owner.world.wo_objects_human:
                 if 'task_enter_vehicle' in c.ai.memory:
                     if c.ai.memory['task_enter_vehicle']['vehicle']==b:
                         occupants+=1
 
-            while occupants<b.ai.max_occupants:
+            while occupants<len(b.ai.vehicle_crew):
                 if len(near_squad)>0:
 
                     # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
@@ -1042,9 +1048,11 @@ class AIHuman(AIBase):
 
         # pick a role
         if role==None:
-            if vehicle.ai.driver==None:
+            if vehicle.ai.vehicle_crew['driver'][0]==False:
                 role='driver'
-                vehicle.ai.driver=self.owner
+                vehicle.ai.vehicle_crew['driver'][0]=True
+                vehicle.ai.vehicle_crew['driver'][1]=self.owner
+                self.owner.render=vehicle.ai.vehicle_crew['driver'][4]
                 self.speak("Taking over driving")
 
             if role==None:
@@ -1059,11 +1067,30 @@ class AIHuman(AIBase):
             if role==None:
                 if vehicle.ai.radio!=None:
                     if vehicle.ai.radio.ai.radio_operator==None:
-                        role='radio_operator'
-                        vehicle.ai.radio.ai.radio_operator=self.owner
+                        if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
+                            role='radio_operator'
+                            vehicle.ai.vehicle_crew['radio_operator'][0]=True
+                            vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
+                            self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
 
             if role==None:
-                role='passenger'
+                
+                # check if any passenger slots are open
+                for key,value in vehicle.ai.vehicle_crew.items():
+                    if 'passenger' in key:
+                        if value[0]==False:
+                            role='passenger'
+                            vehicle.ai.vehicle_crew[key][0]=True
+                            vehicle.ai.vehicle_crew[key][1]=self.owner
+                            self.owner.render=vehicle.ai.vehicle_crew[key][4]
+                            break
+
+            if role==None:
+                engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!!',True)
+
+
+        # update the position to reflect the new seat
+        vehicle.ai.update_child_position_rotation()
 
         task_name='task_vehicle_crew'
         task_details = {
@@ -1594,7 +1621,7 @@ class AIHuman(AIBase):
                     # remove this as well so we don't end up wanting to go back to where the vehicle was
 
                     precheck=True
-                    if vehicle.ai.max_occupants<=len(vehicle.ai.passengers):
+                    if vehicle.check_if_vehicle_is_full()==True:
                         precheck=False
                         self.speak('No more room in this vehicle!')
                     
@@ -1610,19 +1637,6 @@ class AIHuman(AIBase):
                             self.owner.world.remove_queue.append(self.large_pickup)
                             self.large_pickup=None
 
-                        vehicle.ai.passengers.append(self.owner)
-
-                        # reset the position for all passengers and turrets. only really 
-                        # need to do it for this ai but there is no way to narrow it down
-                        vehicle.ai.update_child_position_rotation()
-                        
-                        if vehicle.ai.open_top==False:
-                            # human is hidden by top of vehicle so don't render
-                            self.owner.render=False
-
-                        # tell the squad to mount up
-                        #if self.owner==self.squad.squad_leader:
-                        #   self.handle_squad_transportation_orders()
 
                         # this will decide crew position as well
                         self.switch_task_vehicle_crew(vehicle,destination)
@@ -1640,29 +1654,36 @@ class AIHuman(AIBase):
     def update_task_exit_vehicle(self):
         vehicle=self.memory['task_exit_vehicle']['vehicle']
 
-        # remove from passenger list
-        vehicle.ai.passengers.remove(self.owner)
 
+        for key,value in vehicle.ai.vehicle_crew.items():
+            if value[1]==self.owner:
+                value[1]=None
+                value[0]=False
+
+                if key=='driver':
+                    # this may not do anything. i think it regresses to zero
+                    # turn on the brakes to prevent roll away
+                    vehicle.ai.brake_power=1
+
+                    # tell everyone else to GTFO
+                    for b in vehicle.ai.vehicle_crew.values():
+                        if b[0]==True:
+                            b[1].ai.switch_task_exit_vehicle(vehicle)
+                elif key=='radio_operator':
+                    if vehicle.ai.radio.ai.radio_operator==self.owner:
+                        vehicle.ai.radio.ai.radio_operator=None
+                elif 'passenger' in key:
+                    pass
+                else:
+                    engine.log.add_data('error','ai_human.update_task_exit_vehicle no role found!',True)
+
+
+        # gunners are not considered crew 'for now'
         # remove yourself from any turrets
         for b in vehicle.ai.turrets:
             if b.ai.gunner==self.owner:
                 b.ai.gunner=None
 
-        # remove yourself from driver role
-        if vehicle.ai.driver==self.owner:
-            vehicle.ai.driver=None
-            # turn on the brakes to prevent roll away
-            vehicle.ai.brake_power=1
-
-            if self.health>0:
-                # tell everyone else to GTFO
-                for b in vehicle.ai.passengers:
-                    b.ai.switch_task_exit_vehicle(vehicle)
-
-        # remove yourself from radio
-        if vehicle.ai.radio!=None:
-            if vehicle.ai.radio.ai.radio_operator==self.owner:
-                vehicle.ai.radio.ai.radio_operator=None
 
         # make sure we are visible again
         self.owner.render=True
@@ -1677,9 +1698,10 @@ class AIHuman(AIBase):
         if self.health>0:
             self.speak('Jumping out')
 
+            if self.owner.is_player==False:
             # move slightly
-            coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-            self.switch_task_move_to_location(coords)
+                coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
+                self.switch_task_move_to_location(coords)
 
     #---------------------------------------------------------------------------
     def update_task_loot_container(self):
