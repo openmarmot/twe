@@ -173,7 +173,7 @@ class World(object):
             in_vehicle=None
             vlist=self.wo_objects_vehicle+self.wo_objects_airplane
             for b in vlist:
-                if b.check_if_human_in_vehicle(self.player):
+                if b.ai.check_if_human_in_vehicle(self.player):
                     in_vehicle=b
             
             if in_vehicle==None:
@@ -384,7 +384,7 @@ class World(object):
             acceptable=True
             
             # first check if its full
-            if b.check_if_vehicle_is_full==True:
+            if b.ai.check_if_vehicle_is_full()==True:
                 acceptable=False
 
             # check if we can drive it

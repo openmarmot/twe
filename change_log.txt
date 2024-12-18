@@ -5,12 +5,17 @@ TWE Project : Change Log
 Dec 18 2024
 - added tools/image_tool.py
 - large rewrite of vehicle crew handling 
+- rewrote ignore lists for turrets - effect should be the same 
 - misc minor changes 
 
 image_tool is a stand alone utility that will make it easier to position objects 
 and get relative positions 
 
-note - not finished with the work on this one so this code is broken 
+note - not finished with the work on this one so there may be major issues
+
+todo 
+- add gunners to vehicle_crew ??
+- set crew position offsets 
 
 ----------------------------------
 Dec 17 2024

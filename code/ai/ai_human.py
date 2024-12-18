@@ -355,11 +355,11 @@ class AIHuman(AIBase):
                             else:
                                 event_data.ai.shooter.ai.probable_kills+=1
                         else:
-                            print('collision on a dead human ai detected')
+                            # collision on a dead human
+                            pass
                 
             else:
                 engine.log.add_data('error', 'projectile '+event_data.name+' shooter is none',True)
-                print('Error - projectile '+event_data.name+' shooter is none')
 
             # react 
             if 'vehicle' in self.memory['current_task']:
@@ -451,11 +451,7 @@ class AIHuman(AIBase):
                         if self.wearable_head==None:
                             self.wearable_head=event_data
         else:
-            print('ERROR - object '+event_data.name+' is already in inventory')
-            print('inventory list:')
-            for b in self.inventory:
-                print(' - ',b.name)
-
+            engine.log.add_data('error','ai_human.event_add_inventory - obj already in inventory: '+event_data.name,True)
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,event_data):
@@ -481,14 +477,15 @@ class AIHuman(AIBase):
                 event_data.ai.equipper=None
                 self.update_equipment_slots()
             elif self.large_pickup==event_data:
-                print('ERROR - large pickup should not go through inventory functions')
+                # large_pickup should not go through this method
+                pass
             elif self.wearable_head==event_data:
                 self.wearable_head=None
 
             # need to add a method call here that will search inventory and add new weapon/grendade/whatever if available
 
         else:
-            print('removal error - object not in inventory',event_data.name)
+            engine.log.add_data('error','ai_human.event_remove_inventory object is not in inventory: '+event_data.name,True)
 
     #---------------------------------------------------------------------------
     def event_speak(self,event_data):
@@ -596,10 +593,6 @@ class AIHuman(AIBase):
             if target.ai.health<1:
                 # could get intesting if there are a lot of dead targets but 
                 # it should self clear with this recursion
-                print('error: got dead target: '+target.name+' retrying')
-                print('near ',len(self.near_targets))
-                print('mid',len(self.mid_targets))
-                print('far',len(self.far_targets))
                 target=self.get_target()
                 
         return target
@@ -668,8 +661,7 @@ class AIHuman(AIBase):
             self.event_speak(EVENT_DATA)
 
         else:
-            print('Error: '+self.owner.name+' cannot handle event '+EVENT)
-
+            engine.log.add_data('error','ai_human.handle_event cannot handle event'+EVENT,True)
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords,mouse_screen_coords=None):
@@ -1039,54 +1031,90 @@ class AIHuman(AIBase):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_vehicle_crew(self,vehicle,destination,role=None,turret=None):
+    def switch_task_vehicle_crew(self,vehicle,destination):
         '''switch task to vehicle crew and determine role'''
         # this should always overwrite if it exists
         # A player can go through this if they enter a vehicle
         # this can also be used by a ai in a vehicle already that wants to change role
         # role should be NONE in most cases. 
 
-        # pick a role
-        if role==None:
-            if vehicle.ai.vehicle_crew['driver'][0]==False:
-                role='driver'
-                vehicle.ai.vehicle_crew['driver'][0]=True
-                vehicle.ai.vehicle_crew['driver'][1]=self.owner
-                self.owner.render=vehicle.ai.vehicle_crew['driver'][4]
-                self.speak("Taking over driving")
+        # first remove yourself from any existing crew spots
+        for key,value in vehicle.ai.vehicle_crew.items():
+            if value[1]==self.owner:
+                value[1]=None
+                value[0]=False
 
-            if role==None:
-                for b in vehicle.ai.turrets:
-                    if b.ai.gunner==None:
-                        self.speak("Taking over gunner position")
-                        b.ai.gunner=self.owner
-                        turret=b
-                        role='gunner'
+                if key=='driver':
+                    # this may not do anything. i think it regresses to zero
+                    # turn on the brakes to prevent roll away
+                    vehicle.ai.brake_power=1
+
+                elif key=='radio_operator':
+                    if vehicle.ai.radio.ai.radio_operator==self.owner:
+                        vehicle.ai.radio.ai.radio_operator=None
+                elif 'passenger' in key:
+                    pass
+
+
+        # remove yourself from any turrets
+        for b in vehicle.ai.turrets:
+            if b.ai.gunner==self.owner:
+                b.ai.gunner=None
+
+        role=None
+        # pick a role
+        if vehicle.ai.vehicle_crew['driver'][0]==False:
+            role='driver'
+            vehicle.ai.vehicle_crew['driver'][0]=True
+            vehicle.ai.vehicle_crew['driver'][1]=self.owner
+            self.owner.render=vehicle.ai.vehicle_crew['driver'][4]
+            self.speak("Taking over driving")
+
+        if role==None:
+            for b in vehicle.ai.turrets:
+                if b.ai.gunner==None:
+                    self.speak("Taking over gunner position")
+                    b.ai.gunner=self.owner
+                    turret=b
+                    role='gunner'
+                    break
+
+        if role==None:
+            if vehicle.ai.radio!=None:
+                if vehicle.ai.radio.ai.radio_operator==None:
+                    if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
+                        role='radio_operator'
+                        vehicle.ai.vehicle_crew['radio_operator'][0]=True
+                        vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
+                        self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
+            else:
+                # no radio - so just fill this crew spot as a passenger
+                role='passenger'
+                vehicle.ai.vehicle_crew['radio_operator'][0]=True
+                vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
+                self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
+
+        if role==None:
+            
+            # check if any passenger slots are open
+            for key,value in vehicle.ai.vehicle_crew.items():
+                if 'passenger' in key:
+                    if value[0]==False:
+                        role='passenger'
+                        vehicle.ai.vehicle_crew[key][0]=True
+                        vehicle.ai.vehicle_crew[key][1]=self.owner
+                        self.owner.render=vehicle.ai.vehicle_crew[key][4]
                         break
 
-            if role==None:
-                if vehicle.ai.radio!=None:
-                    if vehicle.ai.radio.ai.radio_operator==None:
-                        if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
-                            role='radio_operator'
-                            vehicle.ai.vehicle_crew['radio_operator'][0]=True
-                            vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
-                            self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
-
-            if role==None:
-                
-                # check if any passenger slots are open
-                for key,value in vehicle.ai.vehicle_crew.items():
-                    if 'passenger' in key:
-                        if value[0]==False:
-                            role='passenger'
-                            vehicle.ai.vehicle_crew[key][0]=True
-                            vehicle.ai.vehicle_crew[key][1]=self.owner
-                            self.owner.render=vehicle.ai.vehicle_crew[key][4]
-                            break
-
-            if role==None:
-                engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!!',True)
+        if role==None:
+            engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!! Vehicle is full='+str(vehicle.ai.check_if_vehicle_is_full()),True)
+            print('name: '+self.owner.name)
+            print('vehicle crew')
+            for key,value in vehicle.ai.vehicle_crew.items():
+                if value[0]==True:
+                    print(key,value[1].name)
+                else:
+                    print(key,'empty')
 
 
         # update the position to reflect the new seat
@@ -1230,7 +1258,7 @@ class AIHuman(AIBase):
 
         # for whatever reason sometimes a vehicle will have a driver jump out
         # this will cause a passenger to take over. will also fill in any empty gunner spots
-        if vehicle.ai.driver==None:
+        if vehicle.ai.vehicle_crew['driver'][0]==False:
             self.switch_task_vehicle_crew(vehicle,self.squad.destination)
         
         if len(self.near_targets)>0:
@@ -1334,7 +1362,7 @@ class AIHuman(AIBase):
             # add the new liquid to the container
             TO_OBJECT.add_inventory(z)
         else:
-            print('error: transfer_liquid error: src/dest not recognized!')
+            engine.log.add_data('error','ai_human.transfer_liquid - src/dest not recognized',True)
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -1621,14 +1649,18 @@ class AIHuman(AIBase):
                     # remove this as well so we don't end up wanting to go back to where the vehicle was
 
                     precheck=True
-                    if vehicle.check_if_vehicle_is_full()==True:
+                    if vehicle.ai.check_if_vehicle_is_full()==True:
                         precheck=False
                         self.speak('No more room in this vehicle!')
                     
-                    if vehicle.ai.driver!=None:
-                        if vehicle.ai.driver.ai.squad.faction!=self.squad.faction:
-                            precheck=False
-                            self.speak('The enemy took this vehicle!')
+                    if precheck:
+                        for value in vehicle.ai.vehicle_crew.values():
+                            if value[0]==True:
+                                if value[1].ai.squad.faction!=self.squad.faction:
+                                    precheck=False
+                                    self.speak('This vehicle is crewed by the enemy!')
+                                    break
+
                     
                     if precheck:
                         # put your large items in the trunk
@@ -1640,6 +1672,7 @@ class AIHuman(AIBase):
 
                         # this will decide crew position as well
                         self.switch_task_vehicle_crew(vehicle,destination)
+
                 else:
                     # -- too far away to enter, what do we do --
                     if distance<self.max_walk_distance:
@@ -1670,8 +1703,9 @@ class AIHuman(AIBase):
                         if b[0]==True:
                             b[1].ai.switch_task_exit_vehicle(vehicle)
                 elif key=='radio_operator':
-                    if vehicle.ai.radio.ai.radio_operator==self.owner:
-                        vehicle.ai.radio.ai.radio_operator=None
+                    if vehicle.ai.radio!=None:
+                        if vehicle.ai.radio.ai.radio_operator==self.owner:
+                            vehicle.ai.radio.ai.radio_operator=None
                 elif 'passenger' in key:
                     pass
                 else:
@@ -1702,6 +1736,8 @@ class AIHuman(AIBase):
             # move slightly
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
                 self.switch_task_move_to_location(coords)
+            else:
+                pass
 
     #---------------------------------------------------------------------------
     def update_task_loot_container(self):

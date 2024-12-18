@@ -1181,8 +1181,8 @@ class World_Menu(object):
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
             self.text_queue.append('- crew -')
-            for key,value in self.selected_object.ai.vehicle_crew.items():
-                text=key+': '
+            for k,value in self.selected_object.ai.vehicle_crew.items():
+                text=k+': '
                 if value[0]==True:
                     text+=value[1].name
                 else:
@@ -1240,13 +1240,7 @@ class World_Menu(object):
                 self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
                 self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
                 self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
-                if self.selected_object.ai.driver==None:
-                    self.text_queue.append('driver: None')
-                else:
-                    self.text_queue.append('---- driver info -------------------')
-                    self.text_queue.append('driver: '+self.selected_object.ai.driver.name)
-                    vehicle_destination_distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.memory['task_vehicle_crew']['destination'])
-                    self.text_queue.append('distance to driver destination: '+str(vehicle_destination_distance))
+
 
 
     #---------------------------------------------------------------------------

@@ -264,9 +264,9 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
         if penetration:
-            if self.driver!=None:
-                if random.randint(0,2)==2:
-                    self.driver.ai.handle_event('collision',projectile)
+            if self.vehicle_crew['driver'][0]==True:
+                if random.randint(0,3)==3:
+                    self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
             
             # should do component damage here
             self.health-=random.randint(20,75)
@@ -579,12 +579,12 @@ class AIVehicle(AIBase):
                 # if position is visible
                 if value[4]==True:
                     # set the world coords with the offset
-                    value[1].world_coords==engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,value[3])
+                    value[1].world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,value[3])
                     value[1].rotation_angle=self.owner.rotation_angle+value[2]
                     value[1].reset_image=True
                 else:
                     # just a simple position
-                    b.world_coords=copy.copy(self.owner.world_coords)
+                    value[1].world_coords=copy.copy(self.owner.world_coords)
 
 
 
