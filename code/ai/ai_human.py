@@ -1092,7 +1092,8 @@ class AIHuman(AIBase):
                         vehicle.ai.vehicle_crew[key][1]=self.owner
                         self.owner.render=vehicle.ai.vehicle_crew[key][4]
 
-        if role==None:
+        # note that some vehicles may not have this crew slot
+        if role==None and 'radio_operator' in vehicle.ai.vehicle_crew:
             if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
                 vehicle.ai.vehicle_crew['radio_operator'][0]=True
                 vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner

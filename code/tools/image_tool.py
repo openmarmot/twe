@@ -389,17 +389,14 @@ class ImageObject(object):
 screen_size = (1200,900)
 image_tool=ImageTool(screen_size)
 
-image_tool.image_objects.append(ImageObject(['sd_kfz_251'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],90))
-image_tool.image_objects.append(ImageObject(['german_soldier'],90))
+image_tool.image_objects.append(ImageObject(['t20'],0))
 image_tool.image_objects.append(ImageObject(['german_soldier'],90))
 image_tool.image_objects.append(ImageObject(['german_soldier'],90))
 image_tool.image_objects.append(ImageObject(['german_soldier'],90))
 image_tool.image_objects.append(ImageObject(['german_soldier'],270))
 image_tool.image_objects.append(ImageObject(['german_soldier'],270))
 image_tool.image_objects.append(ImageObject(['german_soldier'],270))
-image_tool.image_objects.append(ImageObject(['german_soldier'],270))
-image_tool.image_objects.append(ImageObject(['german_soldier'],270))
+
 
 
 while image_tool.quit==False:

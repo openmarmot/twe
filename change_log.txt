@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 19 2024
+- added crew placement for T20 tractor
+- toggled bike driver back to visible (with the new code) 
+- radio operator is now an optional role 
+
+the t20 went down to 6 passengers. I couldn't find a exact historical loadout but 
+from looking at pictures the passenger space looks really tight. 6 has got to be 
+about the max. 
+
+note - unlike the sd.kfz.251, the t20 has a completely open unarmored passenger area.
+
+----------------------------------
 Dec 18 2024
 - added tools/image_tool.py
 - large rewrite of vehicle crew handling 

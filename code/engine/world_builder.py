@@ -1902,16 +1902,13 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['front']=[0,0,0]
         z.ai.passenger_compartment_armor['rear']=[0,0,0]
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
-        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_3']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_4']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_5']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_6']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_7']=[False,None,0,[0,0],True]
-        z.ai.vehicle_crew['passenger_8']=[False,None,0,[0,0],True]
+        z.ai.vehicle_crew['passenger_1']=[False,None,90,[0,-17],True]
+        z.ai.vehicle_crew['passenger_2']=[False,None,90,[11,-17],True]
+        z.ai.vehicle_crew['passenger_3']=[False,None,90,[24,-17],True]
+        z.ai.vehicle_crew['passenger_4']=[False,None,270,[0,17],True]
+        z.ai.vehicle_crew['passenger_5']=[False,None,270,[11,17],True]
+        z.ai.vehicle_crew['passenger_6']=[False,None,270,[24,17],True]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2288,7 +2285,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=142.08
         z.ai.rotation_speed=50.
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],True]
         z.ai.open_top=True
         z.collision_radius=50
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
