@@ -726,7 +726,7 @@ class World(object):
                         error_found=True
 
                     # check for passengers that are missing the correct memory
-                    if 'task_vehicle_crew' not in p.ai.memory:
+                    if 'task_vehicle_crew' not in value[1].ai.memory:
                         print(value[1].name,'missing task_vehicle_crew_memory')
                         error_found=True
 

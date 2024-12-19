@@ -241,7 +241,7 @@ class AIVehicle(AIBase):
                     # we want to exclude driver/radio/gunner as those are different compartments
                     if 'passenger' in key:
                         if random.randint(0,3)==3:
-                            passenger.ai.handle_event('collision',projectile)
+                            value[1].ai.handle_event('collision',projectile)
 
 
             if random.randint(0,3)==3:

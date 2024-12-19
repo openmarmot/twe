@@ -1062,6 +1062,7 @@ class AIHuman(AIBase):
                 b.ai.gunner=None
 
         role=None
+        turret=None
         # pick a role
         if vehicle.ai.vehicle_crew['driver'][0]==False:
             role='driver'
@@ -1071,29 +1072,39 @@ class AIHuman(AIBase):
             self.speak("Taking over driving")
 
         if role==None:
-            for b in vehicle.ai.turrets:
-                if b.ai.gunner==None:
-                    self.speak("Taking over gunner position")
-                    b.ai.gunner=self.owner
-                    turret=b
-                    role='gunner'
-                    break
+            for key,value in vehicle.ai.vehicle_crew.items():
+                if 'gunner' in key:
+                    if value[0]==False:
+                        for b in vehicle.ai.turrets:
+                            if b.ai.gunner==None:
+                                self.speak("Taking over gunner position")
+                                b.ai.gunner=self.owner
+                                turret=b
+                                role='gunner'
+                                break
+                        
+                        # this means that there are more gun slots than turrets for some reason
+                        if role==None:
+                            role='passenger'
+                            engine.log.add_data('warn','ai_human.switch_task_vehicle_crew more gunners than turrets',True)
+
+                        vehicle.ai.vehicle_crew[key][0]=True
+                        vehicle.ai.vehicle_crew[key][1]=self.owner
+                        self.owner.render=vehicle.ai.vehicle_crew[key][4]
 
         if role==None:
-            if vehicle.ai.radio!=None:
-                if vehicle.ai.radio.ai.radio_operator==None:
-                    if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
-                        role='radio_operator'
-                        vehicle.ai.vehicle_crew['radio_operator'][0]=True
-                        vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
-                        self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
-            else:
-                # no radio - so just fill this crew spot as a passenger
-                role='passenger'
+            if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
                 vehicle.ai.vehicle_crew['radio_operator'][0]=True
                 vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
                 self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
 
+                if vehicle.ai.radio!=None:
+                    if vehicle.ai.radio.ai.radio_operator==None:
+                            role='radio_operator'
+                else:
+                    # no radio - so just fill this crew spot as a passenger
+                    role='passenger'
+                
         if role==None:
             
             # check if any passenger slots are open
@@ -1708,15 +1719,14 @@ class AIHuman(AIBase):
                             vehicle.ai.radio.ai.radio_operator=None
                 elif 'passenger' in key:
                     pass
+                elif 'gunner' in key:
+                    # remove yourself from any turrets
+                    for b in vehicle.ai.turrets:
+                        if b.ai.gunner==self.owner:
+                            b.ai.gunner=None
+
                 else:
                     engine.log.add_data('error','ai_human.update_task_exit_vehicle no role found!',True)
-
-
-        # gunners are not considered crew 'for now'
-        # remove yourself from any turrets
-        for b in vehicle.ai.turrets:
-            if b.ai.gunner==self.owner:
-                b.ai.gunner=None
 
 
         # make sure we are visible again

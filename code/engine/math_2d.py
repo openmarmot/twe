@@ -392,6 +392,9 @@ def get_vector_rotation(vector,angle_degrees):
     # Rotation matrix applied to vector
     y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
     x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
+
+    #x = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
+    #y = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
     
     return [x, y]    
 

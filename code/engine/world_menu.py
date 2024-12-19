@@ -753,6 +753,8 @@ class World_Menu(object):
             if self.selected_object.ai.squad.squad_leader!=None:
                 d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords,True)
             self.text_queue.append('current task: '+self.selected_object.ai.memory['current_task'])
+            if self.selected_object.ai.memory['current_task']=='task_vehicle_crew':
+                self.text_queue.append('Vehicle Role: '+self.selected_object.ai.memory['task_vehicle_crew']['role'])
             self.text_queue.append('Distance from player: '+str(d))
             self.text_queue.append('Distance from squad: '+str(d2))
             self.text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))

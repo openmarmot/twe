@@ -20,6 +20,7 @@ import pygame.freetype
 
 
 
+
 class ImageTool(object):
     ''' 2D Graphics Engine using PyGame '''
 
@@ -181,7 +182,8 @@ class ImageTool(object):
             for b in self.image_objects:
                 if b!=self.selected_object:
                     offset=[b.world_coords[0]-self.selected_object.world_coords[0],b.world_coords[1]-self.selected_object.world_coords[1]]
-                    print(b.image_list[b.image_index],' rotation:',b.rotation_angle,'offset:',offset)
+                    adjusted_offset=self.get_vector_rotation(offset,self.selected_object.rotation_angle)
+                    print(b.image_list[b.image_index],' rotation:',b.rotation_angle,'offset:',adjusted_offset)
 
             print('----------------------------------')
 
@@ -312,6 +314,19 @@ class ImageTool(object):
 
         translate=[center_x-player_x,center_y-player_y]
         return translate
+    
+    #------------------------------------------------------------------------------
+    def get_vector_rotation(self,vector,angle_degrees):
+        # note this is adjusted to match how in game coordinates work
+        # in the original code x and y were flipped
+        # Convert angle to radians
+        angle_rad = math.radians(angle_degrees)
+        
+        # Rotation matrix applied to vector
+        y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
+        x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
+        
+        return [x, y] 
     
     #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
