@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 20 2024
+- added checks for armor and speed before throwing a grenade at a vehicle 
+- small distance pre-check increase for grenade throws 
+
+grenades need a overhaul. I think they should probably pre-create their shrapnel 
+projectiles and store them like a gun has bullets in a magazine. this will allow 
+for different types of shrapnel, and a more effective armor pen pre-check 
+
+
+----------------------------------
 Dec 19 2024
 - added crew placement for T20 tractor
 - toggled bike driver back to visible (with the new code) 

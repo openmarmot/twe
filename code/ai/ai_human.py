@@ -1569,9 +1569,18 @@ class AIHuman(AIBase):
                             
 
                     # also check if we should chuck a grenade at it
-                    if distance<300 and distance>150 and self.throwable!=None:
-                        self.throw(enemy.world_coords)
-                        self.speak('Throwing Grenade !!!!')
+                    if distance<310 and distance>150 and self.throwable!=None:
+                        if enemy.is_human:
+                            self.throw(enemy.world_coords)
+                            self.speak('Throwing Grenade !!!!')
+                        elif enemy.is_vehicle:
+                            # grenades will miss if the vehicle is moving fast
+                            if enemy.ai.current_speed<5:
+                                # check pen
+                                if enemy.ai.passenger_compartment_armor['left']<4:
+                                    self.throw(enemy.world_coords)
+                                    self.speak('Throwing Grenade !!!!')
+
 
                     # also check if we should launch antitank
                     if enemy.is_vehicle:
