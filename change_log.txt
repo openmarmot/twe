@@ -2,6 +2,26 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 21 2024
+- working on a new explosion mechanic 
+
+when i started out writing this game I was coming from having written a 
+c# game a number of years earlier. the c# game relied on inheritance to work 
+so there was a base class and then other classes built on it. with python this 
+has been largely unnecessary as anything can be anything due to not being statically 
+typed. Due to this the ai_base class is basically useless 
+
+todo 
+- switch grenade over to new explosion system 
+- introduce some different levels of frag grenades 
+- HE shells 
+- figure out HE vehicle damage 
+
+cleanup todo items 
+- remove aibase. it is not needed 
+- consider removing the entire 'handle event' system 
+
+----------------------------------
 Dec 20 2024
 - added checks for armor and speed before throwing a grenade at a vehicle 
 - small distance pre-check increase for grenade throws 

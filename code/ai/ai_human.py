@@ -454,6 +454,24 @@ class AIHuman(AIBase):
             engine.log.add_data('error','ai_human.event_add_inventory - obj already in inventory: '+event_data.name,True)
 
     #---------------------------------------------------------------------------
+    def event_explosion(self,event_data):
+        ''' explosion event '''
+        # event_data is the explosion power as a float 
+
+        # this will likely just kill the human
+
+        self.health-=event_data
+        engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
+        # short move to simulate being stunned
+        if self.owner.is_player==False:
+            # move slightly
+                coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
+                self.switch_task_move_to_location(coords)
+
+
+
+    #---------------------------------------------------------------------------
     def event_remove_inventory(self,event_data):
         ''' remove object from inventory. does NOT add to world '''
 
@@ -659,6 +677,8 @@ class AIHuman(AIBase):
             self.event_remove_inventory(EVENT_DATA)
         elif EVENT=='speak':
             self.event_speak(EVENT_DATA)
+        elif EVENT=='explosion':
+            self.event_explosion(EVENT_DATA)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+EVENT,True)

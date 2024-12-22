@@ -308,6 +308,33 @@ class World(object):
         print('Cleanup function removing '+str(len(remove_list))+' objects')
         self.remove_queue+=remove_list
 
+
+    #------------------------------------------------------------------------------
+    def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon_name):
+        '''create a explosion that deals damage'''
+        # originator - the ai_human that fired the weapon
+        # weaponName - the weapon that created the explosion
+
+        # damage objects within damage radius 
+        possible=self.wo_objects_human+self.wo_objects_vehicle
+        for b in possible:
+            distance=engine.math_2d.get_distance(world_coords,b.world_coords)
+            if distance<explosion_radius:
+                # power reverse scales with distance
+                power=100*(distance/explosion_radius)
+                if b.is_human:
+                    b.ai.handle_event('explosion',power)        
+
+        # stun objects within stun radius 
+                    
+        # shrapnel
+        if shrapnel_count>0:
+            engine.world_builder.spawn_shrapnel_cloud(self,world_coords,shrapnel_count,originator,weapon_name)
+
+
+        # spawn effects 
+        engine.world_builder.spawn_explosion_and_fire(self,world_coords)
+
     #------------------------------------------------------------------------------
     def create_squads(self):
         for ai in self.tactical_ai.values():
