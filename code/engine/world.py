@@ -333,6 +333,7 @@ class World(object):
 
 
         # spawn effects 
+        engine.world_builder.spawn_object(self,world_coords,'dirt',True)
         engine.world_builder.spawn_explosion_and_fire(self,world_coords)
 
     #------------------------------------------------------------------------------

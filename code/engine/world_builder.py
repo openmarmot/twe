@@ -1148,6 +1148,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
+        z.ai.shrapnel_count=5
+        z.ai.explosion_radius=35
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
         z.ai.has_fuse=True
@@ -1161,6 +1163,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
+        z.ai.shrapnel_count=15
+        z.ai.explosion_radius=20
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
         z.ai.has_fuse=True

@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 22 2024
+- grenadees now use the new explosion function 
+- model24 adjusted to be non-frag grenadee 
+- rg_42 adjusted to be frag grenade
+
+----------------------------------
 Dec 21 2024
 - working on a new explosion mechanic 
 
