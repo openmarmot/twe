@@ -10,7 +10,6 @@ notes :
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
 
@@ -18,9 +17,9 @@ import engine.world_builder
 
 #global variables
 
-class AIThrowable(AIBase):
+class AIThrowable(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         # whether the grenade is active or inactive
         self.thrown=False

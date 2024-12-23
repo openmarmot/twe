@@ -10,16 +10,15 @@ notes :
 import random 
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.penetration_calculator
 import engine.world_builder
 
 #global variables
 
-class AIProjectile(AIBase):
+class AIProjectile(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
         self.flightTime=0.
 
         # initial coordinates for the bullet. set when fired

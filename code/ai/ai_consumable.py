@@ -9,14 +9,12 @@ notes :
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
-
 
 #global variables
 
-class AIConsumable(AIBase):
+class AIConsumable(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         # positive or negative. will be added to corresponding attribute
         self.health_effect=0

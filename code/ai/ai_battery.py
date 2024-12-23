@@ -9,14 +9,10 @@ notes : battery
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 
-
-
-class AIBattery(AIBase):
+class AIBattery(object):
     def __init__(self, owner):
-        super().__init__(owner)
-
+        self.owner=owner
         # capacity in ampere-hours (Ah)
         self.max_capacity=55
 

@@ -10,7 +10,6 @@ notes : hit marker
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.log
 import random
@@ -18,9 +17,9 @@ import random
 
 #global variables
 
-class AIHitMarker(AIBase):
+class AIHitMarker(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         # hit_data object
         self.hit_data=None

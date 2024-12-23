@@ -13,7 +13,6 @@ import random
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 import engine.log
@@ -22,9 +21,9 @@ import engine.penetration_calculator
 
 #global variables
 
-class AIHuman(AIBase):
+class AIHuman(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         self.task_map={
             'task_player_control':self.update_task_player_control,
@@ -1597,7 +1596,7 @@ class AIHuman(AIBase):
                             # grenades will miss if the vehicle is moving fast
                             if enemy.ai.current_speed<5:
                                 # check pen
-                                if enemy.ai.passenger_compartment_armor['left']<4:
+                                if enemy.ai.passenger_compartment_armor['left'][0]<4:
                                     self.throw(enemy.world_coords)
                                     self.speak('Throwing Grenade !!!!')
 

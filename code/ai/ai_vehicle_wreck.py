@@ -11,14 +11,12 @@ notes : some extra stuff for vehicle wrecks
 import copy 
 
 #import custom packages
-from ai.ai_base import AIBase
-
 
 #global variables
 
-class AIVehicleWreck(AIBase):
+class AIVehicleWreck(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         self.inventory=[]
 

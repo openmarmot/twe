@@ -9,13 +9,12 @@ notes : sprite that spins for awhile or moves or whatever
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 
-class AIAnimatedSprite(AIBase):
+class AIAnimatedSprite(object):
     def __init__(self, owner):
-        super().__init__(owner)
-
+        self.owner=owner
+        
         # determines if the update code is active
         self.alive=True
 
