@@ -11,14 +11,12 @@ notes : not sure this is needed
 import copy 
 
 #import custom packages
-from ai.ai_base import AIBase
-
 
 #global variables
 
-class AIContainer(AIBase):
+class AIContainer(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         self.inventory=[]
 

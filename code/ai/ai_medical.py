@@ -9,14 +9,13 @@ notes :
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 
 #global variables
 
-class AIMedical(AIBase):
+class AIMedical(object):
     def __init__(self, owner):
-        super().__init__(owner)
-
+        self.owner=owner
+        
         # should have some special properties just for medical gear
 
         # positive or negative. will be added to corresponding attribute

@@ -10,7 +10,6 @@ notes : the turret for a tank, or the mg mount on a vehicle
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.log
 import engine.penetration_calculator
@@ -19,9 +18,9 @@ import random
 
 #global variables
 
-class AITurret(AIBase):
+class AITurret(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         #[side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal

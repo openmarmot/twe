@@ -9,15 +9,14 @@ notes : radio
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.world_radio
 import engine.math_2d
 
 
 
-class AIRadio(AIBase):
+class AIRadio(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         self.frequency_range = [0,10]  # [20.0, 60.0] MHz
         self.current_frequency = 0

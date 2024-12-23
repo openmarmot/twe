@@ -9,15 +9,13 @@ notes :
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 
 #global variables
 
-class AIMapPointer(AIBase):
+class AIMapPointer(object):
     def __init__(self, owner):
-        super().__init__(owner)
-
+        self.owner=owner
         self.target_coords=None
 
     #---------------------------------------------------------------------------
@@ -28,9 +26,5 @@ class AIMapPointer(AIBase):
         self.owner.heading=engine.math_2d.get_heading_vector(self.owner.world.player.world_coords,self.target_coords)
         self.owner.world_coords=engine.math_2d.moveAlongVector(125,self.owner.world.player.world_coords,self.owner.heading,1)
         self.owner.reset_image=True
-
-
-
-
 
     #---------------------------------------------------------------------------

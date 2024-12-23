@@ -10,16 +10,15 @@ notes : represents an engine. (car engine, jet engine, etc)
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 
 # this is for objects that don't need AI
 
 #global variables
 
-class AIEngine(AIBase):
+class AIEngine(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
         
         # internal combustion engine
         self.internal_combustion=True

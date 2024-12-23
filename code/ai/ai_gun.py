@@ -12,7 +12,6 @@ import random
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder 
 import engine.penetration_calculator
@@ -20,9 +19,9 @@ import engine.penetration_calculator
 
 #global variables
 
-class AIGun(AIBase):
+class AIGun(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         # The magazine that is loaded in the gun
         self.magazine=None

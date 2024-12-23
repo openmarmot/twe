@@ -13,7 +13,6 @@ import random
 import copy
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 import engine.world_builder
 import engine.penetration_calculator
@@ -24,9 +23,9 @@ from engine.hit_data import HitData
 
 #global variables
 
-class AIVehicle(AIBase):
+class AIVehicle(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
         # --- health stuff ----
         self.health=100

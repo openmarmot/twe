@@ -10,16 +10,15 @@ notes :
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.math_2d
 
 # this is for objects that don't need AI
 
 #global variables
 
-class AIBuilding(AIBase):
+class AIBuilding(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
         self.show_interior=False
         self.show_interior_distance=500
 

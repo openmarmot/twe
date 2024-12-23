@@ -9,7 +9,6 @@ notes :
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 import engine.world_builder
 
 
@@ -17,9 +16,9 @@ import engine.world_builder
 
 #global variables
 
-class AICoffeeGrinder(AIBase):
+class AICoffeeGrinder(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
 
 
     #---------------------------------------------------------------------------

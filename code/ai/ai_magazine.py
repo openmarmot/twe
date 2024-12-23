@@ -10,13 +10,12 @@ notes : A (gun) magazine is a object that holds projectiles
 #import built in modules
 
 #import custom packages
-from ai.ai_base import AIBase
 
 #global variables
 
-class AIMagazine(AIBase):
+class AIMagazine(object):
     def __init__(self, owner):
-        super().__init__(owner)
+        self.owner=owner
         # list of compatible gun names
         self.compatible_guns=[]
 

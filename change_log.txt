@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 23 2024
+- removed aibase.py and inheritance 
+- fixed a new error in the ai_human grenade engagement code
+ 
+
+I remembered the one thing the inheritance was really used for - setting owner. 
+I can just do this in every class that needs it instead 
+
+----------------------------------
 Dec 22 2024
 - grenadees now use the new explosion function 
 - model24 adjusted to be non-frag grenadee 
