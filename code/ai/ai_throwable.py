@@ -61,7 +61,7 @@ class AIThrowable(AIBase):
 
     #---------------------------------------------------------------------------
     def explode(self):        
-        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name)
+        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name,0.5,1)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

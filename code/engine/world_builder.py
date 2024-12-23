@@ -721,8 +721,19 @@ def spawn_drop_canister(world,world_coords,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
 
 #------------------------------------------------------------------------------
-def spawn_explosion_and_fire(world,world_coords):
+def spawn_explosion_and_fire(world,world_coords,fire_duration,smoke_duration):
     heading=[0,0]
+
+    for x in range(10):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_smoke',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(30,40)
+        z.ai.rotate_time_max=60
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=smoke_duration
+
     for x in range(1):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_fire',True)
@@ -731,7 +742,7 @@ def spawn_explosion_and_fire(world,world_coords):
         z.ai.rotation_speed=random.randint(80,90)
         z.ai.rotate_time_max=5
         z.ai.move_time_max=5
-        z.ai.alive_time_max=random.uniform(3,4)
+        z.ai.alive_time_max=fire_duration
 
     for x in range(5):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
@@ -753,15 +764,7 @@ def spawn_explosion_and_fire(world,world_coords):
         z.ai.move_time_max=3
         z.ai.alive_time_max=random.uniform(0.09,0.1)
 
-    for x in range(10):
-        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
-        z=spawn_object(world,coords,'small_smoke',True)
-        z.heading=heading
-        z.ai.speed=random.uniform(1,2)
-        z.ai.rotation_speed=random.randint(30,40)
-        z.ai.rotate_time_max=60
-        z.ai.move_time_max=3
-        z.ai.alive_time_max=random.uniform(34,56)
+    
 
 #------------------------------------------------------------------------------
 def spawn_flash(world,world_coords,heading,amount=2):

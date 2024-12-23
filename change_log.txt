@@ -7,6 +7,9 @@ Dec 22 2024
 - model24 adjusted to be non-frag grenadee 
 - rg_42 adjusted to be frag grenade
 
+todo 
+- variable smoke and explosion animation length 
+
 ----------------------------------
 Dec 21 2024
 - working on a new explosion mechanic 

@@ -357,7 +357,7 @@ class AIVehicle(AIBase):
     def handle_death(self):
         engine.world_builder.spawn_container_vehicle_wreck('wreck',self.owner,1)
 
-        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords)
+        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
 
         # this probably could be replaced with a custom container
         for b in self.turrets:

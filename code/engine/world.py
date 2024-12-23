@@ -310,7 +310,7 @@ class World(object):
 
 
     #------------------------------------------------------------------------------
-    def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon_name):
+    def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon_name,fire_duration,smoke_duration):
         '''create a explosion that deals damage'''
         # originator - the ai_human that fired the weapon
         # weaponName - the weapon that created the explosion
@@ -334,7 +334,7 @@ class World(object):
 
         # spawn effects 
         engine.world_builder.spawn_object(self,world_coords,'dirt',True)
-        engine.world_builder.spawn_explosion_and_fire(self,world_coords)
+        engine.world_builder.spawn_explosion_and_fire(self,world_coords,fire_duration,smoke_duration)
 
     #------------------------------------------------------------------------------
     def create_squads(self):
