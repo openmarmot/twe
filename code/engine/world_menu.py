@@ -431,7 +431,7 @@ class World_Menu(object):
             self.text_queue.append('2 - Feldfunk radio and charger ')
             self.text_queue.append('3 - Maybach HL42')
             self.text_queue.append('4 - Pickle Jar')
-            self.text_queue.append('5 - Pickle ')
+            self.text_queue.append('5 - wine ')
             self.text_queue.append('6 - hangar')
             self.text_queue.append('7 - concrete runway')
             self.text_queue.append('8 - german_fuel_can')
@@ -450,7 +450,7 @@ class World_Menu(object):
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle_jar',True)
             elif key=='5':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'pickle',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'wine',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'hangar',True)
             elif key=='7':
@@ -753,6 +753,8 @@ class World_Menu(object):
             if self.selected_object.ai.squad.squad_leader!=None:
                 d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords,True)
             self.text_queue.append('current task: '+self.selected_object.ai.memory['current_task'])
+            if self.selected_object.ai.memory['current_task']=='task_vehicle_crew':
+                self.text_queue.append('Vehicle Role: '+self.selected_object.ai.memory['task_vehicle_crew']['role'])
             self.text_queue.append('Distance from player: '+str(d))
             self.text_queue.append('Distance from squad: '+str(d2))
             self.text_queue.append('AI in building: '+str(self.selected_object.ai.in_building))
@@ -1091,7 +1093,7 @@ class World_Menu(object):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
         if self.menu_state=='none':
 
-            if self.world.player in self.selected_object.ai.passengers:
+            if self.selected_object.ai.check_if_human_in_vehicle(self.world.player):
                 self.menu_state='internal'
             else:
                 self.menu_state='external'
@@ -1123,7 +1125,6 @@ class World_Menu(object):
                 self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
 
             if distance<self.max_menu_distance:
-                self.text_queue.append('Passenger count : '+str(len(self.selected_object.ai.passengers)))
                 self.text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
                 self.text_queue.append('')
                 self.text_queue.append('-- Actions --')
@@ -1181,7 +1182,16 @@ class World_Menu(object):
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-            self.text_queue.append('passenger count : '+str(len(self.selected_object.ai.passengers)))
+            self.text_queue.append('- crew -')
+            for k,value in self.selected_object.ai.vehicle_crew.items():
+                text=k+': '
+                if value[0]==True:
+                    text+=value[1].name
+                else:
+                    text+='unoccupied'
+                self.text_queue.append(text)
+            self.text_queue.append('----')
+
             self.text_queue.append('')
             self.text_queue.append('-- Actions --')
             self.text_queue.append('1 - change role')
@@ -1232,25 +1242,8 @@ class World_Menu(object):
                 self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
                 self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
                 self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
-                self.text_queue.append('passenger count: '+str(len(self.selected_object.ai.passengers)))
-                if self.selected_object.ai.driver==None:
-                    self.text_queue.append('driver: None')
-                else:
-                    self.text_queue.append('---- driver info -------------------')
-                    self.text_queue.append('driver: '+self.selected_object.ai.driver.name)
-                    vehicle_destination_distance=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.driver.ai.memory['task_vehicle_crew']['destination'])
-                    self.text_queue.append('distance to driver destination: '+str(vehicle_destination_distance))
-                # passenger info
-                self.text_queue.append('---- passenger info -------------------')
-                self.text_queue.append('Name/Faction/Role')
-                for b in self.selected_object.ai.passengers:
-                    if 'task_vehicle_crew' in b.ai.memory:
-                        self.text_queue.append(b.name + '/'+b.ai.squad.faction+'/'+b.ai.memory['task_vehicle_crew']['role'])
-                    else:
-                        # this bug is popping up occasionally
-                        engine.log.add_data('error','world_menu vehicle_menu bot in vehicle missing task_vehicle_crew',True)
-                        self.world.run_self_debug()
-                self.text_queue.append('------------------------------------')
+
+
 
     #---------------------------------------------------------------------------
     def update(self):

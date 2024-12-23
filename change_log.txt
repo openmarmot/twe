@@ -1,7 +1,78 @@
 TWE Project : Change Log
 
+
 ----------------------------------
-Dec 14 2024
+Dec 22 2024
+- grenadees now use the new explosion function 
+- model24 adjusted to be non-frag grenadee 
+- rg_42 adjusted to be frag grenade
+
+todo 
+- variable smoke and explosion animation length 
+
+----------------------------------
+Dec 21 2024
+- working on a new explosion mechanic 
+
+when i started out writing this game I was coming from having written a 
+c# game a number of years earlier. the c# game relied on inheritance to work 
+so there was a base class and then other classes built on it. with python this 
+has been largely unnecessary as anything can be anything due to not being statically 
+typed. Due to this the ai_base class is basically useless 
+
+todo 
+- switch grenade over to new explosion system 
+- introduce some different levels of frag grenades 
+- HE shells 
+- figure out HE vehicle damage 
+
+cleanup todo items 
+- remove aibase. it is not needed 
+- consider removing the entire 'handle event' system 
+
+----------------------------------
+Dec 20 2024
+- added checks for armor and speed before throwing a grenade at a vehicle 
+- small distance pre-check increase for grenade throws 
+
+grenades need a overhaul. I think they should probably pre-create their shrapnel 
+projectiles and store them like a gun has bullets in a magazine. this will allow 
+for different types of shrapnel, and a more effective armor pen pre-check 
+
+
+----------------------------------
+Dec 19 2024
+- added crew placement for T20 tractor
+- toggled bike driver back to visible (with the new code) 
+- radio operator is now an optional role 
+
+the t20 went down to 6 passengers. I couldn't find a exact historical loadout but 
+from looking at pictures the passenger space looks really tight. 6 has got to be 
+about the max. 
+
+note - unlike the sd.kfz.251, the t20 has a completely open unarmored passenger area.
+
+----------------------------------
+Dec 18 2024
+- added tools/image_tool.py
+- large rewrite of vehicle crew handling 
+- rewrote ignore lists for turrets - effect should be the same 
+- misc minor changes 
+
+image_tool is a stand alone utility that will make it easier to position objects 
+and get relative positions 
+
+a LOT has changed here, so there are certainly bugs to workout 
+
+----------------------------------
+Dec 17 2024
+- minor cleanup and fixes 
+- hit markers now get transferred to vehicle wrecks on vehicle death 
+
+noted that bandage/medical usage is automatic for the player 
+
+----------------------------------
+Dec 15 2024
 - large rewrite of vehicle collision logs to support more data 
 - you can now turn on hit markers from the debug menu 
 - added a debug option to kill all other bots (very useful for testing)

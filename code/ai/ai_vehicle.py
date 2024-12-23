@@ -127,16 +127,11 @@ class AIVehicle(AIBase):
         self.flaps=0
         self.rudder=0
 
-        # ---
-
-
         # -- crew --
-        # passengers - note that passengers are not removed from the world, so they are still updated
-        self.passengers=[]
-        self.max_occupants=4 # max people that can be in the vehicle, including driver
+ 
 
-        # set when a world_object claims the driver position. ai_human checks this to determine behavior
-        self.driver=None
+        # {'role',[occupied bool,human_object game_obj,seat_rotation angle float,seat_offset [0,0],visible bool]}
+        self.vehicle_crew={}
 
         # --
 
@@ -204,6 +199,27 @@ class AIVehicle(AIBase):
             self.towed_object.ai.in_tow=True
 
     #---------------------------------------------------------------------------
+    def check_if_human_in_vehicle(self,human):
+        '''returns a bool as to whether the human is in the vehicle'''
+        for value in self.vehicle_crew.values():
+            if value[0]==True:
+                if value[1]==human:
+                    return True
+        return False
+
+    #---------------------------------------------------------------------------
+    def check_if_vehicle_is_full(self):
+        '''returns a bool as to whether the vehicle is full'''
+
+        # note - need to think how gunners fit into this
+
+        for value in self.vehicle_crew.values():
+            if value[0]==False:
+                return False
+            
+        return True
+
+    #---------------------------------------------------------------------------
     def detach_tow_object(self):
         '''detach an object that we are towing'''
         if self.towed_object!=None:
@@ -220,19 +236,17 @@ class AIVehicle(AIBase):
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
             self.health-=random.randint(1,3)
-            if len(self.passengers)>1:
-                passenger=random.choice(self.passengers)
-                if 'task_vehicle_crew' in passenger.ai.memory:
-                    if passenger.ai.memory['task_vehicle_crew']['role']=='passenger':
-                        passenger.ai.handle_event('collision',projectile)
-                else:
-                    # this has happened. not sure why yet
-                    engine.log.add_data('warn','ai_vehicle - passenger memory issue',True)
-                    print(passenger.ai.memory)
-            else:
-                if random.randint(0,2)==2:
-                    # extra shot at body damage
-                    self.handle_vehicle_body_projectile_hit(projectile)
+            for key,value in self.vehicle_crew.items():
+                if value[0]==True:
+                    # we want to exclude driver/radio/gunner as those are different compartments
+                    if 'passenger' in key:
+                        if random.randint(0,3)==3:
+                            value[1].ai.handle_event('collision',projectile)
+
+
+            if random.randint(0,3)==3:
+                # extra shot at body damage
+                self.handle_vehicle_body_projectile_hit(projectile)
 
             if self.passenger_compartment_ammo_racks:
                 if random.randint(0,3)==3:
@@ -250,9 +264,9 @@ class AIVehicle(AIBase):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
         if penetration:
-            if self.driver!=None:
-                if random.randint(0,2)==2:
-                    self.driver.ai.handle_event('collision',projectile)
+            if self.vehicle_crew['driver'][0]==True:
+                if random.randint(0,3)==3:
+                    self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
             
             # should do component damage here
             self.health-=random.randint(20,75)
@@ -271,10 +285,10 @@ class AIVehicle(AIBase):
                 # -- determine what area the projectile hit --
                 area_hit='vehicle_body'
                 
-                if self.max_occupants>2:
-                    hit=random.randint(0,1)
-                    if hit==1:
-                        area_hit='passenger_compartment'
+
+                hit=random.randint(0,1)
+                if hit==1:
+                    area_hit='passenger_compartment'
                 
                 if len(self.turrets)>0:
                     hit=random.randint(0,5)
@@ -341,9 +355,9 @@ class AIVehicle(AIBase):
 
     #---------------------------------------------------------------------------
     def handle_death(self):
-        engine.world_builder.spawn_container('wreck',self.owner,1)
+        engine.world_builder.spawn_container_vehicle_wreck('wreck',self.owner,1)
 
-        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords)
+        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
 
         # this probably could be replaced with a custom container
         for b in self.turrets:
@@ -552,18 +566,27 @@ class AIVehicle(AIBase):
             
     #---------------------------------------------------------------------------
     def update_child_position_rotation(self):
+        # this is only called when the vehicle position or rotation changes
+        # it is also called by human_ai when it enters the vehicle
 
         # update passenger rotation and position
-        for b in self.passengers:
-            # coordinates + altitude
-            b.world_coords=copy.copy(self.owner.world_coords)
-            b.altitude=self.owner.altitude
+        for key,value in self.vehicle_crew.items():
+            # if position is occupied
+            if value[0]==True:
 
-            # rotate to match vehicle heading
-            if self.open_top:
-                if b.rotation_angle!=self.owner.rotation_angle:
-                    b.rotation_angle=self.owner.rotation_angle
-                    b.reset_image=True
+                # stuff to change no matter what
+                value[1].altitude=self.owner.altitude
+                # if position is visible
+                if value[4]==True:
+                    # set the world coords with the offset
+                    value[1].world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,value[3])
+                    value[1].rotation_angle=self.owner.rotation_angle+value[2]
+                    value[1].reset_image=True
+                else:
+                    # just a simple position
+                    value[1].world_coords=copy.copy(self.owner.world_coords)
+
+
 
         # update towed object
         if self.towed_object!=None:

@@ -60,6 +60,7 @@ from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
 from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
+from ai.ai_vehicle_wreck import AIVehicleWreck
 
 #global variables
 
@@ -170,7 +171,8 @@ def convert_world_objects_to_map_objects(world,map_square):
         # a couple objects we don't want to save
         if (b.is_projectile==False and b.is_map_pointer==False and
             b.can_be_deleted==False and b.is_particle_effect==False 
-            and b.is_turret==False):
+            and b.is_turret==False and b.is_hit_marker==False 
+            and b.is_body==False and b.is_vehicle_wreck==False):
             # assemble inventory name list
             inventory=[]
             if hasattr(b.ai,'inventory'):
@@ -660,9 +662,8 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
             x.world_coords=current_coords
 
 #------------------------------------------------------------------------------
-# currently used for wrecks and bodies
-def spawn_container(name,world_object,image_index):
-    '''spawns a custom container'''
+def spawn_container_body(name,world_object,image_index):
+    '''spawns a custom container for a body'''
     # name 
     # world_object - the world_object that is being replaced
     # image_index - index of the image to be used - from the world object
@@ -677,6 +678,28 @@ def spawn_container(name,world_object,image_index):
     z.weight=world_object.weight
     z.collision_radius=world_object.collision_radius
     z.is_large_human_pickup=True
+    z.is_body=True
+    z.wo_start()
+
+#------------------------------------------------------------------------------
+# currently used for wrecks and bodies
+def spawn_container_vehicle_wreck(name,world_object,image_index):
+    '''spawns a custom container for a vehicle wreck'''
+    # name 
+    # world_object - the world_object that is being replaced
+    # image_index - index of the image to be used - from the world object
+    z=WorldObject(world_object.world,[world_object.image_list[image_index]],AIVehicleWreck)
+    z.is_container=True
+    z.name=name
+    z.world_coords=world_object.world_coords
+    z.rotation_angle=world_object.rotation_angle
+    z.ai.inventory=world_object.ai.inventory
+    z.ai.collision_log=world_object.ai.collision_log
+    z.world_builder_identity='wreck'
+    z.volume=world_object.volume
+    z.weight=world_object.weight
+    z.collision_radius=world_object.collision_radius
+    z.is_vehicle_wreck=True
     z.wo_start()
 
 
@@ -698,8 +721,19 @@ def spawn_drop_canister(world,world_coords,CRATE_TYPE):
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
 
 #------------------------------------------------------------------------------
-def spawn_explosion_and_fire(world,world_coords):
+def spawn_explosion_and_fire(world,world_coords,fire_duration,smoke_duration):
     heading=[0,0]
+
+    for x in range(10):
+        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
+        z=spawn_object(world,coords,'small_smoke',True)
+        z.heading=heading
+        z.ai.speed=random.uniform(1,2)
+        z.ai.rotation_speed=random.randint(30,40)
+        z.ai.rotate_time_max=60
+        z.ai.move_time_max=3
+        z.ai.alive_time_max=smoke_duration
+
     for x in range(1):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
         z=spawn_object(world,coords,'small_fire',True)
@@ -708,7 +742,7 @@ def spawn_explosion_and_fire(world,world_coords):
         z.ai.rotation_speed=random.randint(80,90)
         z.ai.rotate_time_max=5
         z.ai.move_time_max=5
-        z.ai.alive_time_max=random.uniform(3,4)
+        z.ai.alive_time_max=fire_duration
 
     for x in range(5):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
@@ -730,15 +764,7 @@ def spawn_explosion_and_fire(world,world_coords):
         z.ai.move_time_max=3
         z.ai.alive_time_max=random.uniform(0.09,0.1)
 
-    for x in range(10):
-        coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
-        z=spawn_object(world,coords,'small_smoke',True)
-        z.heading=heading
-        z.ai.speed=random.uniform(1,2)
-        z.ai.rotation_speed=random.randint(30,40)
-        z.ai.rotate_time_max=60
-        z.ai.move_time_max=3
-        z.ai.alive_time_max=random.uniform(34,56)
+    
 
 #------------------------------------------------------------------------------
 def spawn_flash(world,world_coords,heading,amount=2):
@@ -1125,6 +1151,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
+        z.ai.shrapnel_count=5
+        z.ai.explosion_radius=35
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
         z.ai.has_fuse=True
@@ -1138,6 +1166,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_grenade=True
         z.is_throwable=True
         z.ai.explosive=True
+        z.ai.shrapnel_count=15
+        z.ai.explosion_radius=20
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
         z.ai.has_fuse=True
@@ -1704,7 +1734,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
         z.is_towable=True
-        z.ai.max_occupants=10
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_3']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_4']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_5']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_6']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_7']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_8']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_9']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_10']=[False,None,0,[0,0],False]
         z.ai.max_speed=651.2
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1732,7 +1773,18 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='Raupenschlepper Ost'
         z.is_vehicle=True
         z.is_towable=True
-        z.ai.max_occupants=10
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_3']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_4']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_5']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_6']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_7']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_8']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_9']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_10']=[False,None,0,[0,0],False]
         z.ai.max_speed=224.96
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1771,7 +1823,19 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['right']=[8,35,0]
         z.ai.passenger_compartment_armor['front']=[14.5,30,0]
         z.ai.passenger_compartment_armor['rear']=[8,31,0]
-        z.ai.max_occupants=10
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,90,[4,10],True]
+        z.ai.vehicle_crew['passenger_2']=[False,None,90,[12,10],True]
+        z.ai.vehicle_crew['passenger_3']=[False,None,90,[21,10],True]
+        z.ai.vehicle_crew['passenger_4']=[False,None,90,[35,10],True]
+        z.ai.vehicle_crew['passenger_5']=[False,None,90,[51,10],True]
+        z.ai.vehicle_crew['passenger_6']=[False,None,270,[4,-10],True]
+        z.ai.vehicle_crew['passenger_7']=[False,None,270,[12,-10],True]
+        z.ai.vehicle_crew['passenger_8']=[False,None,270,[21,-10],True]
+        z.ai.vehicle_crew['passenger_9']=[False,None,270,[35,-10],True]
+        z.ai.vehicle_crew['passenger_10']=[False,None,270,[51,-10],True]
         z.ai.max_speed=385.9
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1844,7 +1908,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['right']=[0,0,0]
         z.ai.passenger_compartment_armor['front']=[0,0,0]
         z.ai.passenger_compartment_armor['rear']=[0,0,0]
-        z.ai.max_occupants=8
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,90,[0,-17],True]
+        z.ai.vehicle_crew['passenger_2']=[False,None,90,[11,-17],True]
+        z.ai.vehicle_crew['passenger_3']=[False,None,90,[24,-17],True]
+        z.ai.vehicle_crew['passenger_4']=[False,None,270,[0,17],True]
+        z.ai.vehicle_crew['passenger_5']=[False,None,270,[11,17],True]
+        z.ai.vehicle_crew['passenger_6']=[False,None,270,[24,17],True]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1908,7 +1979,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['right']=[40,40,0]
         z.ai.passenger_compartment_armor['front']=[45,61,0]
         z.ai.passenger_compartment_armor['rear']=[40,47,0]
-        z.ai.max_occupants=3
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -1990,7 +2064,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['right']=[40,40,0]
         z.ai.passenger_compartment_armor['front']=[45,61,0]
         z.ai.passenger_compartment_armor['rear']=[40,47,0]
-        z.ai.max_occupants=3
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2057,7 +2134,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.passenger_compartment_armor['right']=[20,40,0]
         z.ai.passenger_compartment_armor['front']=[60,60,0]
         z.ai.passenger_compartment_armor['rear']=[8,68,0]
-        z.ai.max_occupants=3
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2129,7 +2209,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='37mm_m1939_61k_aa_gun'
         z.is_vehicle=True
         z.ai.armor_thickness=0
-        z.ai.max_occupants=2
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False]
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=177.6
         z.ai.open_top=True
@@ -2169,6 +2250,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.ai.max_speed=592
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False]
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
@@ -2207,7 +2292,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=142.08
         z.ai.rotation_speed=50.
-        z.ai.max_occupants=1
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],True]
         z.ai.open_top=True
         z.collision_radius=50
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
@@ -2223,6 +2308,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_ju88':
         z=WorldObject(world,['ju88-winter-weathered','ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False]
         z.ai.max_speed=4736
         z.ai.max_offroad_speed=177.6
         z.ai.stall_speed=100
@@ -2266,6 +2355,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_fa_223_drache':
         z=WorldObject(world,['fa_223_drache','fa_223_drache'],AIVehicle)
         z.name='Focke Achgelis 223 Drache'
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False]
+        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False]
         z.ai.max_speed=4736
         z.ai.max_offroad_speed=177.6
         z.ai.stall_speed=100

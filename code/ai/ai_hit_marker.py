@@ -39,6 +39,9 @@ class AIHitMarker(AIBase):
         if hit_data.penetrated:
             self.owner.image_index=1
 
+        # run this once to get the correct angles
+        self.update_physics()
+
     #---------------------------------------------------------------------------
     def update(self):
         self.update_physics()

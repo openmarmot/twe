@@ -50,7 +50,8 @@ class AIThrowable(AIBase):
         # does this object explode?
         self.explosive=False
         # amount of shrapnel (basically grenade power)
-        self.shrapnel_count=40
+        self.shrapnel_count=0
+        self.explosion_radious=15
 
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
@@ -59,9 +60,8 @@ class AIThrowable(AIBase):
         self.redirected=False
 
     #---------------------------------------------------------------------------
-    def explode(self):
-        # add the shrapnel
-        engine.world_builder.spawn_shrapnel_cloud(self.owner.world,self.owner.world_coords,self.shrapnel_count,self.equipper,self.owner.name)
+    def explode(self):        
+        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name,0.5,1)
 
         # remove the grenade
         # this also stops code execution for this object as its not anywhere else

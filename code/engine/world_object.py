@@ -120,6 +120,9 @@ class WorldObject(object):
         self.is_furniture=False
         self.is_ground_texture=False
 
+        self.is_body=False # dead human
+        self.is_vehicle_wreck=False # dead vehicle wreck
+
         self.is_hit_marker=False
 
         # state of matter
