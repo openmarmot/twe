@@ -62,7 +62,7 @@ class AITurret(object):
 
         # note - extra magazines/ammo should be stored in the vehicle inventory
         self.primary_weapon=None
-        self.secondary_weapon=None
+        self.coaxial_weapon=None
 
         self.collision_log=[]
 
@@ -129,6 +129,12 @@ class AITurret(object):
         if self.health>0:
             self.primary_weapon.rotation_angle=self.owner.rotation_angle
             self.primary_weapon.ai.fire()
+
+    #---------------------------------------------------------------------------
+    def handle_fire_coax(self):
+        if self.health>0:
+            self.coaxial_weapon.rotation_angle=self.owner.rotation_angle
+            self.coaxial_weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):

@@ -136,7 +136,15 @@ class AIHuman(object):
                 else:
                     turret.ai.handle_rotate_right()
             else:
-                turret.ai.handle_fire()
+                if target.is_human:
+                    if turret.ai.coaxial_weapon!=None:
+                        turret.ai.handle_fire_coax()
+                    else:
+                        # maybe fire HE 
+                        # for now just fire with the main gun 
+                        turret.ai.handle_fire()
+                else:
+                    turret.ai.handle_fire()
         else:
             self.memory['task_vehicle_crew']['target']=None
 
@@ -596,7 +604,7 @@ class AIHuman(object):
         return calc_speed
     
     #---------------------------------------------------------------------------
-    def get_target(self):
+    def get_target(self,range):
         '''returns a target or None if there are None'''
         target=None
         if len(self.near_targets)>0:
@@ -608,9 +616,12 @@ class AIHuman(object):
 
         if target!=None:
             if target.ai.health<1:
-                # could get intesting if there are a lot of dead targets but 
-                # it should self clear with this recursion
-                target=self.get_target()
+                target=None
+            else:
+                distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+                if distance>range:
+                    # alternatively we could drive closer.
+                    target=None
                 
         return target
     
@@ -1092,6 +1103,8 @@ class AIHuman(object):
 
         if role==None:
             for key,value in vehicle.ai.vehicle_crew.items():
+                if role!=None:
+                    break
                 if 'gunner' in key:
                     if value[0]==False:
                         for b in vehicle.ai.turrets:
@@ -1258,10 +1271,10 @@ class AIHuman(object):
             #        self.switch_task_pickup_objects(near_magazines)
 
         if self.memory['task_vehicle_crew']['target']==None:
-            self.memory['task_vehicle_crew']['target']=self.get_target()
+            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
         else:
             if self.memory['task_vehicle_crew']['target'].ai.health<1:
-                self.memory['task_vehicle_crew']['target']=self.get_target()
+                self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
 
         # we either already had a target, or we might have just got a new one
         if self.memory['task_vehicle_crew']['target']!=None:
@@ -1622,7 +1635,7 @@ class AIHuman(object):
                                 
                 else:
 
-                    new_enemy=self.get_target()
+                    new_enemy=self.get_target(self.primary_weapon.ai.range)
                     if new_enemy==None:
 
                             # no closer targets. is the target really far out of range?
