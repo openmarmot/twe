@@ -348,14 +348,13 @@ class World(object):
         # this is for objects that use ai_human
         ignore_list=[OBJ]
 
-        # special ignore list for vehicles
         if OBJ.is_turret:
-            if OBJ.ai.gunner!=None:
-                # reset ai to gunner so that a human ignore list is built
-                OBJ=OBJ.ai.gunner
-            else:
-                engine.log.add_data('error','world.generate_ignore_liist turret does not have gunner!!',True)
-
+            if OBJ.ai.vehicle!=None:
+                # reset to a human that is crewing the vehicle
+                for key,value in OBJ.ai.vehicle.ai.vehicle_crew.items():
+                    if value[0]==True:
+                        OBJ=value[1]
+                        break
 
         if OBJ.is_human:
             if self.friendly_fire==False:
@@ -490,7 +489,13 @@ class World(object):
                 if self.player.ai.primary_weapon!=None:
                     self.player.ai.reload_weapon(self.player.ai.primary_weapon)
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
-                self.player.ai.reload_turret()
+                if 'gunner' in self.player.ai.memory['task_vehicle_crew']['role']:
+                    vehicle=self.memory['task_vehicle_crew']['vehicle']
+                    turret=self.memory['task_vehicle_crew']['turret']
+
+                    self.player.ai.reload_weapon(turret.ai.primary_weapon,vehicle)
+                    if turret.ai.coaxial_weapon!=None:
+                        self.player.ai.reload_weapon(turret.ai.coaxial_weapon,vehicle)
 
         if key=='tab':
             self.activate_context_menu()
@@ -549,7 +554,7 @@ class World(object):
                         elif key=='d':
                             vehicle.ai.handle_steer_right()
 
-                elif role=='gunner':
+                elif 'gunner' in role:
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':

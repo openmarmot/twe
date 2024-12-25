@@ -129,7 +129,7 @@ class AIVehicle(object):
         # -- crew --
  
 
-        # {'role',[occupied bool,human_object game_obj,seat_rotation angle float,seat_offset [0,0],visible bool]}
+        # {'role',[occupied bool,human_object game_obj,seat_rotation angle float,seat_offset [0,0],visible bool],role_related_object}
         self.vehicle_crew={}
 
         # --

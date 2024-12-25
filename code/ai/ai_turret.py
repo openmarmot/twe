@@ -58,7 +58,6 @@ class AITurret(object):
         self.last_vehicle_position=[0,0]
         self.last_vehicle_rotation=0
 
-        self.gunner=None # used to keep track of who is manning this turret
 
         # note - extra magazines/ammo should be stored in the vehicle inventory
         self.primary_weapon=None
@@ -81,9 +80,10 @@ class AITurret(object):
                 self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + 
                     ' on the '+side+' at a distance of '+ str(distance))
                 # remote operated turrets mean that the gunner can't be hit by turret penetrations 
-                if self.gunner!=None and self.remote_operated==False:
+                if self.remote_operated==False:
                     if random.randint(0,2)==2:
-                        self.gunner.ai.handle_event('collision',projectile)
+                        print('!! turret gunner hit. needs to be implemented')
+                        #self.gunner.ai.handle_event('collision',projectile)
                 
                 # should do component damage here
                 self.health-=random.randint(1,25)

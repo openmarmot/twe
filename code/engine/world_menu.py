@@ -179,26 +179,38 @@ class World_Menu(object):
             # print out the basic menu
             self.text_queue.append('-- Change Vehicle Role --')
             currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
             if currentRole==None:
                 currentRole='None!'
 
             self.text_queue.append('Vehicle : '+self.selected_object.name)
             self.text_queue.append('Current Role : '+currentRole)
-            self.text_queue.append('1 - Driver')
-            self.text_queue.append('2 - Gunner')
-            self.text_queue.append('3 - Passenger')
-            self.text_queue.append('4 - Chef')
-            self.menu_state='base'
-        if self.menu_state=='base':
-            if key=='1':
-                self.world.player.ai.player_vehicle_role_change('driver')
-                self.deactivate_menu()
-            elif key=='2':
-                self.world.player.ai.player_vehicle_role_change('gunner')
-                self.deactivate_menu()
-            elif key=='3':
-                self.world.player.ai.player_vehicle_role_change('passenger')
-                self.deactivate_menu()
+            if currentRole!='driver':
+                self.text_queue.append('1 - Driver')
+                if key=='1':
+                    self.world.player.ai.player_vehicle_role_change('driver')
+                    self.deactivate_menu()
+                    return
+            if currentRole!='gunner_1' and 'gunner_1' in vehicle.ai.vehicle_crew:
+                self.text_queue.append('2 - Turret: '+vehicle.ai.vehicle_crew['gunner_1'][5].name)
+                if key=='2':
+                    self.world.player.ai.player_vehicle_role_change('gunner_1')
+                    self.deactivate_menu()
+                    return
+            if currentRole!='gunner_2' and 'gunner_2' in vehicle.ai.vehicle_crew:
+                if len(vehicle.ai.turrets)>1:
+                    self.text_queue.append('3 - Turret: '+vehicle.ai.vehicle_crew['gunner_2'][5].name)
+                    if key=='3':
+                        self.world.player.ai.player_vehicle_role_change('gunner_2')
+                        self.deactivate_menu()
+                        return
+
+            if currentRole!='passenger_1' and 'passenger_1' in vehicle.ai.vehicle_crew:
+                self.text_queue.append('4 - Passenger')
+                if key=='4':
+                    self.world.player.ai.player_vehicle_role_change('passenger_1')
+                    self.deactivate_menu()
+                    return
 
      #---------------------------------------------------------------------------
     def coffee_grinder_menu(self, key):
@@ -1181,14 +1193,6 @@ class World_Menu(object):
                         fuel=b.ai.inventory[0].volume
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
-
-            if len(self.selected_object.ai.turrets)>0:
-                self.text_queue.append('- turrets -')
-                for b in self.selected_object.ai.turrets:
-                    gunner='unoccupied'
-                    if b.ai.gunner!=None:
-                        gunner=b.ai.gunner.name
-                    self.text_queue.append(b.name+': '+gunner)
 
             self.text_queue.append('- crew -')
             for k,value in self.selected_object.ai.vehicle_crew.items():

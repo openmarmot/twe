@@ -1,5 +1,17 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 25 2024
+- rewrote reload weapon logic (for ai and for player)
+- added reloads for coaxial mgs 
+- large rewrite of how turrets are manned by vehicle gunners
+- rewrote the player vehicle crew role change menu 
+- added a zoom visibility level for the hit markers 
+
+todo 
+- remove radio.ai.radio operator, add radio as a vehicle_crew role_object
+- remove destination from switch_task_enter_vehicle
+- figure out if ai should keep roles as 'gunner' or use 'gunner_1'
 
 ----------------------------------
 Dec 24 2024
@@ -15,10 +27,6 @@ game all three models are relevant.
 - J has a manual turret traverse 
 
 G should be the least common but i need to model availability yet 
-
-
-
-
 
 ----------------------------------
 Dec 23 2024
