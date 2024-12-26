@@ -1,5 +1,24 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Dec 26 2024
+- fixed a new error with player weapon reload 
+- fixed a new error with player turret reload 
+- added MG34 120 round belts as a 'magazine' option 
+
+might have to add in barrel overheating mechanics. the 120 round belt is pretty wild 
+
+I need a better understanding of when a 75 round drum mag for the Mg34 would be used vs 120 
+round (or greater??) belts. For now I think I'll move the tanks over to the belts 
+
+The bots fire slower than the max due to a bunch of things like trying to align the turrets. The max 
+fire rate on the MG34 is astounding - possibly exceeds the ability of the engine. Will have to look into that when 
+I add the MG42..
+
+todo 
+- Soviet machine guns need some love. 
+
 ----------------------------------
 Dec 25 2024
 - rewrote reload weapon logic (for ai and for player)

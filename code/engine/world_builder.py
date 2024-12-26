@@ -1410,6 +1410,17 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif OBJECT_TYPE=='mg34_belt':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='mg34_belt'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['mg34']
+        z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
+        z.ai.capacity=120
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif OBJECT_TYPE=='37mm_m1939_k61':
         z=WorldObject(world,['mg34'],AIGun)
         z.name='37mm_m1939_k61'
@@ -1941,7 +1952,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         for b in range(100):
             z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False))
         
@@ -2028,7 +2039,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         for b in range(100):
             z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
 
@@ -2100,7 +2111,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         for b in range(100):
             z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
 
@@ -2447,7 +2458,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         for b in range(41):
             z.add_inventory(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
         

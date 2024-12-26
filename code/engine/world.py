@@ -487,11 +487,11 @@ class World(object):
         if key=='r':
             if self.player.ai.memory['current_task']=='task_player_control':
                 if self.player.ai.primary_weapon!=None:
-                    self.player.ai.reload_weapon(self.player.ai.primary_weapon)
+                    self.player.ai.reload_weapon(self.player.ai.primary_weapon,self.player)
             elif self.player.ai.memory['current_task']=='task_vehicle_crew':
                 if 'gunner' in self.player.ai.memory['task_vehicle_crew']['role']:
-                    vehicle=self.memory['task_vehicle_crew']['vehicle']
-                    turret=self.memory['task_vehicle_crew']['turret']
+                    vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+                    turret=self.player.ai.memory['task_vehicle_crew']['turret']
 
                     self.player.ai.reload_weapon(turret.ai.primary_weapon,vehicle)
                     if turret.ai.coaxial_weapon!=None:
