@@ -49,8 +49,8 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 # german tanks / destroyers / assault guns
 - tiger 1
 - tiger 2
-- panzer 4 h
-- panzer 4 j
+- (done) panzer 4 h
+- (done) panzer 4 j
 - panzer 3 M
 - panzer 3 N
 - panther g

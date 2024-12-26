@@ -136,7 +136,15 @@ class AIHuman(object):
                 else:
                     turret.ai.handle_rotate_right()
             else:
-                turret.ai.handle_fire()
+                if target.is_human:
+                    if turret.ai.coaxial_weapon!=None:
+                        turret.ai.handle_fire_coax()
+                    else:
+                        # maybe fire HE 
+                        # for now just fire with the main gun 
+                        turret.ai.handle_fire()
+                else:
+                    turret.ai.handle_fire()
         else:
             self.memory['task_vehicle_crew']['target']=None
 
@@ -596,7 +604,7 @@ class AIHuman(object):
         return calc_speed
     
     #---------------------------------------------------------------------------
-    def get_target(self):
+    def get_target(self,range):
         '''returns a target or None if there are None'''
         target=None
         if len(self.near_targets)>0:
@@ -608,9 +616,12 @@ class AIHuman(object):
 
         if target!=None:
             if target.ai.health<1:
-                # could get intesting if there are a lot of dead targets but 
-                # it should self clear with this recursion
-                target=self.get_target()
+                target=None
+            else:
+                distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+                if distance>range:
+                    # alternatively we could drive closer.
+                    target=None
                 
         return target
     
@@ -738,59 +749,52 @@ class AIHuman(object):
         # this is called by world_menu
         if self.memory['current_task']=='task_vehicle_crew':
             vehicle=self.memory['task_vehicle_crew']['vehicle']
-            current_role=self.memory['task_vehicle_crew']['role']
-            turret=self.memory['task_vehicle_crew']['turret']
 
-            # remove from current role
-            if current_role=='driver':
-                vehicle.ai.driver=None
-            if current_role=='gunner':
-                pass
+            # remove yourself from any existing roles 
+            # first remove yourself from any existing crew spots
+            for key,value in vehicle.ai.vehicle_crew.items():
+                if value[1]==self.owner:
+                    value[1]=None
+                    value[0]=False
 
+                    if key=='driver':
+                        # this may not do anything. i think it regresses to zero
+                        # turn on the brakes to prevent roll away
+                        vehicle.ai.brake_power=1
 
-            if role=='driver':
-                if vehicle.ai.driver!=None:
-                    # reassign current driver
-                    vehicle.ai.driver.ai.memory['task_vehicle_crew']['role']='passenger'
-                vehicle.ai.driver=self.owner
-                self.memory['task_vehicle_crew']['role']='driver'
-            elif role=='gunner':
-                found_turret=False
+                    elif key=='radio_operator':
+                        if vehicle.ai.radio!=None:
+                            if vehicle.ai.radio.ai.radio_operator==self.owner:
+                                vehicle.ai.radio.ai.radio_operator=None
+                    elif 'passenger' in key:
+                        pass
 
-                # search for an empty turret
-                for b in vehicle.ai.turrets:
-                    if b.ai.gunner==None:
-                        self.speak("Taking over gunner position")
-                        b.ai.gunner=self.owner
-                        self.memory['task_vehicle_crew']['turret']=b
-                        self.memory['task_vehicle_crew']['role']='gunner'
-                        found_turret=True
-                        break
+            # --- add to the desired role --
+            if role in vehicle.ai.vehicle_crew:
+                # set the role in memory
+                self.memory['task_vehicle_crew']['role']=role
+                self.owner.render=vehicle.ai.vehicle_crew[role][4]
+
+                # occupied?
+                if vehicle.ai.vehicle_crew[role][0]==True:
+                    # have the current crew member exit and re-enter
+                    crew=vehicle.ai.vehicle_crew[role][1]
+                    crew.ai.switch_task_exit_vehicle(vehicle)
+                    crew.ai.update_task_exit_vehicle()
+
+                vehicle.ai.vehicle_crew[role][0]=True
+                vehicle.ai.vehicle_crew[role][1]=self.owner
+
+                if 'gunner' in role:
+                    self.memory['task_vehicle_crew']['turret']=vehicle.ai.vehicle_crew[role][5]
+
                 
-                # didn't find one. can we boot someone out?
-                if found_turret==False:
-                    for b in vehicle.ai.turrets:
-                        if b.ai.gunner!=None:
 
-                            # reassign gunner
-                            b.ai.gunner.ai.memory['task_vehicle_crew']['role']='passenger'
-
-                            # take over as normal
-                            self.speak("Taking over gunner position")
-                            b.ai.gunner=self.owner
-                            self.memory['task_vehicle_crew']['turret']=b
-                            self.memory['task_vehicle_crew']['role']='gunner'
-                            found_turret=True
-                            break
-
-                # still didn't find one somehow?
-                if found_turret==False:
-                    self.memory['task_vehicle_crew']['role']='passenger'
-                    engine.log.add_data('warn','player change role to gunner failed',True)   
+            else:
+                engine.log.add_data('warn','ai_human.player_vehicle_role_change - role not available in vehicle',True)
 
 
-            elif role=='passenger':
-                self.memory['task_vehicle_crew']['role']='passenger'
+
         else:
             engine.log.add_data('warn','ai_human.player_vehicle_role - current task is not task_vehicle_crew,'+str(self.memory['current_task']),True)
 
@@ -812,7 +816,7 @@ class AIHuman(object):
         # add some fatigue, not sure how much
         self.fatigue+=15
     #-----------------------------------------------------------------------
-    def reload_weapon(self,weapon):
+    def reload_weapon(self,weapon,obj_with_inventory):
         '''reload weapon'''
         self.speak('reloading!')
         if weapon.is_gun:
@@ -825,7 +829,7 @@ class AIHuman(object):
             # find a new magazine, sorting by size
             new_magazine=None
             biggest=0
-            for b in self.inventory:
+            for b in obj_with_inventory.ai.inventory:
                 if b.is_gun_magazine:
                     if weapon.world_builder_identity in b.ai.compatible_guns:
                         if len(b.ai.projectiles)>biggest:
@@ -834,11 +838,11 @@ class AIHuman(object):
 
             # remove old magazine ONLY if we have a new magazine
             if old_magazine!=None and new_magazine!=None:
-                self.event_add_inventory(old_magazine)
+                obj_with_inventory.ai.event_add_inventory(old_magazine)
                 weapon.ai.magazine=None
             # add a new magazine (either the old magazine was removed, or was never there)
             if new_magazine!=None:
-                self.event_remove_inventory(new_magazine)
+                obj_with_inventory.ai.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
             else:
                 self.speak("I'm out of ammo!")
@@ -846,43 +850,7 @@ class AIHuman(object):
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time
         
-    #-----------------------------------------------------------------------
-    def reload_turret(self):
-        # called by world.handle_keydown()
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
-        turret=self.memory['task_vehicle_crew']['turret']
-        if turret!=None:
-            if turret.ai.vehicle!=None and turret.ai.primary_weapon!=None:
-                weapon=turret.ai.primary_weapon
-                # first get the current magazine
-                old_magazine=None
-                if weapon.ai.magazine!=None:
-                    if weapon.ai.magazine.ai.removable:
-                        old_magazine=weapon.ai.magazine
 
-                # find a new magazine, sorting by size
-                new_magazine=None
-                biggest=0
-                for b in vehicle.ai.inventory:
-                    if b.is_gun_magazine:
-                        if weapon.world_builder_identity in b.ai.compatible_guns:
-                            if len(b.ai.projectiles)>biggest:
-                                new_magazine=b
-                                biggest=len(b.ai.projectiles)
-
-                # perform the swap 
-                if old_magazine!=None:
-                    vehicle.ai.event_add_inventory(old_magazine)
-                    weapon.ai.magazine=None
-                if new_magazine!=None:
-                    vehicle.ai.event_remove_inventory(new_magazine)
-                    weapon.ai.magazine=new_magazine
-                    self.speak("I've reloaded the "+weapon.name+" in the turret")
-                else:
-                    self.speak("The "+weapon.name+" in the turret is out of ammo!")
-
-        # at this point we should do a ai_mode change with a timer to simulate the 
-        # reload time
         
     #---------------------------------------------------------------------------
     def speak(self,what):
@@ -1069,16 +1037,11 @@ class AIHuman(object):
                     vehicle.ai.brake_power=1
 
                 elif key=='radio_operator':
-                    if vehicle.ai.radio.ai.radio_operator==self.owner:
-                        vehicle.ai.radio.ai.radio_operator=None
+                    if vehicle.ai.radio!=None:
+                        if vehicle.ai.radio.ai.radio_operator==self.owner:
+                            vehicle.ai.radio.ai.radio_operator=None
                 elif 'passenger' in key:
                     pass
-
-
-        # remove yourself from any turrets
-        for b in vehicle.ai.turrets:
-            if b.ai.gunner==self.owner:
-                b.ai.gunner=None
 
         role=None
         turret=None
@@ -1092,24 +1055,15 @@ class AIHuman(object):
 
         if role==None:
             for key,value in vehicle.ai.vehicle_crew.items():
+                if role!=None:
+                    break
                 if 'gunner' in key:
                     if value[0]==False:
-                        for b in vehicle.ai.turrets:
-                            if b.ai.gunner==None:
-                                self.speak("Taking over gunner position")
-                                b.ai.gunner=self.owner
-                                turret=b
-                                role='gunner'
-                                break
-                        
-                        # this means that there are more gun slots than turrets for some reason
-                        if role==None:
-                            role='passenger'
-                            engine.log.add_data('warn','ai_human.switch_task_vehicle_crew more gunners than turrets',True)
-
                         vehicle.ai.vehicle_crew[key][0]=True
                         vehicle.ai.vehicle_crew[key][1]=self.owner
                         self.owner.render=vehicle.ai.vehicle_crew[key][4]
+                        turret=vehicle.ai.vehicle_crew[key][5]
+                        role='gunner'
 
         # note that some vehicles may not have this crew slot
         if role==None and 'radio_operator' in vehicle.ai.vehicle_crew:
@@ -1243,25 +1197,26 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
-        # check gun ammo
+        # check main gun ammo
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
-        if ammo_gun==0:
+        if ammo_gun==0 and ammo_inventory>0:
             # this should be re-done to check for ammo in vehicle, and do something if there is none
-            self.reload_turret()
+            self.reload_weapon(turret.ai.primary_weapon,vehicle)
 
-            #if ammo_inventory>0:
-            #    self.reload_turret()
-            #else:
-                # need ammo or new gun
-            #    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
-            #    if len(near_magazines)>0:
-            #        self.switch_task_pickup_objects(near_magazines)
+        # check coax ammo
+        if turret.ai.coaxial_weapon!=None:
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
+            if ammo_gun==0 and ammo_inventory>0:
+                # this should be re-done to check for ammo in vehicle, and do something if there is none
+                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+
+
 
         if self.memory['task_vehicle_crew']['target']==None:
-            self.memory['task_vehicle_crew']['target']=self.get_target()
+            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
         else:
             if self.memory['task_vehicle_crew']['target'].ai.health<1:
-                self.memory['task_vehicle_crew']['target']=self.get_target()
+                self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
 
         # we either already had a target, or we might have just got a new one
         if self.memory['task_vehicle_crew']['target']!=None:
@@ -1580,7 +1535,7 @@ class AIHuman(object):
                     ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
                     if ammo_gun==0:
                         if ammo_inventory>0:
-                            self.reload_weapon(self.primary_weapon)
+                            self.reload_weapon(self.primary_weapon,self.owner)
                         else:
                             # need ammo or new gun. hand it over to think to deal with this
                             self.memory.pop('task_engage_enemy',None)
@@ -1622,7 +1577,7 @@ class AIHuman(object):
                                 
                 else:
 
-                    new_enemy=self.get_target()
+                    new_enemy=self.get_target(self.primary_weapon.ai.range)
                     if new_enemy==None:
 
                             # no closer targets. is the target really far out of range?
@@ -1749,10 +1704,7 @@ class AIHuman(object):
                 elif 'passenger' in key:
                     pass
                 elif 'gunner' in key:
-                    # remove yourself from any turrets
-                    for b in vehicle.ai.turrets:
-                        if b.ai.gunner==self.owner:
-                            b.ai.gunner=None
+                    pass
 
                 else:
                     engine.log.add_data('error','ai_human.update_task_exit_vehicle no role found!',True)

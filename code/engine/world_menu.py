@@ -179,26 +179,38 @@ class World_Menu(object):
             # print out the basic menu
             self.text_queue.append('-- Change Vehicle Role --')
             currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
             if currentRole==None:
                 currentRole='None!'
 
             self.text_queue.append('Vehicle : '+self.selected_object.name)
             self.text_queue.append('Current Role : '+currentRole)
-            self.text_queue.append('1 - Driver')
-            self.text_queue.append('2 - Gunner')
-            self.text_queue.append('3 - Passenger')
-            self.text_queue.append('4 - Chef')
-            self.menu_state='base'
-        if self.menu_state=='base':
-            if key=='1':
-                self.world.player.ai.player_vehicle_role_change('driver')
-                self.deactivate_menu()
-            elif key=='2':
-                self.world.player.ai.player_vehicle_role_change('gunner')
-                self.deactivate_menu()
-            elif key=='3':
-                self.world.player.ai.player_vehicle_role_change('passenger')
-                self.deactivate_menu()
+            if currentRole!='driver':
+                self.text_queue.append('1 - Driver')
+                if key=='1':
+                    self.world.player.ai.player_vehicle_role_change('driver')
+                    self.deactivate_menu()
+                    return
+            if currentRole!='gunner_1' and 'gunner_1' in vehicle.ai.vehicle_crew:
+                self.text_queue.append('2 - Turret: '+vehicle.ai.vehicle_crew['gunner_1'][5].name)
+                if key=='2':
+                    self.world.player.ai.player_vehicle_role_change('gunner_1')
+                    self.deactivate_menu()
+                    return
+            if currentRole!='gunner_2' and 'gunner_2' in vehicle.ai.vehicle_crew:
+                if len(vehicle.ai.turrets)>1:
+                    self.text_queue.append('3 - Turret: '+vehicle.ai.vehicle_crew['gunner_2'][5].name)
+                    if key=='3':
+                        self.world.player.ai.player_vehicle_role_change('gunner_2')
+                        self.deactivate_menu()
+                        return
+
+            if currentRole!='passenger_1' and 'passenger_1' in vehicle.ai.vehicle_crew:
+                self.text_queue.append('4 - Passenger')
+                if key=='4':
+                    self.world.player.ai.player_vehicle_role_change('passenger_1')
+                    self.deactivate_menu()
+                    return
 
      #---------------------------------------------------------------------------
     def coffee_grinder_menu(self, key):
@@ -355,9 +367,9 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
-            self.text_queue.append('2 - Kubelwagen Camo')
-            self.text_queue.append('3 - Ju88 ')
-            self.text_queue.append('4 - Dodge G505 Weapons Carrier ')
+            self.text_queue.append('2 - german_panzer_iv_ausf_g')
+            self.text_queue.append('3 - german_panzer_iv_ausf_h')
+            self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - sd_kfz_251 ')
             self.text_queue.append('6 - T20 armored tractor')
             self.text_queue.append('7 - RSO')
@@ -366,11 +378,11 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen_camo',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_g',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_ju88',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_h',True)
             elif key=='4':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_dodge_g505_wc',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251',True)
             elif key=='6':

@@ -389,15 +389,17 @@ class ImageObject(object):
 screen_size = (1200,900)
 image_tool=ImageTool(screen_size)
 
-image_tool.image_objects.append(ImageObject(['t20'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],90))
-image_tool.image_objects.append(ImageObject(['german_soldier'],90))
-image_tool.image_objects.append(ImageObject(['german_soldier'],90))
-image_tool.image_objects.append(ImageObject(['german_soldier'],270))
-image_tool.image_objects.append(ImageObject(['german_soldier'],270))
-image_tool.image_objects.append(ImageObject(['german_soldier'],270))
+#image_tool.image_objects.append(ImageObject(['t20'],0))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],90))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],90))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],90))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],270))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],270))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],270))
 
-
+image_tool.image_objects.append(ImageObject(['panzer_iv_g_chassis'],0))
+image_tool.image_objects.append(ImageObject(['panzer_iv_hull_mg'],0))
+image_tool.image_objects.append(ImageObject(['panzer_iv_g_turret'],0))
 
 while image_tool.quit==False:
 

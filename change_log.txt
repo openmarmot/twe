@@ -1,12 +1,38 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 25 2024
+- rewrote reload weapon logic (for ai and for player)
+- added reloads for coaxial mgs 
+- large rewrite of how turrets are manned by vehicle gunners
+- rewrote the player vehicle crew role change menu 
+- added a zoom visibility level for the hit markers 
+
+todo 
+- remove radio.ai.radio operator, add radio as a vehicle_crew role_object
+- remove destination from switch_task_enter_vehicle
+- figure out if ai should keep roles as 'gunner' or use 'gunner_1'
+
+----------------------------------
+Dec 24 2024
+- added Panzer IV Ausf G / H / J 
+- fixed issue with gun crew assignment 
+- added coax machine guns
+- turret gunner logic to select coax appropriately 
+
+A lot of games just seem to to a G and draw it like a H, but for a late war 
+game all three models are relevant. 
+- G has the L43 gun, H and J have the L48
+- H has armor schurtzen, J has wire schurtzen on the body 
+- J has a manual turret traverse 
+
+G should be the least common but i need to model availability yet 
 
 ----------------------------------
 Dec 23 2024
 - removed aibase.py and inheritance 
 - fixed a new error in the ai_human grenade engagement code
  
-
 I remembered the one thing the inheritance was really used for - setting owner. 
 I can just do this in every class that needs it instead 
 

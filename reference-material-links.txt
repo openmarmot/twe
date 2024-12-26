@@ -1,5 +1,10 @@
 helpful links for research 
 
+# -- notes on scale --
+for sizing it is probably best to go with width, as length is sometimes including the gun, and sometimes not 
+
+
+
 https://tank-afv.com/ww2/germany/german-tanks-armored-vehicles.php
 
 
@@ -8,5 +13,12 @@ https://tank-afv.com/ww2/germany/german-tanks-armored-vehicles.php
 # seems to more or less line up with what ive found from wikipedia or other sources
 https://wiki.warthunder.com/
 
+# old warthunder wiki is still live and has better info 
+https://old-wiki.warthunder.com/
+
 # great source for diagrams 
 https://drawingdatabase.com
+
+
+# german afv production years 
+https://www.feldgrau.com/WW2-German-Armoured-Vehicle-Production/
