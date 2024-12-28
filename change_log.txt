@@ -4,6 +4,7 @@ TWE Project : Change Log
 ----------------------------------
 Dec 27 2024
 - added the DTM - which is just a tank adapted version of the DP28 with a 60 round pan magazine
+- cleaned up the white outline around the mp40 image 
 
 Soviet vehicles have all been switched over to the DTM. 
 
