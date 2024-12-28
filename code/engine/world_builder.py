@@ -1270,6 +1270,32 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif OBJECT_TYPE=='dtm':
+        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
+        # basically a dp28 adapted for tank use
+        z=WorldObject(world,['dp28'],AIGun)
+        z.name='DTM Machine Gun'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.magazine=spawn_object(world,world_coords,'dtm_magazine',False)
+        z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=30
+        z.ai.range=2418
+        z.ai.type='machine gun'
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='dtm_magazine':
+        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='DTM Pan Magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['dtm']
+        z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
+        z.ai.capacity=60
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif OBJECT_TYPE=='ppk':
         z=WorldObject(world,['ppk'],AIGun)
         z.name='ppk'
@@ -2227,11 +2253,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         
-        # turret ammo, temporary 
-        z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
-        z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
-        z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
-        z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
+        # turret ammo
+        for b in range(4):
+            z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
         
     elif OBJECT_TYPE=='t20_turret':
         # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
@@ -2246,7 +2270,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.turret_armor['rear']=[5,31,0]
         z.ai.position_offset=[-25,9]
         z.ai.rotation_range=[-20,20]
-        z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='soviet_t34_76_model_1943':
@@ -2298,7 +2322,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
         for b in range(100):
             z.add_inventory(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
         
@@ -2315,7 +2339,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.turret_armor['rear']=[53,20,0]
         z.ai.position_offset=[-65,13]
         z.ai.rotation_range=[-20,20]
-        z.ai.primary_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='t34_76_model_1943_turret':
@@ -2333,7 +2357,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
-        z.ai.coaxial_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='soviet_t34_85':
@@ -2385,7 +2409,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(6):
-            z.add_inventory(spawn_object(world,world_coords,"dp28_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
         for b in range(100):
             z.add_inventory(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
 
@@ -2404,7 +2428,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_zis_s_53',False)
         z.ai.primary_weapon.ai.equipper=z
-        z.ai.coaxial_weapon=spawn_object(world,world_coords,'dp28',False)
+        z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='german_jagdpanzer_38t_hetzer':

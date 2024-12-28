@@ -2,6 +2,21 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 27 2024
+- added the DTM - which is just a tank adapted version of the DP28 with a 60 round pan magazine
+
+Soviet vehicles have all been switched over to the DTM. 
+
+Had a really hard time finding concrete info on the DTM magazine and the gun in general 
+This video from Ian was one of the few places on the internet where it is even mentioned 
+https://www.youtube.com/watch?v=goLAR1KdqRw
+
+
+todo 
+- panzerfaust launches need a minimum distance to keep the users from roasting themselves 
+
+
+----------------------------------
 Dec 26 2024
 - fixed a new error with player weapon reload 
 - fixed a new error with player turret reload 
