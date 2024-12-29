@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 28 2024
+- switched vehicle spawn positions to a grid. 
+- grid of grids for squads + squad member spawn 
+
+grid spawn for the starts is a nice little visual thing. didn't do 
+much in practical terms and may have reduced vehicle usage - some 
+might end up being too far away - will have to look into this further.
+
+----------------------------------
 Dec 27 2024
 - added the DTM - which is just a tank adapted version of the DP28 with a 60 round pan magazine
 - cleaned up the white outline around the mp40 image 
@@ -15,7 +24,6 @@ https://www.youtube.com/watch?v=goLAR1KdqRw
 
 todo 
 - panzerfaust launches need a minimum distance to keep the users from roasting themselves 
-
 
 ----------------------------------
 Dec 26 2024

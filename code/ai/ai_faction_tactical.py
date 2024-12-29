@@ -92,21 +92,28 @@ class AIFactionTactical(object):
                 # civilians start all over, so just making sure they are idle right away
                 b.destination=copy.copy(b.members[0].world_coords)
         else:
+            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,150,len(self.squads))
+
             for b in self.squads:
 
                 # initially set the squad destination to be th espawn location
-                b.destination=engine.math_2d.randomize_coordinates(self.spawn_location,200)
-                # set the detination for the members as well
+                b.destination=squad_grid.pop()
+
+                # set the member positions
+                member_grid=engine.math_2d.get_grid_coords(b.destination,20,len(b.members))
                 for c in b.members:
-                    c.world_coords=copy.copy(self.spawn_location)
+                    c.world_coords=member_grid.pop()
                     # randomize position a bit
-                    engine.math_2d.randomize_position_and_rotation(c,170)
+                    #engine.math_2d.randomize_position_and_rotation(c,170)
 
         # position the vehicles. in the future they may be added to squads
+        grid_coords=engine.math_2d.get_grid_coords(self.spawn_location,250,len(vehicles))
+
         for b in vehicles:
-            b.world_coords=copy.copy(self.spawn_location)
+            b.world_coords=grid_coords.pop()
+            #b.world_coords=copy.copy(self.spawn_location)
             # randomize position a bit
-            engine.math_2d.randomize_position_and_rotation(b,170)
+            #engine.math_2d.randomize_position_and_rotation(b,170)
 
 
         # update human lists and give out tactical orders right away
