@@ -19,7 +19,7 @@ this is not a full list of what is in game, it is just a way for me to keep trac
     - maybe only updates when you are in radio contact
 - binoculars 
     - enables more zoom levels 
-- better vehicle hit tracking 
+- (done) better vehicle hit tracking 
     - able to turn on a mode that shows each hit 
     - each hit has a line showing the angle 
     - color of line indicates penetration or bounce 
@@ -31,6 +31,14 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 - german tank / afv crew 
 - german ss camo uniforms 
 - more civilians 
+
+# vehicle stuff 
+- gunners should be able to ask the driver to pause (so they can shoot)
+- gunners should be able to ask the driver to rotate and then pause (for shooting/angling)
+- tanks should be able to rotate without moving forwards 
+- gunners should be able to switch between tank round types 
+- stabilization / lack of should be taken into account with gun accuracy 
+
 
 # weapons 
 - all weapons get resized 

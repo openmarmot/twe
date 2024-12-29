@@ -419,6 +419,9 @@ class World(object):
                 if b.is_airplane and human.ai.is_pilot==False:
                     acceptable=False
 
+                if b.ai.requires_afv_training and human.ai.is_afv_trained==False:
+                    acceptable=False
+
             # check factions
             if acceptable:
                 for value in b.ai.vehicle_crew.values():

@@ -133,6 +133,10 @@ class AIVehicle(object):
         self.vehicle_crew={}
 
         # --
+        # this gives the AI clues as to how they should use the vehicle
+        self.vehicle_role=''
+        # whether the crew needs is_afv_trained
+        self.requires_afv_training=False
 
         #
         self.towed_object=None

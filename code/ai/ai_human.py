@@ -82,6 +82,8 @@ class AIHuman(object):
 
         # -- skills --
         self.is_pilot=False
+        self.is_expert_marksman=False
+        self.is_afv_trained=False # afv=armored fighting vehicle
 
         # -- stats --
         self.confirmed_kills=0
@@ -161,6 +163,66 @@ class AIHuman(object):
             if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
                 self.building_list.append(b)
                 self.in_building=True
+
+    #---------------------------------------------------------------------------
+    def calculate_human_accuracy(self,target_coords,distance,weapon):
+        '''returns target_coords adjusted for human weapon accuracy'''
+
+        adjust_max=0
+
+
+        # mechanical accuracy of the gun
+        adjust_max+=weapon.ai.mechanical_accuracy
+
+        # health based
+        if self.health<100:
+            adjust_max+=1
+        if self.health<50:
+            adjust_max+=1
+        if self.health<30:
+            adjust_max+=1
+
+        # fatigue
+        if self.fatigue>3:
+            adjust_max+=0.5
+        if self.fatigue>5:
+            adjust_max+=0.5
+
+        # distance based
+        if distance>500:
+            adjust_max+=1
+        if distance>1000:
+            adjust_max+=1
+        if distance>1500:
+            adjust_max+=1
+        if distance>2000:
+            adjust_max+=1
+
+        # prone bonus 
+        if self.prone:
+            adjust_max-=1
+
+        # skills 
+        if self.is_expert_marksman:
+            adjust_max-=2
+
+        # recent experience
+        if self.confirmed_kills>0:
+            adjust_max-=1
+
+        # reset lower bounds
+        if adjust_max<0:
+            adjust_max=0
+
+
+        # final results
+        if adjust_max>0:
+            return [target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+        else:
+            return target_coords
+
+
+
 
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile):
@@ -520,7 +582,7 @@ class AIHuman(object):
         # event_data ['command',relevant_data]
         if event_data[0]=='task_enter_vehicle':
             # should probably sanity check this first
-            self.switch_task_enter_vehicle(event_data[1])
+            self.switch_task_enter_vehicle(event_data[1],self.squad.destination)
         elif event_data[0]=='ask to join squad':
             if event_data[1]==self.squad:
                 self.speak("I'm already in that squad")
@@ -565,6 +627,8 @@ class AIHuman(object):
                         aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
 
 
+            # adjust for human accuracy factors
+            aim_coords=self.calculate_human_accuracy(aim_coords,distance,weapon)
             weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,aim_coords)
             weapon.ai.fire()
 
@@ -582,7 +646,12 @@ class AIHuman(object):
         # mouse_coords - mouse screen coords
         if weapon.ai.check_if_can_fire():
             # do computations based off of where the mouse is. 
-            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_coords)
+
+            # adjusted coords
+            # this function was meant for world coords.
+            # because it is mouse coords distance won't apply, which may even it out a bit
+            adjusted_coords=self.calculate_human_accuracy(mouse_coords,0,weapon)
+            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
             weapon.ai.fire()
 
     #---------------------------------------------------------------------------
@@ -631,45 +700,58 @@ class AIHuman(object):
 
         near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
 
+        # determine if the whole squad is afv trained
+        squad_afv_training=True
+        for b in near_squad:
+            if b.ai.is_afv_trained==False:
+                squad_afv_training=False
+                break
+
         # remove yourself to prevent recursion
         near_squad.remove(self.owner)
 
         near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,500)
 
         for b in near_vehicle:
-            if len(near_squad)==0:
-                break
-            # calculate occupants
-            occupants=0
 
-            # count the occupants already in the vehicle
-            for c in b.ai.vehicle_crew.values():
-                if c[0]==True:
-                    occupants+=1
+            # skip AFVs if the whole squad isn't trained
+            if b.ai.requires_afv_training and squad_afv_training==False:
+                pass
+            else:
 
-            for c in self.owner.world.wo_objects_human:
-                if 'task_enter_vehicle' in c.ai.memory:
-                    if c.ai.memory['task_enter_vehicle']['vehicle']==b:
+                if len(near_squad)==0:
+                    break
+                # calculate occupants
+                occupants=0
+
+                # count the occupants already in the vehicle
+                for c in b.ai.vehicle_crew.values():
+                    if c[0]==True:
                         occupants+=1
 
-            while occupants<len(b.ai.vehicle_crew):
-                if len(near_squad)>0:
+                for c in self.owner.world.wo_objects_human:
+                    if 'task_enter_vehicle' in c.ai.memory:
+                        if c.ai.memory['task_enter_vehicle']['vehicle']==b:
+                            occupants+=1
 
-                    # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
-                    if near_squad[0].is_player:
-                        self.speak('Get in the vehicle')
-                        near_squad.pop(0)
-                    else:
+                while occupants<len(b.ai.vehicle_crew):
+                    if len(near_squad)>0:
 
-                        if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
-                            #already in a vehicle, so no further action needed
+                        # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
+                        if near_squad[0].is_player:
+                            self.speak('Get in the vehicle')
                             near_squad.pop(0)
                         else:
-                            near_squad[0].ai.switch_task_enter_vehicle(b,destination)
-                            occupants+=1
-                            near_squad.pop(0)
-                else:
-                    break
+
+                            if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
+                                #already in a vehicle, so no further action needed
+                                near_squad.pop(0)
+                            else:
+                                near_squad[0].ai.switch_task_enter_vehicle(b,destination)
+                                occupants+=1
+                                near_squad.pop(0)
+                    else:
+                        break
     
     #---------------------------------------------------------------------------
     def handle_event(self, EVENT, EVENT_DATA):
@@ -704,10 +786,13 @@ class AIHuman(object):
         if self.antitank!=None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
+                adjusted_coords=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
 
             else :
-                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+                distance=engine.math_2d.get_distance(self.owner.world_coords,target_coords)
+                adjusted_coords=self.calculate_human_accuracy(target_coords,distance,self.antitank)
+                self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,adjusted_coords)
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches+=1
 
@@ -891,7 +976,9 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
         if self.squad.squad_leader==self.owner:
-            self.give_squad_transportation_orders(destination)
+            # for now the afv stuff just confuses stuff. we don't want them joining up as passengers
+            if self.is_afv_trained==False:
+                self.give_squad_transportation_orders(destination)
 
     #---------------------------------------------------------------------------
     def switch_task_engage_enemy(self,enemy):
@@ -1136,7 +1223,18 @@ class AIHuman(object):
         distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
         
         if distance<150 and vehicle.ai.current_speed<1:
-            self.switch_task_exit_vehicle(vehicle)
+            # check if we have a different destination from the squad 
+            # this may have updated since we started driving
+            if engine.math_2d.get_distance(destination,self.squad.destination)<350:
+                # we are at our old destination AND we are near the current squad destination
+                
+                # lets jump out
+                # only jump out if you aren't dedicated afv crew
+                if self.is_afv_trained==False:
+                    self.switch_task_exit_vehicle(vehicle)
+            else:
+                # we have a new destination
+                self.memory['task_vehicle_crew']['destination']=engine.math_2d.randomize_coordinates(self.squad.destination,50)
         elif new_passengers>0:
             # wait for new passengers
             vehicle.ai.brake_power=1
@@ -1856,6 +1954,7 @@ class AIHuman(object):
                 if b!=None:
                     # get_closest_vehicle only returns vehicles that aren't full
                     # won't return planes if not a pilot
+                    # won't return AFVs if not AFV trained
                     self.switch_task_enter_vehicle(b,destination)
 
 

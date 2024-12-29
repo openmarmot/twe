@@ -2,6 +2,41 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 29 2024
+- added a human accuracy calculation
+- guns also have mechanical accuracy now 
+- added is_towable to the soviet 37mm
+- humans can now have afv training 
+- tanks now require afv training 
+- added afv crews (can drive afv , but less combat equipment)
+- added afv crews to squad builder 
+- afv crew have some different behavior for vehicles and are less likely to leave them
+- added german afv crew black uniform 
+- fixed an error in the dialog that enables you to tell squad members to board your vehicle
+- some changes to how vehicle drivers handle being near their destination. 
+likely fixed an error where vehicle drivers do not update destinations (less relevant before 
+todays code changes)
+
+hard to say how much the human accuracy effects things at the moment. 
+will probably take more play testing to make a determination 
+
+the new afv crew mechanic will need a fair amount of debugging and tuning.
+the general idea was to reduce the amount of tanks/afvs that get driven to a location 
+and abandoned. I wanted a special dedicated vehicle crew type that will stay with the vehicle 
+
+I know the Germans were transitioning away from the black panzer uniform in >1943 as field grey was 
+better camo - but it is iconic and would otherwhise be hard to make the AFV crew stand out 
+
+I will make a soviet vehicle crew outfit as well, but im guessing they used the same uniform color 
+
+todo 
+- vehicle accuracy 
+- stabilization 
+- telling the driver to stop 
+- soviet afv crew uniform 
+- at squad spawn all AFV crew should be given a vehicle to enter if possible 
+
+----------------------------------
 Dec 28 2024
 - switched vehicle spawn positions to a grid. 
 - grid of grids for squads + squad member spawn 

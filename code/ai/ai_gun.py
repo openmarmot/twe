@@ -44,6 +44,11 @@ class AIGun(object):
         # muzzle velocity (not used)
         self.muzzle_velocity=0
 
+        # mechanical accuracy from a stable mount. 0 is perfectly accurate
+        # 0 is perfect. 5 is terrible
+        # most rifles are 1
+        self.mechanical_accuracy=0
+
         # range - how far the bullet will go before hitting the ground
         # used by the ai and used to calculate projectile flight time
         self.range=0

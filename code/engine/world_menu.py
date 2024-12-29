@@ -735,6 +735,10 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+            if self.selected_object.ai.is_afv_trained:
+                self.text_queue.append('AFV Trained')
+            if self.selected_object.ai.is_expert_marksman:
+                self.text_queue.append('Marksman')
             
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
@@ -1254,6 +1258,16 @@ class World_Menu(object):
                 self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
                 self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
                 self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
+
+                self.text_queue.append('- crew debug -')
+                for k,value in self.selected_object.ai.vehicle_crew.items():
+                    text=k+': '
+                    if value[0]==True:
+                        text+=value[1].name
+                    else:
+                        text+='unoccupied'
+                    self.text_queue.append(text)
+                self.text_queue.append('----')
 
 
 
