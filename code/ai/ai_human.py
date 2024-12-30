@@ -266,7 +266,7 @@ class AIHuman(object):
         self.speak('react to being shot')
 
     #---------------------------------------------------------------------------
-    def check_ammo(self,gun):
+    def check_ammo(self,gun,object_with_inventory):
         '''check ammo and magazines for a gun. return ammo_gun,ammo_inventory,magazine_count'''
         # gun - a world object with ai_gun
         # check_inventory - bool. if true also check inventory
@@ -277,9 +277,9 @@ class AIHuman(object):
 
         ammo_inventory=0
         magazine_count=0
-        for b in self.inventory:
+        for b in object_with_inventory.ai.inventory:
             if b.is_gun_magazine:
-                if gun.name in b.ai.compatible_guns:
+                if gun.world_builder_identity in b.ai.compatible_guns:
                     ammo_inventory+=len(b.ai.projectiles)
                     magazine_count+=1
 
@@ -287,9 +287,9 @@ class AIHuman(object):
         return ammo_gun,ammo_inventory,magazine_count
 
     #---------------------------------------------------------------------------
-    def check_ammo_bool(self,gun):
+    def check_ammo_bool(self,gun,object_with_inventory):
         '''returns True/False as to whether gun has ammo'''
-        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(gun)
+        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(gun,object_with_inventory)
         if ammo_gun>0:
             return True
         elif ammo_inventory>0:
@@ -393,7 +393,7 @@ class AIHuman(object):
                 # don't want to over ride exiting a vehicle 
                 if self.memory['current_task']!='task_exit_vehicle':
                     if self.primary_weapon!=None:
-                        if self.check_ammo_bool(self.primary_weapon):
+                        if self.check_ammo_bool(self.primary_weapon,self.owner):
                             self.switch_task_engage_enemy(closest_object)
                     else:
                         engine.log.add_data('warn','close enemy and no primary weapon. not handled. faction:'+self.squad.faction,True)
@@ -1238,7 +1238,7 @@ class AIHuman(object):
         elif new_passengers>0:
             # wait for new passengers
             vehicle.ai.brake_power=1
-            vehicle.ai.throtte=0
+            vehicle.ai.throttle=0
 
         else:
 
@@ -1251,32 +1251,7 @@ class AIHuman(object):
             if need_start:
                 vehicle.ai.handle_start_engines()
 
-            # get the rotation to the destination 
-            r = engine.math_2d.get_rotation(vehicle.world_coords,destination)
-
-            v = vehicle.rotation_angle
-
-            if r>v:
-                vehicle.ai.handle_steer_left()
-
-            if r<v:
-                vehicle.ai.handle_steer_right()
-
-            
-            # if its close just set it equal
-            if r>v-3 and r<v+3:
-                # neutral out steering 
-                vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=r
-                vehicle.ai.update_heading()
-
-            if (r>355 and v<5) or (r<5 and v>355):
-                # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
-                vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=r
-                vehicle.ai.update_heading()
-                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
-
+            # initial throttle settings
             if distance<140:
                 # apply brakes. bot will only exit when speed is zero
                 # note this number should be < the minimum distance to jump out
@@ -1290,20 +1265,54 @@ class AIHuman(object):
                 vehicle.ai.throttle=1
                 vehicle.ai.brake_power=0
 
+            # get the rotation to the destination 
+            r = engine.math_2d.get_rotation(vehicle.world_coords,destination)
+
+            v = vehicle.rotation_angle
+
+            if r>v:
+                vehicle.ai.handle_steer_left()
+                # helps turn faster
+                if vehicle.ai.throttle==1:
+                    vehicle.ai.throttle=0.5
+
+            if r<v:
+                vehicle.ai.handle_steer_right()
+                # helps turn faster
+                if vehicle.ai.throttle==1:
+                    vehicle.ai.throttle=0.5
+            
+            # if its close just set it equal
+            if r>v-3 and r<v+3:
+                # neutral out steering 
+                vehicle.ai.handle_steer_neutral()
+                vehicle.rotation_angle=r
+                vehicle.ai.update_heading()
+                
+
+            if (r>355 and v<5) or (r<5 and v>355):
+                # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
+                vehicle.ai.handle_steer_neutral()
+                vehicle.rotation_angle=r
+                vehicle.ai.update_heading()
+                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
+
+            
+
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
         # check main gun ammo
-        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
+        ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
         if ammo_gun==0 and ammo_inventory>0:
             # this should be re-done to check for ammo in vehicle, and do something if there is none
             self.reload_weapon(turret.ai.primary_weapon,vehicle)
 
         # check coax ammo
         if turret.ai.coaxial_weapon!=None:
-            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon)
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
             if ammo_gun==0 and ammo_inventory>0:
                 # this should be re-done to check for ammo in vehicle, and do something if there is none
                 self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
@@ -1553,7 +1562,7 @@ class AIHuman(object):
             
             # drop primary weapon 
             if self.primary_weapon!=None:
-                ammo,ammo_inventory,magazines=self.check_ammo(self.primary_weapon)
+                ammo,ammo_inventory,magazines=self.check_ammo(self.primary_weapon,self.owner)
                 dm+=('\n  - weapon: '+self.primary_weapon.name)
                 dm+=('\n  -- ammo in gun: '+str(ammo))
                 dm+=('\n  -- ammo in inventory: '+str(ammo_inventory))
@@ -1630,7 +1639,7 @@ class AIHuman(object):
                         self.prone_state_change()
 
                     # out of ammo ?
-                    ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon)
+                    ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
                     if ammo_gun==0:
                         if ammo_inventory>0:
                             self.reload_weapon(self.primary_weapon,self.owner)
@@ -2089,7 +2098,7 @@ class AIHuman(object):
                         action=True
             else:
                 # -- we have a gun. is it usable? --
-                if self.check_ammo_bool==False:
+                if self.check_ammo_bool(self.primary_weapon,self.owner)==False:
                     # need to get ammo. check for nearby magazines
                     near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
                     if len(near_magazines)>0:

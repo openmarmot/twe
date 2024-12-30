@@ -102,8 +102,14 @@ class AIGun(object):
 
             # spawn smoke
             if self.smoke_on_fire:
-                heading=engine.math_2d.get_heading_from_rotation(self.equipper.rotation_angle+180)
+                heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
                 engine.world_builder.spawn_smoke_cloud(self.owner.world,self.equipper.world_coords,heading)
+                coords=engine.math_2d.moveAlongVector(-15,self.equipper.world_coords,heading,1)
+                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
+                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
+                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
 
             # spawn bullet case
             if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':

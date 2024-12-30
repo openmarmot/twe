@@ -2,6 +2,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 30 2024
+- panzerfaust launch now has a smoke trail from the launcher 
+- ai driver now cuts down to 0.5 throttle when turning 
+- fixed an issue where vehicle gun reloads may not have been triggered 
+- caught a logic error with some code dealing with a out of ammo situation 
+- fixed a bug with ammo check where it was looking at name not world_builder_identity 
+- upped mg ammo for most vehicles (likely still significantly below historical loads)
+
+Some gun magazines had names that were different from their world builder identity
+which could have resulted in situations where they were never reloaded 
+
+panzerfaust smoke trail isn't exactly how I wanted it, but its good 
+enough for now. the point was to make it a little more obvious when a 
+panzerfaust is launched as they are barely visible - and are the #1 
+killer of tanks at the moment.
+
+
+----------------------------------
 Dec 29 2024
 - added a human accuracy calculation
 - guns also have mechanical accuracy now 

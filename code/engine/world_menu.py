@@ -743,7 +743,7 @@ class World_Menu(object):
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
             if self.selected_object.ai.primary_weapon != None:
-                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon)
+                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon,self.selected_object)
                 self.text_queue.append('[primary weapon]: '+self.selected_object.ai.primary_weapon.name)
                 self.text_queue.append('- ammo in gun: '+str(ammo_gun))
                 self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
@@ -1198,6 +1198,20 @@ class World_Menu(object):
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
+            self.text_queue.append('- weapons -')
+            for b in self.selectable_object.ai.turrets:
+                primary_weapon='None'
+                coaxial_weapon='None'
+                if b.ai.primary_weapon!=None:
+                    self.text_queue.append('- '+b.name)
+                    ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
+                    self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                    if b.ai.coaxial_weapon!=None:
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                        self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+
+            self.text_queue.append(' ----')
+
             self.text_queue.append('- crew -')
             for k,value in self.selected_object.ai.vehicle_crew.items():
                 text=k+': '
@@ -1268,6 +1282,20 @@ class World_Menu(object):
                         text+='unoccupied'
                     self.text_queue.append(text)
                 self.text_queue.append('----')
+
+                self.text_queue.append('- weapons -')
+                for b in self.selected_object.ai.turrets:
+                    primary_weapon='None'
+                    coaxial_weapon='None'
+                    if b.ai.primary_weapon!=None:
+                        self.text_queue.append('- '+b.name)
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
+                        self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                        if b.ai.coaxial_weapon!=None:
+                            ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                            self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+
+                self.text_queue.append(' ----')
 
 
 

@@ -116,6 +116,21 @@ class AIFactionTactical(object):
             #engine.math_2d.randomize_position_and_rotation(b,170)
 
 
+        # -- tell AFV dudes to jump into AFVs so they don't just use lame transports --
+        afv_troops=[]
+        for b in humans:
+            if b.ai.is_afv_trained:
+                afv_troops.append(b)
+        for b in vehicles:
+            if b.ai.requires_afv_training:
+                crew_count=len(b.ai.vehicle_crew)
+                while len(afv_troops)>0 and crew_count>0:
+                    crew_count-=1
+                    afv_troops.pop().ai.switch_task_enter_vehicle(b,b.world_coords)
+        
+
+
+
         # update human lists and give out tactical orders right away
         self.update_human_lists()
         self.tactical_order()
