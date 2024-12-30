@@ -1199,7 +1199,7 @@ class World_Menu(object):
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
             self.text_queue.append('- weapons -')
-            for b in self.selectable_object.ai.turrets:
+            for b in self.selected_object.ai.turrets:
                 primary_weapon='None'
                 coaxial_weapon='None'
                 if b.ai.primary_weapon!=None:
@@ -1264,6 +1264,9 @@ class World_Menu(object):
                 self.text_queue.append('')
                 self.text_queue.append('--debug info --')
                 self.text_queue.append('distance from player: '+str(distance))
+                if self.selected_object.ai.vehicle_crew['driver'][0]==True:
+                    squad_dist=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.vehicle_crew['driver'][1].ai.squad.destination)
+                    self.text_queue.append('distance from driver squad destination: '+str(squad_dist))
                 self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
                 #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
                 #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
@@ -1283,7 +1286,7 @@ class World_Menu(object):
                     self.text_queue.append(text)
                 self.text_queue.append('----')
 
-                self.text_queue.append('- weapons -')
+                self.text_queue.append('- weapons debug -')
                 for b in self.selected_object.ai.turrets:
                     primary_weapon='None'
                     coaxial_weapon='None'
@@ -1296,6 +1299,10 @@ class World_Menu(object):
                             self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
 
                 self.text_queue.append(' ----')
+
+                # engine debug 
+                if len(self.selected_object.ai.engines)>0:
+                    self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
 
 
 

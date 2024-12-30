@@ -196,11 +196,24 @@ class AIFactionTactical(object):
 
         for b in self.squads:
             if len(b.members)>0:
+                leader_dist=0
+                squad_spread=0
                 if b.squad_leader!=None:
-                    d=engine.math_2d.get_distance(b.destination,b.squad_leader.world_coords)
+                    leader_dist=engine.math_2d.get_distance(b.destination,b.squad_leader.world_coords)
+
+                    # check spread
+                    for member in b.members:
+                        d=engine.math_2d.get_distance(b.squad_leader.world_coords,member.world_coords)
+                        if d>squad_spread:
+                            squad_spread=d
                     
+                if squad_spread>1000:
+                    # squads that are too spread shouldn't be considered busy because we can't get an accurate read on their position
+                    # if this isn't here then squads can get stuck waiting for a seperated leader
+                    idle_squads.append(b)
+                else:
                     # this probably could be a ai_state check instead of a pure distance meansurement
-                    if d<600:
+                    if leader_dist<600:
                         idle_squads.append(b)
                     else:
                         busy_squads.append(b)

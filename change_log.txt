@@ -9,6 +9,13 @@ Dec 30 2024
 - caught a logic error with some code dealing with a out of ammo situation 
 - fixed a bug with ammo check where it was looking at name not world_builder_identity 
 - upped mg ammo for most vehicles (likely still significantly below historical loads)
+- updated idle squad calculation to take into account spread out squads 
+- misc minor changes
+
+
+it seems idle_squad identification might have been bugged if a squad lead ends up 
+very far away from the destination but also seperated from other squad members, the members 
+could end up getting no new orders and just sitting in vehicles waiting.
 
 Some gun magazines had names that were different from their world builder identity
 which could have resulted in situations where they were never reloaded 

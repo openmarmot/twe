@@ -188,9 +188,10 @@ class GameMenu(object):
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('Pick a Quick Battle Scenario')
+            self.text_queue.append('Note - balance varies wildly with code updates.')
             self.text_queue.append('1 - Infantry only battle ')
             self.text_queue.append('2 - German mech vs Soviet moto')
-            self.text_queue.append('3 - Large mixed unit battle')
+            self.text_queue.append('3 - Large mixed unit battle (choose this)')
             self.text_queue.append('4 - Reserved for testing, content will vary') 
 
             if key in ['1','2','3','4']:
