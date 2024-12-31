@@ -41,6 +41,7 @@ class Graphics_2D_Pygame(object):
 
         self.screen_size=screen_size
         pygame.init()
+        pygame.display.set_caption("https://github.com/openmarmot/twe")
 
         # this seems to significantly improve visual quality when on 
         self.double_buffering=True

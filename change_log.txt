@@ -2,6 +2,107 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 31 2024
+- fixed a bug with coax weapon ammo check
+- increased chance of ammo rack hit, increased chance of passenger hit, 
+decreased damage for non-ammo rack passenger compartment hits 
+- bumped up closest distance that triggers an auto engage from 600 to 1000
+- bots now update destination occasionally for objects they are trying to reach if the object can move 
+
+closest distance will interrupt other tasks - this is what keeps a soldier from 
+walking past an enemy while they are trying to do something else. 
+
+testing notes 
+- i have twice seen a tank where all the crew died but the tank was still alive.
+if the tank is moving when this happens the dead crew drops out and it (very) slowly rolls to a stop 
+this is a neat mechanic 
+
+
+----------------------------------
+Dec 30 2024
+- panzerfaust launch now has a smoke trail from the launcher 
+- ai driver now cuts down to 0.5 throttle when turning 
+- fixed an issue where vehicle gun reloads may not have been triggered 
+- caught a logic error with some code dealing with a out of ammo situation 
+- fixed a bug with ammo check where it was looking at name not world_builder_identity 
+- upped mg ammo for most vehicles (likely still significantly below historical loads)
+- updated idle squad calculation to take into account spread out squads 
+- misc minor changes
+
+
+it seems idle_squad identification might have been bugged if a squad lead ends up 
+very far away from the destination but also seperated from other squad members, the members 
+could end up getting no new orders and just sitting in vehicles waiting.
+
+Some gun magazines had names that were different from their world builder identity
+which could have resulted in situations where they were never reloaded 
+
+panzerfaust smoke trail isn't exactly how I wanted it, but its good 
+enough for now. the point was to make it a little more obvious when a 
+panzerfaust is launched as they are barely visible - and are the #1 
+killer of tanks at the moment.
+
+
+----------------------------------
+Dec 29 2024
+- added a human accuracy calculation
+- guns also have mechanical accuracy now 
+- added is_towable to the soviet 37mm
+- humans can now have afv training 
+- tanks now require afv training 
+- added afv crews (can drive afv , but less combat equipment)
+- added afv crews to squad builder 
+- afv crew have some different behavior for vehicles and are less likely to leave them
+- added german afv crew black uniform 
+- fixed an error in the dialog that enables you to tell squad members to board your vehicle
+- some changes to how vehicle drivers handle being near their destination. 
+likely fixed an error where vehicle drivers do not update destinations (less relevant before 
+todays code changes)
+
+hard to say how much the human accuracy effects things at the moment. 
+will probably take more play testing to make a determination 
+
+the new afv crew mechanic will need a fair amount of debugging and tuning.
+the general idea was to reduce the amount of tanks/afvs that get driven to a location 
+and abandoned. I wanted a special dedicated vehicle crew type that will stay with the vehicle 
+
+I know the Germans were transitioning away from the black panzer uniform in >1943 as field grey was 
+better camo - but it is iconic and would otherwhise be hard to make the AFV crew stand out 
+
+I will make a soviet vehicle crew outfit as well, but im guessing they used the same uniform color 
+
+todo 
+- vehicle accuracy 
+- stabilization 
+- telling the driver to stop 
+- soviet afv crew uniform 
+- at squad spawn all AFV crew should be given a vehicle to enter if possible 
+
+----------------------------------
+Dec 28 2024
+- switched vehicle spawn positions to a grid. 
+- grid of grids for squads + squad member spawn 
+
+grid spawn for the starts is a nice little visual thing. didn't do 
+much in practical terms and may have reduced vehicle usage - some 
+might end up being too far away - will have to look into this further.
+
+----------------------------------
+Dec 27 2024
+- added the DTM - which is just a tank adapted version of the DP28 with a 60 round pan magazine
+- cleaned up the white outline around the mp40 image 
+
+Soviet vehicles have all been switched over to the DTM. 
+
+Had a really hard time finding concrete info on the DTM magazine and the gun in general 
+This video from Ian was one of the few places on the internet where it is even mentioned 
+https://www.youtube.com/watch?v=goLAR1KdqRw
+
+
+todo 
+- panzerfaust launches need a minimum distance to keep the users from roasting themselves 
+
+----------------------------------
 Dec 26 2024
 - fixed a new error with player weapon reload 
 - fixed a new error with player turret reload 

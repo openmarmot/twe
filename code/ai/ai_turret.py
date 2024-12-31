@@ -66,6 +66,26 @@ class AITurret(object):
         self.collision_log=[]
 
     #---------------------------------------------------------------------------
+    def calculate_accuracy(self,weapon):
+        temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+        far_coords=engine.math_2d.moveAlongVector(1000,self.owner.world_coords,temp_heading,1)
+
+        adjust_max=0
+        adjust_max+=weapon.ai.mechanical_accuracy
+
+        if self.vehicle.ai.current_speed>0:
+            adjust_max+=10
+        if self.vehicle.ai.current_speed>100:
+            adjust_max+=10
+
+        # apply adjustment
+        far_coords=[far_coords[0]+random.uniform(-adjust_max,adjust_max),far_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
+        # get the new angle 
+        return engine.math_2d.get_rotation(self.owner.world_coords,far_coords)
+
+
+    #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         
 
@@ -86,7 +106,7 @@ class AITurret(object):
                         #self.gunner.ai.handle_event('collision',projectile)
                 
                 # should do component damage here
-                self.health-=random.randint(1,25)
+                self.health-=random.randint(50,75)
 
             else:
                 # no penetration, but maybe we can have some other effect?
@@ -127,14 +147,16 @@ class AITurret(object):
     #---------------------------------------------------------------------------
     def handle_fire(self):
         if self.health>0:
-            self.primary_weapon.rotation_angle=self.owner.rotation_angle
-            self.primary_weapon.ai.fire()
+            if self.primary_weapon.ai.check_if_can_fire():
+                self.primary_weapon.rotation_angle=self.calculate_accuracy(self.primary_weapon)
+                self.primary_weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def handle_fire_coax(self):
         if self.health>0:
-            self.coaxial_weapon.rotation_angle=self.owner.rotation_angle
-            self.coaxial_weapon.ai.fire()
+            if self.coaxial_weapon.ai.check_if_can_fire():
+                self.coaxial_weapon.rotation_angle=self.calculate_accuracy(self.coaxial_weapon)
+                self.coaxial_weapon.ai.fire()
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):

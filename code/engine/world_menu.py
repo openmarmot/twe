@@ -402,7 +402,7 @@ class World_Menu(object):
             self.text_queue.append('4 - German Field Shovel')
             self.text_queue.append('5 - Dp28')
             self.text_queue.append('6 - ptrs-41')
-            self.text_queue.append('7 - c96')
+            self.text_queue.append('7 - mp40')
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
@@ -419,7 +419,7 @@ class World_Menu(object):
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ptrs_41',True)
             elif key=='7':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'c96',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
                 
         if self.menu_state=='spawn_squads':
             self.text_queue=[]
@@ -514,47 +514,49 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------            
     def engine_menu(self, key):
+        if 'task_vehicle_crew' in self.world.player.ai.memory:
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
 
-        vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+            # print out the basic menu
+            self.text_queue=[]
+            self.text_queue.append('-- Engine Menu --')
+            self.text_queue.append('Transmission: '+vehicle.ai.current_gear)
+            self.text_queue.append('Engine Status')
+            
+            for b in vehicle.ai.engines:
+                self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
 
-        # print out the basic menu
-        self.text_queue=[]
-        self.text_queue.append('-- Engine Menu --')
-        self.text_queue.append('Transmission: '+vehicle.ai.current_gear)
-        self.text_queue.append('Engine Status')
-        
-        for b in vehicle.ai.engines:
-            self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
+            for b in vehicle.ai.batteries:
+                self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
 
-        for b in vehicle.ai.batteries:
-            self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
+            self.text_queue.append('1 - Start Engines')
+            self.text_queue.append('2 - Stop Engines')
+            self.text_queue.append('3 - Change Gears')
 
-        self.text_queue.append('1 - Start Engines')
-        self.text_queue.append('2 - Stop Engines')
-        self.text_queue.append('3 - Change Gears')
-
-        if key=='1':
-            vehicle.ai.handle_start_engines()
-            self.engine_menu(None)
-        if key=='2':
-            vehicle.ai.handle_stop_engines()
-            self.engine_menu(None)
-        if key=='3':
-            if vehicle.ai.current_speed<5:
-                if vehicle.ai.current_gear=='drive':
-                    vehicle.ai.current_gear='neutral'
-                    self.engine_menu('')
-                    return
-                elif vehicle.ai.current_gear=='neutral':
-                    vehicle.ai.current_gear='reverse'
-                    self.engine_menu('')
-                    return
-                elif vehicle.ai.current_gear=='reverse':
-                    vehicle.ai.current_gear='drive'
-                    self.engine_menu('')
-                    return
-            else:
-                engine.log.add_data('warn','going too fast for gear change',True)
+            if key=='1':
+                vehicle.ai.handle_start_engines()
+                self.engine_menu(None)
+            if key=='2':
+                vehicle.ai.handle_stop_engines()
+                self.engine_menu(None)
+            if key=='3':
+                if vehicle.ai.current_speed<5:
+                    if vehicle.ai.current_gear=='drive':
+                        vehicle.ai.current_gear='neutral'
+                        self.engine_menu('')
+                        return
+                    elif vehicle.ai.current_gear=='neutral':
+                        vehicle.ai.current_gear='reverse'
+                        self.engine_menu('')
+                        return
+                    elif vehicle.ai.current_gear=='reverse':
+                        vehicle.ai.current_gear='drive'
+                        self.engine_menu('')
+                        return
+                else:
+                    engine.log.add_data('warn','going too fast for gear change',True)
+        else:
+            self.deactivate_menu()
 
     #---------------------------------------------------------------------------
     def exit_world_menu(self,key):
@@ -735,11 +737,15 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
+            if self.selected_object.ai.is_afv_trained:
+                self.text_queue.append('AFV Trained')
+            if self.selected_object.ai.is_expert_marksman:
+                self.text_queue.append('Marksman')
             
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
             if self.selected_object.ai.primary_weapon != None:
-                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon)
+                ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon,self.selected_object)
                 self.text_queue.append('[primary weapon]: '+self.selected_object.ai.primary_weapon.name)
                 self.text_queue.append('- ammo in gun: '+str(ammo_gun))
                 self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
@@ -1194,6 +1200,20 @@ class World_Menu(object):
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
+            self.text_queue.append('- weapons -')
+            for b in self.selected_object.ai.turrets:
+                primary_weapon='None'
+                coaxial_weapon='None'
+                if b.ai.primary_weapon!=None:
+                    self.text_queue.append('- '+b.name)
+                    ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
+                    self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                    if b.ai.coaxial_weapon!=None:
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                        self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+
+            self.text_queue.append(' ----')
+
             self.text_queue.append('- crew -')
             for k,value in self.selected_object.ai.vehicle_crew.items():
                 text=k+': '
@@ -1246,6 +1266,9 @@ class World_Menu(object):
                 self.text_queue.append('')
                 self.text_queue.append('--debug info --')
                 self.text_queue.append('distance from player: '+str(distance))
+                if self.selected_object.ai.vehicle_crew['driver'][0]==True:
+                    squad_dist=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.vehicle_crew['driver'][1].ai.squad.destination)
+                    self.text_queue.append('distance from driver squad destination: '+str(squad_dist))
                 self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
                 #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
                 #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
@@ -1254,6 +1277,34 @@ class World_Menu(object):
                 self.text_queue.append('wheel steering: '+str(self.selected_object.ai.wheel_steering))
                 self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
                 self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
+
+                self.text_queue.append('- crew debug -')
+                for k,value in self.selected_object.ai.vehicle_crew.items():
+                    text=k+': '
+                    if value[0]==True:
+                        text+=value[1].name
+                    else:
+                        text+='unoccupied'
+                    self.text_queue.append(text)
+                self.text_queue.append('----')
+
+                self.text_queue.append('- weapons debug -')
+                for b in self.selected_object.ai.turrets:
+                    primary_weapon='None'
+                    coaxial_weapon='None'
+                    if b.ai.primary_weapon!=None:
+                        self.text_queue.append('- '+b.name)
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
+                        self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                        if b.ai.coaxial_weapon!=None:
+                            ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                            self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+
+                self.text_queue.append(' ----')
+
+                # engine debug 
+                if len(self.selected_object.ai.engines)>0:
+                    self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
 
 
 

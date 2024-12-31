@@ -1,9 +1,11 @@
 # TWE 
 WW2 Eastern Front Sim
 
-TWE is short for 'To Whatever End' which was the title of a game I worked on from about 2007-2010.
-The game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation.
-Sometime in 2010 I lost all the code when I accidentally erased the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
+TWE is short for 'To Whatever End' which was also the title of a game I worked on from about 2007-2010.
+The original game was originally written in C# with the Microsoft XNA graphics framework and was going to be a open ended world war 2 eastern front simulation. Sometime in 2010 I lost all the code when I accidentally erased the NAS where it was stored. This repo is a fresh start (from scratch) at TWE using Python3 and Pygame. I've decided to switch from 3d to 2d so that I can make more progress on the interesting stuff without getting bogged down with modeling and animation.
+
+TWE is a tactical wargame based roughly on the end of WW2. Unlike most war games the player only controls a single soldier, and the AI can do everything that the player can. The damage model works exactly the same for the player as it does for the AI, and the player has no advantages 
+other than their brain.
 
 I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress. 
 
@@ -25,6 +27,20 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - check cupboards for the elusive pickle jar item. eat pickles!
 - check out the (very early) campaign mode
 
+### Current List of Vehicles Simulated
+- German Kubelwagen
+- German Raupenschlepper OST (RSO) tractor
+- German Panzer IV Ausf G
+- German Panzer IV Ausf H
+- German Panzer IV Ausf J
+- German Jagdpanzer 38t "Hetzer"
+- German Ju88 bomber
+- German FA223 Drache helicopter
+- Soviet T20 "Komsomolets" armored tractor
+- American/Soviet Lend-Lease truck
+- Soviet T34-76 (late)
+- Soviet T34-85
+- Soviet 37mm AA gun
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
   
@@ -57,4 +73,5 @@ See gameplay_instructions.txt for a full list
 but when I have copied code I will try to include references from where I got it
 
 
-![screenshot](/screenshots/twe-oct-16-2024.png "TWE screenshot")
+![screenshot](/screenshots/twe-dec-30-2024.png "TWE screenshot")
+In this screenshot a Sd.kfz.251 loaded with troops drives past a knocked out T34-85. 

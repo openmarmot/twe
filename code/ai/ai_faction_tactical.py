@@ -92,21 +92,43 @@ class AIFactionTactical(object):
                 # civilians start all over, so just making sure they are idle right away
                 b.destination=copy.copy(b.members[0].world_coords)
         else:
+            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,150,len(self.squads))
+
             for b in self.squads:
 
                 # initially set the squad destination to be th espawn location
-                b.destination=engine.math_2d.randomize_coordinates(self.spawn_location,200)
-                # set the detination for the members as well
+                b.destination=squad_grid.pop()
+
+                # set the member positions
+                member_grid=engine.math_2d.get_grid_coords(b.destination,20,len(b.members))
                 for c in b.members:
-                    c.world_coords=copy.copy(self.spawn_location)
+                    c.world_coords=member_grid.pop()
                     # randomize position a bit
-                    engine.math_2d.randomize_position_and_rotation(c,170)
+                    #engine.math_2d.randomize_position_and_rotation(c,170)
 
         # position the vehicles. in the future they may be added to squads
+        grid_coords=engine.math_2d.get_grid_coords(self.spawn_location,250,len(vehicles))
+
         for b in vehicles:
-            b.world_coords=copy.copy(self.spawn_location)
+            b.world_coords=grid_coords.pop()
+            #b.world_coords=copy.copy(self.spawn_location)
             # randomize position a bit
-            engine.math_2d.randomize_position_and_rotation(b,170)
+            #engine.math_2d.randomize_position_and_rotation(b,170)
+
+
+        # -- tell AFV dudes to jump into AFVs so they don't just use lame transports --
+        afv_troops=[]
+        for b in humans:
+            if b.ai.is_afv_trained:
+                afv_troops.append(b)
+        for b in vehicles:
+            if b.ai.requires_afv_training:
+                crew_count=len(b.ai.vehicle_crew)
+                while len(afv_troops)>0 and crew_count>0:
+                    crew_count-=1
+                    afv_troops.pop().ai.switch_task_enter_vehicle(b,b.world_coords)
+        
+
 
 
         # update human lists and give out tactical orders right away
@@ -174,11 +196,24 @@ class AIFactionTactical(object):
 
         for b in self.squads:
             if len(b.members)>0:
+                leader_dist=0
+                squad_spread=0
                 if b.squad_leader!=None:
-                    d=engine.math_2d.get_distance(b.destination,b.squad_leader.world_coords)
+                    leader_dist=engine.math_2d.get_distance(b.destination,b.squad_leader.world_coords)
+
+                    # check spread
+                    for member in b.members:
+                        d=engine.math_2d.get_distance(b.squad_leader.world_coords,member.world_coords)
+                        if d>squad_spread:
+                            squad_spread=d
                     
+                if squad_spread>1000:
+                    # squads that are too spread shouldn't be considered busy because we can't get an accurate read on their position
+                    # if this isn't here then squads can get stuck waiting for a seperated leader
+                    idle_squads.append(b)
+                else:
                     # this probably could be a ai_state check instead of a pure distance meansurement
-                    if d<600:
+                    if leader_dist<600:
                         idle_squads.append(b)
                     else:
                         busy_squads.append(b)

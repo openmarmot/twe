@@ -32,10 +32,13 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
     pistols=[]
     antitank=[]
     unarmed_human=[]
+    afv_crew=[]
 
     # categorize 
     for b in humans:
-        if b.ai.primary_weapon==None:
+        if b.ai.is_afv_trained:
+            afv_crew.append(b)
+        elif b.ai.primary_weapon==None:
             # should probably double check
             unarmed_human.append(b)
         elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_rifles:
@@ -58,7 +61,7 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
     buildsquads=True 
 
     while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human)<1:
+        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human+afv_crew)<1:
             buildsquads=False
         else :
             s=AISquad(world)
@@ -94,6 +97,13 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
                 s.members.append(assault_rifles.pop())
                 s.members.append(assault_rifles.pop())
                 s.members.append(assault_rifles.pop())
+            # -- afv squad --
+            elif len(afv_crew)>3:
+                s.members.append(afv_crew.pop())
+                s.members.append(afv_crew.pop())
+                s.members.append(afv_crew.pop())
+                s.members.append(afv_crew.pop())
+
             # -- erstaz groups --
             else :
                 if len(rifles)>0:
