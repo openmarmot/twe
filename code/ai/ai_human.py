@@ -349,7 +349,7 @@ class AIHuman(object):
         self.mid_targets=[]
         self.far_targets=[]
 
-        closest_distance=600
+        closest_distance=1000
         closest_object=None
 
         # note we are using this list directly, this is ok because we aren't removing from it
@@ -447,7 +447,7 @@ class AIHuman(object):
                         destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
                     if self.prone==False:
                         self.prone_state_change()
-                    self.switch_task_move_to_location(destination)
+                    self.switch_task_move_to_location(destination,None)
 
 
         elif event_data.is_grenade:
@@ -464,7 +464,7 @@ class AIHuman(object):
                     if self.prone==True:
                         self.prone_state_change()
                     destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
-                    self.switch_task_move_to_location(destination)
+                    self.switch_task_move_to_location(destination,None)
 
         elif event_data.is_throwable:
             #throwable but not a grenade 
@@ -536,7 +536,7 @@ class AIHuman(object):
         if self.owner.is_player==False:
             # move slightly
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-                self.switch_task_move_to_location(coords)
+                self.switch_task_move_to_location(coords,None)
 
 
 
@@ -1021,12 +1021,14 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_move_to_location(self,destination):
+    def switch_task_move_to_location(self,destination,moving_object):
         '''switch task'''
+        # moving_object : optional game_object. set when we are moving to something that may move position
         # destination : this is a world_coords
         task_name='task_move_to_location'
         task_details = {
             'destination': copy.copy(destination),
+            'moving_object': moving_object,
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1312,7 +1314,7 @@ class AIHuman(object):
 
         # check coax ammo
         if turret.ai.coaxial_weapon!=None:
-            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
             if ammo_gun==0 and ammo_inventory>0:
                 # this should be re-done to check for ammo in vehicle, and do something if there is none
                 self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
@@ -1693,7 +1695,7 @@ class AIHuman(object):
                             self.switch_task_think()
                         else:
                             # note this should be rewritten to move just a bit towards the enemy, not the whole way
-                            self.switch_task_move_to_location(enemy.world_coords)
+                            self.switch_task_move_to_location(enemy.world_coords,None)
                     else:
                         self.switch_task_engage_enemy(new_enemy)
                     
@@ -1732,7 +1734,7 @@ class AIHuman(object):
                 
                 # double check its walkable
                 if distance_to_destination<self.max_walk_distance:
-                    self.switch_task_move_to_location(destination)
+                    self.switch_task_move_to_location(destination,None)
                 else:
                     # this is probably a loop at this point, lets just cancel the original task
                     self.memory.pop('task_move_to_location',None)
@@ -1778,7 +1780,7 @@ class AIHuman(object):
                 else:
                     # -- too far away to enter, what do we do --
                     if distance<self.max_walk_distance:
-                        self.switch_task_move_to_location(vehicle.world_coords)
+                        self.switch_task_move_to_location(vehicle.world_coords,vehicle)
                     else:
                         # vehicle is way too far away, just cancel task
                         self.memory.pop('task_enter_vehicle',None)
@@ -1833,7 +1835,7 @@ class AIHuman(object):
             if self.owner.is_player==False:
             # move slightly
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-                self.switch_task_move_to_location(coords)
+                self.switch_task_move_to_location(coords,None)
             else:
                 pass
 
@@ -1935,7 +1937,7 @@ class AIHuman(object):
                 self.switch_task_think()
             else:
                 # the distance is intermediate. we still want to pick the item up
-                self.switch_task_move_to_location(container.world_coords)
+                self.switch_task_move_to_location(container.world_coords,None)
 
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
@@ -1943,15 +1945,20 @@ class AIHuman(object):
         
         last_think_time=self.memory['task_move_to_location']['last_think_time']
         think_interval=self.memory['task_move_to_location']['think_interval']
-        destination=self.memory['task_move_to_location']['destination']
-
         
         if self.owner.world.world_seconds-last_think_time>think_interval:
             # reset time
             self.memory['task_move_to_location']['last_think_time']=self.owner.world.world_seconds
 
+            # if there is a moving object, reset the destination to match in case it moved
+            if self.memory['task_move_to_location']['moving_object']!=None:
+                self.memory['task_move_to_location']['destination']=copy.copy(self.memory['task_move_to_location']['moving_object'].world_coords)
+                # reset bot facing angle 
+                self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_move_to_location']['destination'])
+                self.owner.reset_image=True
+
             # -- think about walking --
-            distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_move_to_location']['destination'])
 
             if distance>200 and self.prone:
                 self.prone_state_change()
@@ -1964,7 +1971,7 @@ class AIHuman(object):
                     # get_closest_vehicle only returns vehicles that aren't full
                     # won't return planes if not a pilot
                     # won't return AFVs if not AFV trained
-                    self.switch_task_enter_vehicle(b,destination)
+                    self.switch_task_enter_vehicle(b,self.memory['task_move_to_location']['destination'])
 
 
                 else:
@@ -1976,10 +1983,12 @@ class AIHuman(object):
                 self.switch_task_think()
         
         else:
+
             # -- walk --
             # move
             self.owner.world_coords=engine.math_2d.moveTowardsTarget(self.get_calculated_speed(),
-                self.owner.world_coords,destination,self.owner.world.time_passed_seconds)
+                self.owner.world_coords,self.memory['task_move_to_location']['destination'],
+                self.owner.world.time_passed_seconds)
             # add some fatigue
             self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
 
@@ -2015,7 +2024,7 @@ class AIHuman(object):
 
         # go towards the closest one
         if nearest_object!=None:
-            self.switch_task_move_to_location(nearest_object.world_coords)
+            self.switch_task_move_to_location(nearest_object.world_coords,None)
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
@@ -2039,7 +2048,7 @@ class AIHuman(object):
             
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
             if distance>150:
-                self.switch_task_move_to_location(self.squad.destination)
+                self.switch_task_move_to_location(self.squad.destination,None)
                 action=True
 
             # check on squad members?
@@ -2057,7 +2066,7 @@ class AIHuman(object):
             decision=random.randint(1,100)
             if decision==1:
                 coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
-                self.switch_task_move_to_location(coords)
+                self.switch_task_move_to_location(coords,None)
 
     #---------------------------------------------------------------------------
     def update_task_think(self):
@@ -2140,7 +2149,7 @@ class AIHuman(object):
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
                 # are we close enough to squad?
                 if distance>self.squad_max_distance:
-                    self.switch_task_move_to_location(self.squad.squad_leader.world_coords)
+                    self.switch_task_move_to_location(self.squad.squad_leader.world_coords,None)
                     action=True
 
         # -- ok now we've really run out of things to do. do things that don't matter
@@ -2150,7 +2159,7 @@ class AIHuman(object):
             if decision==1:
                 # go for a walk
                 coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
-                self.switch_task_move_to_location(coords)
+                self.switch_task_move_to_location(coords,None)
             elif decision==2:
                 # check containers
                 containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)

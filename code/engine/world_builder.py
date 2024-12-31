@@ -531,7 +531,7 @@ def load_quick_battle(world,battle_option):
     elif battle_option=='3':
         squads=[]
         squads+=['German 1944 Rifle'] * 4
-        squads+=['German 1944 Panzergrenadier Mech'] * 4
+        squads+=['German 1944 Panzergrenadier Mech'] * 6
         squads+=['German 1944 Fallschirmjager'] * 3
         squads+=['German 1944 Volksgrenadier Storm Group'] * 1
         squads+=['German 1944 Volksgrenadier Fire Group'] * 2
@@ -546,10 +546,10 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
-        squads+=['Soviet T20 Armored Tractor'] * 3
+        squads+=['Soviet T20 Armored Tractor'] * 6
         squads+=['Soviet PTRS-41 AT Squad']
-        squads+=['Soviet T34-76 Model 1943'] * 6
-        squads+=['Soviet T34-85'] * 2
+        squads+=['Soviet T34-76 Model 1943'] * 8
+        squads+=['Soviet T34-85'] * 4
 
     # testing
     elif battle_option=='4':

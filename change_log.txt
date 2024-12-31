@@ -2,6 +2,23 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 31 2024
+- fixed a bug with coax weapon ammo check
+- increased chance of ammo rack hit, increased chance of passenger hit, 
+decreased damage for non-ammo rack passenger compartment hits 
+- bumped up closest distance that triggers an auto engage from 600 to 1000
+- bots now update destination occasionally for objects they are trying to reach if the object can move 
+
+closest distance will interrupt other tasks - this is what keeps a soldier from 
+walking past an enemy while they are trying to do something else. 
+
+testing notes 
+- i have twice seen a tank where all the crew died but the tank was still alive.
+if the tank is moving when this happens the dead crew drops out and it (very) slowly rolls to a stop 
+this is a neat mechanic 
+
+
+----------------------------------
 Dec 30 2024
 - panzerfaust launch now has a smoke trail from the launcher 
 - ai driver now cuts down to 0.5 throttle when turning 

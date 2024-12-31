@@ -238,12 +238,12 @@ class AIVehicle(object):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
-            self.health-=random.randint(1,3)
+            self.health-=random.randint(0,2)
             for key,value in self.vehicle_crew.items():
                 if value[0]==True:
                     # we want to exclude driver/radio/gunner as those are different compartments
                     if 'passenger' in key:
-                        if random.randint(0,3)==3:
+                        if random.randint(0,2)==2:
                             value[1].ai.handle_event('collision',projectile)
 
 
@@ -252,7 +252,7 @@ class AIVehicle(object):
                 self.handle_vehicle_body_projectile_hit(projectile)
 
             if self.passenger_compartment_ammo_racks:
-                if random.randint(0,3)==3:
+                if random.randint(0,2)==2:
                     # ammo rack explosion
                     self.health-=random.randint(50,75)
         else:

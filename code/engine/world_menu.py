@@ -514,47 +514,49 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------            
     def engine_menu(self, key):
+        if 'task_vehicle_crew' in self.world.player.ai.memory:
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
 
-        vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+            # print out the basic menu
+            self.text_queue=[]
+            self.text_queue.append('-- Engine Menu --')
+            self.text_queue.append('Transmission: '+vehicle.ai.current_gear)
+            self.text_queue.append('Engine Status')
+            
+            for b in vehicle.ai.engines:
+                self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
 
-        # print out the basic menu
-        self.text_queue=[]
-        self.text_queue.append('-- Engine Menu --')
-        self.text_queue.append('Transmission: '+vehicle.ai.current_gear)
-        self.text_queue.append('Engine Status')
-        
-        for b in vehicle.ai.engines:
-            self.text_queue.append(f"{b.name} {'[on]' if b.ai.engine_on else '[off]'}")
+            for b in vehicle.ai.batteries:
+                self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
 
-        for b in vehicle.ai.batteries:
-            self.text_queue.append(f"{b.name} charge {round(b.ai.state_of_charge)}/{b.ai.max_capacity}")
+            self.text_queue.append('1 - Start Engines')
+            self.text_queue.append('2 - Stop Engines')
+            self.text_queue.append('3 - Change Gears')
 
-        self.text_queue.append('1 - Start Engines')
-        self.text_queue.append('2 - Stop Engines')
-        self.text_queue.append('3 - Change Gears')
-
-        if key=='1':
-            vehicle.ai.handle_start_engines()
-            self.engine_menu(None)
-        if key=='2':
-            vehicle.ai.handle_stop_engines()
-            self.engine_menu(None)
-        if key=='3':
-            if vehicle.ai.current_speed<5:
-                if vehicle.ai.current_gear=='drive':
-                    vehicle.ai.current_gear='neutral'
-                    self.engine_menu('')
-                    return
-                elif vehicle.ai.current_gear=='neutral':
-                    vehicle.ai.current_gear='reverse'
-                    self.engine_menu('')
-                    return
-                elif vehicle.ai.current_gear=='reverse':
-                    vehicle.ai.current_gear='drive'
-                    self.engine_menu('')
-                    return
-            else:
-                engine.log.add_data('warn','going too fast for gear change',True)
+            if key=='1':
+                vehicle.ai.handle_start_engines()
+                self.engine_menu(None)
+            if key=='2':
+                vehicle.ai.handle_stop_engines()
+                self.engine_menu(None)
+            if key=='3':
+                if vehicle.ai.current_speed<5:
+                    if vehicle.ai.current_gear=='drive':
+                        vehicle.ai.current_gear='neutral'
+                        self.engine_menu('')
+                        return
+                    elif vehicle.ai.current_gear=='neutral':
+                        vehicle.ai.current_gear='reverse'
+                        self.engine_menu('')
+                        return
+                    elif vehicle.ai.current_gear=='reverse':
+                        vehicle.ai.current_gear='drive'
+                        self.engine_menu('')
+                        return
+                else:
+                    engine.log.add_data('warn','going too fast for gear change',True)
+        else:
+            self.deactivate_menu()
 
     #---------------------------------------------------------------------------
     def exit_world_menu(self,key):
