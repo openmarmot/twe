@@ -63,8 +63,6 @@ class AITurret(object):
         self.primary_weapon=None
         self.coaxial_weapon=None
 
-        self.collision_log=[]
-
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
@@ -95,23 +93,24 @@ class AITurret(object):
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
-
+            if self.vehicle!=None:
+                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret')
             if penetration:
-                self.collision_log.append('[penetration] Turret hit by '+projectile.ai.projectile_type + 
-                    ' on the '+side+' at a distance of '+ str(distance))
-                # remote operated turrets mean that the gunner can't be hit by turret penetrations 
-                if self.remote_operated==False:
-                    if random.randint(0,2)==2:
-                        print('!! turret gunner hit. needs to be implemented')
-                        #self.gunner.ai.handle_event('collision',projectile)
+                if self.vehicle!=None:
+                    # remote operated turrets mean that the gunner can't be hit by turret penetrations 
+                    if self.remote_operated==False:
+                        if random.randint(0,1)==1:
+                            for key,value in self.vehicle.ai.vehicle_crew.items():
+                                if value[5]==self.owner:
+                                    if value[0]==True:
+                                        value[1].ai.handle_event('collision',projectile)
                 
                 # should do component damage here
                 self.health-=random.randint(50,75)
 
             else:
-                # no penetration, but maybe we can have some other effect?
-                self.collision_log.append('[bounce] Turret hit by '+projectile.ai.projectile_type + 
-                     ' on the '+side+' at a distance of '+ str(distance))
+                # bounced the projectile
+                pass
 
         elif EVENT_DATA.is_grenade:
             print('bonk')

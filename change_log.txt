@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 1 2025
+- added back in gunner hits from turret penetration. 50% chance 
+
+interesting note - the sd.kfz.251 turret is not armored from the back. the gunner can 
+be shot out pretty easily 
 
 ----------------------------------
 Dec 31 2024
@@ -16,7 +22,6 @@ testing notes
 - i have twice seen a tank where all the crew died but the tank was still alive.
 if the tank is moving when this happens the dead crew drops out and it (very) slowly rolls to a stop 
 this is a neat mechanic 
-
 
 ----------------------------------
 Dec 30 2024
