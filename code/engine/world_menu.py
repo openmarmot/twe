@@ -1219,6 +1219,7 @@ class World_Menu(object):
                 text=k+': '
                 if value[0]==True:
                     text+=value[1].name
+                    text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
                 else:
                     text+='unoccupied'
                 self.text_queue.append(text)
@@ -1283,6 +1284,7 @@ class World_Menu(object):
                     text=k+': '
                     if value[0]==True:
                         text+=value[1].name
+                        text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
                     else:
                         text+='unoccupied'
                     self.text_queue.append(text)

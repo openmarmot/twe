@@ -1198,6 +1198,7 @@ class AIHuman(object):
         task_details = {
             'vehicle': vehicle,
             'role': role,
+            'current_action': 'none', # used to describe inform the rest of the crew what this crew member is doing
             'turret': turret,
             'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
@@ -1214,6 +1215,15 @@ class AIHuman(object):
     def think_vehicle_role_driver(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         destination=self.memory['task_vehicle_crew']['destination']
+
+        # check if the gunners are engaging anyone. we want to be stopped for this
+        gunners_engaging=False
+        for key,value in vehicle.ai.vehicle_crew.items():
+            if 'gunner' in key:
+                if value[0]==True:
+                    if value[1].ai.memory['task_vehicle_crew']['current_action']=='Engaging Targets':
+                        gunners_engaging=True
+                        break
 
         # check if anyone is trying to get in 
         new_passengers=0
@@ -1237,12 +1247,22 @@ class AIHuman(object):
             else:
                 # we have a new destination
                 self.memory['task_vehicle_crew']['destination']=engine.math_2d.randomize_coordinates(self.squad.destination,50)
+                self.memory['task_vehicle_crew']['current_action']='Driving to new squad destination'
+
         elif new_passengers>0:
             # wait for new passengers
             vehicle.ai.brake_power=1
             vehicle.ai.throttle=0
+            self.memory['task_vehicle_crew']['current_action']='Waiting for passengers'
+        elif gunners_engaging:
+            # the gunner is trying to fire. stop the vehicle so they can get a good shot
+            self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
+            vehicle.ai.brake_power=1
+            vehicle.ai.throttle=0
 
         else:
+            
+            self.memory['task_vehicle_crew']['current_action']='Driving to destination'
 
             # turn engines on
             # could do smarter checks here once engines have more stats
@@ -1336,13 +1356,20 @@ class AIHuman(object):
                 # lots of things we could do here.
                 # we could have the driver rotate
                 # for now just get rid of the target
-                self.memory['task_vehicle_crew']['target']==None
+                self.memory['task_vehicle_crew']['target']=None
             else:
                 # check distance
                 distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
                 if distance>turret.ai.primary_weapon.ai.range:
                     # alternatively we could drive closer.
-                    self.memory['task_vehicle_crew']['target']==None
+                    self.memory['task_vehicle_crew']['target']=None
+
+
+        if self.memory['task_vehicle_crew']['target']!=None:
+            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+        else:
+            # no target 
+            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
 
         # if we get this far then we just fire at it
@@ -1375,9 +1402,13 @@ class AIHuman(object):
         radio=vehicle.ai.radio
         if radio==None:
             # radio dissapeared. get a different vehicle task
-            self.switch_task_vehicle_crew(vehicle,self.memory['task_vehicle_crew']['destination'])
+            #self.switch_task_vehicle_crew(vehicle,self.memory['task_vehicle_crew']['destination'])
+
+            # as of Dec 2024 there can be a radio spot with no radio 
+            self.memory['task_vehicle_crew']['current_action']='Hmm did someone steal the radio?'
             
         else:
+            self.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
             if radio.ai.power_on==False:
                 radio.ai.current_frequency=self.squad.faction_tactical.radio_frequency
                 radio.ai.turn_power_on()

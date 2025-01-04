@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 4 2025
+- added 'current_action' to vehicle crew memory as a way of passing info about what the bot is doing 
+- driver will now stop the vehicle if the gunners are engaging something 
+- fixed bug in code for removing vehicle targets that are out of range or are out of the rotation arc 
+
+
+----------------------------------
 Jan 1 2025
 - added back in gunner hits from turret penetration. 50% chance 
 
