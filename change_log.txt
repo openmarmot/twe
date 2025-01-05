@@ -5,7 +5,13 @@ Jan 4 2025
 - added 'current_action' to vehicle crew memory as a way of passing info about what the bot is doing 
 - driver will now stop the vehicle if the gunners are engaging something 
 - fixed bug in code for removing vehicle targets that are out of range or are out of the rotation arc 
+- workingn through some of the pylint suggestions for ai_human 
 
+I should run pylint more often. I think it would have theoretically caught some of my logic errors with using == instead of =
+
+todo 
+- strongly consider removing the event system and just calling the sub functions directly 
+- lots of playtesting needed 
 
 ----------------------------------
 Jan 1 2025

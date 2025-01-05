@@ -66,7 +66,7 @@ class AIHuman(object):
         self.speed = 0
 
         # -- distance tuning --
-        # max distance that is walkable before deciding a vehicle is better 
+        # max distance that is walkable before deciding a vehicle is better
         self.max_walk_distance=2000
         self.max_distance_to_interact_with_object=8
 
@@ -106,11 +106,11 @@ class AIHuman(object):
         self.last_building_check_time=0
         self.building_check_rate=1
 
-        # the ai group that this human is a part of 
+        # the ai group that this human is a part of
         self.squad=None
         self.squad_max_distance=300
 
-        # # target lists. these are refreshed periodically 
+        # # target lists. these are refreshed periodically
         self.near_targets=[]
         self.mid_targets=[]
         self.far_targets=[]
@@ -139,7 +139,7 @@ class AIHuman(object):
                     turret.ai.handle_rotate_right()
             else:
                 if target.is_human:
-                    if turret.ai.coaxial_weapon!=None:
+                    if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
                         # maybe fire HE 
@@ -160,7 +160,7 @@ class AIHuman(object):
         self.in_building=False
         # check to see if we are colliding with any of the buildings
         for b in self.owner.world.wo_objects_building:
-            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) !=None:
+            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) is not None:
                 self.building_list.append(b)
                 self.in_building=True
 
@@ -272,7 +272,7 @@ class AIHuman(object):
         # check_inventory - bool. if true also check inventory
         # return [ammo in gun, ammo in inventory]
         ammo_gun=0
-        if gun.ai.magazine!=None:
+        if gun.ai.magazine is not None:
             ammo_gun=len(gun.ai.magazine.ai.projectiles)
 
         ammo_inventory=0
@@ -326,7 +326,7 @@ class AIHuman(object):
             OBJECT_TO_DROP.world_coords=copy.copy(self.owner.world_coords)
             
             # grenades get 'dropped' when they are thrown and are special
-            if OBJECT_TO_DROP.is_grenade==False:
+            if OBJECT_TO_DROP.is_grenade is False:
                 engine.math_2d.randomize_position_and_rotation(OBJECT_TO_DROP)
             self.owner.world.add_queue.append(OBJECT_TO_DROP)  
         
@@ -377,11 +377,11 @@ class AIHuman(object):
                     closest_distance=d
                     closest_object=target
 
-        if closest_object!=None:
+        if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
                 if self.memory['task_vehicle_crew']['role']=='gunner':
-                    if self.memory['task_vehicle_crew']['target']==None:
+                    if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
                     else:
                         # should probably compare the current target to closest 
@@ -392,7 +392,7 @@ class AIHuman(object):
 
                 # don't want to over ride exiting a vehicle 
                 if self.memory['current_task']!='task_exit_vehicle':
-                    if self.primary_weapon!=None:
+                    if self.primary_weapon is not None:
                         if self.check_ammo_bool(self.primary_weapon,self.owner):
                             self.switch_task_engage_enemy(closest_object)
                     else:
@@ -408,9 +408,9 @@ class AIHuman(object):
             self.calculate_projectile_damage(event_data)
 
             # data collection
-            if event_data.ai.shooter !=None:
+            if event_data.ai.shooter is not None:
                 collision_description+=(' from '+event_data.ai.shooter.name)
-                if event_data.ai.shooter.ai.primary_weapon!=None:
+                if event_data.ai.shooter.ai.primary_weapon is not None:
                     collision_description+=("'s "+event_data.ai.weapon_name)
                 self.collision_log.append(collision_description)   
 
@@ -437,7 +437,7 @@ class AIHuman(object):
             else:
                 # - we are on foot -
 
-                if self.owner.is_player==False:
+                if self.owner.is_player is False:
                     destination=[0,0]
                     if self.squad.faction_tactical.faction=='civilian':
                         # civilian runs further
@@ -445,7 +445,7 @@ class AIHuman(object):
                     else:
                         # soldier just repositions to get away from the fire
                         destination=[self.owner.world_coords[0]+float(random.randint(-30,30)),self.owner.world_coords[1]+float(random.randint(-30,30))]
-                    if self.prone==False:
+                    if self.prone is False:
                         self.prone_state_change()
                     self.switch_task_move_to_location(destination,None)
 
@@ -461,7 +461,7 @@ class AIHuman(object):
                     engine.log.add_data('warn','hit by a grenade while in a vehicle',True)
                 else:
                     # - we are on foot - 
-                    if self.prone==True:
+                    if self.prone is True:
                         self.prone_state_change()
                     destination=[self.owner.world_coords[0]+float(random.randint(-60,60)),self.owner.world_coords[1]+float(random.randint(-60,60))]
                     self.switch_task_move_to_location(destination,None)
@@ -493,7 +493,7 @@ class AIHuman(object):
                 self.inventory.append(event_data)
 
                 if event_data.is_gun :
-                    if self.primary_weapon!=None:
+                    if self.primary_weapon is not None:
                         # drop the current obj and pick up the new one
                         self.drop_object(self.primary_weapon)
                     if self.owner.is_player :
@@ -501,13 +501,13 @@ class AIHuman(object):
                     self.primary_weapon=event_data
                     event_data.ai.equipper=self.owner
                 elif event_data.is_throwable :
-                    if self.throwable==None:
+                    if self.throwable is None:
                         if self.owner.is_player :
                             self.owner.world.text_queue.insert(0,'[ '+event_data.name + ' equipped ]')
                         self.throwable=event_data
                         event_data.ai.equipper=self.owner
                 elif event_data.is_handheld_antitank :
-                    if self.antitank!=None:
+                    if self.antitank is not None:
                         # drop the current obj and pick up the new one
                         self.drop_object(self.antitank)
                     if self.owner.is_player :
@@ -517,7 +517,7 @@ class AIHuman(object):
 
                 elif event_data.is_wearable:
                     if event_data.ai.wearable_region=='head':
-                        if self.wearable_head==None:
+                        if self.wearable_head is None:
                             self.wearable_head=event_data
         else:
             engine.log.add_data('error','ai_human.event_add_inventory - obj already in inventory: '+event_data.name,True)
@@ -533,7 +533,7 @@ class AIHuman(object):
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
         # short move to simulate being stunned
-        if self.owner.is_player==False:
+        if self.owner.is_player is False:
             # move slightly
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
                 self.switch_task_move_to_location(coords,None)
@@ -673,7 +673,7 @@ class AIHuman(object):
         return calc_speed
     
     #---------------------------------------------------------------------------
-    def get_target(self,range):
+    def get_target(self,max_range):
         '''returns a target or None if there are None'''
         target=None
         if len(self.near_targets)>0:
@@ -683,12 +683,12 @@ class AIHuman(object):
         elif len(self.far_targets)>0:
             target=self.far_targets.pop()
 
-        if target!=None:
+        if target is not None:
             if target.ai.health<1:
                 target=None
             else:
                 distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-                if distance>range:
+                if distance>max_range:
                     # alternatively we could drive closer.
                     target=None
                 
@@ -703,7 +703,7 @@ class AIHuman(object):
         # determine if the whole squad is afv trained
         squad_afv_training=True
         for b in near_squad:
-            if b.ai.is_afv_trained==False:
+            if b.ai.is_afv_trained is False:
                 squad_afv_training=False
                 break
 
@@ -715,7 +715,7 @@ class AIHuman(object):
         for b in near_vehicle:
 
             # skip AFVs if the whole squad isn't trained
-            if b.ai.requires_afv_training and squad_afv_training==False:
+            if b.ai.requires_afv_training and squad_afv_training is False:
                 pass
             else:
 
@@ -726,7 +726,7 @@ class AIHuman(object):
 
                 # count the occupants already in the vehicle
                 for c in b.ai.vehicle_crew.values():
-                    if c[0]==True:
+                    if c[0] is True:
                         occupants+=1
 
                 for c in self.owner.world.wo_objects_human:
@@ -754,26 +754,26 @@ class AIHuman(object):
                         break
     
     #---------------------------------------------------------------------------
-    def handle_event(self, EVENT, EVENT_DATA):
+    def handle_event(self, event, event_data):
         ''' overrides base handle_event'''
         # this is supposed to be the main interface that the outside world uses to interact with the ai
         # EVENT - text describing event
         # EVENT_DATA - most likely a world_object but could be anything
 
         # not sure what to do here yet. will have to think of some standard events
-        if EVENT=='add_inventory':
-            self.event_add_inventory(EVENT_DATA)
-        elif EVENT=='collision':
-            self.event_collision(EVENT_DATA)
-        elif EVENT=='remove_inventory':
-            self.event_remove_inventory(EVENT_DATA)
-        elif EVENT=='speak':
-            self.event_speak(EVENT_DATA)
-        elif EVENT=='explosion':
-            self.event_explosion(EVENT_DATA)
+        if event=='add_inventory':
+            self.event_add_inventory(event_data)
+        elif event=='collision':
+            self.event_collision(event_data)
+        elif event=='remove_inventory':
+            self.event_remove_inventory(event_data)
+        elif event=='speak':
+            self.event_speak(event_data)
+        elif event=='explosion':
+            self.event_explosion(event_data)
 
         else:
-            engine.log.add_data('error','ai_human.handle_event cannot handle event'+EVENT,True)
+            engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords,mouse_screen_coords=None):
@@ -783,7 +783,7 @@ class AIHuman(object):
         if self.prone:
             self.prone_state_change()
 
-        if self.antitank!=None:
+        if self.antitank is not None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
                 adjusted_coords=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
@@ -812,12 +812,12 @@ class AIHuman(object):
                     in_use=True
 
             if in_use:
-                engine.log.add_data('warn','Error large pick up is already picked up: '+b.name,True)
+                engine.log.add_data('warn','Error large pick up is already picked up',True)
             else:
                 self.large_pickup=world_object
         else:
             if world_object.is_gun:
-                if self.owner.is_player==False:
+                if self.owner.is_player is False:
                     near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
                     if len(near_magazines)>0:
                         self.switch_task_pickup_objects(near_magazines)
@@ -848,7 +848,7 @@ class AIHuman(object):
                         vehicle.ai.brake_power=1
 
                     elif key=='radio_operator':
-                        if vehicle.ai.radio!=None:
+                        if vehicle.ai.radio is not None:
                             if vehicle.ai.radio.ai.radio_operator==self.owner:
                                 vehicle.ai.radio.ai.radio_operator=None
                     elif 'passenger' in key:
@@ -861,7 +861,7 @@ class AIHuman(object):
                 self.owner.render=vehicle.ai.vehicle_crew[role][4]
 
                 # occupied?
-                if vehicle.ai.vehicle_crew[role][0]==True:
+                if vehicle.ai.vehicle_crew[role][0] is True:
                     # have the current crew member exit and re-enter
                     crew=vehicle.ai.vehicle_crew[role][1]
                     crew.ai.switch_task_exit_vehicle(vehicle)
@@ -907,7 +907,7 @@ class AIHuman(object):
         if weapon.is_gun:
             # first get the current magazine
             old_magazine=None
-            if weapon.ai.magazine!=None:
+            if weapon.ai.magazine is not None:
                 if weapon.ai.magazine.ai.removable:
                     old_magazine=weapon.ai.magazine
 
@@ -922,11 +922,11 @@ class AIHuman(object):
                             biggest=len(b.ai.projectiles)
 
             # remove old magazine ONLY if we have a new magazine
-            if old_magazine!=None and new_magazine!=None:
+            if old_magazine is not None and new_magazine is not None:
                 obj_with_inventory.ai.event_add_inventory(old_magazine)
                 weapon.ai.magazine=None
             # add a new magazine (either the old magazine was removed, or was never there)
-            if new_magazine!=None:
+            if new_magazine is not None:
                 obj_with_inventory.ai.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
             else:
@@ -977,7 +977,7 @@ class AIHuman(object):
 
         if self.squad.squad_leader==self.owner:
             # for now the afv stuff just confuses stuff. we don't want them joining up as passengers
-            if self.is_afv_trained==False:
+            if self.is_afv_trained is False:
                 self.give_squad_transportation_orders(destination)
 
     #---------------------------------------------------------------------------
@@ -1126,7 +1126,7 @@ class AIHuman(object):
                     vehicle.ai.brake_power=1
 
                 elif key=='radio_operator':
-                    if vehicle.ai.radio!=None:
+                    if vehicle.ai.radio is not None:
                         if vehicle.ai.radio.ai.radio_operator==self.owner:
                             vehicle.ai.radio.ai.radio_operator=None
                 elif 'passenger' in key:
@@ -1135,19 +1135,19 @@ class AIHuman(object):
         role=None
         turret=None
         # pick a role
-        if vehicle.ai.vehicle_crew['driver'][0]==False:
+        if vehicle.ai.vehicle_crew['driver'][0] is False:
             role='driver'
             vehicle.ai.vehicle_crew['driver'][0]=True
             vehicle.ai.vehicle_crew['driver'][1]=self.owner
             self.owner.render=vehicle.ai.vehicle_crew['driver'][4]
             self.speak("Taking over driving")
 
-        if role==None:
+        if role is None:
             for key,value in vehicle.ai.vehicle_crew.items():
-                if role!=None:
+                if role is not None:
                     break
                 if 'gunner' in key:
-                    if value[0]==False:
+                    if value[0] is False:
                         vehicle.ai.vehicle_crew[key][0]=True
                         vehicle.ai.vehicle_crew[key][1]=self.owner
                         self.owner.render=vehicle.ai.vehicle_crew[key][4]
@@ -1155,37 +1155,37 @@ class AIHuman(object):
                         role='gunner'
 
         # note that some vehicles may not have this crew slot
-        if role==None and 'radio_operator' in vehicle.ai.vehicle_crew:
-            if vehicle.ai.vehicle_crew['radio_operator'][0]==False:
+        if role is None and 'radio_operator' in vehicle.ai.vehicle_crew:
+            if vehicle.ai.vehicle_crew['radio_operator'][0] is False:
                 vehicle.ai.vehicle_crew['radio_operator'][0]=True
                 vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
                 self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
 
-                if vehicle.ai.radio!=None:
-                    if vehicle.ai.radio.ai.radio_operator==None:
+                if vehicle.ai.radio is not None:
+                    if vehicle.ai.radio.ai.radio_operator is None:
                             role='radio_operator'
                 else:
                     # no radio - so just fill this crew spot as a passenger
                     role='passenger'
                 
-        if role==None:
+        if role is None:
             
             # check if any passenger slots are open
             for key,value in vehicle.ai.vehicle_crew.items():
                 if 'passenger' in key:
-                    if value[0]==False:
+                    if value[0] is False:
                         role='passenger'
                         vehicle.ai.vehicle_crew[key][0]=True
                         vehicle.ai.vehicle_crew[key][1]=self.owner
                         self.owner.render=vehicle.ai.vehicle_crew[key][4]
                         break
 
-        if role==None:
+        if role is None:
             engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!! Vehicle is full='+str(vehicle.ai.check_if_vehicle_is_full()),True)
             print('name: '+self.owner.name)
             print('vehicle crew')
             for key,value in vehicle.ai.vehicle_crew.items():
-                if value[0]==True:
+                if value[0] is True:
                     print(key,value[1].name)
                 else:
                     print(key,'empty')
@@ -1220,7 +1220,7 @@ class AIHuman(object):
         gunners_engaging=False
         for key,value in vehicle.ai.vehicle_crew.items():
             if 'gunner' in key:
-                if value[0]==True:
+                if value[0] is True:
                     if value[1].ai.memory['task_vehicle_crew']['current_action']=='Engaging Targets':
                         gunners_engaging=True
                         break
@@ -1229,7 +1229,7 @@ class AIHuman(object):
         new_passengers=0
         for b in self.owner.world.wo_objects_human:
             if 'task_enter_vehicle' in b.ai.memory:
-                if vehicle==b.ai.memory['task_enter_vehicle']['vehicle']:
+                if vehicle is b.ai.memory['task_enter_vehicle']['vehicle']:
                     new_passengers+=1
         
         distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
@@ -1242,7 +1242,7 @@ class AIHuman(object):
                 
                 # lets jump out
                 # only jump out if you aren't dedicated afv crew
-                if self.is_afv_trained==False:
+                if self.is_afv_trained is False:
                     self.switch_task_exit_vehicle(vehicle)
             else:
                 # we have a new destination
@@ -1268,7 +1268,7 @@ class AIHuman(object):
             # could do smarter checks here once engines have more stats
             need_start=False
             for b in vehicle.ai.engines:
-                if b.ai.engine_on==False:
+                if b.ai.engine_on is False:
                     need_start=True
             if need_start:
                 vehicle.ai.handle_start_engines()
@@ -1333,7 +1333,7 @@ class AIHuman(object):
             self.reload_weapon(turret.ai.primary_weapon,vehicle)
 
         # check coax ammo
-        if turret.ai.coaxial_weapon!=None:
+        if turret.ai.coaxial_weapon is not None:
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
             if ammo_gun==0 and ammo_inventory>0:
                 # this should be re-done to check for ammo in vehicle, and do something if there is none
@@ -1341,18 +1341,18 @@ class AIHuman(object):
 
 
 
-        if self.memory['task_vehicle_crew']['target']==None:
+        if self.memory['task_vehicle_crew']['target'] is None:
             self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
         else:
             if self.memory['task_vehicle_crew']['target'].ai.health<1:
                 self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
 
         # we either already had a target, or we might have just got a new one
-        if self.memory['task_vehicle_crew']['target']!=None:
+        if self.memory['task_vehicle_crew']['target'] is not None:
  
             # check rotation
             rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)==False:
+            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
                 # lots of things we could do here.
                 # we could have the driver rotate
                 # for now just get rid of the target
@@ -1365,7 +1365,7 @@ class AIHuman(object):
                     self.memory['task_vehicle_crew']['target']=None
 
 
-        if self.memory['task_vehicle_crew']['target']!=None:
+        if self.memory['task_vehicle_crew']['target'] is not None:
             self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
         else:
             # no target 
@@ -1380,7 +1380,7 @@ class AIHuman(object):
 
         # for whatever reason sometimes a vehicle will have a driver jump out
         # this will cause a passenger to take over. will also fill in any empty gunner spots
-        if vehicle.ai.vehicle_crew['driver'][0]==False:
+        if vehicle.ai.vehicle_crew['driver'][0] is False:
             self.switch_task_vehicle_crew(vehicle,self.squad.destination)
         
         if len(self.near_targets)>0:
@@ -1400,7 +1400,7 @@ class AIHuman(object):
 
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         radio=vehicle.ai.radio
-        if radio==None:
+        if radio is None:
             # radio dissapeared. get a different vehicle task
             #self.switch_task_vehicle_crew(vehicle,self.memory['task_vehicle_crew']['destination'])
 
@@ -1409,7 +1409,7 @@ class AIHuman(object):
             
         else:
             self.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
-            if radio.ai.power_on==False:
+            if radio.ai.power_on is False:
                 radio.ai.current_frequency=self.squad.faction_tactical.radio_frequency
                 radio.ai.turn_power_on()
 
@@ -1441,12 +1441,12 @@ class AIHuman(object):
         
 
     #---------------------------------------------------------------------------
-    def throw(self,TARGET_COORDS,mouse_screen_coords=None):
+    def throw(self,target_coords,mouse_screen_coords=None):
         ''' throw like you know the thing. cmon man '''   
         # stand up
         if self.prone:
             self.prone_state_change() 
-        if self.throwable!=None:
+        if self.throwable is not None:
 
             # this does all the needed internal ai stuff for the throwable 
             self.throwable.ai.throw()
@@ -1457,36 +1457,36 @@ class AIHuman(object):
                 self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,mouse_screen_coords)
                 self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.screen_coords,mouse_screen_coords)
             else :
-                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,TARGET_COORDS)
-                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,TARGET_COORDS)
+                self.throwable.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target_coords)
+                self.throwable.heading=engine.math_2d.get_heading_vector(self.owner.world_coords,target_coords)
 
             self.drop_object(self.throwable)
 
 
     #---------------------------------------------------------------------------
-    def transfer_liquid(self,FROM_OBJECT,TO_OBJECT):
+    def transfer_liquid(self,from_object,to_object):
         '''transfer liquid/ammo/??? from one object to another'''
         
 
-        if FROM_OBJECT.is_liquid and TO_OBJECT.is_container:
-            source_amount=FROM_OBJECT.volume
+        if from_object.is_liquid and to_object.is_container:
+            source_amount=from_object.volume
             
             # add up total destination volume
             destination_amount=0
-            for b in TO_OBJECT.ai.inventory:
+            for b in to_object.ai.inventory:
                 destination_amount+=b.volume
 
             # remember in containers this is considered a max volume    
-            destination_maximum=TO_OBJECT.volume
+            destination_maximum=to_object.volume
             source_result,destination_result=engine.math_2d.get_transfer_results(source_amount,destination_amount,destination_maximum)
-            FROM_OBJECT.volume=source_result
+            from_object.volume=source_result
             
             # spawn a new liquid object with the amount to transfer
-            z=engine.world_builder.spawn_object(self.owner.world,[0,0],FROM_OBJECT.name,False)
+            z=engine.world_builder.spawn_object(self.owner.world,[0,0],from_object.name,False)
             z.volume=destination_result
 
             # add the new liquid to the container
-            TO_OBJECT.add_inventory(z)
+            to_object.add_inventory(z)
         else:
             engine.log.add_data('error','ai_human.transfer_liquid - src/dest not recognized',True)
 
@@ -1509,13 +1509,13 @@ class AIHuman(object):
                 self.switch_task_think()
 
             # identify and categorize targets. should not be run for the player as it can result in new current_task
-            if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player==False:
+            if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player is False:
                 self.last_target_eval_time=self.owner.world.world_seconds
                 self.target_eval_rate=random.uniform(0.8,6.5)
                 self.evaluate_targets()
 
             # might be faster to have a bool we could check
-            if self.large_pickup!=None:
+            if self.large_pickup is not None:
                 self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
                 
             # building awareness stuff. ai and human need this
@@ -1529,7 +1529,7 @@ class AIHuman(object):
 
         # primmary weapon
         # could also take ammo into account here 
-        if self.primary_weapon==None:
+        if self.primary_weapon is None:
             for b in self.inventory:
                 if b.is_gun:
                     self.primary_weapon=b
@@ -1539,7 +1539,7 @@ class AIHuman(object):
         # secondary weapon
 
         # throwable
-        if self.throwable==None:
+        if self.throwable is None:
             for b in self.inventory:
                 if b.is_throwable:
                     self.throwable=b
@@ -1547,7 +1547,7 @@ class AIHuman(object):
                     break
 
         # anti-tank
-        if self.antitank==None:
+        if self.antitank is None:
             for b in self.inventory:
                 if b.is_handheld_antitank:
                     self.antitank=b
@@ -1594,7 +1594,7 @@ class AIHuman(object):
             
             
             # drop primary weapon 
-            if self.primary_weapon!=None:
+            if self.primary_weapon is not None:
                 ammo,ammo_inventory,magazines=self.check_ammo(self.primary_weapon,self.owner)
                 dm+=('\n  - weapon: '+self.primary_weapon.name)
                 dm+=('\n  -- ammo in gun: '+str(ammo))
@@ -1606,7 +1606,7 @@ class AIHuman(object):
             dm+=('\n  -------------------')
 
             # drop large pickup
-            if self.large_pickup!=None:
+            if self.large_pickup is not None:
                 self.drop_object(self.large_pickup)
 
             if self.memory['current_task']=='task_vehicle_crew':
@@ -1617,7 +1617,7 @@ class AIHuman(object):
                 self.update_task_exit_vehicle()
 
             # remove from squad 
-            if self.squad != None:
+            if self.squad is not None:
                 if self.owner in self.squad.members:
                     self.squad.members.remove(self.owner)
 
@@ -1683,22 +1683,23 @@ class AIHuman(object):
                             
 
                     # also check if we should chuck a grenade at it
-                    if distance<310 and distance>150 and self.throwable!=None:
-                        if enemy.is_human:
-                            self.throw(enemy.world_coords)
-                            self.speak('Throwing Grenade !!!!')
-                        elif enemy.is_vehicle:
-                            # grenades will miss if the vehicle is moving fast
-                            if enemy.ai.current_speed<5:
-                                # check pen
-                                if enemy.ai.passenger_compartment_armor['left'][0]<4:
-                                    self.throw(enemy.world_coords)
-                                    self.speak('Throwing Grenade !!!!')
+                    if self.throwable is not None:
+                        if distance<310 and distance>150:
+                            if enemy.is_human:
+                                self.throw(enemy.world_coords)
+                                self.speak('Throwing Grenade !!!!')
+                            elif enemy.is_vehicle:
+                                # grenades will miss if the vehicle is moving fast
+                                if enemy.ai.current_speed<5:
+                                    # check pen
+                                    if enemy.ai.passenger_compartment_armor['left'][0]<4:
+                                        self.throw(enemy.world_coords)
+                                        self.speak('Throwing Grenade !!!!')
 
 
                     # also check if we should launch antitank
                     if enemy.is_vehicle:
-                        if self.antitank!=None and distance<1800:
+                        if self.antitank is not None and distance<1800:
                             self.launch_antitank(enemy.world_coords)
                         else:
                             # if we get this far the gun has a magazine and ammo
@@ -1711,14 +1712,14 @@ class AIHuman(object):
                                 if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
                                     penetration=True
 
-                            if penetration==False:
+                            if penetration is False:
                                 self.memory.pop('task_engage_enemy',None)
                                 self.switch_task_think()
                                 
                 else:
 
                     new_enemy=self.get_target(self.primary_weapon.ai.range)
-                    if new_enemy==None:
+                    if new_enemy is None:
 
                             # no closer targets. is the target really far out of range?
                         if distance>(self.primary_weapon.ai.range+self.primary_weapon.ai.range*0.5):
@@ -1738,12 +1739,13 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def update_task_enter_vehicle(self):
+        '''update task_enter_vehicle'''
         # Note - this task can also handle the player trying to enter a vehicle 
 
         vehicle=self.memory['task_enter_vehicle']['vehicle']
         destination=self.memory['task_enter_vehicle']['destination']
 
-        if self.owner.world.check_object_exists(vehicle)==False:
+        if self.owner.world.check_object_exists(vehicle) is False:
             self.speak('Where did that '+vehicle.name+' go?')
             self.memory.pop('task_enter_vehicle',None)
             self.switch_task_think()
@@ -1753,7 +1755,7 @@ class AIHuman(object):
             distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
             distance_to_destination=engine.math_2d.get_distance(self.owner.world_coords,destination)
 
-            if distance_to_destination<distance and self.owner.is_player==False:
+            if distance_to_destination<distance and self.owner.is_player is False:
                 # -- vehicle is further than where we wanted to go --
 
                 # i think this should never happen??
@@ -1784,13 +1786,13 @@ class AIHuman(object):
                     # remove this as well so we don't end up wanting to go back to where the vehicle was
 
                     precheck=True
-                    if vehicle.ai.check_if_vehicle_is_full()==True:
+                    if vehicle.ai.check_if_vehicle_is_full() is True:
                         precheck=False
                         self.speak('No more room in this vehicle!')
                     
                     if precheck:
                         for value in vehicle.ai.vehicle_crew.values():
-                            if value[0]==True:
+                            if value[0] is True:
                                 if value[1].ai.squad.faction!=self.squad.faction:
                                     precheck=False
                                     self.speak('This vehicle is crewed by the enemy!')
@@ -1835,10 +1837,10 @@ class AIHuman(object):
 
                     # tell everyone else to GTFO
                     for b in vehicle.ai.vehicle_crew.values():
-                        if b[0]==True:
+                        if b[0] is True:
                             b[1].ai.switch_task_exit_vehicle(vehicle)
                 elif key=='radio_operator':
-                    if vehicle.ai.radio!=None:
+                    if vehicle.ai.radio is not None:
                         if vehicle.ai.radio.ai.radio_operator==self.owner:
                             vehicle.ai.radio.ai.radio_operator=None
                 elif 'passenger' in key:
@@ -1863,7 +1865,7 @@ class AIHuman(object):
         if self.health>0:
             self.speak('Jumping out')
 
-            if self.owner.is_player==False:
+            if self.owner.is_player is False:
             # move slightly
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
                 self.switch_task_move_to_location(coords,None)
@@ -1875,7 +1877,7 @@ class AIHuman(object):
         '''loot a container or object with ai.inventory'''
         container=self.memory['task_loot_container']['container']
 
-        if self.owner.world.check_object_exists(container)==False:
+        if self.owner.world.check_object_exists(container) is False:
             self.memory.pop('task_loot_container',None)
             self.switch_task_think()
         else:
@@ -1890,7 +1892,7 @@ class AIHuman(object):
                 need_consumable=True
                 need_grenade=True
                 need_antitank=False
-                need_gun=self.primary_weapon==None
+                need_gun=self.primary_weapon is None
 
                 # check our inventory
                 for b in self.inventory:
@@ -1941,14 +1943,14 @@ class AIHuman(object):
                             gun=b
 
                     # if not, set it to the gun we have, if we have one
-                    if gun==None:
-                        if self.primary_weapon!=None:
+                    if gun is None:
+                        if self.primary_weapon is not None:
                             gun=self.primary_weapon
 
                     # if we have a gun now, grab compatible magazines
                     # only grab 2 magazines though
                     grabbed=0
-                    if gun!=None:
+                    if gun is not None:
                         for b in gun_magazines:
                             if gun.name in b.ai.compatible_guns:
                                 if grabbed<2:
@@ -1982,7 +1984,7 @@ class AIHuman(object):
             self.memory['task_move_to_location']['last_think_time']=self.owner.world.world_seconds
 
             # if there is a moving object, reset the destination to match in case it moved
-            if self.memory['task_move_to_location']['moving_object']!=None:
+            if self.memory['task_move_to_location']['moving_object'] is not None:
                 self.memory['task_move_to_location']['destination']=copy.copy(self.memory['task_move_to_location']['moving_object'].world_coords)
                 # reset bot facing angle 
                 self.owner.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_move_to_location']['destination'])
@@ -1998,7 +2000,7 @@ class AIHuman(object):
             if distance>self.max_walk_distance:
                 
                 b=self.owner.world.get_closest_vehicle(self.owner,(self.max_walk_distance*0.6))
-                if b!=None:
+                if b is not None:
                     # get_closest_vehicle only returns vehicles that aren't full
                     # won't return planes if not a pilot
                     # won't return AFVs if not AFV trained
@@ -2030,7 +2032,7 @@ class AIHuman(object):
         nearest_distance=2000
         nearest_object=None
         for b in objects:
-            if self.owner.world.check_object_exists(b)==False:
+            if self.owner.world.check_object_exists(b) is False:
                 remove_queue.append(b)
             else:
                 distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
@@ -2054,7 +2056,7 @@ class AIHuman(object):
             objects.remove(b)
 
         # go towards the closest one
-        if nearest_object!=None:
+        if nearest_object is not None:
             self.switch_task_move_to_location(nearest_object.world_coords,None)
 
     #---------------------------------------------------------------------------
@@ -2115,11 +2117,11 @@ class AIHuman(object):
             self.switch_task_player_control()
             action=True
 
-        if action==False:
+        if action is False:
 
 
             # primary weapon
-            if self.primary_weapon==None:
+            if self.primary_weapon is None:
                 # need to get a gun
                 distance=4000
                 if len(self.near_targets)>0:
@@ -2133,12 +2135,12 @@ class AIHuman(object):
                 if distance<4000:
                     gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
 
-                    if gun!=None:
+                    if gun is not None:
                         self.switch_task_pickup_objects([gun])
                         action=True
             else:
                 # -- we have a gun. is it usable? --
-                if self.check_ammo_bool(self.primary_weapon,self.owner)==False:
+                if self.check_ammo_bool(self.primary_weapon,self.owner) is False:
                     # need to get ammo. check for nearby magazines
                     near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
                     if len(near_magazines)>0:
@@ -2155,7 +2157,7 @@ class AIHuman(object):
         
         # -- check if we have older tasks to resume --
         # this is important for compound tasks 
-        if action==False:
+        if action is False:
             if 'task_enter_vehicle' in self.memory:
                 self.memory['current_task']='task_enter_vehicle'
                 action=True
@@ -2168,8 +2170,8 @@ class AIHuman(object):
 
         # -- squad stuff --
         # this should be AFTER anything else important
-        if action==False:
-            if self.squad.squad_leader==None:
+        if action is False:
+            if self.squad.squad_leader is None:
                 self.squad.squad_leader=self.owner
 
             if self.squad.squad_leader==self.owner:
@@ -2185,7 +2187,7 @@ class AIHuman(object):
 
         # -- ok now we've really run out of things to do. do things that don't matter
         # ! NOTE Squad Lead will never get this far
-        if action==False:
+        if action is False:
             decision=random.randint(0,10)
             if decision==1:
                 # go for a walk
@@ -2247,7 +2249,7 @@ class AIHuman(object):
                     # some roles will want to do something every update cycle
 
                     if role=='gunner':
-                        if self.memory['task_vehicle_crew']['target']!=None:
+                        if self.memory['task_vehicle_crew']['target'] is not None:
                             self.action_vehicle_gunner_engage_target()
 
 

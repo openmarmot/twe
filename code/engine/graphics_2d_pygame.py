@@ -36,7 +36,7 @@ class Graphics_2D_Pygame(object):
     def __init__(self,screen_size):
         # called by World.__init__
 
-        self.images=dict()
+        self.images={}
         self.image_cache={}
 
         self.screen_size=screen_size

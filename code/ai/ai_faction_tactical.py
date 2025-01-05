@@ -67,6 +67,7 @@ class AIFactionTactical(object):
 
     #---------------------------------------------------------------------------
     def create_squads(self):
+        '''sort a list of humans into squads and initialize them'''
         humans=[]
         vehicles=[]
 
@@ -81,7 +82,6 @@ class AIFactionTactical(object):
                 # maybe some other stuff that should be positioned with the faction ??
 
 
-        '''sort a list of humans into squads and initialize them'''
         self.squads=engine.squad_builder.create_squads_from_human_list(self.world,humans,self)
 
         # reset spawn locations.
@@ -147,6 +147,7 @@ class AIFactionTactical(object):
         elif self.faction=='civilian':
             return 0
         else:
+            return 0
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
     #---------------------------------------------------------------------------
