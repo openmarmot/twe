@@ -7,6 +7,10 @@ kinda follow pep8 : https://peps.python.org/pep-0008/#introduction
 
 leaning towards using underscores in variable and method names. its very readable 
 
+# use pylint to check for pep8 and other issues 
+pip install pylint 
+pylint codefile.py 
+
 -- Coordinate System ----------------------
 
 world_coords=(x,y) : ?
