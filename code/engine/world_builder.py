@@ -73,7 +73,7 @@ list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
 
-list_guns=['kar98k','stg44','mp40','mg34','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43',
+list_guns=['kar98k','stg44','mp40','mg34','mg42','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43',
     'svt40','svt40-sniper','mg15','fg42-type1','fg42-type2','c96','c96_red_9']
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w','c96']
@@ -83,8 +83,8 @@ list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1'
 list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
 list_guns_smg=['mp40','ppsh43']
 list_guns_assault_rifles=['stg44']
-list_guns_machine_guns=['mg34','dp28','mg15','fg42-type1','fg42-type2']
-list_guns_pistols=['1911','ppk','tt33']
+list_guns_machine_guns=['mg34','mg42','dp28','mg15','fg42-type1','fg42-type2']
+list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9']
 list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
@@ -550,6 +550,7 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet PTRS-41 AT Squad']
         squads+=['Soviet T34-76 Model 1943'] * 8
         squads+=['Soviet T34-85'] * 4
+        squads+=['Soviet 37mm Auto-Cannon'] * 4
 
     # testing
     elif battle_option=='4':
@@ -1437,12 +1438,25 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.type='machine gun'
         z.rotation_angle=float(random.randint(0,359))
 
+    elif OBJECT_TYPE=='mg42':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='mg42'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=1
+        z.ai.magazine=spawn_object(world,world_coords,'mg34_drum_magazine',False)
+        z.ai.rate_of_fire=0.04
+        z.ai.reload_speed=13
+        z.ai.range=2418
+        z.ai.type='machine gun'
+        z.rotation_angle=float(random.randint(0,359))
+
     elif OBJECT_TYPE=='mg34_drum_magazine':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
         z.name='mg34_drum_magazine'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
-        z.ai.compatible_guns=['mg34']
+        z.ai.compatible_guns=['mg34','mg42']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=50
         z.rotation_angle=float(random.randint(0,359))
@@ -1453,9 +1467,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.name='mg34_belt'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
-        z.ai.compatible_guns=['mg34']
+        z.ai.compatible_guns=['mg34','mg42']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
-        z.ai.capacity=120
+        z.ai.capacity=250
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -2556,8 +2570,8 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,turret]
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,-10],True,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,10],True,turret]
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=177.6
         z.ai.open_top=True
@@ -2882,6 +2896,17 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.world_builder_identity='german_mg34'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mg34',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
+    
+    elif OBJECT_TYPE=='german_mg42':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mg42'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg42',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
