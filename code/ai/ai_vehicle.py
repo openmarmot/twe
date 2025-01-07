@@ -597,6 +597,10 @@ class AIVehicle(object):
             if self.towed_object.rotation_angle!=self.owner.rotation_angle:
                 self.towed_object.rotation_angle=self.owner.rotation_angle
                 self.towed_object.reset_image=True
+
+            if self.towed_object.is_vehicle:
+                # need to specifically call this as it will not trigger on the towed object itself as its engine is not used
+                self.towed_object.ai.update_child_position_rotation()
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):

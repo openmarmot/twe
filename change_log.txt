@@ -1,11 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 6 2025
+- fixed crew position not updating on towed vehicles 
+
+If you are playing as soviets you can now tow the 37mm aa guns into good defensive positions 
+around the map. They have 360 traverse and a decent rate of fire (should probably be higher) 
+but currently HE shells are not modelled yet so they will be of limmited affectiveness. 
+
+todo 
+- fix tow distance
+- add tow offsets for some vehicles 
+
+----------------------------------
 Jan 5 2025
 - added mg42 
 - adjusted mg34/42 belt length to be a historical 250
 - switched some squads to mg42
 - added visible crew + positions back to the soviet 37mm
+
+mg42 re-uses the mg34 artwork. all the guns need to be redrawn to scale - and i'm just not feeling 
+like doing that at the moment.
 
 added the 37mm aa back to the skirmish battle to keep it on my mind. towed guns SHOULD be a 
 big part of this game - but they need some love before they are usable
