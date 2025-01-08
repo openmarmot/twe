@@ -1326,50 +1326,61 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
+        out_of_ammo_primary=False
+        out_of_ammo_coax=False
+
         # check main gun ammo
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
-        if ammo_gun==0 and ammo_inventory>0:
-            # this should be re-done to check for ammo in vehicle, and do something if there is none
-            self.reload_weapon(turret.ai.primary_weapon,vehicle)
+        if ammo_gun==0:
+            if ammo_inventory>0:
+                # this should be re-done to check for ammo in vehicle, and do something if there is none
+                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+            else:
+                out_of_ammo_primary=True
 
         # check coax ammo
         if turret.ai.coaxial_weapon is not None:
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
-            if ammo_gun==0 and ammo_inventory>0:
-                # this should be re-done to check for ammo in vehicle, and do something if there is none
-                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+            if ammo_gun==0:
+                if ammo_inventory>0:
+                    # this should be re-done to check for ammo in vehicle, and do something if there is none
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                else:
+                    out_of_ammo_coax=True
 
-
-
-        if self.memory['task_vehicle_crew']['target'] is None:
-            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+        if out_of_ammo_coax and out_of_ammo_primary:
+            self.memory['task_vehicle_crew']['current_action']='Out of Ammo'
         else:
-            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+
+            if self.memory['task_vehicle_crew']['target'] is None:
                 self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
-
-        # we either already had a target, or we might have just got a new one
-        if self.memory['task_vehicle_crew']['target'] is not None:
- 
-            # check rotation
-            rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
-                # lots of things we could do here.
-                # we could have the driver rotate
-                # for now just get rid of the target
-                self.memory['task_vehicle_crew']['target']=None
             else:
-                # check distance
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                if distance>turret.ai.primary_weapon.ai.range:
-                    # alternatively we could drive closer.
+                if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                    self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+
+            # we either already had a target, or we might have just got a new one
+            if self.memory['task_vehicle_crew']['target'] is not None:
+    
+                # check rotation
+                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
+                    # lots of things we could do here.
+                    # we could have the driver rotate
+                    # for now just get rid of the target
                     self.memory['task_vehicle_crew']['target']=None
+                else:
+                    # check distance
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                    if distance>turret.ai.primary_weapon.ai.range:
+                        # alternatively we could drive closer.
+                        self.memory['task_vehicle_crew']['target']=None
 
 
-        if self.memory['task_vehicle_crew']['target'] is not None:
-            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
-        else:
-            # no target 
-            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+            if self.memory['task_vehicle_crew']['target'] is not None:
+                self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+            else:
+                # no target 
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
 
         # if we get this far then we just fire at it

@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 7 2025
+- increased the max distance for the tow option from 200 to 300 to make it easier 
+- added explosion as an option for projectiles 
+- 37mm frag round is now explosive with fragmentation 
+- possible fixed a rare bug with vehicle menu erroring out when player dies in a vehicle 
+- added a 'out of ammo' state for the gunner so the driver won't stop if the gunner has a target but cant fire
+
+the explosive rounds actually look kinda cool. not terrible 
+
+I need to figure out what effect explosive rounds have on armor. I feel like 37mm HE should probably still 
+wreck a 251. but maybe not?? It is actually on the higher end of armor for ww2 vehicles 
+
+I was driving a t34-76 while play testing and noticed that the gunner could not pierce a panzer 4 frontally but 
+could from the side. thats probably about right. 
+
+----------------------------------
 Jan 6 2025
 - fixed crew position not updating on towed vehicles 
 
