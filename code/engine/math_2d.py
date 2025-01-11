@@ -46,7 +46,7 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
     # frontal_area is the objects frontal cross-sectional area in square meters
     # weight : kilograms
 
-    # adjustment to game units 
+    # adjustment to game units
     adjustment=1
 
     # Calculate net force
@@ -55,7 +55,7 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
     # Calculate acceleration in m/s^2
     acceleration = net_force / weight
 
-    # adjust to game units 
+    # adjust to game units
     acceleration*=adjustment
 
     # round to 2 sd
@@ -68,8 +68,8 @@ def calculate_hit_side(vehicle_angle,projectile_angle):
     '''determine what side of a vehicle is hit'''
 
     # ! Note - this is very roughly accurate
-    # for example if you hit the side while in front of the vehicle 
-    # it will tend to record as front 
+    # for example if you hit the side while in front of the vehicle
+    # it will tend to record as front
 
     relative_angle = (projectile_angle - vehicle_angle) % 360
     if 0 <= relative_angle < 45 or 315 <= relative_angle < 360:
@@ -100,7 +100,6 @@ def calculate_offset_coords_and_rotation(base_coords,base_rotation,offset_obj_co
 
     return true_offset,true_offset_rot
 
-
 #------------------------------------------------------------------------------
 def calculate_relative_position(coords,rotation,offset):
     ''' calculate a position based on a offset and a given coordinate and rotation'''
@@ -110,8 +109,8 @@ def calculate_relative_position(coords,rotation,offset):
 
 #------------------------------------------------------------------------------
 def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
-    # wo - (worldobject)the object possibly doing the colliding 
-    # collision_list - (list[worldobject] a list of all possible objects that 
+    # wo - (worldobject)the object possibly doing the colliding
+    # collision_list - (list[worldobject] a list of all possible objects that
     # list of objects to ignore (should include wo)
 
     # returns the first result only
@@ -213,7 +212,7 @@ def get_grid_coords(initial_coords, diameter, count):
         else:
             last_coord[0] += diameter
     return grid_coords
-    
+
 #------------------------------------------------------------------------------
 def get_heading_vector(location,destination):
     ''' normalized vector representing the heading (direction) to a target'''
@@ -221,7 +220,7 @@ def get_heading_vector(location,destination):
     # destination = [float,float]
     vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
     heading=get_normalized(vec_to_dest)
-    return heading 
+    return heading
 
 #--------------------------------------------------------------------------------
 def get_heading_from_rotation(rotation):
@@ -244,14 +243,14 @@ def get_normalized(vec2):
 #------------------------------------------------------------------------------
 def get_normalized_angle(degrees):
     return round(degrees % 360,2)
- 
+
 #------------------------------------------------------------------------------
 def get_optimal_column_count(amount):
     '''Calculates an optimal column count that balances columns and rows'''
-    
+
     if amount <= 0:
         return 1  # Return 1 for zero or negative amounts for practical reasons
-    
+
     optimal_columns = 1
     min_diff = float('inf')
     
@@ -428,7 +427,6 @@ def randomize_position_and_rotation(worldobj,amount=15,):
     worldobj.rotation_angle=float(random.randint(0,359))
     worldobj.reset_image=True
 
-
 #------------------------------------------------------------------------------
 def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
     ''' regress a variable to zero over time '''
@@ -446,11 +444,3 @@ def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
 
     return var
     
-#------------------------------------------------------------------------------
-def get_round_vector_2(vector):
-    return [round(vector[0],2),round(vector[1],2)]
-
-
-
-
-

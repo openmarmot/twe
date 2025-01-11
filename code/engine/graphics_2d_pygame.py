@@ -299,38 +299,38 @@ class Graphics_2D_Pygame(object):
 
         # text stuff
         if self.mode==0:
-            self.h=0
+            h=0
             for b in self.game_menu.text_queue:
-                self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.color_black)
+                h+=15
+                self.small_font.render_to(self.screen, (40, h), b, self.color_black)
         elif self.mode==1: 
-            self.h=0
+            h=0
             for b in islice(self.world.text_queue,self.world.text_queue_display_size):
-                self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+                h+=15
+                self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-            self.h+=20
+            h+=20
             for b in self.world.world_menu.text_queue:
-                self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.menu_color)
+                h+=15
+                self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
             if(self.world.debug_mode):
-                self.h=0
+                h=0
                 for b in self.world.debug_text_queue:
-                    self.h+=15
-                    self.small_font.render_to(self.screen, (900, self.h), b,self.menu_color )
+                    h+=15
+                    self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
 
             if(self.world.display_vehicle_text):
-                self.h=0
+                h=0
                 for b in self.world.vehicle_text_queue:
-                    self.h+=15
-                    self.small_font.render_to(self.screen, (500, self.h), b, self.menu_color)
+                    h+=15
+                    self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
 
         elif self.mode==2:
-            self.h=0
+            h=0
             for b in self.strategic_map.strategic_menu.text_queue:
-                self.h+=15
-                self.small_font.render_to(self.screen, (40, self.h), b, self.color_black)
+                h+=15
+                self.small_font.render_to(self.screen, (40, h), b, self.color_black)
 
         if self.double_buffering:
             pygame.display.flip()

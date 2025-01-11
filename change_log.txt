@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 11 2025
+- added the art file for the ju88 that had been deleted awhile ago 
+- minor pylint related cleanup 
+
+went looking for the gimp file for the sd.kfz.251 which i thought was in the 
+repo at one point but no luck. I might have to redraw that. 
+
+----------------------------------
 Jan 7 2025
 - increased the max distance for the tow option from 200 to 300 to make it easier 
 - added explosion as an option for projectiles 
