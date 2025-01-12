@@ -717,8 +717,8 @@ def spawn_drop_canister(world,world_coords,CRATE_TYPE):
     if CRATE_TYPE=='mixed_supply':
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_german_guns,False))
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_german_guns,False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
-        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust',False))
+        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust_60',False))
+        z.ai.inventory.append(spawn_object(world,world_coords,'panzerfaust_100',False))
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_consumables_common,False))
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_medical,False))
@@ -1119,14 +1119,14 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'pickle',False))
         z.add_inventory(spawn_object(world,world_coords,'pickle',False))
 
-    elif OBJECT_TYPE=='panzerfaust':
+    elif OBJECT_TYPE=='panzerfaust_60':
         z=WorldObject(world,['panzerfaust','panzerfaust_empty'],AIGun)
-        z.name='panzerfaust'
+        z.name='panzerfaust 60'
         z.minimum_visible_scale=0.4
         z.ai.mechanical_accuracy=2
         z.ai.speed=300
         z.is_handheld_antitank=True
-        z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_magazine',False)
+        z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_60_magazine',False)
         z.ai.rate_of_fire=0.12
         z.ai.reload_speed=0
         z.ai.range=1209
@@ -1134,20 +1134,44 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.smoke_on_fire=True
         z.rotation_angle=float(random.randint(0,359))
 
-    elif OBJECT_TYPE=='panzerfaust_magazine':
-        z=WorldObject(world,['stg44_magazine'],AIMagazine)
-        z.name='panzerfaust_magazine'
+    elif OBJECT_TYPE=='panzerfaust_60_magazine':
+        z=WorldObject(world,['panzerfaust_empty'],AIMagazine)
+        z.name='panzerfaust internal magazine'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
-        z.ai.compatible_guns=['panzerfaust']
+        z.ai.compatible_guns=['panzerfaust_60']
         z.ai.compatible_projectiles=['panzerfaust_60']
         z.ai.capacity=1
         z.ai.removable=False
         z.rotation_angle=float(random.randint(0,359))
-        p=spawn_object(world,world_coords,'projectile',False)
-        p.image_list=['panzerfaust_warhead']
-        p.ai.projectile_type='panzerfaust_60'
-        z.ai.projectiles.append(p)
+        load_magazine(world,z)
+
+    elif OBJECT_TYPE=='panzerfaust_100':
+        z=WorldObject(world,['panzerfaust','panzerfaust_empty'],AIGun)
+        z.name='panzerfaust 100'
+        z.minimum_visible_scale=0.4
+        z.ai.mechanical_accuracy=2
+        z.ai.speed=300
+        z.is_handheld_antitank=True
+        z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
+        z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=0
+        z.ai.range=1813
+        z.ai.type='antitank launcher'
+        z.ai.smoke_on_fire=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='panzerfaust_100_magazine':
+        z=WorldObject(world,['panzerfaust_empty'],AIMagazine)
+        z.name='panzerfaust internal magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['panzerfaust_100']
+        z.ai.compatible_projectiles=['panzerfaust_100']
+        z.ai.capacity=1
+        z.ai.removable=False
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
 
     elif OBJECT_TYPE=='model24':
         z=WorldObject(world,['model24'],AIThrowable)
@@ -1777,7 +1801,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=7
         z.ai.range=2418
         z.ai.type='semi auto rifle'
-        z.ai.projectile_type='7.62x54_L'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='svt40_magazine':
@@ -1804,7 +1827,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.reload_speed=8
         z.ai.range=2418
         z.ai.type='semi auto rifle'
-        z.ai.projectile_type='7.62x54_L'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='soviet_dodge_g505_wc':
@@ -1941,6 +1963,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         for b in range(11):
             z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
+
 
         
     elif OBJECT_TYPE=='sd_kfz_251_mg34_turret':
@@ -2832,7 +2857,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_60',False))
         
     elif OBJECT_TYPE=='german_k43':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -2889,7 +2914,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_60',False))
         
     elif OBJECT_TYPE=='german_mg34':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -2940,7 +2965,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'stg44_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_60',False))
         
     elif OBJECT_TYPE=='german_fg42-type2':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -3065,7 +3090,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'mg34',False))
         z.add_inventory(spawn_object(world,world_coords,'mg34_drum_magazine',False))
-        z.add_inventory(spawn_object(world,world_coords,'panzerfaust',False))
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_60',False))
     
     elif OBJECT_TYPE=='civilian_shovel_man':
         # a shovel enthusiast
@@ -3553,12 +3578,13 @@ def spawn_sparks(world,world_coords,amount=30):
         z.ai.alive_time_max=random.uniform(1.1,1.3)
 
 #------------------------------------------------------------------------------
-def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,ORIGINATOR,WEAPON_NAME):
+def spawn_heat_jet(world,world_coords,TARGET_COORDS,AMOUNT,heat_projectile_type,ORIGINATOR,WEAPON_NAME):
     ''' creates a cone/line of shrapnel. used for panzerfaust'''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+    # heat_projectile_type - a heat name from the projectile database that corresponds to the correct heat jet for the weapon
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-5,5))+TARGET_COORDS[0],float(random.randint(-5,5))+TARGET_COORDS[1]]
-        spawn_shrapnel(world,world_coords,target_coords,[],'HEAT_jet',0.1,0.3,ORIGINATOR,WEAPON_NAME)
+        spawn_shrapnel(world,world_coords,target_coords,[],heat_projectile_type,0.1,0.3,ORIGINATOR,WEAPON_NAME)
 
 
 # init 

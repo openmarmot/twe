@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 12 2025
+- cleanup and standardization in world_builder 
+- panzerfaust splits into panzerfaust 60 and panzerfaust 100 
+- different HEAT jets are now supported 
+- sd.kfz.251 now has a chance of having a panzerfaust 100 in inventory 
+
+panzerfaust rangers were normalized to match subgun and assault rifle ranges 
+
+decided to keep the panzerfaust troops with panzerfaust 60 for now as it is the most common type 
+
+todo 
+- add panzershreck 
+- add crates back to the world
+- find a way to add more random stuff/clutter  
+
+----------------------------------
 Jan 11 2025
 - added the art file for the ju88 that had been deleted awhile ago 
 - minor pylint related cleanup 
