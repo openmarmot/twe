@@ -535,19 +535,19 @@ def load_quick_battle(world,battle_option):
         squads+=['German 1944 Fallschirmjager'] * 3
         squads+=['German 1944 Volksgrenadier Storm Group'] * 1
         squads+=['German 1944 Volksgrenadier Fire Group'] * 2
-        squads+=['German Hetzer Squad'] * 5
+        squads+=['German Hetzer Squad'] * 3
         squads+=['German Aufklaren Kubelwagen'] * 2
         squads+=['German RSO Vehicle'] * 2
         squads+=['German Panzer IV Ausf G'] * 2
         squads+=['German Panzer IV Ausf H'] * 2
         squads+=['German Panzer IV Ausf J'] * 2
 
-        squads+=['Soviet 1943 Rifle'] * 4
+        squads+=['Soviet 1943 Rifle'] * 6
         squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 6
-        squads+=['Soviet PTRS-41 AT Squad']
+        squads+=['Soviet PTRS-41 AT Squad'] * 3
         squads+=['Soviet T34-76 Model 1943'] * 8
         squads+=['Soviet T34-85'] * 4
         squads+=['Soviet 37mm Auto-Cannon'] * 4

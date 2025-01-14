@@ -1,5 +1,28 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 13 2025
+- upped some vehicle and turret penetration damage 
+- turret hits now have a chance to also damage the vehicle
+- updated evaluate_targets to handle the new gunner roles 
+- gunners now consider penetration characteristics of their weapon vs the target (only in think mode )
+
+I've changed the force mix a bit for the large quick battle to be more lop sided in the soviets favor and.. 
+it did not help. Ever since the vehicle gunnery and panzerfaust improvements they have been getting wrecked 
+crazy hard. Part of it is definitely that panzerfausts are crazy deadly, and part of it is probably that the mg34 
+and now mg42 are very very good.
+
+I'd like to replace vehicle health with component health, but i need more components first.
+I could probably add in engine damage though. 
+With vehicle health it is hard to get a damage model that feels right. In my play testing today 
+there were vehicles taking a ton of hits before going down.
+
+todo 
+- look at armor pen of rifles at distance. they should not bounce off zero armor 
+- need a faction vehicle list for friendly fire 
+- damage from rifle caliber rounds to afv should be low and not treated the same as tank rounds 
+
 ----------------------------------
 Jan 12 2025
 - cleanup and standardization in world_builder 

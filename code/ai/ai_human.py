@@ -380,7 +380,7 @@ class AIHuman(object):
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
-                if self.memory['task_vehicle_crew']['role']=='gunner':
+                if 'gunner' in self.memory['task_vehicle_crew']['role']:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
                     else:
@@ -1347,6 +1347,8 @@ class AIHuman(object):
                     self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                 else:
                     out_of_ammo_coax=True
+        else:
+            out_of_ammo_coax=True
 
         if out_of_ammo_coax and out_of_ammo_primary:
             self.memory['task_vehicle_crew']['current_action']='Out of Ammo'
@@ -1374,6 +1376,26 @@ class AIHuman(object):
                     if distance>turret.ai.primary_weapon.ai.range:
                         # alternatively we could drive closer.
                         self.memory['task_vehicle_crew']['target']=None
+                    else:
+                        # check penetration
+                        # there are several places this could be done. this is a good spot, but 
+                        # maybe it should be done earlier like in get_target? alternatively we probably want 
+                        # 'some' amount of firing that won't penetrate as it adds a lot of excitement and is 
+                        # more realistic. just doing it here means its possible some firing will happen before a think
+
+                        # can we penetrate it in a best case scenario?
+                        target=self.memory['task_vehicle_crew']['target']
+                        if target.is_vehicle:
+                            penetration=False
+                            if out_of_ammo_primary is False:
+                                if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                                    penetration=True
+                            elif out_of_ammo_coax is False:
+                                if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                                    penetration=True
+
+                            if penetration is False:
+                                self.memory['task_vehicle_crew']['target']=None
 
 
             if self.memory['task_vehicle_crew']['target'] is not None:

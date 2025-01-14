@@ -254,7 +254,7 @@ class AIVehicle(object):
             if self.passenger_compartment_ammo_racks:
                 if random.randint(0,2)==2:
                     # ammo rack explosion
-                    self.health-=random.randint(50,75)
+                    self.health-=random.randint(70,100)
         else:
             # no penetration, but maybe we can have some other effect?
             pass
