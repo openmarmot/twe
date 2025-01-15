@@ -139,6 +139,7 @@ class World(object):
         self.friendly_fire_squad=False # only at the squad level
         self.friendly_fire_explosive=True # grenade shrap clouds
         self.friendly_fire_explosive_squad=True # only at the squad level
+        self.friendly_fire_vehicle=False # False means friendly vehicles are added to the ignore list
 
 
         # physics stuff 
@@ -355,14 +356,19 @@ class World(object):
                     if value[0]==True:
                         OBJ=value[1]
                         break
-
+        
+        # this should always be true at this point
         if OBJ.is_human:
-            if self.friendly_fire==False:
+            if self.friendly_fire is False:
                 ignore_list+=OBJ.ai.squad.faction_tactical.allied_humans
-            elif self.friendly_fire_squad==False:
+                
+            elif self.friendly_fire_squad is False:
                 # just add the squad
                 ignore_list+=OBJ.ai.squad.members
 
+            if self.friendly_fire_vehicle is False:
+                ignore_list+=OBJ.ai.squad.faction_tactical.allied_crewed_vehicles
+                
             if OBJ.is_player:
                 pass
             elif OBJ.is_soldier:
