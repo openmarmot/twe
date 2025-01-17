@@ -1218,12 +1218,18 @@ class AIHuman(object):
 
         # check if the gunners are engaging anyone. we want to be stopped for this
         gunners_engaging=False
+        vehicle_target=None
         for key,value in vehicle.ai.vehicle_crew.items():
             if 'gunner' in key:
                 if value[0] is True:
                     if value[1].ai.memory['task_vehicle_crew']['current_action']=='Engaging Targets':
-                        gunners_engaging=True
-                        break
+                        if value[1].ai.memory['task_vehicle_crew']['target'] is not None:
+                            gunners_engaging=True
+                            if value[1].ai.memory['task_vehicle_crew']['target'].is_vehicle:
+                                vehicle_target=value[1].ai.memory['task_vehicle_crew']['target']
+                                # we handle only one vehicle_target at the moment
+                                break 
+                        
 
         # check if anyone is trying to get in 
         new_passengers=0
@@ -1251,14 +1257,66 @@ class AIHuman(object):
 
         elif new_passengers>0:
             # wait for new passengers
+            # no need to check this again for a bit
+            self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
             vehicle.ai.brake_power=1
             vehicle.ai.throttle=0
             self.memory['task_vehicle_crew']['current_action']='Waiting for passengers'
         elif gunners_engaging:
-            # the gunner is trying to fire. stop the vehicle so they can get a good shot
-            self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
-            vehicle.ai.brake_power=1
-            vehicle.ai.throttle=0
+            if vehicle_target is None:
+                # is it worth stopping for humans?
+                # no need to check this again for a bit
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                # the gunner is trying to fire. stop the vehicle so they can get a good shot
+                self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
+                vehicle.ai.brake_power=1
+                vehicle.ai.throttle=0
+
+            else:
+                # we are firing at a vehicle
+                if random.randint(0,1)==1:
+                    # lets angle towards the target 
+                    # get the rotation to the destination 
+                    r = engine.math_2d.get_rotation(vehicle.world_coords,vehicle_target.world_coords)
+
+                    v = vehicle.rotation_angle
+
+                    if r>v:
+                        vehicle.ai.handle_steer_left()
+                        # helps turn faster
+                        vehicle.ai.throttle=0.3
+
+                    if r<v:
+                        vehicle.ai.handle_steer_right()
+                        # helps turn faster
+                        vehicle.ai.throttle=0.3
+            
+                    # if its close just set it equal
+                    if r>v-3 and r<v+3:
+                        # neutral out steering 
+                        vehicle.ai.handle_steer_neutral()
+                        vehicle.rotation_angle=r
+                        vehicle.ai.update_heading()
+
+                        # hit the brakes
+                        vehicle.ai.throttle=0
+                        vehicle.ai.brake_power=1
+
+                        # no need to check this again for a bit
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                        self.memory['task_vehicle_crew']['current_action']='Angling towards target'
+                else:
+                    # lets just pause
+                    # no need to check this again for a bit
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                    # the gunner is trying to fire. stop the vehicle so they can get a good shot
+                    self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
+                    vehicle.ai.brake_power=1
+                    vehicle.ai.throttle=0
+
 
         else:
             
