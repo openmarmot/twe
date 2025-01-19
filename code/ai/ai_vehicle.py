@@ -422,6 +422,46 @@ class AIVehicle(object):
         self.flaps=0
 
     #---------------------------------------------------------------------------
+    def handle_hit_with_flame(self):
+        '''handle the vehicle being hit with flame'''
+
+        crew_damage=False
+        passenger_damage=False
+
+        if random.randint(0,1)==1:
+            # hit the main vehicle
+            if random.randint(0,3)==3:
+                crew_damage=True
+
+            self.health-=random.randint(0,10)
+
+        else:
+            # hit the crew compartment
+            self.health-=random.randint(0,10)
+            if self.open_top:
+                if random.randint(0,1)==1:
+                    # got in the open top
+                    passenger_damage=True
+                else:
+                    if random.randint(0,3)==3:
+                        # leaked in through cracks
+                        passenger_damage=True
+
+        if crew_damage or passenger_damage:
+
+            for key,value in self.vehicle_crew.items():
+                if value[0] is True:
+                    if crew_damage:
+                        if 'driver' in key:
+                            value[1].ai.handle_hit_with_flame()
+                        if 'gunner' in key:
+                            value[1].ai.handle_hit_with_flame()
+                    if passenger_damage:
+                        if 'passenger' in key:
+                            value[1].ai.handle_hit_with_flame()
+                
+
+    #---------------------------------------------------------------------------
     def handle_rudder_left(self):
         self.rudder=-1
 

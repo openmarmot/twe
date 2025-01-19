@@ -125,11 +125,13 @@ class AIHuman(object):
         # this is the action the vehicle gunner takes when it is NOT thinking
         # and has a target that is not None
         target=self.memory['task_vehicle_crew']['target']
+        # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['turret']
 
+        
         if target.ai.health>0:
             # check actual turret rotation angle against angle to target
-            needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
+            needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
             
             # probably need to do some rounding here
             if round(needed_rotation,1)!=round(turret.rotation_angle,1):
@@ -266,6 +268,33 @@ class AIHuman(object):
         self.speak('react to being shot')
 
     #---------------------------------------------------------------------------
+    def calculate_turret_aim(self):
+        '''calculates the correct turret angle to hit a target'''
+
+        target=self.memory['task_vehicle_crew']['target']
+        turret=self.memory['task_vehicle_crew']['turret']
+
+        aim_coords=target.world_coords
+        # guess how long it will take for the bullet to arrive
+        distance=engine.math_2d.get_distance(turret.world_coords,target.world_coords)
+        time_passed=distance/1000
+        if target.is_vehicle:
+            if target.ai.current_speed>0:
+                aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
+
+        if target.is_human:
+            if target.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
+                if vehicle.ai.current_speed>0:
+                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
+            else:
+                if target.ai.memory['current_task']=='task_move_to_location':
+                    destination=target.ai.memory['task_move_to_location']['destination']
+                    aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
+
+        self.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
+
+    #---------------------------------------------------------------------------
     def check_ammo(self,gun,object_with_inventory):
         '''check ammo and magazines for a gun. return ammo_gun,ammo_inventory,magazine_count'''
         # gun - a world object with ai_gun
@@ -383,10 +412,12 @@ class AIHuman(object):
                 if 'gunner' in self.memory['task_vehicle_crew']['role']:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
+                        self.calculate_turret_aim()
                     else:
                         # should probably compare the current target to closest 
                         # and see if it makes sense to switch targets
                         self.memory['task_vehicle_crew']['target']=closest_object
+                        self.calculate_turret_aim()
 
             else:
 
@@ -531,6 +562,8 @@ class AIHuman(object):
 
         self.health-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
+        self.collision_log.append('hurt by explosion')
 
         # short move to simulate being stunned
         if self.owner.is_player is False:
@@ -774,6 +807,13 @@ class AIHuman(object):
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
+
+    #---------------------------------------------------------------------------
+    def handle_hit_with_flame(self):
+        '''handle being hit with something that is on fire'''
+        self.health-=random.randint(20,100)
+
+        self.collision_log.append('burned by fire')
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords,mouse_screen_coords=None):
@@ -1203,6 +1243,7 @@ class AIHuman(object):
             'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
             'target': None, # target for tthe gunner role
+            'calculated_turret_angle': None, #used by the gunner role
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1457,6 +1498,8 @@ class AIHuman(object):
 
 
             if self.memory['task_vehicle_crew']['target'] is not None:
+                # update the turret angle for the target
+                self.calculate_turret_aim()
                 self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
             else:
                 # no target 

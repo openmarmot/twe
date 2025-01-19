@@ -545,9 +545,10 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet 1943 Rifle'] * 6
         squads+=['Soviet 1944 Rifle'] * 3
         squads+=['Soviet 1944 SMG'] * 3
+        squads+=['Soviet 1943 Assault SMG'] * 2
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 6
-        squads+=['Soviet PTRS-41 AT Squad'] * 3
+        squads+=['Soviet PTRS-41 AT Squad'] * 4
         squads+=['Soviet T34-76 Model 1943'] * 8
         squads+=['Soviet T34-85'] * 4
         squads+=['Soviet 37mm Auto-Cannon'] * 4
@@ -1182,6 +1183,21 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.explosive=True
         z.ai.shrapnel_count=5
         z.ai.explosion_radius=35
+        z.ai.max_speed=150
+        z.ai.max_flight_time=2.0
+        z.ai.has_fuse=True
+        z.ai.fuse_max_time=4
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='molotov_cocktail':
+        z=WorldObject(world,['green_bottle'],AIThrowable)
+        z.name='Molotov Cocktail'
+        z.minimum_visible_scale=0.4
+        z.is_grenade=True
+        z.is_throwable=True
+        z.ai.flammable=True
+        z.ai.explode_on_contact=True
+        z.ai.flame_amount=5
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
         z.ai.has_fuse=True
@@ -2819,7 +2835,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']
         z.world_builder_identity='german_afv_crew'
         z.ai.is_afv_trained=True
-        #z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         #z.add_inventory(spawn_object(world,world_coords,'model24',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
@@ -2827,8 +2842,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        #z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
-        #z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
 
     elif OBJECT_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -2893,6 +2906,21 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
+
+    elif OBJECT_TYPE=='german_mp40_molotov':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.world_builder_identity='german_mp40'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mp40',False))
+        z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
+        z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
@@ -3027,6 +3055,21 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
+
+    elif OBJECT_TYPE=='soviet_ppsh43_molotov':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        z.world_builder_identity='soviet_ppsh43'
+        z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
+        z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
+        z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
+        z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43_magazine',False))

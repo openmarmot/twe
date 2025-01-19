@@ -126,6 +126,21 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
                 break
     return collided
 
+#------------------------------------------------------------------------------
+def checkCollisionCircleCoordsAllResults(world_coords,collision_range,collision_list, ignore_list):
+    # modified collision checkt that uses a world_coords instead of an object
+    # collision_range replaces wo.collision_radius
+
+    collided=[]
+    for b in collision_list:
+        distance=get_distance(world_coords,b.world_coords)
+
+        if distance < (collision_range+b.collision_radius):
+            if b not in ignore_list:
+                collided.append(b)
+                
+    return collided
+
 #-----------------------------------------------------------------------------
 def collision_sort(runs,wo_objects):
     ''' moves around objects so they no longer collide'''

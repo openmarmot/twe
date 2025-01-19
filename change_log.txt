@@ -2,6 +2,30 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 18 2025
+- added lead calculation to turret aiming 
+- bumped t34-76 ap values up significantly 
+- added molotov cocktails 
+
+the lead calculation happens during think phase so the turret gunners will be more accurate 
+immediately after thinking, and then less so (for moving targets)
+
+this resolves the issue with thanks shooting thousands of rounds at moving soldiers and missing all of them. 
+the downside is that the lead calculation works very well and tanks are now unstoppable 
+
+this also means that firing on a vehicle that is moving is probably less accurate for most shots - which is 
+probably ok with the state of ww2 gun equipment 
+
+Adding the molotov cocktails required a lot of additional code. After I was done I did some quick 
+research and learned that they really weren't in common use in the soviet army. they were 
+historically more of a anti-soviet thing (finnish etc) whoops.
+
+I added molotovs to a couple troops on the german and soviet side but they will remain uncommon. 
+
+the flame mechanism is pretty hard to get a hit with, but if it hits a vehicle and passes the 
+dice role it will damage the crew heavily, possibly taking some of them out. 
+
+----------------------------------
 Jan 15 2025
 - added a driver behavior to angle towards vehicles that are being engaged (50% of the time)
 
