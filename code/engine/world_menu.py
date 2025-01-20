@@ -367,7 +367,7 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
-            self.text_queue.append('2 - german_panzer_iv_ausf_g')
+            self.text_queue.append('2 - hetzer')
             self.text_queue.append('3 - german_panzer_iv_ausf_h')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - sd_kfz_251 ')
@@ -378,7 +378,7 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_g',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_jagdpanzer_38t_hetzer',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_h',True)
             elif key=='4':
@@ -397,23 +397,23 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
             self.text_queue.append('1 - MG34 ')
-            self.text_queue.append('2 - Panzerfaust ')
+            self.text_queue.append('2 - Panzerfaust 60')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
-            self.text_queue.append('4 - German Field Shovel')
+            self.text_queue.append('4 - molotov')
             self.text_queue.append('5 - MG42')
             self.text_queue.append('6 - ptrs-41')
-            self.text_queue.append('7 - mp40')
+            self.text_queue.append('7 - rpg43')
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust_60',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
             elif key=='4':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_field_shovel',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'molotov_cocktail',True)
             elif key=='5':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg42',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
@@ -422,7 +422,7 @@ class World_Menu(object):
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ptrs_41',True)
             elif key=='7':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'rpg43',True)
                 
         if self.menu_state=='spawn_squads':
             self.text_queue=[]
@@ -1154,7 +1154,7 @@ class World_Menu(object):
                 self.text_queue.append('3 - storage ')
                 if fuel_option:
                     self.text_queue.append('4 - fuel ')
-                if distance<200 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                if distance<300 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
                     vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
                     self.text_queue.append('5 - Tow Vehicle')
                     if key=='5':
@@ -1178,91 +1178,97 @@ class World_Menu(object):
                     self.change_menu('fuel')
 
         if self.menu_state=='internal':
-            currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
-            if currentRole==None:
-                currentRole='none'
+            if 'task_vehicle_crew' in self.world.player.ai.memory:
+                currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
+                if currentRole==None:
+                    currentRole='none'
 
-            radio=False
-            if self.selected_object.ai.radio!=None:
-                radio=True
-            self.text_queue=[]
-            self.text_queue.append('--Internal Vehicle Menu --')
-            self.text_queue.append('Vehicle : '+self.selected_object.name)
-            self.text_queue.append('Health : '+str(self.selected_object.ai.health))
-            self.text_queue.append('Current Role : '+currentRole)
-            if radio:
-                self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
-            if len(self.selected_object.ai.engines)>0:
-                self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
+                radio=False
+                if self.selected_object.ai.radio!=None:
+                    radio=True
+                self.text_queue=[]
+                self.text_queue.append('--Internal Vehicle Menu --')
+                self.text_queue.append('Vehicle : '+self.selected_object.name)
+                self.text_queue.append('Health : '+str(self.selected_object.ai.health))
+                self.text_queue.append('Current Role : '+currentRole)
+                if radio:
+                    self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
+                if len(self.selected_object.ai.engines)>0:
+                    self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
 
-            for b in self.selected_object.ai.fuel_tanks:
-                fuel=0
-                if len(b.ai.inventory)>0:
-                    if 'gas' in b.ai.inventory[0].name:
-                        fuel=b.ai.inventory[0].volume
-                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
-                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+                for b in self.selected_object.ai.fuel_tanks:
+                    fuel=0
+                    if len(b.ai.inventory)>0:
+                        if 'gas' in b.ai.inventory[0].name:
+                            fuel=b.ai.inventory[0].volume
+                    fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                    self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-            self.text_queue.append('- weapons -')
-            for b in self.selected_object.ai.turrets:
-                primary_weapon='None'
-                coaxial_weapon='None'
-                if b.ai.primary_weapon!=None:
-                    self.text_queue.append('- '+b.name)
-                    ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
-                    self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
-                    if b.ai.coaxial_weapon!=None:
-                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
-                        self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                self.text_queue.append('- weapons -')
+                for b in self.selected_object.ai.turrets:
+                    primary_weapon='None'
+                    coaxial_weapon='None'
+                    if b.ai.primary_weapon!=None:
+                        self.text_queue.append('- '+b.name)
+                        self.text_queue.append('-- health: '+str(b.ai.health))
+                        self.text_queue.append('-- jammed: '+str(b.ai.turret_jammed))
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
+                        self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                        if b.ai.coaxial_weapon!=None:
+                            ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                            self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
 
-            self.text_queue.append(' ----')
+                self.text_queue.append(' ----')
 
-            self.text_queue.append('- crew -')
-            for k,value in self.selected_object.ai.vehicle_crew.items():
-                text=k+': '
-                if value[0]==True:
-                    text+=value[1].name
-                    text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
-                else:
-                    text+='unoccupied'
-                self.text_queue.append(text)
-            self.text_queue.append('----')
+                self.text_queue.append('- crew -')
+                for k,value in self.selected_object.ai.vehicle_crew.items():
+                    text=k+': '
+                    if value[0]==True:
+                        text+=value[1].name
+                        text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
+                    else:
+                        text+='unoccupied'
+                    self.text_queue.append(text)
+                self.text_queue.append('----')
 
-            self.text_queue.append('')
-            self.text_queue.append('-- Actions --')
-            self.text_queue.append('1 - change role')
-            self.text_queue.append('2 - exit vehicle ')
-            self.text_queue.append('3 - engine menu')
-            self.text_queue.append('4 - toggle HUD')
-            if radio:
-                self.text_queue.append('5 - radio')
+                self.text_queue.append('')
+                self.text_queue.append('-- Actions --')
+                self.text_queue.append('1 - change role')
+                self.text_queue.append('2 - exit vehicle ')
+                self.text_queue.append('3 - engine menu')
+                self.text_queue.append('4 - toggle HUD')
+                if radio:
+                    self.text_queue.append('5 - radio')
 
-            if self.selected_object.ai.towed_object!=None:
-                self.text_queue.append('6 - Stop Towing')
-                if key=='6':
-                    self.world.text_queue.append('[You detach the vehicle from the tow bar]')
-                    self.selected_object.ai.detach_tow_object()
+                if self.selected_object.ai.towed_object!=None:
+                    self.text_queue.append('6 - Stop Towing')
+                    if key=='6':
+                        self.world.text_queue.append('[You detach the vehicle from the tow bar]')
+                        self.selected_object.ai.detach_tow_object()
+                        self.deactivate_menu()
+                        return
+
+                if key=='1':
+                    self.change_menu('change_vehicle_role')
+                if key=='2':
+                    # exit the vehicle
+                    self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle'])
+                    self.world.display_vehicle_text=False
+                    self.world.text_queue.append('[ You exit the vehicle ]')
                     self.deactivate_menu()
-                    return
-
-            if key=='1':
-                self.change_menu('change_vehicle_role')
-            if key=='2':
-                # exit the vehicle
-                self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle'])
-                self.world.display_vehicle_text=False
-                self.world.text_queue.append('[ You exit the vehicle ]')
+                if key=='3':
+                    self.change_menu('engine_menu')
+                if key=='4':
+                    #flip the bool
+                    self.world.display_vehicle_text=not self.world.display_vehicle_text
+                    #refresh the text
+                    self.vehicle_menu('none')
+                if key=='5' and radio:
+                    self.selected_object=self.selected_object.ai.radio
+                    self.change_menu('radio_menu')
+            else:
+                # task_vehicle_crew not in memory, so internal is a mistake. player probably died and was removed from the vehicle
                 self.deactivate_menu()
-            if key=='3':
-                self.change_menu('engine_menu')
-            if key=='4':
-                #flip the bool
-                self.world.display_vehicle_text=not self.world.display_vehicle_text
-                #refresh the text
-                self.vehicle_menu('none')
-            if key=='5' and radio:
-                self.selected_object=self.selected_object.ai.radio
-                self.change_menu('radio_menu')
 
         # -- add debug info --
         if self.world.debug_mode==True:

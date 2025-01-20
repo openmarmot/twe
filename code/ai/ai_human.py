@@ -125,11 +125,13 @@ class AIHuman(object):
         # this is the action the vehicle gunner takes when it is NOT thinking
         # and has a target that is not None
         target=self.memory['task_vehicle_crew']['target']
+        # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['turret']
 
+        
         if target.ai.health>0:
             # check actual turret rotation angle against angle to target
-            needed_rotation=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
+            needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
             
             # probably need to do some rounding here
             if round(needed_rotation,1)!=round(turret.rotation_angle,1):
@@ -142,9 +144,10 @@ class AIHuman(object):
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
-                        # maybe fire HE 
-                        # for now just fire with the main gun 
-                        turret.ai.handle_fire()
+                        if turret.ai.primary_weapon.ai.use_antipersonnel:
+                            turret.ai.handle_fire()
+                        else:
+                            self.memory['task_vehicle_crew']['target']=None
                 else:
                     turret.ai.handle_fire()
         else:
@@ -225,16 +228,26 @@ class AIHuman(object):
 
 
     #---------------------------------------------------------------------------
-    def calculate_projectile_damage(self,projectile):
+    def calculate_projectile_damage(self,projectile,distance):
         '''calculate and apply damage from projectile hit'''
 
         bleeding_hit=False
         hit=random.randint(1,5)
         if hit==1:
             #head
-            self.health-=random.randint(85,100)
-            bleeding_hit=True
-                
+            if self.wearable_head is None:
+                self.health-=random.randint(85,100)
+                bleeding_hit=True
+            else:
+                penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor)
+                if penetration:
+                    self.health-=random.randint(85,100)
+                    bleeding_hit=True
+                else:
+                    # armor stopped the hit
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
+                    self.owner.world.helmet_bounces+=1
+                    self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
             self.health-=random.randint(50,80)
@@ -257,6 +270,11 @@ class AIHuman(object):
             self.health-=30
             bleeding_hit=True
         
+        if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>20:
+            # do additional damage for large projectiless
+            self.health-=30
+            bleeding_hit=True
+        
         if bleeding_hit:
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
@@ -264,6 +282,33 @@ class AIHuman(object):
                 self.owner.world.text_queue.insert(0,'You are hit and begin to bleed')
 
         self.speak('react to being shot')
+
+    #---------------------------------------------------------------------------
+    def calculate_turret_aim(self):
+        '''calculates the correct turret angle to hit a target'''
+
+        target=self.memory['task_vehicle_crew']['target']
+        turret=self.memory['task_vehicle_crew']['turret']
+
+        aim_coords=target.world_coords
+        # guess how long it will take for the bullet to arrive
+        distance=engine.math_2d.get_distance(turret.world_coords,target.world_coords)
+        time_passed=distance/1000
+        if target.is_vehicle:
+            if target.ai.current_speed>0:
+                aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
+
+        if target.is_human:
+            if target.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
+                if vehicle.ai.current_speed>0:
+                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
+            else:
+                if target.ai.memory['current_task']=='task_move_to_location':
+                    destination=target.ai.memory['task_move_to_location']['destination']
+                    aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
+
+        self.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
 
     #---------------------------------------------------------------------------
     def check_ammo(self,gun,object_with_inventory):
@@ -380,13 +425,15 @@ class AIHuman(object):
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
-                if self.memory['task_vehicle_crew']['role']=='gunner':
+                if 'gunner' in self.memory['task_vehicle_crew']['role']:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
+                        self.calculate_turret_aim()
                     else:
-                        # should probably compare the current target to closest 
-                        # and see if it makes sense to switch targets
-                        self.memory['task_vehicle_crew']['target']=closest_object
+                        # only switch targets if we aren't currently firing at a vehicle
+                        if self.memory['task_vehicle_crew']['target'].is_vehicle is False:
+                            self.memory['task_vehicle_crew']['target']=closest_object
+                            self.calculate_turret_aim()
 
             else:
 
@@ -405,7 +452,7 @@ class AIHuman(object):
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.health
 
-            self.calculate_projectile_damage(event_data)
+            self.calculate_projectile_damage(event_data,distance)
 
             # data collection
             if event_data.ai.shooter is not None:
@@ -531,6 +578,8 @@ class AIHuman(object):
 
         self.health-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
+
+        self.collision_log.append('hurt by explosion')
 
         # short move to simulate being stunned
         if self.owner.is_player is False:
@@ -774,6 +823,13 @@ class AIHuman(object):
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
+
+    #---------------------------------------------------------------------------
+    def handle_hit_with_flame(self):
+        '''handle being hit with something that is on fire'''
+        self.health-=random.randint(20,100)
+
+        self.collision_log.append('burned by fire')
 
     #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords,mouse_screen_coords=None):
@@ -1048,7 +1104,7 @@ class AIHuman(object):
         # if this task already exists we just want to update it
         if task_name in self.memory:
             # just add the extra objects on
-            self.memory[task_name][objects]+=objects
+            self.memory[task_name]['objects']+=objects
         else:
             # otherwise create a new one
             
@@ -1203,6 +1259,7 @@ class AIHuman(object):
             'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
             'target': None, # target for tthe gunner role
+            'calculated_turret_angle': None, #used by the gunner role
             'last_think_time': 0,
             'think_interval': 0.5
         }
@@ -1218,12 +1275,18 @@ class AIHuman(object):
 
         # check if the gunners are engaging anyone. we want to be stopped for this
         gunners_engaging=False
+        vehicle_target=None
         for key,value in vehicle.ai.vehicle_crew.items():
             if 'gunner' in key:
                 if value[0] is True:
                     if value[1].ai.memory['task_vehicle_crew']['current_action']=='Engaging Targets':
-                        gunners_engaging=True
-                        break
+                        if value[1].ai.memory['task_vehicle_crew']['target'] is not None:
+                            gunners_engaging=True
+                            if value[1].ai.memory['task_vehicle_crew']['target'].is_vehicle:
+                                vehicle_target=value[1].ai.memory['task_vehicle_crew']['target']
+                                # we handle only one vehicle_target at the moment
+                                break 
+                        
 
         # check if anyone is trying to get in 
         new_passengers=0
@@ -1251,14 +1314,66 @@ class AIHuman(object):
 
         elif new_passengers>0:
             # wait for new passengers
+            # no need to check this again for a bit
+            self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
             vehicle.ai.brake_power=1
             vehicle.ai.throttle=0
             self.memory['task_vehicle_crew']['current_action']='Waiting for passengers'
         elif gunners_engaging:
-            # the gunner is trying to fire. stop the vehicle so they can get a good shot
-            self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
-            vehicle.ai.brake_power=1
-            vehicle.ai.throttle=0
+            if vehicle_target is None:
+                # is it worth stopping for humans?
+                # no need to check this again for a bit
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                # the gunner is trying to fire. stop the vehicle so they can get a good shot
+                self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
+                vehicle.ai.brake_power=1
+                vehicle.ai.throttle=0
+
+            else:
+                # we are firing at a vehicle
+                if random.randint(0,1)==1:
+                    # lets angle towards the target 
+                    # get the rotation to the destination 
+                    r = engine.math_2d.get_rotation(vehicle.world_coords,vehicle_target.world_coords)
+
+                    v = vehicle.rotation_angle
+
+                    if r>v:
+                        vehicle.ai.handle_steer_left()
+                        # helps turn faster
+                        vehicle.ai.throttle=0.3
+
+                    if r<v:
+                        vehicle.ai.handle_steer_right()
+                        # helps turn faster
+                        vehicle.ai.throttle=0.3
+            
+                    # if its close just set it equal
+                    if r>v-3 and r<v+3:
+                        # neutral out steering 
+                        vehicle.ai.handle_steer_neutral()
+                        vehicle.rotation_angle=r
+                        vehicle.ai.update_heading()
+
+                        # hit the brakes
+                        vehicle.ai.throttle=0
+                        vehicle.ai.brake_power=1
+
+                        # no need to check this again for a bit
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                        self.memory['task_vehicle_crew']['current_action']='Angling towards target'
+                else:
+                    # lets just pause
+                    # no need to check this again for a bit
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
+
+                    # the gunner is trying to fire. stop the vehicle so they can get a good shot
+                    self.memory['task_vehicle_crew']['current_action']='Hold for gunners'
+                    vehicle.ai.brake_power=1
+                    vehicle.ai.throttle=0
+
 
         else:
             
@@ -1292,32 +1407,33 @@ class AIHuman(object):
 
             v = vehicle.rotation_angle
 
-            if r>v:
-                vehicle.ai.handle_steer_left()
-                # helps turn faster
-                if vehicle.ai.throttle==1:
-                    vehicle.ai.throttle=0.5
-
-            if r<v:
-                vehicle.ai.handle_steer_right()
-                # helps turn faster
-                if vehicle.ai.throttle==1:
-                    vehicle.ai.throttle=0.5
-            
             # if its close just set it equal
-            if r>v-3 and r<v+3:
+            if r>v-4 and r<v+4:
                 # neutral out steering 
                 vehicle.ai.handle_steer_neutral()
                 vehicle.rotation_angle=r
                 vehicle.ai.update_heading()
+            else:
+
+                if r>v:
+                    vehicle.ai.handle_steer_left()
+                    # helps turn faster
+                    if vehicle.ai.throttle==1:
+                        vehicle.ai.throttle=0.5
+
+                if r<v:
+                    vehicle.ai.handle_steer_right()
+                    # helps turn faster
+                    if vehicle.ai.throttle==1:
+                        vehicle.ai.throttle=0.5
                 
 
-            if (r>355 and v<5) or (r<5 and v>355):
-                # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
-                vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=r
-                vehicle.ai.update_heading()
-                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
+                if (r>355 and v<5) or (r<5 and v>355):
+                    # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
+                    vehicle.ai.handle_steer_neutral()
+                    vehicle.rotation_angle=r
+                    vehicle.ai.update_heading()
+                    engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
 
             
 
@@ -1326,50 +1442,85 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
+        out_of_ammo_primary=False
+        out_of_ammo_coax=False
+
         # check main gun ammo
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
-        if ammo_gun==0 and ammo_inventory>0:
-            # this should be re-done to check for ammo in vehicle, and do something if there is none
-            self.reload_weapon(turret.ai.primary_weapon,vehicle)
+        if ammo_gun==0:
+            if ammo_inventory>0:
+                # this should be re-done to check for ammo in vehicle, and do something if there is none
+                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+            else:
+                out_of_ammo_primary=True
 
         # check coax ammo
         if turret.ai.coaxial_weapon is not None:
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
-            if ammo_gun==0 and ammo_inventory>0:
-                # this should be re-done to check for ammo in vehicle, and do something if there is none
-                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
-
-
-
-        if self.memory['task_vehicle_crew']['target'] is None:
-            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+            if ammo_gun==0:
+                if ammo_inventory>0:
+                    # this should be re-done to check for ammo in vehicle, and do something if there is none
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                else:
+                    out_of_ammo_coax=True
         else:
-            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+            out_of_ammo_coax=True
+
+        if out_of_ammo_coax and out_of_ammo_primary:
+            self.memory['task_vehicle_crew']['current_action']='Out of Ammo'
+        else:
+
+            if self.memory['task_vehicle_crew']['target'] is None:
                 self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
-
-        # we either already had a target, or we might have just got a new one
-        if self.memory['task_vehicle_crew']['target'] is not None:
- 
-            # check rotation
-            rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-            if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
-                # lots of things we could do here.
-                # we could have the driver rotate
-                # for now just get rid of the target
-                self.memory['task_vehicle_crew']['target']=None
             else:
-                # check distance
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
-                if distance>turret.ai.primary_weapon.ai.range:
-                    # alternatively we could drive closer.
+                if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                    self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+
+            # we either already had a target, or we might have just got a new one
+            if self.memory['task_vehicle_crew']['target'] is not None:
+    
+                # check rotation
+                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
+                    # lots of things we could do here.
+                    # we could have the driver rotate
+                    # for now just get rid of the target
                     self.memory['task_vehicle_crew']['target']=None
+                else:
+                    # check distance
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_vehicle_crew']['target'].world_coords)
+                    if distance>turret.ai.primary_weapon.ai.range:
+                        # alternatively we could drive closer.
+                        self.memory['task_vehicle_crew']['target']=None
+                    else:
+                        # check penetration
+                        # there are several places this could be done. this is a good spot, but 
+                        # maybe it should be done earlier like in get_target? alternatively we probably want 
+                        # 'some' amount of firing that won't penetrate as it adds a lot of excitement and is 
+                        # more realistic. just doing it here means its possible some firing will happen before a think
+
+                        # can we penetrate it in a best case scenario?
+                        target=self.memory['task_vehicle_crew']['target']
+                        if target.is_vehicle:
+                            penetration=False
+                            if out_of_ammo_primary is False:
+                                if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                                    penetration=True
+                            elif out_of_ammo_coax is False:
+                                if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                                    penetration=True
+
+                            if penetration is False:
+                                self.memory['task_vehicle_crew']['target']=None
 
 
-        if self.memory['task_vehicle_crew']['target'] is not None:
-            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
-        else:
-            # no target 
-            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+            if self.memory['task_vehicle_crew']['target'] is not None:
+                # update the turret angle for the target
+                self.calculate_turret_aim()
+                self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+            else:
+                # no target 
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
 
         # if we get this far then we just fire at it

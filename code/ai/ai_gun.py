@@ -69,6 +69,10 @@ class AIGun(object):
         # spawns smoke when fired
         self.smoke_on_fire=False
 
+        # gives the AI hints on how to use this weapon
+        self.use_antitank=False
+        self.use_antipersonnel=False
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''

@@ -19,7 +19,7 @@ set spacing to 8
 15 mph = 177.6
 
 # -- weapons --
-# effective distances compressed somewhat to keep the game playable 
+# ! Note:  effective distances compressed somewhat to keep the game playable 
 
 projectile flight time is auto calculated as range/projectile speed
 
@@ -34,3 +34,10 @@ range : 50 yards = 150 feet = 1209 game units
 
 # pistols
 range : 25 yards = 75 feet = 604 game units
+
+
+# panzerfaust 60
+range : 1209 units
+
+# panzerfaust 100
+range : 1813

@@ -34,6 +34,7 @@ class AITurret(object):
         self.turret_armor['rear']=[0,0,0]
 
         self.health=100
+        self.turret_jammed=False
 
         # for remote operated machine guns - mostly german
         self.remote_operated=False
@@ -104,9 +105,17 @@ class AITurret(object):
                                 if value[5]==self.owner:
                                     if value[0]==True:
                                         value[1].ai.handle_event('collision',projectile)
+
+                    # chance to essentially ricochet/explode/shrapnel down into the main vehicle
+                    if random.randint(0,2)==2:
+                        self.vehicle.ai.health-=random.randint(20,30)
+                        # should have a chance to damage crew as well
                 
                 # should do component damage here
-                self.health-=random.randint(50,75)
+                if random.randint(0,1)==1:
+                    self.turret_jammed=True
+                else:
+                    self.health-=random.randint(25,75)
 
             else:
                 # bounced the projectile
@@ -137,11 +146,13 @@ class AITurret(object):
 
     #---------------------------------------------------------------------------
     def handle_rotate_left(self):
-        self.rotation_change=1
+        if self.turret_jammed is False:
+            self.rotation_change=1
 
     #---------------------------------------------------------------------------
     def handle_rotate_right(self):
-        self.rotation_change=-1
+        if self.turret_jammed is False:
+            self.rotation_change=-1
 
     #---------------------------------------------------------------------------
     def handle_fire(self):

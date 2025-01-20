@@ -63,6 +63,7 @@ class AIFactionTactical(object):
 
         self.allied_humans=[]
         self.hostile_humans=[]
+        self.allied_crewed_vehicles=[]
 
 
     #---------------------------------------------------------------------------
@@ -360,11 +361,17 @@ class AIFactionTactical(object):
         '''updates lists of humans that ai_faction_tactical keeps'''
         self.allied_humans=[]
         self.hostile_humans=[]
+        self.allied_crewed_vehicles
 
         for b in self.world.wo_objects_human:
             if b.ai.squad!=None:
                 if b.ai.squad.faction==self.faction or b.ai.squad.faction in self.allied_factions:
                     self.allied_humans.append(b)
+
+                    # if they are in a vehicle add it to the list
+                    if 'task_vehicle_crew' in b.ai.memory:
+                        if b.ai.memory['task_vehicle_crew']['vehicle'] not in self.allied_crewed_vehicles:
+                            self.allied_crewed_vehicles.append(b.ai.memory['task_vehicle_crew']['vehicle'])
                 else:
                     if b.ai.squad.faction in self.hostile_factions:
                         self.hostile_humans.append(b)

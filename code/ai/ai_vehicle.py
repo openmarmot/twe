@@ -238,7 +238,7 @@ class AIVehicle(object):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
-            self.health-=random.randint(0,2)
+            self.health-=random.randint(0,5)
             for key,value in self.vehicle_crew.items():
                 if value[0]==True:
                     # we want to exclude driver/radio/gunner as those are different compartments
@@ -252,9 +252,9 @@ class AIVehicle(object):
                 self.handle_vehicle_body_projectile_hit(projectile)
 
             if self.passenger_compartment_ammo_racks:
-                if random.randint(0,2)==2:
+                if random.randint(0,1)==1:
                     # ammo rack explosion
-                    self.health-=random.randint(50,75)
+                    self.health-=random.randint(70,100)
         else:
             # no penetration, but maybe we can have some other effect?
             pass
@@ -272,7 +272,10 @@ class AIVehicle(object):
                     self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
             
             # should do component damage here
-            self.health-=random.randint(20,75)
+            if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>45:
+                self.health-=random.randint(50,75)
+            else:
+                self.health-=random.randint(10,40)
 
         else:
             # no penetration, but maybe we can have some other effect?
@@ -422,6 +425,46 @@ class AIVehicle(object):
         self.flaps=0
 
     #---------------------------------------------------------------------------
+    def handle_hit_with_flame(self):
+        '''handle the vehicle being hit with flame'''
+
+        crew_damage=False
+        passenger_damage=False
+
+        if random.randint(0,1)==1:
+            # hit the main vehicle
+            if random.randint(0,3)==3:
+                crew_damage=True
+
+            self.health-=random.randint(0,10)
+
+        else:
+            # hit the crew compartment
+            self.health-=random.randint(0,10)
+            if self.open_top:
+                if random.randint(0,1)==1:
+                    # got in the open top
+                    passenger_damage=True
+                else:
+                    if random.randint(0,3)==3:
+                        # leaked in through cracks
+                        passenger_damage=True
+
+        if crew_damage or passenger_damage:
+
+            for key,value in self.vehicle_crew.items():
+                if value[0] is True:
+                    if crew_damage:
+                        if 'driver' in key:
+                            value[1].ai.handle_hit_with_flame()
+                        if 'gunner' in key:
+                            value[1].ai.handle_hit_with_flame()
+                    if passenger_damage:
+                        if 'passenger' in key:
+                            value[1].ai.handle_hit_with_flame()
+                
+
+    #---------------------------------------------------------------------------
     def handle_rudder_left(self):
         self.rudder=-1
 
@@ -547,8 +590,11 @@ class AIVehicle(object):
 
         # bring controls back to neutral slowly over time
         self.neutral_controls()
+        
+        # this is needed because some non collision events can reduce health
+        if self.health<1:
+            self.handle_death()
 
-    
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
         self.acceleration=0
@@ -597,6 +643,10 @@ class AIVehicle(object):
             if self.towed_object.rotation_angle!=self.owner.rotation_angle:
                 self.towed_object.rotation_angle=self.owner.rotation_angle
                 self.towed_object.reset_image=True
+
+            if self.towed_object.is_vehicle:
+                # need to specifically call this as it will not trigger on the towed object itself as its engine is not used
+                self.towed_object.ai.update_child_position_rotation()
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):

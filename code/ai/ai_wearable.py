@@ -19,8 +19,9 @@ class AIWearable(object):
         self.owner=owner
         # head / whatever
         self.wearable_region='none'
-        # thickness of armor grade steel in mm
-        self.armor_thickness=0
+        #[side][armor thickness,armor slope,spaced_armor_thickness]
+        # slope 0 degrees is vertical, 90 degrees is horizontal
+        self.armor=[0,0,0]
 
     #---------------------------------------------------------------------------
     def update(self):

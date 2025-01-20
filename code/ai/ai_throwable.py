@@ -8,6 +8,7 @@ notes :
 
 #import built in modules
 import copy
+import random
 
 #import custom packages
 import engine.math_2d
@@ -52,19 +53,68 @@ class AIThrowable(object):
         self.shrapnel_count=0
         self.explosion_radious=15
 
+        # explode when it hits something
+        self.explode_on_contact=False
+        self.unreliable_contact_fuse=False
+
+        # does this object result in a fire 
+        self.flammable=False
+        # number of flame areas
+        self.flame_amount=0
+
+        # is the objecct a HEAT projectile
+        self.heat=False
+        self.heat_projectile_type=None # matches up with the projectile_data dict in penetration_calculator.py
+
         # the object (human) that actually equipped this weapon
         # set by ai_man.event_inventory
         self.equipper=None
 
         self.redirected=False
 
+        # gives the AI hints on how to use this weapon
+        self.use_antitank=False
+        self.use_antipersonnel=False
+
+    #---------------------------------------------------------------------------
+    def handle_explosion(self):
+        '''handles all the various explosion types and effects'''
+
+        if self.explosive:
+            self.explode()
+        if self.flammable:
+            self.explode_flame()
+        if self.heat:
+            self.explode_heat()
+
+        self.owner.world.remove_queue.append(self.owner)
+
     #---------------------------------------------------------------------------
     def explode(self):        
         self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name,0.5,1)
 
-        # remove the grenade
-        # this also stops code execution for this object as its not anywhere else
+    #---------------------------------------------------------------------------
+    def explode_flame(self):
+
+        for flame in range(self.flame_amount):
+            coords=engine.math_2d.randomize_coordinates(self.owner.world_coords,random.randint(15,75))
+            engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,5)
+
+            possible=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
+
+            hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,10,possible,[])
+
+            for hit in hit_list:
+                hit.ai.handle_hit_with_flame()
+
         self.owner.world.remove_queue.append(self.owner)
+
+    #---------------------------------------------------------------------------
+    def explode_heat(self):
+        target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
+        engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,1,self.heat_projectile_type,self.equipper,self.owner.name)
+        engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
 
     #---------------------------------------------------------------------------
     def redirect(self,target_coords):
@@ -112,16 +162,30 @@ class AIThrowable(object):
                 self.fuse_active_time+=time_passed
 
                 if self.fuse_active_time>self.fuse_max_time:
-                    if self.explosive:
-                        self.explode()
+                    self.handle_explosion()
+                    return
 
         if self.thrown:
             self.flightTime+=time_passed
             if(self.flightTime>self.max_flight_time):
-                # reset. should stop movement
-                self.thrown=False
-                self.flightTime=0
-                self.speed=self.max_speed
+
+                if self.explode_on_contact:
+                    if self.unreliable_contact_fuse:
+                        if random.randint(0,1)==1:
+                            self.handle_explosion()
+                        else:
+                            # contact explosion failed, just reset the grenade
+                            self.thrown=False
+                            self.flightTime=0
+                            self.speed=self.max_speed
+                    else:
+                        self.handle_explosion()
+                else:
+
+                    # reset. should stop movement
+                    self.thrown=False
+                    self.flightTime=0
+                    self.speed=self.max_speed
             else:
                 # move along path
                 self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
@@ -130,17 +194,30 @@ class AIThrowable(object):
                 if self.flightTime>0.1:
                     objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
                     if self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True) !=None:
-                        # just stop the grenade. maybe some spin or reverse movement?
-                        if self.redirected==False:
-                            self.speed=-20
-                            self.flightTime=self.max_flight_time-1
-
-                            # clear the ignore list so it can collide with anything
-                            self.ignore_list=[]
+                        if self.explode_on_contact:
+                            if self.unreliable_contact_fuse:
+                                if random.randint(0,1)==1:
+                                    self.handle_explosion()
+                                else:
+                                    # contact explosion failed, just reset the grenade
+                                    self.thrown=False
+                                    self.flightTime=0
+                                    self.speed=self.max_speed
+                            else:
+                                self.handle_explosion()
 
                         else:
-                            # basically give it another chance to collide
-                            self.redirected=False
+                            # just stop the grenade. maybe some spin or reverse movement?
+                            if self.redirected==False:
+                                self.speed=-20
+                                self.flightTime=self.max_flight_time-1
+
+                                # clear the ignore list so it can collide with anything
+                                self.ignore_list=[]
+
+                            else:
+                                # basically give it another chance to collide
+                                self.redirected=False
 
 
 

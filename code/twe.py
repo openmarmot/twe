@@ -24,15 +24,15 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 #global variables
 
 screen_size = (1200,900)
- 
 
 #------------------------------------------------------------------------------
 def run():
+    '''main function'''
 
     graphic_engine=Graphics_2D_Pygame(screen_size)
 
     # main game loop
-    while graphic_engine.quit==False:
+    while graphic_engine.quit is False:
 
         graphic_engine.update()
         graphic_engine.render()

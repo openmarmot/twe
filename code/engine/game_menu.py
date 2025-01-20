@@ -14,14 +14,14 @@ import random
 import os
 
 #import custom packages
-import engine.world_builder 
+import engine.world_builder
 import engine.math_2d
 
 
 #global variables
 
 
-class GameMenu(object):
+class GameMenu():
     ''' in game menu '''
 
     #---------------------------------------------------------------------------
@@ -44,14 +44,10 @@ class GameMenu(object):
     def handle_input(self,key):
         # called by graphics_2d_pygame when there is a suitable key press
         # key is a string corresponding to the actual key being pressed
-        
-        # reset timer
-        self.time_since_input=0
 
         if key=='esc':
             self.deactivate_menu()
             self.change_menu('start')
-
 
         if self.active_menu=='start':
             self.start_menu(key)
@@ -212,8 +208,4 @@ class GameMenu(object):
         # make the menu auto close after a period of time
 
         pass
-
-        #self.time_since_input+=time_passed_seconds
-        #if self.time_since_input>self.max_menu_idle_time and self.active_menu!='start':
-        #    self.deactivate_menu()
 

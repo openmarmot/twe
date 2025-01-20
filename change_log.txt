@@ -1,11 +1,156 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 19 2025
+- added rpg43 grenade (heat)
+- AFV crew changes, most have pistols now 
+- fixed 45 acp projectile name error 
+- fixed a (rare) error with switch_task_pickup_objects
+- increased chances of vehicle damage 
+- adjusted penetration values for most projectiles to give them >=1 penetration out to longer distances
+- getting hit in the head now results in a penetration check against your helmet (if you have one)
+- rebalanced quick battle - soviets have the advantage now 
+- minor adjustments to vehicle steering
+- primary weapons in turrets will no longer be fired at humans if they aren't tagged as use_antipersonnel 
+- added turret jamming 
+- minor turret health changes 
+- fixed rare bug with <0 health vehicles 
+
+Not sure on rpg43 distribution. I couldn't find any historical sources on how common these 
+were at the squad level. I get the impression that Soviet hand held AT was fairly uncommon with 
+the expecption of AT rifles - which were apparently used through the entire war in great numbers 
+
+The german AFV crew now gets a random pistol or a MP40. This is the first time that a lot of the 
+pistols that have been created will actually be used in game. 
+
+todo 
+- make more pistols 
+
+----------------------------------
+Jan 18 2025
+- added lead calculation to turret aiming 
+- bumped t34-76 ap values up significantly 
+- added molotov cocktails 
+
+the lead calculation happens during think phase so the turret gunners will be more accurate 
+immediately after thinking, and then less so (for moving targets)
+
+this resolves the issue with thanks shooting thousands of rounds at moving soldiers and missing all of them. 
+the downside is that the lead calculation works very well and tanks are now unstoppable 
+
+this also means that firing on a vehicle that is moving is probably less accurate for most shots - which is 
+probably ok with the state of ww2 gun equipment 
+
+Adding the molotov cocktails required a lot of additional code. After I was done I did some quick 
+research and learned that they really weren't in common use in the soviet army. they were 
+historically more of a anti-soviet thing (finnish etc) whoops.
+
+I added molotovs to a couple troops on the german and soviet side but they will remain uncommon. 
+
+the flame mechanism is pretty hard to get a hit with, but if it hits a vehicle and passes the 
+dice role it will damage the crew heavily, possibly taking some of them out. 
+
+----------------------------------
+Jan 15 2025
+- added a driver behavior to angle towards vehicles that are being engaged (50% of the time)
+
+mixed feelings on this after play testing. The soviets seemed to be doing better, but that wasn't 
+the expected result as it affects all tanks, but the german tanks have the worst side armor. 
+
+the implementation is not great. I probably need more vehicle crew variables so that the driver 
+can better pass state to itself for the next iteration. 
+
+----------------------------------
+Jan 14 2025
+- faction_tactical now keeps track of faction associated vehicles
+- friendly fire is now off for vehicles (based on the faction list)
+
+I should add a stun effect from large pen and non-pen that cause the driver to reverse away a bit.
+maybe a morale system for the ai_human that affects both soldiers on foot and in vehile 
+
+----------------------------------
+Jan 13 2025
+- upped some vehicle and turret penetration damage 
+- turret hits now have a chance to also damage the vehicle
+- updated evaluate_targets to handle the new gunner roles 
+- gunners now consider penetration characteristics of their weapon vs the target (only in think mode )
+
+I've changed the force mix a bit for the large quick battle to be more lop sided in the soviets favor and.. 
+it did not help. Ever since the vehicle gunnery and panzerfaust improvements they have been getting wrecked 
+crazy hard. Part of it is definitely that panzerfausts are crazy deadly, and part of it is probably that the mg34 
+and now mg42 are very very good.
+
+I'd like to replace vehicle health with component health, but i need more components first.
+I could probably add in engine damage though. 
+With vehicle health it is hard to get a damage model that feels right. In my play testing today 
+there were vehicles taking a ton of hits before going down.
+
+todo 
+- look at armor pen of rifles at distance. they should not bounce off zero armor 
+- need a faction vehicle list for friendly fire 
+- damage from rifle caliber rounds to afv should be low and not treated the same as tank rounds 
+
+----------------------------------
+Jan 12 2025
+- cleanup and standardization in world_builder 
+- panzerfaust splits into panzerfaust 60 and panzerfaust 100 
+- different HEAT jets are now supported 
+- sd.kfz.251 now has a chance of having a panzerfaust 100 in inventory 
+
+panzerfaust rangers were normalized to match subgun and assault rifle ranges 
+
+decided to keep the panzerfaust troops with panzerfaust 60 for now as it is the most common type 
+
+todo 
+- add panzershreck 
+- add crates back to the world
+- find a way to add more random stuff/clutter  
+
+----------------------------------
+Jan 11 2025
+- added the art file for the ju88 that had been deleted awhile ago 
+- minor pylint related cleanup 
+
+went looking for the gimp file for the sd.kfz.251 which i thought was in the 
+repo at one point but no luck. I might have to redraw that. 
+
+----------------------------------
+Jan 7 2025
+- increased the max distance for the tow option from 200 to 300 to make it easier 
+- added explosion as an option for projectiles 
+- 37mm frag round is now explosive with fragmentation 
+- possible fixed a rare bug with vehicle menu erroring out when player dies in a vehicle 
+- added a 'out of ammo' state for the gunner so the driver won't stop if the gunner has a target but cant fire
+
+the explosive rounds actually look kinda cool. not terrible 
+
+I need to figure out what effect explosive rounds have on armor. I feel like 37mm HE should probably still 
+wreck a 251. but maybe not?? It is actually on the higher end of armor for ww2 vehicles 
+
+I was driving a t34-76 while play testing and noticed that the gunner could not pierce a panzer 4 frontally but 
+could from the side. thats probably about right. 
+
+----------------------------------
+Jan 6 2025
+- fixed crew position not updating on towed vehicles 
+
+If you are playing as soviets you can now tow the 37mm aa guns into good defensive positions 
+around the map. They have 360 traverse and a decent rate of fire (should probably be higher) 
+but currently HE shells are not modelled yet so they will be of limmited affectiveness. 
+
+todo 
+- fix tow distance
+- add tow offsets for some vehicles 
+
+----------------------------------
 Jan 5 2025
 - added mg42 
 - adjusted mg34/42 belt length to be a historical 250
 - switched some squads to mg42
 - added visible crew + positions back to the soviet 37mm
+
+mg42 re-uses the mg34 artwork. all the guns need to be redrawn to scale - and i'm just not feeling 
+like doing that at the moment.
 
 added the 37mm aa back to the skirmish battle to keep it on my mind. towed guns SHOULD be a 
 big part of this game - but they need some love before they are usable
