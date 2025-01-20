@@ -162,6 +162,10 @@ class World(object):
         # some stats 
         self.panzerfaust_launches=0
 
+        # count on how many times a helmet bounces a projectile
+        self.helmet_bounces=0
+
+
         # whether hit markers exist or not
         self.hit_markers=False
 
@@ -947,6 +951,7 @@ class World(object):
         self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
         self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
         self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
+        self.debug_text_queue.append('Helmet bounces: '+str(self.helmet_bounces))
         self.debug_text_queue.append('----- Player Stats -----')
         self.debug_text_queue.append('Player Name: '+self.player.name)
         self.debug_text_queue.append('Player memory current task: '+self.player.ai.memory['current_task'])

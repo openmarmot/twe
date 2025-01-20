@@ -397,19 +397,19 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
             self.text_queue.append('1 - MG34 ')
-            self.text_queue.append('2 - Panzerfaust ')
+            self.text_queue.append('2 - Panzerfaust 60')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
             self.text_queue.append('4 - molotov')
             self.text_queue.append('5 - MG42')
             self.text_queue.append('6 - ptrs-41')
-            self.text_queue.append('7 - mp40')
+            self.text_queue.append('7 - rpg43')
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust_60',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
             elif key=='4':
@@ -422,7 +422,7 @@ class World_Menu(object):
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ptrs_41',True)
             elif key=='7':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'rpg43',True)
                 
         if self.menu_state=='spawn_squads':
             self.text_queue=[]
@@ -1210,6 +1210,8 @@ class World_Menu(object):
                     coaxial_weapon='None'
                     if b.ai.primary_weapon!=None:
                         self.text_queue.append('- '+b.name)
+                        self.text_queue.append('-- health: '+str(b.ai.health))
+                        self.text_queue.append('-- jammed: '+str(b.ai.turret_jammed))
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
                         self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
                         if b.ai.coaxial_weapon!=None:

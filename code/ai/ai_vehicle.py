@@ -238,7 +238,7 @@ class AIVehicle(object):
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
-            self.health-=random.randint(0,2)
+            self.health-=random.randint(0,5)
             for key,value in self.vehicle_crew.items():
                 if value[0]==True:
                     # we want to exclude driver/radio/gunner as those are different compartments
@@ -252,7 +252,7 @@ class AIVehicle(object):
                 self.handle_vehicle_body_projectile_hit(projectile)
 
             if self.passenger_compartment_ammo_racks:
-                if random.randint(0,2)==2:
+                if random.randint(0,1)==1:
                     # ammo rack explosion
                     self.health-=random.randint(70,100)
         else:
@@ -272,7 +272,10 @@ class AIVehicle(object):
                     self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
             
             # should do component damage here
-            self.health-=random.randint(20,75)
+            if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>45:
+                self.health-=random.randint(50,75)
+            else:
+                self.health-=random.randint(10,40)
 
         else:
             # no penetration, but maybe we can have some other effect?
@@ -587,8 +590,11 @@ class AIVehicle(object):
 
         # bring controls back to neutral slowly over time
         self.neutral_controls()
+        
+        # this is needed because some non collision events can reduce health
+        if self.health<1:
+            self.handle_death()
 
-    
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
         self.acceleration=0

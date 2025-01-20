@@ -1,5 +1,30 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 19 2025
+- added rpg43 grenade (heat)
+- AFV crew changes, most have pistols now 
+- fixed 45 acp projectile name error 
+- fixed a (rare) error with switch_task_pickup_objects
+- increased chances of vehicle damage 
+- adjusted penetration values for most projectiles to give them >=1 penetration out to longer distances
+- getting hit in the head now results in a penetration check against your helmet (if you have one)
+- rebalanced quick battle - soviets have the advantage now 
+- minor adjustments to vehicle steering
+- primary weapons in turrets will no longer be fired at humans if they aren't tagged as use_antipersonnel 
+- added turret jamming 
+- minor turret health changes 
+- fixed rare bug with <0 health vehicles 
+
+Not sure on rpg43 distribution. I couldn't find any historical sources on how common these 
+were at the squad level. I get the impression that Soviet hand held AT was fairly uncommon with 
+the expecption of AT rifles - which were apparently used through the entire war in great numbers 
+
+The german AFV crew now gets a random pistol or a MP40. This is the first time that a lot of the 
+pistols that have been created will actually be used in game. 
+
+todo 
+- make more pistols 
 
 ----------------------------------
 Jan 18 2025

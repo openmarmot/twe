@@ -144,9 +144,10 @@ class AIHuman(object):
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
-                        # maybe fire HE 
-                        # for now just fire with the main gun 
-                        turret.ai.handle_fire()
+                        if turret.ai.primary_weapon.ai.use_antipersonnel:
+                            turret.ai.handle_fire()
+                        else:
+                            self.memory['task_vehicle_crew']['target']=None
                 else:
                     turret.ai.handle_fire()
         else:
@@ -227,16 +228,26 @@ class AIHuman(object):
 
 
     #---------------------------------------------------------------------------
-    def calculate_projectile_damage(self,projectile):
+    def calculate_projectile_damage(self,projectile,distance):
         '''calculate and apply damage from projectile hit'''
 
         bleeding_hit=False
         hit=random.randint(1,5)
         if hit==1:
             #head
-            self.health-=random.randint(85,100)
-            bleeding_hit=True
-                
+            if self.wearable_head is None:
+                self.health-=random.randint(85,100)
+                bleeding_hit=True
+            else:
+                penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor)
+                if penetration:
+                    self.health-=random.randint(85,100)
+                    bleeding_hit=True
+                else:
+                    # armor stopped the hit
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
+                    self.owner.world.helmet_bounces+=1
+                    self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
             self.health-=random.randint(50,80)
@@ -256,6 +267,11 @@ class AIHuman(object):
 
         # extra damage from large caliber projectiles
         if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>12:
+            self.health-=30
+            bleeding_hit=True
+        
+        if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>20:
+            # do additional damage for large projectiless
             self.health-=30
             bleeding_hit=True
         
@@ -414,10 +430,10 @@ class AIHuman(object):
                         self.memory['task_vehicle_crew']['target']=closest_object
                         self.calculate_turret_aim()
                     else:
-                        # should probably compare the current target to closest 
-                        # and see if it makes sense to switch targets
-                        self.memory['task_vehicle_crew']['target']=closest_object
-                        self.calculate_turret_aim()
+                        # only switch targets if we aren't currently firing at a vehicle
+                        if self.memory['task_vehicle_crew']['target'].is_vehicle is False:
+                            self.memory['task_vehicle_crew']['target']=closest_object
+                            self.calculate_turret_aim()
 
             else:
 
@@ -436,7 +452,7 @@ class AIHuman(object):
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.health
 
-            self.calculate_projectile_damage(event_data)
+            self.calculate_projectile_damage(event_data,distance)
 
             # data collection
             if event_data.ai.shooter is not None:
@@ -1088,7 +1104,7 @@ class AIHuman(object):
         # if this task already exists we just want to update it
         if task_name in self.memory:
             # just add the extra objects on
-            self.memory[task_name][objects]+=objects
+            self.memory[task_name]['objects']+=objects
         else:
             # otherwise create a new one
             
@@ -1391,32 +1407,33 @@ class AIHuman(object):
 
             v = vehicle.rotation_angle
 
-            if r>v:
-                vehicle.ai.handle_steer_left()
-                # helps turn faster
-                if vehicle.ai.throttle==1:
-                    vehicle.ai.throttle=0.5
-
-            if r<v:
-                vehicle.ai.handle_steer_right()
-                # helps turn faster
-                if vehicle.ai.throttle==1:
-                    vehicle.ai.throttle=0.5
-            
             # if its close just set it equal
-            if r>v-3 and r<v+3:
+            if r>v-4 and r<v+4:
                 # neutral out steering 
                 vehicle.ai.handle_steer_neutral()
                 vehicle.rotation_angle=r
                 vehicle.ai.update_heading()
+            else:
+
+                if r>v:
+                    vehicle.ai.handle_steer_left()
+                    # helps turn faster
+                    if vehicle.ai.throttle==1:
+                        vehicle.ai.throttle=0.5
+
+                if r<v:
+                    vehicle.ai.handle_steer_right()
+                    # helps turn faster
+                    if vehicle.ai.throttle==1:
+                        vehicle.ai.throttle=0.5
                 
 
-            if (r>355 and v<5) or (r<5 and v>355):
-                # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
-                vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=r
-                vehicle.ai.update_heading()
-                engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
+                if (r>355 and v<5) or (r<5 and v>355):
+                    # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
+                    vehicle.ai.handle_steer_neutral()
+                    vehicle.rotation_angle=r
+                    vehicle.ai.update_heading()
+                    engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
 
             
 
