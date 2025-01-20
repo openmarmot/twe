@@ -535,24 +535,8 @@ def load_quick_battle(world,battle_option):
 
     # -- initial troops --
 
-    # infantry only
-    if battle_option=='1':
-        squads=[]
-        squads+=['German 1944 Rifle'] * 4
-        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
-        squads+=['German 1944 Fallschirmjager'] * 2
-        squads+=['Soviet 1943 Rifle'] * 2
-        squads+=['Soviet 1944 SMG'] * 2
-        squads+=['Soviet 1944 Rifle'] * 4
-
-    # german mech vs soviet moto
-    elif battle_option=='2':
-        squads=[]
-        squads+=['German 1944 Panzergrenadier Mech'] * 8
-        squads+=['Soviet 1944 Rifle Motorized'] * 8
-    
     # large mixed unit battle
-    elif battle_option=='3':
+    if battle_option=='1':
         squads=[]
         squads+=['German 1944 Rifle'] * 4
         squads+=['German 1944 Panzergrenadier Mech'] * 6
@@ -577,15 +561,26 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
 
+    # german and civilian only
+    elif battle_option=='2':
+        squads=[]
+        squads+=['German 1944 Panzergrenadier Mech'] * 8
+
+    
+    # soviet and civilian only 
+    elif battle_option=='3':
+        squads=[]
+        squads+=['Soviet 1943 Assault SMG'] * 2
+        squads+=['Soviet 1944 Rifle Motorized'] * 3
+        squads+=['Soviet T20 Armored Tractor'] * 6
+        squads+=['Soviet PTRS-41 AT Squad'] * 6
+        squads+=['Soviet T34-76 Model 1943'] * 8
+        squads+=['Soviet T34-85'] * 8
+        squads+=['Soviet 37mm Auto-Cannon'] * 4
+
     # testing
     elif battle_option=='4':
-        squads=[]
-        squads+=['German 1944 Fallschirmjager']
-        squads+=['Soviet 1944 Rifle']
-        squads+=['Soviet T34-85']
-        squads+=['German Aufklaren Kubelwagen'] * 2
-        squads+=['German RSO Vehicle'] * 2
-        
+        squads=[]       
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -2159,8 +2154,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l43',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='german_panzer_iv_ausf_h':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2231,8 +2228,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     # J is a H with simplicication. schurtzen are replaced with wire schurtzen on the hull (thin)
     elif OBJECT_TYPE=='german_panzer_iv_ausf_j':
@@ -2304,8 +2303,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='75mm_kwk40_l43':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2424,6 +2425,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -2493,6 +2495,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.position_offset=[-65,13]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='t34_76_model_1943_turret':
@@ -2510,7 +2513,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
+        z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='soviet_t34_85':
@@ -2582,8 +2587,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_zis_s_53',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
@@ -2674,6 +2681,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'7.5cm_pak39_L48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php

@@ -69,6 +69,9 @@ class AIGun(object):
         # spawns smoke when fired
         self.smoke_on_fire=False
 
+        # spawn a bullet casing when fired
+        self.spawn_case=True
+
         # gives the AI hints on how to use this weapon
         self.use_antitank=False
         self.use_antipersonnel=False
@@ -116,12 +119,13 @@ class AIGun(object):
                 engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
 
             # spawn bullet case
-            if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
-                z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'steel_case',True)
-                z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
-            elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
-                z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'brass',True)
-                z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
+            if self.spawn_case:
+                if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='steel':
+                    z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'steel_case',True)
+                    z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
+                elif engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['case_material']=='brass':
+                    z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'brass',True)
+                    z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
             # handle special case for weapons that change appearance when empty
             if len(self.magazine.ai.projectiles)==0:

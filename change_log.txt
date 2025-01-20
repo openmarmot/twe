@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 20 2025
+- most vehicle weapons no longer produce shell casings 
+- retraced the lines on the t34-76 turret with a brighter grey to make it more visible 
+- deleted some unused images
+
+hetzer remote gun is a exception to this as it is fully external and 
+would eject shell casings into the environment. same with the sd.kfz.251
+
+thinking about making more soldier art. probably luftwaffe ground troop + luftwaffe with camo smock. 
+will also need a waffen ss smock soldier.
+
+need to learn more about soviet uniforms.
+
+----------------------------------
 Jan 19 2025
 - added rpg43 grenade (heat)
 - AFV crew changes, most have pistols now 
