@@ -5,6 +5,7 @@ Jan 20 2025
 - most vehicle weapons no longer produce shell casings 
 - retraced the lines on the t34-76 turret with a brighter grey to make it more visible 
 - deleted some unused images
+- added luftwaffe ground crew with k98k and mg-15
 
 hetzer remote gun is a exception to this as it is fully external and 
 would eject shell casings into the environment. same with the sd.kfz.251

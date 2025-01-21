@@ -839,7 +839,7 @@ class World(object):
             print('You are now '+self.player.name)
             return True
         else:
-            engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction',True)
+            engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction: '+self.player_spawn_faction,True)
             return False
 
     #---------------------------------------------------------------------------
