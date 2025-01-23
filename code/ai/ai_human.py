@@ -2351,10 +2351,11 @@ class AIHuman(object):
                     self.switch_task_loot_container(random.choice(containers))
             elif decision==3:
                 # eat 
-                for b in self.inventory:
-                    if b.is_consumable:
-                        self.eat(b)
-                        break
+                if self.hunger>20 or self.thirst>20:
+                    for b in self.inventory:
+                        if b.is_consumable:
+                            self.eat(b)
+                            break
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

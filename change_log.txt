@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 22 2025
+- turret pens also damaging the vehicle no longer happens for remote turrets (no opening to the vehicle)
+- fixed game menu faction and quick battle mismatches 
+- added wallet readout to player menu 
+- ai now only eats/drinks when hunger/thirst is >20
+
+
+I better do something with the wallet and banking stuff before i forget about it completely 
+
+
+----------------------------------
 Jan 20 2025
 - most vehicle weapons no longer produce shell casings 
 - retraced the lines on the t34-76 turret with a brighter grey to make it more visible 

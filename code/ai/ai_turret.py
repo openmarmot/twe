@@ -106,10 +106,11 @@ class AITurret(object):
                                     if value[0]==True:
                                         value[1].ai.handle_event('collision',projectile)
 
-                    # chance to essentially ricochet/explode/shrapnel down into the main vehicle
-                    if random.randint(0,2)==2:
-                        self.vehicle.ai.health-=random.randint(20,30)
-                        # should have a chance to damage crew as well
+                        # chance to essentially ricochet/explode/shrapnel down into the main vehicle
+                        # Note - this does not happen if the turret is remote operated as there is no crew opening
+                        if random.randint(0,2)==2:
+                            self.vehicle.ai.health-=random.randint(20,30)
+                            # should have a chance to damage crew as well
                 
                 # should do component damage here
                 if random.randint(0,1)==1:

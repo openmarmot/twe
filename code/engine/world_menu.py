@@ -760,6 +760,11 @@ class World_Menu(object):
                 self.text_queue.append('[anti-tank weapon]: '+self.selected_object.ai.antitank.name)
 
             self.text_queue.append('')
+            self.text_queue.append('--- Wallet ---')
+            for currency_name,currency_amount in self.selected_object.ai.wallet.items():
+                self.text_queue.append(currency_name+': '+str(currency_amount))
+                
+            self.text_queue.append('')
             self.text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
                 self.text_queue.append('Squad Leader')
