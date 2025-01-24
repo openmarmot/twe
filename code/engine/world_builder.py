@@ -2887,7 +2887,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
-        z.is_soldier=True
         z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
 
 
@@ -2897,7 +2896,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
-        z.is_soldier=True
         z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
 
     elif OBJECT_TYPE=='german_luftwaffe_ground_crew_kar98k':

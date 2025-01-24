@@ -375,8 +375,7 @@ class World(object):
                 
             if OBJ.is_player:
                 pass
-            elif OBJ.is_soldier:
-                pass
+
             if OBJ.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
                 ignore_list.append(OBJ.ai.memory['task_vehicle_crew']['vehicle'])

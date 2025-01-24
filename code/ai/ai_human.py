@@ -34,6 +34,7 @@ class AIHuman(object):
             'task_engage_enemy':self.update_task_engage_enemy,
             'task_pickup_objects':self.update_task_pickup_objects,
             'task_think':self.update_task_think,
+            'task_think_idle':self.update_task_think_idle,
             'task_squad_leader':self.update_task_squad_leader,
             'task_loot_container':self.update_task_loot_container
         }
@@ -1146,7 +1147,27 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def switch_task_think(self):
+        '''switch to task_think'''
         task_name='task_think'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'something': 'something'
+            }
+
+            self.memory[task_name]=task_details
+
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_think_idle(self):
+        '''switch to task_think_idle'''
+        task_name='task_think_idle'
 
         if task_name in self.memory:
             # eventually will probably having something to update here
@@ -2339,26 +2360,35 @@ class AIHuman(object):
         # -- ok now we've really run out of things to do. do things that don't matter
         # ! NOTE Squad Lead will never get this far
         if action is False:
-            decision=random.randint(0,10)
-            if decision==1:
-                # go for a walk
-                coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
-                self.switch_task_move_to_location(coords,None)
-            elif decision==2:
-                # check containers
-                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
-                if len(containers)>0:
-                    self.switch_task_loot_container(random.choice(containers))
-            elif decision==3:
-                # eat 
-                if self.hunger>20 or self.thirst>20:
-                    for b in self.inventory:
-                        if b.is_consumable:
-                            self.eat(b)
-                            break
+            self.switch_task_think_idle()
+
+    #---------------------------------------------------------------------------
+    def update_task_think_idle(self):
+        '''update task_think_idle '''
+        # update task_think was getting too long
+        # this task is used to figure out something to do when the bot is idle (has nothing urgent to do)
+
+        decision=random.randint(0,10)
+        if decision==1:
+            # go for a walk
+            coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
+            self.switch_task_move_to_location(coords,None)
+        elif decision==2:
+            # check containers
+            containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
+            if len(containers)>0:
+                self.switch_task_loot_container(random.choice(containers))
+        elif decision==3:
+            # eat 
+            if self.hunger>20 or self.thirst>20:
+                for b in self.inventory:
+                    if b.is_consumable:
+                        self.eat(b)
+                        break
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):
+        '''update task_vehicle_crew'''
 
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         if vehicle.ai.health<1:
