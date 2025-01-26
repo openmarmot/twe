@@ -124,6 +124,8 @@ def create_squads_from_human_list(world,humans,ai_faction_tactical):
                     s.members.append(pistols.pop())
                 if len(unarmed_human)>0:
                     s.members.append(unarmed_human.pop())
+                if len(afv_crew)>0:
+                    s.members.append(afv_crew.pop())
 
 
                 # lets do it again

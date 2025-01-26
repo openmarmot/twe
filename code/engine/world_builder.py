@@ -550,6 +550,8 @@ def load_quick_battle(world,battle_option):
         squads+=['German Panzer IV Ausf H'] * 2
         squads+=['German Panzer IV Ausf J'] * 2
         squads+=['German Luftwaffe MG-15 Crew'] * 2
+        squads+=['German PAK 40'] * 2
+        squads+=['German Sd.kfz.251/22'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -567,6 +569,8 @@ def load_quick_battle(world,battle_option):
         squads=[]
         #squads+=['German 1944 Panzergrenadier Mech'] * 8
         squads+=['German Luftwaffe MG-15 Crew'] * 2
+        squads+=['German PAK 40'] * 2
+        squads+=['German Sd.kfz.251/22'] * 2
 
     
     # soviet and civilian only 
@@ -2057,6 +2061,75 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
 
+    elif OBJECT_TYPE=='german_sd_kfz_251/22':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
+        z.name='Sd.Kfz.251/22'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=True
+        z.ai.vehicle_armor['top']=[8,8,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[8,19,0]
+        z.ai.vehicle_armor['right']=[8,19,0]
+        z.ai.vehicle_armor['front']=[14.5,20,0]
+        z.ai.vehicle_armor['rear']=[8,31,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[8,35,0]
+        z.ai.passenger_compartment_armor['right']=[8,35,0]
+        z.ai.passenger_compartment_armor['front']=[14.5,30,0]
+        z.ai.passenger_compartment_armor['rear']=[8,31,0]
+        turret=spawn_object(world,world_coords,'251_pak40_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,turret]
+        z.ai.vehicle_crew['passenger_1']=[False,None,90,[4,10],True,None]
+        z.ai.vehicle_crew['passenger_2']=[False,None,90,[12,10],True,None]
+        z.ai.max_speed=385.9
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        for b in range(24):
+            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
+
+    elif OBJECT_TYPE=='251_pak40_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_vehicle_turret','pak40_vehicle_turret'],AITurret)
+        z.name='PAK 40 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-30,30]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
+        z.ai.primary_weapon.ai.equipper=z
+
     elif OBJECT_TYPE=='german_panzer_iv_ausf_g':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
         z=WorldObject(world,['panzer_iv_g_chassis','panzer_iv_g_chassis_destroyed'],AIVehicle)
@@ -2678,7 +2751,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.requires_afv_training=True
-        z.ai.armor_thickness=0
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
@@ -2712,6 +2784,79 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'37mm_m1939_k61',False)
         z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='german_pak40':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_carriage_deployed','pak40_carriage_deployed'],AIVehicle)
+        z.name='PAK 40'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=False
+        z.ai.vehicle_armor['top']=[0,0,0]
+        z.ai.vehicle_armor['bottom']=[13,0,0]
+        z.ai.vehicle_armor['left']=[6,22,0]
+        z.ai.vehicle_armor['right']=[6,22,0]
+        z.ai.vehicle_armor['front']=[6,36,0]
+        z.ai.vehicle_armor['rear']=[0,0,0]
+        turret=spawn_object(world,world_coords,'pak40_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        z.ai.vehicle_crew['driver']=[False,None,0,[7.0, -9.0],True,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[13,15],True,turret]
+        z.ai.max_speed=177.6
+        z.ai.max_offroad_speed=177.6
+        z.ai.open_top=True
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.rotation_angle=float(random.randint(0,359))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+       
+    elif OBJECT_TYPE=='pak40_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_turret','pak40_turret'],AITurret)
+        z.name='PAK 40 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-60,60]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
+        z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='75mm_pak40':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='75mm_pak40'
+        z.is_gun=True
+        z.ai.mechanical_accuracy=1
+        z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
+        z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=13
+        z.ai.range=2418
+        z.ai.type='cannon'
+        z.ai.use_antitank=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='75mm_pak40_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='75mm_kwk40_l48_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['75mm_pak40']
+        z.ai.compatible_projectiles=['PzGr39_75_PAK40']
+        z.ai.capacity=1
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
 
   
     elif OBJECT_TYPE=='german_kubelwagen':
