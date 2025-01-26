@@ -36,7 +36,8 @@ class AIHuman(object):
             'task_think':self.update_task_think,
             'task_think_idle':self.update_task_think_idle,
             'task_squad_leader':self.update_task_squad_leader,
-            'task_loot_container':self.update_task_loot_container
+            'task_loot_container':self.update_task_loot_container,
+            'task_sit_down':self.update_task_sit_down,
         }
 
         self.memory={}
@@ -1122,6 +1123,20 @@ class AIHuman(object):
         '''switch task'''
         task_name='task_player_control'
         task_details = {
+        }
+
+        self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_sit_down(self):
+        '''switch task'''
+        task_name='task_sit_down'
+        task_details = {
+            'status':'searching',
+            'furniture_object': None,
+            'sit_start_time':0,
+            'sit_duration':300
         }
 
         self.memory[task_name]=task_details
@@ -2230,6 +2245,9 @@ class AIHuman(object):
         # go towards the closest one
         if nearest_object is not None:
             self.switch_task_move_to_location(nearest_object.world_coords,None)
+        else:
+            if len(objects)==0:
+                self.memory.pop('task_pickup_objects',None)
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
@@ -2273,6 +2291,41 @@ class AIHuman(object):
                 coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
                 self.switch_task_move_to_location(coords,None)
 
+    #---------------------------------------------------------------------------
+    def update_task_sit_down(self):
+        '''update task_sit_down'''
+        
+        # searching, moving to, sitting
+        self.memory['task_sit_down']['status']
+
+        if self.memory['task_sit_down']['status']=='searching':
+            distance=1000
+            # don't want the soldiers wandering off too far 
+            if self.squad.faction in ['german','soviet','american']:
+                distance=500
+            temp=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_furniture,distance)
+
+            if temp is None:
+                # give up for now
+                self.memory.pop('task_sit_down',None)
+                return
+            else:
+                self.memory['task_sit_down']['status']='moving_to_object'
+                self.memory['task_sit_down']['furniture_object']=temp
+
+        if self.memory['task_sit_down']['status']=='moving_to_object':
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_sit_down']['furniture_object'].world_coords)
+            if distance<self.max_distance_to_interact_with_object:
+                # sit down
+                self.memory['task_sit_down']['status']='sitting'
+                self.memory['task_sit_down']['sit_start_time']=self.owner.world.world_seconds
+            else:
+                self.switch_task_move_to_location(self.memory['task_sit_down']['furniture_object'].world_coords,None)
+
+        if self.memory['task_sit_down']['status']=='sitting':
+            # should get up after a time limit passes 
+            if self.owner.world.world_seconds-self.memory['task_sit_down']['sit_start_time']>self.memory['task_sit_down']['sit_duration']:
+                self.memory.pop('task_sit_down',None)
     #---------------------------------------------------------------------------
     def update_task_think(self):
         '''task think - thinking about what to do next'''
@@ -2339,6 +2392,9 @@ class AIHuman(object):
             elif 'task_loot_container' in self.memory:
                 self.memory['current_task']='task_loot_container'
                 action=True
+            elif 'task_sit_down' in self.memory:
+                self.memory['current_task']='task_sit_down'
+                action=True
 
         # -- squad stuff --
         # this should be AFTER anything else important
@@ -2385,6 +2441,8 @@ class AIHuman(object):
                     if b.is_consumable:
                         self.eat(b)
                         break
+        elif decision==4:
+            self.switch_task_sit_down()
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

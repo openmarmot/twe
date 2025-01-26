@@ -2,6 +2,23 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 25 2025
+- minor ai_human updates 
+- adding code for sitting down on furniture 
+
+apparently i had created a whole world objects category for furniture - with 
+the only object in that category being the brown chair. The chair was added in 
+2023 and I didn't do anything with it until now. There are actually a lot of 
+little random bits in the game like that. 
+
+Now the AI has a idle task for sitting down. the AI will travel to the nearest 
+chair - but only if one is in range, with the range being shorter for soldiers than 
+civilians. 
+
+the new task_sit_down is a good model for a complex task. It has three stages (search/move/sit)
+and it can handle switching context to a move task. 
+
+----------------------------------
 Jan 23 2025
 - minor cleanup
 - added think_idle task 
