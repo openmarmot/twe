@@ -375,8 +375,7 @@ class World(object):
                 
             if OBJ.is_player:
                 pass
-            elif OBJ.is_soldier:
-                pass
+
             if OBJ.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
                 ignore_list.append(OBJ.ai.memory['task_vehicle_crew']['vehicle'])
@@ -839,7 +838,7 @@ class World(object):
             print('You are now '+self.player.name)
             return True
         else:
-            engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction',True)
+            engine.log.add_data('error','world.spawn_player but there are no humans left in the world of the correct faction: '+self.player_spawn_faction,True)
             return False
 
     #---------------------------------------------------------------------------
@@ -964,7 +963,8 @@ class World(object):
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
         self.debug_text_queue.append('----- Faction Stats ------')
         for b in self.tactical_ai.values():
-            self.debug_text_queue.append(b.faction+': '+str(len(b.allied_humans)))
+            self.debug_text_queue.append(b.faction+' humans: '+str(len(b.allied_humans)))
+            self.debug_text_queue.append(b.faction+' vehicles: '+str(len(b.allied_crewed_vehicles)))
 
 
         # world area data

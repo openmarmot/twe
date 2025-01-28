@@ -479,7 +479,7 @@ def get_squad_map_objects(squad_name):
     elif 'Soviet' in squad_name:
         members=soviet_squad_data[squad_name]['members'].split(',')
     else:
-        engine.log.add_data('error','ai_faction_strategic.deploy_squad_to_map squad_name '+squad_name+' not recognized',True)
+        engine.log.add_data('error','worldbuilder.get_squad_map_objects squad_name '+squad_name+' not recognized',True)
 
     # convert each member to a map_object
     map_objects=[]
@@ -535,24 +535,8 @@ def load_quick_battle(world,battle_option):
 
     # -- initial troops --
 
-    # infantry only
-    if battle_option=='1':
-        squads=[]
-        squads+=['German 1944 Rifle'] * 4
-        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
-        squads+=['German 1944 Fallschirmjager'] * 2
-        squads+=['Soviet 1943 Rifle'] * 2
-        squads+=['Soviet 1944 SMG'] * 2
-        squads+=['Soviet 1944 Rifle'] * 4
-
-    # german mech vs soviet moto
-    elif battle_option=='2':
-        squads=[]
-        squads+=['German 1944 Panzergrenadier Mech'] * 8
-        squads+=['Soviet 1944 Rifle Motorized'] * 8
-    
     # large mixed unit battle
-    elif battle_option=='3':
+    if battle_option=='1':
         squads=[]
         squads+=['German 1944 Rifle'] * 4
         squads+=['German 1944 Panzergrenadier Mech'] * 6
@@ -565,6 +549,9 @@ def load_quick_battle(world,battle_option):
         squads+=['German Panzer IV Ausf G'] * 2
         squads+=['German Panzer IV Ausf H'] * 2
         squads+=['German Panzer IV Ausf J'] * 2
+        squads+=['German Luftwaffe MG-15 Crew'] * 2
+        squads+=['German PAK 40'] * 2
+        squads+=['German Sd.kfz.251/22'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -577,15 +564,29 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
 
+    # german and civilian only
+    elif battle_option=='2':
+        squads=[]
+        #squads+=['German 1944 Panzergrenadier Mech'] * 8
+        squads+=['German Luftwaffe MG-15 Crew'] * 2
+        squads+=['German PAK 40'] * 2
+        squads+=['German Sd.kfz.251/22'] * 2
+
+    
+    # soviet and civilian only 
+    elif battle_option=='3':
+        squads=[]
+        squads+=['Soviet 1943 Assault SMG'] * 2
+        squads+=['Soviet 1944 Rifle Motorized'] * 3
+        squads+=['Soviet T20 Armored Tractor'] * 6
+        squads+=['Soviet PTRS-41 AT Squad'] * 6
+        squads+=['Soviet T34-76 Model 1943'] * 8
+        squads+=['Soviet T34-85'] * 8
+        squads+=['Soviet 37mm Auto-Cannon'] * 4
+
     # testing
     elif battle_option=='4':
-        squads=[]
-        squads+=['German 1944 Fallschirmjager']
-        squads+=['Soviet 1944 Rifle']
-        squads+=['Soviet T34-85']
-        squads+=['German Aufklaren Kubelwagen'] * 2
-        squads+=['German RSO Vehicle'] * 2
-        
+        squads=[]       
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -992,7 +993,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.volume=20
         z.name='german_fuel_can'
-        z.world_builder_identity='german_fuel_can'
         z.rotation_angle=float(random.randint(0,359))
         fill_container(world,z,'gas_80_octane')
 
@@ -1002,7 +1002,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.volume=0.3
         z.name='blue_coffee_cup'
         z.minimum_visible_scale=0.4
-        z.world_builder_identity='blue_coffee_cup'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='55_gallon_drum':
@@ -1011,7 +1010,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.volume=208
         z.name='55_gallon_drum'
         z.collision_radius=15
-        z.world_builder_identity='55_gallon_drum'
         z.rotation_angle=float(random.randint(0,359))
         z.volume=208.2
         fill_container(world,z,'gas_80_octane')
@@ -1022,7 +1020,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.volume=208
         z.name='barrel'
         z.collision_radius=15
-        z.world_builder_identity='barrel'
         z.rotation_angle=float(random.randint(0,359))
         if random.randint(0,1)==1:
             fill_container(world,z,'water')
@@ -1033,7 +1030,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.name='german_mg_ammo_can'
         z.minimum_visible_scale=0.4
-        z.world_builder_identity='german_mg_ammo_can'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='german_drop_canister':
@@ -1042,7 +1038,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.name='german drop canister'
         z.collision_radius=20
-        z.world_builder_identity='german_drop_canister'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='crate':
@@ -1051,13 +1046,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.name='crate'
         z.collision_radius=20
-        z.world_builder_identity='crate'
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
     
     elif OBJECT_TYPE=='crate_mp40':
         z=spawn_object(world,world_coords,'crate',False)
-        z.world_builder_identity='crate_mp40'
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
@@ -1073,7 +1066,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='crate_random_consumables':
         z=spawn_object(world,world_coords,'small_crate',False)
-        z.world_builder_identity='crate_random_consumables'
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
@@ -1090,7 +1082,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.name='small_crate'
         z.collision_radius=20
-        z.world_builder_identity='small_crate'
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
 
@@ -1100,7 +1091,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_large_human_pickup=True
         z.name='cupboard'
         z.collision_radius=20
-        z.world_builder_identity='cupboard'
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
 
@@ -1117,7 +1107,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.volume=1
         z.name='coffee_tin'
         z.minimum_visible_scale=0.4
-        z.world_builder_identity='coffee_tin'
         z.rotation_angle=float(random.randint(0,359))
         contents='coffee_beans'
         if random.randint(0,1)==1:
@@ -1130,7 +1119,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.volume=1
         z.name='jar'
         z.minimum_visible_scale=0.4
-        z.world_builder_identity='jar'
         z.rotation_angle=float(random.randint(0,359))
 
     elif OBJECT_TYPE=='pickle_jar':
@@ -1270,7 +1258,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z=WorldObject(world,['mp40'],AIGun)
         z.name='mp40'
         z.minimum_visible_scale=0.4
-        z.world_builder_identity='gun_mp40'
         z.is_gun=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'mp40_magazine',False)
@@ -2074,6 +2061,75 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
 
+    elif OBJECT_TYPE=='german_sd_kfz_251/22':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
+        z.name='Sd.Kfz.251/22'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=True
+        z.ai.vehicle_armor['top']=[8,8,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[8,19,0]
+        z.ai.vehicle_armor['right']=[8,19,0]
+        z.ai.vehicle_armor['front']=[14.5,20,0]
+        z.ai.vehicle_armor['rear']=[8,31,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[8,35,0]
+        z.ai.passenger_compartment_armor['right']=[8,35,0]
+        z.ai.passenger_compartment_armor['front']=[14.5,30,0]
+        z.ai.passenger_compartment_armor['rear']=[8,31,0]
+        turret=spawn_object(world,world_coords,'251_pak40_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,turret]
+        z.ai.vehicle_crew['passenger_1']=[False,None,90,[4,10],True,None]
+        z.ai.vehicle_crew['passenger_2']=[False,None,90,[12,10],True,None]
+        z.ai.max_speed=385.9
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        for b in range(24):
+            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
+
+    elif OBJECT_TYPE=='251_pak40_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_vehicle_turret','pak40_vehicle_turret'],AITurret)
+        z.name='PAK 40 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-30,30]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
+        z.ai.primary_weapon.ai.equipper=z
+
     elif OBJECT_TYPE=='german_panzer_iv_ausf_g':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
         z=WorldObject(world,['panzer_iv_g_chassis','panzer_iv_g_chassis_destroyed'],AIVehicle)
@@ -2159,8 +2215,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l43',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='german_panzer_iv_ausf_h':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2231,8 +2289,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     # J is a H with simplicication. schurtzen are replaced with wire schurtzen on the hull (thin)
     elif OBJECT_TYPE=='german_panzer_iv_ausf_j':
@@ -2304,8 +2364,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='75mm_kwk40_l43':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2424,6 +2486,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -2493,6 +2556,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.position_offset=[-65,13]
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='t34_76_model_1943_turret':
@@ -2510,7 +2574,9 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
+        z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon.ai.equipper=z
 
     elif OBJECT_TYPE=='soviet_t34_85':
@@ -2582,8 +2648,10 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_zis_s_53',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.coaxial_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
@@ -2674,6 +2742,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'7.5cm_pak39_L48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2682,7 +2751,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.requires_afv_training=True
-        z.ai.armor_thickness=0
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
@@ -2716,6 +2784,79 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'37mm_m1939_k61',False)
         z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='german_pak40':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_carriage_deployed','pak40_carriage_deployed'],AIVehicle)
+        z.name='PAK 40'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=False
+        z.ai.vehicle_armor['top']=[0,0,0]
+        z.ai.vehicle_armor['bottom']=[13,0,0]
+        z.ai.vehicle_armor['left']=[6,22,0]
+        z.ai.vehicle_armor['right']=[6,22,0]
+        z.ai.vehicle_armor['front']=[6,36,0]
+        z.ai.vehicle_armor['rear']=[0,0,0]
+        turret=spawn_object(world,world_coords,'pak40_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        z.ai.vehicle_crew['driver']=[False,None,0,[7.0, -9.0],True,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[13,15],True,turret]
+        z.ai.max_speed=177.6
+        z.ai.max_offroad_speed=177.6
+        z.ai.open_top=True
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.rolling_resistance=0.03
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.rotation_angle=float(random.randint(0,359))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+       
+    elif OBJECT_TYPE=='pak40_turret':
+        # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['pak40_turret','pak40_turret'],AITurret)
+        z.name='PAK 40 turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-60,60]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
+        z.ai.primary_weapon.ai.equipper=z
+
+    elif OBJECT_TYPE=='75mm_pak40':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='75mm_pak40'
+        z.is_gun=True
+        z.ai.mechanical_accuracy=1
+        z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
+        z.ai.rate_of_fire=0.9
+        z.ai.reload_speed=13
+        z.ai.range=2418
+        z.ai.type='cannon'
+        z.ai.use_antitank=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='75mm_pak40_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='75mm_kwk40_l48_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['75mm_pak40']
+        z.ai.compatible_projectiles=['PzGr39_75_PAK40']
+        z.ai.capacity=1
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
 
   
     elif OBJECT_TYPE=='german_kubelwagen':
@@ -2756,7 +2897,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_kubelwagen_camo':
         z=spawn_object(world,world_coords,'german_kubelwagen',False)
         z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed']
-        z.world_builder_identity='german_kubelwagen_camo'
 
     elif OBJECT_TYPE=='red_bicycle':
         # note second image is used for the wreck..
@@ -2892,7 +3032,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
-        z.is_soldier=True
         z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
 
 
@@ -2902,13 +3041,39 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
-        z.is_soldier=True
         z.ai.wallet['Soviet Ruble']=round(random.uniform(0.05,1.5),2)
+
+    elif OBJECT_TYPE=='german_luftwaffe_ground_crew_kar98k':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.image_list=['luftwaffe_ground_crew','luftwaffe_ground_crew_prone','luftwaffe_ground_crew_dead']
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'kar98k_magazine',False))
+
+    elif OBJECT_TYPE=='german_luftwaffe_ground_crew_mg15':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.image_list=['luftwaffe_ground_crew','luftwaffe_ground_crew_prone','luftwaffe_ground_crew_dead']
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
+        z.add_inventory(spawn_object(world,world_coords,'mg15_drum_magazine',False))
 
     elif OBJECT_TYPE=='german_afv_crew_mp40':
         z=spawn_object(world,world_coords,'german_soldier',False)
         z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']
-        z.world_builder_identity='german_afv_crew'
         z.ai.is_afv_trained=True
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
@@ -2922,13 +3087,11 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     elif OBJECT_TYPE=='german_afv_crew_pistol':
         z=spawn_object(world,world_coords,'german_soldier',False)
         z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']
-        z.world_builder_identity='german_afv_crew'
         z.ai.is_afv_trained=True
         add_random_pistol_to_inventory(z,world)
 
     elif OBJECT_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_kar98k'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -2942,7 +3105,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_kar98k_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_kar98k'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'kar98k',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -2957,7 +3119,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_k43':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_k43'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'k43',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -2971,7 +3132,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_g41w':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_g41w'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'g41w',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -2985,7 +3145,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_mp40':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_mp40'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -2999,7 +3158,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_mp40_molotov':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_mp40'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
@@ -3014,7 +3172,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='german_mp40_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_mp40'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mp40',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3029,7 +3186,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_mg34':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_mg34'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mg34',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3040,7 +3196,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     
     elif OBJECT_TYPE=='german_mg42':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_mg42'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'mg42',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3051,7 +3206,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_stg44':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_stg44'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'stg44',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3065,7 +3219,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_stg44_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_stg44'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'stg44',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3080,7 +3233,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='german_fg42-type2':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.world_builder_identity='german_fg42-type2'
         z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
         z.add_inventory(spawn_object(world,world_coords,'fg42-type2',False))
         z.add_inventory(spawn_object(world,world_coords,'model24',False))
@@ -3096,7 +3248,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
     # --------- soviet types ----------------------------------------
     elif OBJECT_TYPE=='soviet_afv_crew_tt33':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_afv_crew'
         z.ai.is_afv_trained=True
         z.add_inventory(spawn_object(world,world_coords,'tt33',False))
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
@@ -3104,7 +3255,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.add_inventory(spawn_object(world,world_coords,'tt33_magazine',False))
     elif OBJECT_TYPE=='soviet_mosin_nagant':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_mosin_nagant'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'mosin_nagant',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
@@ -3118,7 +3268,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='soviet_svt40':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_svt40'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'svt40',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
@@ -3132,7 +3281,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='soviet_ppsh43':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_ppsh43'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
@@ -3146,7 +3294,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='soviet_ppsh43_rpg43':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_ppsh43'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
         z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
@@ -3161,7 +3308,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='soviet_ppsh43_molotov':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_ppsh43'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'ppsh43',False))
         z.add_inventory(spawn_object(world,world_coords,'molotov_cocktail',False))
@@ -3176,7 +3322,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='soviet_dp28':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_dp28'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'dp28',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
@@ -3187,7 +3332,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         
     elif OBJECT_TYPE=='soviet_tt33':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_tt33'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'tt33',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))
@@ -3197,7 +3341,6 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
 
     elif OBJECT_TYPE=='soviet_ptrs_41':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
-        z.world_builder_identity='soviet_ptrs_41'
         z.add_inventory(spawn_object(world,world_coords,'helmet_ssh40',False))
         z.add_inventory(spawn_object(world,world_coords,'ptrs_41',False))
         z.add_inventory(spawn_object(world,world_coords,'rg_42_grenade',False))

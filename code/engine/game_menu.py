@@ -180,24 +180,35 @@ class GameMenu():
                 key='none'
 
         if self.menu_state=='battle_select':
+            faction=self.graphics_engine.world.player_spawn_faction
             self.text_queue=[]
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('Pick a Quick Battle Scenario')
             self.text_queue.append('Note - balance varies wildly with code updates.')
-            self.text_queue.append('1 - Infantry only battle ')
-            self.text_queue.append('2 - German mech vs Soviet moto')
-            self.text_queue.append('3 - Large mixed unit battle (choose this)')
-            self.text_queue.append('4 - Reserved for testing, content will vary') 
-
-            if key in ['1','2','3','4']:
-
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,key)
-
+            self.text_queue.append('1 - Large mixed unit battle (choose this) ')
+            if key=='1':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'1')
                 self.graphics_engine.switch_mode(1)
                 self.deactivate_menu()
-                
- 
+            if faction in ['german','civilian']:
+                self.text_queue.append('2 - German and Civilian only (No fighting)')
+                if key=='2':
+                    engine.world_builder.load_quick_battle(self.graphics_engine.world,'2')
+                    self.graphics_engine.switch_mode(1)
+                    self.deactivate_menu()
+            if faction in ['soviet','civilian']:
+                self.text_queue.append('3 - Soviet and Civilian only (No fighting)')
+                if key=='3':
+                    engine.world_builder.load_quick_battle(self.graphics_engine.world,'3')
+                    self.graphics_engine.switch_mode(1)
+                    self.deactivate_menu()
+
+            self.text_queue.append('4 - Reserved for testing, content will vary')
+            if key=='4':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'4')
+                self.graphics_engine.switch_mode(1)
+                self.deactivate_menu() 
 
 
 

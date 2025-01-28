@@ -112,6 +112,10 @@ class AIFactionTactical(object):
 
         for b in vehicles:
             b.world_coords=grid_coords.pop()
+            if self.faction=='german':
+                b.rotation_angle=270
+            elif self.faction=='soviet':
+                b.rotation_angle=90
             #b.world_coords=copy.copy(self.spawn_location)
             # randomize position a bit
             #engine.math_2d.randomize_position_and_rotation(b,170)
@@ -361,7 +365,7 @@ class AIFactionTactical(object):
         '''updates lists of humans that ai_faction_tactical keeps'''
         self.allied_humans=[]
         self.hostile_humans=[]
-        self.allied_crewed_vehicles
+        self.allied_crewed_vehicles=[]
 
         for b in self.world.wo_objects_human:
             if b.ai.squad!=None:

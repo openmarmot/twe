@@ -183,6 +183,12 @@ class AIVehicle(object):
         # used for death message 
         self.collision_log=[]
 
+        # used for targeting
+        self.recent_noise_or_move=False
+        # reset in update
+        self.last_noise_or_move_time=0 # in world.world_seconds
+        self.recent_noise_or_move_reset_seconds=30
+
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit):
         hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit)
@@ -595,6 +601,10 @@ class AIVehicle(object):
         if self.health<1:
             self.handle_death()
 
+        if self.recent_noise_or_move:
+            if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
+                self.recent_noise_or_move=False
+
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
         self.acceleration=0
@@ -769,6 +779,9 @@ class AIVehicle(object):
 
         # move along vector
         if self.current_speed>0:
+
+            self.recent_noise_or_move=True
+            self.last_noise_or_move_time=self.owner.world.world_seconds
 
             # apply gearbox
             gear_velocity=self.current_speed*self.transmission[self.current_gear][0]

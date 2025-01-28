@@ -34,8 +34,10 @@ class AIHuman(object):
             'task_engage_enemy':self.update_task_engage_enemy,
             'task_pickup_objects':self.update_task_pickup_objects,
             'task_think':self.update_task_think,
+            'task_think_idle':self.update_task_think_idle,
             'task_squad_leader':self.update_task_squad_leader,
-            'task_loot_container':self.update_task_loot_container
+            'task_loot_container':self.update_task_loot_container,
+            'task_sit_down':self.update_task_sit_down,
         }
 
         self.memory={}
@@ -103,8 +105,14 @@ class AIHuman(object):
 
         self.in_building=False
         self.building_list=[] # list of buildings the ai is overlapping spatially
+        self.closest_building=None
         self.last_building_check_time=0
         self.building_check_rate=1
+
+        self.recent_noise_or_move=False
+        # reset in update
+        self.last_noise_or_move_time=0 # in world.world_seconds
+        self.recent_noise_or_move_reset_seconds=30
 
         # the ai group that this human is a part of
         self.squad=None
@@ -161,11 +169,22 @@ class AIHuman(object):
         # clear building list and in_building bool
         self.building_list=[]
         self.in_building=False
-        # check to see if we are colliding with any of the buildings
+        self.closest_building=None
+
+        closest_distance=1000
         for b in self.owner.world.wo_objects_building:
-            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) is not None:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+            if distance<closest_distance:
+                closest_distance=distance
+                self.closest_building=b
+
+            # check if we are in/overlapping any buildings
+            if distance<(self.owner.collision_radius+b.collision_radius):
                 self.building_list.append(b)
                 self.in_building=True
+                
+
+
 
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
@@ -408,15 +427,73 @@ class AIHuman(object):
                     target=b.ai.memory['task_vehicle_crew']['vehicle']
                     # could do something further here to check armor pen
 
-                if d<800:
-                    if target not in self.near_targets:
+                # vehicle crew target analysis
+                if self.memory['current_task']=='task_vehicle_crew':
+                    if d<400:
+                        # always seen at this range
+                        if target not in self.near_targets:
+                            self.near_targets.append(target)
+                    elif d<800:
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.near_targets.append(target)
+                            else:
+                                # if not in building, everything is seen at this range
+                                self.near_targets.append(target)
+                        else:
+                            # vehicles are ALWAYS seen at this range
+                            if target not in self.near_targets:
+                                self.near_targets.append(target)
+                    elif d<1500:                        
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.mid_targets.append(target)
+                            else:
+                                if target.ai.prone is False:
+                                    self.mid_targets.append(target)
+                        else:
+                            # vehicles are seen at this range
+                            if target not in self.mid_targets:
+                                self.mid_targets.append(target)
+                    elif d<2450:
+                        if target.is_human:
+                            if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
+                                if target not in self.far_targets:
+                                    self.far_targets.append(target)
+                        else:
+                            if target.ai.recent_noise_or_move:
+                                if target not in self.far_targets:
+                                    self.far_targets.append(target)
+
+                # - human (not in vehicle) target analysis - 
+                else:
+                    if d<800:
+                        # humans always see everything at this range
                         self.near_targets.append(target)
-                elif d<1500:
-                    if target not in self.mid_targets:
-                        self.mid_targets.append(target)
-                elif d<2450:
-                    if target not in self.far_targets:
-                        self.far_targets.append(target)
+                    elif d<1500:                        
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.mid_targets.append(target)
+                            else:
+                                # if not in building, everything is seen at this range
+                                self.mid_targets.append(target)
+                        else:
+                            # vehicles are ALWAYS seen by humans at this range
+                            if target not in self.mid_targets:
+                                self.mid_targets.append(target)
+                    elif d<2450:
+                        if target.is_human:
+                            if target.ai.recent_noise_or_move and target.ai.in_building is False:
+                                self.far_targets.append(target)
+                        else:
+                            if target.ai.recent_noise_or_move:
+                                self.far_targets.append(target)
 
                 if d<closest_distance:
                     closest_distance=d
@@ -655,6 +732,8 @@ class AIHuman(object):
         ''' fires a weapon '''
 
         if weapon.ai.check_if_can_fire():
+            self.recent_noise_or_move=True
+            self.last_noise_or_move_time=self.owner.world.world_seconds
 
             aim_coords=target.world_coords
             # guess how long it will take for the bullet to arrive
@@ -1127,6 +1206,20 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
+    def switch_task_sit_down(self):
+        '''switch task'''
+        task_name='task_sit_down'
+        task_details = {
+            'status':'searching',
+            'furniture_object': None,
+            'sit_start_time':0,
+            'sit_duration':300
+        }
+
+        self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
     def switch_task_squad_leader(self):
         '''switch task'''
         task_name='task_squad_leader'
@@ -1146,7 +1239,27 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def switch_task_think(self):
+        '''switch to task_think'''
         task_name='task_think'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'something': 'something'
+            }
+
+            self.memory[task_name]=task_details
+
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_think_idle(self):
+        '''switch to task_think_idle'''
+        task_name='task_think_idle'
 
         if task_name in self.memory:
             # eventually will probably having something to update here
@@ -1674,6 +1787,10 @@ class AIHuman(object):
                 self.last_building_check_time=self.owner.world.world_seconds
                 self.building_check()
 
+            if self.recent_noise_or_move:
+                if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
+                    self.recent_noise_or_move=False
+
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
         '''update any empty equipment slots'''
@@ -2129,6 +2246,9 @@ class AIHuman(object):
         
         last_think_time=self.memory['task_move_to_location']['last_think_time']
         think_interval=self.memory['task_move_to_location']['think_interval']
+
+        self.recent_noise_or_move=True
+        self.last_noise_or_move_time=self.owner.world.world_seconds
         
         if self.owner.world.world_seconds-last_think_time>think_interval:
             # reset time
@@ -2209,6 +2329,9 @@ class AIHuman(object):
         # go towards the closest one
         if nearest_object is not None:
             self.switch_task_move_to_location(nearest_object.world_coords,None)
+        else:
+            if len(objects)==0:
+                self.memory.pop('task_pickup_objects',None)
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
@@ -2253,6 +2376,41 @@ class AIHuman(object):
                 self.switch_task_move_to_location(coords,None)
 
     #---------------------------------------------------------------------------
+    def update_task_sit_down(self):
+        '''update task_sit_down'''
+        
+        # searching, moving to, sitting
+        self.memory['task_sit_down']['status']
+
+        if self.memory['task_sit_down']['status']=='searching':
+            distance=1000
+            # don't want the soldiers wandering off too far 
+            if self.squad.faction in ['german','soviet','american']:
+                distance=500
+            temp=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_furniture,distance)
+
+            if temp is None:
+                # give up for now
+                self.memory.pop('task_sit_down',None)
+                return
+            else:
+                self.memory['task_sit_down']['status']='moving_to_object'
+                self.memory['task_sit_down']['furniture_object']=temp
+
+        if self.memory['task_sit_down']['status']=='moving_to_object':
+            distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_sit_down']['furniture_object'].world_coords)
+            if distance<self.max_distance_to_interact_with_object:
+                # sit down
+                self.memory['task_sit_down']['status']='sitting'
+                self.memory['task_sit_down']['sit_start_time']=self.owner.world.world_seconds
+            else:
+                self.switch_task_move_to_location(self.memory['task_sit_down']['furniture_object'].world_coords,None)
+
+        if self.memory['task_sit_down']['status']=='sitting':
+            # should get up after a time limit passes 
+            if self.owner.world.world_seconds-self.memory['task_sit_down']['sit_start_time']>self.memory['task_sit_down']['sit_duration']:
+                self.memory.pop('task_sit_down',None)
+    #---------------------------------------------------------------------------
     def update_task_think(self):
         '''task think - thinking about what to do next'''
         # the ugly function where we have to determine what we are doing
@@ -2276,9 +2434,9 @@ class AIHuman(object):
                 # need to get a gun
                 distance=4000
                 if len(self.near_targets)>0:
-                    distance=200
+                    distance=300
                 elif len(self.mid_targets)>0:
-                    distance=400
+                    distance=500
                 elif len(self.far_targets)>0:
                     distance=900
 
@@ -2318,6 +2476,9 @@ class AIHuman(object):
             elif 'task_loot_container' in self.memory:
                 self.memory['current_task']='task_loot_container'
                 action=True
+            elif 'task_sit_down' in self.memory:
+                self.memory['current_task']='task_sit_down'
+                action=True
 
         # -- squad stuff --
         # this should be AFTER anything else important
@@ -2339,25 +2500,40 @@ class AIHuman(object):
         # -- ok now we've really run out of things to do. do things that don't matter
         # ! NOTE Squad Lead will never get this far
         if action is False:
-            decision=random.randint(0,10)
-            if decision==1:
-                # go for a walk
-                coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
-                self.switch_task_move_to_location(coords,None)
-            elif decision==2:
-                # check containers
-                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
-                if len(containers)>0:
-                    self.switch_task_loot_container(random.choice(containers))
-            elif decision==3:
-                # eat 
+            self.switch_task_think_idle()
+
+    #---------------------------------------------------------------------------
+    def update_task_think_idle(self):
+        '''update task_think_idle '''
+        # update task_think was getting too long
+        # this task is used to figure out something to do when the bot is idle (has nothing urgent to do)
+
+        decision=random.randint(0,10)
+        if decision==1:
+            # go for a walk
+            coords=[self.owner.world_coords[0]+random.randint(-45,45),self.owner.world_coords[1]+random.randint(-45,45)]
+            self.switch_task_move_to_location(coords,None)
+        elif decision==2:
+            # check containers
+            containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
+            if len(containers)>0:
+                self.switch_task_loot_container(random.choice(containers))
+        elif decision==3:
+            # eat 
+            if self.hunger>20 or self.thirst>20:
                 for b in self.inventory:
                     if b.is_consumable:
                         self.eat(b)
                         break
+        elif decision==4:
+            self.switch_task_sit_down()
+        elif decision==5:
+            if self.closest_building is not None:
+                self.switch_task_move_to_location(self.closest_building.world_coords,None)
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):
+        '''update task_vehicle_crew'''
 
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         if vehicle.ai.health<1:

@@ -401,8 +401,8 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['panzer_iv_hull_mg'],0))
 #image_tool.image_objects.append(ImageObject(['panzer_iv_g_turret'],0))
 
-image_tool.image_objects.append(ImageObject(['zu_7_carriage'],0))
-image_tool.image_objects.append(ImageObject(['37mm_m1939_61k_turret'],0))
+image_tool.image_objects.append(ImageObject(['pak40_carriage_deployed'],0))
+image_tool.image_objects.append(ImageObject(['pak40_turret'],0))
 image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 

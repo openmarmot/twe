@@ -95,7 +95,6 @@ class WorldObject(object):
         self.is_player=False
         self.is_human=False # something that has ai_human
         
-        self.is_soldier=False
         self.is_vehicle=False
         self.is_airplane=False
         self.is_gun=False

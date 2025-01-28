@@ -367,7 +367,7 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
-            self.text_queue.append('2 - hetzer')
+            self.text_queue.append('2 - german_sd_kfz_251-22')
             self.text_queue.append('3 - german_panzer_iv_ausf_h')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - sd_kfz_251 ')
@@ -378,7 +378,7 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_jagdpanzer_38t_hetzer',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_h',True)
             elif key=='4':
@@ -442,7 +442,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_misc':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Misc --')
-            self.text_queue.append('1 - smoke cloud  ')
+            self.text_queue.append('1 - brown_chair')
             self.text_queue.append('2 - Feldfunk radio and charger ')
             self.text_queue.append('3 - Maybach HL42')
             self.text_queue.append('4 - Pickle Jar')
@@ -453,9 +453,7 @@ class World_Menu(object):
             self.text_queue.append('9 - grid 50 foot')
 
             if key=='1':
-                heading=engine.math_2d.get_heading_from_rotation(self.world.player.rotation_angle-90)
-                #engine.world_builder.spawn_smoke_cloud(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],heading)
-                engine.world_builder.spawn_explosion_and_fire(self.world,[self.world.player.world_coords[0]+50,self.world.player.world_coords[1]])
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'brown_chair',True)
 
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'radio_feldfu_b',True)
@@ -686,6 +684,7 @@ class World_Menu(object):
         self.text_queue.append('penetration: ' +str(self.selected_object.ai.hit_data.penetrated))
         self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
         self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
+        self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
 
 
 
@@ -759,6 +758,11 @@ class World_Menu(object):
             if self.selected_object.ai.antitank!=None:
                 self.text_queue.append('[anti-tank weapon]: '+self.selected_object.ai.antitank.name)
 
+            self.text_queue.append('')
+            self.text_queue.append('--- Wallet ---')
+            for currency_name,currency_amount in self.selected_object.ai.wallet.items():
+                self.text_queue.append(currency_name+': '+str(currency_amount))
+                
             self.text_queue.append('')
             self.text_queue.append('--- Squad Info ---')
             if self.selected_object.ai.squad.squad_leader==self.selected_object:
