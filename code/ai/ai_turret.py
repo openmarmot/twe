@@ -168,6 +168,8 @@ class AITurret(object):
             if self.coaxial_weapon.ai.check_if_can_fire():
                 self.coaxial_weapon.rotation_angle=self.calculate_accuracy(self.coaxial_weapon)
                 self.coaxial_weapon.ai.fire()
+                self.vehicle.ai.recent_noise_or_move=True
+                self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):

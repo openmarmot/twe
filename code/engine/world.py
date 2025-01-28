@@ -963,7 +963,8 @@ class World(object):
         self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
         self.debug_text_queue.append('----- Faction Stats ------')
         for b in self.tactical_ai.values():
-            self.debug_text_queue.append(b.faction+': '+str(len(b.allied_humans)))
+            self.debug_text_queue.append(b.faction+' humans: '+str(len(b.allied_humans)))
+            self.debug_text_queue.append(b.faction+' vehicles: '+str(len(b.allied_crewed_vehicles)))
 
 
         # world area data

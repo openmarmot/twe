@@ -105,8 +105,14 @@ class AIHuman(object):
 
         self.in_building=False
         self.building_list=[] # list of buildings the ai is overlapping spatially
+        self.closest_building=None
         self.last_building_check_time=0
         self.building_check_rate=1
+
+        self.recent_noise_or_move=False
+        # reset in update
+        self.last_noise_or_move_time=0 # in world.world_seconds
+        self.recent_noise_or_move_reset_seconds=30
 
         # the ai group that this human is a part of
         self.squad=None
@@ -163,11 +169,22 @@ class AIHuman(object):
         # clear building list and in_building bool
         self.building_list=[]
         self.in_building=False
-        # check to see if we are colliding with any of the buildings
+        self.closest_building=None
+
+        closest_distance=1000
         for b in self.owner.world.wo_objects_building:
-            if engine.math_2d.checkCollisionCircleOneResult(self.owner,[b],[]) is not None:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+            if distance<closest_distance:
+                closest_distance=distance
+                self.closest_building=b
+
+            # check if we are in/overlapping any buildings
+            if distance<(self.owner.collision_radius+b.collision_radius):
                 self.building_list.append(b)
                 self.in_building=True
+                
+
+
 
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
@@ -410,15 +427,73 @@ class AIHuman(object):
                     target=b.ai.memory['task_vehicle_crew']['vehicle']
                     # could do something further here to check armor pen
 
-                if d<800:
-                    if target not in self.near_targets:
+                # vehicle crew target analysis
+                if self.memory['current_task']=='task_vehicle_crew':
+                    if d<400:
+                        # always seen at this range
+                        if target not in self.near_targets:
+                            self.near_targets.append(target)
+                    elif d<800:
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.near_targets.append(target)
+                            else:
+                                # if not in building, everything is seen at this range
+                                self.near_targets.append(target)
+                        else:
+                            # vehicles are ALWAYS seen at this range
+                            if target not in self.near_targets:
+                                self.near_targets.append(target)
+                    elif d<1500:                        
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.mid_targets.append(target)
+                            else:
+                                if target.ai.prone is False:
+                                    self.mid_targets.append(target)
+                        else:
+                            # vehicles are seen at this range
+                            if target not in self.mid_targets:
+                                self.mid_targets.append(target)
+                    elif d<2450:
+                        if target.is_human:
+                            if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
+                                if target not in self.far_targets:
+                                    self.far_targets.append(target)
+                        else:
+                            if target.ai.recent_noise_or_move:
+                                if target not in self.far_targets:
+                                    self.far_targets.append(target)
+
+                # - human (not in vehicle) target analysis - 
+                else:
+                    if d<800:
+                        # humans always see everything at this range
                         self.near_targets.append(target)
-                elif d<1500:
-                    if target not in self.mid_targets:
-                        self.mid_targets.append(target)
-                elif d<2450:
-                    if target not in self.far_targets:
-                        self.far_targets.append(target)
+                    elif d<1500:                        
+                        if target.is_human:
+                            # if in building, only seen if noise/move
+                            if target.ai.in_building:
+                                if target.ai.recent_noise_or_move:
+                                    self.mid_targets.append(target)
+                            else:
+                                # if not in building, everything is seen at this range
+                                self.mid_targets.append(target)
+                        else:
+                            # vehicles are ALWAYS seen by humans at this range
+                            if target not in self.mid_targets:
+                                self.mid_targets.append(target)
+                    elif d<2450:
+                        if target.is_human:
+                            if target.ai.recent_noise_or_move and target.ai.in_building is False:
+                                self.far_targets.append(target)
+                        else:
+                            if target.ai.recent_noise_or_move:
+                                self.far_targets.append(target)
 
                 if d<closest_distance:
                     closest_distance=d
@@ -657,6 +732,8 @@ class AIHuman(object):
         ''' fires a weapon '''
 
         if weapon.ai.check_if_can_fire():
+            self.recent_noise_or_move=True
+            self.last_noise_or_move_time=self.owner.world.world_seconds
 
             aim_coords=target.world_coords
             # guess how long it will take for the bullet to arrive
@@ -1710,6 +1787,10 @@ class AIHuman(object):
                 self.last_building_check_time=self.owner.world.world_seconds
                 self.building_check()
 
+            if self.recent_noise_or_move:
+                if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
+                    self.recent_noise_or_move=False
+
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
         '''update any empty equipment slots'''
@@ -2165,6 +2246,9 @@ class AIHuman(object):
         
         last_think_time=self.memory['task_move_to_location']['last_think_time']
         think_interval=self.memory['task_move_to_location']['think_interval']
+
+        self.recent_noise_or_move=True
+        self.last_noise_or_move_time=self.owner.world.world_seconds
         
         if self.owner.world.world_seconds-last_think_time>think_interval:
             # reset time
@@ -2350,9 +2434,9 @@ class AIHuman(object):
                 # need to get a gun
                 distance=4000
                 if len(self.near_targets)>0:
-                    distance=200
+                    distance=300
                 elif len(self.mid_targets)>0:
-                    distance=400
+                    distance=500
                 elif len(self.far_targets)>0:
                     distance=900
 
@@ -2443,6 +2527,9 @@ class AIHuman(object):
                         break
         elif decision==4:
             self.switch_task_sit_down()
+        elif decision==5:
+            if self.closest_building is not None:
+                self.switch_task_move_to_location(self.closest_building.world_coords,None)
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

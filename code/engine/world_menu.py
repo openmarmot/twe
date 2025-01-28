@@ -684,6 +684,7 @@ class World_Menu(object):
         self.text_queue.append('penetration: ' +str(self.selected_object.ai.hit_data.penetrated))
         self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
         self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
+        self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
 
 
 

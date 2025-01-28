@@ -1,10 +1,23 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 27 2025
+- vehicles and humans now have recent_noise_or_move attribute 
+- human evaluate_targets uses recent_noise_or_move to determine visibility 
+- hit marker menu readout now includes distance 
+- added faction vehicle count to debug data 
+- fixed a bug with faction vehicle count 
+- added a closest_building variable + rewrote building detection to support it 
+- added a idle task to move to the closest building 
+
+the recent_noise_or_move change did not have a immediate obvious effect. 
+the human ai needs to be updated to use prone more, and to prefer to be in buildings whenever possible 
 
 ----------------------------------
 Jan 26 2025
 - added pak 40
 - added sd.kfz.251/22 with the pak40
+- adjusted spawn rotation angle for german and soviet vehicles 
 
 The 251/22 is pretty interesting. It has no anti-infantry weapons and only 24 AT rounds.
 It has the pak40 which is the best AT gun in the game at the moment, but it has 
@@ -12,6 +25,17 @@ paper thin armor that will only stop rifle rounds.
 
 I probably need to add some way for the crew to fire out of the top of open topped vehicles, 
 but it would probably be pretty complicated. maybe a special turret.
+
+todo 
+- implement 'signature' variable for humans and tanks 
+    this will be sound + visible signature. 
+    + when firing gun 
+    + when walking 
+    + for not prone 
+    - for in building 
+
+signature will be used to decide if a human/vehicle gets rendered, and decide if a human or vehicle shows up 
+for targeting for the AI 
 
 ----------------------------------
 Jan 25 2025
