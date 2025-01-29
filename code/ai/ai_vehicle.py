@@ -223,7 +223,7 @@ class AIVehicle(object):
         # note - need to think how gunners fit into this
 
         for value in self.vehicle_crew.values():
-            if value[0]==False:
+            if value[0] is False:
                 return False
             
         return True
@@ -367,6 +367,8 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_death(self):
+        self.detach_tow_object()
+
         engine.world_builder.spawn_container_vehicle_wreck('wreck',self.owner,1)
 
         engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)

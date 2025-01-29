@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 28 2025
+- vehicles now detach any towed object on death 
+- minor cleanup and optimization
+
+----------------------------------
 Jan 27 2025
 - vehicles and humans now have recent_noise_or_move attribute 
 - human evaluate_targets uses recent_noise_or_move to determine visibility 
