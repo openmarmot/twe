@@ -277,14 +277,14 @@ class World(object):
 
 
     #---------------------------------------------------------------------------
-    def check_object_exists(self,object):
+    def check_object_exists(self,wo_obj):
         '''returns a bool as to whether the object is in the world'''
 
-        if object in self.wo_objects:
-            if object in self.remove_queue:
+        if wo_obj in self.wo_objects:
+            if wo_obj in self.remove_queue:
                 print('debug : check object on object in remove_queue')
                 return False
-            elif object in self.exit_queue:
+            elif wo_obj in self.exit_queue:
                 print('debug : check object on object in exit_queue')
                 return False
             else:
@@ -292,7 +292,6 @@ class World(object):
         else:
             return False
             
-
     #------------------------------------------------------------------------------
     def cleanup(self):
         '''cleanup routine for when performance is hurting'''
@@ -456,11 +455,6 @@ class World(object):
                     compatible_magazines.append(b)
         return compatible_magazines
 
-    #---------------------------------------------------------------------------
-    def get_random_object(self,OBJECT_LIST):
-        ''' return a random object from a list '''
-        i=random.randint(0,len(OBJECT_LIST)-1)
-        return OBJECT_LIST[i]
     
     #---------------------------------------------------------------------------
     def get_objects_within_range(self,WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
@@ -659,7 +653,6 @@ class World(object):
                 for b in temp:
                     if b[0]==True:
                         b[1].ai.handle_exit_vehicle()
-
 
 
             print(message)

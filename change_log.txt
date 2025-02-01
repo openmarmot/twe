@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 31 2025
+- added lru cache to a couple functions in math_2d 
+- minor cleanup 
+
+I couldn't tell a difference with the lru cache. 
+maybe i should just disable it.
+A custom cache for get_distance and some of the rounding functions might 
+be worth it.
+----------------------------------
 Jan 29 2025
 - minor cleanup and optimization of graphics_2d_pygame 
 

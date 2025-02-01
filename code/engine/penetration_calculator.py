@@ -72,8 +72,6 @@ def check_passthrough(projectile,target):
         passthrough=get_building_passthrough(projectile,target)
     elif target.is_human:
         passthrough=get_human_passthrough(projectile,target)
-    elif target.is_vehicle:
-        passthrough=get_vehicle_passthrough(projectile,target)
 
     return passthrough
 
@@ -119,28 +117,6 @@ def get_human_passthrough(PROJECTILE,TARGET):
             passthrough=True
     return passthrough
 
-#---------------------------------------------------------------------------
-def get_vehicle_passthrough(PROJECTILE,TARGET):
-    global projectile_data
-
-    # eventually vehicles will get a unique penetration calculation to check armor 
-
-    proj_material=projectile_data[PROJECTILE.ai.projectile_type]['projectile_material']
-    passthrough=False
-    if proj_material=='mild_steel':
-        if random.randint(1,100) <50:
-            passthrough=True
-    elif proj_material=='hard_steel':
-        if random.randint(1,100) <80:
-            passthrough=True
-    elif proj_material=='tungsten':
-        if random.randint(1,100) <90:
-            passthrough=True
-    else :
-        # everything else - mostly lead
-        if random.randint(1,100) <20:
-            passthrough=True
-    return passthrough
             
 #---------------------------------------------------------------------------
 def load_projectile_data():

@@ -26,6 +26,8 @@ import math
 import random
 import copy
 
+from functools import lru_cache
+
 #import custom packages
 
 
@@ -37,6 +39,7 @@ GRAVITY=-9.8
 
 
 #------------------------------------------------------------------------------
+@lru_cache(maxsize=1000)
 def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
     '''calculate acceleration'''
     # force - force in watts
@@ -238,6 +241,7 @@ def get_heading_vector(location,destination):
     return heading
 
 #--------------------------------------------------------------------------------
+@lru_cache(maxsize=1000)
 def get_heading_from_rotation(rotation):
     ''' get heading vector. input is rotation in degrees'''
 
@@ -256,6 +260,7 @@ def get_normalized(vec2):
     return b
 
 #------------------------------------------------------------------------------
+@lru_cache(maxsize=1000)
 def get_normalized_angle(degrees):
     return round(degrees % 360,2)
 

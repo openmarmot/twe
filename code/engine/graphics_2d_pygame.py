@@ -242,8 +242,6 @@ class Graphics_2D_Pygame(object):
             for c in b:
                 if c.reset_image:
                     self.reset_pygame_image(c)
-                    #self.reset_pygame_image_v2(c)
-                #self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
                 if(self.draw_collision):
