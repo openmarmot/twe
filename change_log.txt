@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 2 2025
+- turned off bullet cases for panzer iv hull mg 
+- added panzerschreck
+
+todo
+need to handle reloading for anti-tank weapons 
+
+----------------------------------
 Feb 1 2025
 - added more caching for math functions 
 

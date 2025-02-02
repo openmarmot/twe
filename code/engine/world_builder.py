@@ -552,6 +552,7 @@ def load_quick_battle(world,battle_option):
         squads+=['German Luftwaffe MG-15 Crew'] * 2
         squads+=['German PAK 40'] * 2
         squads+=['German Sd.kfz.251/22'] * 2
+        squads+=['German Panzerschreck Team'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -1183,6 +1184,34 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.is_gun_magazine=True
         z.ai.compatible_guns=['panzerfaust_100']
         z.ai.compatible_projectiles=['panzerfaust_100']
+        z.ai.capacity=1
+        z.ai.removable=False
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
+    elif OBJECT_TYPE=='panzerschreck':
+        z=WorldObject(world,['panzerschreck','panzerschreck'],AIGun)
+        z.name='panzerschreck'
+        z.minimum_visible_scale=0.4
+        z.ai.mechanical_accuracy=2
+        z.ai.speed=300
+        z.is_handheld_antitank=True
+        z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
+        z.ai.rate_of_fire=0.12
+        z.ai.reload_speed=0
+        z.ai.range=2000
+        z.ai.type='antitank launcher'
+        z.ai.use_antitank=True
+        z.ai.smoke_on_fire=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif OBJECT_TYPE=='panzerschreck_magazine':
+        z=WorldObject(world,['panzerfaust_warhead'],AIMagazine)
+        z.name='panzerschreck magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['panzerschreck']
+        z.ai.compatible_projectiles=['panzerschreck']
         z.ai.capacity=1
         z.ai.removable=False
         z.rotation_angle=float(random.randint(0,359))
@@ -2199,6 +2228,7 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif OBJECT_TYPE=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with SPAWN TRUE as they are always in world
@@ -3089,6 +3119,17 @@ def spawn_object(world,world_coords,OBJECT_TYPE, SPAWN):
         z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']
         z.ai.is_afv_trained=True
         add_random_pistol_to_inventory(z,world)
+
+    elif OBJECT_TYPE=='german_pistol_panzerschreck':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
+        z.add_inventory(spawn_object(world,world_coords,'model24',False))
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        add_random_pistol_to_inventory(z,world)
+        z.add_inventory(spawn_object(world,world_coords,'panzerschreck',False))
+        for b in range(6):
+            z.add_inventory(spawn_object(world,world_coords,"panzerschreck_magazine",False))
+
 
     elif OBJECT_TYPE=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
