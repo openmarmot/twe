@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 1 2025
+- added more caching for math functions 
+
+----------------------------------
 Jan 31 2025
 - added lru cache to a couple functions in math_2d 
 - minor cleanup 

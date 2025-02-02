@@ -773,10 +773,10 @@ class World_Menu(object):
             self.text_queue.append('')
             self.text_queue.append('--- Debug Info ---')
             self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
-            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords,True)
+            d=engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
             d2='no squad lead'
             if self.selected_object.ai.squad.squad_leader!=None:
-                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords,True)
+                d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords)
             self.text_queue.append('current task: '+self.selected_object.ai.memory['current_task'])
             if self.selected_object.ai.memory['current_task']=='task_vehicle_crew':
                 self.text_queue.append('Vehicle Role: '+self.selected_object.ai.memory['task_vehicle_crew']['role'])

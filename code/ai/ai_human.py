@@ -525,7 +525,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
         if event_data.is_projectile:
-            distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords,True)
+            distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.health
 

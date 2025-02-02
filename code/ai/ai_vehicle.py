@@ -238,7 +238,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
@@ -267,7 +267,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])

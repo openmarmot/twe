@@ -37,6 +37,7 @@ from functools import lru_cache
 # velocity of gravity in meters/second
 GRAVITY=-9.8
 
+cache_check=[]
 
 #------------------------------------------------------------------------------
 @lru_cache(maxsize=1000)
@@ -157,14 +158,18 @@ def collision_sort(runs,wo_objects):
                 a.world_coords[1]+=float(random.randint(-100,100))
 
 #------------------------------------------------------------------------------
-def get_distance(coords1, coords2,round_number=False):
+def get_distance(coords1, coords2):
+    '''get the distance between two sets of coordinates'''
+    return get_distance_cache(tuple(coords1),tuple(coords2))
+
+#------------------------------------------------------------------------------
+@lru_cache(maxsize=2000)
+def get_distance_cache(coords1, coords2):
+    '''cached version, inputs are tuples'''
     x=coords1[0]-coords2[0]
     y=coords1[1]-coords2[1]
     distance=math.sqrt(x*x+y*y)
-    if round_number:
-        return round(distance,1)
-    else:
-        return distance
+    return round(distance,1)
 
 #------------------------------------------------------------------------------
 def get_column_coords(initial_coords, diameter, count, rotation_degrees, width):
@@ -234,6 +239,7 @@ def get_grid_coords(initial_coords, diameter, count):
 #------------------------------------------------------------------------------
 def get_heading_vector(location,destination):
     ''' normalized vector representing the heading (direction) to a target'''
+
     # location = [float,float]
     # destination = [float,float]
     vec_to_dest=[destination[0]-location[0],destination[1]-location[1]]
@@ -251,6 +257,13 @@ def get_heading_from_rotation(rotation):
 
 #------------------------------------------------------------------------------
 def get_normalized(vec2):
+    return get_normalized_cache(tuple(vec2))
+
+#-----------------------------------------------------------------------------
+@lru_cache(maxsize=2000)
+def get_normalized_cache(vec2):
+    '''cached version, parameters are tuples'''
+
     l=math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
     b=[0.,0.]
     try:
@@ -359,6 +372,14 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
         
 #------------------------------------------------------------------------------
 def get_rotation(coords, target_coords):
+    '''get rotation angle from one set of coordinates to another'''
+    return get_rotation_cache(tuple(coords),tuple(target_coords))
+
+#------------------------------------------------------------------------------
+@lru_cache(maxsize=5000)
+def get_rotation_cache(coords,target_coords):
+    '''the cached version. parameters are tuples'''
+
     delta_x = coords[0] - target_coords[0]
     delta_y = coords[1] - target_coords[1]
     
@@ -372,6 +393,7 @@ def get_rotation(coords, target_coords):
 
 #------------------------------------------------------------------------------
 def get_round_vector_2(vector):
+    
     return [round(vector[0],2),round(vector[1],2)]
 
 #------------------------------------------------------------------------------
@@ -403,6 +425,13 @@ def get_vector_length(vec2):
 
 #------------------------------------------------------------------------------
 def get_vector_rotation(vector,angle_degrees):
+    return get_vector_rotation_cache(tuple(vector),angle_degrees)
+
+#-----------------------------------------------------------------------------
+@lru_cache(maxsize=5000)
+def get_vector_rotation_cache(vector,angle_degrees):
+    '''cached version, vector is a tuple'''
+
     # note this is adjusted to match how in game coordinates work
     # in the original code x and y were flipped
     # Convert angle to radians
@@ -411,9 +440,6 @@ def get_vector_rotation(vector,angle_degrees):
     # Rotation matrix applied to vector
     y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
     x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
-
-    #x = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
-    #y = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
     
     return [x, y]    
 
