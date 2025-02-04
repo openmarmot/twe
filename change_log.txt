@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 3 2025
+- more pylint code cleanup 
+- general refactoring for code readability
+
+----------------------------------
 Feb 2 2025
 - turned off bullet cases for panzer iv hull mg 
 - added panzerschreck

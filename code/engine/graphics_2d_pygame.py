@@ -16,7 +16,7 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 
 #import built in modules
 from itertools import islice
-import os 
+import os
 
 # import pip packages
 import pygame
@@ -43,7 +43,7 @@ class Graphics_2D_Pygame(object):
         pygame.init()
         pygame.display.set_caption("https://github.com/openmarmot/twe")
 
-        # this seems to significantly improve visual quality when on 
+        # this seems to significantly improve visual quality when on
         self.double_buffering=True
         if self.double_buffering:
             self.screen = pygame.display.set_mode(self.screen_size, pygame.DOUBLEBUF, 32)
@@ -77,10 +77,8 @@ class Graphics_2D_Pygame(object):
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
         # count of rendered objects
-        self.renderCount=0
+        self.render_count=0
 
-        
-        
         # time stuff
         self.clock=pygame.time.Clock()
         self.time_passed=None
@@ -92,10 +90,8 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.menu_color=('#ffffff')
-        self.color_black=('#000000')
-
-        
+        self.menu_color='#ffffff'
+        self.color_black='#000000'
 
         # draw collision circles
         self.draw_collision=False
@@ -167,8 +163,9 @@ class Graphics_2D_Pygame(object):
         # load all images
         self.load_all_images('images')
 
-#------------------------------------------------------------------------------
-    def handleInput(self):
+    #------------------------------------------------------------------------------
+    def handle_input(self):
+        ''' handle input from user'''
 
         # usefull for single button presses where you don't 
         # need to know if the button is still pressed
@@ -217,7 +214,7 @@ class Graphics_2D_Pygame(object):
                 if keys[key]:
                     action()
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def load_all_images(self,folder_path):
         '''load all the images into pygame'''
         try:
@@ -233,7 +230,7 @@ class Graphics_2D_Pygame(object):
             engine.log.add_data('error', f'Failed to load images: {e}', True)
 
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def render(self):
         self.update_render_info()
 
@@ -244,7 +241,7 @@ class Graphics_2D_Pygame(object):
                     self.reset_pygame_image(c)
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
-                if(self.draw_collision):
+                if self.draw_collision:
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
                 if self.mode==2:
@@ -280,13 +277,13 @@ class Graphics_2D_Pygame(object):
                 h+=15
                 self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-            if(self.world.debug_mode):
+            if self.world.debug_mode :
                 h=0
                 for b in self.world.debug_text_queue:
                     h+=15
                     self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
 
-            if(self.world.display_vehicle_text):
+            if self.world.display_vehicle_text :
                 h=0
                 for b in self.world.vehicle_text_queue:
                     h+=15
@@ -303,13 +300,13 @@ class Graphics_2D_Pygame(object):
         else:
             pygame.display.update()
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def reset_all(self):
         ''' resize all world_objects'''
         for b in self.world.wo_objects:
             b.reset_image=True
 
-#---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self,mouse_coords):
         possible_objects=[]
 
@@ -320,7 +317,10 @@ class Graphics_2D_Pygame(object):
                     pass
                 elif self.mode==1:
                     # filter out a couple things we don't want to click on
-                    if c.is_player==False and c!=self.world.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                    if (c.is_player is False 
+                        and c != self.world.player.ai.large_pickup 
+                        and c.is_turret is False 
+                        and c.can_be_deleted is False):
                         possible_objects.append(c)
                 elif self.mode==2:
                     # for strategic map we want everything
@@ -346,7 +346,7 @@ class Graphics_2D_Pygame(object):
             elif self.mode==2:
                 self.strategic_map.strategic_menu.activate_menu(closest_object)
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def switch_mode(self,desired_mode):
         '''switch the graphic engine mode '''
 
@@ -363,12 +363,12 @@ class Graphics_2D_Pygame(object):
             engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
 
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def update(self):
         '''
             any misc updating that needs to be done
         '''
-        self.handleInput()
+        self.handle_input()
 
         # update time
         self.time_passed=self.clock.tick(self.max_fps)
@@ -384,7 +384,7 @@ class Graphics_2D_Pygame(object):
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
-                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.renderCount))
+                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
 
                 
                 # image cache debug info 
@@ -398,7 +398,7 @@ class Graphics_2D_Pygame(object):
             self.strategic_map.update()
 
             
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def update_render_info(self):
         '''
             -checks if world objects are within the viewable
@@ -409,7 +409,7 @@ class Graphics_2D_Pygame(object):
         #clear out the render levels
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
-        self.renderCount=0
+        self.render_count=0
         if self.mode==0:
             pass
         elif self.mode==1:
@@ -440,18 +440,18 @@ class Graphics_2D_Pygame(object):
                     obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
                     obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
             
-            self.renderCount = len(renderable_objects)
+            self.render_count = len(renderable_objects)
         elif self.mode==2:
             for b in self.strategic_map.map_squares:
                 self.renderlists[0].append(b)
 
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
         x,y=pygame.mouse.get_pos()
         return [x,y]
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def get_mouse_world_coords(self):
         ''' return world coords of mouse'''
         # pretty sure this math doesnt make any sense
@@ -460,12 +460,12 @@ class Graphics_2D_Pygame(object):
         player_y=self.world.player.world_coords[1]
         return [player_x-x,player_y-y]
 
-#-----------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     def get_player_screen_coords(self):
         ''' return player screen coordinates'''
         return [self.screen_size[0]/2,self.screen_size[1]/2]
     
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
         center_x=self.screen_size[0]/2
@@ -478,7 +478,7 @@ class Graphics_2D_Pygame(object):
         translate=[center_x-player_x,center_y-player_y]
         return translate
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
         '''Reset the image for a world object with caching'''
         wo.reset_image = False
@@ -515,7 +515,7 @@ class Graphics_2D_Pygame(object):
                 True
             )
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def zoom_out(self):
         '''zoom out'''
         if self.scale>self.scale_limit[0]:
@@ -523,7 +523,7 @@ class Graphics_2D_Pygame(object):
             self.view_adjust+=self.view_adjustment
             #print('zoom out',self.scale)
             self.reset_all()
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
         if self.scale<self.scale_limit[1]:
