@@ -16,7 +16,7 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 
 #import built in modules
 from itertools import islice
-import os 
+import os
 
 # import pip packages
 import pygame
@@ -43,7 +43,7 @@ class Graphics_2D_Pygame(object):
         pygame.init()
         pygame.display.set_caption("https://github.com/openmarmot/twe")
 
-        # this seems to significantly improve visual quality when on 
+        # this seems to significantly improve visual quality when on
         self.double_buffering=True
         if self.double_buffering:
             self.screen = pygame.display.set_mode(self.screen_size, pygame.DOUBLEBUF, 32)
@@ -77,10 +77,8 @@ class Graphics_2D_Pygame(object):
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
         # count of rendered objects
-        self.renderCount=0
+        self.render_count=0
 
-        
-        
         # time stuff
         self.clock=pygame.time.Clock()
         self.time_passed=None
@@ -92,10 +90,8 @@ class Graphics_2D_Pygame(object):
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
-        self.menu_color=('#ffffff')
-        self.color_black=('#000000')
-
-        
+        self.menu_color='#ffffff'
+        self.color_black='#000000'
 
         # draw collision circles
         self.draw_collision=False
@@ -119,12 +115,57 @@ class Graphics_2D_Pygame(object):
         self.view_adjust=self.view_adjust_minimum
         self.view_adjustment=400
 
+        # -- key stuff --
+        self.key_press_actions = {
+            pygame.K_w: lambda: self.world.handle_key_press('w'),
+            pygame.K_s: lambda: self.world.handle_key_press('s'),
+            pygame.K_a: lambda: self.world.handle_key_press('a'),
+            pygame.K_d: lambda: self.world.handle_key_press('d'),
+            pygame.K_f: lambda: self.world.handle_key_press('f', self.get_mouse_screen_coords()),
+            pygame.K_g: lambda: self.world.handle_key_press('g', self.get_mouse_screen_coords()),
+            pygame.K_t: lambda: self.world.handle_key_press('t', self.get_mouse_screen_coords()),
+            pygame.K_b: lambda: self.world.handle_key_press('b'),
+            pygame.K_p: lambda: self.world.handle_key_press('p'),
+            pygame.K_UP: lambda: self.world.handle_key_press('up'),
+            pygame.K_DOWN: lambda: self.world.handle_key_press('down'),
+            pygame.K_LEFT: lambda: self.world.handle_key_press('left'),
+            pygame.K_RIGHT: lambda: self.world.handle_key_press('right'),
+        }
+
+        self.key_down_translations = {
+            pygame.K_BACKQUOTE: "tilde",
+            pygame.K_0: "0",
+            pygame.K_1: "1",
+            pygame.K_2: "2",
+            pygame.K_3: "3",
+            pygame.K_4: "4",
+            pygame.K_5: "5",
+            pygame.K_6: "6",
+            pygame.K_7: "7",
+            pygame.K_8: "8",
+            pygame.K_9: "9",
+            pygame.K_ESCAPE: "esc",
+            pygame.K_TAB: 'tab',
+            pygame.K_p: 'p',
+            pygame.K_t: 't',
+            pygame.K_g: 'g',
+            pygame.K_r: 'r',
+            pygame.K_MINUS: '-',
+            pygame.K_EQUALS: '+',
+            pygame.K_z: 'z',
+            pygame.K_x: 'x',
+            pygame.K_LEFTBRACKET: '[',
+            pygame.K_RIGHTBRACKET: ']',
+            # Add more mappings as needed
+        }
+
+
         # load all images
         self.load_all_images('images')
 
-
-#------------------------------------------------------------------------------
-    def handleInput(self):
+    #------------------------------------------------------------------------------
+    def handle_input(self):
+        ''' handle input from user'''
 
         # usefull for single button presses where you don't 
         # need to know if the button is still pressed
@@ -134,56 +175,14 @@ class Graphics_2D_Pygame(object):
                 self.quit=True
             if event.type==pygame.KEYDOWN:
                 #print(event.key)
-                translated_key='none'
-                if event.key==96:
-                    translated_key="tilde"
-                elif event.key==48:
-                    translated_key="0"
-                elif event.key==49:
-                    translated_key="1"
-                elif event.key==50:
-                    translated_key="2"
-                elif event.key==51:
-                    translated_key="3"
-                elif event.key==52:
-                    translated_key="4"
-                elif event.key==53:
-                    translated_key="5"
-                elif event.key==54:
-                    translated_key="6"
-                elif event.key==55:
-                    translated_key="7"
-                elif event.key==56:
-                    translated_key="8"
-                elif event.key==57:
-                    translated_key="9"
-                elif event.key==27:
-                    translated_key="esc"
-                elif event.key==9:
-                    translated_key='tab'
-                elif event.key==112:
-                    translated_key='p'
-                elif event.key==116:
-                    translated_key='t'
-                elif event.key==103:
-                    translated_key='g'
-                elif event.key==114:
-                    translated_key='r'
-                elif event.key==45:
-                    translated_key='-'
-                elif event.key==61:
-                    translated_key='+'
-                elif event.key==122:
-                    translated_key='z'
-                elif event.key==120:
-                    translated_key='x'
+                translated_key=self.key_down_translations.get(event.key,'none')
 
                 if self.mode==0:
                     self.game_menu.handle_input(translated_key)
                 elif self.mode==1:
-                    if event.key==91: # [
+                    if translated_key=='[':
                         self.zoom_out()
-                    elif event.key==93: # ]
+                    elif translated_key==']':
                         self.zoom_in()
                     else:
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
@@ -206,66 +205,32 @@ class Graphics_2D_Pygame(object):
                 #print(str(event.pos))
                 pass
         
-        # handle key press
+        # handle key press (continuous input)
         # i think more than one can be down at once, that is why we don't do if/elif
         if self.mode==1:
-            keys=pygame.key.get_pressed()
+            keys = pygame.key.get_pressed()
+            
+            for key, action in self.key_press_actions.items():
+                if keys[key]:
+                    action()
 
-            if keys[pygame.K_w]:
-                self.world.handle_key_press('w')
-
-            if keys[pygame.K_s]:
-                self.world.handle_key_press('s')
-
-            if keys[pygame.K_a]:
-                self.world.handle_key_press('a')
-
-            if keys[pygame.K_d]:
-                self.world.handle_key_press('d')
-
-            if keys[pygame.K_f]:
-                self.world.handle_key_press('f',self.get_mouse_screen_coords())
-
-            if keys[pygame.K_g]:
-                self.world.handle_key_press('g',self.get_mouse_screen_coords())
-
-            if keys[pygame.K_t]:
-                self.world.handle_key_press('t',self.get_mouse_screen_coords())
-
-            if keys[pygame.K_b]:
-                self.world.handle_key_press('b')
-
-            if keys[pygame.K_p]:
-                self.world.handle_key_press('p')
-
-            if keys[pygame.K_UP]:
-                self.world.handle_key_press('up')
-
-            if keys[pygame.K_DOWN]:
-                self.world.handle_key_press('down')
-
-            if keys[pygame.K_LEFT]:
-                self.world.handle_key_press('left')
-
-            if keys[pygame.K_RIGHT]:
-                self.world.handle_key_press('right')
-
-
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def load_all_images(self,folder_path):
         '''load all the images into pygame'''
-        files_and_dirs = os.listdir(folder_path)
-        # Filter out directories, keeping only files
-        files = [f for f in files_and_dirs if os.path.isfile(os.path.join(folder_path, f))]
+        try:
+            for filename in os.listdir(folder_path):
+                filepath = os.path.join(folder_path, filename)
+                if os.path.isfile(filepath):
+                    name, ext = os.path.splitext(filename)
+                    # just loading png for now, but could add other formats later
+                    if ext.lower() in ['.png']:
+                        self.images[name] = pygame.image.load(filepath).convert_alpha()
+            print('Image loading complete')
+        except Exception as e:
+            engine.log.add_data('error', f'Failed to load images: {e}', True)
 
-        for b in files:
-            name=b.split('.')[0]
-            image_path=folder_path+'/'+b
-            self.images[name]=pygame.image.load(image_path).convert_alpha()
-        
-        print('Image loading complete')
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def render(self):
         self.update_render_info()
 
@@ -274,11 +239,9 @@ class Graphics_2D_Pygame(object):
             for c in b:
                 if c.reset_image:
                     self.reset_pygame_image(c)
-                    #self.reset_pygame_image_v2(c)
-                #self.screen.blit(c.image, (c.screen_coords[0]-c.image_size[0]/2, c.screen_coords[1]-c.image_size[1]/2))
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
-                if(self.draw_collision):
+                if self.draw_collision:
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
                 if self.mode==2:
@@ -314,13 +277,13 @@ class Graphics_2D_Pygame(object):
                 h+=15
                 self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-            if(self.world.debug_mode):
+            if self.world.debug_mode :
                 h=0
                 for b in self.world.debug_text_queue:
                     h+=15
                     self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
 
-            if(self.world.display_vehicle_text):
+            if self.world.display_vehicle_text :
                 h=0
                 for b in self.world.vehicle_text_queue:
                     h+=15
@@ -337,13 +300,13 @@ class Graphics_2D_Pygame(object):
         else:
             pygame.display.update()
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def reset_all(self):
         ''' resize all world_objects'''
         for b in self.world.wo_objects:
             b.reset_image=True
 
-#---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self,mouse_coords):
         possible_objects=[]
 
@@ -354,7 +317,10 @@ class Graphics_2D_Pygame(object):
                     pass
                 elif self.mode==1:
                     # filter out a couple things we don't want to click on
-                    if c.is_player==False and c!=self.world.player.ai.large_pickup and c.is_turret==False and c.can_be_deleted==False:
+                    if (c.is_player is False 
+                        and c != self.world.player.ai.large_pickup 
+                        and c.is_turret is False 
+                        and c.can_be_deleted is False):
                         possible_objects.append(c)
                 elif self.mode==2:
                     # for strategic map we want everything
@@ -380,7 +346,7 @@ class Graphics_2D_Pygame(object):
             elif self.mode==2:
                 self.strategic_map.strategic_menu.activate_menu(closest_object)
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def switch_mode(self,desired_mode):
         '''switch the graphic engine mode '''
 
@@ -397,13 +363,12 @@ class Graphics_2D_Pygame(object):
             engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
 
 
-
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def update(self):
         '''
             any misc updating that needs to be done
         '''
-        self.handleInput()
+        self.handle_input()
 
         # update time
         self.time_passed=self.clock.tick(self.max_fps)
@@ -419,7 +384,7 @@ class Graphics_2D_Pygame(object):
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
-                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.renderCount))
+                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
 
                 
                 # image cache debug info 
@@ -433,68 +398,60 @@ class Graphics_2D_Pygame(object):
             self.strategic_map.update()
 
             
-
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def update_render_info(self):
         '''
             -checks if world objects are within the viewable
              screen area, and if so, translates their world coordinates
              to screen coordinates
         '''
-        # note - i wonder if computing this is slower than just rendering everything
-        # should add an ability to toggle this once i get a FPS count setup
-
         
         #clear out the render levels
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
-        self.renderCount=0
+        self.render_count=0
         if self.mode==0:
             pass
         elif self.mode==1:
 
-            viewrange_x=((self.world.player.world_coords[0]+
-                self.screen_size[0]+self.view_adjust), (self.world.player.world_coords[0]-
-                self.screen_size[0]-self.view_adjust))
-            viewrange_y=((self.world.player.world_coords[1]+
-                self.screen_size[1]+self.view_adjust), (self.world.player.world_coords[1]-
-                self.screen_size[1])-self.view_adjust)
+            viewrange_x = (
+                self.world.player.world_coords[0] + self.screen_size[0] + self.view_adjust,
+                self.world.player.world_coords[0] - self.screen_size[0] - self.view_adjust
+            )
+            viewrange_y = (
+                self.world.player.world_coords[1] + self.screen_size[1] + self.view_adjust,
+                self.world.player.world_coords[1] - self.screen_size[1] - self.view_adjust
+            )
             
-            translation=self.get_translation()
-
-            for b in self.world.wo_objects:
-
-                if b.render:
-                    
-                    # check if the relative scale of the object is enough to make it visible
-                    if (self.scale+b.scale_modifier)>=b.minimum_visible_scale:
-                        
-                        #determine whether object 'b' world_coords are within
-                        #the viewport bounding box
-                        if(b.world_coords[0]<viewrange_x[0] and
-                            b.world_coords[0]>viewrange_x[1]):
-                            if(b.world_coords[1]<viewrange_y[0] and
-                                b.world_coords[1]>viewrange_y[1]):
-                                #object is within the viewport, add it to the render list
-                                self.renderlists[b.render_level].append(b)
-                                self.renderCount+=1
-                                #apply transform to generate screen coords
-
-                                # player screen coords are set by get_translation
-                                if b.is_player==False:
-                                    b.screen_coords[0]=(b.world_coords[0]*self.scale+translation[0])
-                                    b.screen_coords[1]=(b.world_coords[1]*self.scale+translation[1])
-
+            translation = self.get_translation()
+            
+            # More efficient filtering and rendering
+            renderable_objects = [
+                obj for obj in self.world.wo_objects 
+                if (obj.render and 
+                    (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale and
+                    viewrange_x[1] < obj.world_coords[0] < viewrange_x[0] and
+                    viewrange_y[1] < obj.world_coords[1] < viewrange_y[0])
+            ]
+            
+            for obj in renderable_objects:
+                self.renderlists[obj.render_level].append(obj)
+                if not obj.is_player:
+                    obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
+                    obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
+            
+            self.render_count = len(renderable_objects)
         elif self.mode==2:
             for b in self.strategic_map.map_squares:
                 self.renderlists[0].append(b)
 
-#------------------------------------------------------------------------------
+
+    #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
         x,y=pygame.mouse.get_pos()
         return [x,y]
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def get_mouse_world_coords(self):
         ''' return world coords of mouse'''
         # pretty sure this math doesnt make any sense
@@ -503,12 +460,12 @@ class Graphics_2D_Pygame(object):
         player_y=self.world.player.world_coords[1]
         return [player_x-x,player_y-y]
 
-#-----------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     def get_player_screen_coords(self):
         ''' return player screen coordinates'''
         return [self.screen_size[0]/2,self.screen_size[1]/2]
     
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
         center_x=self.screen_size[0]/2
@@ -520,30 +477,27 @@ class Graphics_2D_Pygame(object):
 
         translate=[center_x-player_x,center_y-player_y]
         return translate
-    
-#------------------------------------------------------------------------------
+
+    #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
-        '''reset the image for a world object'''
-        wo.reset_image=False
-        obj_scale=self.scale+wo.scale_modifier
-        wo.image_size=self.images[wo.image_list[wo.image_index]].get_size()
-        wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
+        '''Reset the image for a world object with caching'''
+        wo.reset_image = False
+        obj_scale = self.scale + wo.scale_modifier
+        wo.image_size = (
+            int(self.images[wo.image_list[wo.image_index]].get_width() * obj_scale),
+            int(self.images[wo.image_list[wo.image_index]].get_height() * obj_scale)
+        )
         wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
+
+        # Create a unique key based on image name, size, and rotation
+        key = f"{wo.image_list[wo.image_index]}_{wo.image_size}_{round(wo.rotation_angle, 1)}"
         
-        # check if the correct image is already in the cache
-        
-        # rounding the angle should massively reduce the amount of images we need to hash 
-        # without much of a visual loss, and zero angle math lass as we are only doing it for 
-        # the key
-        key = wo.image_list[wo.image_index]+str(wo.image_size)+str(round(wo.rotation_angle,1))
-        if self.scale in self.image_cache:
-            if key in self.image_cache[self.scale]:
-                wo.image=self.image_cache[self.scale][key]
-                #print('cache hit')
-                return
-        else:
-            self.image_cache[self.scale]={}
-        
+        # Check if the image is already cached
+        scale_cache = self.image_cache.setdefault(self.scale, {})
+        if key in scale_cache:
+            wo.image = scale_cache[key]
+            return
+
         try:
             image=self.images[wo.image_list[wo.image_index]]
             orig_rect = image.get_rect()
@@ -553,12 +507,15 @@ class Graphics_2D_Pygame(object):
             rot_image = rot_image.subsurface(rot_rect).copy()
             resize_image=pygame.transform.scale(rot_image,wo.image_size)
             wo.image=resize_image
-            self.image_cache[self.scale][key]=resize_image
-        except:
-            engine.log.add_data('error','graphics_2d_pygame.reset_pygame_image: image transform error with image '+wo.image_list[wo.image_index],True)
-        
+            scale_cache[key] = resize_image
+        except KeyError:
+            engine.log.add_data(
+                'error',
+                f'graphics_2d_pygame.reset_pygame_image: image transform error with image {wo.image_list[wo.image_index]}',
+                True
+            )
 
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def zoom_out(self):
         '''zoom out'''
         if self.scale>self.scale_limit[0]:
@@ -566,7 +523,7 @@ class Graphics_2D_Pygame(object):
             self.view_adjust+=self.view_adjustment
             #print('zoom out',self.scale)
             self.reset_all()
-#------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
         if self.scale<self.scale_limit[1]:

@@ -27,10 +27,11 @@ import engine.world_radio
 #global variables
 
 
-class World(object):
+class World():
+    '''world class. holds everything to do with simulating the living world'''
     #---------------------------------------------------------------------------
     def __init__(self):
-
+        '''initialize world'''
         # name of the map square that world was loaded from. set by strategic_map.load_world()
         # this is None for a quick battle
         self.map_square_name=None
@@ -181,7 +182,7 @@ class World(object):
                 if b.ai.check_if_human_in_vehicle(self.player):
                     in_vehicle=b
             
-            if in_vehicle==None:
+            if in_vehicle is None:
                 self.world_menu.activate_menu(self.player)
             else:
                 self.world_menu.activate_menu(in_vehicle)
@@ -189,57 +190,57 @@ class World(object):
             self.world_menu.deactivate_menu()
 
     #---------------------------------------------------------------------------
-    def add_object(self, WORLD_OBJECT):
+    def add_object(self, world_object):
         '''add object to the world'''
         # !! NOTE this should not be called by objects directly. use the add_queue instead
 
         # reset the image so that the graphics engine can make sure it matches the current view scale
-        WORLD_OBJECT.reset_image=True
+        world_object.reset_image=True
 
-        if WORLD_OBJECT not in self.wo_objects:
+        if world_object not in self.wo_objects:
             
             # set or reset spawn time in world_seconds
-            WORLD_OBJECT.spawn_time=self.world_seconds
+            world_object.spawn_time=self.world_seconds
 
-            self.wo_objects.append(WORLD_OBJECT)
-            if WORLD_OBJECT.collision:
-                self.wo_objects_collision.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_human:
-                self.wo_objects_human.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_gun:
-                self.wo_objects_guns.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_vehicle:
-                self.wo_objects_vehicle.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_grenade:
-                self.wo_objects_grenade.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_consumable:
-                self.wo_objects_consumable.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_building:
-                self.wo_objects_building.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_map_pointer:
-                self.wo_objects_map_pointer.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_handheld_antitank:
-                self.wo_objects_handheld_antitank.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_airplane:
-                self.wo_objects_airplane.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_melee:
-                self.wo_objects_melee.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_medical:
-                self.wo_objects_medical.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_container:
-                self.wo_objects_container.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_ammo_container:
-                self.wo_objects_ammo_container.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_furniture:
-                self.wo_objects_furniture.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_gun_magazine:
-                self.wo_objects_gun_magazines.append(WORLD_OBJECT)
-            if WORLD_OBJECT.can_be_deleted:
-                self.wo_objects_cleanup.append(WORLD_OBJECT)
-            if WORLD_OBJECT.is_radio:
-                self.wo_objects_radio.append(WORLD_OBJECT)
+            self.wo_objects.append(world_object)
+            if world_object.collision:
+                self.wo_objects_collision.append(world_object)
+            if world_object.is_human:
+                self.wo_objects_human.append(world_object)
+            if world_object.is_gun:
+                self.wo_objects_guns.append(world_object)
+            if world_object.is_vehicle:
+                self.wo_objects_vehicle.append(world_object)
+            if world_object.is_grenade:
+                self.wo_objects_grenade.append(world_object)
+            if world_object.is_consumable:
+                self.wo_objects_consumable.append(world_object)
+            if world_object.is_building:
+                self.wo_objects_building.append(world_object)
+            if world_object.is_map_pointer:
+                self.wo_objects_map_pointer.append(world_object)
+            if world_object.is_handheld_antitank:
+                self.wo_objects_handheld_antitank.append(world_object)
+            if world_object.is_airplane:
+                self.wo_objects_airplane.append(world_object)
+            if world_object.is_melee:
+                self.wo_objects_melee.append(world_object)
+            if world_object.is_medical:
+                self.wo_objects_medical.append(world_object)
+            if world_object.is_container:
+                self.wo_objects_container.append(world_object)
+            if world_object.is_ammo_container:
+                self.wo_objects_ammo_container.append(world_object)
+            if world_object.is_furniture:
+                self.wo_objects_furniture.append(world_object)
+            if world_object.is_gun_magazine:
+                self.wo_objects_gun_magazines.append(world_object)
+            if world_object.can_be_deleted:
+                self.wo_objects_cleanup.append(world_object)
+            if world_object.is_radio:
+                self.wo_objects_radio.append(world_object)
         else:
-            print('Error!! '+ WORLD_OBJECT.name+' already in world.wo_objects. Add fails !!')
+            print('Error!! '+ world_object.name+' already in world.wo_objects. Add fails !!')
         
     #---------------------------------------------------------------------------
     def check_collision_return_object(self,collider,ignore_list, objects,consider_prone=False):
@@ -252,7 +253,7 @@ class World(object):
 
 
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
-        if collided !=None:
+        if collided is not None:
             if collided.is_human:
                 if collided.ai.memory['current_task']=='task_vehicle_crew':
                     collided=collided.ai.memory['task_vehicle_crew']['vehicle']
@@ -277,14 +278,14 @@ class World(object):
 
 
     #---------------------------------------------------------------------------
-    def check_object_exists(self,object):
+    def check_object_exists(self,wo_obj):
         '''returns a bool as to whether the object is in the world'''
 
-        if object in self.wo_objects:
-            if object in self.remove_queue:
+        if wo_obj in self.wo_objects:
+            if wo_obj in self.remove_queue:
                 print('debug : check object on object in remove_queue')
                 return False
-            elif object in self.exit_queue:
+            elif wo_obj in self.exit_queue:
                 print('debug : check object on object in exit_queue')
                 return False
             else:
@@ -292,7 +293,6 @@ class World(object):
         else:
             return False
             
-
     #------------------------------------------------------------------------------
     def cleanup(self):
         '''cleanup routine for when performance is hurting'''
@@ -347,62 +347,62 @@ class World(object):
             ai.create_squads()
 
     #---------------------------------------------------------------------------
-    def generate_ignore_list(self,OBJ):
+    def generate_ignore_list(self,obj):
         ''' generates a ignore list for collision checking'''
-        # OBJ - the world object that needs the ignore list
+        # obj - the world object that needs the ignore list
         # this is for objects that use ai_human
-        ignore_list=[OBJ]
+        ignore_list=[obj]
 
-        if OBJ.is_turret:
-            if OBJ.ai.vehicle!=None:
+        if obj.is_turret:
+            if obj.ai.vehicle is not None:
                 # reset to a human that is crewing the vehicle
-                for key,value in OBJ.ai.vehicle.ai.vehicle_crew.items():
-                    if value[0]==True:
-                        OBJ=value[1]
+                for key,value in obj.ai.vehicle.ai.vehicle_crew.items():
+                    if value[0] is True:
+                        obj=value[1]
                         break
         
         # this should always be true at this point
-        if OBJ.is_human:
+        if obj.is_human:
             if self.friendly_fire is False:
-                ignore_list+=OBJ.ai.squad.faction_tactical.allied_humans
+                ignore_list+=obj.ai.squad.faction_tactical.allied_humans
                 
             elif self.friendly_fire_squad is False:
                 # just add the squad
-                ignore_list+=OBJ.ai.squad.members
+                ignore_list+=obj.ai.squad.members
 
             if self.friendly_fire_vehicle is False:
-                ignore_list+=OBJ.ai.squad.faction_tactical.allied_crewed_vehicles
+                ignore_list+=obj.ai.squad.faction_tactical.allied_crewed_vehicles
                 
-            if OBJ.is_player:
+            if obj.is_player:
                 pass
 
-            if OBJ.ai.memory['current_task']=='task_vehicle_crew':
+            if obj.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
-                ignore_list.append(OBJ.ai.memory['task_vehicle_crew']['vehicle'])
-                for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
+                ignore_list.append(obj.ai.memory['task_vehicle_crew']['vehicle'])
+                for b in obj.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
                     ignore_list.append(b)
 
                 # add the vehicle crew
-                for b in OBJ.ai.memory['task_vehicle_crew']['vehicle'].ai.vehicle_crew.values():
-                    if b[0]==True:
+                for b in obj.ai.memory['task_vehicle_crew']['vehicle'].ai.vehicle_crew.values():
+                    if b[0] is True:
                         ignore_list.append(b[1])
 
-            if OBJ.ai.in_building:
+            if obj.ai.in_building:
                 # add possible buildings the equipper is in.
                 # assuming they are shooting out windows so should not hit the building
-                ignore_list+=OBJ.ai.building_list
+                ignore_list+=obj.ai.building_list
         else:
-            engine.log.add_data('error','world.generate_ignore_list OBJ is not human'+OBJ.name,True)
+            engine.log.add_data('error','world.generate_ignore_list obj is not human'+obj.name,True)
 
         return ignore_list
 
     #---------------------------------------------------------------------------
-    def get_closest_object(self, WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
+    def get_closest_object(self, world_coords,objECT_LIST,max_distance):
         ''' can be used on its own or referenced like get_closest_gun() does'''
-        best_distance=MAX_DISTANCE
+        best_distance=max_distance
         best_object=None
-        for b in OBJECT_LIST:
-            d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
+        for b in objECT_LIST:
+            d=engine.math_2d.get_distance(world_coords,b.world_coords)
             if d<best_distance:
                 best_distance=d 
                 best_object=b
@@ -420,21 +420,21 @@ class World(object):
             acceptable=True
             
             # first check if its full
-            if b.ai.check_if_vehicle_is_full()==True:
+            if b.ai.check_if_vehicle_is_full() is True:
                 acceptable=False
 
             # check if we can drive it
             if acceptable:
-                if b.is_airplane and human.ai.is_pilot==False:
+                if b.is_airplane and human.ai.is_pilot is False:
                     acceptable=False
 
-                if b.ai.requires_afv_training and human.ai.is_afv_trained==False:
+                if b.ai.requires_afv_training and human.ai.is_afv_trained is False:
                     acceptable=False
 
             # check factions
             if acceptable:
                 for value in b.ai.vehicle_crew.values():
-                    if value[0]==True:
+                    if value[0] is True:
                         if value[1].ai.squad.faction!=human.ai.squad.faction:
                             acceptable=False
 
@@ -456,19 +456,14 @@ class World(object):
                     compatible_magazines.append(b)
         return compatible_magazines
 
-    #---------------------------------------------------------------------------
-    def get_random_object(self,OBJECT_LIST):
-        ''' return a random object from a list '''
-        i=random.randint(0,len(OBJECT_LIST)-1)
-        return OBJECT_LIST[i]
     
     #---------------------------------------------------------------------------
-    def get_objects_within_range(self,WORLD_COORDS,OBJECT_LIST,MAX_DISTANCE):
+    def get_objects_within_range(self,WORLD_COORDS,object_list,max_distance):
         '''check distance on objects from an array and returns the ones that are in range'''
         near_objects=[]
-        for b in OBJECT_LIST:
+        for b in object_list:
             d=engine.math_2d.get_distance(WORLD_COORDS,b.world_coords)
-            if d<MAX_DISTANCE:
+            if d<max_distance:
                 near_objects.append(b)
         return near_objects
 
@@ -609,7 +604,7 @@ class World(object):
     #---------------------------------------------------------------------------
     def kill_all_nonplayer_humans(self):
         for b in self.wo_objects_human:
-            if b.is_player==False:
+            if b.is_player is False:
                 b.ai.health-=500
         engine.log.add_data('note','world.kill_all_nonplayer_humans executed',True)
 
@@ -661,7 +656,6 @@ class World(object):
                         b[1].ai.handle_exit_vehicle()
 
 
-
             print(message)
 
             # remove from the world
@@ -691,50 +685,50 @@ class World(object):
                 self.remove_queue.append(b)
 
     #---------------------------------------------------------------------------
-    def remove_object(self, WORLD_OBJECT):
+    def remove_object(self, world_object):
         ''' remove object from world. '''
         # !! note - objects should add themselves to the remove_queue instead of calling this directly
 
-        if WORLD_OBJECT in self.wo_objects:
-            self.wo_objects.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.collision and WORLD_OBJECT in self.wo_objects_collision:
-                self.wo_objects_collision.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_human:
-                self.wo_objects_human.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_gun:
-                self.wo_objects_guns.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_vehicle:
-                self.wo_objects_vehicle.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_grenade:
-                self.wo_objects_grenade.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_consumable:
-                self.wo_objects_consumable.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_building:
-                self.wo_objects_building.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_map_pointer:
-                self.wo_objects_map_pointer.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_handheld_antitank:
-                self.wo_objects_handheld_antitank.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_airplane:
-                self.wo_objects_airplane.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_melee:
-                self.wo_objects_melee.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_medical:
-                self.wo_objects_medical.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_container:
-                self.wo_objects_container.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_ammo_container:
-                self.wo_objects_ammo_container.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_furniture:
-                self.wo_objects_furniture.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.can_be_deleted:
-                self.wo_objects_cleanup.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_gun_magazine:
-                self.wo_objects_gun_magazines.remove(WORLD_OBJECT)
-            if WORLD_OBJECT.is_radio:
-                self.wo_objects_radio.remove(WORLD_OBJECT)
+        if world_object in self.wo_objects:
+            self.wo_objects.remove(world_object)
+            if world_object.collision and world_object in self.wo_objects_collision:
+                self.wo_objects_collision.remove(world_object)
+            if world_object.is_human:
+                self.wo_objects_human.remove(world_object)
+            if world_object.is_gun:
+                self.wo_objects_guns.remove(world_object)
+            if world_object.is_vehicle:
+                self.wo_objects_vehicle.remove(world_object)
+            if world_object.is_grenade:
+                self.wo_objects_grenade.remove(world_object)
+            if world_object.is_consumable:
+                self.wo_objects_consumable.remove(world_object)
+            if world_object.is_building:
+                self.wo_objects_building.remove(world_object)
+            if world_object.is_map_pointer:
+                self.wo_objects_map_pointer.remove(world_object)
+            if world_object.is_handheld_antitank:
+                self.wo_objects_handheld_antitank.remove(world_object)
+            if world_object.is_airplane:
+                self.wo_objects_airplane.remove(world_object)
+            if world_object.is_melee:
+                self.wo_objects_melee.remove(world_object)
+            if world_object.is_medical:
+                self.wo_objects_medical.remove(world_object)
+            if world_object.is_container:
+                self.wo_objects_container.remove(world_object)
+            if world_object.is_ammo_container:
+                self.wo_objects_ammo_container.remove(world_object)
+            if world_object.is_furniture:
+                self.wo_objects_furniture.remove(world_object)
+            if world_object.can_be_deleted:
+                self.wo_objects_cleanup.remove(world_object)
+            if world_object.is_gun_magazine:
+                self.wo_objects_gun_magazines.remove(world_object)
+            if world_object.is_radio:
+                self.wo_objects_radio.remove(world_object)
         else:
-            print('Error!! '+ WORLD_OBJECT.name+' not in world.wo_objects. Remove fails !!')
+            print('Error!! '+ world_object.name+' not in world.wo_objects. Remove fails !!')
         
     #---------------------------------------------------------------------------
     def run_self_debug(self):
@@ -799,7 +793,7 @@ class World(object):
                 error_found=True
             
             # check for invisible people
-            if b.render==False and 'task_vehicle_crew' not in b.ai.memory:
+            if b.render is False and 'task_vehicle_crew' not in b.ai.memory:
                 print(b.name,'is invisible and does not have task_vehicle_crew memory')
                 error_found=True
             
@@ -896,7 +890,7 @@ class World(object):
     def update(self,time_passed_seconds):
         self.time_passed_seconds=time_passed_seconds
 
-        if self.is_paused==False:
+        if self.is_paused is False:
             self.world_seconds+=self.time_passed_seconds
             self.process_reinforcements()
 
@@ -944,27 +938,27 @@ class World(object):
 
     #------------------------------------------------------------------------------
     def update_debug_info(self):
-        self.debug_text_queue=[]
-        self.debug_text_queue.append('World Objects: '+ str(len(self.wo_objects)))
-        self.debug_text_queue.append('wo_objects_cleanup: '+ str(len(self.wo_objects_cleanup)))
-        self.debug_text_queue.append('Exited objects count: '+ str(self.exited_object_count))
-        self.debug_text_queue.append('Vehicles: '+ str(len(self.wo_objects_vehicle)))
-        self.debug_text_queue.append('Panzerfaust launches: '+str(self.panzerfaust_launches))
-        self.debug_text_queue.append('Helmet bounces: '+str(self.helmet_bounces))
-        self.debug_text_queue.append('----- Player Stats -----')
-        self.debug_text_queue.append('Player Name: '+self.player.name)
-        self.debug_text_queue.append('Player memory current task: '+self.player.ai.memory['current_task'])
-        self.debug_text_queue.append('Player Scale Modifier: '+str(self.player.scale_modifier))
-        self.debug_text_queue.append('Player World Coords: '+str(engine.math_2d.get_round_vector_2(self.player.world_coords)))
-        self.debug_text_queue.append('Player Screen Coords'+str(self.player.screen_coords))
-        self.debug_text_queue.append('Player altitude: ' + str(self.player.altitude))
-        self.debug_text_queue.append('Player Fatigue: '+str(round(self.player.ai.fatigue,1)))
-        self.debug_text_queue.append('Player Speed: '+str(self.player.ai.get_calculated_speed()))
-        self.debug_text_queue.append('Player building overlap count: '+str(len(self.player.ai.building_list)))
+        self.debug_text_queue = []
+        self.debug_text_queue.append(f"World Objects: {len(self.wo_objects)}")
+        self.debug_text_queue.append(f"wo_objects_cleanup: {len(self.wo_objects_cleanup)}")
+        self.debug_text_queue.append(f"Exited objects count: {self.exited_object_count}")
+        self.debug_text_queue.append(f"Vehicles: {len(self.wo_objects_vehicle)}")
+        self.debug_text_queue.append(f"Panzerfaust launches: {self.panzerfaust_launches}")
+        self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
+        self.debug_text_queue.append("----- Player Stats -----")
+        self.debug_text_queue.append(f"Player Name: {self.player.name}")
+        self.debug_text_queue.append(f"Player memory current task: {self.player.ai.memory['current_task']}")
+        self.debug_text_queue.append(f"Player Scale Modifier: {self.player.scale_modifier}")
+        self.debug_text_queue.append(f"Player World Coords: {engine.math_2d.get_round_vector_2(self.player.world_coords)}")
+        self.debug_text_queue.append(f"Player Screen Coords: {self.player.screen_coords}")
+        self.debug_text_queue.append(f"Player altitude: {self.player.altitude}")
+        self.debug_text_queue.append(f"Player Fatigue: {round(self.player.ai.fatigue, 1)}")
+        self.debug_text_queue.append(f"Player Speed: {self.player.ai.get_calculated_speed()}")
+        self.debug_text_queue.append(f"Player building overlap count: {len(self.player.ai.building_list)}")
         self.debug_text_queue.append('----- Faction Stats ------')
         for b in self.tactical_ai.values():
-            self.debug_text_queue.append(b.faction+' humans: '+str(len(b.allied_humans)))
-            self.debug_text_queue.append(b.faction+' vehicles: '+str(len(b.allied_crewed_vehicles)))
+            self.debug_text_queue.append(f"{b.faction} humans: {len(b.allied_humans)}")
+            self.debug_text_queue.append(f"{b.faction} vehicles: {len(b.allied_crewed_vehicles)}")
 
 
         # world area data
@@ -990,18 +984,17 @@ class World(object):
                 fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                 self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-            self.vehicle_text_queue.append('max speed | current speed: '+str(round(vehicle.ai.max_speed,1))+
-                ' | '+str(round(vehicle.ai.current_speed,1)))
-            self.vehicle_text_queue.append('acceleration: '+str(vehicle.ai.acceleration))
-            self.vehicle_text_queue.append('throttle: '+str(vehicle.ai.throttle))
-            self.vehicle_text_queue.append('brake: '+str(vehicle.ai.brake_power))
-            self.vehicle_text_queue.append('wheel steering: '+str(vehicle.ai.wheel_steering))
+            self.vehicle_text_queue.append(f'max speed | current speed: {round(vehicle.ai.max_speed, 1)} | {round(vehicle.ai.current_speed, 1)}')
+            self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
+            self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
+            self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
+            self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
 
             # airplane specific 
             if vehicle.is_airplane:
-                self.vehicle_text_queue.append('altitude: '+str(round(vehicle.altitude,1)))
-                self.vehicle_text_queue.append('rate of climb: '+str(round(vehicle.ai.rate_of_climb,1)))
-                self.vehicle_text_queue.append('ailerons: '+str(round(vehicle.ai.ailerons,1)))
-                self.vehicle_text_queue.append('elevator: '+str(round(vehicle.ai.elevator,1)))
-                self.vehicle_text_queue.append('rudder: '+str(round(vehicle.ai.rudder,1)))
-                self.vehicle_text_queue.append('flaps: '+str(round(vehicle.ai.flaps,1)))
+                self.vehicle_text_queue.append(f'altitude: {round(vehicle.altitude, 1)}')
+                self.vehicle_text_queue.append(f'rate of climb: {round(vehicle.ai.rate_of_climb, 1)}')
+                self.vehicle_text_queue.append(f'ailerons: {round(vehicle.ai.ailerons, 1)}')
+                self.vehicle_text_queue.append(f'elevator: {round(vehicle.ai.elevator, 1)}')
+                self.vehicle_text_queue.append(f'rudder: {round(vehicle.ai.rudder, 1)}')
+                self.vehicle_text_queue.append(f'flaps: {round(vehicle.ai.flaps, 1)}')

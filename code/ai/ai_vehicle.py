@@ -223,7 +223,7 @@ class AIVehicle(object):
         # note - need to think how gunners fit into this
 
         for value in self.vehicle_crew.values():
-            if value[0]==False:
+            if value[0] is False:
                 return False
             
         return True
@@ -238,7 +238,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
@@ -267,7 +267,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
@@ -367,6 +367,8 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_death(self):
+        self.detach_tow_object()
+
         engine.world_builder.spawn_container_vehicle_wreck('wreck',self.owner,1)
 
         engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)

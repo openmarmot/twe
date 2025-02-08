@@ -30,7 +30,7 @@ class GameMenu():
 
         self.active_menu='start' # which menu type (debug/weapon/vehicle/etc)
         self.menu_state='none' # where you are in the menu
-        
+
         self.text_queue=[]
 
         self.graphics_engine=graphics_engine
@@ -42,6 +42,7 @@ class GameMenu():
         self.start_menu('none')
     #---------------------------------------------------------------------------
     def handle_input(self,key):
+        '''handle input from the user'''
         # called by graphics_2d_pygame when there is a suitable key press
         # key is a string corresponding to the actual key being pressed
 
@@ -69,14 +70,14 @@ class GameMenu():
 
     #---------------------------------------------------------------------------
     def deactivate_menu(self):
-        self.selected_object=None
+        '''deactivate the menu'''
         self.active_menu='none'
         self.menu_state='none'
         self.text_queue=[]
 
     #---------------------------------------------------------------------------
     def load_save_menu(self, key):
-
+        '''load save menu'''
         if self.menu_state == 'none':
             # self.graphics_engine.world.is_paused = False
             self.text_queue = []
@@ -130,6 +131,7 @@ class GameMenu():
 
     #---------------------------------------------------------------------------
     def start_menu(self, key):
+        '''start menu'''
         if self.menu_state=='none':
             #self.graphics_engine.world.is_paused=False
             self.text_queue=[]
@@ -139,7 +141,7 @@ class GameMenu():
             self.text_queue.append('1 - New Campaign (preview: work in progess)')
             self.text_queue.append('2 - Load Campaign (preview: work in progress)')
             self.text_queue.append('3 - Quick Battle (choose this)')
-            self.text_queue.append('4 - Exit') 
+            self.text_queue.append('4 - Exit')
 
             if key=='1':
                 self.graphics_engine.mode=2
@@ -164,7 +166,7 @@ class GameMenu():
             self.text_queue.append('2 - German')
             self.text_queue.append('3 - Soviet')
             self.text_queue.append('4 - Civilian/Neutral')
-            
+
             # note 1 is missing as americans are not implemented
             if key in ['2','3','4']:
                 if key=='1':
@@ -214,9 +216,9 @@ class GameMenu():
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):
+        '''update'''
 
         # should maybe check if a menu is active first. no need for this to be constantly running
         # make the menu auto close after a period of time
 
         pass
-

@@ -90,7 +90,7 @@ class AITurret(object):
 
         if EVENT_DATA.is_projectile:
             projectile=EVENT_DATA
-            distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords,True)
+            distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])

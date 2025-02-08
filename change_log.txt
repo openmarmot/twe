@@ -1,6 +1,64 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 7 2025
+- added auto reload for handheld AT
+
+At the moment the reload only really applies to 
+the panzerschreck. eventually I'll probably add the bazooka as well.
+
+the handheld AT auto reloads for now. not worth adding in a new 
+manual reload interface just for panzerschrecks.
+
+will have to check if the ai fires them all off at once.
+
+----------------------------------
+Feb 3 2025
+- more pylint code cleanup 
+- general refactoring for code readability
+
+----------------------------------
+Feb 2 2025
+- turned off bullet cases for panzer iv hull mg 
+- added panzerschreck
+
+todo
+need to handle reloading for anti-tank weapons 
+
+----------------------------------
+Feb 1 2025
+- added more caching for math functions 
+
+----------------------------------
+Jan 31 2025
+- added lru cache to a couple functions in math_2d 
+- minor cleanup 
+
+I couldn't tell a difference with the lru cache. 
+maybe i should just disable it.
+A custom cache for get_distance and some of the rounding functions might 
+be worth it.
+----------------------------------
+Jan 29 2025
+- minor cleanup and optimization of graphics_2d_pygame 
+
+ran graphics_2d_pygame through a couple ai models to see if 
+there was anything interesting i was missing. best suggestion 
+was to replace all the if/else for input with dictionaries - 
+which i implemented. 
+
+also rewrote a couple other sections to reduce and clean up 
+some of the exessive if statements, but performance effect was 
+not noticeable.
+
+i should look into using lru caching with some of the math_2d methods 
+
+----------------------------------
+Jan 28 2025
+- vehicles now detach any towed object on death 
+- minor cleanup and optimization
+
+----------------------------------
 Jan 27 2025
 - vehicles and humans now have recent_noise_or_move attribute 
 - human evaluate_targets uses recent_noise_or_move to determine visibility 

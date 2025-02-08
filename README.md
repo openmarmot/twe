@@ -36,6 +36,9 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - German Jagdpanzer 38t "Hetzer"
 - German Ju88 bomber
 - German FA223 Drache helicopter
+- German Sd.kfz.251
+- German Sd.kfz.251/22
+- German PAK 40
 - Soviet T20 "Komsomolets" armored tractor
 - American/Soviet Lend-Lease truck
 - Soviet T34-76 (late)
