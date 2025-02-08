@@ -931,8 +931,13 @@ class AIHuman(object):
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches+=1
 
-            # drop the tube now that it is empty
-            self.drop_object(self.antitank)
+            # attempt reload. drop if fail
+            if self.reload_weapon(self.antitank,self.owner) is False:
+                # drop the tube now that it is empty
+                self.drop_object(self.antitank)
+            else:
+                print(self.check_ammo(self.antitank,self.owner))
+
 
     #---------------------------------------------------------------------------
     def pickup_object(self,world_object):
@@ -1037,9 +1042,9 @@ class AIHuman(object):
         self.fatigue+=15
     #-----------------------------------------------------------------------
     def reload_weapon(self,weapon,obj_with_inventory):
-        '''reload weapon'''
+        '''reload weapon. return bool as to whether it was successful'''
         self.speak('reloading!')
-        if weapon.is_gun:
+        if weapon.is_gun or weapon.is_handheld_antitank:
             # first get the current magazine
             old_magazine=None
             if weapon.ai.magazine is not None:
@@ -1064,8 +1069,13 @@ class AIHuman(object):
             if new_magazine is not None:
                 obj_with_inventory.ai.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
+                return True
             else:
                 self.speak("I'm out of ammo!")
+                return False
+        else:
+            engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
+            return False
 
         # at this point we should do a ai_mode change with a timer to simulate the 
         # reload time

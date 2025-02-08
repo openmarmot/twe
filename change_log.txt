@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 7 2025
+- added auto reload for handheld AT
+
+At the moment the reload only really applies to 
+the panzerschreck. eventually I'll probably add the bazooka as well.
+
+the handheld AT auto reloads for now. not worth adding in a new 
+manual reload interface just for panzerschrecks.
+
+will have to check if the ai fires them all off at once.
+
+----------------------------------
 Feb 3 2025
 - more pylint code cleanup 
 - general refactoring for code readability
