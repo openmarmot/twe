@@ -40,7 +40,6 @@ GRAVITY=-9.8
 cache_check=[]
 
 #------------------------------------------------------------------------------
-@lru_cache(maxsize=1000)
 def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
     '''calculate acceleration'''
     # force - force in watts
@@ -160,12 +159,6 @@ def collision_sort(runs,wo_objects):
 #------------------------------------------------------------------------------
 def get_distance(coords1, coords2):
     '''get the distance between two sets of coordinates'''
-    return get_distance_cache(tuple(coords1),tuple(coords2))
-
-#------------------------------------------------------------------------------
-@lru_cache(maxsize=2000)
-def get_distance_cache(coords1, coords2):
-    '''cached version, inputs are tuples'''
     x=coords1[0]-coords2[0]
     y=coords1[1]-coords2[1]
     distance=math.sqrt(x*x+y*y)
@@ -247,7 +240,7 @@ def get_heading_vector(location,destination):
     return heading
 
 #--------------------------------------------------------------------------------
-@lru_cache(maxsize=1000)
+@lru_cache(maxsize=2000)
 def get_heading_from_rotation(rotation):
     ''' get heading vector. input is rotation in degrees'''
 
@@ -257,13 +250,6 @@ def get_heading_from_rotation(rotation):
 
 #------------------------------------------------------------------------------
 def get_normalized(vec2):
-    return get_normalized_cache(tuple(vec2))
-
-#-----------------------------------------------------------------------------
-@lru_cache(maxsize=2000)
-def get_normalized_cache(vec2):
-    '''cached version, parameters are tuples'''
-
     l=math.sqrt(vec2[0]*vec2[0]+vec2[1]*vec2[1])
     b=[0.,0.]
     try:
@@ -272,8 +258,9 @@ def get_normalized_cache(vec2):
         pass
     return b
 
+
+
 #------------------------------------------------------------------------------
-@lru_cache(maxsize=1000)
 def get_normalized_angle(degrees):
     return round(degrees % 360,2)
 
@@ -373,13 +360,6 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
 #------------------------------------------------------------------------------
 def get_rotation(coords, target_coords):
     '''get rotation angle from one set of coordinates to another'''
-    return get_rotation_cache(tuple(coords),tuple(target_coords))
-
-#------------------------------------------------------------------------------
-@lru_cache(maxsize=5000)
-def get_rotation_cache(coords,target_coords):
-    '''the cached version. parameters are tuples'''
-
     delta_x = coords[0] - target_coords[0]
     delta_y = coords[1] - target_coords[1]
     
@@ -390,6 +370,7 @@ def get_rotation_cache(coords,target_coords):
     angle_deg = math.degrees(angle_rad)
         
     return get_normalized_angle(angle_deg)
+
 
 #------------------------------------------------------------------------------
 def get_round_vector_2(vector):
@@ -425,13 +406,6 @@ def get_vector_length(vec2):
 
 #------------------------------------------------------------------------------
 def get_vector_rotation(vector,angle_degrees):
-    return get_vector_rotation_cache(tuple(vector),angle_degrees)
-
-#-----------------------------------------------------------------------------
-@lru_cache(maxsize=5000)
-def get_vector_rotation_cache(vector,angle_degrees):
-    '''cached version, vector is a tuple'''
-
     # note this is adjusted to match how in game coordinates work
     # in the original code x and y were flipped
     # Convert angle to radians
@@ -441,7 +415,7 @@ def get_vector_rotation_cache(vector,angle_degrees):
     y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
     x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
     
-    return [x, y]    
+    return [x, y] 
 
 #------------------------------------------------------------------------------
 def moveAlongVector(speed,location,heading,time_passed):

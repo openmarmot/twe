@@ -1,6 +1,32 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 8 2025
+- removed most of the lru_cache stuff 
+- rewrite of vehicle driving ai 
+- added some more is vehicle full checks for enter vehicle related tasks 
+
+lru_cache should have helped but i suspect there 
+just wasn't enough cache hits. Its hard to say because 
+frame rate is so variable but I think overall it was hurting.
+It might have been better if i didn't have to convert to tuple first 
+
+there shouldn't be lines of bots walking to a vehicle only to find that it is full anymore 
+
+large vehicle driver ai rewrite. The crew can now talk to the driver and 
+ask them to complete several actions 
+
+introduced the vehicle commander role, although it is not coded yet 
+
+todo 
+- pak40 needs a engine so it can be rotated 
+- vehicle turrets are firing when out of range again. need to fix 
+
+play test notes 
+- new driver ai has seemed to negatively affect the  hetzer 
+    - rotate request is probably not slowing down fast enough 
+
+----------------------------------
 Feb 7 2025
 - added auto reload for handheld AT
 
