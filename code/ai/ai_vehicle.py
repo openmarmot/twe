@@ -68,6 +68,7 @@ class AIVehicle(object):
         # --- components ---
 
         # turrets - these are spawned and are in world 
+        # !! Note these should be added in order of importance due to know the driver handles requests
         self.turrets=[]
 
         # for rotary wing .. vehicles

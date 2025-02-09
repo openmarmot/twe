@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 9 2025
+- fixed variable error in the new driver code 
+- gave pak40 bike pedals as a temporary experiment 
+- misc cleanup
+- fixed crew communication so it actually works 
+
+confirmed rotate to target now works. I watched a hetzer do a 180 and nail a t34 that was 
+coming up behind it.
+
+more tweaks are needed to the pak40 speed to get it to rotate without moving much. 
+might just need some code specifically for rotate but not move. 
+
+the driver rotation response also needs a cooldown once the task is finished. otherwise 
+it can oscillate wildly between gunners and targets 
+
+----------------------------------
 Feb 8 2025
 - removed most of the lru_cache stuff 
 - rewrite of vehicle driving ai 

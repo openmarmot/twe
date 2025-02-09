@@ -524,9 +524,6 @@ def load_quick_battle(world,battle_option):
         name='Town' # should generate a interessting name
         map_objects+=generate_world_area(coords,'town',name)
 
-    # generate clutter
-    map_objects+=generate_clutter(map_objects)
-
     # generate civilians
     map_objects+=generate_civilians(map_objects)
 
@@ -2177,12 +2174,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[30,0,0]
         z.ai.passenger_compartment_armor['front']=[80,64,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
-        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
-        z.ai.turrets.append(mg_turret)
-        mg_turret.ai.vehicle=z
         main_turret=spawn_object(world,world_coords,'panzer_iv_g_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
+        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2268,12 +2265,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[30,0,5]
         z.ai.passenger_compartment_armor['front']=[80,64,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
-        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
-        z.ai.turrets.append(mg_turret)
-        mg_turret.ai.vehicle=z
         main_turret=spawn_object(world,world_coords,'panzer_iv_h_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
+        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2343,12 +2340,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[30,0,1]
         z.ai.passenger_compartment_armor['front']=[80,64,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
-        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
-        z.ai.turrets.append(mg_turret)
-        mg_turret.ai.vehicle=z
         main_turret=spawn_object(world,world_coords,'panzer_iv_j_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
+        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2536,12 +2533,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[40,40,0]
         z.ai.passenger_compartment_armor['front']=[45,61,0]
         z.ai.passenger_compartment_armor['rear']=[40,47,0]
-        mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
-        z.ai.turrets.append(mg_turret)
-        mg_turret.ai.vehicle=z
         main_turret=spawn_object(world,world_coords,'t34_76_model_1943_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
+        mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2627,12 +2624,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[40,40,0]
         z.ai.passenger_compartment_armor['front']=[45,61,0]
         z.ai.passenger_compartment_armor['rear']=[40,47,0]
-        mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
-        z.ai.turrets.append(mg_turret)
-        mg_turret.ai.vehicle=z
         main_turret=spawn_object(world,world_coords,'t34_85_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
+        mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
+        z.ai.turrets.append(mg_turret)
+        mg_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2702,13 +2699,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[20,40,0]
         z.ai.passenger_compartment_armor['front']=[60,60,0]
         z.ai.passenger_compartment_armor['rear']=[8,68,0]
+        main_turret=spawn_object(world,world_coords,'jagdpanzer_38t_main_gun',True)
+        z.ai.turrets.append(main_turret)
+        main_turret.ai.vehicle=z
         mg_turret=spawn_object(world,world_coords,'remote_mg34_turret',True)
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         mg_turret.ai.position_offset=[-5,-15]
-        main_turret=spawn_object(world,world_coords,'jagdpanzer_38t_main_gun',True)
-        z.ai.turrets.append(main_turret)
-        main_turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
@@ -2831,8 +2828,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[7.0, -9.0],True,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[13,15],True,turret]
-        z.ai.max_speed=177.6
-        z.ai.max_offroad_speed=177.6
+        z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
+        z.ai.max_speed=50
+        z.ai.max_offroad_speed=50
         z.ai.open_top=True
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
@@ -3034,12 +3032,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         right_rotor.ai.vehicle=z
         z.ai.rotors.append(right_rotor)
 
-
     elif object_type=='fa_223_rotor':
         z=WorldObject(world,['fa_223_drache_rotor','fa_223_drache_rotor'],AIRotor)
         z.name='FA 223 Drache Rotor'
         z.is_rotor=True
-
 
     elif object_type=='civilian_man':
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
@@ -3061,7 +3057,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=15
         z.is_human=True
         z.ai.wallet['German Military Script']=round(random.uniform(0.05,1.5),2)
-
 
     elif object_type=='soviet_soldier':
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
