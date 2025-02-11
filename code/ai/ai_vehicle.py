@@ -68,6 +68,7 @@ class AIVehicle(object):
         # --- components ---
 
         # turrets - these are spawned and are in world 
+        # !! Note these should be added in order of importance due to know the driver handles requests
         self.turrets=[]
 
         # for rotary wing .. vehicles
@@ -156,7 +157,7 @@ class AIVehicle(object):
         self.rate_of_climb=0
 
         # max rate of climb in meters/second. vehicle specific 
-        self.max_rate_of_climb=3
+        self.max_rate_of_climb=0
 
         # the current speed
         self.current_speed=0.
@@ -795,13 +796,13 @@ class AIVehicle(object):
             self.update_child_position_rotation()
     #---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):
-
-        # need some sort of actual algo here
-        lift=9.8 # counter act gravity for now
-        if self.current_speed>self.stall_speed:
-            # if elevator is zero then rate of climb will be zero
-            # if elevator is up (-1) then rate of climb will be negative
-            self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
+        if self.max_rate_of_climb!=0:
+            # need some sort of actual algo here
+            lift=9.8 # counter act gravity for now
+            if self.current_speed>self.stall_speed:
+                # if elevator is zero then rate of climb will be zero
+                # if elevator is up (-1) then rate of climb will be negative
+                self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
 
 
 

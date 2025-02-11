@@ -1,6 +1,63 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 10 2025
+- "fixed" pak40 rotation and movement 
+- bumped pak40 ammo from 10 to 30
+- fixed bug causing altitude to fluctuate while driving in ground vehicles 
+
+reducing the weight of the pak40 to something more realistic and bumping the speed 
+was enough to get it about perfect. it can now move very slowly and turn fast. (too fast)
+
+I think I confirmed that the AI will fire all the panzerschreck ammo at once. i need to 
+add a reload timer to fix this 
+
+todo 
+- reload timers 
+
+----------------------------------
+Feb 9 2025
+- fixed variable error in the new driver code 
+- gave pak40 bike pedals as a temporary experiment 
+- misc cleanup
+- fixed crew communication so it actually works 
+
+confirmed rotate to target now works. I watched a hetzer do a 180 and nail a t34 that was 
+coming up behind it.
+
+more tweaks are needed to the pak40 speed to get it to rotate without moving much. 
+might just need some code specifically for rotate but not move. 
+
+the driver rotation response also needs a cooldown once the task is finished. otherwise 
+it can oscillate wildly between gunners and targets 
+
+----------------------------------
+Feb 8 2025
+- removed most of the lru_cache stuff 
+- rewrite of vehicle driving ai 
+- added some more is vehicle full checks for enter vehicle related tasks 
+
+lru_cache should have helped but i suspect there 
+just wasn't enough cache hits. Its hard to say because 
+frame rate is so variable but I think overall it was hurting.
+It might have been better if i didn't have to convert to tuple first 
+
+there shouldn't be lines of bots walking to a vehicle only to find that it is full anymore 
+
+large vehicle driver ai rewrite. The crew can now talk to the driver and 
+ask them to complete several actions 
+
+introduced the vehicle commander role, although it is not coded yet 
+
+todo 
+- pak40 needs a engine so it can be rotated 
+- vehicle turrets are firing when out of range again. need to fix 
+
+play test notes 
+- new driver ai has seemed to negatively affect the  hetzer 
+    - rotate request is probably not slowing down fast enough 
+
+----------------------------------
 Feb 7 2025
 - added auto reload for handheld AT
 
