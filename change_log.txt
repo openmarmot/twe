@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 10 2025
+- "fixed" pak40 rotation and movement 
+- bumped pak40 ammo from 10 to 30
+- fixed bug causing altitude to fluctuate while driving in ground vehicles 
+
+reducing the weight of the pak40 to something more realistic and bumping the speed 
+was enough to get it about perfect. it can now move very slowly and turn fast. (too fast)
+
+I think I confirmed that the AI will fire all the panzerschreck ammo at once. i need to 
+add a reload timer to fix this 
+
+todo 
+- reload timers 
+
+----------------------------------
 Feb 9 2025
 - fixed variable error in the new driver code 
 - gave pak40 bike pedals as a temporary experiment 

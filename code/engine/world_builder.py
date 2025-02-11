@@ -2829,18 +2829,18 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_crew['driver']=[False,None,0,[7.0, -9.0],True,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[13,15],True,turret]
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
-        z.ai.max_speed=50
-        z.ai.max_offroad_speed=50
+        z.ai.max_speed=100
+        z.ai.max_offroad_speed=100
         z.ai.open_top=True
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=1400
         z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
-        for b in range(10):
+        for b in range(30):
             z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
        
     elif object_type=='pak40_turret':
@@ -2957,6 +2957,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.stall_speed=100
         z.ai.rotation_speed=50
         z.ai.acceleration=100
+        z.ai.max_rate_of_climb=3
         z.ai.throttle_zero=False
         z.collision_radius=200
         mg=spawn_object(world,world_coords,'mg15',False)
@@ -3004,6 +3005,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.stall_speed=100
         z.ai.rotation_speed=50
         z.ai.acceleration=100
+        z.ai.max_rate_of_climb=3
         z.ai.throttle_zero=False
         z.collision_radius=200
         z.is_airplane=True
