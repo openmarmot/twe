@@ -80,7 +80,6 @@ class AIHuman(object):
         # self.melee=None
         # objects that are large_human_pickup. only one at a time
         self.large_pickup=None
-        self.carrying_offset=[10,10]  #vector offset for when you are carrying a object
 
         # -- skills --
         self.is_pilot=False
@@ -1900,9 +1899,9 @@ class AIHuman(object):
                 self.target_eval_rate=random.uniform(0.8,6.5)
                 self.evaluate_targets()
 
-            # might be faster to have a bool we could check
-            if self.large_pickup is not None:
-                self.large_pickup.world_coords=engine.math_2d.get_vector_addition(self.owner.world_coords,self.carrying_offset)
+            # reset large pickup positiion if we moved
+            if self.large_pickup is not None and self.owner.reset_image:
+                self.update_large_pickup_position()
                 
             # building awareness stuff. ai and human need this
             if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
@@ -2034,6 +2033,15 @@ class AIHuman(object):
             print(dm)
 
     #---------------------------------------------------------------------------
+    def update_large_pickup_position(self):
+        '''update large pickup position'''
+        # eventually will support custom angles and offsets
+        self.large_pickup.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle+0)
+        self.large_pickup.world_coords=engine.math_2d.calculate_relative_position(
+            self.owner.world_coords,self.owner.rotation_angle,[10,0])
+        self.large_pickup.reset_image=True
+
+    #---------------------------------------------------------------------------
     def update_task_engage_enemy(self):
 
         # - getting this far assumes that you have a primary weapon
@@ -2116,8 +2124,8 @@ class AIHuman(object):
                             self.memory.pop('task_engage_enemy',None)
                             self.switch_task_think()
                         else:
-                            # note this should be rewritten to move just a bit towards the enemy, not the whole way
-                            self.switch_task_move_to_location(enemy.world_coords,None)
+                            # move about 150 units closer to the enemy and re-engage 
+                            self.switch_task_move_to_location(engine.math_2d.moveTowardsTarget(150,self.owner.world_coords,enemy.world_coords,1),None)
                     else:
                         self.switch_task_engage_enemy(new_enemy)
                     

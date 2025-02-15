@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 14 2025
+- large human pickup gets a computed position and angle 
+- minor ai_human updates 
+
+note - i noticed the ai doesn't turn towards what it is firing at anymore. i wonder if 
+that got left out in the ai code rewrite. will have to think if it should be added back in 
+
+----------------------------------
 Feb 10 2025
 - "fixed" pak40 rotation and movement 
 - bumped pak40 ammo from 10 to 30
