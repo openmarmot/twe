@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 16 2025
+- added german radio team
+- working on standardizing worldbuilder soldier loadouts 
+- increased ammo for soldiers with bolt actions 
+
+----------------------------------
 Feb 14 2025
 - large human pickup gets a computed position and angle 
 - minor ai_human updates 

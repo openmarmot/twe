@@ -48,8 +48,6 @@ class AIHuman(object):
         # 'currency name',amount
         self.wallet={}
 
-
-
         # -- health stuff --
         self.health=100
         self.bleeding=False
@@ -1899,9 +1897,7 @@ class AIHuman(object):
                 self.target_eval_rate=random.uniform(0.8,6.5)
                 self.evaluate_targets()
 
-            # reset large pickup positiion if we moved
-            if self.large_pickup is not None and self.owner.reset_image:
-                self.update_large_pickup_position()
+            
                 
             # building awareness stuff. ai and human need this
             if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
@@ -1911,6 +1907,11 @@ class AIHuman(object):
             if self.recent_noise_or_move:
                 if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
                     self.recent_noise_or_move=False
+                
+                # reset large pickup positiion if we moved
+                # this is a lazy way to check if we moved. could probably add a bool..
+                if self.large_pickup is not None:
+                    self.update_large_pickup_position()
 
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
