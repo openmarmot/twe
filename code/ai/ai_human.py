@@ -1012,8 +1012,10 @@ class AIHuman(object):
 
             # attempt reload. drop if fail
             if self.reload_weapon(self.antitank,self.owner) is False:
-                # drop the tube now that it is empty
-                self.drop_object(self.antitank)
+                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
+                if ammo_gun==0 and ammo_inventory==0:
+                    # drop the tube now that it is empty
+                    self.drop_object(self.antitank)
             else:
                 print(self.check_ammo(self.antitank,self.owner))
 
@@ -1150,7 +1152,7 @@ class AIHuman(object):
                 weapon.ai.magazine=new_magazine
                 return True
             else:
-                self.speak("I'm out of ammo!")
+                self.speak("No new magazines available")
                 return False
         else:
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
@@ -2062,79 +2064,93 @@ class AIHuman(object):
                 self.memory['task_engage_enemy']['last_think_time']=self.owner.world.world_seconds
                 self.memory['task_engage_enemy']['think_interval']=random.uniform(0.1,1.5)
 
-                # distance?
-                distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
-
-                if distance<self.primary_weapon.ai.range:
-                    # maybe only when not in buildings??
-                    if not self.prone:
-                        self.prone_state_change()
-
-                    # out of ammo ?
-                    ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
-                    if ammo_gun==0:
-                        if ammo_inventory>0:
-                            self.reload_weapon(self.primary_weapon,self.owner)
-                        else:
-                            # need ammo or new gun. hand it over to think to deal with this
-                            self.memory.pop('task_engage_enemy',None)
-                            self.switch_task_think()
-                            
-
-                    # also check if we should chuck a grenade at it
-                    if self.throwable is not None:
-                        if distance<310 and distance>150:
-                            if enemy.is_human:
-                                self.throw(enemy.world_coords)
-                                self.speak('Throwing Grenade !!!!')
-                            elif enemy.is_vehicle:
-                                # grenades will miss if the vehicle is moving fast
-                                if enemy.ai.current_speed<5:
-                                    # check pen
-                                    if enemy.ai.passenger_compartment_armor['left'][0]<4:
-                                        self.throw(enemy.world_coords)
-                                        self.speak('Throwing Grenade !!!!')
-
-
-                    # also check if we should launch antitank
-                    if enemy.is_vehicle:
-                        if self.antitank is not None and distance<1800:
-                            self.launch_antitank(enemy.world_coords)
-                        else:
-                            # if we get this far the gun has a magazine and ammo
-
-                            # can we penetrate it in a best case scenario?
-                            penetration=False
-                            if ammo_gun>0:
-                                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
-                                    penetration=True
-                                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
-                                    penetration=True
-
-                            if penetration is False:
-                                self.memory.pop('task_engage_enemy',None)
-                                self.switch_task_think()
-                                
+                if enemy.is_human:
+                    self.update_task_engage_enemy_human()
+                elif enemy.is_vehicle:
+                    self.update_task_engage_enemy_vehicle()
                 else:
-
-                    new_enemy=self.get_target(self.primary_weapon.ai.range)
-                    if new_enemy is None:
-
-                            # no closer targets. is the target really far out of range?
-                        if distance>(self.primary_weapon.ai.range+self.primary_weapon.ai.range*0.5):
-                            self.memory.pop('task_engage_enemy',None)
-                            self.switch_task_think()
-                        else:
-                            # move about 150 units closer to the enemy and re-engage 
-                            self.switch_task_move_to_location(engine.math_2d.moveTowardsTarget(150,self.owner.world_coords,enemy.world_coords,1),None)
-                    else:
-                        self.switch_task_engage_enemy(new_enemy)
-                    
+                    engine.log.add_data('error',f'ai_human.update_task_engage_enemy unkown object {enemy.name}',True)
 
             else:
                 # -- fire --
                 self.fire(self.primary_weapon,enemy)
                 self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
+
+    #---------------------------------------------------------------------------
+    def update_task_engage_enemy_human(self):
+        enemy=self.memory['task_engage_enemy']['enemy']
+        distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
+        if distance<self.primary_weapon.ai.range:
+            # maybe only when not in buildings??
+            if not self.prone:
+                self.prone_state_change()
+
+            # out of ammo ?
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
+            if ammo_gun==0:
+                if ammo_inventory>0:
+                    self.reload_weapon(self.primary_weapon,self.owner)
+                else:
+                    # need ammo or new gun. hand it over to think to deal with this
+                    self.memory.pop('task_engage_enemy',None)
+                    self.switch_task_think()
+                    
+
+            # also check if we should chuck a grenade at it
+            if self.throwable is not None:
+                if distance<310 and distance>150:
+                    if enemy.is_human:
+                        self.throw(enemy.world_coords)
+                        self.speak('Throwing Grenade !!!!')
+
+        else:
+
+            new_enemy=self.get_target(self.primary_weapon.ai.range)
+            if new_enemy is None:
+
+                    # no closer targets. is the target really far out of range?
+                if distance>(self.primary_weapon.ai.range+self.primary_weapon.ai.range*0.5):
+                    self.memory.pop('task_engage_enemy',None)
+                    self.switch_task_think()
+                else:
+                    # move about 150 units closer to the enemy and re-engage 
+                    self.switch_task_move_to_location(engine.math_2d.moveTowardsTarget(150,self.owner.world_coords,enemy.world_coords,1),None)
+            else:
+                self.switch_task_engage_enemy(new_enemy)
+    
+    #---------------------------------------------------------------------------
+    def update_task_engage_enemy_vehicle(self):
+        enemy=self.memory['task_engage_enemy']['enemy']
+        distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
+        penetration=False
+
+        if self.antitank is not None:
+            if distance<self.antitank.ai.range:
+                self.launch_antitank(enemy.world_coords)
+        else:
+
+            # also check if we should chuck a grenade at it
+            if self.throwable is not None:
+                if distance<310 and distance>150:
+
+                    # grenades will miss if the vehicle is moving fast
+                    if enemy.ai.current_speed<5:
+                        # check pen
+                        if enemy.ai.passenger_compartment_armor['left'][0]<4 or self.throwable.ai.use_antitank:
+                            self.throw(enemy.world_coords)
+                            self.speak(f'Throwing {self.throwable.name} !!!!')
+
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
+            # can we penetrate it in a best case scenario?
+            if ammo_gun>0:
+                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
+                    penetration=True
+                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
+                    penetration=True
+
+        if penetration is False:
+            self.memory.pop('task_engage_enemy',None)
+            self.switch_task_think()
 
     #---------------------------------------------------------------------------
     def update_task_enter_vehicle(self):

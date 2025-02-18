@@ -1276,7 +1276,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
-        z.ai.rate_of_fire=0.12
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=0
         z.ai.range=2000
         z.ai.type='antitank launcher'

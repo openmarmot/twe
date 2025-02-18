@@ -1,8 +1,25 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 17 2025
+- updated panzerschreck rate of fire to about 1 per 30 seconds 
+- split update_task_engage_enemy() into anti vehicle and anti human functions 
+- ai is now aware of the use_antitank attribute of grenades 
+- ai now uses the weapon range attribute when deciding whether to fire antitank weapons 
+    - previously it had to be within primary weapon range + a hardcoded AT range value 
+- minor adjustments and cleanup 
+
+rate of fire for panzerschreck is a bit of a hack around the fact that we 
+don't have a reload time implemented yet 
+
+todo 
+- throwables should get a range attribute. this should then be used in place of hardcoded numbers 
+
+
+----------------------------------
 Feb 16 2025
 - added german radio team
+- change to large human pickup position/angle computation to make it more frequent 
 - working on standardizing worldbuilder soldier loadouts 
 - increased ammo for soldiers with bolt actions 
 
