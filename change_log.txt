@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 19 2025
+- minor cleanup 
+- added my cat dani
+
+dani gets a unique ai but i think eventually I will want to add some animals
+and birds.
+
+----------------------------------
 Feb 17 2025
 - updated panzerschreck rate of fire to about 1 per 30 seconds 
 - split update_task_engage_enemy() into anti vehicle and anti human functions 
@@ -14,7 +22,6 @@ don't have a reload time implemented yet
 
 todo 
 - throwables should get a range attribute. this should then be used in place of hardcoded numbers 
-
 
 ----------------------------------
 Feb 16 2025

@@ -61,6 +61,7 @@ from ai.ai_turret import AITurret
 from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
 from ai.ai_vehicle_wreck import AIVehicleWreck
+from ai.ai_dani import AIDani
 
 #global variables
 
@@ -3122,6 +3123,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['fa_223_drache_rotor','fa_223_drache_rotor'],AIRotor)
         z.name='FA 223 Drache Rotor'
         z.is_rotor=True
+
+    elif object_type=='dani':
+        z=WorldObject(world,['dani'],AIDani)
+        z.name='Dani'
+        z.ai.speed=30
+        z.collision_radius=15
 
     elif object_type=='civilian_man':
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)

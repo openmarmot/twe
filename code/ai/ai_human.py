@@ -264,9 +264,6 @@ class AIHuman(object):
                 self.building_list.append(b)
                 self.in_building=True
                 
-
-
-
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
         '''returns target_coords adjusted for human weapon accuracy'''
@@ -323,9 +320,6 @@ class AIHuman(object):
             return [target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
         else:
             return target_coords
-
-
-
 
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile,distance):
@@ -1877,7 +1871,7 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def update(self):
-        ''' overrides base update '''
+        ''' update '''
         # update health 
         self.update_health()
 
