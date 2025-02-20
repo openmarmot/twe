@@ -29,7 +29,7 @@ class AIGun(object):
         #time last fired
         self.last_fired_time=0
 
-        # 60/rate of fire
+        # 60/(rate of fire in rounds per minute)
         self.rate_of_fire=0.
 
         # reload speed in seconds

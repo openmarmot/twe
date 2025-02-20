@@ -33,11 +33,11 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 - more civilians 
 
 # vehicle stuff 
-- gunners should be able to ask the driver to pause (so they can shoot)
-- gunners should be able to ask the driver to rotate and then pause (for shooting/angling)
+- (done) gunners should be able to ask the driver to pause (so they can shoot)
+- (done) gunners should be able to ask the driver to rotate and then pause (for shooting/angling)
 - tanks should be able to rotate without moving forwards 
 - gunners should be able to switch between tank round types 
-- stabilization / lack of should be taken into account with gun accuracy 
+- (done) stabilization / lack of should be taken into account with gun accuracy 
 
 
 # weapons 

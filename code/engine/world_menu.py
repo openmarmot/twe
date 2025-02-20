@@ -445,7 +445,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_misc':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Misc --')
-            self.text_queue.append('1 - brown_chair')
+            self.text_queue.append('1 - dani')
             self.text_queue.append('2 - Feldfunk radio and charger ')
             self.text_queue.append('3 - Maybach HL42')
             self.text_queue.append('4 - Pickle Jar')
@@ -456,7 +456,7 @@ class World_Menu(object):
             self.text_queue.append('9 - grid 50 foot')
 
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'brown_chair',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'dani',True)
 
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+40,self.world.player.world_coords[1]],'radio_feldfu_b',True)
