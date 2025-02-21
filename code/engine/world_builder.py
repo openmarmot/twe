@@ -1308,6 +1308,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.explosion_radius=35
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
+        z.ai.range=310
         z.ai.has_fuse=True
         z.ai.fuse_max_time=4
         z.ai.use_antipersonnel=True
@@ -1325,6 +1326,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.unreliable_contact_fuse=True
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
+        z.ai.range=310
         z.ai.has_fuse=False # no time fuse
         z.ai.fuse_max_time=4
         z.ai.use_antitank=True
@@ -1341,6 +1343,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.flame_amount=5
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
+        z.ai.range=310
         z.ai.has_fuse=True
         z.ai.fuse_max_time=4
         z.ai.use_antipersonnel=True
@@ -1358,6 +1361,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.explosion_radius=20
         z.ai.max_speed=150
         z.ai.max_flight_time=2.0
+        z.ai.range=310
         z.ai.has_fuse=True
         z.ai.fuse_max_time=3
         z.ai.use_antipersonnel=True
@@ -3522,6 +3526,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=112
         z.ai.max_speed=112
         z.ai.maxTime=2
+        z.ai.range=310
         z.rotation_angle=float(random.randint(0,359)) 
     elif object_type=='german_folding_shovel':
         z=WorldObject(world,['german_folding_shovel'],AIThrowable)
@@ -3531,6 +3536,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=112
         z.ai.max_speed=112
         z.ai.maxTime=2
+        z.ai.range=310
         z.rotation_angle=float(random.randint(0,359))
     # https://en.wikipedia.org/wiki/Kharkiv_model_V-2
     elif object_type=='kharkiv_v2-34_engine':

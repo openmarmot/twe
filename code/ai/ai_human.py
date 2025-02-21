@@ -2092,7 +2092,7 @@ class AIHuman(object):
 
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
-                if distance<310 and distance>150:
+                if distance<self.throwable.ai.range and distance>150:
                     if enemy.is_human:
                         self.throw(enemy.world_coords)
                         self.speak('Throwing Grenade !!!!')
@@ -2125,7 +2125,7 @@ class AIHuman(object):
 
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
-                if distance<310 and distance>150:
+                if distance<self.throwable.ai.range and distance>150:
 
                     # grenades will miss if the vehicle is moving fast
                     if enemy.ai.current_speed<5:

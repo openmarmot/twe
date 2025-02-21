@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 20 2025
+- added range to throwable items. used by ai_human
+
+----------------------------------
 Feb 19 2025
 - minor cleanup 
 - added my cat dani
