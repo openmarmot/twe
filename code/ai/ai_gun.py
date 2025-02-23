@@ -68,6 +68,8 @@ class AIGun(object):
 
         # spawns smoke when fired
         self.smoke_on_fire=False
+        self.smoke_type='none'
+        self.smoke_offset=[0,0]
 
         # spawn a bullet casing when fired
         self.spawn_case=True
@@ -109,14 +111,26 @@ class AIGun(object):
 
             # spawn smoke
             if self.smoke_on_fire:
-                heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-                engine.world_builder.spawn_smoke_cloud(self.owner.world,self.equipper.world_coords,heading)
-                coords=engine.math_2d.moveAlongVector(-15,self.equipper.world_coords,heading,1)
-                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
-                coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
-                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
-                coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
-                engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                if self.smoke_type=='rocket':
+                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,self.equipper.world_coords,heading)
+                    coords=engine.math_2d.moveAlongVector(-15,self.equipper.world_coords,heading,1)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                    coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                    coords=engine.math_2d.moveAlongVector(-15,coords,heading,1)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,heading)
+                elif self.smoke_type=='cannon':
+                    left_heading=engine.math_2d.get_heading_from_rotation(
+                        engine.math_2d.get_normalized_angle(self.owner.rotation_angle-90))
+                    right_heading=engine.math_2d.get_heading_from_rotation(
+                        engine.math_2d.get_normalized_angle(self.owner.rotation_angle+90))
+                    coords=engine.math_2d.calculate_relative_position(
+                        self.equipper.world_coords,self.owner.rotation_angle,self.smoke_offset)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,left_heading,3)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,coords,right_heading,3)
+                    engine.world_builder.spawn_flash(self.owner.world,coords,
+                        engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
 
             # spawn bullet case
             if self.spawn_case:

@@ -875,11 +875,9 @@ def spawn_explosion_and_fire(world,world_coords,fire_duration,smoke_duration):
         z.ai.move_time_max=3
         z.ai.alive_time_max=random.uniform(0.09,0.1)
 
-    
-
 #------------------------------------------------------------------------------
 def spawn_flash(world,world_coords,heading,amount=2):
-    ''' spawn smoke cloud '''
+    ''' spawn flash cloud '''
 
     for x in range(amount):
         coords=[world_coords[0]+random.randint(-2,2),world_coords[1]+random.randint(-2,2)]
@@ -1227,6 +1225,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.type='antitank launcher'
         z.ai.use_antitank=True
         z.ai.smoke_on_fire=True
+        z.ai.smoke_type='rocket'
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='panzerfaust_60_magazine':
@@ -1255,6 +1254,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.type='antitank launcher'
         z.ai.use_antitank=True
         z.ai.smoke_on_fire=True
+        z.ai.smoke_type='rocket'
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='panzerfaust_100_magazine':
@@ -1283,6 +1283,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.type='antitank launcher'
         z.ai.use_antitank=True
         z.ai.smoke_on_fire=True
+        z.ai.smoke_type='rocket'
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='panzerschreck_magazine':
@@ -2241,6 +2242,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.position_offset=[0,0]
         z.ai.rotation_range=[-30,30]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
 
     elif object_type=='german_panzer_iv_ausf_g':
@@ -2329,6 +2334,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l43',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2403,6 +2411,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2478,6 +2489,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk40_l48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2688,6 +2702,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'76mm_m1940_f34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.spawn_case=False
@@ -2762,6 +2779,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_zis_s_53',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2856,6 +2876,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'7.5cm_pak39_L48',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='soviet_37mm_m1939_61k_aa_gun_carriage':
@@ -2898,6 +2921,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'37mm_m1939_k61',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='german_pak40':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2948,6 +2975,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-60,60]
         z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_pak40',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='75mm_pak40':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2960,7 +2991,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
-        z.rotation_angle=float(random.randint(0,359))
+        z.rotation_angle=0
 
     elif object_type=='75mm_pak40_magazine':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
@@ -3398,7 +3429,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_smoke'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15
@@ -3413,7 +3444,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_fire'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15
@@ -3428,7 +3459,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_explosion'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15

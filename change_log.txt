@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Feb 23 2025
+- added smoke and flash to cannons 
+
+I was lazy and only set the correct position on one of them.
+need to go back and fix
+
 ----------------------------------
 Feb 20 2025
 - added range to throwable items. used by ai_human
