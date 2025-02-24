@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+----------------------------------
+Feb 24 2025
+- bumped up rate of fire on all large caliber weapons to around 1 per 30 seconds 
+- adjusted cannon smoke offsets for all cannons 
 
 ----------------------------------
 Feb 23 2025

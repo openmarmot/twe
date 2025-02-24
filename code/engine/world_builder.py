@@ -1705,7 +1705,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'7.5cm_pak39_L48_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
@@ -1730,7 +1730,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'76mm_m1940_f34_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
@@ -1754,7 +1754,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'85mm_zis_s_53_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
@@ -2336,7 +2336,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-93.0, 1.0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2413,7 +2413,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-100.0, 1.0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2491,7 +2491,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-100.0, 1.0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2503,7 +2503,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l43_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
@@ -2527,7 +2527,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l48_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
@@ -2704,7 +2704,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-82,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.spawn_case=False
@@ -2781,7 +2781,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-147,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
@@ -2878,7 +2878,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-83,-1]
         z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='soviet_37mm_m1939_61k_aa_gun_carriage':
@@ -2923,7 +2923,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-54,1]
         z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='german_pak40':
@@ -2977,7 +2977,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'
-        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.smoke_offset=[-76,0]
         z.ai.primary_weapon.ai.spawn_case=False
 
     elif object_type=='75mm_pak40':
@@ -2986,7 +2986,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
-        z.ai.rate_of_fire=0.9
+        z.ai.rate_of_fire=30
         z.ai.reload_speed=13
         z.ai.range=2418
         z.ai.type='cannon'
