@@ -1217,7 +1217,6 @@ class World_Menu(object):
                     coaxial_weapon='None'
                     if b.ai.primary_weapon!=None:
                         self.text_queue.append('- '+b.name)
-                        self.text_queue.append('-- health: '+str(b.ai.health))
                         self.text_queue.append('-- jammed: '+str(b.ai.turret_jammed))
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
                         self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))

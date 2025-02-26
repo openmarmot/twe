@@ -1237,6 +1237,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['panzerfaust_60']
         z.ai.capacity=1
         z.ai.removable=False
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1266,6 +1267,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['panzerfaust_100']
         z.ai.capacity=1
         z.ai.removable=False
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1294,7 +1296,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['panzerschreck']
         z.ai.compatible_projectiles=['panzerschreck']
         z.ai.capacity=1
-        z.ai.removable=False
+        z.ai.removable=True
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1670,6 +1673,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['mg34','mg42']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=250
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1720,6 +1724,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['7.5cm_pak39_L48']
         z.ai.compatible_projectiles=['PzGr39_75_L48']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1745,6 +1750,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['76mm_m1940_f34']
         z.ai.compatible_projectiles=['76x385_AP']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -1769,6 +1775,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['85mm_zis_s_53']
         z.ai.compatible_projectiles=['BR-365k']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -2174,6 +2181,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_turret=True
 
     elif object_type=='german_sd_kfz_251/22':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2247,6 +2255,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_turret=True
 
     elif object_type=='german_panzer_iv_ausf_g':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2341,6 +2350,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='german_panzer_iv_ausf_h':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2418,6 +2428,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     # J is a H with simplicication. schurtzen are replaced with wire schurtzen on the hull (thin)
     elif object_type=='german_panzer_iv_ausf_j':
@@ -2496,6 +2507,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='75mm_kwk40_l43':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2518,6 +2530,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['75mm_kwk40_l43']
         z.ai.compatible_projectiles=['PzGr39_75_L43']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -2542,6 +2555,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['75mm_kwk40_l48']
         z.ai.compatible_projectiles=['PzGr39_75_L48']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -2615,6 +2629,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -2709,6 +2724,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon.ai.equipper=z
+        z.ai.primary_turret=True
 
     elif object_type=='soviet_t34_85':
         # ref : https://wiki.warthunder.com/T-34-85
@@ -2786,6 +2802,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
@@ -2880,6 +2897,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_type='cannon'
         z.ai.primary_weapon.ai.smoke_offset=[-83,-1]
         z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2925,6 +2943,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_type='cannon'
         z.ai.primary_weapon.ai.smoke_offset=[-54,1]
         z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='german_pak40':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2979,6 +2998,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_type='cannon'
         z.ai.primary_weapon.ai.smoke_offset=[-76,0]
         z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
 
     elif object_type=='75mm_pak40':
         z=WorldObject(world,['mg34'],AIGun)
@@ -3001,6 +3021,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['75mm_pak40']
         z.ai.compatible_projectiles=['PzGr39_75_PAK40']
         z.ai.capacity=1
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 

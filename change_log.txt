@@ -1,6 +1,27 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 25 2025
+- added 'primary_turret' bool for turrets 
+- ai gunners will now check this when deciding whether to ask the driver to do things 
+- guns can now be damaged or jammed 
+- turret penetration now results in turret component damage not health damage for the turret
+- turret no longer has health 
+- ai gunner is now aware of gun damage, jams, and turret jams. 
+- ai gunner can fix gun jams
+- mg34 belts and 1 round cannon 'magazines' are now disintegrating and dissapear when empty 
+
+this is a start of a move towards component damage and away from unrealistic health counters.
+i'd like to eventually do this for humans and vehicles. 
+
+
+todo 
+- consider adding ammo_stowage to turrets and vehicles and moving ammo storage over to it. 
+- add the possibility of a turret hit causing a ammo explosion 
+- figure out if turret jams and gun damage should cause crew bail outs 
+- was unable to trigger a grenade throw from soviet troops while in a tank - need to look at that further 
+
+----------------------------------
 Feb 24 2025
 - bumped up rate of fire on all large caliber weapons to around 1 per 30 seconds 
 - adjusted cannon smoke offsets for all cannons 

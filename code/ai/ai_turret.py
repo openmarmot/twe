@@ -33,7 +33,7 @@ class AITurret(object):
         self.turret_armor['front']=[0,0,0]
         self.turret_armor['rear']=[0,0,0]
 
-        self.health=100
+        # this means that it can no longer rotate
         self.turret_jammed=False
 
         # for remote operated machine guns - mostly german
@@ -59,6 +59,9 @@ class AITurret(object):
         self.last_vehicle_position=[0,0]
         self.last_vehicle_rotation=0
 
+        # whether this is the main/most important turret or not.
+        # used by ai_human to determine actions
+        self.primary_turret=False
 
         # note - extra magazines/ammo should be stored in the vehicle inventory
         self.primary_weapon=None
@@ -112,11 +115,23 @@ class AITurret(object):
                             self.vehicle.ai.health-=random.randint(20,30)
                             # should have a chance to damage crew as well
                 
-                # should do component damage here
-                if random.randint(0,1)==1:
+                # component damage
+                damaged_component=random.choice(['turret track','primary weapon','coaxial weapon','miraculously unharmed'])
+                if damaged_component=='turret track':
                     self.turret_jammed=True
-                else:
-                    self.health-=random.randint(25,75)
+                elif damaged_component=='primary weapon':
+                    if self.primary_weapon:
+                        if random.randint(0,1)==1:
+                            self.primary_weapon.ai.action_jammed=True
+                        else:
+                            self.primary_weapon.ai.damaged=True
+                elif damaged_component=='coaxial weapon':
+                    if self.coaxial_weapon:
+                        if random.randint(0,1)==1:
+                            self.coaxial_weapon.ai.action_jammed=True
+                        else:
+                            self.coaxial_weapon.ai.damaged=True
+
 
             else:
                 # bounced the projectile
@@ -157,19 +172,19 @@ class AITurret(object):
 
     #---------------------------------------------------------------------------
     def handle_fire(self):
-        if self.health>0:
-            if self.primary_weapon.ai.check_if_can_fire():
-                self.primary_weapon.rotation_angle=self.calculate_accuracy(self.primary_weapon)
-                self.primary_weapon.ai.fire()
+        if self.primary_weapon.ai.check_if_can_fire():
+            self.primary_weapon.rotation_angle=self.calculate_accuracy(self.primary_weapon)
+            self.primary_weapon.ai.fire()
+            self.vehicle.ai.recent_noise_or_move=True
+            self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
 
     #---------------------------------------------------------------------------
     def handle_fire_coax(self):
-        if self.health>0:
-            if self.coaxial_weapon.ai.check_if_can_fire():
-                self.coaxial_weapon.rotation_angle=self.calculate_accuracy(self.coaxial_weapon)
-                self.coaxial_weapon.ai.fire()
-                self.vehicle.ai.recent_noise_or_move=True
-                self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
+        if self.coaxial_weapon.ai.check_if_can_fire():
+            self.coaxial_weapon.rotation_angle=self.calculate_accuracy(self.coaxial_weapon)
+            self.coaxial_weapon.ai.fire()
+            self.vehicle.ai.recent_noise_or_move=True
+            self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):

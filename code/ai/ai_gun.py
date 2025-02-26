@@ -78,10 +78,16 @@ class AIGun(object):
         self.use_antitank=False
         self.use_antipersonnel=False
 
+        self.damaged=False # gun is damaged and cannot operate
+        self.action_jammed=False # gun action is jammed witha shell in the chamber
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''
         ''' used externally and by the fire function'''
+        if self.damaged or self.action_jammed:
+            return False
+
         if self.magazine!=None:
             if(self.owner.world.world_seconds-self.last_fired_time>self.rate_of_fire):
                 if len(self.magazine.ai.projectiles)>0:

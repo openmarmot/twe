@@ -1136,12 +1136,13 @@ class AIHuman(object):
                             new_magazine=b
                             biggest=len(b.ai.projectiles)
 
-            # remove old magazine ONLY if we have a new magazine
-            if old_magazine is not None and new_magazine is not None:
-                obj_with_inventory.ai.event_add_inventory(old_magazine)
-                weapon.ai.magazine=None
             # add a new magazine (either the old magazine was removed, or was never there)
             if new_magazine is not None:
+                if old_magazine is not None:
+                    # empty disintegrating magazines get de-referenced and dissapear 
+                    if old_magazine.ai.disintegrating==False or len(old_magazine.ai.projectiles)>0:
+                        obj_with_inventory.ai.event_add_inventory(old_magazine)
+
                 obj_with_inventory.ai.event_remove_inventory(new_magazine)
                 weapon.ai.magazine=new_magazine
                 return True
@@ -1151,10 +1152,6 @@ class AIHuman(object):
         else:
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
             return False
-
-        # at this point we should do a ai_mode change with a timer to simulate the 
-        # reload time
-        
 
         
     #---------------------------------------------------------------------------
@@ -1651,6 +1648,9 @@ class AIHuman(object):
 
         out_of_ammo_primary=False
         out_of_ammo_coax=False
+        turret_jammed=turret.ai.turret_jammed
+        weapons_damaged=False
+        weapons_jammed=False
 
         # check main gun ammo
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
@@ -1673,85 +1673,144 @@ class AIHuman(object):
         else:
             out_of_ammo_coax=True
 
+        # check weapons 
+        if turret.ai.primary_weapon:
+            if turret.ai.primary_weapon.ai.damaged:
+                weapons_damaged=True
+            if turret.ai.primary_weapon.ai.action_jammed:
+                weapons_jammed=True
+        if turret.ai.coaxial_weapon:
+            if turret.ai.coaxial_weapon.ai.damaged:
+                weapons_damaged=True
+            if turret.ai.coaxial_weapon.ai.action_jammed:
+                weapons_jammed=True
+
         if out_of_ammo_coax and out_of_ammo_primary:
             self.memory['task_vehicle_crew']['current_action']='Out of Ammo'
-        else:
+            self.memory['task_vehicle_crew']['target']=None
+            return
+        
+        if turret_jammed:
+            # we should probably bail out
+            self.memory['task_vehicle_crew']['current_action']='Turret Jammed'
+            self.memory['task_vehicle_crew']['target']=None
+            return
 
-            if self.memory['task_vehicle_crew']['target'] is None:
-                self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+        if weapons_damaged:
+            self.memory['task_vehicle_crew']['current_action']='Weapons Damaged'
+            self.memory['task_vehicle_crew']['target']=None
+            return
+        
+        if weapons_jammed:
+            # this we can fix ourselves
+            #if we are already in this state then consider it fixed 
+            if self.memory['task_vehicle_crew']['current_action']=='Weapons Jammed':
+                engine.log.add_data('info','ai_human.think_vehicle_role_gunner - fixing jammed gun',True)
+                if turret.ai.primary_weapon:
+                    if turret.ai.primary_weapon.ai.action_jammed:
+                        self.speak('fixing jammed gun')
+                        turret.ai.primary_weapon.ai.action_jammed=False
+                if turret.ai.coaxial_weapon:
+                    if turret.ai.coaxial_weapon.ai.action_jammed:
+                        self.speak('fixing jammed gun')
+                        turret.ai.coaxial_weapon.ai.action_jammed=False
+                # wait for a bit to simulate fixing
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
             else:
-                if self.memory['task_vehicle_crew']['target'].ai.health<1:
-                    self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+                self.memory['task_vehicle_crew']['current_action']='Weapons Jammed'
+                self.memory['task_vehicle_crew']['target']=None
 
-            # we either already had a target, or we might have just got a new one
-            if self.memory['task_vehicle_crew']['target'] is not None:
-                target=self.memory['task_vehicle_crew']['target']
-                # check rotation
-                rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
-                if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
+            return
+
+        if self.memory['task_vehicle_crew']['target'] is None:
+            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+        else:
+            if self.memory['task_vehicle_crew']['target'].ai.health<1:
+                self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+
+        # we have a target, lets think about it in more detail
+        if self.memory['task_vehicle_crew']['target'] is not None:
+            self.think_vehicle_role_gunner_examine_target(out_of_ammo_primary,out_of_ammo_coax)
+                
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_gunner_examine_target(self,out_of_ammo_primary,out_of_ammo_coax):
+        '''thinking about the current target after other things have been thought about'''
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        turret=self.memory['task_vehicle_crew']['turret']
+        target=self.memory['task_vehicle_crew']['target']
+
+        # check rotation
+        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
+        if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
+            # lets only ask to rotate if we are the main turret
+            if turret.ai.primary_turret:
+                if vehicle.ai.vehicle_crew['driver'][0]:
+                    # ask the driver to rotate towards the target
+                    if target.is_vehicle or random.randint(0,1)==1:
+                        self.speak_vehicle_internal('driver','rotate to target')
+                        # wait for a couple seconds before rechecking
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                else:
+                    # no driver so we can't rotate the vehicle. 
+                    # maybe we should bail out?
+                    self.memory['task_vehicle_crew']['target']=None
+            else:
+                self.memory['task_vehicle_crew']['target']=None
+        else:
+            # check distance
+            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+            if distance>turret.ai.primary_weapon.ai.range:
+
+                # lets only drive closer if we are the main turret
+                if turret.ai.primary_turret:
                     if vehicle.ai.vehicle_crew['driver'][0]:
-                        # ask the driver to rotate towards the target
-                        if target.is_vehicle or random.randint(0,1)==1:
-                            self.speak_vehicle_internal('driver','rotate to target')
-                            # wait for a couple seconds before rechecking
-                            self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                        # ask the driver to drive towards the target
+                        
+                        self.speak_vehicle_internal('driver','drive to destination')
+                        # calculate a destination closer to the target
+                        self.memory['task_vehicle_crew']['destination']=engine.math_2d.moveTowardsTarget(300,vehicle.world_coords,target.world_coords,1)
+                        # wait for a couple seconds before rechecking
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
                     else:
                         # no driver so we can't rotate the vehicle. 
                         # maybe we should bail out?
                         self.memory['task_vehicle_crew']['target']=None
                 else:
-                    # check distance
-                    distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-                    if distance>turret.ai.primary_weapon.ai.range:
-                        if vehicle.ai.vehicle_crew['driver'][0]:
-                            # ask the driver to rotate towards the target
-                            
-                            self.speak_vehicle_internal('driver','drive to destination')
-                            # calculate a destination closer to the target
-                            self.memory['task_vehicle_crew']['destination']=engine.math_2d.moveTowardsTarget(300,vehicle.world_coords,target.world_coords,1)
-                            # wait for a couple seconds before rechecking
-                            self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                        else:
-                            # no driver so we can't rotate the vehicle. 
-                            # maybe we should bail out?
-                            self.memory['task_vehicle_crew']['target']=None
-                    else:
-                        # check penetration
-                        # there are several places this could be done. this is a good spot, but 
-                        # maybe it should be done earlier like in get_target? alternatively we probably want 
-                        # 'some' amount of firing that won't penetrate as it adds a lot of excitement and is 
-                        # more realistic. just doing it here means its possible some firing will happen before a think
-
-                        # can we penetrate it in a best case scenario?
-                        
-                        if target.is_vehicle:
-                            penetration=False
-                            if out_of_ammo_primary is False:
-                                if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                                    penetration=True
-                            elif out_of_ammo_coax is False:
-                                if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                                    penetration=True
-
-                            if penetration is False:
-                                self.memory['task_vehicle_crew']['target']=None
-                            else:
-                                # we can penetrate. lets ask the driver to hold. should we only do this if we are engaging vehicles?
-                                if vehicle.ai.current_speed>5:
-                                    if vehicle.ai.vehicle_crew['driver'][0]:
-                                        self.speak_vehicle_internal('driver','hold for engagement')
-
-
-            if self.memory['task_vehicle_crew']['target'] is not None:
-                # update the turret angle for the target
-                self.calculate_turret_aim()
-                self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+                    self.memory['task_vehicle_crew']['target']=None
             else:
-                # no target 
-                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                # check penetration
+                # there are several places this could be done. this is a good spot, but 
+                # maybe it should be done earlier like in get_target? alternatively we probably want 
+                # 'some' amount of firing that won't penetrate as it adds a lot of excitement and is 
+                # more realistic. just doing it here means its possible some firing will happen before a think
+
+                # can we penetrate it in a best case scenario?
+                
+                if target.is_vehicle:
+                    penetration=False
+                    if out_of_ammo_primary is False:
+                        if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                            penetration=True
+                    elif out_of_ammo_coax is False:
+                        if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                            penetration=True
+
+                    if penetration is False:
+                        self.memory['task_vehicle_crew']['target']=None
+                    else:
+                        # we can penetrate. lets ask the driver to hold. should we only do this if we are engaging vehicles?
+                        if vehicle.ai.current_speed>5:
+                            if vehicle.ai.vehicle_crew['driver'][0]:
+                                self.speak_vehicle_internal('driver','hold for engagement')
 
 
-        # if we get this far then we just fire at it
+        if self.memory['task_vehicle_crew']['target'] is not None:
+            # update the turret angle for the target
+            self.calculate_turret_aim()
+            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+        else:
+            # no target 
+            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):

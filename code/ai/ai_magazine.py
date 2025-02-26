@@ -31,6 +31,10 @@ class AIMagazine(object):
 
         # list of projectiles (world_object)
         self.projectiles=[]
+
+        # disentegrating magazines dissapear from the world when they are emptied 
+        # done by the ai_human reloading code
+        self.disintegrating=False
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
