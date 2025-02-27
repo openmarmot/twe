@@ -1140,7 +1140,7 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.text_queue.append('Vehicle : '+self.selected_object.name)
-            self.text_queue.append('Health : '+str(self.selected_object.ai.health))
+            self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
 
             for b in self.selected_object.ai.fuel_tanks:
                 fuel=0
@@ -1196,7 +1196,7 @@ class World_Menu(object):
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
                 self.text_queue.append('Vehicle : '+self.selected_object.name)
-                self.text_queue.append('Health : '+str(self.selected_object.ai.health))
+                self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
                 self.text_queue.append('Current Role : '+currentRole)
                 if radio:
                     self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)

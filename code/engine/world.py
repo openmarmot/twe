@@ -419,25 +419,24 @@ class World():
         for b in self.wo_objects_vehicle:
             acceptable=True
             
+            if b.ai.vehicle_disabled:
+                continue
+            
             # first check if its full
-            if b.ai.check_if_vehicle_is_full() is True:
-                acceptable=False
+            if b.ai.check_if_vehicle_is_full():
+                continue
 
-            # check if we can drive it
-            if acceptable:
-                if b.is_airplane and human.ai.is_pilot is False:
-                    acceptable=False
+            if b.is_airplane and human.ai.is_pilot is False:
+                continue
 
-                if b.ai.requires_afv_training and human.ai.is_afv_trained is False:
-                    acceptable=False
+            if b.ai.requires_afv_training and human.ai.is_afv_trained is False:
+                continue
 
-            # check factions
-            if acceptable:
-                for value in b.ai.vehicle_crew.values():
-                    if value[0] is True:
-                        if value[1].ai.squad.faction!=human.ai.squad.faction:
-                            acceptable=False
-
+            # factions
+            for value in b.ai.vehicle_crew.values():
+                if value[0] is True:
+                    if value[1].ai.squad.faction!=human.ai.squad.faction:
+                        acceptable=False
 
             if acceptable:
                 d=engine.math_2d.get_distance(human.world_coords,b.world_coords)

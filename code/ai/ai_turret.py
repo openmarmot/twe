@@ -99,24 +99,11 @@ class AITurret(object):
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
             if self.vehicle!=None:
                 self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret')
-            if penetration:
-                if self.vehicle!=None:
-                    # remote operated turrets mean that the gunner can't be hit by turret penetrations 
-                    if self.remote_operated==False:
-                        if random.randint(0,1)==1:
-                            for key,value in self.vehicle.ai.vehicle_crew.items():
-                                if value[5]==self.owner:
-                                    if value[0]==True:
-                                        value[1].ai.handle_event('collision',projectile)
-
-                        # chance to essentially ricochet/explode/shrapnel down into the main vehicle
-                        # Note - this does not happen if the turret is remote operated as there is no crew opening
-                        if random.randint(0,2)==2:
-                            self.vehicle.ai.health-=random.randint(20,30)
-                            # should have a chance to damage crew as well
-                
+            if penetration:                
                 # component damage
-                damaged_component=random.choice(['turret track','primary weapon','coaxial weapon','miraculously unharmed'])
+                damaged_component=random.choice(['turret track','primary weapon',
+                    'coaxial weapon','crew','miraculously unharmed'])
+                
                 if damaged_component=='turret track':
                     self.turret_jammed=True
                 elif damaged_component=='primary weapon':
@@ -131,6 +118,12 @@ class AITurret(object):
                             self.coaxial_weapon.ai.action_jammed=True
                         else:
                             self.coaxial_weapon.ai.damaged=True
+                elif damaged_component=='crew':
+                    if self.remote_operated==False and self.vehicle:
+                        for key,value in self.vehicle.ai.vehicle_crew.items():
+                            if value[5]==self.owner:
+                                if value[0]==True:
+                                    value[1].ai.handle_event('collision',projectile)
 
 
             else:

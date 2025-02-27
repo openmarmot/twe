@@ -217,19 +217,17 @@ class AIHuman(object):
         # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['turret']
 
+        # check actual turret rotation angle against angle to target
+        needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
         
-        if target.ai.health>0:
-            # check actual turret rotation angle against angle to target
-            needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
-            
-            # probably need to do some rounding here
-            if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-                if needed_rotation>turret.rotation_angle:
-                    turret.ai.handle_rotate_left()
-                else:
-                    turret.ai.handle_rotate_right()
+        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
+            if needed_rotation>turret.rotation_angle:
+                turret.ai.handle_rotate_left()
             else:
-                if target.is_human:
+                turret.ai.handle_rotate_right()
+        else:
+            if target.is_human:
+                if target.a.health>0:
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
@@ -238,9 +236,13 @@ class AIHuman(object):
                         else:
                             self.memory['task_vehicle_crew']['target']=None
                 else:
+                    self.memory['task_vehicle_crew']['target']=None
+            else:
+                if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
+                    turret.ai.handle_fire_coax()
+                else:
                     turret.ai.handle_fire()
-        else:
-            self.memory['task_vehicle_crew']['target']=None
+
 
     #---------------------------------------------------------------------------
     def building_check(self):
@@ -421,7 +423,12 @@ class AIHuman(object):
                 if gun.world_builder_identity in b.ai.compatible_guns:
                     ammo_inventory+=len(b.ai.projectiles)
                     magazine_count+=1
-
+        if object_with_inventory.is_vehicle:
+            for b in object_with_inventory.ai.ammo_rack:
+                if b.is_gun_magazine:
+                    if gun.world_builder_identity in b.ai.compatible_guns:
+                        ammo_inventory+=len(b.ai.projectiles)
+                        magazine_count+=1
 
         return ammo_gun,ammo_inventory,magazine_count
 
@@ -914,45 +921,47 @@ class AIHuman(object):
         near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,500)
 
         for b in near_vehicle:
+            # skip disabled vehicles
+            if b.ai.vehicle_disabled:
+                continue
 
             # skip AFVs if the whole squad isn't trained
             if b.ai.requires_afv_training and squad_afv_training is False:
-                pass
-            else:
+                continue
 
-                if len(near_squad)==0:
-                    break
-                # calculate occupants
-                occupants=0
+            if len(near_squad)==0:
+                break
+            # calculate occupants
+            occupants=0
 
-                # count the occupants already in the vehicle
-                for c in b.ai.vehicle_crew.values():
-                    if c[0] is True:
+            # count the occupants already in the vehicle
+            for c in b.ai.vehicle_crew.values():
+                if c[0] is True:
+                    occupants+=1
+
+            for c in self.owner.world.wo_objects_human:
+                if 'task_enter_vehicle' in c.ai.memory:
+                    if c.ai.memory['task_enter_vehicle']['vehicle']==b:
                         occupants+=1
 
-                for c in self.owner.world.wo_objects_human:
-                    if 'task_enter_vehicle' in c.ai.memory:
-                        if c.ai.memory['task_enter_vehicle']['vehicle']==b:
-                            occupants+=1
+            while occupants<len(b.ai.vehicle_crew):
+                if len(near_squad)>0:
 
-                while occupants<len(b.ai.vehicle_crew):
-                    if len(near_squad)>0:
+                    # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
+                    if near_squad[0].is_player:
+                        self.speak('Get in the vehicle')
+                        near_squad.pop(0)
+                    else:
 
-                        # want to exclude the player as otherwise the ai will take over, but want to also let the player know somehow
-                        if near_squad[0].is_player:
-                            self.speak('Get in the vehicle')
+                        if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
+                            #already in a vehicle, so no further action needed
                             near_squad.pop(0)
                         else:
-
-                            if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
-                                #already in a vehicle, so no further action needed
-                                near_squad.pop(0)
-                            else:
-                                near_squad[0].ai.switch_task_enter_vehicle(b,destination)
-                                occupants+=1
-                                near_squad.pop(0)
-                    else:
-                        break
+                            near_squad[0].ai.switch_task_enter_vehicle(b,destination)
+                            occupants+=1
+                            near_squad.pop(0)
+                else:
+                    break
     
     #---------------------------------------------------------------------------
     def handle_event(self, event, event_data):
@@ -1136,6 +1145,14 @@ class AIHuman(object):
                             new_magazine=b
                             biggest=len(b.ai.projectiles)
 
+            if new_magazine is None and obj_with_inventory.is_vehicle:
+                for b in obj_with_inventory.ai.ammo_rack:
+                    if b.is_gun_magazine:
+                        if weapon.world_builder_identity in b.ai.compatible_guns:
+                            if len(b.ai.projectiles)>biggest:
+                                new_magazine=b
+                                biggest=len(b.ai.projectiles)
+
             # add a new magazine (either the old magazine was removed, or was never there)
             if new_magazine is not None:
                 if old_magazine is not None:
@@ -1143,7 +1160,15 @@ class AIHuman(object):
                     if old_magazine.ai.disintegrating==False or len(old_magazine.ai.projectiles)>0:
                         obj_with_inventory.ai.event_add_inventory(old_magazine)
 
-                obj_with_inventory.ai.event_remove_inventory(new_magazine)
+                # remove the new magazine from inventory
+                if new_magazine in obj_with_inventory.ai.inventory:
+                    obj_with_inventory.ai.event_remove_inventory(new_magazine)
+                elif obj_with_inventory.is_vehicle:
+                    if new_magazine in obj_with_inventory.ai.ammo_rack:
+                        obj_with_inventory.ai.event_remove_inventory(new_magazine)
+                    else:
+                        engine.log.add_data('error','ai_human.reload_weapon - new magazine not in inventory or ammo rack',True)
+                
                 weapon.ai.magazine=new_magazine
                 return True
             else:
@@ -1484,6 +1509,10 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         
         crew_communication=self.memory['task_vehicle_crew']['crew_communication']
+
+        if vehicle.ai.vehicle_disabled:
+            self.switch_task_exit_vehicle(vehicle)
+            return
         
         # respond to crew
         if len(crew_communication)>0:
@@ -1646,6 +1675,10 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
+        if vehicle.ai.vehicle_disabled:
+            self.switch_task_exit_vehicle(vehicle)
+            return
+
         out_of_ammo_primary=False
         out_of_ammo_coax=False
         turret_jammed=turret.ai.turret_jammed
@@ -1739,6 +1772,18 @@ class AIHuman(object):
         turret=self.memory['task_vehicle_crew']['turret']
         target=self.memory['task_vehicle_crew']['target']
 
+        # check whether target is still a threat
+        if target.is_human:
+            if target.ai.health<1:
+                self.memory['task_vehicle_crew']['target']=None
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                return
+        elif target.is_vehicle:
+            if target.ai.check_if_vehicle_is_crewed()==False:
+                self.memory['task_vehicle_crew']['target']=None
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                return
+
         # check rotation
         rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
         if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
@@ -1804,7 +1849,7 @@ class AIHuman(object):
                                 self.speak_vehicle_internal('driver','hold for engagement')
 
 
-        if self.memory['task_vehicle_crew']['target'] is not None:
+        if self.memory['task_vehicle_crew']['target']:
             # update the turret angle for the target
             self.calculate_turret_aim()
             self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
@@ -1815,6 +1860,10 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
+
+        if vehicle.ai.vehicle_disabled:
+            self.switch_task_exit_vehicle(vehicle)
+            return
 
         # for whatever reason sometimes a vehicle will have a driver jump out
         # this will cause a passenger to take over. will also fill in any empty gunner spots
@@ -1835,9 +1884,13 @@ class AIHuman(object):
         # note radio.ai.radio_operator set by switch_task_vehicle_crew
         # not a ton that we really need to do here atm
 
-
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         radio=vehicle.ai.radio
+
+        if vehicle.ai.vehicle_disabled:
+            self.switch_task_exit_vehicle(vehicle)
+            return
+
         if radio is None:
             # radio dissapeared. get a different vehicle task
             #self.switch_task_vehicle_crew(vehicle,self.memory['task_vehicle_crew']['destination'])
@@ -2747,51 +2800,45 @@ class AIHuman(object):
     def update_task_vehicle_crew(self):
         '''update task_vehicle_crew'''
 
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
-        if vehicle.ai.health<1:
-            self.switch_task_exit_vehicle(vehicle)
+        role=self.memory['task_vehicle_crew']['role']
+
+        if self.owner.is_player:
+            # not sure what we need to to do here. controls are now handled by world
+            pass
         else:
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
-            role=self.memory['task_vehicle_crew']['role']
-            turret=self.memory['task_vehicle_crew']['turret']
+            last_think_time=self.memory['task_vehicle_crew']['last_think_time']
+            think_interval=self.memory['task_vehicle_crew']['think_interval']
 
-            if self.owner.is_player:
-                # not sure what we need to to do here. controls are now handled by world
-                pass
-            else:
-                last_think_time=self.memory['task_vehicle_crew']['last_think_time']
-                think_interval=self.memory['task_vehicle_crew']['think_interval']
+            # think
+            if self.owner.world.world_seconds-last_think_time>think_interval:
+                # reset time
+                self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
+                
 
-                # think
-                if self.owner.world.world_seconds-last_think_time>think_interval:
-                    # reset time
-                    self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
-                    
-
-                    if role=='driver':
-                        # driver needs a fast refresh for smooth vehicle controls
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
-                        self.think_vehicle_role_driver()
-                    elif 'gunner' in role:
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
-                        self.think_vehicle_role_gunner()
-                    elif 'passenger' in role:
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
-                        self.think_vehicle_role_passenger()
-                    elif 'radio_operator' in role:
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
-                        self.think_vehicle_role_radio_operator()
-                    else:
-                        engine.log.add_data('error','unknown vehicle role: '+role,True)
-
+                if role=='driver':
+                    # driver needs a fast refresh for smooth vehicle controls
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
+                    self.think_vehicle_role_driver()
+                elif 'gunner' in role:
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
+                    self.think_vehicle_role_gunner()
+                elif 'passenger' in role:
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
+                    self.think_vehicle_role_passenger()
+                elif 'radio_operator' in role:
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
+                    self.think_vehicle_role_radio_operator()
                 else:
-                    # some roles will want to do something every update cycle
+                    engine.log.add_data('error','unknown vehicle role: '+role,True)
 
-                    if 'gunner' in role:
-                        if self.memory['task_vehicle_crew']['target'] is not None:
-                            self.action_vehicle_gunner_engage_target()
-                    elif 'driver' in role:
-                        self.action_vehicle_driver()
+            else:
+                # some roles will want to do something every update cycle
+
+                if 'gunner' in role:
+                    if self.memory['task_vehicle_crew']['target'] is not None:
+                        self.action_vehicle_gunner_engage_target()
+                elif 'driver' in role:
+                    self.action_vehicle_driver()
 
 
     #-----------------------------------------------------------------------

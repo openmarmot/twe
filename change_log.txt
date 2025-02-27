@@ -1,6 +1,49 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 26 2025
+- added vehicle ammo racks
+- some adjustment of vehicle ammo loadouts 
+- overhaul of vehicle damage simulation 
+- vehicles no longer have health and cannot die 
+- changes to how ai gunners assess target health 
+- turret hits more likely 1/5 to 1/4
+- misc minor changes
+
+A ammo rack is similar to inventory but it only has main gun ammo.
+This is used for a vehicle damage event where the more ammo you have 
+left, the higher possibility of an explosion. 
+
+I wanted to add turret ammo racks but after a lot of time searching I concluded that 
+I could not find consistent data on turret ammo loadout. I think it was overall rare 
+in WW2 vehicles, with the possible exception of the Tiger II.
+
+passenger compartment hits in vehicles without cannon (no major ammo storage) will likely 
+hurt the crew but won't do much else.
+
+vehicle body hits are likely to take out the engine which disables the vehicle and will 
+cause a bail out.
+
+In order to help the ai understand the new complex vehicle damage there is now a 
+vehicle_disabled bool - which is turned on currently by engine damage and ammo rack 
+explosions. This bool will cause the crew to bail when they see it, and will cause the 
+AI to not enter the vehicle if they come across it. 
+
+removing health as a variable from vehicles is going to have some weird effects. it will 
+take awhile to sort everything out 
+
+gunners are now less likely to stop shooting at vehicles - they only make this decision 
+in the think phase - and currently they check to see if a vehicle is empty
+
+no more vehicle wrecks - which is good because they were not a great solution 
+
+I wonder if I can remove health from humans. 
+
+todo 
+- add more vehicle damage effects 
+- add electric and manual traverse speeds for turrets (with engine on or vehicle electric check)
+
+----------------------------------
 Feb 25 2025
 - added 'primary_turret' bool for turrets 
 - ai gunners will now check this when deciding whether to ask the driver to do things 

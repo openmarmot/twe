@@ -791,27 +791,6 @@ def spawn_container_body(name,world_object,image_index):
     z.is_body=True
     z.wo_start()
 
-#------------------------------------------------------------------------------
-# currently used for wrecks and bodies
-def spawn_container_vehicle_wreck(name,world_object,image_index):
-    '''spawns a custom container for a vehicle wreck'''
-    # name 
-    # world_object - the world_object that is being replaced
-    # image_index - index of the image to be used - from the world object
-    z=WorldObject(world_object.world,[world_object.image_list[image_index]],AIVehicleWreck)
-    z.is_container=True
-    z.name=name
-    z.world_coords=world_object.world_coords
-    z.rotation_angle=world_object.rotation_angle
-    z.ai.inventory=world_object.ai.inventory
-    z.ai.collision_log=world_object.ai.collision_log
-    z.world_builder_identity='wreck'
-    z.volume=world_object.volume
-    z.weight=world_object.weight
-    z.collision_radius=world_object.collision_radius
-    z.is_vehicle_wreck=True
-    z.wo_start()
-
 
 #------------------------------------------------------------------------------
 def spawn_drop_canister(world,world_coords,CRATE_TYPE):
@@ -2229,8 +2208,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        for b in range(24):
-            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        z.ai.ammo_rack_capacity=24
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
@@ -2308,8 +2288,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
-        for b in range(100):
-            z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False))
+        z.ai.ammo_rack_capacity=87
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False))
         
     elif object_type=='panzer_iv_hull_mg':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2403,8 +2384,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
-        for b in range(100):
-            z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        z.ai.ammo_rack_capacity=87
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
 
     elif object_type=='panzer_iv_h_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2482,8 +2464,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
-        for b in range(100):
-            z.add_inventory(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        z.ai.ammo_rack_capacity=87
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
 
     elif object_type=='panzer_iv_j_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2682,8 +2665,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
-        for b in range(100):
-            z.add_inventory(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
+        z.ai.ammo_rack_capacity=77
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
         
     elif object_type=='t34_hull_mg_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2777,8 +2761,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
-        for b in range(100):
-            z.add_inventory(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
+        z.ai.ammo_rack_capacity=57
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
 
     elif object_type=='t34_85_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2857,8 +2842,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
-        for b in range(41):
-            z.add_inventory(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
+        z.ai.ammo_rack_capacity=41
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
         
     elif object_type=='remote_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2922,12 +2908,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.ammo_rack_capacity=15
         for b in range(10):
-            z.add_inventory(spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False))
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False))
         for b in range(5):
             temp=spawn_object(world,world_coords,"37mm_m1939_k61_magazine",False)
             load_magazine(world,temp,'37x252_AP-T')
-            z.add_inventory(temp)
+            z.ai.ammo_rack.append(temp)
             
     elif object_type=='37mm_m1939_61k_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2975,8 +2962,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
-        for b in range(30):
-            z.add_inventory(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        z.ai.ammo_rack_capacity=30
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
        
     elif object_type=='pak40_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world

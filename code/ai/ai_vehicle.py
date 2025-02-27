@@ -27,9 +27,6 @@ class AIVehicle(object):
     def __init__(self, owner):
         self.owner=owner
 
-        # --- health stuff ----
-        self.health=100
-
         # --- armor ---
         #[side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal
@@ -92,6 +89,10 @@ class AIVehicle(object):
         
         # open top aka passengers are viewable
         self.open_top=False
+
+        # only stores main gun ammo
+        self.ammo_rack=[]
+        self.ammo_rack_capacity=0 # max capacity
 
         # ----- controls ------
 
@@ -190,6 +191,10 @@ class AIVehicle(object):
         self.last_noise_or_move_time=0 # in world.world_seconds
         self.recent_noise_or_move_reset_seconds=30
 
+        # vehicle is damaged to the point that it is out of action
+        # note this is just a clue for the AI and does not do anything
+        self.vehicle_disabled=False
+
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit):
         hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit)
@@ -228,6 +233,15 @@ class AIVehicle(object):
                 return False
             
         return True
+    
+    #---------------------------------------------------------------------------
+    def check_if_vehicle_is_crewed(self):
+        '''returns a bool as to whether there is live crew in the vehicle'''
+        for value in self.vehicle_crew.values():
+            if value[0] is True:
+                if value[1].ai.health>0:
+                    return True
+        return False
 
     #---------------------------------------------------------------------------
     def detach_tow_object(self):
@@ -237,93 +251,41 @@ class AIVehicle(object):
                 self.towed_object.ai.in_tow=False
             self.towed_object=None
 
-    #---------------------------------------------------------------------------
-    def handle_passenger_compartment_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
-        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
-        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
-        if penetration:
-            self.health-=random.randint(0,5)
-            for key,value in self.vehicle_crew.items():
-                if value[0]==True:
-                    # we want to exclude driver/radio/gunner as those are different compartments
-                    if 'passenger' in key:
-                        if random.randint(0,2)==2:
-                            value[1].ai.handle_event('collision',projectile)
-
-
-            if random.randint(0,3)==3:
-                # extra shot at body damage
-                self.handle_vehicle_body_projectile_hit(projectile)
-
-            if self.passenger_compartment_ammo_racks:
-                if random.randint(0,1)==1:
-                    # ammo rack explosion
-                    self.health-=random.randint(70,100)
-        else:
-            # no penetration, but maybe we can have some other effect?
-            pass
-
-    #---------------------------------------------------------------------------
-    def handle_vehicle_body_projectile_hit(self,projectile):
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-
-        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
-        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
-        if penetration:
-            if self.vehicle_crew['driver'][0]==True:
-                if random.randint(0,3)==3:
-                    self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
-            
-            # should do component damage here
-            if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>45:
-                self.health-=random.randint(50,75)
-            else:
-                self.health-=random.randint(10,40)
-
-        else:
-            # no penetration, but maybe we can have some other effect?
-            pass
     #---------------------------------------------------------------------------
     def event_collision(self,EVENT_DATA):
         
 
         if EVENT_DATA.is_projectile:
             # avoids hits on dead vehicles that haven't been removed from the game yet
-            if self.health>0:
             
-                # -- determine what area the projectile hit --
-                area_hit='vehicle_body'
-                
+            # -- determine what area the projectile hit --
+            area_hit='vehicle_body'
+            
 
-                hit=random.randint(0,1)
-                if hit==1:
-                    area_hit='passenger_compartment'
-                
-                if len(self.turrets)>0:
-                    hit=random.randint(0,5)
-                    if hit==5:
-                        area_hit='turret'
+            hit=random.randint(0,1)
+            if hit==1:
+                area_hit='passenger_compartment'
+            
+            if len(self.turrets)>0:
+                hit=random.randint(0,4)
+                if hit==5:
+                    area_hit='turret'
 
-                if area_hit=='vehicle_body':
-                    self.handle_vehicle_body_projectile_hit(EVENT_DATA)
-                elif area_hit=='passenger_compartment':
-                    self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
-                elif area_hit=='turret':
-                    # pass it on for the turret to handle
-                    turret=random.choice(self.turrets)
-                    turret.ai.handle_event('collision',EVENT_DATA)
-                else:
-                    engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
+            if area_hit=='vehicle_body':
+                self.handle_vehicle_body_projectile_hit(EVENT_DATA)
+            elif area_hit=='passenger_compartment':
+                self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
+            elif area_hit=='turret':
+                # pass it on for the turret to handle
+                turret=random.choice(self.turrets)
+                turret.ai.handle_event('collision',EVENT_DATA)
+            else:
+                engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
 
-                engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
-                engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
+            #engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
+            engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
 
-                if self.health<1:
-                    self.handle_death()
 
         elif EVENT_DATA.is_grenade:
             print('bonk')
@@ -345,7 +307,6 @@ class AIVehicle(object):
             # put whatever it is in the inventory
             self.inventory.append(EVENT_DATA) 
 
-
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,EVENT_DATA):
         if EVENT_DATA in self.inventory:
@@ -359,47 +320,92 @@ class AIVehicle(object):
             EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
 
     #---------------------------------------------------------------------------
+    def handle_component_damage(self,damaged_component,projectile):
+        '''handle damage to a component'''
+        if damaged_component=='driver':
+            if self.vehicle_crew['driver_projectile'][0]==True:
+                self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
+        elif damaged_component=='engine':
+            for b in self.engines:
+                b.ai.damaged=True
+                if b.ai.internal_combustion:
+                    #smoke!
+                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
+                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
+                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
+            self.vehicle_disabled=True
+        elif damaged_component=='all_crew':
+            for key,value in self.vehicle_crew.items():
+                if value[0]==True:
+                    value[1].ai.handle_event('collision',projectile)
+        elif damaged_component=='random_crew_projectile':
+            for key,value in self.vehicle_crew.items():
+                if value[0]==True:
+                    if random.randint(0,1)==1:
+                        value[1].ai.handle_event('collision',projectile)
+        elif damaged_component=='random_crew_explosion':
+            for key,value in self.vehicle_crew.items():
+                if value[0]==True:
+                    if random.randint(0,1)==1:
+                        value[1].ai.handle_event('explosion',random.randint(30,150))
+        elif damaged_component=='random_crew_fire':
+            for key,value in self.vehicle_crew.items():
+                if value[0]==True:
+                    if random.randint(0,1)==1:
+                        value[1].ai.handle_hit_with_flame()
+        elif damaged_component=='ammo_rack':
+            temp=random.randint(0,self.ammo_rack_capacity)
+            if temp<len(self.ammo_rack):
+                self.handle_component_damage('random_crew_explosion',None)
+                self.handle_component_damage('engine',None)
+                self.vehicle_disabled=True
+                for b in self.turrets:
+                    b.turret_jammed=True
+                    if b.primary_weapon:
+                        b.primary_weapon.ai.damaged=True
+                    if b.coaxial_weapon:
+                        b.coaxial_weapon.ai.damaged=True
+                engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
+
+
+    #---------------------------------------------------------------------------
+    def handle_passenger_compartment_projectile_hit(self,projectile):
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
+
+        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
+        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
+        if penetration:
+            damaged_component=random.choice(['random_crew_projectile','ammo_rack','miraculously unharmed'])
+            self.handle_component_damage(damaged_component,projectile)
+
+        else:
+            # no penetration, but maybe we can have some other effect?
+            pass
+
+    #---------------------------------------------------------------------------
+    def handle_vehicle_body_projectile_hit(self,projectile):
+        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
+
+        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
+        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
+        if penetration:
+            damaged_component=random.choice(['driver_projectile','engine','miraculously unharmed'])
+            self.handle_component_damage(damaged_component,projectile)
+
+        else:
+            # no penetration, but maybe we can have some other effect?
+            pass
+
+    #---------------------------------------------------------------------------
     def handle_aileron_left(self):
         self.ailerons=1
 
     #---------------------------------------------------------------------------
     def handle_aileron_right(self):
         self.ailerons=-1
-
-    #---------------------------------------------------------------------------
-    def handle_death(self):
-        self.detach_tow_object()
-
-        engine.world_builder.spawn_container_vehicle_wreck('wreck',self.owner,1)
-
-        engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
-
-        # this probably could be replaced with a custom container
-        for b in self.turrets:
-            # leave in world but make inoperable
-            b.ai.vehicle=None
-            b.ai.health=0
-            #self.owner.world.remove_queue.append(b)
-
-        
-        dm=''
-        dm+=(self.owner.name+' died.')
-        dm+=('\n  -- collision log --')
-        for b in self.collision_log:
-            dm+=('\n --'+ 
-                 ' hit by '+b.projectile_name+
-                 ' at a distance of '+str(b.distance)+
-                 ' on the '+b.hit_side+' side.'+
-                 ' Compartment hit:'+b.hit_compartment+
-                 ' Penetration:'+str(b.penetrated))
-        dm+=('\n  -------------------')
-        
-
-        print(dm)
-
-        # human ai will figure out for itself that it needs to leave
-        # remove from world
-        self.owner.world.remove_queue.append(self.owner)
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
@@ -437,41 +443,11 @@ class AIVehicle(object):
     def handle_hit_with_flame(self):
         '''handle the vehicle being hit with flame'''
 
-        crew_damage=False
-        passenger_damage=False
-
-        if random.randint(0,1)==1:
-            # hit the main vehicle
-            if random.randint(0,3)==3:
-                crew_damage=True
-
-            self.health-=random.randint(0,10)
-
+        if self.open_top:
+            self.handle_component_damage('random_crew_fire',None)
         else:
-            # hit the crew compartment
-            self.health-=random.randint(0,10)
-            if self.open_top:
-                if random.randint(0,1)==1:
-                    # got in the open top
-                    passenger_damage=True
-                else:
-                    if random.randint(0,3)==3:
-                        # leaked in through cracks
-                        passenger_damage=True
-
-        if crew_damage or passenger_damage:
-
-            for key,value in self.vehicle_crew.items():
-                if value[0] is True:
-                    if crew_damage:
-                        if 'driver' in key:
-                            value[1].ai.handle_hit_with_flame()
-                        if 'gunner' in key:
-                            value[1].ai.handle_hit_with_flame()
-                    if passenger_damage:
-                        if 'passenger' in key:
-                            value[1].ai.handle_hit_with_flame()
-                
+            if random.randint(0,3)==3:
+                self.handle_component_damage('random_crew_fire',None)
 
     #---------------------------------------------------------------------------
     def handle_rudder_left(self):
@@ -485,11 +461,14 @@ class AIVehicle(object):
     def handle_start_engines(self):
         for b in self.engines:
             if b.ai.engine_on==False:
-                b.ai.engine_on=True
+                if b.ai.damaged is False:
+                    b.ai.engine_on=True
+                # smoke no matter what
                 if b.ai.internal_combustion:
                     #smoke!
                     heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,b.ai.exhaust_position_offset)
+                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
+                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
                     engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
 
     #---------------------------------------------------------------------------
@@ -615,7 +594,7 @@ class AIVehicle(object):
         # calculate total current engine force
         total_engine_force=0
         for b in self.engines:
-            if b.ai.engine_on:
+            if b.ai.engine_on and b.ai.damaged is False:
                 total_engine_force+=b.ai.max_engine_force*b.ai.throttle_control
 
         # prevents this from going negative. but maybe we want that?
