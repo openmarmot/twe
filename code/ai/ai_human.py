@@ -892,13 +892,11 @@ class AIHuman(object):
             target=self.far_targets.pop()
 
         if target is not None:
-            if target.ai.health<1:
+
+            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+            if distance>max_range:
+                # alternatively we could drive closer.
                 target=None
-            else:
-                distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-                if distance>max_range:
-                    # alternatively we could drive closer.
-                    target=None
                 
         return target
     

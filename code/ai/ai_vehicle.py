@@ -547,9 +547,6 @@ class AIVehicle(object):
     def update(self):
         ''' overrides base update '''
 
-        # -- general stuff for all objects --
-        # health is check upon projectile collision 
-
         # update engines
         for b in self.engines:
             b.throttle_control=self.throttle
@@ -579,10 +576,6 @@ class AIVehicle(object):
         # bring controls back to neutral slowly over time
         self.neutral_controls()
         
-        # this is needed because some non collision events can reduce health
-        if self.health<1:
-            self.handle_death()
-
         if self.recent_noise_or_move:
             if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
                 self.recent_noise_or_move=False

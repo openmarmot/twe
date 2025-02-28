@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 27 2025
+- bugfix 
+
+----------------------------------
 Feb 26 2025
 - added vehicle ammo racks
 - some adjustment of vehicle ammo loadouts 

@@ -1153,7 +1153,6 @@ class World_Menu(object):
                 self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
 
             if distance<self.max_menu_distance:
-                self.text_queue.append('Vehicle Health : '+str(self.selected_object.ai.health))
                 self.text_queue.append('')
                 self.text_queue.append('-- Actions --')
                 self.text_queue.append('1 - info (not implemented) ')
