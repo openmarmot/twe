@@ -39,6 +39,9 @@ class AIThrowable(object):
         # current speed
         self.speed=0
 
+        # this is checked by ai_human when determining if a grenade throw is in range
+        self.range=310
+
         # objects to ignore for collision purposes
         self.ignore_list=[]
 

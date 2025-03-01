@@ -1,5 +1,94 @@
 TWE Project : Change Log
 
+
+----------------------------------
+March 01 2025
+- more bugfix 
+
+----------------------------------
+Feb 27 2025
+- bugfix 
+
+----------------------------------
+Feb 26 2025
+- added vehicle ammo racks
+- some adjustment of vehicle ammo loadouts 
+- overhaul of vehicle damage simulation 
+- vehicles no longer have health and cannot die 
+- changes to how ai gunners assess target health 
+- turret hits more likely 1/5 to 1/4
+- misc minor changes
+
+A ammo rack is similar to inventory but it only has main gun ammo.
+This is used for a vehicle damage event where the more ammo you have 
+left, the higher possibility of an explosion. 
+
+I wanted to add turret ammo racks but after a lot of time searching I concluded that 
+I could not find consistent data on turret ammo loadout. I think it was overall rare 
+in WW2 vehicles, with the possible exception of the Tiger II.
+
+passenger compartment hits in vehicles without cannon (no major ammo storage) will likely 
+hurt the crew but won't do much else.
+
+vehicle body hits are likely to take out the engine which disables the vehicle and will 
+cause a bail out.
+
+In order to help the ai understand the new complex vehicle damage there is now a 
+vehicle_disabled bool - which is turned on currently by engine damage and ammo rack 
+explosions. This bool will cause the crew to bail when they see it, and will cause the 
+AI to not enter the vehicle if they come across it. 
+
+removing health as a variable from vehicles is going to have some weird effects. it will 
+take awhile to sort everything out 
+
+gunners are now less likely to stop shooting at vehicles - they only make this decision 
+in the think phase - and currently they check to see if a vehicle is empty
+
+no more vehicle wrecks - which is good because they were not a great solution 
+
+I wonder if I can remove health from humans. 
+
+todo 
+- add more vehicle damage effects 
+- add electric and manual traverse speeds for turrets (with engine on or vehicle electric check)
+
+----------------------------------
+Feb 25 2025
+- added 'primary_turret' bool for turrets 
+- ai gunners will now check this when deciding whether to ask the driver to do things 
+- guns can now be damaged or jammed 
+- turret penetration now results in turret component damage not health damage for the turret
+- turret no longer has health 
+- ai gunner is now aware of gun damage, jams, and turret jams. 
+- ai gunner can fix gun jams
+- mg34 belts and 1 round cannon 'magazines' are now disintegrating and dissapear when empty 
+
+this is a start of a move towards component damage and away from unrealistic health counters.
+i'd like to eventually do this for humans and vehicles. 
+
+
+todo 
+- consider adding ammo_stowage to turrets and vehicles and moving ammo storage over to it. 
+- add the possibility of a turret hit causing a ammo explosion 
+- figure out if turret jams and gun damage should cause crew bail outs 
+- was unable to trigger a grenade throw from soviet troops while in a tank - need to look at that further 
+
+----------------------------------
+Feb 24 2025
+- bumped up rate of fire on all large caliber weapons to around 1 per 30 seconds 
+- adjusted cannon smoke offsets for all cannons 
+
+----------------------------------
+Feb 23 2025
+- added smoke and flash to cannons 
+
+I was lazy and only set the correct position on one of them.
+need to go back and fix
+
+----------------------------------
+Feb 20 2025
+- added range to throwable items. used by ai_human
+
 ----------------------------------
 Feb 19 2025
 - minor cleanup 

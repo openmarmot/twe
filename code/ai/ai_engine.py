@@ -57,6 +57,8 @@ class AIEngine(object):
         # if its at 0 and the engine is on, the engine should choke and die
         self.throttle_control=1
 
+        self.damaged=False
+
     #---------------------------------------------------------------------------
     def consume_fuel(self):
         if self.engine_on:
