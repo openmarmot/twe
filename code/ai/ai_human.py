@@ -227,7 +227,7 @@ class AIHuman(object):
                 turret.ai.handle_rotate_right()
         else:
             if target.is_human:
-                if target.a.health>0:
+                if target.ai.health>0:
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
@@ -1755,9 +1755,6 @@ class AIHuman(object):
 
         if self.memory['task_vehicle_crew']['target'] is None:
             self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
-        else:
-            if self.memory['task_vehicle_crew']['target'].ai.health<1:
-                self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
 
         # we have a target, lets think about it in more detail
         if self.memory['task_vehicle_crew']['target'] is not None:
@@ -2154,31 +2151,33 @@ class AIHuman(object):
         # - getting this far assumes that you have a primary weapon
 
         enemy=self.memory['task_engage_enemy']['enemy']
-        if enemy.ai.health<1:
-            self.memory.pop('task_engage_enemy',None)
-            self.switch_task_think()
-        else:
-            last_think_time=self.memory['task_engage_enemy']['last_think_time']
-            think_interval=self.memory['task_engage_enemy']['think_interval']
-    
-            if self.owner.world.world_seconds-last_think_time>think_interval:
-                # -- think --
+        if enemy.is_human:
+            if enemy.ai.health<1:
+                self.memory.pop('task_engage_enemy',None)
+                self.switch_task_think()
+                return
+        
+        last_think_time=self.memory['task_engage_enemy']['last_think_time']
+        think_interval=self.memory['task_engage_enemy']['think_interval']
 
-                # reset time
-                self.memory['task_engage_enemy']['last_think_time']=self.owner.world.world_seconds
-                self.memory['task_engage_enemy']['think_interval']=random.uniform(0.1,1.5)
+        if self.owner.world.world_seconds-last_think_time>think_interval:
+            # -- think --
 
-                if enemy.is_human:
-                    self.update_task_engage_enemy_human()
-                elif enemy.is_vehicle:
-                    self.update_task_engage_enemy_vehicle()
-                else:
-                    engine.log.add_data('error',f'ai_human.update_task_engage_enemy unkown object {enemy.name}',True)
+            # reset time
+            self.memory['task_engage_enemy']['last_think_time']=self.owner.world.world_seconds
+            self.memory['task_engage_enemy']['think_interval']=random.uniform(0.1,1.5)
 
+            if enemy.is_human:
+                self.update_task_engage_enemy_human()
+            elif enemy.is_vehicle:
+                self.update_task_engage_enemy_vehicle()
             else:
-                # -- fire --
-                self.fire(self.primary_weapon,enemy)
-                self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
+                engine.log.add_data('error',f'ai_human.update_task_engage_enemy unkown object {enemy.name}',True)
+
+        else:
+            # -- fire --
+            self.fire(self.primary_weapon,enemy)
+            self.fatigue+=self.fatigue_add_rate*self.owner.world.time_passed_seconds
 
     #---------------------------------------------------------------------------
     def update_task_engage_enemy_human(self):
@@ -2241,9 +2240,9 @@ class AIHuman(object):
                     if enemy.ai.current_speed<5:
                         # check pen
                         if enemy.ai.passenger_compartment_armor['left'][0]<4 or self.throwable.ai.use_antitank:
-                            self.throw(enemy.world_coords)
                             self.speak(f'Throwing {self.throwable.name} !!!!')
-
+                            self.throw(enemy.world_coords)
+                            
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
             # can we penetrate it in a best case scenario?
             if ammo_gun>0:

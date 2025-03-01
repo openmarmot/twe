@@ -362,10 +362,10 @@ class AIVehicle(object):
                 self.vehicle_disabled=True
                 for b in self.turrets:
                     b.turret_jammed=True
-                    if b.primary_weapon:
-                        b.primary_weapon.ai.damaged=True
-                    if b.coaxial_weapon:
-                        b.coaxial_weapon.ai.damaged=True
+                    if b.ai.primary_weapon:
+                        b.ai.primary_weapon.ai.damaged=True
+                    if b.ai.coaxial_weapon:
+                        b.ai.coaxial_weapon.ai.damaged=True
                 engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
 
 
