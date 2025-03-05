@@ -152,8 +152,8 @@ class AIFactionTactical(object):
         elif self.faction=='civilian':
             return 0
         else:
-            return 0
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
+            return 0
 
     #---------------------------------------------------------------------------
     def get_area_friendly_count(self,area):
