@@ -2,6 +2,19 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 04 2025
+- minor cleanup
+- added a squad data printout to the debug menu 
+
+started working on a rewrite of ai_faction_tactical code but 
+decided it would be better to mostly delete it and move that over 
+to the squad lead - that would be more realistic for these tactical 
+battles.
+
+created a github project for TWE. idk if i will use it long term or 
+not
+
+----------------------------------
 March 01 2025
 - more bugfix 
 

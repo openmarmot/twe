@@ -56,8 +56,9 @@ class AISquad(object):
         # outgoing messages go here
         # radio operators will pop them and send them through their radios
         self.radio_send_queue=[]
-
         # format [world.world_seconds,'message']
+
+        self.name=''
 
     #---------------------------------------------------------------------------
     def add_to_squad(self, WORLD_OBJECT):

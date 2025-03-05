@@ -194,9 +194,6 @@ class AIFactionTactical(object):
     #---------------------------------------------------------------------------
     def tactical_order(self):
         
-        # randomize think_rate a bit 
-        self.think_rate=random.randint(60,90)
-
         idle_squads=[] # these are squads that are near their current squad destination
         busy_squads=[]
 
@@ -353,6 +350,8 @@ class AIFactionTactical(object):
 
         if self.time_since_update>self.think_rate:
             self.time_since_update=0
+            # randomize think_rate a bit 
+            self.think_rate=random.randint(60,90)
 
             self.update_human_lists()
 
