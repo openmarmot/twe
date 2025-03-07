@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 07 2025
+- more squad rewrie work 
+
+----------------------------------
 March 06 2025
 - rewrite of squad_builder 
 - started rewrite of squad spawning and general squad handling 

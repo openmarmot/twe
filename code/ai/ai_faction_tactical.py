@@ -200,6 +200,23 @@ class AIFactionTactical(object):
             print('debug : attempt to split a squad with zero new members')
 
     #---------------------------------------------------------------------------
+    def start(self):
+        '''do all ai_faction_tactical starting tasks needed after world creation'''
+
+        # create squads 
+        self.create_squads()
+
+        # set squad and object starting positions
+        self.set_starting_positions()
+
+        # create initial tactical orders
+        # note - this might have to wait -- squads will not have appointed squad leads yet
+
+    #---------------------------------------------------------------------------
+    def set_starting_positions(self):
+        pass
+
+    #---------------------------------------------------------------------------
     def tactical_order(self):
         
         idle_squads=[] # these are squads that are near their current squad destination

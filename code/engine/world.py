@@ -341,11 +341,6 @@ class World():
         engine.world_builder.spawn_object(self,world_coords,'dirt',True)
         engine.world_builder.spawn_explosion_and_fire(self,world_coords,fire_duration,smoke_duration)
 
-    #------------------------------------------------------------------------------
-    def create_squads(self):
-        for ai in self.tactical_ai.values():
-            ai.create_squads()
-
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,obj):
         ''' generates a ignore list for collision checking'''
@@ -839,8 +834,9 @@ class World():
         '''performs world tasks necessary for a new world to start'''
         # called by world_builder.load_world()
         
-        # generation squads
-        self.create_squads()
+        # tactical_ai start. create squads, figure out initial coords, orders, etc 
+        for ai in self.tactical_ai.values():
+            ai.start()
 
         # print debug info
         self.log_world_data()
