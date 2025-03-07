@@ -99,10 +99,7 @@ list_medical_ultra_rare=[]
 
 # ------ variables that get pulled from sqlite -----------------------------------
 loaded=False
-soviet_squad_data={}
-german_squad_data={}
-american_squad_data=[]
-civilian_squad_data={}
+squad_data={}
 
 #------------------------------------------------------------------------------
 def add_random_pistol_to_inventory(wo,world):
@@ -555,10 +552,10 @@ def get_random_from_list(world,world_coords,OBJECT_LIST,spawn):
 def get_squad_map_objects(squad_name):
     '''get a list of map objects that make up a squad'''
     members=[]
-    if 'German' in squad_name:
-        members=german_squad_data[squad_name]['members'].split(',')
-    elif 'Soviet' in squad_name:
-        members=soviet_squad_data[squad_name]['members'].split(',')
+
+    if squad_name in squad_data:
+        members=squad_data[squad_name]['members'].split(',')
+
     else:
         engine.log.add_data('error','worldbuilder.get_squad_map_objects squad_name '+squad_name+' not recognized',True)
 
@@ -677,22 +674,16 @@ def load_quick_battle(world,battle_option):
 def load_sqlite_data():
     ''' load a bunch of data that i put in sqlite '''
     global loaded
-    global soviet_squad_data
-    global german_squad_data
-    global american_squad_data
-    global civilian_squad_data
+
     
     if loaded is False:
-        soviet_squad_data=load_sqlite_squad_data('soviet')
-        german_squad_data=load_sqlite_squad_data('german')
-        american_squad_data=load_sqlite_squad_data('american')
-        civilian_squad_data=load_sqlite_squad_data('civilian')
+        squad_data=load_sqlite_squad_data()
 
     else:
         print('Error : Projectile data is already loaded')
 
 #------------------------------------------------------------------------------
-def load_sqlite_squad_data(faction):
+def load_sqlite_squad_data():
     '''builds a squad_data dictionary from sqlite data'''
 
     squad_data={}
@@ -701,7 +692,7 @@ def load_sqlite_squad_data(faction):
 
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM squad_data WHERE faction=?",(faction,))
+    cursor.execute("SELECT * FROM squad_data")
     
     # Fetch all column names
     column_names = [description[0] for description in cursor.description]

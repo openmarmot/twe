@@ -1,5 +1,20 @@
 TWE Project : Change Log
 
+----------------------------------
+March 06 2025
+- rewrite of squad_builder 
+- started rewrite of squad spawning and general squad handling 
+
+squad_builder now creates squads that match the squad definitions from sqlite. 
+this will result in more sane squads both in campaign and quick battle
+
+vehicle handling for squads is being redone. now squads will be aware of their starting 
+vehicles. 
+
+I thought about deleting aifactiontactical all together - but i think this will have to wait. 
+It is almost not needed..
+
+! note - work is not done so this will break dev branch for a bit 
 
 ----------------------------------
 March 04 2025

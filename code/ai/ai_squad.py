@@ -14,6 +14,7 @@ import copy
 
 #import custom packages
 import engine.math_2d
+import engine.log
 
 #global variables
 
@@ -31,6 +32,9 @@ class AISquad(object):
         # people in the squad 
         # ai_human will remove itself on death 
         self.members=[]
+
+        # vehicles the squad spawned with
+        self.vehicles=[]
 
         # world_object squad member who is the leader.
         # squad memebers will self elect and update this 
@@ -63,21 +67,21 @@ class AISquad(object):
     #---------------------------------------------------------------------------
     def add_to_squad(self, WORLD_OBJECT):
         ''' add a world_object to the squad. DOES NOT SPAWN AT THE MOMENT'''
-        if WORLD_OBJECT.is_human==False:
-            print('error: attempting to add a non human to squad')
-        
+        if WORLD_OBJECT.is_human:
+            # remmove from the old squad
+            if WORLD_OBJECT.ai.squad!=None:
+                WORLD_OBJECT.ai.squad.members.remove(WORLD_OBJECT)    
 
-        # remmove from the old squad
-        if WORLD_OBJECT.ai.squad!=None:
-            WORLD_OBJECT.ai.squad.members.remove(WORLD_OBJECT)    
+            # add to this squad
+            self.members.append(WORLD_OBJECT)
 
-        # add to this squad
-        self.members.append(WORLD_OBJECT)
-
-        # set squad var in ai
-        WORLD_OBJECT.ai.squad=self
-
-        # not sure what else we need to do
+            # set squad var in ai
+            WORLD_OBJECT.ai.squad=self
+        elif WORLD_OBJECT.is_vehicle:
+            self.vehicles.append(WORLD_OBJECT)
+        else:
+            engine.log.add_data('error',f'AISquad.add_to_squad() unknown object type {WORLD_OBJECT.name}',True)
+            
 
     #---------------------------------------------------------------------------
     def reset_squad_variable(self):

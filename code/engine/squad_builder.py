@@ -18,161 +18,46 @@ import engine.world_builder
 from ai.ai_squad import AISquad
 
 #------------------------------------------------------------------------------
-def create_squads_from_human_list(world,humans,ai_faction_tactical):
-    ''' takes a list of humans, sorts them by weapon type, and then puts them in squads'''
-    #ai_faction_tactical ref to the ai_faction_tactical that calls this
-    
+def create_squads_2(world_objects):
+    ''' new style create squads'''
+    # -- 1. build the squad objects dict --
+    squad_objects={}
+    for b in world_objects:
+        if b.is_human or b.is_vehicle:
+            if b.world_builder_identity in squad_objects:
+                squad_objects[b.world_builder_identity].append(b)
+            else:
+                squad_objects[b.world_builder_identity]=[b]
 
-    # automatically adds the created squads to the correct faction tactical AI
-    assault_rifles=[]
-    rifles=[]
-    semiauto_rifles=[]
-    subguns=[]
-    machineguns=[]
-    pistols=[]
-    antitank=[]
-    unarmed_human=[]
-    afv_crew=[]
+    # -- 2. create the standard squads based on engine.world_builder.squad_data --
+    squads = []
+    while True:
+        squad_made = False
+        for squad_definition in engine.world_builder.squad_data.values():
+            # Check if squad can be formed
+            required = {}
+            for identity in squad_definition:
+                required[identity] = required.get(identity, 0) + 1
+            can_form = all(len(squad_objects.get(identity, [])) >= count for identity, count in required.items())
 
-    # categorize 
-    for b in humans:
-        if b.ai.is_afv_trained:
-            afv_crew.append(b)
-        elif b.ai.primary_weapon==None:
-            # should probably double check
-            unarmed_human.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_rifles:
-            rifles.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_assault_rifles:
-            assault_rifles.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_smg:
-            subguns.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_machine_guns:
-            machineguns.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_pistols:
-            pistols.append(b)
-        elif b.ai.primary_weapon.world_builder_identity in engine.world_builder.list_guns_at_rifles:
-            antitank.append(b)
-        else:
-            print('error: unknown primary weapon '+b.ai.primary_weapon.name+' in squad creation')
+            if can_form:
+                # Form the squad
+                current_squad = []
+                for identity in squad_definition:
+                    current_squad.append(squad_objects[identity].pop(0))
+                squads.append(current_squad)
+                squad_made = True
+                break  # Move to next iteration
+        if not squad_made:
+            break  # No more squads possible
 
-    squad_list=[]
-
-    buildsquads=True 
-
-    while buildsquads:
-        if len(assault_rifles+rifles+semiauto_rifles+subguns+machineguns+antitank+pistols+unarmed_human+afv_crew)<1:
-            buildsquads=False
-        else :
-            s=AISquad(world)
-            s.faction=ai_faction_tactical.faction
-            s.faction_tactical=ai_faction_tactical
-
-            # -- build a rifle squad --
-            if len(rifles)>7 :
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-                s.members.append(rifles.pop())
-
-                # mg ?
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-
-                # squad lead 
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                elif len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                elif len(pistols)>0:
-                    s.members.append(pistols.pop())
-            # -- assault squad --
-            elif len(assault_rifles)>4 :
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-                s.members.append(assault_rifles.pop())
-            # -- afv squad --
-            elif len(afv_crew)>3:
-                s.members.append(afv_crew.pop())
-                s.members.append(afv_crew.pop())
-                s.members.append(afv_crew.pop())
-                s.members.append(afv_crew.pop())
-
-            # -- erstaz groups --
-            else :
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(afv_crew)>0:
-                    s.members.append(afv_crew.pop())
+    # -- 3. create the erstatz squads --
+    remaining_objects = [obj for identity in squad_objects for obj in squad_objects[identity]]    
+    additional_squads = [remaining_objects[i:i+7] for i in range(0, len(remaining_objects), 7)]
+    squads.extend(additional_squads)
 
 
-                # lets do it again
 
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
+    return squads
 
-                # and maybe one more time
-                if len(rifles)>0:
-                    s.members.append(rifles.pop())
-                if len(semiauto_rifles)>0:
-                    s.members.append(semiauto_rifles.pop())
-                if len(subguns)>0:
-                    s.members.append(subguns.pop())
-                if len(assault_rifles)>0:
-                    s.members.append(assault_rifles.pop())
-                if len(machineguns)>0:
-                    s.members.append(machineguns.pop())
-                if len(antitank)>0:
-                    s.members.append(antitank.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())
-                if len(pistols)>0:
-                    s.members.append(pistols.pop())
-                if len(unarmed_human)>0:
-                    s.members.append(unarmed_human.pop())               
 
-            # give every squad member a link back to the squad
-            for member in s.members:
-                member.ai.squad=s
-
-            squad_list.append(s)
-
-    return squad_list

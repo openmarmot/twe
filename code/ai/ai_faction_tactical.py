@@ -69,21 +69,29 @@ class AIFactionTactical(object):
     #---------------------------------------------------------------------------
     def create_squads(self):
         '''sort a list of humans into squads and initialize them'''
-        humans=[]
-        vehicles=[]
 
-        # don't use faction specific wo_ lists as we are trying to get rid of them
+        # create a list of squad objects
+        squad_objects=[]
         for b in self.world.wo_objects:
             if b.world_builder_identity.startswith(self.faction):
-                if b.is_human:
-                    humans.append(b)
-                elif b.is_vehicle:
-                    vehicles.append(b)
+                if b.is_human or b.is_vehicle:
+                    squad_objects.append(b)
 
-                # maybe some other stuff that should be positioned with the faction ??
+        # sort this into squad lists
+        self.squad_lists=engine.squad_builder.create_squads_2(squad_objects)
+
+        # create the squads
+        for b in self.squad_lists:
+            squad=AISquad(self.world)
+            squad.faction=self.faction
+            squad.faction_tactical=self
+            for c in b:
+                squad.add_to_squad(c)
+
+            self.squads.append(squad)
 
 
-        self.squads=engine.squad_builder.create_squads_from_human_list(self.world,humans,self)
+# ---------- below this needs to be rewritten and moved to its own function ------------ 
 
         # reset spawn locations.
         # civilians have world_coords set when they are generated, but after that they should be 
