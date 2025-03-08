@@ -20,7 +20,7 @@ import engine.world_builder
 
 #global variables
 
-class AIFactionTactical(object):
+class AIFactionTactical():
     def __init__(self,world,faction,allied_factions,hostile_factions,spawn_location,radio_frequency):
 
 
@@ -78,10 +78,10 @@ class AIFactionTactical(object):
                     squad_objects.append(b)
 
         # sort this into squad lists
-        self.squad_lists=engine.squad_builder.create_squads_2(squad_objects)
+        squad_lists=engine.squad_builder.create_squads(squad_objects)
 
         # create the squads
-        for b in self.squad_lists:
+        for b in squad_lists:
             squad=AISquad(self.world)
             squad.faction=self.faction
             squad.faction_tactical=self
@@ -90,74 +90,23 @@ class AIFactionTactical(object):
 
             self.squads.append(squad)
 
-
-# ---------- below this needs to be rewritten and moved to its own function ------------ 
-
-        # reset spawn locations.
-        # civilians have world_coords set when they are generated, but after that they should be 
-        # reset. hmmm
-        if self.faction=='civilian':
-            for b in self.squads:
-                # civilians start all over, so just making sure they are idle right away
-                b.destination=copy.copy(b.members[0].world_coords)
-        else:
-            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,150,len(self.squads))
-
-            for b in self.squads:
-
-                # initially set the squad destination to be th espawn location
-                b.destination=squad_grid.pop()
-
-                # set the member positions
-                member_grid=engine.math_2d.get_grid_coords(b.destination,20,len(b.members))
-                for c in b.members:
-                    c.world_coords=member_grid.pop()
-                    # randomize position a bit
-                    #engine.math_2d.randomize_position_and_rotation(c,170)
-
-        # position the vehicles. in the future they may be added to squads
-        grid_coords=engine.math_2d.get_grid_coords(self.spawn_location,250,len(vehicles))
-
-        for b in vehicles:
-            b.world_coords=grid_coords.pop()
-            if self.faction=='german':
-                b.rotation_angle=270
-            elif self.faction=='soviet':
-                b.rotation_angle=90
-            #b.world_coords=copy.copy(self.spawn_location)
-            # randomize position a bit
-            #engine.math_2d.randomize_position_and_rotation(b,170)
-
-
-        # -- tell AFV dudes to jump into AFVs so they don't just use lame transports --
-        afv_troops=[]
-        for b in humans:
-            if b.ai.is_afv_trained:
-                afv_troops.append(b)
-        for b in vehicles:
-            if b.ai.requires_afv_training:
-                crew_count=len(b.ai.vehicle_crew)
-                while len(afv_troops)>0 and crew_count>0:
-                    crew_count-=1
-                    afv_troops.pop().ai.switch_task_enter_vehicle(b,b.world_coords)
-        
-
-
-
-        # update human lists and give out tactical orders right away
-        self.update_human_lists()
-        self.tactical_order()
+        if False:
+            for squad in self.squads:
+                print('---------')
+                print(', '.join(obj.world_builder_identity for obj in squad.members))
+                print(', '.join(obj.world_builder_identity for obj in squad.vehicles))
+                print('---------')
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):
         '''get a enemy count for a world_area'''
         if self.faction=='german':
             return area.soviet_count+area.american_count
-        elif self.faction=='soviet':
+        if self.faction=='soviet':
             return area.german_count+area.american_count
-        elif self.faction=='american':
+        if self.faction=='american':
             return area.german_count+area.soviet_count
-        elif self.faction=='civilian':
+        if self.faction=='civilian':
             return 0
         else:
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
@@ -202,19 +151,60 @@ class AIFactionTactical(object):
     #---------------------------------------------------------------------------
     def start(self):
         '''do all ai_faction_tactical starting tasks needed after world creation'''
-
+        print(f'faction start: {self.faction}')
         # create squads 
         self.create_squads()
-
+        print(f'faction squads: {len(self.squads)}')
         # set squad and object starting positions
         self.set_starting_positions()
 
         # create initial tactical orders
         # note - this might have to wait -- squads will not have appointed squad leads yet
 
+        # update human lists and give out tactical orders right away
+        self.update_human_lists()
+        self.tactical_order()
+
     #---------------------------------------------------------------------------
     def set_starting_positions(self):
-        pass
+        '''set the starting positions of the squads, squad members, and vehicles'''
+        # reset spawn locations.
+        # civilians have world_coords set when they are generated, but after that they should be reset
+        if self.faction=='civilian':
+            for b in self.squads:
+                # civilians start all over, so just making sure they are idle right away
+                b.destination=copy.copy(b.members[0].world_coords)
+        else:
+            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,150,len(self.squads))
+
+            for b in self.squads:
+
+                # initially set the squad destination to be th espawn location
+                b.destination=squad_grid.pop()
+
+                # set the member positions
+                member_grid=engine.math_2d.get_grid_coords(b.destination,20,len(b.members))
+                member_vehicle_assignments=[]
+                for c in b.members:
+                    c.world_coords=member_grid.pop()
+                    member_vehicle_assignments.append(c)
+                    # randomize position a bit
+                    #engine.math_2d.randomize_position_and_rotation(c,170)
+
+                # handle squad attached vehicles
+                for vehicle in b.vehicles:
+                    vehicle.world_coords=copy.copy(b.destination)
+                    # set initial rotation
+                    if self.faction=='german':
+                        vehicle.rotation_angle=270
+                    elif self.faction=='soviet':
+                        vehicle.rotation_angle=90
+                    
+                    # assign vehicle crew
+                    crew_count=len(vehicle.ai.vehicle_crew)
+                    while len(member_vehicle_assignments)>0 and crew_count>0:
+                        crew_count-=1
+                        member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,vehicle.world_coords)
 
     #---------------------------------------------------------------------------
     def tactical_order(self):

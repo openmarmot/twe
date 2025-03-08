@@ -1,8 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 08 2025
+- finished initial work on squad rewrite
+
+squads are now created based on the templates in the sqlite table. 
+squads will also get initial orders to enter the vehicles associated 
+with the squad. 
+
+----------------------------------
 March 07 2025
-- more squad rewrie work 
+- more squad rewrite work 
 
 ----------------------------------
 March 06 2025
