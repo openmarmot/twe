@@ -95,9 +95,6 @@ class AIFactionStrategic(object):
             # missing squad lists
             engine.log.add_data('warn','ai_faction_strategic.buy_and_place_units, faction '+self.faction+' has no squad data',True)
 
-
-
-
     #---------------------------------------------------------------------------
     def evaluate_neighbor(self,current_square, neighbor):
         '''evaluate a neighboring map square'''

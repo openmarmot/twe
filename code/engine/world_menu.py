@@ -319,6 +319,7 @@ class World_Menu(object):
             self.text_queue.append('5 - start self debug')
             self.text_queue.append('6 - toggle_hit_markers')
             self.text_queue.append('7 - kill all humans except for the player')
+            self.text_queue.append('8 - print squad info')
 
             if key=='1':
                 self.world.toggle_map()
@@ -342,6 +343,17 @@ class World_Menu(object):
             elif key=='7':
                 self.world.kill_all_nonplayer_humans()
                 return
+            elif key=='8':
+                for tactical in self.world.tactical_ai.values():
+                    print(f'============{tactical.faction}============')
+                    for squad in tactical.squads:
+                        print(f'----Squad: {squad.name}----')
+                        print(f'radio contact: {squad.radio_contact}')
+                        print(f'radio recieve queue length: {len(squad.radio_receive_queue)}')
+                        print(f'radio send queue length: {len(squad.radio_send_queue)}')
+                        print(f'members: {len(squad.members)}')
+                        
+                        print('---------------------')
         if self.menu_state=='spawn':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu --')
@@ -426,6 +438,8 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ptrs_41',True)
             elif key=='7':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'rpg43',True)
+            
+
                 
         if self.menu_state=='spawn_squads':
             self.text_queue=[]

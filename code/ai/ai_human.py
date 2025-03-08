@@ -1352,7 +1352,8 @@ class AIHuman(object):
         else:
             task_details = {
                 'last_think_time': 0,
-                'think_interval': 0.5
+                'think_interval': 0.5,
+                'tactical_orders':['none','none'] 
             }
 
             self.memory[task_name]=task_details

@@ -98,11 +98,7 @@ list_medical_ultra_rare=[]
 #----------------------------------------------------------------
 
 # ------ variables that get pulled from sqlite -----------------------------------
-loaded=False
-soviet_squad_data={}
-german_squad_data={}
-american_squad_data=[]
-civilian_squad_data={}
+squad_data={}
 
 #------------------------------------------------------------------------------
 def add_random_pistol_to_inventory(wo,world):
@@ -554,12 +550,13 @@ def get_random_from_list(world,world_coords,OBJECT_LIST,spawn):
 #------------------------------------------------------------------------------
 def get_squad_map_objects(squad_name):
     '''get a list of map objects that make up a squad'''
+    global squad_data
     members=[]
-    if 'German' in squad_name:
-        members=german_squad_data[squad_name]['members'].split(',')
-    elif 'Soviet' in squad_name:
-        members=soviet_squad_data[squad_name]['members'].split(',')
+    if squad_name in squad_data:
+        members=squad_data[squad_name]['members'].split(',')
+
     else:
+        print('squad data',squad_data)
         engine.log.add_data('error','worldbuilder.get_squad_map_objects squad_name '+squad_name+' not recognized',True)
 
     # convert each member to a map_object
@@ -673,35 +670,18 @@ def load_quick_battle(world,battle_option):
 
     load_world(world,map_objects)
 
-#------------------------------------------------------------------------------
-def load_sqlite_data():
-    ''' load a bunch of data that i put in sqlite '''
-    global loaded
-    global soviet_squad_data
-    global german_squad_data
-    global american_squad_data
-    global civilian_squad_data
-    
-    if loaded is False:
-        soviet_squad_data=load_sqlite_squad_data('soviet')
-        german_squad_data=load_sqlite_squad_data('german')
-        american_squad_data=load_sqlite_squad_data('american')
-        civilian_squad_data=load_sqlite_squad_data('civilian')
-
-    else:
-        print('Error : Projectile data is already loaded')
 
 #------------------------------------------------------------------------------
-def load_sqlite_squad_data(faction):
+def load_sqlite_squad_data():
     '''builds a squad_data dictionary from sqlite data'''
-
+    global squad_data
     squad_data={}
 
     conn = sqlite3.connect('data/data.sqlite')
 
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM squad_data WHERE faction=?",(faction,))
+    cursor.execute("SELECT * FROM squad_data")
     
     # Fetch all column names
     column_names = [description[0] for description in cursor.description]
@@ -717,7 +697,6 @@ def load_sqlite_squad_data(faction):
     # Close the database connection
     conn.close()
 
-    return squad_data
 
 #------------------------------------------------------------------------------
 def load_world(world,map_objects):
@@ -3888,6 +3867,5 @@ def spawn_heat_jet(world,world_coords,target_coords,AMOUNT,heat_projectile_type,
         target_coords=[float(random.randint(-5,5))+target_coords[0],float(random.randint(-5,5))+target_coords[1]]
         spawn_shrapnel(world,world_coords,target_coords,[],heat_projectile_type,0.1,0.3,originator,weapon_name)
 
-
-# init 
-load_sqlite_data()
+# load squad data 
+load_sqlite_squad_data()
