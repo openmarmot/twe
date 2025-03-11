@@ -162,7 +162,8 @@ def get_distance(coords1, coords2):
     x=coords1[0]-coords2[0]
     y=coords1[1]-coords2[1]
     distance=math.sqrt(x*x+y*y)
-    return round(distance,1)
+    #return round(distance,1) # turns out this is pretty slow and not needed
+    return distance
 
 #------------------------------------------------------------------------------
 def get_column_coords(initial_coords, diameter, count, rotation_degrees, width):

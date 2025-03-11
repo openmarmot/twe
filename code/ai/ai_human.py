@@ -248,7 +248,7 @@ class AIHuman(object):
     def building_check(self):
 
         # randomize time before we hit this method again
-        self.building_check_rate=random.uniform(0.1,1.5)
+        self.building_check_rate=random.uniform(1.5,2.5)
         # clear building list and in_building bool
         self.building_list=[]
         self.in_building=False

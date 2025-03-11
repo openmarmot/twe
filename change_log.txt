@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 10 2025
+- rewrote a lot of the data display for internal vehicle menu 
+- bumped up building check rate - it was being checked super often 
+- removed rounding from math_2d.get_distance for a pretty nice performance bump 
+
+noted one issue with the new vehicle damage system is that a tank can be overlapping another 
+vehicle and never get hit because the first one blocks everything. 
+
+i experimented with going with a larger game window. the current one is too small to really 
+engage in combat easily for humans, you end up having to zoom out too much 
+
+spent a fair amount of time working on performance because im back on a older intel cpu laptop 
+that is not great at running this game. surprisingly large gain from removing a round from 
+get_distance. should probably remove more rounds - unsure why that is so slow 
+
+----------------------------------
 March 08 2025
 - finished initial work on squad rewrite
 
