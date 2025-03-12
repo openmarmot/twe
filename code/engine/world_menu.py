@@ -1208,14 +1208,23 @@ class World_Menu(object):
                     radio=True
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
-                self.text_queue.append('Vehicle : '+self.selected_object.name)
+                self.text_queue.append(f'Your Health: {self.world.player.ai.health}')
+                self.text_queue.append(f'Current Vehicle Role: {currentRole}')
+                self.text_queue.append(f'Vehicle: {self.selected_object.name}')
                 self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
-                self.text_queue.append('Current Role : '+currentRole)
+                
                 if radio:
                     self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
-                if len(self.selected_object.ai.engines)>0:
-                    self.text_queue.append('Engine : '+str(self.selected_object.ai.engines[0].ai.engine_on))
 
+                # - engine data - 
+                self.text_queue.append('-')
+                for b in self.selected_object.ai.engines:
+                    self.text_queue.append(f'Engine: {b.name}')
+                    self.text_queue.append(f' - Engine On: {b.ai.engine_on}')
+                    self.text_queue.append(f' - Engine Damaged: {b.ai.damaged}')
+
+                # - fuel tanks -
+                self.text_queue.append('-')
                 for b in self.selected_object.ai.fuel_tanks:
                     fuel=0
                     if len(b.ai.inventory)>0:
@@ -1223,19 +1232,31 @@ class World_Menu(object):
                             fuel=b.ai.inventory[0].volume
                     fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                     self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
-
-                self.text_queue.append('- weapons -')
+                
+                # - turret data - 
                 for b in self.selected_object.ai.turrets:
-                    primary_weapon='None'
-                    coaxial_weapon='None'
+                    self.text_queue.append('-')
+                    self.text_queue.append(f'Turret: {b.name}')
+                    if b.ai.turret_jammed:
+                        self.text_queue.append(' - Turret ring is jammed')
+                    
                     if b.ai.primary_weapon!=None:
-                        self.text_queue.append('- '+b.name)
-                        self.text_queue.append('-- jammed: '+str(b.ai.turret_jammed))
+                        self.text_queue.append(f' - {b.ai.primary_weapon.name}')
+                        if b.ai.primary_weapon.ai.action_jammed:
+                            self.text_queue.append(' -- action is jammed')
+                        if b.ai.primary_weapon.ai.damaged:
+                            self.text_queue.append(' -- weapon is damaged')
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
-                        self.text_queue.append('-- '+b.ai.primary_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
-                        if b.ai.coaxial_weapon!=None:
-                            ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
-                            self.text_queue.append('-- '+b.ai.coaxial_weapon.name+': '+str(ammo_gun)+'/'+str(ammo_inventory))
+                        self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
+
+                    if b.ai.coaxial_weapon!=None:
+                        self.text_queue.append(f' - {b.ai.coaxial_weapon.name}')
+                        if b.ai.coaxial_weapon.ai.action_jammed:
+                            self.text_queue.append(' -- action is jammed')
+                        if b.ai.coaxial_weapon.ai.damaged:
+                            self.text_queue.append(' -- weapon is damaged')
+                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
+                        self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
 
                 self.text_queue.append(' ----')
 

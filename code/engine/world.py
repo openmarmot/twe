@@ -264,6 +264,10 @@ class World():
                         if chance==1:
                             # missed due to prone
                             collided=None
+            elif collided.is_vehicle:
+                if collided.ai.vehicle_disabled:
+                    # this way a disabled vehicle doesn't block shots for something behind it
+                    collided=None
 
         return collided
     

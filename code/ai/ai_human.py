@@ -133,7 +133,7 @@ class AIHuman(object):
             calculated_vehicle_angle=self.memory['task_vehicle_crew']['calculated_vehicle_angle']
             vehicle=self.memory['task_vehicle_crew']['vehicle']
             # initial throttle settings
-            if calculated_distance<100:
+            if calculated_distance<150:
                 # apply brakes. bot will only exit when speed is zero
                 # note this number should be < the minimum distance to jump out
                 # or you can end up with drivers stuck in the vehicle if they slow down fast
@@ -159,13 +159,13 @@ class AIHuman(object):
                 if calculated_vehicle_angle>v:
                     vehicle.ai.handle_steer_left()
                     # helps turn faster
-                    if vehicle.ai.throttle==1:
+                    if vehicle.ai.throttle>0.5:
                         vehicle.ai.throttle=0.5
 
                 if calculated_vehicle_angle<v:
                     vehicle.ai.handle_steer_right()
                     # helps turn faster
-                    if vehicle.ai.throttle==1:
+                    if vehicle.ai.throttle>0.5:
                         vehicle.ai.throttle=0.5
                 
 
@@ -186,6 +186,13 @@ class AIHuman(object):
 
             v=vehicle.rotation_angle
 
+            if vehicle.ai.current_speed>10:
+                vehicle.ai.throttle=0
+                vehicle.ai.brake_power=1
+            else:
+                vehicle.ai.throttle=0.2
+                vehicle.ai.brake_power=1
+
             # if its close just set it equal
             if calculated_vehicle_angle>v-6 and calculated_vehicle_angle<v+6:
                 # neutral out steering 
@@ -200,13 +207,9 @@ class AIHuman(object):
 
                 if calculated_vehicle_angle>v:
                     vehicle.ai.handle_steer_left()
-                    vehicle.ai.throttle=0.3
-                    vehicle.ai.brake_power=1
 
                 if calculated_vehicle_angle<v:
                     vehicle.ai.handle_steer_right()
-                    vehicle.ai.throttle=0.3
-                    vehicle.ai.brake_power=1
 
 
     #---------------------------------------------------------------------------
@@ -248,7 +251,7 @@ class AIHuman(object):
     def building_check(self):
 
         # randomize time before we hit this method again
-        self.building_check_rate=random.uniform(0.1,1.5)
+        self.building_check_rate=random.uniform(1.5,2.5)
         # clear building list and in_building bool
         self.building_list=[]
         self.in_building=False
@@ -587,12 +590,10 @@ class AIHuman(object):
                 if 'gunner' in self.memory['task_vehicle_crew']['role']:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
-                        self.calculate_turret_aim()
                     else:
                         # only switch targets if we aren't currently firing at a vehicle
                         if self.memory['task_vehicle_crew']['target'].is_vehicle is False:
                             self.memory['task_vehicle_crew']['target']=closest_object
-                            self.calculate_turret_aim()
 
             else:
 
@@ -1207,7 +1208,7 @@ class AIHuman(object):
     def speak_vehicle_internal(self,receipient,message):
         '''speak to the crew of the vehicle'''
         # receipient - A vehicle crew role
-        # message - string
+        # message - string - if None it will remove prior commands
 
         if receipient=='all':
             pass
@@ -1216,7 +1217,11 @@ class AIHuman(object):
             if receipient in vehicle.ai.vehicle_crew:
                 if vehicle.ai.vehicle_crew[receipient][0] is True:
                     role=self.memory['task_vehicle_crew']['role']
-                    vehicle.ai.vehicle_crew[receipient][1].ai.memory['task_vehicle_crew']['crew_communication'][role]=message
+                    if message is None:
+                        # remove any prior messages
+                        vehicle.ai.vehicle_crew[receipient][1].ai.memory['task_vehicle_crew']['crew_communication'].pop(role,None)
+                    else:
+                        vehicle.ai.vehicle_crew[receipient][1].ai.memory['task_vehicle_crew']['crew_communication'][role]=message
                 else:
                     engine.log.add_data('warn','ai_human.speak_vehicle_internal - receipient not in vehicle crew',True)
           
@@ -1508,10 +1513,6 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         
         crew_communication=self.memory['task_vehicle_crew']['crew_communication']
-
-        if vehicle.ai.vehicle_disabled:
-            self.switch_task_exit_vehicle(vehicle)
-            return
         
         # respond to crew
         if len(crew_communication)>0:
@@ -1593,7 +1594,7 @@ class AIHuman(object):
             else:
                 # we are close to the squad destination
                 # lets wait i guess??
-                self.memory['task_vehicle_crew']['current_action']='waiting'
+                self.memory['task_vehicle_crew']['current_action']='Waiting at destination'
                 vehicle.ai.brake_power=1
                 vehicle.ai.throttle=0
 
@@ -1637,7 +1638,7 @@ class AIHuman(object):
             if distance<150:
                 # we are close enough
                 self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                self.memory['task_vehicle_crew']['current_action']='waiting'
+                self.memory['task_vehicle_crew']['current_action']='Waiting at destination'
                 vehicle.ai.brake_power=1
                 vehicle.ai.throttle=0
             else:
@@ -1674,9 +1675,8 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
-        if vehicle.ai.vehicle_disabled:
-            self.switch_task_exit_vehicle(vehicle)
-            return
+        # cancel any current requests for the driver
+        self.speak_vehicle_internal('driver',None)
 
         out_of_ammo_primary=False
         out_of_ammo_coax=False
@@ -1775,14 +1775,79 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
         elif target.is_vehicle:
-            if target.ai.check_if_vehicle_is_crewed()==False:
+            if target.ai.check_if_vehicle_is_crewed()==False or target.ai.vehicle_disabled:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
+            
+        rotation_check=False
+        distance_check=False
+        penetration_check=False
 
         # check rotation
         rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
-        if self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret) is False:
+        rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
+
+        # check distance
+        distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+        distance_check=distance<turret.ai.primary_weapon.ai.range
+
+        # check penetration
+        if target.is_vehicle:
+            if out_of_ammo_primary is False:
+                if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                    penetration_check=True
+            elif out_of_ammo_coax is False:
+                if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
+                    penetration_check=True
+        else:
+            penetration_check=True
+
+        # - results: all good -
+        if rotation_check and distance_check and penetration_check:
+            # we are clear to engage
+            # ask the driver to hold position
+            if vehicle.ai.vehicle_crew['driver'][0]:
+                self.speak_vehicle_internal('driver','hold for engagement')
+
+            # update the turret angle for the target
+            self.calculate_turret_aim()
+            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+
+            return
+        
+        # - results: can't penetrate -
+        if penetration_check is False:
+            self.memory['task_vehicle_crew']['target']=None
+            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+            return
+        
+        # - results: distance issue
+        if distance_check is False:
+            # lets only drive closer if we are the main turret
+            if turret.ai.primary_turret:
+                if vehicle.ai.vehicle_crew['driver'][0]:
+                    # ask the driver to drive towards the target
+                    
+                    self.speak_vehicle_internal('driver','drive to destination')
+                    # calculate a destination closer to the target
+                    self.memory['task_vehicle_crew']['destination']=engine.math_2d.moveTowardsTarget(300,vehicle.world_coords,target.world_coords,1)
+                    # wait for a couple seconds before rechecking
+                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                    return
+                else:
+                    # no driver so we can't rotate the vehicle. 
+                    # maybe we should bail out?
+                    self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                    return
+            else:
+                self.memory['task_vehicle_crew']['target']=None
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                return
+        
+        # - results: rotation issue
+        if rotation_check is False:
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
                 if vehicle.ai.vehicle_crew['driver'][0]:
@@ -1791,75 +1856,25 @@ class AIHuman(object):
                         self.speak_vehicle_internal('driver','rotate to target')
                         # wait for a couple seconds before rechecking
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                        self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
+                        return
                 else:
                     # no driver so we can't rotate the vehicle. 
                     # maybe we should bail out?
                     self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                    return
             else:
                 self.memory['task_vehicle_crew']['target']=None
-        else:
-            # check distance
-            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-            if distance>turret.ai.primary_weapon.ai.range:
-
-                # lets only drive closer if we are the main turret
-                if turret.ai.primary_turret:
-                    if vehicle.ai.vehicle_crew['driver'][0]:
-                        # ask the driver to drive towards the target
-                        
-                        self.speak_vehicle_internal('driver','drive to destination')
-                        # calculate a destination closer to the target
-                        self.memory['task_vehicle_crew']['destination']=engine.math_2d.moveTowardsTarget(300,vehicle.world_coords,target.world_coords,1)
-                        # wait for a couple seconds before rechecking
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                    else:
-                        # no driver so we can't rotate the vehicle. 
-                        # maybe we should bail out?
-                        self.memory['task_vehicle_crew']['target']=None
-                else:
-                    self.memory['task_vehicle_crew']['target']=None
-            else:
-                # check penetration
-                # there are several places this could be done. this is a good spot, but 
-                # maybe it should be done earlier like in get_target? alternatively we probably want 
-                # 'some' amount of firing that won't penetrate as it adds a lot of excitement and is 
-                # more realistic. just doing it here means its possible some firing will happen before a think
-
-                # can we penetrate it in a best case scenario?
-                
-                if target.is_vehicle:
-                    penetration=False
-                    if out_of_ammo_primary is False:
-                        if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                            penetration=True
-                    elif out_of_ammo_coax is False:
-                        if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                            penetration=True
-
-                    if penetration is False:
-                        self.memory['task_vehicle_crew']['target']=None
-                    else:
-                        # we can penetrate. lets ask the driver to hold. should we only do this if we are engaging vehicles?
-                        if vehicle.ai.current_speed>5:
-                            if vehicle.ai.vehicle_crew['driver'][0]:
-                                self.speak_vehicle_internal('driver','hold for engagement')
-
-
-        if self.memory['task_vehicle_crew']['target']:
-            # update the turret angle for the target
-            self.calculate_turret_aim()
-            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
-        else:
-            # no target 
-            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                return
+            
+        # shouldn't get this far
+        engine.log.add_data('error','ai_human.think_vehicle_role_gunner_examine_target - unknown state',True)
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
-
-        if vehicle.ai.vehicle_disabled:
-            self.switch_task_exit_vehicle(vehicle)
-            return
 
         # for whatever reason sometimes a vehicle will have a driver jump out
         # this will cause a passenger to take over. will also fill in any empty gunner spots
@@ -1882,10 +1897,6 @@ class AIHuman(object):
 
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         radio=vehicle.ai.radio
-
-        if vehicle.ai.vehicle_disabled:
-            self.switch_task_exit_vehicle(vehicle)
-            return
 
         if radio is None:
             # radio dissapeared. get a different vehicle task
@@ -2798,6 +2809,12 @@ class AIHuman(object):
     def update_task_vehicle_crew(self):
         '''update task_vehicle_crew'''
 
+        # this is for all crew
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        if vehicle.ai.vehicle_disabled:
+            self.switch_task_exit_vehicle(vehicle)
+            return
+
         role=self.memory['task_vehicle_crew']['role']
 
         if self.owner.is_player:
@@ -2834,7 +2851,8 @@ class AIHuman(object):
 
                 if 'gunner' in role:
                     if self.memory['task_vehicle_crew']['target'] is not None:
-                        self.action_vehicle_gunner_engage_target()
+                        if self.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
+                            self.action_vehicle_gunner_engage_target()
                 elif 'driver' in role:
                     self.action_vehicle_driver()
 
