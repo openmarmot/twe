@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 11 2025
+- rewrite of a lot of vehicle role stuff 
+- added 3000 column to projectile data 
+- projectiles no longer collide with disabled vehicles 
+
+somehow i got a projectile hit at 3000. never had that happen before.
+one of the weapons must be misconfigured 
+
+empty vehicles blocking shots was getting to be a big issue because the ai can't 
+check collision pathing. good compromise is empty vehicles block shots, disabled 
+vehicles do not.
+
+the new code seems a lot better and vehicle movement. specifically the s curves 
+vehicles were getting into seems to have been fixed. i think this was a rotation 
+with too high of a speed that constantly overshot. 
+
+target selection seems particularily bad for vehicles - they really need to know 
+how to prioritize.
+
+----------------------------------
 March 10 2025
 - rewrote a lot of the data display for internal vehicle menu 
 - bumped up building check rate - it was being checked super often 
