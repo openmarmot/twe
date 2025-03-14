@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+
+----------------------------------
+March 13 2025
+- some pylint style cleanup 
+
 ----------------------------------
 March 11 2025
 - rewrite of a lot of vehicle role stuff 

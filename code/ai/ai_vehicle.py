@@ -23,7 +23,7 @@ from engine.hit_data import HitData
 
 #global variables
 
-class AIVehicle(object):
+class AIVehicle():
     def __init__(self, owner):
         self.owner=owner
 
@@ -197,6 +197,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit):
+        '''add hit data to the collision log'''
         hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit)
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
@@ -206,7 +207,7 @@ class AIVehicle(object):
     def attach_tow_object(self,tow_object):
         '''attach an object for towing'''
 
-        if self.towed_object!=None:
+        if self.towed_object is not None:
             self.detach_tow_object()
         
         self.towed_object=tow_object
@@ -217,7 +218,7 @@ class AIVehicle(object):
     def check_if_human_in_vehicle(self,human):
         '''returns a bool as to whether the human is in the vehicle'''
         for value in self.vehicle_crew.values():
-            if value[0]==True:
+            if value[0] is True:
                 if value[1]==human:
                     return True
         return False
@@ -253,10 +254,10 @@ class AIVehicle(object):
 
 
     #---------------------------------------------------------------------------
-    def event_collision(self,EVENT_DATA):
-        
+    def event_collision(self,event_data):
+        '''handle a collision event'''
 
-        if EVENT_DATA.is_projectile:
+        if event_data.is_projectile:
             # avoids hits on dead vehicles that haven't been removed from the game yet
             
             # -- determine what area the projectile hit --
@@ -273,57 +274,59 @@ class AIVehicle(object):
                     area_hit='turret'
 
             if area_hit=='vehicle_body':
-                self.handle_vehicle_body_projectile_hit(EVENT_DATA)
+                self.handle_vehicle_body_projectile_hit(event_data)
             elif area_hit=='passenger_compartment':
-                self.handle_passenger_compartment_projectile_hit(EVENT_DATA)
+                self.handle_passenger_compartment_projectile_hit(event_data)
             elif area_hit=='turret':
                 # pass it on for the turret to handle
                 turret=random.choice(self.turrets)
-                turret.ai.handle_event('collision',EVENT_DATA)
+                turret.ai.handle_event('collision',event_data)
             else:
                 engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
 
-            #engine.world_builder.spawn_object(self.owner.world,EVENT_DATA.world_coords,'dirt',True)
-            engine.world_builder.spawn_sparks(self.owner.world,EVENT_DATA.world_coords,random.randint(1,2))
+            #engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
+            engine.world_builder.spawn_sparks(self.owner.world,event_data.world_coords,random.randint(1,2))
 
 
-        elif EVENT_DATA.is_grenade:
+        elif event_data.is_grenade:
             print('bonk')
         else:
-            engine.log.add_data('error','ai_vehicle event_collision - unhandled collision type'+EVENT_DATA.name,True)
+            engine.log.add_data('error','ai_vehicle event_collision - unhandled collision type'+event_data.name,True)
 
     #---------------------------------------------------------------------------
-    def event_add_inventory(self,EVENT_DATA):
+    def event_add_inventory(self,event_data):
+        '''add an object to the inventory'''
 
-        if EVENT_DATA.is_human:
+        if event_data.is_human:
             # we don't want humans in here
             print('! Error - human added to vehicle inventory')
         else:
 
-            if EVENT_DATA.is_radio:
+            if event_data.is_radio:
                 if self.radio==None:
-                    self.radio=EVENT_DATA
+                    self.radio=event_data
 
             # put whatever it is in the inventory
-            self.inventory.append(EVENT_DATA) 
+            self.inventory.append(event_data) 
 
     #---------------------------------------------------------------------------
-    def event_remove_inventory(self,EVENT_DATA):
-        if EVENT_DATA in self.inventory:
-            self.inventory.remove(EVENT_DATA)
+    def event_remove_inventory(self,event_data):
+        '''remove an object from the inventory'''
+        if event_data in self.inventory:
+            self.inventory.remove(event_data)
 
-            if EVENT_DATA.is_radio:
-                if self.radio==EVENT_DATA:
+            if event_data.is_radio:
+                if self.radio==event_data:
                     self.radio=None
 
             # make sure the obj world_coords reflect the obj that had it in inventory
-            EVENT_DATA.world_coords=copy.copy(self.owner.world_coords)
+            event_data.world_coords=copy.copy(self.owner.world_coords)
 
     #---------------------------------------------------------------------------
     def handle_component_damage(self,damaged_component,projectile):
         '''handle damage to a component'''
         if damaged_component=='driver':
-            if self.vehicle_crew['driver_projectile'][0]==True:
+            if self.vehicle_crew['driver_projectile'][0] is True:
                 self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
         elif damaged_component=='engine':
             for b in self.engines:
@@ -337,21 +340,21 @@ class AIVehicle(object):
             self.vehicle_disabled=True
         elif damaged_component=='all_crew':
             for key,value in self.vehicle_crew.items():
-                if value[0]==True:
+                if value[0] is True:
                     value[1].ai.handle_event('collision',projectile)
         elif damaged_component=='random_crew_projectile':
             for key,value in self.vehicle_crew.items():
-                if value[0]==True:
+                if value[0] is True:
                     if random.randint(0,1)==1:
                         value[1].ai.handle_event('collision',projectile)
         elif damaged_component=='random_crew_explosion':
             for key,value in self.vehicle_crew.items():
-                if value[0]==True:
+                if value[0] is True:
                     if random.randint(0,1)==1:
                         value[1].ai.handle_event('explosion',random.randint(30,150))
         elif damaged_component=='random_crew_fire':
             for key,value in self.vehicle_crew.items():
-                if value[0]==True:
+                if value[0] is True:
                     if random.randint(0,1)==1:
                         value[1].ai.handle_hit_with_flame()
         elif damaged_component=='ammo_rack':
@@ -371,6 +374,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_passenger_compartment_projectile_hit(self,projectile):
+        '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
@@ -386,6 +390,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile):
+        '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
         side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
@@ -401,18 +406,22 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_aileron_left(self):
+        '''handle left aileron input'''
         self.ailerons=1
 
     #---------------------------------------------------------------------------
     def handle_aileron_right(self):
+        '''handle right aileron input'''
         self.ailerons=-1
 
     #---------------------------------------------------------------------------
     def handle_elevator_up(self):
+        '''handle elevator up event'''
         self.elevator=-1
 
     #---------------------------------------------------------------------------
     def handle_elevator_down(self):
+        '''handle elevator down event'''
         self.elevator=1
 
     #---------------------------------------------------------------------------
@@ -433,10 +442,12 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_flaps_down(self):
+        '''handle flaps down event'''
         self.flaps=1
 
     #---------------------------------------------------------------------------
     def handle_flaps_up(self):
+        '''handle flaps up event'''
         self.flaps=0
 
     #---------------------------------------------------------------------------
@@ -451,14 +462,17 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_rudder_left(self):
+        '''handle left rudder input'''
         self.rudder=-1
 
     #---------------------------------------------------------------------------
     def handle_rudder_right(self):
+        '''handle right rudder input'''
         self.rudder=1
 
     #---------------------------------------------------------------------------
     def handle_start_engines(self):
+        '''handle starting the engines'''
         for b in self.engines:
             if b.ai.engine_on==False:
                 if b.ai.damaged is False:
@@ -473,6 +487,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def handle_stop_engines(self):
+        '''handle stopping the engines'''
         for b in self.engines:
             if b.ai.engine_on==True:
                 b.ai.engine_on=False
@@ -582,6 +597,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
+        '''update the acceleration calculation'''
         self.acceleration=0
 
         # calculate total current engine force
@@ -600,6 +616,7 @@ class AIVehicle(object):
             
     #---------------------------------------------------------------------------
     def update_child_position_rotation(self):
+        '''update the position and rotation of child objects'''
         # this is only called when the vehicle position or rotation changes
         # it is also called by human_ai when it enters the vehicle
 
@@ -635,7 +652,7 @@ class AIVehicle(object):
         
     #---------------------------------------------------------------------------
     def update_electrical_system(self):
-
+        '''update the electrical system'''
         # update batteries
         for b in self.batteries:
             b.update()
@@ -695,6 +712,7 @@ class AIVehicle(object):
 
     #---------------------------------------------------------------------------
     def update_physics(self):
+        '''update the physics of the vehicle'''
         time_passed=self.owner.world.time_passed_seconds
 
         heading_changed = False
@@ -768,6 +786,7 @@ class AIVehicle(object):
             self.update_child_position_rotation()
     #---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):
+        '''update the rate of climb calculation'''
         if self.max_rate_of_climb!=0:
             # need some sort of actual algo here
             lift=9.8 # counter act gravity for now
