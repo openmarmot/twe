@@ -1,7 +1,6 @@
 
 '''
-module : world_area.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : kind of a control point, a map feature that the factions will want to attack or defend 
 '''

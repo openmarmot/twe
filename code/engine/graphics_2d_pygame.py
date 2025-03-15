@@ -1,7 +1,6 @@
 
 '''
-module : graphics_2d_pygame.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 This should hold as much of the pygame specifc code as possibe.

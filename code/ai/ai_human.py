@@ -1,7 +1,6 @@
 
 '''
-module : ai_player.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces

@@ -1,7 +1,6 @@
 
 '''
-module : ai_vehicle.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : the vehicle isn't really meant to have AI. 
 the only thing that should be here is physics and hardware stuff.
@@ -93,6 +92,13 @@ class AIVehicle():
         # only stores main gun ammo
         self.ammo_rack=[]
         self.ammo_rack_capacity=0 # max capacity
+
+        # wheels 
+        self.max_wheels=0 # maximum wheels that can be fitted to the vehicle
+        self.min_weels=0 # minimum number of healthy wheels to move
+        self.wheels=[]
+        self.spare_wheels=[]
+        self.max_spare_wheels=0
 
         # ----- controls ------
 
@@ -251,7 +257,6 @@ class AIVehicle():
             if self.towed_object.is_vehicle:
                 self.towed_object.ai.in_tow=False
             self.towed_object=None
-
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):

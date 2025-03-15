@@ -1,6 +1,5 @@
 '''
-module : squad_builder.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : 
 

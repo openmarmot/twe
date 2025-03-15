@@ -1,6 +1,5 @@
 '''
-module : world_menu.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu

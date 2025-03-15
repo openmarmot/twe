@@ -1,7 +1,6 @@
 
 '''
-module : world_builder.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : 
 
@@ -62,6 +61,7 @@ from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
 from ai.ai_vehicle_wreck import AIVehicleWreck
 from ai.ai_dani import AIDani
+from ai.ai_wheel import AIWheel
 
 #global variables
 
@@ -3019,6 +3019,14 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.engines.append(spawn_object(world,world_coords,"volkswagen_type_82_engine",False))
         z.ai.engines[0].ai.exhaust_position_offset=[65,10]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.ai.min_wheels=4
+        z.ai.max_wheels=4
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.spare_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.max_spare_wheels=1
         if random.randint(0,3)==1:
             mg=spawn_object(world,world_coords,'mg34',False)
             z.add_inventory(mg)
@@ -3035,6 +3043,12 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='german_kubelwagen_camo':
         z=spawn_object(world,world_coords,'german_kubelwagen',False)
         z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed']
+
+    elif object_type=='volkswagen_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='Volkswagen Wheel'
+        z.ai.compatible_vehicles=['german_kubelwagen','german_kubelwagen_camo']
+
 
     elif object_type=='red_bicycle':
         # note second image is used for the wreck..

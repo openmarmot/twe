@@ -2,9 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 15 2025
+- minor cleanup 
+- added wheel object for vehicles 
+- added volkswagen wheel
+
+haven't decided yet how wheels will be incorporated in vehicle physics 
+
+----------------------------------
 March 14 2025
 - added radios to the german tanks 
-
 
 todo 
 - add a german tank engine 

@@ -1,6 +1,5 @@
 '''
-module : map_object.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : this is the compressed map version of a world_object that is suitable for saving and loading
 '''

@@ -1,7 +1,6 @@
 
 '''
-module : image_tool.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 A special tool for working with images
