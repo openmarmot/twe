@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+March 14 2025
+- added radios to the german tanks 
+
+
+todo 
+- add a german tank engine 
+
+----------------------------------
 March 13 2025
 - some pylint style cleanup 
 
