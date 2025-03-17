@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+----------------------------------
+March 16 2025
+- moved rolling_resistance from being a world_object var to a local var in a ai_vehicle function 
+- rolling resistance now effected by wheel damage 
+- added a chance of wheel hits for left and right hits. 
+
+I keep adding vehicle components and the amount of info that needs to display is getting out of hand 
+Also every time I add a component I need to add code so the AI understands it, and that is lagging behind 
+
+wheel hit chance is fairly low now. has to be a body hit from the left or right and then gets a 50% chance 
+of being a wheel hit. also added in armor calc so that bullets won't damage tanks.
+
+todo 
+- tires/tracks
+- ai awareness of wheel damage and repair/replace mechanics 
+- test and tune rolling resistance 
 
 ----------------------------------
 March 15 2025

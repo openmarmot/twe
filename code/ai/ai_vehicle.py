@@ -266,6 +266,8 @@ class AIVehicle():
             # avoids hits on dead vehicles that haven't been removed from the game yet
             
             # -- determine what area the projectile hit --
+            side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+
             area_hit='vehicle_body'
             
 
@@ -279,9 +281,16 @@ class AIVehicle():
                     area_hit='turret'
 
             if area_hit=='vehicle_body':
-                self.handle_vehicle_body_projectile_hit(event_data)
+                # vehicle body has a chance for a wheel hit
+                if side in ['left','right']:
+                    if random.randint(0,1)==1:
+                        self.handle_wheel_projectile_hit(event_data,side)
+                    else: 
+                        self.handle_vehicle_body_projectile_hit(event_data,side)
+                else:
+                    self.handle_vehicle_body_projectile_hit(event_data,side)
             elif area_hit=='passenger_compartment':
-                self.handle_passenger_compartment_projectile_hit(event_data)
+                self.handle_passenger_compartment_projectile_hit(event_data,side)
             elif area_hit=='turret':
                 # pass it on for the turret to handle
                 turret=random.choice(self.turrets)
@@ -378,11 +387,9 @@ class AIVehicle():
 
 
     #---------------------------------------------------------------------------
-    def handle_passenger_compartment_projectile_hit(self,projectile):
+    def handle_passenger_compartment_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-
-        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
@@ -394,11 +401,9 @@ class AIVehicle():
             pass
 
     #---------------------------------------------------------------------------
-    def handle_vehicle_body_projectile_hit(self,projectile):
+    def handle_vehicle_body_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-
-        side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
         if penetration:
@@ -535,6 +540,24 @@ class AIVehicle():
             print('Warning - throttle_zero interferes with throttle up')
 
     #---------------------------------------------------------------------------
+    def handle_wheel_hit(self,projectile,side):
+        '''handle a projectile hit to the vehicle body'''
+        if len(self.wheels)>0:
+            wheel=random.choice(self.wheels)
+            distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
+            penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
+            self.add_hit_data(projectile,penetration,side,distance,'Wheel')
+            if penetration:
+                if random.randint(0,1)==0:
+                    wheel.ai.damaged=True
+                else:
+                    wheel.ai.destroyed=True
+
+            else:
+                # no penetration, but maybe we can have some other effect?
+                pass
+
+    #---------------------------------------------------------------------------
     def neutral_controls(self):
         ''' return controls to neutral over time'''
 
@@ -603,6 +626,9 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def update_acceleration_calculation(self):
         '''update the acceleration calculation'''
+
+        # this can probably doesn't need to be done every update
+
         self.acceleration=0
 
         # calculate total current engine force
@@ -611,11 +637,17 @@ class AIVehicle():
             if b.ai.engine_on and b.ai.damaged is False:
                 total_engine_force+=b.ai.max_engine_force*b.ai.throttle_control
 
+        # no idea what are good values for this at the moment
+        rolling_resistance=0.03
+        for b in self.wheels:
+            if b.ai.damaged or b.ai.destroyed:
+                rolling_resistance+=1
+
         # prevents this from going negative. but maybe we want that?
         # 0 engine force could result in negative accelleration 
         if total_engine_force>0:
             self.acceleration=engine.math_2d.calculate_acceleration(
-                total_engine_force,self.owner.rolling_resistance,
+                total_engine_force,rolling_resistance,
                 self.owner.drag_coefficient,self.owner.world.air_density,
                 self.owner.frontal_area,self.owner.weight)
             

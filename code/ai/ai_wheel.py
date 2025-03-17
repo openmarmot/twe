@@ -17,6 +17,8 @@ class AIWheel(object):
 
         self.damaged=False # can be repaired
         self.destroyed=False # cannot be repaired
+
+        self.armor=0
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

@@ -2011,7 +2011,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=2380
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2050,7 +2049,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=2500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2104,7 +2102,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2174,7 +2171,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2252,7 +2248,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2349,7 +2344,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2430,7 +2424,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2560,7 +2553,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=3500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2632,7 +2624,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2728,7 +2719,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2809,7 +2799,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2887,7 +2876,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
@@ -2941,7 +2929,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=1400
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
@@ -3011,7 +2998,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -3063,7 +3049,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=50
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.weight=13
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
 
@@ -3097,7 +3082,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=6
         # fuel tank ref : https://airpages.ru/eng/lw/ju88_2.shtml
@@ -3138,7 +3122,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=6
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))

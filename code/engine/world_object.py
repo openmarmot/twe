@@ -66,7 +66,6 @@ class WorldObject(object):
         # for liquids and most other things this is the current actual volume
         self.volume=0 # liters.
         self.weight=0 #kilograms
-        self.rolling_resistance=0.015
         self.drag_coefficient=0.8
         self.frontal_area=0 # square meters
 
