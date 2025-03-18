@@ -266,7 +266,7 @@ class AIVehicle():
             # avoids hits on dead vehicles that haven't been removed from the game yet
             
             # -- determine what area the projectile hit --
-            side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+            side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,event_data.rotation_angle)
 
             area_hit='vehicle_body'
             
@@ -540,7 +540,7 @@ class AIVehicle():
             print('Warning - throttle_zero interferes with throttle up')
 
     #---------------------------------------------------------------------------
-    def handle_wheel_hit(self,projectile,side):
+    def handle_wheel_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
         if len(self.wheels)>0:
             wheel=random.choice(self.wheels)

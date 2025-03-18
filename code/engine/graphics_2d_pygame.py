@@ -354,7 +354,8 @@ class Graphics_2D_Pygame(object):
             self.background.fill((255, 255, 255))
         elif desired_mode==1:
             self.mode=1
-            self.background.fill((128, 102, 77))
+            #self.background.fill((128, 102, 77))
+            self.background.fill((201,184,171))
         elif desired_mode==2:
             self.mode=2
             self.background.fill((255, 255, 255))

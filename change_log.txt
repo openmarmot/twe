@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 17 2025
+- bug fix 
+- added wheel data to 'in vehicle' menu print out 
+- changed terrain color again 
+
+i need to come up with a actual terrain tile solution or maybe just create some terrain features that can be added 
+as objects to break it up a bit. 
+
+----------------------------------
 March 16 2025
 - moved rolling_resistance from being a world_object var to a local var in a ai_vehicle function 
 - rolling resistance now effected by wheel damage 

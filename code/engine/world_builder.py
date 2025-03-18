@@ -3658,6 +3658,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0
+        z.default_scale=1
     elif object_type=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'

@@ -1257,6 +1257,16 @@ class World_Menu(object):
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
                         self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
 
+                # - wheel data -
+                self.text_queue.append('-')
+                for b in self.selected_object.ai.wheels:
+                    wheel_text=b.name
+                    if b.ai.damaged:
+                        wheel_text+=' damaged'
+                    if b.ai.destroyed:
+                        wheel_text+=' destroyed'
+                    self.text_queue.append(wheel_text)
+
                 self.text_queue.append(' ----')
 
                 self.text_queue.append('- crew -')
