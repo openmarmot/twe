@@ -48,7 +48,10 @@ class AIHuman(object):
         self.wallet={}
 
         # -- health stuff --
-        self.health=100
+        self.blood_pressure=100
+        self.blood_pressure_max=100 # as mm/hg
+        self.blood_pressure_min=30 # goes into shock below this
+
         self.bleeding=False
         self.last_bleed_time=0
         self.bleed_interval=0.5
@@ -229,7 +232,7 @@ class AIHuman(object):
                 turret.ai.handle_rotate_right()
         else:
             if target.is_human:
-                if target.ai.health>0:
+                if target.ai.blood_pressure>0:
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
@@ -279,28 +282,27 @@ class AIHuman(object):
         adjust_max+=weapon.ai.mechanical_accuracy
 
         # health based
-        if self.health<100:
+        if self.blood_pressure<100:
             adjust_max+=1
-        if self.health<50:
-            adjust_max+=1
-        if self.health<30:
-            adjust_max+=1
+        if self.blood_pressure<50:
+            adjust_max+=10
+
 
         # fatigue
         if self.fatigue>3:
             adjust_max+=0.5
         if self.fatigue>5:
-            adjust_max+=0.5
+            adjust_max+=3
 
         # distance based
         if distance>500:
             adjust_max+=1
         if distance>1000:
-            adjust_max+=1
+            adjust_max+=4
         if distance>1500:
-            adjust_max+=1
+            adjust_max+=2
         if distance>2000:
-            adjust_max+=1
+            adjust_max+=2
 
         # prone bonus 
         if self.prone:
@@ -334,12 +336,12 @@ class AIHuman(object):
         if hit==1:
             #head
             if self.wearable_head is None:
-                self.health-=random.randint(85,100)
+                self.blood_pressure-=random.randint(30,100)
                 bleeding_hit=True
             else:
                 penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor)
                 if penetration:
-                    self.health-=random.randint(85,100)
+                    self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
                 else:
                     # armor stopped the hit
@@ -348,29 +350,29 @@ class AIHuman(object):
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
-            self.health-=random.randint(50,80)
+            self.blood_pressure-=random.randint(50,80)
             bleeding_hit=True
         elif hit==3:
             #lower body
-            self.health-=random.randint(30,60)
+            self.blood_pressure-=random.randint(30,60)
             bleeding_hit=True
         elif hit==4:
             # feet
-            self.health-=random.randint(30,40)
+            self.blood_pressure-=random.randint(30,40)
             bleeding_hit=True
         elif hit==5:
             # hands
-            self.health-=random.randint(30,40)
+            self.blood_pressure-=random.randint(30,40)
             bleeding_hit=True
 
         # extra damage from large caliber projectiles
         if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>12:
-            self.health-=30
+            self.blood_pressure-=30
             bleeding_hit=True
         
         if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>20:
             # do additional damage for large projectiless
-            self.health-=30
+            self.blood_pressure-=30
             bleeding_hit=True
         
         if bleeding_hit:
@@ -481,7 +483,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
-        self.health+=CONSUMABLE.ai.health_effect
+        self.blood_pressure+=CONSUMABLE.ai.health_effect
         self.hunger+=CONSUMABLE.ai.hunger_effect
         self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
@@ -503,7 +505,7 @@ class AIHuman(object):
         # note we are using this list directly, this is ok because we aren't removing from it
         for b in self.squad.faction_tactical.hostile_humans:
             # quick check because this list isn't refreshed that often..
-            if b.ai.health>0:
+            if b.ai.blood_pressure>0:
                 d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
                 target=b
@@ -609,7 +611,7 @@ class AIHuman(object):
         if event_data.is_projectile:
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
-            starting_health=self.health
+            starting_health=self.blood_pressure
 
             self.calculate_projectile_damage(event_data,distance)
 
@@ -622,10 +624,10 @@ class AIHuman(object):
 
                 # kill tracking
                 if event_data.ai.shooter.is_human:
-                    if self.health<30:
+                    if self.blood_pressure<30:
                         # protects from recording hits on something that was already dead
                         if starting_health>0:
-                            if self.health<1:
+                            if self.blood_pressure<1:
                                 event_data.ai.shooter.ai.confirmed_kills+=1
                             else:
                                 event_data.ai.shooter.ai.probable_kills+=1
@@ -735,7 +737,7 @@ class AIHuman(object):
 
         # this will likely just kill the human
 
-        self.health-=event_data
+        self.blood_pressure-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
         self.collision_log.append('hurt by explosion')
@@ -986,7 +988,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def handle_hit_with_flame(self):
         '''handle being hit with something that is on fire'''
-        self.health-=random.randint(20,100)
+        self.blood_pressure-=random.randint(20,100)
 
         self.collision_log.append('burned by fire')
 
@@ -1769,7 +1771,7 @@ class AIHuman(object):
 
         # check whether target is still a threat
         if target.is_human:
-            if target.ai.health<1:
+            if target.ai.blood_pressure<1:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
@@ -1993,7 +1995,7 @@ class AIHuman(object):
         # update health 
         self.update_health()
 
-        if self.health>0:
+        if self.blood_pressure>self.blood_pressure_min:
             # update the current task
             if self.memory['current_task'] in self.memory:
                 if self.memory['current_task'] in self.task_map:
@@ -2026,6 +2028,10 @@ class AIHuman(object):
                 # this is a lazy way to check if we moved. could probably add a bool..
                 if self.large_pickup is not None:
                     self.update_large_pickup_position()
+        else:
+            # blood pressure is too low. in shock 
+            if self.prone is False:
+                self.prone_state_change()
 
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
@@ -2062,12 +2068,12 @@ class AIHuman(object):
     def update_health(self):
         '''update health and handle death'''
 
-        if self.health>0:
+        if self.blood_pressure>0:
             if self.bleeding:
                 if self.owner.world.world_seconds-self.last_bleed_time>self.bleed_interval:
                     self.last_bleed_time=self.owner.world.world_seconds+random.uniform(0,2)
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
-                    self.health-=1+random.uniform(0,3)
+                    self.blood_pressure-=10+random.uniform(0,3)
 
                     if random.randint(0,3)==0:
                         for b in self.inventory:
@@ -2163,7 +2169,7 @@ class AIHuman(object):
 
         enemy=self.memory['task_engage_enemy']['enemy']
         if enemy.is_human:
-            if enemy.ai.health<1:
+            if enemy.ai.blood_pressure<1:
                 self.memory.pop('task_engage_enemy',None)
                 self.switch_task_think()
                 return
@@ -2393,7 +2399,7 @@ class AIHuman(object):
         self.memory.pop('task_exit_vehicle',None)
 
         # maybe grab your large pick up if you put it in the trunk
-        if self.health>0:
+        if self.blood_pressure>0:
             self.speak('Jumping out')
 
             if self.owner.is_player is False:
@@ -2869,7 +2875,7 @@ class AIHuman(object):
 
         self.bleeding=False
 
-        self.health+=medical.ai.health_effect
+        self.blood_pressure+=medical.ai.health_effect
         self.hunger+=medical.ai.hunger_effect
         self.thirst_rate+=medical.ai.thirst_effect
         self.fatigue+=medical.ai.fatigue_effect

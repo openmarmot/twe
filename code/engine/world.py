@@ -508,7 +508,7 @@ class World():
     def handle_key_press(self,key,mouse_screen_coords=None):
         '''handle key press'''
         # stop player from moving when dead
-        if self.player.ai.health>0:
+        if self.player.ai.blood_pressure>0:
             # key press is when a key is held down
             # key - string  example 'w'
             if self.player.ai.memory['current_task']=='task_vehicle_crew':
@@ -602,7 +602,7 @@ class World():
     def kill_all_nonplayer_humans(self):
         for b in self.wo_objects_human:
             if b.is_player is False:
-                b.ai.health-=500
+                b.ai.blood_pressure=0
         engine.log.add_data('note','world.kill_all_nonplayer_humans executed',True)
 
     #---------------------------------------------------------------------------
@@ -770,7 +770,7 @@ class World():
                         print('---')
                         print('name',value[1].name)
                         print('exists in world',self.check_object_exists(value[1]))
-                        print('health',value[1].ai.health)
+                        print('blood pressure',value[1].ai.blood_pressure)
                         print('memory dump:')
                         print(value[1].ai.memory)
                         print('---')
@@ -785,7 +785,7 @@ class World():
             error_found=False
 
             # check for zombies
-            if b.ai.health<1:
+            if b.ai.blood_pressure<1:
                 print(b.name,'is dead !!')
                 error_found=True
             
@@ -798,7 +798,7 @@ class World():
                 print('---')
                 print('name',b.name)
                 print('exists in world',self.check_object_exists(b))
-                print('health',b.ai.health)
+                print('blood pressure',b.ai.blood_pressure)
                 print('memory dump:')
                 print(b.ai.memory)
                 print('---')

@@ -246,7 +246,7 @@ class AIVehicle():
         '''returns a bool as to whether there is live crew in the vehicle'''
         for value in self.vehicle_crew.values():
             if value[0] is True:
-                if value[1].ai.health>0:
+                if value[1].ai.blood_pressure>0:
                     return True
         return False
 

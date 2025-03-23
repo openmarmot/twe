@@ -508,7 +508,7 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- Eat/Drink Menu --')
-        self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
         self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
         self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
         self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -601,7 +601,7 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- First Aid Menu --')
-        self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
         self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
         self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
         self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -749,7 +749,7 @@ class World_Menu(object):
         if distance<500:
             self.text_queue.append('')
             self.text_queue.append('--- Stats ---')
-            self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+            self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
             self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
             self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -1207,7 +1207,7 @@ class World_Menu(object):
                     radio=True
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
-                self.text_queue.append(f'Your Health: {self.world.player.ai.health}')
+                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
                 self.text_queue.append(f'Current Vehicle Role: {currentRole}')
                 self.text_queue.append(f'Vehicle: {self.selected_object.name}')
                 self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))

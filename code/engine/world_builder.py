@@ -3350,7 +3350,6 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='civilian_big_cheese':
         # big cheese!
         z=spawn_object(world,world_coords,'civilian_man',False)
-        z.ai.health*=2
         z.name='big cheese'
         z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
         z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
@@ -3375,7 +3374,6 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='civilian_shovel_man':
         # a shovel enthusiast
         z=spawn_object(world,world_coords,'civilian_man',False)
-        z.ai.health*=2
         z.name='Mr. Shovel'
         z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
         z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))

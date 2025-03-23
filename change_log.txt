@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 23 2025
+- human health replaced by blood pressure 
+
+blood pressure acts in a similar way to health, but bleeding drops it 
+faster. 
+
+If bp is <30 the human will prone and be unresponsive until bp raises 
+
+this allows us to have a medic in the future that can fix humans 
+
+----------------------------------
 March 17 2025
 - bug fix 
 - added wheel data to 'in vehicle' menu print out 
