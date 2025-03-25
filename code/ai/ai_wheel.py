@@ -18,7 +18,8 @@ class AIWheel(object):
         self.damaged=False # can be repaired
         self.destroyed=False # cannot be repaired
 
-        self.armor=0
+        #[armor thickness,armor slope,spaced_armor_thickness]
+        self.armor=[1,0,0]
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''

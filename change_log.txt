@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 24 2025
+- bug fix 
+- slightly darker background color so tracers show up 
+
+----------------------------------
 March 23 2025
 - human health replaced by blood pressure 
 
