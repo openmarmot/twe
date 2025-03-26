@@ -12,7 +12,7 @@ import math
 
 #import custom packages
 import engine.math_2d
-
+import engine.log
 
 
 # velocity is in feet per second
@@ -24,7 +24,7 @@ loaded=False
 # {name:{projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count},}
 projectile_data={}
 
-
+max_distance=3000
 
 #---------------------------------------------------------------------------
 def calculate_penetration(projectile,distance,armor_type,armor):
@@ -38,7 +38,12 @@ def calculate_penetration(projectile,distance,armor_type,armor):
     spaced_armor=armor[2]
 
     # get penetration value for projectile at range
-    max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
+    max_penetration=0
+    if distance>max_distance:
+        # not sure how this is happening yet..
+        engine.log.add_data('Error',f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance}')
+    else:
+        max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
 
     # fast check first
     if max_penetration<(armor_thickness+spaced_armor):

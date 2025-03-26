@@ -629,6 +629,7 @@ def load_quick_battle(world,battle_option):
         squads+=['German Sd.kfz.251/22'] * 2
         squads+=['German Panzerschreck Team'] * 2
         squads+=['German FeldFunk Team'] * 2
+        squads+=['German Medic'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -640,6 +641,7 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet T34-76 Model 1943'] * 8
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
+        squads+=['Soviet Medic'] * 2
 
     # german and civilian only
     elif battle_option=='2':
@@ -3294,6 +3296,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'fg42-type2')
+    
+    elif object_type=='german_medic':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        z.ai.is_medic=True
         
 
     # --------- soviet types ----------------------------------------
@@ -3341,6 +3348,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
         add_standard_loadout(z,world,'tt33')
+
+    elif object_type=='soviet_medic':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        z.ai.is_medic=True
 
     elif object_type=='soviet_ptrs_41':
         z=spawn_object(world,world_coords,'soviet_soldier',False)

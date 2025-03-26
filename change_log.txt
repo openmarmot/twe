@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 25 2025
+- some code refactoring 
+- low blood pressure now affects speed 
+- added medic ai code 
+- added german/soviet medic (one man) squads 
+- added a catch for projectiles with range > that what is in the sql data 
+
+medics start off unarmed but they can pick up a weapon like any other human.
+they are unlikely to survive long, but its a fun mechanic 
+medics can stop bleeding and increase blood pressure 
+
+play test notes 
+- i think the panzerschreck is still being rapid fired by the AI
+- balance of the large scenario seems to favor the germans again. not sure why 
+
+----------------------------------
 March 24 2025
 - bug fix 
 - slightly darker background color so tracers show up 
