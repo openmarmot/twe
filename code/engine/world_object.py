@@ -1,7 +1,6 @@
 
 '''
-module : module_template.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 '''
@@ -52,6 +51,7 @@ class WorldObject(object):
         # should probably never be negative unless if we start simulating uh holes in the ground
         self.scale_modifier=0
 
+
         # if the object scale (world scale + scale_modifier) is under 
         # this it won't be rendered
         self.minimum_visible_scale=0.1
@@ -67,7 +67,6 @@ class WorldObject(object):
         # for liquids and most other things this is the current actual volume
         self.volume=0 # liters.
         self.weight=0 #kilograms
-        self.rolling_resistance=0.015
         self.drag_coefficient=0.8
         self.frontal_area=0 # square meters
 

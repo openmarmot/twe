@@ -1,6 +1,5 @@
 '''
-module : engine/global_exchange_rates.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : sets the global exchange rates for various currencies and commodities
 '''

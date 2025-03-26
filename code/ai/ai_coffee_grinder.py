@@ -1,8 +1,6 @@
 
 '''
-module : ai_coffee_grinder.py
-anguage : Python 3.x
-email : andrew@openmarmot.com
+repo : https://github.com/openmarmot/twe
 notes :
 '''
 

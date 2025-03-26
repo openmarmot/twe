@@ -1,7 +1,6 @@
 
 '''
-module : ai_turret.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : the turret for a tank, or the mg mount on a vehicle
 '''

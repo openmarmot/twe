@@ -1,6 +1,5 @@
 '''
-module : hit_data.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : this records all the data for a hit on a vehicle or other object
 - should contain data ONLY, not object references

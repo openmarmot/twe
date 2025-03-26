@@ -1,7 +1,6 @@
 
 '''
-module : ai_player.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 event - something that could happen to the ai, possibly caused by external forces
@@ -38,6 +37,7 @@ class AIHuman(object):
             'task_squad_leader':self.update_task_squad_leader,
             'task_loot_container':self.update_task_loot_container,
             'task_sit_down':self.update_task_sit_down,
+            'task_medic':self.update_task_medic,
         }
 
         self.memory={}
@@ -49,7 +49,10 @@ class AIHuman(object):
         self.wallet={}
 
         # -- health stuff --
-        self.health=100
+        self.blood_pressure=100
+        self.blood_pressure_max=100 # as mm/hg
+        self.blood_pressure_min=30 # goes into shock below this
+
         self.bleeding=False
         self.last_bleed_time=0
         self.bleed_interval=0.5
@@ -83,6 +86,7 @@ class AIHuman(object):
         self.is_pilot=False
         self.is_expert_marksman=False
         self.is_afv_trained=False # afv=armored fighting vehicle
+        self.is_medic=False
 
         # -- stats --
         self.confirmed_kills=0
@@ -230,7 +234,7 @@ class AIHuman(object):
                 turret.ai.handle_rotate_right()
         else:
             if target.is_human:
-                if target.ai.health>0:
+                if target.ai.blood_pressure>0:
                     if turret.ai.coaxial_weapon is not None:
                         turret.ai.handle_fire_coax()
                     else:
@@ -280,28 +284,27 @@ class AIHuman(object):
         adjust_max+=weapon.ai.mechanical_accuracy
 
         # health based
-        if self.health<100:
+        if self.blood_pressure<100:
             adjust_max+=1
-        if self.health<50:
-            adjust_max+=1
-        if self.health<30:
-            adjust_max+=1
+        if self.blood_pressure<50:
+            adjust_max+=10
+
 
         # fatigue
         if self.fatigue>3:
             adjust_max+=0.5
         if self.fatigue>5:
-            adjust_max+=0.5
+            adjust_max+=3
 
         # distance based
         if distance>500:
             adjust_max+=1
         if distance>1000:
-            adjust_max+=1
+            adjust_max+=4
         if distance>1500:
-            adjust_max+=1
+            adjust_max+=2
         if distance>2000:
-            adjust_max+=1
+            adjust_max+=2
 
         # prone bonus 
         if self.prone:
@@ -335,12 +338,12 @@ class AIHuman(object):
         if hit==1:
             #head
             if self.wearable_head is None:
-                self.health-=random.randint(85,100)
+                self.blood_pressure-=random.randint(30,100)
                 bleeding_hit=True
             else:
                 penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor)
                 if penetration:
-                    self.health-=random.randint(85,100)
+                    self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
                 else:
                     # armor stopped the hit
@@ -349,29 +352,29 @@ class AIHuman(object):
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
-            self.health-=random.randint(50,80)
+            self.blood_pressure-=random.randint(50,80)
             bleeding_hit=True
         elif hit==3:
             #lower body
-            self.health-=random.randint(30,60)
+            self.blood_pressure-=random.randint(30,60)
             bleeding_hit=True
         elif hit==4:
             # feet
-            self.health-=random.randint(30,40)
+            self.blood_pressure-=random.randint(30,40)
             bleeding_hit=True
         elif hit==5:
             # hands
-            self.health-=random.randint(30,40)
+            self.blood_pressure-=random.randint(30,40)
             bleeding_hit=True
 
         # extra damage from large caliber projectiles
         if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>12:
-            self.health-=30
+            self.blood_pressure-=30
             bleeding_hit=True
         
         if engine.penetration_calculator.projectile_data[projectile.ai.projectile_type]['diameter']>20:
             # do additional damage for large projectiless
-            self.health-=30
+            self.blood_pressure-=30
             bleeding_hit=True
         
         if bleeding_hit:
@@ -462,7 +465,7 @@ class AIHuman(object):
         # for example, some turrets may face forward, some may face backward 
 
         return angle_ok
-
+    
     #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
@@ -482,7 +485,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def eat(self,CONSUMABLE):
         # eat the consumable object. or part of it anyway
-        self.health+=CONSUMABLE.ai.health_effect
+        self.blood_pressure+=CONSUMABLE.ai.health_effect
         self.hunger+=CONSUMABLE.ai.hunger_effect
         self.thirst+=CONSUMABLE.ai.thirst_effect
         self.fatigue+=CONSUMABLE.ai.fatigue_effect
@@ -504,7 +507,7 @@ class AIHuman(object):
         # note we are using this list directly, this is ok because we aren't removing from it
         for b in self.squad.faction_tactical.hostile_humans:
             # quick check because this list isn't refreshed that often..
-            if b.ai.health>0:
+            if b.ai.blood_pressure>0:
                 d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
 
                 target=b
@@ -610,7 +613,7 @@ class AIHuman(object):
         if event_data.is_projectile:
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
-            starting_health=self.health
+            starting_health=self.blood_pressure
 
             self.calculate_projectile_damage(event_data,distance)
 
@@ -623,10 +626,10 @@ class AIHuman(object):
 
                 # kill tracking
                 if event_data.ai.shooter.is_human:
-                    if self.health<30:
+                    if self.blood_pressure<30:
                         # protects from recording hits on something that was already dead
                         if starting_health>0:
-                            if self.health<1:
+                            if self.blood_pressure<1:
                                 event_data.ai.shooter.ai.confirmed_kills+=1
                             else:
                                 event_data.ai.shooter.ai.probable_kills+=1
@@ -736,7 +739,7 @@ class AIHuman(object):
 
         # this will likely just kill the human
 
-        self.health-=event_data
+        self.blood_pressure-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
         self.collision_log.append('hurt by explosion')
@@ -878,9 +881,23 @@ class AIHuman(object):
             calc_speed*=0.9
         if self.prone:
             calc_speed*=0.5
+        if self.blood_pressure<100:
+            calc_speed*=0.9
+        if self.blood_pressure<50:
+            calc_speed*=0.5
         
         return calc_speed
     
+    #---------------------------------------------------------------------------
+    def get_nearby_wounded_humans(self,human_list,max_range):
+        '''return a list of nearby wounded humans'''
+        wounded_humans=[]
+        for human in human_list:
+            if human.ai.blood_pressure<80:
+                if engine.math_2d.get_distance(self.owner.world_coords,human.world_coords)<max_range:
+                    wounded_humans.append(human)
+        return wounded_humans
+
     #---------------------------------------------------------------------------
     def get_target(self,max_range):
         '''returns a target or None if there are None'''
@@ -987,7 +1004,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def handle_hit_with_flame(self):
         '''handle being hit with something that is on fire'''
-        self.health-=random.randint(20,100)
+        self.blood_pressure-=random.randint(20,100)
 
         self.collision_log.append('burned by fire')
 
@@ -1280,6 +1297,26 @@ class AIHuman(object):
         }
 
         self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_medic(self,wounded_humans):
+        '''switch to task_think'''
+        task_name='task_medic'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'wounded_humans': wounded_humans,
+                'current_patient': None
+            }
+
+            self.memory[task_name]=task_details
+
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
@@ -1770,7 +1807,7 @@ class AIHuman(object):
 
         # check whether target is still a threat
         if target.is_human:
-            if target.ai.health<1:
+            if target.ai.blood_pressure<1:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
@@ -1994,7 +2031,7 @@ class AIHuman(object):
         # update health 
         self.update_health()
 
-        if self.health>0:
+        if self.blood_pressure>self.blood_pressure_min:
             # update the current task
             if self.memory['current_task'] in self.memory:
                 if self.memory['current_task'] in self.task_map:
@@ -2027,6 +2064,10 @@ class AIHuman(object):
                 # this is a lazy way to check if we moved. could probably add a bool..
                 if self.large_pickup is not None:
                     self.update_large_pickup_position()
+        else:
+            # blood pressure is too low. in shock 
+            if self.prone is False:
+                self.prone_state_change()
 
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
@@ -2063,12 +2104,12 @@ class AIHuman(object):
     def update_health(self):
         '''update health and handle death'''
 
-        if self.health>0:
+        if self.blood_pressure>0:
             if self.bleeding:
                 if self.owner.world.world_seconds-self.last_bleed_time>self.bleed_interval:
                     self.last_bleed_time=self.owner.world.world_seconds+random.uniform(0,2)
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
-                    self.health-=1+random.uniform(0,3)
+                    self.blood_pressure-=10+random.uniform(0,3)
 
                     if random.randint(0,3)==0:
                         for b in self.inventory:
@@ -2164,7 +2205,7 @@ class AIHuman(object):
 
         enemy=self.memory['task_engage_enemy']['enemy']
         if enemy.is_human:
-            if enemy.ai.health<1:
+            if enemy.ai.blood_pressure<1:
                 self.memory.pop('task_engage_enemy',None)
                 self.switch_task_think()
                 return
@@ -2394,7 +2435,7 @@ class AIHuman(object):
         self.memory.pop('task_exit_vehicle',None)
 
         # maybe grab your large pick up if you put it in the trunk
-        if self.health>0:
+        if self.blood_pressure>0:
             self.speak('Jumping out')
 
             if self.owner.is_player is False:
@@ -2503,6 +2544,32 @@ class AIHuman(object):
             else:
                 # the distance is intermediate. we still want to pick the item up
                 self.switch_task_move_to_location(container.world_coords,None)
+
+    #---------------------------------------------------------------------------
+    def update_task_medic(self):
+        '''update task medic'''
+        # simple task. takes care of all the wounded and then pops itself.
+
+        if self.memory['task_medic']['current_patient'] is None:
+            if len(self.memory['task_medic']['wounded_humans'])==0:
+                self.memory.pop('task_medic',None)
+                self.switch_task_think()
+                return
+            self.memory['task_medic']['current_patient']=self.memory['task_medic']['wounded_humans'].pop()
+        patient=self.memory['task_medic']['current_patient']
+        distance=engine.math_2d.get_distance(self.owner.world_coords,patient.world_coords)
+        if distance>1000:
+             self.memory['task_medic']['current_patient']=None
+             return
+        if distance>self.max_distance_to_interact_with_object:
+            self.switch_task_move_to_location(patient.world_coords,patient)
+            return         
+
+        # if we get this far we are close enough to treat the patient
+        patient.ai.bleeding=False
+        patient.ai.blood_pressure+=15
+        self.memory['task_medic']['current_patient']=None
+        self.speak('You will live soldier. All patched up.')
 
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
@@ -2692,89 +2759,95 @@ class AIHuman(object):
         # !! probably need to check the last time we were here so we aren't 
         # hitting this too often as it is likely computationally intense
 
-        action=False
+        # note - this function uses heavy use of 'return' to control flow
+
         
         # -- priorities --
 
         if self.owner.is_player:
             self.switch_task_player_control()
-            action=True
-
-        if action is False:
+            return
 
 
-            # primary weapon
-            if self.primary_weapon is None:
-                # need to get a gun
-                distance=4000
-                if len(self.near_targets)>0:
-                    distance=300
-                elif len(self.mid_targets)>0:
-                    distance=500
-                elif len(self.far_targets)>0:
-                    distance=900
+        # primary weapon
+        if self.primary_weapon is None:
+            # need to get a gun
+            distance=4000
+            if len(self.near_targets)>0:
+                distance=300
+            elif len(self.mid_targets)>0:
+                distance=500
+            elif len(self.far_targets)>0:
+                distance=900
 
-                # this also means that humans without any targets will not get a gun
-                if distance<4000:
-                    gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+            # this also means that humans without any targets will not get a gun
+            if distance<4000:
+                gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
 
-                    if gun is not None:
-                        self.switch_task_pickup_objects([gun])
-                        action=True
-            else:
-                # -- we have a gun. is it usable? --
-                if self.check_ammo_bool(self.primary_weapon,self.owner) is False:
-                    # need to get ammo. check for nearby magazines
-                    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
-                    if len(near_magazines)>0:
-                        self.switch_task_pickup_objects(near_magazines)
-                        action=True
-                    else:
-                        # check containers
-                        containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,500)
-                        if len(containers)>0:
-                            self.switch_task_loot_container(random.choice(containers))
-                        else:
-                            # set primary weapon to none - possibly causing the bot to pickup a new weapon
-                            self.primary_weapon=None
+                if gun is not None:
+                    self.switch_task_pickup_objects([gun])
+                    return
+        else:
+            # -- we have a gun. is it usable? --
+            if self.check_ammo_bool(self.primary_weapon,self.owner) is False:
+                # need to get ammo. check for nearby magazines
+                near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
+                if len(near_magazines)>0:
+                    self.switch_task_pickup_objects(near_magazines)
+                    return
+                
+                # check containers for spare ammo
+                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,500)
+                if len(containers)>0:
+                    self.switch_task_loot_container(random.choice(containers))
+                    return
+                
+                # ran out of options to find ammo. set this to cause the bot to pickup a new weapon
+                self.primary_weapon=None
         
         # -- check if we have older tasks to resume --
-        # this is important for compound tasks 
-        if action is False:
-            if 'task_enter_vehicle' in self.memory:
-                self.memory['current_task']='task_enter_vehicle'
-                action=True
-            elif 'task_pickup_objects' in self.memory:
-                self.memory['current_task']='task_pickup_objects'
-                action=True
-            elif 'task_loot_container' in self.memory:
-                self.memory['current_task']='task_loot_container'
-                action=True
-            elif 'task_sit_down' in self.memory:
-                self.memory['current_task']='task_sit_down'
-                action=True
+        # this is important for compound tasks
+        if 'task_medic' in self.memory:
+            self.memory['current_task']='task_medic'
+            return 
+        if 'task_enter_vehicle' in self.memory:
+            self.memory['current_task']='task_enter_vehicle'
+            return
+        if 'task_pickup_objects' in self.memory:
+            self.memory['current_task']='task_pickup_objects'
+            return
+        if 'task_loot_container' in self.memory:
+            self.memory['current_task']='task_loot_container'
+            return
+        if 'task_sit_down' in self.memory:
+            self.memory['current_task']='task_sit_down'
+            return
+        
+        # -- unique job role stuff -- 
+        if self.is_medic:
+            wounded_humans=self.get_nearby_wounded_humans(self.squad.faction_tactical.allied_humans,1000)
+            if len(wounded_humans)>0:
+                self.switch_task_medic(wounded_humans)
 
-        # -- squad stuff --
-        # this should be AFTER anything else important
-        if action is False:
-            if self.squad.squad_leader is None:
-                self.squad.squad_leader=self.owner
+        # -- squad stuff (lower importance)--
+        # could maybe have some logic to this if i ever add ranks 
+        if self.squad.squad_leader is None:
+            self.squad.squad_leader=self.owner
 
-            if self.squad.squad_leader==self.owner:
-                self.switch_task_squad_leader()
-                action=True
-            else:
-                # being in a squad wwhen we aren't lead basically just means staying close to the squad lead
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
-                # are we close enough to squad?
-                if distance>self.squad_max_distance:
-                    self.switch_task_move_to_location(self.squad.squad_leader.world_coords,None)
-                    action=True
+        if self.squad.squad_leader==self.owner:
+            self.switch_task_squad_leader()
+            return
+    
+        # being in a squad wwhen we aren't lead basically just means staying close to the squad lead
+        distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
+        # are we close enough to squad?
+        if distance>self.squad_max_distance:
+            self.switch_task_move_to_location(self.squad.squad_leader.world_coords,None)
+            return
 
         # -- ok now we've really run out of things to do. do things that don't matter
         # ! NOTE Squad Lead will never get this far
-        if action is False:
-            self.switch_task_think_idle()
+        self.switch_task_think_idle()
 
     #---------------------------------------------------------------------------
     def update_task_think_idle(self):
@@ -2870,7 +2943,7 @@ class AIHuman(object):
 
         self.bleeding=False
 
-        self.health+=medical.ai.health_effect
+        self.blood_pressure+=medical.ai.health_effect
         self.hunger+=medical.ai.hunger_effect
         self.thirst_rate+=medical.ai.thirst_effect
         self.fatigue+=medical.ai.fatigue_effect

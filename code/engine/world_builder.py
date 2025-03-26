@@ -1,7 +1,6 @@
 
 '''
-module : world_builder.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : 
 
@@ -62,6 +61,7 @@ from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
 from ai.ai_vehicle_wreck import AIVehicleWreck
 from ai.ai_dani import AIDani
+from ai.ai_wheel import AIWheel
 
 #global variables
 
@@ -629,6 +629,7 @@ def load_quick_battle(world,battle_option):
         squads+=['German Sd.kfz.251/22'] * 2
         squads+=['German Panzerschreck Team'] * 2
         squads+=['German FeldFunk Team'] * 2
+        squads+=['German Medic'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -640,6 +641,7 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet T34-76 Model 1943'] * 8
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
+        squads+=['Soviet Medic'] * 2
 
     # german and civilian only
     elif battle_option=='2':
@@ -2011,7 +2013,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=2380
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2050,7 +2051,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=2500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2104,7 +2104,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2174,7 +2173,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2252,7 +2250,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2264,6 +2261,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
@@ -2348,7 +2346,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2360,6 +2357,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
@@ -2428,7 +2426,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2440,6 +2437,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
@@ -2557,7 +2555,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=3500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2629,7 +2626,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2725,7 +2721,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2806,7 +2801,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=26500
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2818,6 +2812,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
@@ -2883,7 +2878,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=7800
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
@@ -2937,7 +2931,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=1400
-        z.rolling_resistance=0.03
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
@@ -3007,7 +3000,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=40.
         z.collision_radius=50
         z.weight=800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -3015,6 +3007,14 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.engines.append(spawn_object(world,world_coords,"volkswagen_type_82_engine",False))
         z.ai.engines[0].ai.exhaust_position_offset=[65,10]
         z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.ai.min_wheels=4
+        z.ai.max_wheels=4
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.spare_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.max_spare_wheels=1
         if random.randint(0,3)==1:
             mg=spawn_object(world,world_coords,'mg34',False)
             z.add_inventory(mg)
@@ -3032,6 +3032,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_kubelwagen',False)
         z.image_list=['kubelwagen_camo','kubelwagen_camo_destroyed']
 
+    elif object_type=='volkswagen_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='Volkswagen Wheel'
+        z.ai.compatible_vehicles=['german_kubelwagen','german_kubelwagen_camo']
+
+
     elif object_type=='red_bicycle':
         # note second image is used for the wreck..
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
@@ -3045,7 +3051,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=50
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.weight=13
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=3
 
@@ -3079,7 +3084,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=6
         # fuel tank ref : https://airpages.ru/eng/lw/ju88_2.shtml
@@ -3120,7 +3124,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
         z.weight=9800
-        z.rolling_resistance=0.015
         z.drag_coefficient=0.8
         z.frontal_area=6
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -3293,6 +3296,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'fg42-type2')
+    
+    elif object_type=='german_medic':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        z.ai.is_medic=True
         
 
     # --------- soviet types ----------------------------------------
@@ -3341,6 +3349,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         add_standard_loadout(z,world,'standard_soviet_gear')
         add_standard_loadout(z,world,'tt33')
 
+    elif object_type=='soviet_medic':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        z.ai.is_medic=True
+
     elif object_type=='soviet_ptrs_41':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
@@ -3349,7 +3362,6 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='civilian_big_cheese':
         # big cheese!
         z=spawn_object(world,world_coords,'civilian_man',False)
-        z.ai.health*=2
         z.name='big cheese'
         z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
         z.add_inventory(spawn_object(world,world_coords,'adler-cheese',False))
@@ -3374,7 +3386,6 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='civilian_shovel_man':
         # a shovel enthusiast
         z=spawn_object(world,world_coords,'civilian_man',False)
-        z.ai.health*=2
         z.name='Mr. Shovel'
         z.add_inventory(spawn_object(world,world_coords,'coffee_tin',False))
         z.add_inventory(spawn_object(world,world_coords,'german_folding_shovel',False))
@@ -3657,6 +3668,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0
+        z.default_scale=1
     elif object_type=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'

@@ -1,6 +1,83 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 25 2025
+- some code refactoring 
+- low blood pressure now affects speed 
+- added medic ai code 
+- added german/soviet medic (one man) squads 
+- added a catch for projectiles with range > that what is in the sql data 
+
+medics start off unarmed but they can pick up a weapon like any other human.
+they are unlikely to survive long, but its a fun mechanic 
+medics can stop bleeding and increase blood pressure 
+
+play test notes 
+- i think the panzerschreck is still being rapid fired by the AI
+- balance of the large scenario seems to favor the germans again. not sure why 
+
+----------------------------------
+March 24 2025
+- bug fix 
+- slightly darker background color so tracers show up 
+
+----------------------------------
+March 23 2025
+- human health replaced by blood pressure 
+
+blood pressure acts in a similar way to health, but bleeding drops it 
+faster. 
+
+If bp is <30 the human will prone and be unresponsive until bp raises 
+
+this allows us to have a medic in the future that can fix humans 
+
+----------------------------------
+March 17 2025
+- bug fix 
+- added wheel data to 'in vehicle' menu print out 
+- changed terrain color again 
+
+i need to come up with a actual terrain tile solution or maybe just create some terrain features that can be added 
+as objects to break it up a bit. 
+
+----------------------------------
+March 16 2025
+- moved rolling_resistance from being a world_object var to a local var in a ai_vehicle function 
+- rolling resistance now effected by wheel damage 
+- added a chance of wheel hits for left and right hits. 
+
+I keep adding vehicle components and the amount of info that needs to display is getting out of hand 
+Also every time I add a component I need to add code so the AI understands it, and that is lagging behind 
+
+wheel hit chance is fairly low now. has to be a body hit from the left or right and then gets a 50% chance 
+of being a wheel hit. also added in armor calc so that bullets won't damage tanks.
+
+todo 
+- tires/tracks
+- ai awareness of wheel damage and repair/replace mechanics 
+- test and tune rolling resistance 
+
+----------------------------------
+March 15 2025
+- minor cleanup 
+- added wheel object for vehicles 
+- added volkswagen wheel
+
+haven't decided yet how wheels will be incorporated in vehicle physics 
+
+----------------------------------
+March 14 2025
+- added radios to the german tanks 
+
+todo 
+- add a german tank engine 
+
+----------------------------------
+March 13 2025
+- some pylint style cleanup 
+
+----------------------------------
 March 11 2025
 - rewrite of a lot of vehicle role stuff 
 - added 3000 column to projectile data 

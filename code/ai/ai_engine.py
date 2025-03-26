@@ -1,7 +1,6 @@
 
 '''
-module : ai_engine.py
-Language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : represents an engine. (car engine, jet engine, etc)
 '''

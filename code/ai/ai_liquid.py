@@ -1,7 +1,6 @@
 
 '''
-module : ai_liquid.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : special characteristics for a liquid
 '''

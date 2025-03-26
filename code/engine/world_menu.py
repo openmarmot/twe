@@ -1,6 +1,5 @@
 '''
-module : world_menu.py
-language : Python 3.x
+repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes :
 this class contains code for the world in game menu
@@ -509,7 +508,7 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- Eat/Drink Menu --')
-        self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
         self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
         self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
         self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -602,7 +601,7 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- First Aid Menu --')
-        self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+        self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
         self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
         self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
         self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -750,7 +749,7 @@ class World_Menu(object):
         if distance<500:
             self.text_queue.append('')
             self.text_queue.append('--- Stats ---')
-            self.text_queue.append('Health: '+str(round(self.selected_object.ai.health,1)))
+            self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
             self.text_queue.append('Hunger: '+str(round(self.selected_object.ai.hunger,1)))
             self.text_queue.append('Thirst: '+str(round(self.selected_object.ai.thirst,1)))
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
@@ -1208,7 +1207,7 @@ class World_Menu(object):
                     radio=True
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
-                self.text_queue.append(f'Your Health: {self.world.player.ai.health}')
+                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
                 self.text_queue.append(f'Current Vehicle Role: {currentRole}')
                 self.text_queue.append(f'Vehicle: {self.selected_object.name}')
                 self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
@@ -1257,6 +1256,16 @@ class World_Menu(object):
                             self.text_queue.append(' -- weapon is damaged')
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
                         self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
+
+                # - wheel data -
+                self.text_queue.append('-')
+                for b in self.selected_object.ai.wheels:
+                    wheel_text=b.name
+                    if b.ai.damaged:
+                        wheel_text+=' damaged'
+                    if b.ai.destroyed:
+                        wheel_text+=' destroyed'
+                    self.text_queue.append(wheel_text)
 
                 self.text_queue.append(' ----')
 
