@@ -159,9 +159,10 @@ class World():
         self.cleanup_threshold=4000
 
 
-        # some stats 
+        # -- some stat counters for the debug info screen --
         self.panzerfaust_launches=0
-
+        # incremented when a medic heals someone
+        self.medic_heals=0
         # count on how many times a helmet bounces a projectile
         self.helmet_bounces=0
 
@@ -633,27 +634,17 @@ class World():
             message=b.name + ' has exited the world area'
             if b.is_human:
                 message+=('\n  - faction: '+b.ai.squad.faction)
-                message+=('\n  - ai_state: '+b.ai.ai_state)
-                message+=('\n  - ai_goal: '+b.ai.ai_goal)
-                message+=('\n  - ai_vehicle_goal: '+b.ai.ai_vehicle_goal)
 
                 # exit vehicle
-                if b.ai.in_vehicle:
-                    b.ai.handle_exit_vehicle()
-
-                # remove from squad 
-                b.ai.squad.members.remove(b)
-
-            elif b.is_vehicle:
-                # tell all the passengers to get out
-                # kind of a fail safe as they are likely already in the list
-                temp=copy.copy(b.ai.vehicle_crew.values())
-                for b in temp:
-                    if b[0]==True:
-                        b[1].ai.handle_exit_vehicle()
+            
+            if b.is_vehicle:
+                # process all the passengers
+                pass
 
 
             print(message)
+
+            print('!!!! Process Exit Queue Needs a Rewrite !!!!! ')
 
             # remove from the world
             self.remove_queue.append(b)
@@ -943,6 +934,7 @@ class World():
         self.debug_text_queue.append(f"Vehicles: {len(self.wo_objects_vehicle)}")
         self.debug_text_queue.append(f"Panzerfaust launches: {self.panzerfaust_launches}")
         self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
+        self.debug_text_queue.append(f'Medic Heals: {self.medic_heals}')
         self.debug_text_queue.append("----- Player Stats -----")
         self.debug_text_queue.append(f"Player Name: {self.player.name}")
         self.debug_text_queue.append(f"Player memory current task: {self.player.ai.memory['current_task']}")

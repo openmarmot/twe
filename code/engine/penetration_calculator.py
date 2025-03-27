@@ -41,7 +41,7 @@ def calculate_penetration(projectile,distance,armor_type,armor):
     max_penetration=0
     if distance>max_distance:
         # not sure how this is happening yet..
-        engine.log.add_data('Error',f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance}')
+        engine.log.add_data('Error',f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance} armor: {armor} flightTime:{projectile.ai.flightTime} maxTime:{projectile.ai.maxTime}',True)
     else:
         max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
 

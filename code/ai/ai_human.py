@@ -2571,6 +2571,9 @@ class AIHuman(object):
         self.memory['task_medic']['current_patient']=None
         self.speak('You will live soldier. All patched up.')
 
+        # update this stat counter so i can track if this ever actually happens.. lol
+        self.owner.world.medic_heals+=1
+
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
         '''update task'''
