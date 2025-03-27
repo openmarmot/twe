@@ -38,11 +38,9 @@ def create_squads(world_objects):
             for identity in squad_definition['members'].split(','):
 
                 required[identity] = required.get(identity, 0) + 1
-            print(required)
             can_form = all(len(squad_objects.get(identity, [])) >= count for identity, count in required.items())
 
             if can_form:
-                print(can_form)
                 # Form the squad
                 current_squad = []
                 for identity in squad_definition['members'].split(','):

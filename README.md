@@ -76,5 +76,5 @@ See gameplay_instructions.txt for a full list
 but when I have copied code I will try to include references from where I got it
 
 
-![screenshot](/screenshots/twe-dec-30-2024.png "TWE screenshot")
-In this screenshot a Sd.kfz.251 loaded with troops drives past a knocked out T34-85. 
+![screenshot](/screenshots/twe-mar-26-2025.png "TWE screenshot")
+In this screenshot a large battle unfolds between Soviet and German forces. 

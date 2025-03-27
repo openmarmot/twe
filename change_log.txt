@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 26 2025
+- bug fix 
+- added a debug counter for medic heals 
+
+updated readme screenshot 
+
+let some test games run a long time and caught a couple bugs.
+Also was able to verify that the new medic code does work, although its 
+more likely that the medic just gets killed 
+
+thinking about removing the kill logs - they are making it hard to find actual 
+bugs. there are 500+ humans in the large scenario so that is a ton of logs.
+The data is still pretty neat. maybe i can turn it into a csv or something 
+
+there is clearly a bug causing some bullets to fly infinitely as im getting a 
+lot of 5000 range max range errors. maybe something with the new disabled vehicle 
+penetration mechanic. have not reliably triggered it but I've added more debug data 
+so I should have more info the next time it happens. It seems like it should be impossible..
+
+----------------------------------
 March 25 2025
 - some code refactoring 
 - low blood pressure now affects speed 
