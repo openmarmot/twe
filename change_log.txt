@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 27 2025
+- disabled death logs for now 
+- minor changes to menu info 
+- minor fixes/changes
+
+I want to do something different with the human and vehicle logs but im not sure 
+what for now. the info is interesting but it was excessively cluttering up the console log 
+
+----------------------------------
 March 26 2025
 - bug fix 
 - added a debug counter for medic heals 

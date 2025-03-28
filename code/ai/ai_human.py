@@ -2187,7 +2187,7 @@ class AIHuman(object):
                 self.owner.world.world_menu.handle_input('none')
         
             #print death message
-            print(dm)
+            #print(dm)
 
     #---------------------------------------------------------------------------
     def update_large_pickup_position(self):

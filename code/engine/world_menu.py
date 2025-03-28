@@ -747,6 +747,15 @@ class World_Menu(object):
                     self.menu_state = 'non_squad_member_menu'
 
         if distance<500:
+            if self.selected_object.ai.is_medic:
+                self.text_queue.append('Medic')
+            if self.selected_object.ai.is_afv_trained:
+                self.text_queue.append('AFV Trained')
+            if self.selected_object.ai.is_expert_marksman:
+                self.text_queue.append('Marksman')
+            if self.selected_object.ai.squad.squad_leader==self.selected_object:
+                self.text_queue.append('Squad Leader')
+
             self.text_queue.append('')
             self.text_queue.append('--- Stats ---')
             self.text_queue.append('Blood Pressure: '+str(round(self.selected_object.ai.blood_pressure,1)))
@@ -755,10 +764,7 @@ class World_Menu(object):
             self.text_queue.append('Fatigue ' + str(round(self.selected_object.ai.fatigue,1)))
             self.text_queue.append('Confirmed Kills: '+str(self.selected_object.ai.confirmed_kills))
             self.text_queue.append('Probable Kills: '+str(self.selected_object.ai.probable_kills))
-            if self.selected_object.ai.is_afv_trained:
-                self.text_queue.append('AFV Trained')
-            if self.selected_object.ai.is_expert_marksman:
-                self.text_queue.append('Marksman')
+            
             
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
@@ -780,9 +786,7 @@ class World_Menu(object):
                 self.text_queue.append(currency_name+': '+str(currency_amount))
                 
             self.text_queue.append('')
-            self.text_queue.append('--- Squad Info ---')
-            if self.selected_object.ai.squad.squad_leader==self.selected_object:
-                self.text_queue.append('Squad Leader')
+            
             self.text_queue.append('Squad Size: '+str(len(self.selected_object.ai.squad.members)))
 
         if self.world.debug_mode==True:
@@ -1153,17 +1157,10 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--External Vehicle Menu : ' + self.selected_object.name + ' --')
             self.text_queue.append('Vehicle : '+self.selected_object.name)
-            self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
+            if self.selected_object.ai.vehicle_disabled:
+                self.text_queue.append('Vehicle Disabled')
 
-            for b in self.selected_object.ai.fuel_tanks:
-                fuel=0
-                if len(b.ai.inventory)>0:
-                    if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
-                        fuel=b.ai.inventory[0].volume
-                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
-                self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
-            if self.selected_object.ai.radio!=None:
-                self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
+
 
             if distance<self.max_menu_distance:
                 self.text_queue.append('')
