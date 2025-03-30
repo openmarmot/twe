@@ -584,12 +584,16 @@ class World_Menu(object):
         self.text_queue.append('Current coordinates '+str(engine.math_2d.get_round_vector_2(self.world.player.world_coords)))
 
         if self.world.map_square_name==None:
-            self.text_queue.append('Exiting the map not enabled for quick battles')
+            # this means we are playing quick battle.
+            # just quit the game
+            engine.log.export_all()
+            exit()
         else:
             self.text_queue.append('Current Map: '+self.world.map_square_name)
 
             self.text_queue.append('1 - Exit World')
             if key=='1':
+                engine.log.export_all()
                 self.world.exit_world=True
                 self.deactivate_menu()
 
