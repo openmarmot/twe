@@ -686,6 +686,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_add_inventory(self,event_data):
         ''' add object to inventory. does not remove obj from world'''
+        self.recent_noise_or_move=True
+        self.last_noise_or_move_time=self.owner.world.world_seconds
         if event_data not in self.inventory:
             if event_data.is_large_human_pickup:
                 # note - this will happen when a large_human_pickup is in another container

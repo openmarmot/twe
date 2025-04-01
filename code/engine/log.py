@@ -67,5 +67,7 @@ def export_to_csv(dict_list,filename_prefix):
 #---------------------------------------------------------------------------
 def export_all():
     '''export all data'''
+    # this is called when exiting the world from world_menu human menu
+
     export_to_csv(data_log,'game_log')
     export_to_csv(human_death_log,'death_log')
