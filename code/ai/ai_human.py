@@ -686,6 +686,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_add_inventory(self,event_data):
         ''' add object to inventory. does not remove obj from world'''
+        self.recent_noise_or_move=True
+        self.last_noise_or_move_time=self.owner.world.world_seconds
         if event_data not in self.inventory:
             if event_data.is_large_human_pickup:
                 # note - this will happen when a large_human_pickup is in another container
@@ -2126,30 +2128,29 @@ class AIHuman(object):
     
         else:
             # -- handle death --
-            # construct death message
-            dm=''
-            dm+=('\n  -------------------')
-            dm+=('\n '+self.owner.name+' died.')
-            dm+=('\n  - faction: '+self.squad.faction)
-            dm+=('\n  - confirmed kills: '+str(self.confirmed_kills))
-            dm+=('\n  - probable kills: '+str(self.probable_kills))
-            dm+=('\n  - collision log --')
-            for b in self.collision_log:
-                dm+=('\n     - '+b)
-            dm+=('\n  ------------------')
-            
-            
+
+            # -- create death log --
+            death_log={
+                'name':self.owner.name,
+                'faction':self.squad.faction,
+                'last collision':'none',
+                'primary weapon':'none',
+                'confirmed kills':str(self.confirmed_kills),
+                'probably kills':str(self.probable_kills)
+            }
+            if self.primary_weapon is not None:
+                death_log['primary weapon']=self.primary_weapon.name
+
+            if len(self.collision_log)>0:
+                death_log['last collision']=self.collision_log[-1]
+
+            engine.log.human_death_log.append(death_log)
+            # --
+
             # drop primary weapon 
             if self.primary_weapon is not None:
-                ammo,ammo_inventory,magazines=self.check_ammo(self.primary_weapon,self.owner)
-                dm+=('\n  - weapon: '+self.primary_weapon.name)
-                dm+=('\n  -- ammo in gun: '+str(ammo))
-                dm+=('\n  -- ammo in inventory: '+str(ammo_inventory))
-                dm+=('\n  -- magazine count: '+str(magazines))
-
                 self.drop_object(self.primary_weapon)
             
-            dm+=('\n  -------------------')
 
             # drop large pickup
             if self.large_pickup is not None:
@@ -2187,7 +2188,7 @@ class AIHuman(object):
                 self.owner.world.world_menu.handle_input('none')
         
             #print death message
-            print(dm)
+            #print(dm)
 
     #---------------------------------------------------------------------------
     def update_large_pickup_position(self):

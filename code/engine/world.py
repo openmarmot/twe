@@ -598,6 +598,8 @@ class World():
 
                 if action:
                     self.player.ai.fatigue+=self.player.ai.fatigue_add_rate*self.time_passed_seconds
+                    self.player.ai.recent_noise_or_move=True
+                    self.player.ai.last_noise_or_move_time=self.world_seconds
 
     #---------------------------------------------------------------------------
     def kill_all_nonplayer_humans(self):

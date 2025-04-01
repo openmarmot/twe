@@ -1,6 +1,34 @@
 TWE Project : Change Log
 
 ----------------------------------
+March 31 2025
+- fixed player large human pickups 
+- player now creates noise when moving 
+
+the player seemed somewhat less likely to be shot for awhile, i bet that was 
+because player movement was not generating noise. that has been fixed 
+
+todo 
+-dani should be a large human pickup 
+- more dani art 
+- fix start screen so it isn't so blindingly white 
+
+----------------------------------
+March 30 2025
+- logs save to .csv in ./logs/ on exit now 
+- main human menu has a exit world option that is now enabled in quick battle 
+- human death logs redone and now saved in engine.log 
+
+----------------------------------
+March 27 2025
+- disabled death logs for now 
+- minor changes to menu info 
+- minor fixes/changes
+
+I want to do something different with the human and vehicle logs but im not sure 
+what for now. the info is interesting but it was excessively cluttering up the console log 
+
+----------------------------------
 March 26 2025
 - bug fix 
 - added a debug counter for medic heals 

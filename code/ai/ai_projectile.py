@@ -60,14 +60,14 @@ class AIProjectile(object):
         else:
             print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 
-        # remove the grenade
+        # remove the projectile
         # this also stops code execution for this object as its not anywhere else
         self.owner.world.remove_queue.append(self.owner)
 
 
     #---------------------------------------------------------------------------
     def update(self):
-        ''' overrides base update '''
+        ''' update '''
         time_passed=self.owner.world.time_passed_seconds
 
         self.flightTime+=time_passed

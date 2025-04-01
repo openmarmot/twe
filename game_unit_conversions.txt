@@ -3,7 +3,10 @@
 Vew->Show Grid
 
 Image-> configure grid
-set spacing to 8
+set spacing to 8 pixels (0.027in)
+
+For determining size when creating images it is best to use a diagram image and scale by width. 
+It is never clear whether length measurements include gun barrels and there is a lot of variation of length measurements
 
 # -- game units --
 

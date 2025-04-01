@@ -1,6 +1,6 @@
 # twe specific
 code/saves/save*
-
+code/logs/*
 
 .DS_Store
 **/.DS_Store
