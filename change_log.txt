@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 01 2025
+- added the RSO PAK 
+
+The RSO PAK is very unsurvivable. I think I will give it some low hull armor, but it will likely 
+still be vulnerable to MG fire. 
+
+----------------------------------
 March 31 2025
 - fixed player large human pickups 
 - player now creates noise when moving 

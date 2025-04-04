@@ -405,8 +405,10 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
-image_tool.image_objects.append(ImageObject(['pak40_turret'],0))
-image_tool.image_objects.append(ImageObject(['small_smoke'],0))
+image_tool.image_objects.append(ImageObject(['rso_pak'],0))
+image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 while image_tool.quit==False:
 

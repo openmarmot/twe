@@ -381,7 +381,7 @@ class World_Menu(object):
             self.text_queue.append('2 - german_sd_kfz_251-22')
             self.text_queue.append('3 - german_panzer_iv_ausf_h')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
-            self.text_queue.append('5 - sd_kfz_251 ')
+            self.text_queue.append('5 - rso pak')
             self.text_queue.append('6 - T20 armored tractor')
             self.text_queue.append('7 - RSO')
             self.text_queue.append('8 - t34-76 model 1943')
@@ -395,7 +395,7 @@ class World_Menu(object):
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_rso_pak',True)
             elif key=='6':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_t20',True)
             elif key=='7':

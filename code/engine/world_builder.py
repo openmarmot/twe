@@ -621,6 +621,7 @@ def load_quick_battle(world,battle_option):
         squads+=['German Hetzer Squad'] * 2
         squads+=['German Aufklaren Kubelwagen'] * 2
         squads+=['German RSO Vehicle'] * 2
+        squads+=['German RSO PAK'] * 1
         squads+=['German Panzer IV Ausf G'] * 2
         squads+=['German Panzer IV Ausf H'] * 2
         squads+=['German Panzer IV Ausf J'] * 2
@@ -2062,6 +2063,42 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='german_rso_pak':
+        # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
+        # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
+        z=WorldObject(world,['rso_pak','rso_destroyed'],AIVehicle)
+        z.name='Raupenschlepper Ost PAK'
+        z.is_vehicle=True
+        z.is_towable=True
+        turret=spawn_object(world,world_coords,'251_pak40_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        turret.ai.position_offset=[11,0]
+        turret.ai.rotation_range=[-360,360]
+        z.ai.vehicle_crew['driver']=[False,None,0,[-39,-13],True,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[29,-3],True,turret]
+        z.ai.max_speed=224.96
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=2500
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"deutz_diesel_65hp_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.ai.ammo_rack_capacity=24
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='german_sd_kfz_251':
