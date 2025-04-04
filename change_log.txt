@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 03 2025
+- gave the rso pak a small amount of vehicle armor 
+- added code to fix the turret jitter 
+
+rso pak gets 5mm of vehicle armor but no passenger compartment armor. 
+this will protect the vehicle from pistol fire to the vehicle body, but close 
+rifle fire will still get through. longer range rifle fire may bounce. 
+the passenger compartment is unprotected. 
+
+looking at my angle measurements idk if they make sense or not. I don't remember how I ended up deciding that 90 was horizontal 
+and 0 was vertical. really i need to also calculate the angle relative to the incoming shell. 
+
+----------------------------------
 April 01 2025
 - added the RSO PAK 
 

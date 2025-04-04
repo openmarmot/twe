@@ -2072,6 +2072,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Raupenschlepper Ost PAK'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.vehicle_armor['top']=[5,0,0]
+        z.ai.vehicle_armor['bottom']=[5,0,0]
+        z.ai.vehicle_armor['left']=[5,0,0]
+        z.ai.vehicle_armor['right']=[5,0,0]
+        z.ai.vehicle_armor['front']=[5.20,20,0]
+        z.ai.vehicle_armor['rear']=[5,0,0]
         turret=spawn_object(world,world_coords,'251_pak40_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z

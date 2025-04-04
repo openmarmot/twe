@@ -228,10 +228,15 @@ class AIHuman(object):
         needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
         
         if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            if needed_rotation>turret.rotation_angle:
-                turret.ai.handle_rotate_left()
+            # if its fairly close, set it equal to avoid constant tiny turret movement
+            if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
+                turret.rotation_angle=needed_rotation
+                turret.ai.rotation_change=0
             else:
-                turret.ai.handle_rotate_right()
+                if needed_rotation>turret.rotation_angle:
+                    turret.ai.handle_rotate_left()
+                else:
+                    turret.ai.handle_rotate_right()
         else:
             if target.is_human:
                 if target.ai.blood_pressure>0:
