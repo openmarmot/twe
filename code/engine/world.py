@@ -163,6 +163,8 @@ class World():
         self.panzerfaust_launches=0
         # incremented when a medic heals someone
         self.medic_heals=0
+        # incremented when a mechanic fixes a vehicle
+        self.mechanic_fixes=0
         # count on how many times a helmet bounces a projectile
         self.helmet_bounces=0
 
@@ -937,6 +939,7 @@ class World():
         self.debug_text_queue.append(f"Panzerfaust launches: {self.panzerfaust_launches}")
         self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
         self.debug_text_queue.append(f'Medic Heals: {self.medic_heals}')
+        self.debug_text_queue.append(f'Mechanic Fixes: {self.mechanic_fixes}')
         self.debug_text_queue.append("----- Player Stats -----")
         self.debug_text_queue.append(f"Player Name: {self.player.name}")
         self.debug_text_queue.append(f"Player memory current task: {self.player.ai.memory['current_task']}")

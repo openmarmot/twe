@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 06 2025
+- started work on adding code for mechanics 
+
+----------------------------------
 April 03 2025
 - gave the rso pak a small amount of vehicle armor 
 - added code to fix the turret jitter 

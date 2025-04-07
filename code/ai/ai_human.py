@@ -38,6 +38,7 @@ class AIHuman(object):
             'task_loot_container':self.update_task_loot_container,
             'task_sit_down':self.update_task_sit_down,
             'task_medic':self.update_task_medic,
+            'task_mechanic':self.update_task_mechanic,
         }
 
         self.memory={}
@@ -1327,6 +1328,26 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
+    def switch_task_mechanic(self,damaged_vehicles):
+        '''switch to task_think'''
+        task_name='task_medic'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'damaged_vehicles': damaged_vehicles,
+                'current_vehicle': None
+            }
+
+            self.memory[task_name]=task_details
+
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
     def switch_task_move_to_location(self,destination,moving_object):
         '''switch task'''
         # moving_object : optional game_object. set when we are moving to something that may move position
@@ -2552,6 +2573,35 @@ class AIHuman(object):
                 self.switch_task_move_to_location(container.world_coords,None)
 
     #---------------------------------------------------------------------------
+    def update_task_mechanic(self):
+        '''update task mechanic'''
+        # simple task. takes care of all the wounded and then pops itself.
+
+        if self.memory['task_mechanic']['current_vehicle'] is None:
+            if len(self.memory['task_mechanic']['damaged_vehicles'])==0:
+                self.memory.pop('task_mechanic',None)
+                self.switch_task_think()
+                return
+            self.memory['task_mechanic']['current_vehicle']=self.memory['task_mechanic']['current_vehicle'].pop()
+        current_vehicle=self.memory['task_mechanic']['current_vehicle']
+        distance=engine.math_2d.get_distance(self.owner.world_coords,current_vehicle.world_coords)
+        if distance>1000:
+             self.memory['task_mechanic']['current_vehicle']=None
+             return
+        if distance>self.max_distance_to_interact_with_object:
+            self.switch_task_move_to_location(current_vehicle.world_coords,current_vehicle)
+            return         
+
+        # if we get this far we are close enough to work on the vehicle
+        patient.ai.bleeding=False
+        patient.ai.blood_pressure+=15
+        self.memory['task_medic']['current_patient']=None
+        self.speak('You will live soldier. All patched up.')
+
+        # update this stat counter so i can track if this ever actually happens.. lol
+        self.owner.world.mechanic_fixes+=1
+
+    #---------------------------------------------------------------------------
     def update_task_medic(self):
         '''update task medic'''
         # simple task. takes care of all the wounded and then pops itself.
@@ -2830,6 +2880,9 @@ class AIHuman(object):
             return
         if 'task_sit_down' in self.memory:
             self.memory['current_task']='task_sit_down'
+            return
+        if 'task_mechanic' in self.memory:
+            self.memory['current_task']='task_mechanic'
             return
         
         # -- unique job role stuff -- 
