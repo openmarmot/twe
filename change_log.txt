@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 07 2025
+- more work on mechanic ai
+- added mechanic class for soviets and germans 
+- minor fixes and updates 
+
+eventually i want repairs to take a decent amount of time, for now 
+they are instant -- just to get mechanics in the game. 
+
+i would also like a unique set of items for mechanics. maybe things that are 
+required in order to perform repairs 
+
+----------------------------------
 April 06 2025
 - started work on adding code for mechanics 
 

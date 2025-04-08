@@ -124,6 +124,10 @@ def add_random_pistol_to_inventory(wo,world):
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
+    elif pistol==5:
+        wo.add_inventory(spawn_object(world,wo.world_coords,'c96',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
 
 #------------------------------------------------------------------------------
 def add_standard_loadout(wo,world,loadout):
@@ -631,6 +635,7 @@ def load_quick_battle(world,battle_option):
         squads+=['German Panzerschreck Team'] * 2
         squads+=['German FeldFunk Team'] * 2
         squads+=['German Medic'] * 2
+        squads+=['German Mechanic'] * 2
 
         squads+=['Soviet 1943 Rifle'] * 2
         squads+=['Soviet 1944 Rifle'] * 6
@@ -643,6 +648,7 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
         squads+=['Soviet Medic'] * 2
+        squads+=['Soviet Mechanic'] * 2
 
     # german and civilian only
     elif battle_option=='2':
@@ -3254,9 +3260,6 @@ def spawn_object(world,world_coords,object_type, spawn):
 
     elif object_type=='german_pistol_panzerschreck':
         z=spawn_object(world,world_coords,'german_soldier',False)
-        z.add_inventory(spawn_object(world,world_coords,'helmet_stahlhelm',False))
-        z.add_inventory(spawn_object(world,world_coords,'model24',False))
-        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'panzerschreck')
         add_random_pistol_to_inventory(z,world)
@@ -3344,6 +3347,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         z.ai.is_medic=True
+
+    elif object_type=='german_mechanic':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_random_pistol_to_inventory(z,world)
+        z.ai.is_mechanic=True
         
 
     # --------- soviet types ----------------------------------------
@@ -3396,6 +3405,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
         z.ai.is_medic=True
+    
+    elif object_type=='soviet_mechanic':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        add_standard_loadout(z,world,'tt33')
+        z.ai.is_mechanic=True
 
     elif object_type=='soviet_ptrs_41':
         z=spawn_object(world,world_coords,'soviet_soldier',False)

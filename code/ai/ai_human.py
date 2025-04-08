@@ -88,6 +88,7 @@ class AIHuman(object):
         self.is_expert_marksman=False
         self.is_afv_trained=False # afv=armored fighting vehicle
         self.is_medic=False
+        self.is_mechanic=False
 
         # -- stats --
         self.confirmed_kills=0
@@ -896,6 +897,18 @@ class AIHuman(object):
         
         return calc_speed
     
+    #---------------------------------------------------------------------------
+    def get_nearby_damaged_vehicles(self,max_range):
+        '''return a list of nearby disabled vehicles'''
+        # this could be modified to return damaged vehicles that are not fully disabled
+
+        damaged_vehicles=[]
+        for vehicle in self.owner.world.wo_objects_vehicle:
+            if vehicle.ai.vehicle_disabled:
+                if engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)<max_range:
+                    damaged_vehicles.append(vehicle)
+        return damaged_vehicles
+
     #---------------------------------------------------------------------------
     def get_nearby_wounded_humans(self,human_list,max_range):
         '''return a list of nearby wounded humans'''
@@ -2593,13 +2606,22 @@ class AIHuman(object):
             return         
 
         # if we get this far we are close enough to work on the vehicle
-        patient.ai.bleeding=False
-        patient.ai.blood_pressure+=15
-        self.memory['task_medic']['current_patient']=None
-        self.speak('You will live soldier. All patched up.')
+        #engine
+        for b in current_vehicle.ai.engines:
+            if b.ai.damaged:
+                b.ai.damaged=False
+        #turret 
+        for b in current_vehicle.ai.turrets:
+            if b.ai.turret_jammed:
+                b.ai.turret_jammed=False
+        current_vehicle.ai.vehicle_disabled=False
+
+        # clear out this vehicle so a new one is picked next cycle
+        self.memory['task_mechanic']['current_vehicle']=None
 
         # update this stat counter so i can track if this ever actually happens.. lol
         self.owner.world.mechanic_fixes+=1
+        
 
     #---------------------------------------------------------------------------
     def update_task_medic(self):
@@ -2890,6 +2912,12 @@ class AIHuman(object):
             wounded_humans=self.get_nearby_wounded_humans(self.squad.faction_tactical.allied_humans,1000)
             if len(wounded_humans)>0:
                 self.switch_task_medic(wounded_humans)
+                return
+        if self.is_mechanic:
+            damaged_vehicles=self.get_nearby_damaged_vehicles(1000)
+            if len(damaged_vehicles)>0:
+                self.switch_task_mechanic(damaged_vehicles)
+                return
 
         # -- squad stuff (lower importance)--
         # could maybe have some logic to this if i ever add ranks 
