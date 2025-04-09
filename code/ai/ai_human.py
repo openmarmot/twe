@@ -1343,7 +1343,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def switch_task_mechanic(self,damaged_vehicles):
         '''switch to task_think'''
-        task_name='task_medic'
+        task_name='task_mechanic'
 
         if task_name in self.memory:
             # eventually will probably having something to update here
@@ -1936,6 +1936,11 @@ class AIHuman(object):
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
                         self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
                         return
+                    else:
+                        self.memory['task_vehicle_crew']['target']=None
+                        self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                        return
+
                 else:
                     # no driver so we can't rotate the vehicle. 
                     # maybe we should bail out?
@@ -1949,6 +1954,7 @@ class AIHuman(object):
             
         # shouldn't get this far
         engine.log.add_data('error','ai_human.think_vehicle_role_gunner_examine_target - unknown state',True)
+        engine.log.add_data('error',f'rotation check: {rotation_check} distance check:{distance_check} penetration check: {penetration_check} target name:{target.name}',True)
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
@@ -2595,7 +2601,7 @@ class AIHuman(object):
                 self.memory.pop('task_mechanic',None)
                 self.switch_task_think()
                 return
-            self.memory['task_mechanic']['current_vehicle']=self.memory['task_mechanic']['current_vehicle'].pop()
+            self.memory['task_mechanic']['current_vehicle']=self.memory['task_mechanic']['damaged_vehicles'].pop()
         current_vehicle=self.memory['task_mechanic']['current_vehicle']
         distance=engine.math_2d.get_distance(self.owner.world_coords,current_vehicle.world_coords)
         if distance>1000:
@@ -2627,7 +2633,6 @@ class AIHuman(object):
     def update_task_medic(self):
         '''update task medic'''
         # simple task. takes care of all the wounded and then pops itself.
-
         if self.memory['task_medic']['current_patient'] is None:
             if len(self.memory['task_medic']['wounded_humans'])==0:
                 self.memory.pop('task_medic',None)

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 08 2025
+- fix bugs with new mechanic ai role 
+- fixed unknown state for think_vehicle_role_gunner_examine_target
+
+----------------------------------
 April 07 2025
 - more work on mechanic ai
 - added mechanic class for soviets and germans 
