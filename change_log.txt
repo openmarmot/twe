@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 12 2025
+- filled in placeholder wheels for the rest of the vehicles 
+
+pretty much all the vehicles need to be gone through and have all the variables tuned and customized 
+
+----------------------------------
 April 11 2025
 - wheel now has tire attributes 
 - added wheels to a couple more vehicles 

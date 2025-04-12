@@ -2032,6 +2032,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"g505_wheel",False))
+
+    elif object_type=='g505_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='g505 Wheel'
+        z.ai.compatible_vehicles=['soviet_dodge_g505_wc']
 
     elif object_type=='german_rso':
         # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
@@ -2070,6 +2080,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"rso_wheel",False))
 
     elif object_type=='german_rso_pak':
         # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
@@ -2112,6 +2127,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"rso_wheel",False))
+
+    elif object_type=='rso_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='RSO Wheel'
+        z.ai.compatible_vehicles=['german_rso_pak','german_rso']
 
     elif object_type=='german_sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2170,6 +2195,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"251_wheel",False))
 
     elif object_type=='sd_kfz_251_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2240,6 +2270,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+
+    elif object_type=='251_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='251 Wheel'
+        z.ai.compatible_vehicles=['german_sd_kfz_251/22','german_sd_kfz_251']
 
     elif object_type=='251_pak40_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2317,6 +2357,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=87
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
         
     elif object_type=='panzer_iv_hull_mg':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2413,6 +2458,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=87
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
 
     elif object_type=='panzer_iv_h_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2493,6 +2543,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=87
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
+
+    elif object_type=='panzeriv_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='Panzer IV Wheel'
+        z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h''german_panzer_iv_ausf_j']
 
     elif object_type=='panzer_iv_j_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2620,6 +2680,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         # turret ammo
         for b in range(4):
             z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"t20_wheel",False))
+
+    elif object_type=='t20_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='T20 Wheel'
+        z.ai.compatible_vehicles=['soviet_t20']
         
     elif object_type=='t20_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2692,6 +2762,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=77
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
         
     elif object_type=='t34_hull_mg_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2787,6 +2862,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=57
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+
+    elif object_type=='t34_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='T34 Wheel'
+        z.ai.compatible_vehicles=['soviet_t34_85','soviet_t34_76']
 
     elif object_type=='t34_85_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2868,7 +2953,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=41
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
-        
+        z.ai.min_wheels=8
+        z.ai.max_wheels=8
+        z.ai.max_spare_wheels=0
+        for b in range(8):
+            z.ai.wheels.append(spawn_object(world,world_coords,"panzer38t_wheel",False))
+
+    elif object_type=='panzer38t_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='Gun Carriage Wheel'
+        z.ai.compatible_vehicles=['german_jagdpanzer_38t_hetzer']
         
     elif object_type=='remote_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
