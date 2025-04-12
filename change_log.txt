@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+April 11 2025
+- wheel now has tire attributes 
+- added wheels to a couple more vehicles 
+
+wheel damage and repairing it is not fully coded yet. 
+also need to add tracks 
 ----------------------------------
 April 08 2025
 - fix bugs with new mechanic ai role 
