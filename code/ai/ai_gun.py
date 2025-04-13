@@ -31,12 +31,6 @@ class AIGun(object):
         # 60/(rate of fire in rounds per minute)
         self.rate_of_fire=0.
 
-        # reload speed in seconds
-        self.reload_speed=10
-
-        # bool
-        self.reloading=False
-
         # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
 

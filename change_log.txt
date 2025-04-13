@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+April 13 2025
+- added some short think pauses after accomplishing some driver actions to make actions seem 
+less eratic 
+
+thinking about finally adding reloading, but it seems like it is going to be a bother. 
+was originally going to add it to the guns, but it should really be part of humans, so it will 
+be an ai action, but that means coding it is multiple places and the player will also need a implementation
+
+----------------------------------
 April 12 2025
 - filled in placeholder wheels for the rest of the vehicles 
 

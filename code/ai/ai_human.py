@@ -1707,6 +1707,8 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['current_action']='waiting'
                 vehicle.ai.brake_power=1
                 vehicle.ai.throttle=0
+                # wait to think for a bit so we don't end up doing something else immediately
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(20,35)
             else:
                 self.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                 self.memory['task_vehicle_crew']['current_action']='rotating'
@@ -1743,6 +1745,9 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
                 self.memory['task_vehicle_crew']['current_action']='waiting'
                 return
+            else:
+                # wait to think for a bit so we don't end up doing something else
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(15,25)
 
 
         else:
