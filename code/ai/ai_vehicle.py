@@ -378,7 +378,7 @@ class AIVehicle():
                 self.handle_component_damage('engine',None)
                 self.vehicle_disabled=True
                 for b in self.turrets:
-                    b.turret_jammed=True
+                    b.ai.turret_jammed=True
                     if b.ai.primary_weapon:
                         b.ai.primary_weapon.ai.damaged=True
                     if b.ai.coaxial_weapon:

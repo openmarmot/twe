@@ -38,6 +38,7 @@ class AIHuman(object):
             'task_loot_container':self.update_task_loot_container,
             'task_sit_down':self.update_task_sit_down,
             'task_medic':self.update_task_medic,
+            'task_mechanic':self.update_task_mechanic,
         }
 
         self.memory={}
@@ -87,6 +88,7 @@ class AIHuman(object):
         self.is_expert_marksman=False
         self.is_afv_trained=False # afv=armored fighting vehicle
         self.is_medic=False
+        self.is_mechanic=False
 
         # -- stats --
         self.confirmed_kills=0
@@ -228,10 +230,15 @@ class AIHuman(object):
         needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
         
         if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            if needed_rotation>turret.rotation_angle:
-                turret.ai.handle_rotate_left()
+            # if its fairly close, set it equal to avoid constant tiny turret movement
+            if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
+                turret.rotation_angle=needed_rotation
+                turret.ai.rotation_change=0
             else:
-                turret.ai.handle_rotate_right()
+                if needed_rotation>turret.rotation_angle:
+                    turret.ai.handle_rotate_left()
+                else:
+                    turret.ai.handle_rotate_right()
         else:
             if target.is_human:
                 if target.ai.blood_pressure>0:
@@ -748,9 +755,10 @@ class AIHuman(object):
 
         # short move to simulate being stunned
         if self.owner.is_player is False:
-            # move slightly
-            coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-            self.switch_task_move_to_location(coords,None)
+            if self.memory['current_task']!='task_vehicle_crew':
+                # move slightly
+                coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
+                self.switch_task_move_to_location(coords,None)
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,event_data):
@@ -890,6 +898,18 @@ class AIHuman(object):
         
         return calc_speed
     
+    #---------------------------------------------------------------------------
+    def get_nearby_damaged_vehicles(self,max_range):
+        '''return a list of nearby disabled vehicles'''
+        # this could be modified to return damaged vehicles that are not fully disabled
+
+        damaged_vehicles=[]
+        for vehicle in self.owner.world.wo_objects_vehicle:
+            if vehicle.ai.vehicle_disabled:
+                if engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)<max_range:
+                    damaged_vehicles.append(vehicle)
+        return damaged_vehicles
+
     #---------------------------------------------------------------------------
     def get_nearby_wounded_humans(self,human_list,max_range):
         '''return a list of nearby wounded humans'''
@@ -1322,6 +1342,26 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
+    def switch_task_mechanic(self,damaged_vehicles):
+        '''switch to task_think'''
+        task_name='task_mechanic'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'damaged_vehicles': damaged_vehicles,
+                'current_vehicle': None
+            }
+
+            self.memory[task_name]=task_details
+
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
     def switch_task_move_to_location(self,destination,moving_object):
         '''switch task'''
         # moving_object : optional game_object. set when we are moving to something that may move position
@@ -1540,7 +1580,8 @@ class AIHuman(object):
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
             'last_think_time': 0,
-            'think_interval': 0.5
+            'think_interval': 0.5,
+            'reload_start_time':0
         }
 
         self.memory[task_name]=task_details
@@ -1668,6 +1709,8 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['current_action']='waiting'
                 vehicle.ai.brake_power=1
                 vehicle.ai.throttle=0
+                # wait to think for a bit so we don't end up doing something else immediately
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(20,35)
             else:
                 self.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                 self.memory['task_vehicle_crew']['current_action']='rotating'
@@ -1704,6 +1747,9 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
                 self.memory['task_vehicle_crew']['current_action']='waiting'
                 return
+            else:
+                # wait to think for a bit so we don't end up doing something else
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(15,25)
 
 
         else:
@@ -1713,6 +1759,23 @@ class AIHuman(object):
     def think_vehicle_role_gunner(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
+
+        # handle the reloading action
+        if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+            if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+            > turret.ai.primary_weapon.ai.reload_speed):
+                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                self.memory['task_vehicle_crew']['current_action']='none'
+            else:
+                return
+        if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+            if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+            > turret.ai.coaxial_weapon.ai.reload_speed):
+                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                self.memory['task_vehicle_crew']['current_action']='none'
+            else:
+                return    
+
 
         # cancel any current requests for the driver
         self.speak_vehicle_internal('driver',None)
@@ -1727,8 +1790,10 @@ class AIHuman(object):
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
         if ammo_gun==0:
             if ammo_inventory>0:
-                # this should be re-done to check for ammo in vehicle, and do something if there is none
-                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                # start the reload process
+                self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                return
             else:
                 out_of_ammo_primary=True
 
@@ -1737,8 +1802,10 @@ class AIHuman(object):
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
             if ammo_gun==0:
                 if ammo_inventory>0:
-                    # this should be re-done to check for ammo in vehicle, and do something if there is none
-                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    # start the reload process
+                    self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                    self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
+                    return
                 else:
                     out_of_ammo_coax=True
         else:
@@ -1897,6 +1964,11 @@ class AIHuman(object):
                         self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
                         self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
                         return
+                    else:
+                        self.memory['task_vehicle_crew']['target']=None
+                        self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                        return
+
                 else:
                     # no driver so we can't rotate the vehicle. 
                     # maybe we should bail out?
@@ -1910,6 +1982,7 @@ class AIHuman(object):
             
         # shouldn't get this far
         engine.log.add_data('error','ai_human.think_vehicle_role_gunner_examine_target - unknown state',True)
+        engine.log.add_data('error',f'rotation check: {rotation_check} distance check:{distance_check} penetration check: {penetration_check} target name:{target.name}',True)
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
@@ -2547,10 +2620,47 @@ class AIHuman(object):
                 self.switch_task_move_to_location(container.world_coords,None)
 
     #---------------------------------------------------------------------------
+    def update_task_mechanic(self):
+        '''update task mechanic'''
+        # simple task. takes care of all the wounded and then pops itself.
+
+        if self.memory['task_mechanic']['current_vehicle'] is None:
+            if len(self.memory['task_mechanic']['damaged_vehicles'])==0:
+                self.memory.pop('task_mechanic',None)
+                self.switch_task_think()
+                return
+            self.memory['task_mechanic']['current_vehicle']=self.memory['task_mechanic']['damaged_vehicles'].pop()
+        current_vehicle=self.memory['task_mechanic']['current_vehicle']
+        distance=engine.math_2d.get_distance(self.owner.world_coords,current_vehicle.world_coords)
+        if distance>1000:
+             self.memory['task_mechanic']['current_vehicle']=None
+             return
+        if distance>self.max_distance_to_interact_with_object:
+            self.switch_task_move_to_location(current_vehicle.world_coords,current_vehicle)
+            return         
+
+        # if we get this far we are close enough to work on the vehicle
+        #engine
+        for b in current_vehicle.ai.engines:
+            if b.ai.damaged:
+                b.ai.damaged=False
+        #turret 
+        for b in current_vehicle.ai.turrets:
+            if b.ai.turret_jammed:
+                b.ai.turret_jammed=False
+        current_vehicle.ai.vehicle_disabled=False
+
+        # clear out this vehicle so a new one is picked next cycle
+        self.memory['task_mechanic']['current_vehicle']=None
+
+        # update this stat counter so i can track if this ever actually happens.. lol
+        self.owner.world.mechanic_fixes+=1
+        
+
+    #---------------------------------------------------------------------------
     def update_task_medic(self):
         '''update task medic'''
         # simple task. takes care of all the wounded and then pops itself.
-
         if self.memory['task_medic']['current_patient'] is None:
             if len(self.memory['task_medic']['wounded_humans'])==0:
                 self.memory.pop('task_medic',None)
@@ -2826,12 +2936,21 @@ class AIHuman(object):
         if 'task_sit_down' in self.memory:
             self.memory['current_task']='task_sit_down'
             return
+        if 'task_mechanic' in self.memory:
+            self.memory['current_task']='task_mechanic'
+            return
         
         # -- unique job role stuff -- 
         if self.is_medic:
             wounded_humans=self.get_nearby_wounded_humans(self.squad.faction_tactical.allied_humans,1000)
             if len(wounded_humans)>0:
                 self.switch_task_medic(wounded_humans)
+                return
+        if self.is_mechanic:
+            damaged_vehicles=self.get_nearby_damaged_vehicles(1000)
+            if len(damaged_vehicles)>0:
+                self.switch_task_mechanic(damaged_vehicles)
+                return
 
         # -- squad stuff (lower importance)--
         # could maybe have some logic to this if i ever add ranks 

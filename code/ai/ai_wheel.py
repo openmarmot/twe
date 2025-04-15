@@ -18,6 +18,11 @@ class AIWheel(object):
         self.damaged=False # can be repaired
         self.destroyed=False # cannot be repaired
 
+        # some wheels like tank wheels don't have a inflated tire
+        self.has_tire=True
+        self.tire_damaged=False
+        self.tire_destroyed=False
+
         #[armor thickness,armor slope,spaced_armor_thickness]
         self.armor=[1,0,0]
     #---------------------------------------------------------------------------

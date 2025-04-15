@@ -1,6 +1,83 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 14 2025
+- vehicle gunners have a reload action now 
+- reload speed for turret guns is now in use 
+- fixed an issue where a explosion in a vehicle left dead people in the vehicle 
+
+part of me thinks that dead people in the vehicle is actually the realistic ideal outcome
+but a lot of stuff interacts with vehicle crews and it all expects them to be alive.. 
+
+todo 
+- player reloading timing 
+- ai reloading for regular guns 
+- ai reloading for panzerschrek 
+
+----------------------------------
+April 13 2025
+- added some short think pauses after accomplishing some driver actions to make actions seem 
+less eratic 
+
+thinking about finally adding reloading, but it seems like it is going to be a bother. 
+was originally going to add it to the guns, but it should really be part of humans, so it will 
+be an ai action, but that means coding it is multiple places and the player will also need a implementation
+
+----------------------------------
+April 12 2025
+- filled in placeholder wheels for the rest of the vehicles 
+
+pretty much all the vehicles need to be gone through and have all the variables tuned and customized 
+
+----------------------------------
+April 11 2025
+- wheel now has tire attributes 
+- added wheels to a couple more vehicles 
+
+wheel damage and repairing it is not fully coded yet. 
+also need to add tracks 
+----------------------------------
+April 08 2025
+- fix bugs with new mechanic ai role 
+- fixed unknown state for think_vehicle_role_gunner_examine_target
+
+----------------------------------
+April 07 2025
+- more work on mechanic ai
+- added mechanic class for soviets and germans 
+- minor fixes and updates 
+
+eventually i want repairs to take a decent amount of time, for now 
+they are instant -- just to get mechanics in the game. 
+
+i would also like a unique set of items for mechanics. maybe things that are 
+required in order to perform repairs 
+
+----------------------------------
+April 06 2025
+- started work on adding code for mechanics 
+
+----------------------------------
+April 03 2025
+- gave the rso pak a small amount of vehicle armor 
+- added code to fix the turret jitter 
+
+rso pak gets 5mm of vehicle armor but no passenger compartment armor. 
+this will protect the vehicle from pistol fire to the vehicle body, but close 
+rifle fire will still get through. longer range rifle fire may bounce. 
+the passenger compartment is unprotected. 
+
+looking at my angle measurements idk if they make sense or not. I don't remember how I ended up deciding that 90 was horizontal 
+and 0 was vertical. really i need to also calculate the angle relative to the incoming shell. 
+
+----------------------------------
+April 01 2025
+- added the RSO PAK 
+
+The RSO PAK is very unsurvivable. I think I will give it some low hull armor, but it will likely 
+still be vulnerable to MG fire. 
+
+----------------------------------
 March 31 2025
 - fixed player large human pickups 
 - player now creates noise when moving 
