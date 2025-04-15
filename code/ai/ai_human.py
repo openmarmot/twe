@@ -39,6 +39,7 @@ class AIHuman(object):
             'task_sit_down':self.update_task_sit_down,
             'task_medic':self.update_task_medic,
             'task_mechanic':self.update_task_mechanic,
+            'task_reload':self.update_task_reload
         }
 
         self.memory={}
@@ -1052,14 +1053,12 @@ class AIHuman(object):
             self.owner.world.panzerfaust_launches+=1
 
             # attempt reload. drop if fail
-            if self.reload_weapon(self.antitank,self.owner) is False:
-                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
-                if ammo_gun==0 and ammo_inventory==0:
-                    # drop the tube now that it is empty
-                    self.drop_object(self.antitank)
-            else:
-                print(self.check_ammo(self.antitank,self.owner))
-
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
+            if ammo_gun==0 and ammo_inventory==0:
+                # drop the tube now that it is empty
+                self.drop_object(self.antitank)
+            elif ammo_gun==0 and ammo_inventory>0:
+                self.switch_task_reload(self.antitank)
 
     #---------------------------------------------------------------------------
     def pickup_object(self,world_object):
@@ -1409,6 +1408,26 @@ class AIHuman(object):
         }
 
         self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_reload(self,weapon):
+        '''switch to task_reload'''
+        task_name='task_reload'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'reload_start_time':self.owner.world.world_seconds,
+                'weapon':weapon
+            }
+
+            self.memory[task_name]=task_details
+
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
@@ -2319,13 +2338,14 @@ class AIHuman(object):
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
             if ammo_gun==0:
                 if ammo_inventory>0:
-                    self.reload_weapon(self.primary_weapon,self.owner)
+                    self.switch_task_reload(self.primary_weapon)
+                    return
                 else:
                     # need ammo or new gun. hand it over to think to deal with this
                     self.memory.pop('task_engage_enemy',None)
                     self.switch_task_think()
+                    return
                     
-
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
                 if distance<self.throwable.ai.range and distance>150:
@@ -2794,6 +2814,16 @@ class AIHuman(object):
         # controls got moved to world. nothing left over here for now
         pass
 
+    #---------------------------------------------------------------------------
+    def update_task_reload(self):
+        ''' update task reload'''
+        # this is used to reload a hand held gun or at weapon 
+        if (self.owner.world.world_seconds-self.memory['task_reload']['reload_start_time'] > 
+            self.memory['task_reload']['weapon'].ai.reload_speed):
+            self.reload_weapon(self.memory['task_reload']['weapon'],self.owner)
+            self.memory.pop('task_reload',None)
+            self.switch_task_think()
+            
     #---------------------------------------------------------------------------
     def update_task_squad_leader(self):
 

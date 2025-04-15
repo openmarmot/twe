@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 15 2025
+- added a reload task for the ai (covers guns and at weapons)
+
+reloading should be fully implemented for the AI now. 
+I will have to do something similar for the player.
+
+I might have to setup some infantry only battles to make sure it is actually working 
+
+----------------------------------
 April 14 2025
 - vehicle gunners have a reload action now 
 - reload speed for turret guns is now in use 
