@@ -1246,8 +1246,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=0
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=30
         z.ai.range=2000
         z.ai.type='antitank launcher'
         z.ai.use_antitank=True
@@ -1500,7 +1500,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'c96_magazine',False)
         z.ai.rate_of_fire=0.7
-        z.ai.reload_speed=5
+        z.ai.reload_speed=8
         z.ai.range=604
         z.ai.type='pistol'
         z.ai.use_antipersonnel=True
@@ -1525,7 +1525,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'c96_red_9_magazine',False)
         z.ai.rate_of_fire=0.7
-        z.ai.reload_speed=5
+        z.ai.reload_speed=8
         z.ai.range=604
         z.ai.type='pistol'
         z.ai.use_antipersonnel=True
@@ -1601,7 +1601,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'mg34_drum_magazine',False)
         z.ai.rate_of_fire=0.05
-        z.ai.reload_speed=13
+        z.ai.reload_speed=15
         z.ai.range=2418
         z.ai.type='machine gun'
         z.ai.use_antipersonnel=True
@@ -1615,7 +1615,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'mg34_drum_magazine',False)
         z.ai.rate_of_fire=0.04
-        z.ai.reload_speed=13
+        z.ai.reload_speed=15
         z.ai.range=2418
         z.ai.type='machine gun'
         z.ai.use_antipersonnel=True
@@ -1651,7 +1651,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'37mm_m1939_k61_magazine',False)
         z.ai.rate_of_fire=0.9
-        z.ai.reload_speed=13
+        z.ai.reload_speed=20
         z.ai.range=2418
         z.ai.type='automatic cannon'
         z.ai.use_antipersonnel=True
@@ -1676,8 +1676,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'7.5cm_pak39_L48_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=20
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
@@ -1702,8 +1702,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'76mm_m1940_f34_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=30
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
@@ -1727,8 +1727,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'85mm_zis_s_53_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=28
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
@@ -1754,7 +1754,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'mg15_drum_magazine',False)
         z.ai.rate_of_fire=0.06
-        z.ai.reload_speed=13
+        z.ai.reload_speed=16
         z.ai.range=2418
         z.ai.type='machine gun'
         z.ai.use_antipersonnel=True
@@ -1935,7 +1935,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'ptrs_41_magazine',False)
         z.ai.rate_of_fire=1.9
-        z.ai.reload_speed=11
+        z.ai.reload_speed=14
         z.ai.range=2418
         z.ai.type='rifle'
         #z.ai.use_antipersonnel=True
@@ -1989,7 +1989,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'svt40_magazine',False)
         z.ai.mag_capacity=10
         z.ai.rate_of_fire=0.8
-        z.ai.reload_speed=8
+        z.ai.reload_speed=10
         z.ai.range=2418
         z.ai.type='semi auto rifle'
         z.ai.use_antipersonnel=True
@@ -2584,8 +2584,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l43_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=20
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
@@ -2609,8 +2609,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l48_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=20
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True
@@ -3131,8 +3131,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_gun=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
-        z.ai.rate_of_fire=30
-        z.ai.reload_speed=13
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=20
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True

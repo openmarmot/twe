@@ -755,9 +755,10 @@ class AIHuman(object):
 
         # short move to simulate being stunned
         if self.owner.is_player is False:
-            # move slightly
-            coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
-            self.switch_task_move_to_location(coords,None)
+            if self.memory['current_task']!='task_vehicle_crew':
+                # move slightly
+                coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
+                self.switch_task_move_to_location(coords,None)
 
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,event_data):
@@ -1579,7 +1580,8 @@ class AIHuman(object):
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
             'last_think_time': 0,
-            'think_interval': 0.5
+            'think_interval': 0.5,
+            'reload_start_time':0
         }
 
         self.memory[task_name]=task_details
@@ -1758,6 +1760,23 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle']
         turret=self.memory['task_vehicle_crew']['turret']
 
+        # handle the reloading action
+        if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+            if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+            > turret.ai.primary_weapon.ai.reload_speed):
+                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                self.memory['task_vehicle_crew']['current_action']='none'
+            else:
+                return
+        if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+            if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+            > turret.ai.coaxial_weapon.ai.reload_speed):
+                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                self.memory['task_vehicle_crew']['current_action']='none'
+            else:
+                return    
+
+
         # cancel any current requests for the driver
         self.speak_vehicle_internal('driver',None)
 
@@ -1771,8 +1790,10 @@ class AIHuman(object):
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
         if ammo_gun==0:
             if ammo_inventory>0:
-                # this should be re-done to check for ammo in vehicle, and do something if there is none
-                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                # start the reload process
+                self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                return
             else:
                 out_of_ammo_primary=True
 
@@ -1781,8 +1802,10 @@ class AIHuman(object):
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
             if ammo_gun==0:
                 if ammo_inventory>0:
-                    # this should be re-done to check for ammo in vehicle, and do something if there is none
-                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    # start the reload process
+                    self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                    self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
+                    return
                 else:
                     out_of_ammo_coax=True
         else:

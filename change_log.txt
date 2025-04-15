@@ -1,5 +1,18 @@
 TWE Project : Change Log
 
+----------------------------------
+April 14 2025
+- vehicle gunners have a reload action now 
+- reload speed for turret guns is now in use 
+- fixed an issue where a explosion in a vehicle left dead people in the vehicle 
+
+part of me thinks that dead people in the vehicle is actually the realistic ideal outcome
+but a lot of stuff interacts with vehicle crews and it all expects them to be alive.. 
+
+todo 
+- player reloading timing 
+- ai reloading for regular guns 
+- ai reloading for panzerschrek 
 
 ----------------------------------
 April 13 2025

@@ -31,6 +31,10 @@ class AIGun(object):
         # 60/(rate of fire in rounds per minute)
         self.rate_of_fire=0.
 
+        # time in seconds it takes to reload
+        # this is referenced by ai_human
+        self.reload_speed=15
+
         # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
 
