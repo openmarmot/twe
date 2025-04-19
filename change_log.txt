@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 18 2025
+- minor updates 
+- large human pickup position offsets are now per object 
+- added the burst mechanism used for hand weapons to vehicle weapons 
+
+i updated the offset for dani. the gas can needs to be updated as well - but I think 
+i should create some new art for it as well. 
+
+the burst system could be better. for MGs it means pretty much always a 10 
+round burst. could probably randomize a bit. working well enough for now though 
+
+----------------------------------
 April 16 2025
 - player reloads now use the new timing system 
 

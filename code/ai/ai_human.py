@@ -218,7 +218,6 @@ class AIHuman(object):
                 if calculated_vehicle_angle<v:
                     vehicle.ai.handle_steer_right()
 
-
     #---------------------------------------------------------------------------
     def action_vehicle_gunner_engage_target(self):
         # this is the action the vehicle gunner takes when it is NOT thinking
@@ -241,22 +240,36 @@ class AIHuman(object):
                 else:
                     turret.ai.handle_rotate_right()
         else:
+            fire_primary=False
+            fire_coax=False
             if target.is_human:
                 if target.ai.blood_pressure>0:
                     if turret.ai.coaxial_weapon is not None:
-                        turret.ai.handle_fire_coax()
+                        fire_coax=True
                     else:
                         if turret.ai.primary_weapon.ai.use_antipersonnel:
-                            turret.ai.handle_fire()
+                            fire_primary=True
                         else:
                             self.memory['task_vehicle_crew']['target']=None
                 else:
                     self.memory['task_vehicle_crew']['target']=None
             else:
                 if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
-                    turret.ai.handle_fire_coax()
+                    fire_coax=True
                 else:
+                    fire_primary=True
+
+            # handle bursts and fire weapon
+            if fire_primary or fire_coax:
+                self.current_burst+=1
+                if self.current_burst>self.max_burst:
+                    self.current_burst=0
+                    self.memory['task_vehicle_crew']['target']=None
+
+                if fire_primary:
                     turret.ai.handle_fire()
+                if fire_coax:
+                    turret.ai.handle_fire_coax()
 
 
     #---------------------------------------------------------------------------
@@ -2347,7 +2360,7 @@ class AIHuman(object):
         # eventually will support custom angles and offsets
         self.large_pickup.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle+0)
         self.large_pickup.world_coords=engine.math_2d.calculate_relative_position(
-            self.owner.world_coords,self.owner.rotation_angle,[10,0])
+            self.owner.world_coords,self.owner.rotation_angle,self.large_pickup.large_pickup_offset)
         self.large_pickup.reset_image=True
 
     #---------------------------------------------------------------------------
@@ -2967,6 +2980,7 @@ class AIHuman(object):
         
         # -- priorities --
 
+        # player will switch_task for a couple things like reloading 
         if self.owner.is_player:
             self.switch_task_player_control()
             return

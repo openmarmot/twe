@@ -3325,8 +3325,11 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='dani':
         z=WorldObject(world,['dani'],AIDani)
         z.name='Dani'
-        z.ai.speed=30
+        z.ai.speed=40
         z.collision_radius=15
+        z.is_large_human_pickup=True
+        z.large_pickup_offset=[-3,12]
+
 
     elif object_type=='civilian_man':
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
