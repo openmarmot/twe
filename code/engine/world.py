@@ -492,17 +492,7 @@ class World():
 
         # controls for vehicles and walking 
         if key=='r':
-            if self.player.ai.memory['current_task']=='task_player_control':
-                if self.player.ai.primary_weapon!=None:
-                    self.player.ai.reload_weapon(self.player.ai.primary_weapon,self.player)
-            elif self.player.ai.memory['current_task']=='task_vehicle_crew':
-                if 'gunner' in self.player.ai.memory['task_vehicle_crew']['role']:
-                    vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
-                    turret=self.player.ai.memory['task_vehicle_crew']['turret']
-
-                    self.player.ai.reload_weapon(turret.ai.primary_weapon,vehicle)
-                    if turret.ai.coaxial_weapon!=None:
-                        self.player.ai.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+            self.player.ai.handle_player_reload()
 
         if key=='tab':
             self.activate_context_menu()
@@ -510,6 +500,8 @@ class World():
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None):
         '''handle key press'''
+        # these are for key presses that can be continuous
+
         # stop player from moving when dead
         if self.player.ai.blood_pressure>0:
             # key press is when a key is held down

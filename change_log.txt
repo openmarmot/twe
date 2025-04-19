@@ -1,6 +1,42 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 18 2025
+- minor updates 
+- large human pickup position offsets are now per object 
+- added the burst mechanism used for hand weapons to vehicle weapons 
+
+i updated the offset for dani. the gas can needs to be updated as well - but I think 
+i should create some new art for it as well. 
+
+the burst system could be better. for MGs it means pretty much always a 10 
+round burst. could probably randomize a bit. working well enough for now though 
+
+----------------------------------
+April 16 2025
+- player reloads now use the new timing system 
+
+player reloads are grouped now. 
+if the player is in a vehicle hitting 'r' either reloads the coax or primary weapon if they 
+are in a turret depending on which gun is empty (if any)
+if the player is not in a vehicle the primary weapon and at weapon will be checked 
+
+I was able to re-use the ai 'task_reload' code for the player so this conveniently 
+also proves that code works correctly. 
+
+when working on this i realized there is still no way for the player to fire the 
+coax mg. player turret control is still terrible so it doesn't really matter ... :D 
+
+----------------------------------
+April 15 2025
+- added a reload task for the ai (covers guns and at weapons)
+
+reloading should be fully implemented for the AI now. 
+I will have to do something similar for the player.
+
+I might have to setup some infantry only battles to make sure it is actually working 
+
+----------------------------------
 April 14 2025
 - vehicle gunners have a reload action now 
 - reload speed for turret guns is now in use 

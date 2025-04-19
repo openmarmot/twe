@@ -140,6 +140,9 @@ class WorldObject(object):
         
         # ---- \ descriptor bools ----------------------------
 
+        # how this object should be offset if it is carried by a human
+        self.large_pickup_offset=[10,0]
+
         # AI where any unique code for the object is held
         # note that 'AI' is a class that is passed in
         self.ai=AI(self)

@@ -244,6 +244,7 @@ class ImageTool(object):
             self.text_queue.append('Object: '+self.selected_object.image_list[self.selected_object.image_index])
             self.text_queue.append('Rotation angle: '+str(round(self.selected_object.rotation_angle,2)))
             self.text_queue.append('W/S/A/D to move')
+            self.text_queue.append('R to rotate')
             self.text_queue.append('1: print offsets relative to this object (rotation should be 0)')
 
         # update time
@@ -405,11 +406,9 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
-image_tool.image_objects.append(ImageObject(['rso_pak'],0))
-image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
+image_tool.image_objects.append(ImageObject(['dani'],0))
+image_tool.image_objects.append(ImageObject(['civilian_man'],0))
 while image_tool.quit==False:
 
     image_tool.update()

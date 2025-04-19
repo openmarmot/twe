@@ -39,6 +39,7 @@ class AIHuman(object):
             'task_sit_down':self.update_task_sit_down,
             'task_medic':self.update_task_medic,
             'task_mechanic':self.update_task_mechanic,
+            'task_reload':self.update_task_reload
         }
 
         self.memory={}
@@ -217,7 +218,6 @@ class AIHuman(object):
                 if calculated_vehicle_angle<v:
                     vehicle.ai.handle_steer_right()
 
-
     #---------------------------------------------------------------------------
     def action_vehicle_gunner_engage_target(self):
         # this is the action the vehicle gunner takes when it is NOT thinking
@@ -240,22 +240,36 @@ class AIHuman(object):
                 else:
                     turret.ai.handle_rotate_right()
         else:
+            fire_primary=False
+            fire_coax=False
             if target.is_human:
                 if target.ai.blood_pressure>0:
                     if turret.ai.coaxial_weapon is not None:
-                        turret.ai.handle_fire_coax()
+                        fire_coax=True
                     else:
                         if turret.ai.primary_weapon.ai.use_antipersonnel:
-                            turret.ai.handle_fire()
+                            fire_primary=True
                         else:
                             self.memory['task_vehicle_crew']['target']=None
                 else:
                     self.memory['task_vehicle_crew']['target']=None
             else:
                 if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
-                    turret.ai.handle_fire_coax()
+                    fire_coax=True
                 else:
+                    fire_primary=True
+
+            # handle bursts and fire weapon
+            if fire_primary or fire_coax:
+                self.current_burst+=1
+                if self.current_burst>self.max_burst:
+                    self.current_burst=0
+                    self.memory['task_vehicle_crew']['target']=None
+
+                if fire_primary:
                     turret.ai.handle_fire()
+                if fire_coax:
+                    turret.ai.handle_fire_coax()
 
 
     #---------------------------------------------------------------------------
@@ -1031,6 +1045,64 @@ class AIHuman(object):
         self.collision_log.append('burned by fire')
 
     #---------------------------------------------------------------------------
+    def handle_player_reload(self):
+        '''handle player hitting r to reload'''
+        # called by world.handle_key_press
+
+        # check if we are in a vehicle
+        if self.memory['current_task']=='task_vehicle_crew':
+            turret=self.memory['task_vehicle_crew']['turret']
+            vehicle=self.memory['task_vehicle_crew']['vehicle']
+            # make sure the player is actually in a turret
+            if turret!=None:
+                # basically if both are out of ammo the player will have to reload twice to get both done
+
+                # check main gun ammo
+                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.primary_weapon,vehicle)
+                if ammo_gun==0:
+                    if ammo_inventory>0:
+                        # start the reload process
+                        self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                        self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                        self.speak('reloading main gun')
+                        return
+
+                # check coax ammo
+                if turret.ai.coaxial_weapon is not None:
+                    ammo_gun,ammo_inventory,magazine_count=self.check_ammo(turret.ai.coaxial_weapon,vehicle)
+                    if ammo_gun==0:
+                        if ammo_inventory>0:
+                            # start the reload process
+                            self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                            self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
+                            self.speak('reloading coax')
+                            return
+            else:
+                # in the future it will probably be possible to shoot a regular gun from a vehicle
+                # and then this can be reloaded here 
+                pass
+        else:
+            # player is not in a vehicle so lets reload their regular weapons 
+
+            # check AT weapon first
+            if self.antitank is not None:
+                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
+                if ammo_gun==0 and ammo_inventory>0:
+                    self.switch_task_reload(self.antitank)
+                    self.speak(f'reloading {self.antitank.name}')
+                    return
+
+            # check primary weapon if we didn't reload the AT weapon
+            # player gun reload is special - the player doesn't check ammo in gun so they can reload 
+            # partially full magazines
+            if self.primary_weapon is not None:
+                ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
+                if ammo_inventory>0:
+                    self.switch_task_reload(self.primary_weapon)
+                    self.speak(f'reloading {self.primary_weapon.name}')
+
+
+    #---------------------------------------------------------------------------
     def launch_antitank(self,target_coords,mouse_screen_coords=None):
         ''' launch antitank ''' 
 
@@ -1052,14 +1124,13 @@ class AIHuman(object):
             self.owner.world.panzerfaust_launches+=1
 
             # attempt reload. drop if fail
-            if self.reload_weapon(self.antitank,self.owner) is False:
+            if self.owner.is_player is False:
                 ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
                 if ammo_gun==0 and ammo_inventory==0:
                     # drop the tube now that it is empty
                     self.drop_object(self.antitank)
-            else:
-                print(self.check_ammo(self.antitank,self.owner))
-
+                elif ammo_gun==0 and ammo_inventory>0:
+                    self.switch_task_reload(self.antitank)
 
     #---------------------------------------------------------------------------
     def pickup_object(self,world_object):
@@ -1409,6 +1480,26 @@ class AIHuman(object):
         }
 
         self.memory[task_name]=task_details
+        self.memory['current_task']=task_name
+
+    #---------------------------------------------------------------------------
+    def switch_task_reload(self,weapon):
+        '''switch to task_reload'''
+        task_name='task_reload'
+
+        if task_name in self.memory:
+            # eventually will probably having something to update here
+            pass
+        else:
+            # otherwise create a new one
+            
+            task_details = {
+                'reload_start_time':self.owner.world.world_seconds,
+                'weapon':weapon
+            }
+
+            self.memory[task_name]=task_details
+
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
@@ -2269,7 +2360,7 @@ class AIHuman(object):
         # eventually will support custom angles and offsets
         self.large_pickup.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle+0)
         self.large_pickup.world_coords=engine.math_2d.calculate_relative_position(
-            self.owner.world_coords,self.owner.rotation_angle,[10,0])
+            self.owner.world_coords,self.owner.rotation_angle,self.large_pickup.large_pickup_offset)
         self.large_pickup.reset_image=True
 
     #---------------------------------------------------------------------------
@@ -2319,13 +2410,14 @@ class AIHuman(object):
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
             if ammo_gun==0:
                 if ammo_inventory>0:
-                    self.reload_weapon(self.primary_weapon,self.owner)
+                    self.switch_task_reload(self.primary_weapon)
+                    return
                 else:
                     # need ammo or new gun. hand it over to think to deal with this
                     self.memory.pop('task_engage_enemy',None)
                     self.switch_task_think()
+                    return
                     
-
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
                 if distance<self.throwable.ai.range and distance>150:
@@ -2795,6 +2887,16 @@ class AIHuman(object):
         pass
 
     #---------------------------------------------------------------------------
+    def update_task_reload(self):
+        ''' update task reload'''
+        # this is used to reload a hand held gun or at weapon 
+        if (self.owner.world.world_seconds-self.memory['task_reload']['reload_start_time'] > 
+            self.memory['task_reload']['weapon'].ai.reload_speed):
+            self.reload_weapon(self.memory['task_reload']['weapon'],self.owner)
+            self.memory.pop('task_reload',None)
+            self.switch_task_think()
+            
+    #---------------------------------------------------------------------------
     def update_task_squad_leader(self):
 
         last_think_time=self.memory['task_squad_leader']['last_think_time']
@@ -2878,6 +2980,7 @@ class AIHuman(object):
         
         # -- priorities --
 
+        # player will switch_task for a couple things like reloading 
         if self.owner.is_player:
             self.switch_task_player_control()
             return
@@ -3015,7 +3118,23 @@ class AIHuman(object):
 
         if self.owner.is_player:
             # not sure what we need to to do here. controls are now handled by world
-            pass
+            
+            # handle vehicle turret gun reloads for the player
+            turret=self.memory['task_vehicle_crew']['turret']
+            if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.primary_weapon.ai.reload_speed):
+                    self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
+            if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.coaxial_weapon.ai.reload_speed):
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
         else:
             last_think_time=self.memory['task_vehicle_crew']['last_think_time']
             think_interval=self.memory['task_vehicle_crew']['think_interval']
