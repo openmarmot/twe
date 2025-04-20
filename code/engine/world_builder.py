@@ -2137,6 +2137,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='RSO Wheel'
         z.ai.compatible_vehicles=['german_rso_pak','german_rso']
+        z.ai.armor=[5,0,0]
 
     elif object_type=='german_sd_kfz_251':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2280,6 +2281,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='251 Wheel'
         z.ai.compatible_vehicles=['german_sd_kfz_251/22','german_sd_kfz_251']
+        z.ai.armor=[5,0,0]
+        
 
     elif object_type=='251_pak40_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2553,6 +2556,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='Panzer IV Wheel'
         z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h''german_panzer_iv_ausf_j']
+        z.ai.armor=[10,0,0]
 
     elif object_type=='panzer_iv_j_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2690,6 +2694,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='T20 Wheel'
         z.ai.compatible_vehicles=['soviet_t20']
+        z.ai.armor=[5,0,0]
         
     elif object_type=='t20_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2872,6 +2877,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='T34 Wheel'
         z.ai.compatible_vehicles=['soviet_t34_85','soviet_t34_76']
+        z.ai.armor=[10,0,0]
 
     elif object_type=='t34_85_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2963,6 +2969,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='Gun Carriage Wheel'
         z.ai.compatible_vehicles=['german_jagdpanzer_38t_hetzer']
+        z.ai.armor=[10,0,0]
         
     elif object_type=='remote_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
