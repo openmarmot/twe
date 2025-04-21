@@ -95,10 +95,23 @@ class AIVehicle():
 
         # wheels 
         self.max_wheels=0 # maximum wheels that can be fitted to the vehicle
-        self.min_weels=0 # minimum number of healthy wheels to move
-        self.wheels=[]
+        self.min_weels_per_side_front=0 # minimum number of healthy wheels to move
+        self.min_weels_per_side_rear=0 # minimum number of healthy wheels to move
+
+        self.front_left_wheels=[]
+        self.front_right_wheels=[]
+        
+        self.rear_left_wheels=[]
+        self.rear_right_wheels=[]
+
         self.spare_wheels=[]
         self.max_spare_wheels=0
+
+        # tracks
+        self.left_tracks=[]
+        self.right_tracks=[]
+        self.spare_track_segments=[]
+
 
         # ----- controls ------
 
@@ -249,7 +262,46 @@ class AIVehicle():
                 if value[1].ai.blood_pressure>0:
                     return True
         return False
+    
+    #---------------------------------------------------------------------------
+    def check_wheel_health(self):
+        '''check the health of all the wheels against minimums'''
 
+        # front left
+        wheel_count=len(self.front_left_wheels)
+        for b in self.front_left_wheels:
+            if b.ai.destroyed:
+                wheel_count-=1
+        if wheel_count<self.min_weels_per_side_front:
+            self.vehicle_disabled=True
+            return
+        
+        # front right
+        wheel_count=len(self.front_right_wheels)
+        for b in self.front_right_wheels:
+            if b.ai.destroyed:
+                wheel_count-=1
+        if wheel_count<self.min_weels_per_side_front:
+            self.vehicle_disabled=True
+            return
+        
+        # rear left
+        wheel_count=len(self.rear_left_wheels)
+        for b in self.rear_left_wheels:
+            if b.ai.destroyed:
+                wheel_count-=1
+        if wheel_count<self.min_weels_per_side_rear:
+            self.vehicle_disabled=True
+            return
+        
+        # rear right
+        wheel_count=len(self.rear_right_wheels)
+        for b in self.rear_right_wheels:
+            if b.ai.destroyed:
+                wheel_count-=1
+        if wheel_count<self.min_weels_per_side_rear:
+            self.vehicle_disabled=True
+            return
     #---------------------------------------------------------------------------
     def detach_tow_object(self):
         '''detach an object that we are towing'''
@@ -542,8 +594,18 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_wheel_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
-        if len(self.wheels)>0:
-            wheel=random.choice(self.wheels)
+        wheel=None
+        if side=='left':
+            if random.randint(0,1)==0:
+                wheel=random.choice(self.front_left_wheels)
+            else:
+                wheel=random.choice(self.rear_left_wheels)
+        elif side=='right':
+            if random.randint(0,1)==0:
+                wheel=random.choice(self.front_right_wheels)
+            else:
+                wheel=random.choice(self.rear_right_wheels)
+        if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
             self.add_hit_data(projectile,penetration,side,distance,'Wheel')
@@ -552,6 +614,9 @@ class AIVehicle():
                     wheel.ai.damaged=True
                 else:
                     wheel.ai.destroyed=True
+
+                    # check if that was enough to disable the vehicle
+                    self.check_wheel_health()
 
             else:
                 # no penetration, but maybe we can have some other effect?

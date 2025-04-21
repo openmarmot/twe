@@ -1,6 +1,28 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 21 2025
+- introduced a more complicated wheel setup 
+
+there are now 4 sets of wheels 
+- front left 
+- front right
+- rear right
+- rear left
+
+each section has a minimum number of wheels. A destroyed wheel 
+does not count toward the total. falling below the minimum disables 
+the vehicle.
+
+when a wheel is hit only the front/rear set on the side of the hit can be 
+damaged. this matter somewhat as each set on some vehicles can handle some damage 
+
+# todo 
+- airplane wheels 
+- tank tracks 
+- tires
+
+----------------------------------
 April 19 2025
 - updated armor value for some wheels 
 
