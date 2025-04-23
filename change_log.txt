@@ -3,6 +3,7 @@ TWE Project : Change Log
 ----------------------------------
 April 22 2025
 - bug fix 
+- started work on a new vehicle diagnostics ui
 
 the wheel print out in the vehicle menu can overflow the screen now. 
 i need a dedicated vehicle system diagnostics page.
