@@ -704,9 +704,24 @@ class AIVehicle():
 
         # no idea what are good values for this at the moment
         rolling_resistance=0.03
-        for b in self.wheels:
-            if b.ai.damaged or b.ai.destroyed:
-                rolling_resistance+=1
+
+        # this is costly to do every update. 
+        # also unsure what the full effect will be 
+        # turning this off for now..
+        wheel_damage=False
+        if wheel_damage:
+            for b in self.front_left_wheels:
+                if b.ai.damaged or b.ai.destroyed:
+                    rolling_resistance+=1
+            for b in self.front_right_wheels:
+                if b.ai.damaged or b.ai.destroyed:
+                    rolling_resistance+=1
+            for b in self.rear_left_wheels:
+                if b.ai.damaged or b.ai.destroyed:
+                    rolling_resistance+=1
+            for b in self.rear_right_wheels:
+                if b.ai.damaged or b.ai.destroyed:
+                    rolling_resistance+=1
 
         # prevents this from going negative. but maybe we want that?
         # 0 engine force could result in negative accelleration 

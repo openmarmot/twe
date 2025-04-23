@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 22 2025
+- bug fix 
+
+the wheel print out in the vehicle menu can overflow the screen now. 
+i need a dedicated vehicle system diagnostics page 
+
+----------------------------------
 April 21 2025
 - introduced a more complicated wheel setup 
 
@@ -21,6 +28,10 @@ damaged. this matter somewhat as each set on some vehicles can handle some damag
 - airplane wheels 
 - tank tracks 
 - tires
+
+# other thoughts 
+maybe wheels need to be connected to axles so we can simulate open or locked differentials 
+- this would also make it easier to simulate/understand traction 
 
 ----------------------------------
 April 19 2025

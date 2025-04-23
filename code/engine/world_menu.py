@@ -1259,8 +1259,41 @@ class World_Menu(object):
                         self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
 
                 # - wheel data -
-                self.text_queue.append('-')
-                for b in self.selected_object.ai.wheels:
+                self.text_queue.append('- front left wheels -')
+                for b in self.selected_object.ai.front_left_wheels:
+                    wheel_text=b.name
+                    if b.ai.damaged:
+                        wheel_text+=' damaged'
+                    if b.ai.destroyed:
+                        wheel_text+=' destroyed'
+                    self.text_queue.append(wheel_text)
+
+                self.text_queue.append(' ----')
+
+                self.text_queue.append('- front right wheels -')
+                for b in self.selected_object.ai.front_right_wheels:
+                    wheel_text=b.name
+                    if b.ai.damaged:
+                        wheel_text+=' damaged'
+                    if b.ai.destroyed:
+                        wheel_text+=' destroyed'
+                    self.text_queue.append(wheel_text)
+
+                self.text_queue.append(' ----')
+
+                self.text_queue.append('- rear left wheels -')
+                for b in self.selected_object.ai.rear_left_wheels:
+                    wheel_text=b.name
+                    if b.ai.damaged:
+                        wheel_text+=' damaged'
+                    if b.ai.destroyed:
+                        wheel_text+=' destroyed'
+                    self.text_queue.append(wheel_text)
+
+                self.text_queue.append(' ----')
+
+                self.text_queue.append('- rear right wheels -')
+                for b in self.selected_object.ai.rear_right_wheels:
                     wheel_text=b.name
                     if b.ai.damaged:
                         wheel_text+=' damaged'
