@@ -5,7 +5,9 @@ April 22 2025
 - bug fix 
 
 the wheel print out in the vehicle menu can overflow the screen now. 
-i need a dedicated vehicle system diagnostics page 
+i need a dedicated vehicle system diagnostics page.
+i'm thinking it would be a overlay - game would probably continue running in 
+the background. 
 
 ----------------------------------
 April 21 2025

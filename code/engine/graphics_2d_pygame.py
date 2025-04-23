@@ -348,17 +348,23 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def switch_mode(self,desired_mode):
         '''switch the graphic engine mode '''
-
+        # main menu
         if desired_mode==0:
             self.mode=0
             self.background.fill((255, 255, 255))
+        # tactical battle
         elif desired_mode==1:
             self.mode=1
             #self.background.fill((128, 102, 77))
             #self.background.fill((201,184,171))
             self.background.fill((171,149,131))
+        # strategic screen
         elif desired_mode==2:
             self.mode=2
+            self.background.fill((255, 255, 255))
+        # vehicle info
+        elif desired_mode==3:
+            self.mode=3
             self.background.fill((255, 255, 255))
         else:
             engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
