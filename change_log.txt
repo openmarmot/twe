@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 23 2025
+- rewrite of some stuff in graphics_2d_pygame to accomodate more graphic modes 
+- work on the new vehicle diagnostics screen 
+- screen center is now computed on load 
+- misc minor changes
+
+I think the vehicle diagnostic screen will replace a lot of the vehicle menu data print outs. 
+There is a lot more room for text when I am using the full screen, and the white background 
+makes it a lot easier to read 
+
+todo 
+- noticed a strategic mode error. put it in the issues backlog 
+
+----------------------------------
 April 22 2025
 - bug fix 
 - started work on a new vehicle diagnostics ui

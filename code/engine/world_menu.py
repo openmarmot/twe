@@ -1169,7 +1169,7 @@ class World_Menu(object):
             if distance<self.max_menu_distance:
                 self.text_queue.append('')
                 self.text_queue.append('-- Actions --')
-                self.text_queue.append('1 - info (not implemented) ')
+                self.text_queue.append('1 - vehicle diagnostics ')
                 self.text_queue.append('2 - enter vehicle ')
                 self.text_queue.append('3 - storage ')
                 if fuel_option:
@@ -1183,7 +1183,9 @@ class World_Menu(object):
                         self.deactivate_menu()
                         return
                 if key=='1':
-                    pass
+                    self.world.vehicle_diagnostics=True
+                    self.world.vehicle_diagnostics_vehicle=self.selected_object
+                    return
                 if key=='2':
                     # enter the vehicle 
                     self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
@@ -1258,50 +1260,6 @@ class World_Menu(object):
                         ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
                         self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
 
-                # - wheel data -
-                self.text_queue.append('- front left wheels -')
-                for b in self.selected_object.ai.front_left_wheels:
-                    wheel_text=b.name
-                    if b.ai.damaged:
-                        wheel_text+=' damaged'
-                    if b.ai.destroyed:
-                        wheel_text+=' destroyed'
-                    self.text_queue.append(wheel_text)
-
-                self.text_queue.append(' ----')
-
-                self.text_queue.append('- front right wheels -')
-                for b in self.selected_object.ai.front_right_wheels:
-                    wheel_text=b.name
-                    if b.ai.damaged:
-                        wheel_text+=' damaged'
-                    if b.ai.destroyed:
-                        wheel_text+=' destroyed'
-                    self.text_queue.append(wheel_text)
-
-                self.text_queue.append(' ----')
-
-                self.text_queue.append('- rear left wheels -')
-                for b in self.selected_object.ai.rear_left_wheels:
-                    wheel_text=b.name
-                    if b.ai.damaged:
-                        wheel_text+=' damaged'
-                    if b.ai.destroyed:
-                        wheel_text+=' destroyed'
-                    self.text_queue.append(wheel_text)
-
-                self.text_queue.append(' ----')
-
-                self.text_queue.append('- rear right wheels -')
-                for b in self.selected_object.ai.rear_right_wheels:
-                    wheel_text=b.name
-                    if b.ai.damaged:
-                        wheel_text+=' damaged'
-                    if b.ai.destroyed:
-                        wheel_text+=' destroyed'
-                    self.text_queue.append(wheel_text)
-
-                self.text_queue.append(' ----')
 
                 self.text_queue.append('- crew -')
                 for k,value in self.selected_object.ai.vehicle_crew.items():
