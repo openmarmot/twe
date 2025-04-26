@@ -430,21 +430,19 @@ class Graphics_2D_Pygame(object):
     def select_closest_object_with_mouse(self,mouse_coords):
         possible_objects=[]
 
-        # sort through the objects that are rendered (visible)
-        for b in self.renderlists:
-            for c in b:
-                if self.mode==0:
-                    pass
-                elif self.mode==1:
+        if self.mode==1:
+            # sort through the objects that are rendered (visible)
+            for b in self.renderlists:
+                for c in b:
                     # filter out a couple things we don't want to click on
                     if (c.is_player is False 
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
                         and c.can_be_deleted is False):
                         possible_objects.append(c)
-                elif self.mode==2:
-                    # for strategic map we want everything
-                    possible_objects.append(c)
+        elif self.mode==2:
+            # for strategic map we want everything
+            possible_objects=self.strategic_map.map_squares
 
         object_distance=50
         closest_object=None
@@ -469,6 +467,12 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def switch_mode(self,desired_mode):
         '''switch the graphic engine mode '''
+
+        # reset scale to defaults
+        self.scale=self.scale_limit[1]
+        self.view_adjust=self.view_adjust_minimum
+        self.reset_all()
+        
         # main menu
         if desired_mode==0:
             self.mode=0

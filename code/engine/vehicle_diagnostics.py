@@ -36,7 +36,7 @@ class VehicleDiagnostics(object):
     def load(self,vehicle,screen_center):
         self.vehicle=vehicle
         self.screen_center=screen_center
-
+        self.image_objects=[]
         # add the main object 
         v=VehicleDiagnosticObject()
         v.image_list=self.vehicle.image_list
@@ -61,7 +61,8 @@ class VehicleDiagnostics(object):
 
         self.text_queue.append([f'vehicle: {self.vehicle.name}',copy.copy(coord),self.text_black])
         coord[1]+=spacing
-        self.text_queue.append([f'vehicle: {self.vehicle.name}',copy.copy(coord),self.text_black])
+        if self.vehicle.ai.vehicle_disabled:
+            self.text_queue.append(['disabled',copy.copy(coord),self.text_red])
 
         # diagnostics 
         coord=[40,80]
@@ -102,6 +103,13 @@ class VehicleDiagnostics(object):
             coord[1]+=spacing
         if wheel_destroyed:
             self.text_queue.append(['wheel(s) destroyed',copy.copy(coord),self.text_red])
+            coord[1]+=spacing
+        engine_damaged=False
+        for b in self.vehicle.ai.engines:
+            if b.ai.damaged:
+                engine_damaged=True
+        if engine_damaged:
+            self.text_queue.append(['engine(s) damaged',copy.copy(coord),self.text_red])
             coord[1]+=spacing
 
 

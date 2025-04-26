@@ -706,7 +706,6 @@ def load_sqlite_squad_data():
     # Close the database connection
     conn.close()
 
-
 #------------------------------------------------------------------------------
 def load_world(world,map_objects):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''

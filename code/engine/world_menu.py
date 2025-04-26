@@ -1288,7 +1288,7 @@ class World_Menu(object):
                         self.selected_object.ai.detach_tow_object()
                         self.deactivate_menu()
                         return
-
+                self.text_queue.append('7 - vehicle diagnostics')
                 if key=='1':
                     self.change_menu('change_vehicle_role')
                 if key=='2':
@@ -1307,6 +1307,10 @@ class World_Menu(object):
                 if key=='5' and radio:
                     self.selected_object=self.selected_object.ai.radio
                     self.change_menu('radio_menu')
+                if key=='7':
+                    self.world.vehicle_diagnostics=True
+                    self.world.vehicle_diagnostics_vehicle=self.selected_object
+                    return
             else:
                 # task_vehicle_crew not in memory, so internal is a mistake. player probably died and was removed from the vehicle
                 self.deactivate_menu()

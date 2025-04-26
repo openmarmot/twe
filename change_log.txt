@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 25 2025
+- fixed strategic mode squad data error 
+- fixed scaling error when switching modes  
+- minor changes 
+
+
+----------------------------------
+April 24 2025
+- more work on the vehicle diagnostics page 
+
+----------------------------------
 April 23 2025
 - rewrite of some stuff in graphics_2d_pygame to accomodate more graphic modes 
 - work on the new vehicle diagnostics screen 
