@@ -37,6 +37,11 @@ class World():
 
         # triggers a unload of the world and the transition to strategic_map
         self.exit_world=False
+
+        # triggers a switch to the vehicle diagnostics mode
+        self.vehicle_diagnostics=False
+        # the specific vehicle for the diagnostics page
+        self.vehicle_diagnostics_vehicle=None
         
         # spawn locations
         self.spawn_center=[0.,0.]

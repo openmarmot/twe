@@ -27,6 +27,7 @@ import engine.math_2d
 from engine.game_menu import GameMenu
 from engine.world import World
 from engine.strategic_map import StrategicMap
+from engine.vehicle_diagnostics import VehicleDiagnostics
 import engine.log
 
 class Graphics_2D_Pygame(object):
@@ -39,6 +40,7 @@ class Graphics_2D_Pygame(object):
         self.image_cache={}
 
         self.screen_size=screen_size
+        self.screen_center=[self.screen_size[0]/2,self.screen_size[1]/2]
         pygame.init()
         pygame.display.set_caption("https://github.com/openmarmot/twe")
 
@@ -60,6 +62,7 @@ class Graphics_2D_Pygame(object):
         self.game_menu=GameMenu(self)
         self.world=World()
         self.strategic_map=StrategicMap(self)
+        self.vehicle_diagnostics=VehicleDiagnostics()
 
 
         # render level kind of a 'z' layer
@@ -163,6 +166,37 @@ class Graphics_2D_Pygame(object):
         self.load_all_images('images')
 
     #------------------------------------------------------------------------------
+    def get_mouse_screen_coords(self):
+        '''return mouse screen coordinates'''
+        x,y=pygame.mouse.get_pos()
+        return [x,y]
+
+    #------------------------------------------------------------------------------
+    def get_mouse_world_coords(self):
+        ''' return world coords of mouse'''
+        # pretty sure this math doesnt make any sense
+        x,y=pygame.mouse.get_pos()
+        player_x=self.world.player.world_coords[0]
+        player_y=self.world.player.world_coords[1]
+        return [player_x-x,player_y-y]
+
+    #-----------------------------------------------------------------------------
+    def get_player_screen_coords(self):
+        ''' return player screen coordinates'''
+        return self.screen_center
+    
+    #------------------------------------------------------------------------------
+    def get_translation(self):
+        ''' returns the translation for world to screen coords '''
+        player_x=self.world.player.world_coords[0]*self.scale
+        player_y=self.world.player.world_coords[1]*self.scale
+        
+        self.world.player.screen_coords=self.screen_center
+
+        translate=[self.screen_center[0]-player_x,self.screen_center[1]-player_y]
+        return translate
+
+    #------------------------------------------------------------------------------
     def handle_input(self):
         ''' handle input from user'''
 
@@ -187,8 +221,10 @@ class Graphics_2D_Pygame(object):
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
                 elif self.mode==2:
                     self.strategic_map.handle_keydown(translated_key)
+                elif self.mode==3:
+                    self.vehicle_diagnostics.handle_keydown(translated_key)
                 else:
-                    engine.log.add_data('error','graphic_engine.mode unknown '+str(self.mode),True)
+                    engine.log.add_data('error','graphics_2d_pygame.handle_input graphic_engine.mode unknown '+str(self.mode),True)
 
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
@@ -231,6 +267,32 @@ class Graphics_2D_Pygame(object):
 
     #------------------------------------------------------------------------------
     def render(self):
+
+        if self.mode==0:
+            self.render_mode_0()
+        elif self.mode==1:
+            self.render_mode_1()
+        elif self.mode==2:
+            self.render_mode_2()
+        elif self.mode==3:
+            self.render_mode_3()
+
+    #------------------------------------------------------------------------------
+    def render_mode_0(self):
+        '''render mode 0 : main game menu'''
+        self.screen.blit(self.background, (0, 0))
+        h=0
+        for b in self.game_menu.text_queue:
+            h+=15
+            self.small_font.render_to(self.screen, (40, h), b, self.color_black)
+
+        if self.double_buffering:
+            pygame.display.flip()
+        else:
+            pygame.display.update()
+    #------------------------------------------------------------------------------
+    def render_mode_1(self):
+        '''render mode 1 : tactical mode'''
         self.update_render_info()
 
         self.screen.blit(self.background, (0, 0))
@@ -243,56 +305,27 @@ class Graphics_2D_Pygame(object):
                 if self.draw_collision:
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
 
-                if self.mode==2:
-                    # special text stuff for map mode
+        h=0
+        for b in islice(self.world.text_queue,self.world.text_queue_display_size):
+            h+=15
+            self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-                    if c.airport:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.color_black)
-                    if c.rail_yard:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.color_black)
-                    if c.town:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.color_black)
+        h+=20
+        for b in self.world.world_menu.text_queue:
+            h+=15
+            self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-                    # german count 
-                    if c.german_count>0:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]-25,c.screen_coords[1]+20), str(c.german_count), self.color_black)
-                    if c.soviet_count>0:
-                        self.small_font.render_to(self.screen, (c.screen_coords[0]+15,c.screen_coords[1]+20), str(c.soviet_count), self.color_black)
-
-        # text stuff
-        if self.mode==0:
+        if self.world.debug_mode :
             h=0
-            for b in self.game_menu.text_queue:
+            for b in self.world.debug_text_queue:
                 h+=15
-                self.small_font.render_to(self.screen, (40, h), b, self.color_black)
-        elif self.mode==1: 
+                self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
+
+        if self.world.display_vehicle_text :
             h=0
-            for b in islice(self.world.text_queue,self.world.text_queue_display_size):
+            for b in self.world.vehicle_text_queue:
                 h+=15
-                self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
-
-            h+=20
-            for b in self.world.world_menu.text_queue:
-                h+=15
-                self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
-
-            if self.world.debug_mode :
-                h=0
-                for b in self.world.debug_text_queue:
-                    h+=15
-                    self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
-
-            if self.world.display_vehicle_text :
-                h=0
-                for b in self.world.vehicle_text_queue:
-                    h+=15
-                    self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
-
-        elif self.mode==2:
-            h=0
-            for b in self.strategic_map.strategic_menu.text_queue:
-                h+=15
-                self.small_font.render_to(self.screen, (40, h), b, self.color_black)
+                self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
 
         if self.double_buffering:
             pygame.display.flip()
@@ -300,184 +333,55 @@ class Graphics_2D_Pygame(object):
             pygame.display.update()
 
     #------------------------------------------------------------------------------
-    def reset_all(self):
-        ''' resize all world_objects'''
-        for b in self.world.wo_objects:
-            b.reset_image=True
+    def render_mode_2(self):
+        '''render mode 3 : strategic mode'''
 
-    #---------------------------------------------------------------------------
-    def select_closest_object_with_mouse(self,mouse_coords):
-        possible_objects=[]
 
-        # sort through the objects that are rendered (visible)
-        for b in self.renderlists:
-            for c in b:
-                if self.mode==0:
-                    pass
-                elif self.mode==1:
-                    # filter out a couple things we don't want to click on
-                    if (c.is_player is False 
-                        and c != self.world.player.ai.large_pickup 
-                        and c.is_turret is False 
-                        and c.can_be_deleted is False):
-                        possible_objects.append(c)
-                elif self.mode==2:
-                    # for strategic map we want everything
-                    possible_objects.append(c)
+        self.screen.blit(self.background, (0, 0))
+        for c in self.strategic_map.map_squares:
+            if c.reset_image:
+                self.reset_pygame_image(c)
+            self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
-        object_distance=50
-        closest_object=None
+            if c.airport:
+                self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.color_black)
+            if c.rail_yard:
+                self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.color_black)
+            if c.town:
+                self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.color_black)
 
-        for b in possible_objects:
-            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
-            if distance<object_distance:
-                object_distance=distance
-                closest_object=b
-        
-        if closest_object != None:
-            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
-            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
+            # german count 
+            if c.german_count>0:
+                self.small_font.render_to(self.screen, (c.screen_coords[0]-25,c.screen_coords[1]+20), str(c.german_count), self.color_black)
+            if c.soviet_count>0:
+                self.small_font.render_to(self.screen, (c.screen_coords[0]+15,c.screen_coords[1]+20), str(c.soviet_count), self.color_black)
 
-            if self.mode==0:
-                pass
-            elif self.mode==1:
-                self.world.world_menu.activate_menu(closest_object)
-            elif self.mode==2:
-                self.strategic_map.strategic_menu.activate_menu(closest_object)
+        h=0
+        for b in self.strategic_map.strategic_menu.text_queue:
+            h+=15
+            self.small_font.render_to(self.screen, (40, h), b, self.color_black)
 
-    #------------------------------------------------------------------------------
-    def switch_mode(self,desired_mode):
-        '''switch the graphic engine mode '''
-
-        if desired_mode==0:
-            self.mode=0
-            self.background.fill((255, 255, 255))
-        elif desired_mode==1:
-            self.mode=1
-            #self.background.fill((128, 102, 77))
-            #self.background.fill((201,184,171))
-            self.background.fill((171,149,131))
-        elif desired_mode==2:
-            self.mode=2
-            self.background.fill((255, 255, 255))
+        if self.double_buffering:
+            pygame.display.flip()
         else:
-            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
-
-
-    #------------------------------------------------------------------------------
-    def update(self):
-        '''
-            any misc updating that needs to be done
-        '''
-        self.handle_input()
-
-        # update time
-        self.time_passed=self.clock.tick(self.max_fps)
-        self.time_passed_seconds=self.time_passed / 1000.0
-
-        if self.mode==0:
-            pass
-            #self.game_menu.update(self.time_passed_seconds)
-        elif self.mode==1:
-            self.world.update(self.time_passed_seconds)
-            # insert graphic engine specific debug text (after world.update populated it)
-            if self.world.debug_mode and self.world.is_paused==False:
-                self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
-                self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
-                self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
-                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
-
-                
-                # image cache debug info 
-                #for key, value in self.image_cache.items():
-                #    self.world.debug_text_queue.insert(4,f"Image cache {key} - size: {len(value)}")
-            
-            if self.world.exit_world:
-                self.strategic_map.unload_world()
-                self.switch_mode(2)
-        elif self.mode==2:
-            self.strategic_map.update()
-
-            
-    #------------------------------------------------------------------------------
-    def update_render_info(self):
-        '''
-            -checks if world objects are within the viewable
-             screen area, and if so, translates their world coordinates
-             to screen coordinates
-        '''
-        
-        #clear out the render levels
-        self.renderlists=[[] for _ in range(self.render_level_count)]
-
-        self.render_count=0
-        if self.mode==0:
-            pass
-        elif self.mode==1:
-
-            viewrange_x = (
-                self.world.player.world_coords[0] + self.screen_size[0] + self.view_adjust,
-                self.world.player.world_coords[0] - self.screen_size[0] - self.view_adjust
-            )
-            viewrange_y = (
-                self.world.player.world_coords[1] + self.screen_size[1] + self.view_adjust,
-                self.world.player.world_coords[1] - self.screen_size[1] - self.view_adjust
-            )
-            
-            translation = self.get_translation()
-            
-            # More efficient filtering and rendering
-            renderable_objects = [
-                obj for obj in self.world.wo_objects 
-                if (obj.render and 
-                    (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale and
-                    viewrange_x[1] < obj.world_coords[0] < viewrange_x[0] and
-                    viewrange_y[1] < obj.world_coords[1] < viewrange_y[0])
-            ]
-            
-            for obj in renderable_objects:
-                self.renderlists[obj.render_level].append(obj)
-                if not obj.is_player:
-                    obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
-                    obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
-            
-            self.render_count = len(renderable_objects)
-        elif self.mode==2:
-            for b in self.strategic_map.map_squares:
-                self.renderlists[0].append(b)
-
+            pygame.display.update()
 
     #------------------------------------------------------------------------------
-    def get_mouse_screen_coords(self):
-        x,y=pygame.mouse.get_pos()
-        return [x,y]
+    def render_mode_3(self):
+        '''render mode 4 : vehicle diagnostic overlay'''
+        self.screen.blit(self.background, (0, 0))
+        for c in self.vehicle_diagnostics.image_objects:
+            if c.reset_image:
+                self.reset_pygame_image(c)
+            self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
-    #------------------------------------------------------------------------------
-    def get_mouse_world_coords(self):
-        ''' return world coords of mouse'''
-        # pretty sure this math doesnt make any sense
-        x,y=pygame.mouse.get_pos()
-        player_x=self.world.player.world_coords[0]
-        player_y=self.world.player.world_coords[1]
-        return [player_x-x,player_y-y]
+        for text in self.vehicle_diagnostics.text_queue:
+            self.small_font.render_to(self.screen, text[1], text[0],text[2] )
 
-    #-----------------------------------------------------------------------------
-    def get_player_screen_coords(self):
-        ''' return player screen coordinates'''
-        return [self.screen_size[0]/2,self.screen_size[1]/2]
-    
-    #------------------------------------------------------------------------------
-    def get_translation(self):
-        ''' returns the translation for world to screen coords '''
-        center_x=self.screen_size[0]/2
-        center_y=self.screen_size[1]/2
-        player_x=self.world.player.world_coords[0]*self.scale
-        player_y=self.world.player.world_coords[1]*self.scale
-        
-        self.world.player.screen_coords=[center_x,center_y]
-
-        translate=[center_x-player_x,center_y-player_y]
-        return translate
+        if self.double_buffering:
+            pygame.display.flip()
+        else:
+            pygame.display.update()
 
     #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
@@ -515,6 +419,171 @@ class Graphics_2D_Pygame(object):
                 f'graphics_2d_pygame.reset_pygame_image: image transform error with image {wo.image_list[wo.image_index]}',
                 True
             )
+
+    #------------------------------------------------------------------------------
+    def reset_all(self):
+        ''' resize all world_objects'''
+        for b in self.world.wo_objects:
+            b.reset_image=True
+
+    #---------------------------------------------------------------------------
+    def select_closest_object_with_mouse(self,mouse_coords):
+        possible_objects=[]
+
+        if self.mode==1:
+            # sort through the objects that are rendered (visible)
+            for b in self.renderlists:
+                for c in b:
+                    # filter out a couple things we don't want to click on
+                    if (c.is_player is False 
+                        and c != self.world.player.ai.large_pickup 
+                        and c.is_turret is False 
+                        and c.can_be_deleted is False):
+                        possible_objects.append(c)
+        elif self.mode==2:
+            # for strategic map we want everything
+            possible_objects=self.strategic_map.map_squares
+
+        object_distance=50
+        closest_object=None
+
+        for b in possible_objects:
+            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
+            if distance<object_distance:
+                object_distance=distance
+                closest_object=b
+        
+        if closest_object != None:
+            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
+            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
+
+            if self.mode==0:
+                pass
+            elif self.mode==1:
+                self.world.world_menu.activate_menu(closest_object)
+            elif self.mode==2:
+                self.strategic_map.strategic_menu.activate_menu(closest_object)
+
+    #------------------------------------------------------------------------------
+    def switch_mode(self,desired_mode):
+        '''switch the graphic engine mode '''
+
+        # reset scale to defaults
+        self.scale=self.scale_limit[1]
+        self.view_adjust=self.view_adjust_minimum
+        self.reset_all()
+        
+        # main menu
+        if desired_mode==0:
+            self.mode=0
+            self.background.fill((255, 255, 255))
+        # tactical battle
+        elif desired_mode==1:
+            self.mode=1
+            #self.background.fill((128, 102, 77))
+            #self.background.fill((201,184,171))
+            self.background.fill((171,149,131))
+        # strategic screen
+        elif desired_mode==2:
+            self.mode=2
+            self.background.fill((255, 255, 255))
+        # vehicle info
+        elif desired_mode==3:
+            self.mode=3
+            self.background.fill((255, 255, 255))
+        else:
+            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
+
+
+    #------------------------------------------------------------------------------
+    def update(self):
+        '''
+            any misc updating that needs to be done
+        '''
+        self.handle_input()
+
+        # update time
+        self.time_passed=self.clock.tick(self.max_fps)
+        self.time_passed_seconds=self.time_passed / 1000.0
+
+        if self.mode==0:
+            pass
+            #self.game_menu.update(self.time_passed_seconds)
+        elif self.mode==1:
+            self.world.update(self.time_passed_seconds)
+            # insert graphic engine specific debug text (after world.update populated it)
+            if self.world.debug_mode and self.world.is_paused==False:
+                self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
+                self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
+                self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
+                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
+
+                
+                # image cache debug info 
+                #for key, value in self.image_cache.items():
+                #    self.world.debug_text_queue.insert(4,f"Image cache {key} - size: {len(value)}")
+            
+            if self.world.exit_world:
+                self.strategic_map.unload_world()
+                self.switch_mode(2)
+
+            if self.world.vehicle_diagnostics:
+                self.world.vehicle_diagnostics=False
+                self.vehicle_diagnostics.load(self.world.vehicle_diagnostics_vehicle,self.screen_center)
+                self.switch_mode(3)
+
+        elif self.mode==2:
+            self.strategic_map.update()
+        elif self.mode==3:
+            self.vehicle_diagnostics.update()
+
+            if self.vehicle_diagnostics.exit:
+                self.vehicle_diagnostics.exit=False
+                self.switch_mode(1)
+
+            
+    #------------------------------------------------------------------------------
+    def update_render_info(self):
+        '''
+            checks if world objects are within the viewable screen area,
+              and if so, translates their world coordinates to screen coordinates
+              only used by tactical mode
+        '''
+        
+        #clear out the render levels
+        self.renderlists=[[] for _ in range(self.render_level_count)]
+
+        self.render_count=0
+
+
+        viewrange_x = (
+            self.world.player.world_coords[0] + self.screen_size[0] + self.view_adjust,
+            self.world.player.world_coords[0] - self.screen_size[0] - self.view_adjust
+        )
+        viewrange_y = (
+            self.world.player.world_coords[1] + self.screen_size[1] + self.view_adjust,
+            self.world.player.world_coords[1] - self.screen_size[1] - self.view_adjust
+        )
+        
+        translation = self.get_translation()
+        
+        # More efficient filtering and rendering
+        renderable_objects = [
+            obj for obj in self.world.wo_objects 
+            if (obj.render and 
+                (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale and
+                viewrange_x[1] < obj.world_coords[0] < viewrange_x[0] and
+                viewrange_y[1] < obj.world_coords[1] < viewrange_y[0])
+        ]
+        
+        for obj in renderable_objects:
+            self.renderlists[obj.render_level].append(obj)
+            if not obj.is_player:
+                obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
+                obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
+        
+        self.render_count = len(renderable_objects)
+
 
     #------------------------------------------------------------------------------
     def zoom_out(self):

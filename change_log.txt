@@ -1,6 +1,80 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 25 2025
+- fixed strategic mode squad data error 
+- fixed scaling error when switching modes  
+- minor changes 
+
+
+----------------------------------
+April 24 2025
+- more work on the vehicle diagnostics page 
+
+----------------------------------
+April 23 2025
+- rewrite of some stuff in graphics_2d_pygame to accomodate more graphic modes 
+- work on the new vehicle diagnostics screen 
+- screen center is now computed on load 
+- misc minor changes
+
+I think the vehicle diagnostic screen will replace a lot of the vehicle menu data print outs. 
+There is a lot more room for text when I am using the full screen, and the white background 
+makes it a lot easier to read 
+
+todo 
+- noticed a strategic mode error. put it in the issues backlog 
+
+----------------------------------
+April 22 2025
+- bug fix 
+- started work on a new vehicle diagnostics ui
+
+the wheel print out in the vehicle menu can overflow the screen now. 
+i need a dedicated vehicle system diagnostics page.
+i'm thinking it would be a overlay - game would probably continue running in 
+the background. 
+
+----------------------------------
+April 21 2025
+- introduced a more complicated wheel setup 
+
+there are now 4 sets of wheels 
+- front left 
+- front right
+- rear right
+- rear left
+
+each section has a minimum number of wheels. A destroyed wheel 
+does not count toward the total. falling below the minimum disables 
+the vehicle.
+
+when a wheel is hit only the front/rear set on the side of the hit can be 
+damaged. this matter somewhat as each set on some vehicles can handle some damage 
+
+# todo 
+- airplane wheels 
+- tank tracks 
+- tires
+
+# other thoughts 
+maybe wheels need to be connected to axles so we can simulate open or locked differentials 
+- this would also make it easier to simulate/understand traction 
+
+----------------------------------
+April 19 2025
+- updated armor value for some wheels 
+
+damaged wheels have to have some sort of effect on the vehicle and eventually disable 
+it but im not sure what i want to do yet. german vehicles with skirts also need the 
+spaced armor value on their wheels.
+
+i may split wheels into left and right sides so at least the damage hits the correct 
+set of wheels - although what would the benefit be?
+
+also need to add tracks 
+
+----------------------------------
 April 18 2025
 - minor updates 
 - large human pickup position offsets are now per object 
@@ -11,6 +85,9 @@ i should create some new art for it as well.
 
 the burst system could be better. for MGs it means pretty much always a 10 
 round burst. could probably randomize a bit. working well enough for now though 
+
+todo 
+- i noticed a t34 had a penetration on a wheel from a rifle bullet - will have to look into that
 
 ----------------------------------
 April 16 2025

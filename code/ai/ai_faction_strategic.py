@@ -63,7 +63,12 @@ class AIFactionStrategic(object):
     def buy_and_place_units(self,funds):
         '''buy and place units at the beginning of a turn'''
 
-        squad_options=getattr(engine.world_builder,f"{self.faction}_squad_data")
+        squad_options={}
+        # sort for just the faction specific squads
+        for key,value in engine.world_builder.squad_data.items():
+            if value['faction']==self.faction:
+                squad_options[key]=value
+
 
         squad_names=list(squad_options.keys())
 
