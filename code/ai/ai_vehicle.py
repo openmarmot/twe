@@ -594,17 +594,25 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_wheel_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
+
+        # note - vehicles that only have wheels in some of the groups will fair 
+        # better here. the flow should probably be updated to fix this.
+
         wheel=None
         if side=='left':
             if random.randint(0,1)==0:
-                wheel=random.choice(self.front_left_wheels)
+                if self.front_left_wheels:
+                    wheel=random.choice(self.front_left_wheels)
             else:
-                wheel=random.choice(self.rear_left_wheels)
+                if self.rear_left_wheels:
+                    wheel=random.choice(self.rear_left_wheels)
         elif side=='right':
             if random.randint(0,1)==0:
-                wheel=random.choice(self.front_right_wheels)
+                if self.front_right_wheels:
+                    wheel=random.choice(self.front_right_wheels)
             else:
-                wheel=random.choice(self.rear_right_wheels)
+                if self.rear_right_wheels:
+                    wheel=random.choice(self.rear_right_wheels)
         if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)

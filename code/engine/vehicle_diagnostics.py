@@ -59,14 +59,18 @@ class VehicleDiagnostics(object):
         spacing=15
         coord=[40,15]
 
+        self.text_queue.append([f'[Esc to Exit]',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        coord[1]+=spacing
+
         self.text_queue.append([f'vehicle: {self.vehicle.name}',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         if self.vehicle.ai.vehicle_disabled:
             self.text_queue.append(['disabled',copy.copy(coord),self.text_red])
 
         # diagnostics 
-        coord=[40,80]
-        self.text_queue.append(['--diagnostics--',copy.copy(coord),self.text_black])
+        coord=[40,100]
+        self.text_queue.append(['-- diagnostics --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         for b in self.vehicle.ai.turrets:
             if b.ai.turret_jammed:
@@ -111,6 +115,97 @@ class VehicleDiagnostics(object):
         if engine_damaged:
             self.text_queue.append(['engine(s) damaged',copy.copy(coord),self.text_red])
             coord[1]+=spacing
+        
+        # - engine data -
+        # this should move to its own page
+        
+        coord=[40,200]
+        self.text_queue.append(['-- engine data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for b in self.vehicle.ai.engines:
+            self.text_queue.append([f'Engine: {b.name}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+            self.text_queue.append([f'-> engine on: {b.ai.engine_on}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+            if b.ai.damaged:
+                self.text_queue.append([f'-> damaged',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+
+        # - fuel tank data -
+        # this should move to its own page
+        
+        coord=[40,350]
+        self.text_queue.append(['-- fuel data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for b in self.vehicle.ai.fuel_tanks:
+            self.text_queue.append([f'Fuel Tank: {b.name}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+            if len(b.ai.inventory)>0:
+                if 'gas' in b.ai.inventory[0].name:
+                    self.text_queue.append([f'-> gas: {b.ai.inventory[0].volume} liters',copy.copy(coord),self.text_black])
+                    coord[1]+=spacing
+                if 'diesel' in b.ai.inventory[0].name:
+                    self.text_queue.append([f'-> diesel: {b.ai.inventory[0].volume} liters',copy.copy(coord),self.text_black])
+                    coord[1]+=spacing
+            if b.ai.punctured:
+                self.text_queue.append([f'-> punctured',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+            if b.ai.contaminated:
+                self.text_queue.append([f'-> contaminated',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+
+
+        # - turret data - 
+        # this should eventually move to its own page 
+        coord=[40,450]
+        self.text_queue.append(['-- turret data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+       
+        for b in self.vehicle.ai.turrets:
+            self.text_queue.append([f'Turret: {b.name}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+
+            if b.ai.turret_jammed:
+                self.text_queue.append([' -> Turret ring is jammed',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+            
+            if b.ai.primary_weapon!=None:
+                self.text_queue.append([f' -> {b.ai.primary_weapon.name}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+                if b.ai.primary_weapon.ai.action_jammed:
+                    self.text_queue.append([' --> action is jammed',copy.copy(coord),self.text_red])
+                    coord[1]+=spacing
+                if b.ai.primary_weapon.ai.damaged:
+                    self.text_queue.append([' --> weapon is damaged',copy.copy(coord),self.text_red])
+                    coord[1]+=spacing
+                ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.primary_weapon,self.vehicle)
+                self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+
+            if b.ai.coaxial_weapon!=None:
+                self.text_queue.append([f' -> {b.ai.coaxial_weapon.name}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+                if b.ai.coaxial_weapon.ai.action_jammed:
+                    self.text_queue.append([' --> action is jammed',copy.copy(coord),self.text_red])
+                    coord[1]+=spacing
+                if b.ai.coaxial_weapon.ai.damaged:
+                    self.text_queue.append([' --> weapon is damaged',copy.copy(coord),self.text_red])
+                    coord[1]+=spacing
+                ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.vehicle)
+                self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+
+        # - hit log data -
+        coord=[40,600]
+        self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for b in self.vehicle.ai.collision_log[-10:]:
+            if b.penetrated:
+                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+            else:
+                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
 
 
 
