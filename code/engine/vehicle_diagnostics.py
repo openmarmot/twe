@@ -196,7 +196,7 @@ class VehicleDiagnostics(object):
                 coord[1]+=spacing
 
         # - hit log data -
-        coord=[40,600]
+        coord=[40,700]
         self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         for b in self.vehicle.ai.collision_log[-10:]:

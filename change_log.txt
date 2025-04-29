@@ -1,11 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 28 2025
+- minor adjustments and fixes 
+
+----------------------------------
 April 27 2025
 - moving more data over to vehicle diagnostics from the vehicle menu 
 - fixed a occasional error in the wheel_hit code 
-
-
 
 ----------------------------------
 April 25 2025
