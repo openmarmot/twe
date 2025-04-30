@@ -109,8 +109,6 @@ class AIThrowable(object):
             for hit in hit_list:
                 hit.ai.handle_hit_with_flame()
 
-        self.owner.world.remove_queue.append(self.owner)
-
     #---------------------------------------------------------------------------
     def explode_heat(self):
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)

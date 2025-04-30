@@ -2599,17 +2599,23 @@ class AIHuman(object):
 
         # delete this task as it is now complete
         self.memory.pop('task_exit_vehicle',None)
+        self.memory['current_task']=''
 
         # maybe grab your large pick up if you put it in the trunk
         if self.blood_pressure>0:
             self.speak('Jumping out')
 
             if self.owner.is_player is False:
-            # move slightly
+                # move slightly
+                # this seems to be needed to prevent the ai from immediately jumping back in 
                 coords=[self.owner.world_coords[0]+random.randint(-15,15),self.owner.world_coords[1]+random.randint(-15,15)]
                 self.switch_task_move_to_location(coords,None)
             else:
                 pass
+        else:
+            # this is also needed to prevent dead passengers from being under a disabled vehicle
+            self.owner.world_coords=[self.owner.world_coords[0]+random.randint(5,15),self.owner.world_coords[1]+random.randint(5,15)]
+
 
     #---------------------------------------------------------------------------
     def update_task_loot_container(self):

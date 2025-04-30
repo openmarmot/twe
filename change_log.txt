@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 29 2025
+- dead bodies exiting vehicles now have slightly randomized positions
+- fixed molotov cocktail world remove error 
+
+looked at the mouse selection code to see if i could prefer vehicles over bodies/weapons 
+but did not see a clean solution to the problem. might need a z sorted mouse select. 
+
+the better option is probably going to be keeping dead bodies in the vehicle. 
+
+found some odd behaviour with ai repeatedly entering/exiting vehicles. this might have 
+been due to enemies being close.
+
+really need to add some behavior for vehicles when they can't pen something. 
+german half tracks will drive up right next to a soviet tank and hang out until they are 
+shot.
+
+----------------------------------
 April 28 2025
 - minor adjustments and fixes 
 
