@@ -30,36 +30,40 @@ class VehicleDiagnostics(object):
         if translated_key=='esc':
             self.exit=True
             return
-
+        if translated_key=='1':
+            self.load_main_screen
+        if translated_key=='2':
+            pass
+        if translated_key=='3':
+            pass
+        if translated_key=='4':
+            pass
+        if translated_key=='5':
+            pass
 
     #---------------------------------------------------------------------------
     def load(self,vehicle,screen_center):
         self.vehicle=vehicle
         self.screen_center=screen_center
+        self.load_main_screen
+
+    #---------------------------------------------------------------------------
+    def load_main_screen(self):
+        '''load main screen text and image '''
+
         self.image_objects=[]
         # add the main object 
         v=VehicleDiagnosticObject()
         v.image_list=self.vehicle.image_list
-        v.screen_coords=screen_center
+        v.screen_coords=self.screen_center
         self.image_objects.append(v)
 
-        self.update_text_main_screen()
 
-    #---------------------------------------------------------------------------
-    def update(self):
-        '''update. called by graphics_2d_pygame'''
-
-        pass
-        
-
-    #---------------------------------------------------------------------------
-    def update_text_main_screen(self):
-        '''update the main screen text'''
         self.text_queue=[]
         spacing=15
         coord=[40,15]
 
-        self.text_queue.append([f'[Esc to Exit]',copy.copy(coord),self.text_black])
+        self.text_queue.append([f'[Esc to Exit][2 Turrets][3 Crew][4 Engine][5 Wheels]',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         coord[1]+=spacing
 
@@ -207,6 +211,11 @@ class VehicleDiagnostics(object):
                 self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_black])
                 coord[1]+=spacing
 
+    #---------------------------------------------------------------------------
+    def update(self):
+        '''update. called by graphics_2d_pygame'''
+
+        pass
 
 
 class VehicleDiagnosticObject(object):

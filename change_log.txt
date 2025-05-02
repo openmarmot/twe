@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 1 2025
+- minor work on vehicle diagnostics 
+
+----------------------------------
 April 29 2025
 - dead bodies exiting vehicles now have slightly randomized positions
 - fixed molotov cocktail world remove error 
