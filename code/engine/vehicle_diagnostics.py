@@ -36,17 +36,86 @@ class VehicleDiagnostics(object):
         if translated_key=='2':
             self.load_turret_screen()
         if translated_key=='3':
-            pass
+            self.load_crew_screen()
         if translated_key=='4':
-            pass
+            self.load_engine_screen()
         if translated_key=='5':
-            pass
+            self.load_wheels_screen()
 
     #---------------------------------------------------------------------------
     def load(self,vehicle,screen_center):
         self.vehicle=vehicle
         self.screen_center=screen_center
         self.load_main_screen()
+
+    #---------------------------------------------------------------------------
+    def load_crew_screen(self):
+        '''load main screen text and image '''
+
+        self.image_objects=[]
+        # add the main object 
+        v=VehicleDiagnosticObject()
+        v.image_list=self.vehicle.image_list
+        v.screen_coords=self.screen_center
+        self.image_objects.append(v)
+
+
+        self.text_queue=[]
+        spacing=15
+        coord=[40,15]
+
+        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        coord[1]+=spacing
+
+        coord=[40,100]
+        self.text_queue.append(['crew role | crew member | current task',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for k,value in self.vehicle.ai.vehicle_crew.items():
+            text=k+': '
+            if value[0]==True:
+                text+=value[1].name
+                text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
+            else:
+                text+='unoccupied'
+            self.text_queue.append([text,copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+
+    #---------------------------------------------------------------------------
+    def load_engine_screen(self):
+        '''load main screen text and image '''
+
+        self.image_objects=[]
+        # add the main object 
+        v=VehicleDiagnosticObject()
+        v.image_list=self.vehicle.image_list
+        v.screen_coords=self.screen_center
+        self.image_objects.append(v)
+
+
+        self.text_queue=[]
+        spacing=15
+        coord=[40,15]
+
+        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        coord[1]+=spacing
+
+         # - engine data -
+        # this should move to its own page
+        
+        coord=[40,200]
+        self.text_queue.append(['-- engine data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for b in self.vehicle.ai.engines:
+            self.text_queue.append([f'Engine: {b.name}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+            self.text_queue.append([f'-> engine on: {b.ai.engine_on}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+            if b.ai.damaged:
+                self.text_queue.append([f'-> damaged',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+        
 
     #---------------------------------------------------------------------------
     def load_main_screen(self):
@@ -121,20 +190,7 @@ class VehicleDiagnostics(object):
             self.text_queue.append(['engine(s) damaged',copy.copy(coord),self.text_red])
             coord[1]+=spacing
         
-        # - engine data -
-        # this should move to its own page
-        
-        coord=[40,200]
-        self.text_queue.append(['-- engine data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        for b in self.vehicle.ai.engines:
-            self.text_queue.append([f'Engine: {b.name}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-            self.text_queue.append([f'-> engine on: {b.ai.engine_on}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-            if b.ai.damaged:
-                self.text_queue.append([f'-> damaged',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
+       
 
         # - fuel tank data -
         # this should move to its own page
@@ -245,6 +301,26 @@ class VehicleDiagnostics(object):
 
             coord[1]+=spacing
             coord[1]+=spacing
+
+    #---------------------------------------------------------------------------
+    def load_wheels_screen(self):
+        '''load main screen text and image '''
+
+        self.image_objects=[]
+        # add the main object 
+        v=VehicleDiagnosticObject()
+        v.image_list=self.vehicle.image_list
+        v.screen_coords=self.screen_center
+        self.image_objects.append(v)
+
+
+        self.text_queue=[]
+        spacing=15
+        coord=[40,15]
+
+        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        coord[1]+=spacing
 
     #---------------------------------------------------------------------------
     def update(self):
