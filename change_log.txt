@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 2 2025
+- added vehicle diagnostics turret page 
+- misc fixes to vehicle diagnostics 
+
+----------------------------------
 May 1 2025
 - minor work on vehicle diagnostics 
 

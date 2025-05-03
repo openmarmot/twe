@@ -23,17 +23,18 @@ class VehicleDiagnostics(object):
         self.text_black='#000000'
         self.text_red='#FF2121'
 
+        self.menu_string='[Esc to Exit]  [1 Main]  [2 Turrets]  [3 Crew]  [4 Engine]  [5 Wheels]'
+
     #---------------------------------------------------------------------------
     def handle_keydown(self,translated_key):
-        print(translated_key)
 
         if translated_key=='esc':
             self.exit=True
             return
         if translated_key=='1':
-            self.load_main_screen
+            self.load_main_screen()
         if translated_key=='2':
-            pass
+            self.load_turret_screen()
         if translated_key=='3':
             pass
         if translated_key=='4':
@@ -45,7 +46,7 @@ class VehicleDiagnostics(object):
     def load(self,vehicle,screen_center):
         self.vehicle=vehicle
         self.screen_center=screen_center
-        self.load_main_screen
+        self.load_main_screen()
 
     #---------------------------------------------------------------------------
     def load_main_screen(self):
@@ -63,7 +64,7 @@ class VehicleDiagnostics(object):
         spacing=15
         coord=[40,15]
 
-        self.text_queue.append([f'[Esc to Exit][2 Turrets][3 Crew][4 Engine][5 Wheels]',copy.copy(coord),self.text_black])
+        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
         coord[1]+=spacing
         coord[1]+=spacing
 
@@ -159,11 +160,54 @@ class VehicleDiagnostics(object):
                 coord[1]+=spacing
 
 
+        
+
+        # - hit log data -
+        coord=[40,700]
+        self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for b in self.vehicle.ai.collision_log[-10:]:
+            if b.penetrated:
+                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_red])
+                coord[1]+=spacing
+            else:
+                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+
+
+    #---------------------------------------------------------------------------
+    def load_turret_screen(self):
+        '''load main screen text and image '''
+
+        self.image_objects=[]
+        turret_coords=[]
+        if len(self.vehicle.ai.turrets)==0:
+            pass
+        elif len(self.vehicle.ai.turrets)==1:
+            turret_coords=[self.screen_center]
+        if len(self.vehicle.ai.turrets)==2:
+            turret_coords=[]
+            turret_coords.append([self.screen_center[0]+200,self.screen_center[1]])
+            turret_coords.append([self.screen_center[0]-200,self.screen_center[1]])
+
+        for turret in self.vehicle.ai.turrets:
+            v=VehicleDiagnosticObject()
+            v.image_list=turret.image_list
+            v.screen_coords=turret_coords.pop()
+            self.image_objects.append(v)
+
+
+        self.text_queue=[]
+        spacing=15
+        coord=[40,15]
+
+        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        coord[1]+=spacing
+
         # - turret data - 
         # this should eventually move to its own page 
-        coord=[40,450]
-        self.text_queue.append(['-- turret data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
+        coord=[40,150]
        
         for b in self.vehicle.ai.turrets:
             self.text_queue.append([f'Turret: {b.name}',copy.copy(coord),self.text_black])
@@ -199,17 +243,8 @@ class VehicleDiagnostics(object):
                 self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
                 coord[1]+=spacing
 
-        # - hit log data -
-        coord=[40,700]
-        self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        for b in self.vehicle.ai.collision_log[-10:]:
-            if b.penetrated:
-                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
-            else:
-                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} side: {b.hit_side} compartment: {b.hit_compartment}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+            coord[1]+=spacing
+            coord[1]+=spacing
 
     #---------------------------------------------------------------------------
     def update(self):
