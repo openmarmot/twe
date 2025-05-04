@@ -120,6 +120,10 @@ class World_Menu(object):
     def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
 
+        if SELECTED_OBJECT is None:
+            engine.log.add_data('error','world_menu.activate_menu SELECTED_OBJECT is None')
+            return
+
         self.time_since_input=0
 
         # this is necessary to prevent the player from accidentally exiting the death menu

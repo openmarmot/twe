@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 4 2025
+- added wait task to ai human 
+- minor changes to vehicle diagnostics 
+- refactor of task_enter_vehicle 
+- added more error catching for world_menu
+
+several tasks now go to the wait task for several second when they are done. this is to simulate 
+things like the time it takes to pick up a object 
+
+task_enter_vehicle now does a early abort if the vehicle is disabled. 
+
+play test notes : 
+- i saw a disabled t34-85 with a driver that had its current task set to driving. 
+not sure how this happened as a disabled vehicle should cause all the crew to leave
+- it seems there are some objects without a name that end up in world. i'm not sure 
+what they are at the moment, but i saw them on the self-debug print out 
+
+todo 
+- vehicle reactions to threats 
+----------------------------------
 May 3 2025
 - added missing vehicle diagnostics screens 
 

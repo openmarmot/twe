@@ -39,7 +39,8 @@ class AIHuman(object):
             'task_sit_down':self.update_task_sit_down,
             'task_medic':self.update_task_medic,
             'task_mechanic':self.update_task_mechanic,
-            'task_reload':self.update_task_reload
+            'task_reload':self.update_task_reload,
+            'task_wait':self.update_task_wait
         }
 
         self.memory={}
@@ -1677,7 +1678,17 @@ class AIHuman(object):
 
         self.memory[task_name]=task_details
         self.memory['current_task']=task_name
-        
+
+    #---------------------------------------------------------------------------
+    def switch_task_wait(self,wait_time_seconds):
+        '''switch task wait'''
+        task_name='task_wait'
+        task_details = {
+            'end_time': self.owner.world.world_seconds+wait_time_seconds,
+        }
+
+        self.memory[task_name]=task_details
+        self.memory['current_task']=task_name        
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
@@ -2486,78 +2497,81 @@ class AIHuman(object):
             self.speak('Where did that '+vehicle.name+' go?')
             self.memory.pop('task_enter_vehicle',None)
             self.switch_task_think()
-        else:
-            # -- vehicle still exists --
+            return
 
-            distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
-            distance_to_destination=engine.math_2d.get_distance(self.owner.world_coords,destination)
+        if vehicle.ai.vehicle_disabled:
+            self.speak(f'This {vehicle.name} is destroyed!')
+            self.memory.pop('task_enter_vehicle',None)
+            self.switch_task_think()
+            return
 
-            if distance_to_destination<distance and self.owner.is_player is False:
-                # -- vehicle is further than where we wanted to go --
+        distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
+        distance_to_destination=engine.math_2d.get_distance(self.owner.world_coords,destination)
 
-                # i think this should never happen??
-                # basically we are closer to our final destination than we are to the vehicle
+        if distance_to_destination<distance and self.owner.is_player is False:
+            # vehicle is further away than our actual destination
+            # lets just walk
 
-                # first cancel the task
+            # first cancel the task
+            self.memory.pop('task_enter_vehicle',None)
+            
+            # double check its walkable
+            if distance_to_destination<self.max_walk_distance:
+                self.speak(f"Forget the {vehicle.name}. I'm walking")
+                self.switch_task_move_to_location(destination,None)
+                return
+            else:
+                # this is probably a loop at this point, lets just cancel the original task
+                self.speak("I've lost track of what I was doing..")
+                self.memory.pop('task_move_to_location',None)
+                self.switch_task_think()
+                return
+
+        if distance<self.max_distance_to_interact_with_object or self.owner.is_player:
+
+            # no matter what at this point this task is complete
+            self.memory.pop('task_enter_vehicle',None)
+            # reset current task if we don't end up doing anything else
+            self.switch_task_think()
+
+            # remove this as well so we don't end up wanting to go back to where the vehicle was
+
+            precheck=True
+            if vehicle.ai.check_if_vehicle_is_full() is True:
+                precheck=False
+                self.speak('No more room in this vehicle!')
+            
+            if precheck:
+                for value in vehicle.ai.vehicle_crew.values():
+                    if value[0] is True:
+                        if value[1].ai.squad.faction!=self.squad.faction:
+                            precheck=False
+                            self.speak('This vehicle is crewed by the enemy!')
+                            break
+
+            if precheck:
+                # put your large items in the trunk
+                if self.large_pickup:
+                    vehicle.add_inventory(self.large_pickup)
+                    self.owner.world.remove_queue.append(self.large_pickup)
+                    self.large_pickup=None
+
+                # this will decide crew position as well
+                self.switch_task_vehicle_crew(vehicle,destination)
+            else:
+                # something went wrong, cancel the task
                 self.memory.pop('task_enter_vehicle',None)
                 self.switch_task_think()
-                
-                # double check its walkable
-                if distance_to_destination<self.max_walk_distance:
-                    self.switch_task_move_to_location(destination,None)
-                else:
-                    # this is probably a loop at this point, lets just cancel the original task
-                    self.memory.pop('task_move_to_location',None)
-                    self.switch_task_think()
+
+        else:
+            # -- too far away to enter, what do we do --
+            if distance<self.max_walk_distance:
+                self.switch_task_move_to_location(vehicle.world_coords,vehicle)
             else:
-                # -- vehicle task still makes sense --
-                # -- OR we are the player--
-
-                if distance<self.max_distance_to_interact_with_object or self.owner.is_player:
-
-                    # no matter what at this point this task is complete
-                    self.memory.pop('task_enter_vehicle',None)
-                    # reset current task if we don't end up doing anything else
-                    self.switch_task_think()
-
-                    # remove this as well so we don't end up wanting to go back to where the vehicle was
-
-                    precheck=True
-                    if vehicle.ai.check_if_vehicle_is_full() is True:
-                        precheck=False
-                        self.speak('No more room in this vehicle!')
-                    
-                    if precheck:
-                        for value in vehicle.ai.vehicle_crew.values():
-                            if value[0] is True:
-                                if value[1].ai.squad.faction!=self.squad.faction:
-                                    precheck=False
-                                    self.speak('This vehicle is crewed by the enemy!')
-                                    break
-
-                    
-                    if precheck:
-                        # put your large items in the trunk
-                        if self.large_pickup:
-                            vehicle.add_inventory(self.large_pickup)
-                            self.owner.world.remove_queue.append(self.large_pickup)
-                            self.large_pickup=None
-
-                        # this will decide crew position as well
-                        self.switch_task_vehicle_crew(vehicle,destination)
-                    else:
-                        # something went wrong, cancel the task
-                        self.memory.pop('task_enter_vehicle',None)
-                        self.switch_task_think()
-
-                else:
-                    # -- too far away to enter, what do we do --
-                    if distance<self.max_walk_distance:
-                        self.switch_task_move_to_location(vehicle.world_coords,vehicle)
-                    else:
-                        # vehicle is way too far away, just cancel task
-                        self.memory.pop('task_enter_vehicle',None)
-                        self.switch_task_think()
+                # vehicle is way too far away, just cancel task
+                self.speak(f"The {vehicle.name} is too far away. Let's rethink this.")
+                self.memory.pop('task_enter_vehicle',None)
+                self.switch_task_think()
 
     #---------------------------------------------------------------------------
     def update_task_exit_vehicle(self):
@@ -2630,7 +2644,7 @@ class AIHuman(object):
             if distance<self.max_distance_to_interact_with_object:
                 # done with this task
                 self.memory.pop('task_loot_container',None)
-                self.switch_task_think()
+                self.switch_task_wait(random.randint(14,30))
 
                 # -- loot container --
                 need_medical=True
@@ -2725,7 +2739,7 @@ class AIHuman(object):
         if self.memory['task_mechanic']['current_vehicle'] is None:
             if len(self.memory['task_mechanic']['damaged_vehicles'])==0:
                 self.memory.pop('task_mechanic',None)
-                self.switch_task_think()
+                self.switch_task_wait(random.randint(15,30))
                 return
             self.memory['task_mechanic']['current_vehicle']=self.memory['task_mechanic']['damaged_vehicles'].pop()
         current_vehicle=self.memory['task_mechanic']['current_vehicle']
@@ -2762,7 +2776,7 @@ class AIHuman(object):
         if self.memory['task_medic']['current_patient'] is None:
             if len(self.memory['task_medic']['wounded_humans'])==0:
                 self.memory.pop('task_medic',None)
-                self.switch_task_think()
+                self.switch_task_wait(random.randint(10,15))
                 return
             self.memory['task_medic']['current_patient']=self.memory['task_medic']['wounded_humans'].pop()
         patient=self.memory['task_medic']['current_patient']
@@ -2885,6 +2899,7 @@ class AIHuman(object):
         else:
             if len(objects)==0:
                 self.memory.pop('task_pickup_objects',None)
+                self.switch_task_wait(random.randint(5,15))
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
@@ -3177,7 +3192,11 @@ class AIHuman(object):
                 elif 'driver' in role:
                     self.action_vehicle_driver()
 
-
+    #---------------------------------------------------------------------------
+    def update_task_wait(self):
+        '''update task wait'''
+        if self.owner.world.world_seconds>self.memory['task_wait']['end_time']:
+            self.switch_task_think()
     #-----------------------------------------------------------------------
     def use_medical_object(self,medical):
         # MEDICAL - a medical object
