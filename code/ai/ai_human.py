@@ -136,10 +136,14 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def action_vehicle_driver(self):
         ''' the action the driver is taking when not thinking'''
+        # some default values
+        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle.ai.throttle=0
+        vehicle.ai.brake_power=1
+
         if self.memory['task_vehicle_crew']['current_action']=='driving':
             calculated_distance=self.memory['task_vehicle_crew']['calculated_distance_to_target']
             calculated_vehicle_angle=self.memory['task_vehicle_crew']['calculated_vehicle_angle']
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
             # initial throttle settings
             if calculated_distance<150:
                 # apply brakes. bot will only exit when speed is zero
@@ -190,8 +194,6 @@ class AIHuman(object):
             # throttle + brake seems to be working here fairly well
 
             calculated_vehicle_angle=self.memory['task_vehicle_crew']['calculated_vehicle_angle']
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
-
             v=vehicle.rotation_angle
 
             if vehicle.ai.current_speed>10:

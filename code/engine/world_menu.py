@@ -383,7 +383,7 @@ class World_Menu(object):
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
             self.text_queue.append('2 - german_sd_kfz_251-22')
-            self.text_queue.append('3 - german_panzer_iv_ausf_h')
+            self.text_queue.append('3 - soviet_37mm_m1939_61k_aa_gun_carriage')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - rso pak')
             self.text_queue.append('6 - T20 armored tractor')
@@ -395,7 +395,7 @@ class World_Menu(object):
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_h',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_37mm_m1939_61k_aa_gun_carriage',True)
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
