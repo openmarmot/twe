@@ -480,9 +480,12 @@ class Graphics_2D_Pygame(object):
         # tactical battle
         elif desired_mode==1:
             self.mode=1
-            #self.background.fill((128, 102, 77))
+            # this one has great constrast with the sprites
+            # bullets are very visible
+            self.background.fill((128, 102, 77))
+
             #self.background.fill((201,184,171))
-            self.background.fill((171,149,131))
+            #self.background.fill((171,149,131))
         # strategic screen
         elif desired_mode==2:
             self.mode=2

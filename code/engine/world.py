@@ -294,10 +294,10 @@ class World():
 
         if wo_obj in self.wo_objects:
             if wo_obj in self.remove_queue:
-                print('debug : check object on object in remove_queue')
+                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in remove_queue',True)
                 return False
             elif wo_obj in self.exit_queue:
-                print('debug : check object on object in exit_queue')
+                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in exit_queue',True)
                 return False
             else:
                 return True

@@ -1246,7 +1246,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
         z.ai.rate_of_fire=1
-        z.ai.reload_speed=30
+        z.ai.reload_speed=25
         z.ai.range=2000
         z.ai.type='antitank launcher'
         z.ai.use_antitank=True
@@ -1650,7 +1650,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'37mm_m1939_k61_magazine',False)
         z.ai.rate_of_fire=0.9
-        z.ai.reload_speed=20
+        z.ai.reload_speed=15
         z.ai.range=2418
         z.ai.type='automatic cannon'
         z.ai.use_antipersonnel=True
@@ -3072,13 +3072,14 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret.ai.vehicle=z
         z.ai.vehicle_crew['driver']=[False,None,0,[0,-10],True,None]
         z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,10],True,turret]
-        z.ai.max_speed=177.6
-        z.ai.max_offroad_speed=177.6
+        z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
+        z.ai.max_speed=100
+        z.ai.max_offroad_speed=100
         z.ai.open_top=True
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=1400
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
@@ -3193,7 +3194,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
         z.ai.rate_of_fire=1
-        z.ai.reload_speed=20
+        z.ai.reload_speed=19
         z.ai.range=2418
         z.ai.type='cannon'
         z.ai.use_antitank=True

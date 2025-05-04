@@ -1,11 +1,80 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 4 2025
+- added wait task to ai human 
+- minor changes to vehicle diagnostics 
+- refactor of task_enter_vehicle 
+- added more error catching for world_menu
+- added default brake action for drivers 
+- adjusted the soviet 37mm so it can move very slowly like the pak40 
+- adjusted some reload speeds 
+
+several tasks now go to the wait task for several second when they are done. this is to simulate 
+things like the time it takes to pick up a object 
+
+task_enter_vehicle now does a early abort if the vehicle is disabled. 
+
+drivers are on the brake way more. the result of this is the vehicle stops faster when the driver 
+is waiting or holding for a engagement. this means vehicles will likely engage at longer distances and 
+will reduce the chances that a vehicle accidentally drives past a target they are trying to engage. 
+
+soviet 37mm AA can now slowly move into position. I did three play tests where i followed them 
+and in each test they got machine gunned before they had any effect.  they would probably do 
+better in a infantry only fight. 
+
+play test notes : 
+- i saw a disabled t34-85 with a driver that had its current task set to driving. 
+not sure how this happened as a disabled vehicle should cause all the crew to leave
+- it seems there are some objects without a name that end up in world. i'm not sure 
+what they are at the moment, but i saw them on the self-debug print out 
+
+todo 
+- vehicle reactions to threats 
+----------------------------------
+May 3 2025
+- added missing vehicle diagnostics screens 
+
+----------------------------------
+May 2 2025
+- added vehicle diagnostics turret page 
+- misc fixes to vehicle diagnostics 
+
+----------------------------------
+May 1 2025
+- minor work on vehicle diagnostics 
+
+----------------------------------
+April 29 2025
+- dead bodies exiting vehicles now have slightly randomized positions
+- fixed molotov cocktail world remove error 
+
+looked at the mouse selection code to see if i could prefer vehicles over bodies/weapons 
+but did not see a clean solution to the problem. might need a z sorted mouse select. 
+
+the better option is probably going to be keeping dead bodies in the vehicle. 
+
+found some odd behaviour with ai repeatedly entering/exiting vehicles. this might have 
+been due to enemies being close.
+
+really need to add some behavior for vehicles when they can't pen something. 
+german half tracks will drive up right next to a soviet tank and hang out until they are 
+shot.
+
+----------------------------------
+April 28 2025
+- minor adjustments and fixes 
+
+----------------------------------
+April 27 2025
+- moving more data over to vehicle diagnostics from the vehicle menu 
+- fixed a occasional error in the wheel_hit code 
+
+----------------------------------
 April 25 2025
 - fixed strategic mode squad data error 
 - fixed scaling error when switching modes  
 - minor changes 
-
 
 ----------------------------------
 April 24 2025

@@ -120,6 +120,10 @@ class World_Menu(object):
     def activate_menu(self, SELECTED_OBJECT):
         ''' takes in a object that was mouse clicked on and returns a appropriate context menu'''
 
+        if SELECTED_OBJECT is None:
+            engine.log.add_data('error','world_menu.activate_menu SELECTED_OBJECT is None')
+            return
+
         self.time_since_input=0
 
         # this is necessary to prevent the player from accidentally exiting the death menu
@@ -379,7 +383,7 @@ class World_Menu(object):
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - Kubelwagen ')
             self.text_queue.append('2 - german_sd_kfz_251-22')
-            self.text_queue.append('3 - german_panzer_iv_ausf_h')
+            self.text_queue.append('3 - soviet_37mm_m1939_61k_aa_gun_carriage')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - rso pak')
             self.text_queue.append('6 - T20 armored tractor')
@@ -391,7 +395,7 @@ class World_Menu(object):
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_h',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_37mm_m1939_61k_aa_gun_carriage',True)
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
@@ -1218,47 +1222,6 @@ class World_Menu(object):
                 if radio:
                     self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
 
-                # - engine data - 
-                self.text_queue.append('-')
-                for b in self.selected_object.ai.engines:
-                    self.text_queue.append(f'Engine: {b.name}')
-                    self.text_queue.append(f' - Engine On: {b.ai.engine_on}')
-                    self.text_queue.append(f' - Engine Damaged: {b.ai.damaged}')
-
-                # - fuel tanks -
-                self.text_queue.append('-')
-                for b in self.selected_object.ai.fuel_tanks:
-                    fuel=0
-                    if len(b.ai.inventory)>0:
-                        if 'gas' in b.ai.inventory[0].name:
-                            fuel=b.ai.inventory[0].volume
-                    fuel_text=str(b.volume) + '|' + str(round(fuel,2))
-                    self.text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
-                
-                # - turret data - 
-                for b in self.selected_object.ai.turrets:
-                    self.text_queue.append('-')
-                    self.text_queue.append(f'Turret: {b.name}')
-                    if b.ai.turret_jammed:
-                        self.text_queue.append(' - Turret ring is jammed')
-                    
-                    if b.ai.primary_weapon!=None:
-                        self.text_queue.append(f' - {b.ai.primary_weapon.name}')
-                        if b.ai.primary_weapon.ai.action_jammed:
-                            self.text_queue.append(' -- action is jammed')
-                        if b.ai.primary_weapon.ai.damaged:
-                            self.text_queue.append(' -- weapon is damaged')
-                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.primary_weapon,self.selected_object)
-                        self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
-
-                    if b.ai.coaxial_weapon!=None:
-                        self.text_queue.append(f' - {b.ai.coaxial_weapon.name}')
-                        if b.ai.coaxial_weapon.ai.action_jammed:
-                            self.text_queue.append(' -- action is jammed')
-                        if b.ai.coaxial_weapon.ai.damaged:
-                            self.text_queue.append(' -- weapon is damaged')
-                        ammo_gun,ammo_inventory,magazine_count=self.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.selected_object)
-                        self.text_queue.append(f' -- ammo {ammo_gun}/{ammo_inventory}')
 
 
                 self.text_queue.append('- crew -')
