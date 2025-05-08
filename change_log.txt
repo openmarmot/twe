@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 7 2025
+- refactored ai_human visibility calculations into their own functions 
+- minor bump in enemy spotting distance 
+
+instead of a combined near_targets I am considering doing near_humans and near_vehicles
+that way vehicle gunners can focus on other vehicles as a priority, and other smart actions 
+around vehicles can be more easily taken by just checking the length of the near list 
+
+----------------------------------
 May 4 2025
 - added wait task to ai human 
 - minor changes to vehicle diagnostics 
