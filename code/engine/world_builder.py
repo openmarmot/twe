@@ -644,7 +644,7 @@ def load_quick_battle(world,battle_option):
         squads+=['Soviet 1944 Rifle Motorized'] * 3
         squads+=['Soviet T20 Armored Tractor'] * 6
         squads+=['Soviet PTRS-41 AT Squad'] * 6
-        squads+=['Soviet T34-76 Model 1943'] * 8
+        squads+=['Soviet T34-76 Model 1943'] * 12
         squads+=['Soviet T34-85'] * 8
         squads+=['Soviet 37mm Auto-Cannon'] * 4
         squads+=['Soviet Medic'] * 2
