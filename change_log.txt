@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 14 2025
+- added standard kubelwagen with one solider as a squad type 
+- more squad cost adjustments 
+
+feels like its time to add a couple more tanks. 
+
+----------------------------------
 May 13 2025
 - wrote a random battle creater 
 - quick battle options are now three sizes of random battle 
