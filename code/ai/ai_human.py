@@ -124,9 +124,12 @@ class AIHuman(object):
         self.squad_max_distance=300
 
         # # target lists. these are refreshed periodically
-        self.near_targets=[]
-        self.mid_targets=[]
-        self.far_targets=[]
+        self.near_human_targets=[]
+        self.mid_human_targets=[]
+        self.far_human_targets=[]
+        self.near_vehicle_targets=[]
+        self.mid_vehicle_targets=[]
+        self.far_vehicle_targets=[]
         self.last_target_eval_time=0
         self.target_eval_rate=random.uniform(0.1,0.9)
 
@@ -491,6 +494,92 @@ class AIHuman(object):
         return angle_ok
     
     #---------------------------------------------------------------------------
+    def check_visibility(self,target,distance):
+        '''check whether we can see a target at a distance'''
+        if distance<800:
+            # humans always see everything at this range
+            return True
+        elif distance<1500:                        
+            if target.is_human:
+                # if in building, only seen if noise/move
+                if target.ai.in_building:
+                    if target.ai.recent_noise_or_move:
+                        return True
+                    else:
+                        return False
+                else:
+                    # if not in building, everything is seen at this range
+                    return True
+            else:
+                # vehicles are ALWAYS seen by humans at this range
+                return True
+        elif distance<2500:
+            if target.is_human:
+                if target.ai.recent_noise_or_move and target.ai.in_building is False:
+                    return True
+                else:
+                    return False
+            else:
+                if target.ai.recent_noise_or_move:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+                
+
+
+    #---------------------------------------------------------------------------
+    def check_visibility_from_vehicle(self,target,distance):
+        '''check whether we can see a target at a distance from inside a vehicle'''
+        if distance<400:
+            return True
+        if distance<800:
+            if target.is_human:
+                # if in building, only seen if noise/move
+                if target.ai.in_building:
+                    if target.ai.recent_noise_or_move:
+                        return True
+                    else:
+                        return False
+                else:
+                    return True
+            else:
+                # vehicles are ALWAYS seen at this range
+                return True
+        if distance<1500:                        
+            if target.is_human:
+                # if in building, only seen if noise/move
+                if target.ai.in_building:
+                    if target.ai.recent_noise_or_move:
+                        return True
+                    else:
+                        return False
+                else:
+                    if target.ai.prone is False:
+                        return True
+                    else:
+                        return False
+            else:
+                # vehicles are seen at this range
+                return True
+        if distance<3000:
+            if target.is_human:
+                if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
+                    return True
+                else:
+                    return False
+            else:
+                if target.ai.recent_noise_or_move:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+        
+
+    
+    #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
         # any distance calculation would be made before this function is called
@@ -521,96 +610,62 @@ class AIHuman(object):
     def evaluate_targets(self):
         '''find and categorize targets. react to close ones'''
 
-        self.near_targets=[]
-        self.mid_targets=[]
-        self.far_targets=[]
+        self.near_human_targets=[]
+        self.mid_human_targets=[]
+        self.far_human_targets=[]
+        self.near_vehicle_targets=[]
+        self.mid_vehicle_targets=[]
+        self.far_vehicle_targets=[]
 
         closest_distance=1000
         closest_object=None
 
         # note we are using this list directly, this is ok because we aren't removing from it
         for b in self.squad.faction_tactical.hostile_humans:
+            spotted=False
             # quick check because this list isn't refreshed that often..
             if b.ai.blood_pressure>0:
                 d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
+                # 3000 is the max engagement range for anything
+                if d<3000:
 
-                target=b
-                if 'task_vehicle_crew' in b.ai.memory:
-                    target=b.ai.memory['task_vehicle_crew']['vehicle']
-                    # could do something further here to check armor pen
+                    target=b
+                    if 'task_vehicle_crew' in b.ai.memory:
+                        target=b.ai.memory['task_vehicle_crew']['vehicle']
+                        # could do something further here to check armor pen
 
-                # vehicle crew target analysis
-                if self.memory['current_task']=='task_vehicle_crew':
-                    if d<400:
-                        # always seen at this range
-                        if target not in self.near_targets:
-                            self.near_targets.append(target)
-                    elif d<800:
-                        if target.is_human:
-                            # if in building, only seen if noise/move
-                            if target.ai.in_building:
-                                if target.ai.recent_noise_or_move:
-                                    self.near_targets.append(target)
-                            else:
-                                # if not in building, everything is seen at this range
-                                self.near_targets.append(target)
-                        else:
-                            # vehicles are ALWAYS seen at this range
-                            if target not in self.near_targets:
-                                self.near_targets.append(target)
-                    elif d<1500:                        
-                        if target.is_human:
-                            # if in building, only seen if noise/move
-                            if target.ai.in_building:
-                                if target.ai.recent_noise_or_move:
-                                    self.mid_targets.append(target)
-                            else:
-                                if target.ai.prone is False:
-                                    self.mid_targets.append(target)
-                        else:
-                            # vehicles are seen at this range
-                            if target not in self.mid_targets:
-                                self.mid_targets.append(target)
-                    elif d<2450:
-                        if target.is_human:
-                            if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
-                                if target not in self.far_targets:
-                                    self.far_targets.append(target)
-                        else:
-                            if target.ai.recent_noise_or_move:
-                                if target not in self.far_targets:
-                                    self.far_targets.append(target)
+                    # vehicle crew target analysis
+                    if self.memory['current_task']=='task_vehicle_crew':
+                        spotted=self.check_visibility_from_vehicle(target,d)
 
-                # - human (not in vehicle) target analysis - 
-                else:
-                    if d<800:
-                        # humans always see everything at this range
-                        self.near_targets.append(target)
-                    elif d<1500:                        
-                        if target.is_human:
-                            # if in building, only seen if noise/move
-                            if target.ai.in_building:
-                                if target.ai.recent_noise_or_move:
-                                    self.mid_targets.append(target)
-                            else:
-                                # if not in building, everything is seen at this range
-                                self.mid_targets.append(target)
-                        else:
-                            # vehicles are ALWAYS seen by humans at this range
-                            if target not in self.mid_targets:
-                                self.mid_targets.append(target)
-                    elif d<2450:
-                        if target.is_human:
-                            if target.ai.recent_noise_or_move and target.ai.in_building is False:
-                                self.far_targets.append(target)
-                        else:
-                            if target.ai.recent_noise_or_move:
-                                self.far_targets.append(target)
+                    # - human (not in vehicle) target analysis - 
+                    else:
+                        spotted=self.check_visibility(target,d)
 
-                if d<closest_distance:
-                    closest_distance=d
-                    closest_object=target
 
+                    if spotted:
+                        if target.is_human:
+                            if d<800:
+                                self.near_human_targets.append(target)
+                            elif d<1500:
+                                self.mid_human_targets.append(target)
+                            elif d<2500:
+                                self.far_human_targets.append(target)
+                        else:
+                            #eventually these will be vehicle specific lists
+                            if d<800:
+                                self.near_vehicle_targets.append(target)
+                            elif d<1500:
+                                self.mid_vehicle_targets.append(target)
+                            elif d<3000:
+                                self.far_vehicle_targets.append(target)
+
+
+                    if d<closest_distance:
+                        closest_distance=d
+                        closest_object=target
+
+        # note that we should double check that we can actually see the closest target
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
@@ -938,15 +993,35 @@ class AIHuman(object):
         return wounded_humans
 
     #---------------------------------------------------------------------------
-    def get_target(self,max_range):
+    def get_target_human(self,max_range):
         '''returns a target or None if there are None'''
         target=None
-        if len(self.near_targets)>0:
-            target=self.near_targets.pop()
-        elif len(self.mid_targets)>0:
-            target=self.mid_targets.pop()
-        elif len(self.far_targets)>0:
-            target=self.far_targets.pop()
+        if len(self.near_human_targets)>0:
+            target=self.near_human_targets.pop()
+        elif len(self.mid_human_targets)>0:
+            target=self.mid_human_targets.pop()
+        elif len(self.far_human_targets)>0:
+            target=self.far_human_targets.pop()
+
+        if target is not None:
+
+            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+            if distance>max_range:
+                # alternatively we could drive closer.
+                target=None
+                
+        return target
+    
+    #---------------------------------------------------------------------------
+    def get_target_vehicle(self,max_range):
+        '''returns a target or None if there are None'''
+        target=None
+        if len(self.near_vehicle_targets)>0:
+            target=self.near_vehicle_targets.pop()
+        elif len(self.mid_vehicle_targets)>0:
+            target=self.mid_vehicle_targets.pop()
+        elif len(self.far_vehicle_targets)>0:
+            target=self.far_vehicle_targets.pop()
 
         if target is not None:
 
@@ -1965,7 +2040,19 @@ class AIHuman(object):
             return
 
         if self.memory['task_vehicle_crew']['target'] is None:
-            self.memory['task_vehicle_crew']['target']=self.get_target(turret.ai.primary_weapon.ai.range)
+            target=None
+            if turret.ai.primary_weapon.ai.use_antitank:
+                #prioritize vehicles
+                target=self.get_target_vehicle(turret.ai.primary_weapon.ai.range)
+                if target is None:
+                    target=self.get_target_human(turret.ai.primary_weapon.ai.range)
+            else:
+                # prioritize humans 
+                target=self.get_target_human(turret.ai.primary_weapon.ai.range)
+                if target is None:
+                    target=self.get_target_vehicle(turret.ai.primary_weapon.ai.range)
+            if target is not None:
+                self.memory['task_vehicle_crew']['target']=target
 
         # we have a target, lets think about it in more detail
         if self.memory['task_vehicle_crew']['target'] is not None:
@@ -2097,7 +2184,7 @@ class AIHuman(object):
         if vehicle.ai.vehicle_crew['driver'][0] is False:
             self.switch_task_vehicle_crew(vehicle,self.squad.destination)
         
-        if len(self.near_targets)>0:
+        if len(self.near_human_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
 
@@ -2243,10 +2330,7 @@ class AIHuman(object):
                 # this is a lazy way to check if we moved. could probably add a bool..
                 if self.large_pickup is not None:
                     self.update_large_pickup_position()
-        else:
-            # blood pressure is too low. in shock 
-            if self.prone is False:
-                self.prone_state_change()
+
 
     #---------------------------------------------------------------------------
     def update_equipment_slots(self):
@@ -2302,6 +2386,17 @@ class AIHuman(object):
                 self.fatigue-=self.fatigue_remove_rate*self.owner.world.time_passed_seconds
             self.hunger+=self.hunger_rate*self.owner.world.time_passed_seconds
             self.thirst+=self.thirst_rate*self.owner.world.time_passed_seconds
+
+            # passed out
+            if self.blood_pressure<self.blood_pressure_min:
+                if self.prone is False:
+                    self.prone_state_change()
+                if self.memory['current_task']=='task_vehicle_crew':
+                    # re-use this function to exit the vehicle cleanly
+                    self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                    self.update_task_exit_vehicle()
+                elif self.memory['current_task']=='task_exit_vehicle':
+                    self.update_task_exit_vehicle()
     
         else:
             # -- handle death --
@@ -2387,6 +2482,11 @@ class AIHuman(object):
                 self.memory.pop('task_engage_enemy',None)
                 self.switch_task_think()
                 return
+        elif enemy.is_vehicle:
+            if enemy.ai.vehicle_disabled:
+                self.memory.pop('task_engage_enemy',None)
+                self.switch_task_think()
+                return
         
         last_think_time=self.memory['task_engage_enemy']['last_think_time']
         think_interval=self.memory['task_engage_enemy']['think_interval']
@@ -2440,7 +2540,9 @@ class AIHuman(object):
 
         else:
 
-            new_enemy=self.get_target(self.primary_weapon.ai.range)
+            new_enemy=self.get_target_human(self.primary_weapon.ai.range)
+            if new_enemy is None:
+                new_enemy=self.get_target_vehicle(self.primary_weapon.ai.range)
             if new_enemy is None:
 
                     # no closer targets. is the target really far out of range?
@@ -3007,17 +3109,25 @@ class AIHuman(object):
         if self.owner.is_player:
             self.switch_task_player_control()
             return
+        
+        # check for AT targets as a high priority
+        if self.antitank is not None:
+            if self.check_ammo_bool(self.antitank,self.owner):
+                vehicle_target=self.get_target_vehicle(self.antitank.ai.range)
+                if vehicle_target is not None:
+                    self.switch_task_engage_enemy(vehicle_target)
+                    return
 
 
         # primary weapon
         if self.primary_weapon is None:
             # need to get a gun
             distance=4000
-            if len(self.near_targets)>0:
-                distance=300
-            elif len(self.mid_targets)>0:
-                distance=500
-            elif len(self.far_targets)>0:
+            if len(self.near_human_targets)>0:
+                distance=400
+            elif len(self.near_human_targets)>0:
+                distance=600
+            elif len(self.near_human_targets)>0:
                 distance=900
 
             # this also means that humans without any targets will not get a gun
@@ -3029,7 +3139,15 @@ class AIHuman(object):
                     return
         else:
             # -- we have a gun. is it usable? --
-            if self.check_ammo_bool(self.primary_weapon,self.owner) is False:
+            if self.check_ammo_bool(self.primary_weapon,self.owner):
+                
+                # focus on humans, AT weapon specific check was done earlier (above)
+                human_target=self.get_target_human(self.primary_weapon.ai.range)
+                if human_target is not None:
+                    self.switch_task_engage_enemy(human_target)
+                    return
+
+            else:
                 # need to get ammo. check for nearby magazines
                 near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
                 if len(near_magazines)>0:
@@ -3044,6 +3162,7 @@ class AIHuman(object):
                 
                 # ran out of options to find ammo. set this to cause the bot to pickup a new weapon
                 self.primary_weapon=None
+            
         
         # -- check if we have older tasks to resume --
         # this is important for compound tasks

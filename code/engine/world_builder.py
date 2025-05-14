@@ -294,6 +294,54 @@ def convert_world_objects_to_map_objects(world,map_square):
     # TBD - handle objects that exited the map
 
 #------------------------------------------------------------------------------
+def create_random_battlegroup(faction,funds):
+    '''create random battlegroup for a faction'''
+
+    battlegroup=[]
+    cost=0
+
+    squad_options={}
+    squad_options_tanks={}
+    squad_options_infantry={}
+    squad_options_other={}
+    # sort for faction specific data
+    for key,value in squad_data.items():
+        if value['faction']==faction:
+            squad_options[key]=value
+
+            if value['type']=='tank':
+                squad_options_tanks[key]=value
+            elif value['type'] in ['infantry','motorized_infantry','mechanized_infantry']:
+                squad_options_infantry[key]=value
+            else:
+                squad_options_other[key]=value
+    
+    while cost<funds:
+        if squad_options_infantry:
+            random_key = random.choice(list(squad_options_infantry.keys()))
+            for i in range(random.randint(3,5)):
+                if cost<funds:
+                    cost+=squad_options_infantry[random_key]['cost']
+                    battlegroup.append(random_key)
+
+        if squad_options_tanks:
+            random_key = random.choice(list(squad_options_tanks.keys()))
+            for i in range(random.randint(1,3)):
+                if cost<funds:
+                    cost+=squad_options_tanks[random_key]['cost']
+                    battlegroup.append(random_key)
+
+        if squad_options_other:
+            random_key = random.choice(list(squad_options_other.keys()))
+            for i in range(random.randint(1,2)):
+                if cost<funds:
+                    cost+=squad_options_other[random_key]['cost']
+                    battlegroup.append(random_key)
+    
+    return battlegroup
+
+
+#------------------------------------------------------------------------------
 def fill_container(world,container,fill_name):
     ''' fill container with an object (liquid)'''
     # CONTAINER - should be empty
@@ -614,61 +662,24 @@ def load_quick_battle(world,battle_option):
 
     # -- initial troops --
 
-    # large mixed unit battle
     if battle_option=='1':
+        points=2500
         squads=[]
-        squads+=['German 1944 Rifle'] * 4
-        squads+=['German 1944 Panzergrenadier Mech'] * 6
-        squads+=['German 1944 Fallschirmjager'] * 3
-        squads+=['German 1944 Volksgrenadier Storm Group'] * 1
-        squads+=['German 1944 Volksgrenadier Fire Group'] * 2
-        squads+=['German Hetzer Squad'] * 2
-        squads+=['German Aufklaren Kubelwagen'] * 2
-        squads+=['German RSO Vehicle'] * 2
-        squads+=['German RSO PAK'] * 1
-        squads+=['German Panzer IV Ausf G'] * 2
-        squads+=['German Panzer IV Ausf H'] * 2
-        squads+=['German Panzer IV Ausf J'] * 2
-        squads+=['German Luftwaffe MG-15 Crew'] * 2
-        squads+=['German PAK 40'] * 2
-        squads+=['German Sd.kfz.251/22'] * 2
-        squads+=['German Panzerschreck Team'] * 2
-        squads+=['German FeldFunk Team'] * 2
-        squads+=['German Medic'] * 2
-        squads+=['German Mechanic'] * 2
+        squads+=create_random_battlegroup('german',points)
+        squads+=create_random_battlegroup('soviet',points)
 
-        squads+=['Soviet 1943 Rifle'] * 2
-        squads+=['Soviet 1944 Rifle'] * 6
-        squads+=['Soviet 1944 SMG'] * 2
-        squads+=['Soviet 1943 Assault SMG'] * 2
-        squads+=['Soviet 1944 Rifle Motorized'] * 3
-        squads+=['Soviet T20 Armored Tractor'] * 6
-        squads+=['Soviet PTRS-41 AT Squad'] * 6
-        squads+=['Soviet T34-76 Model 1943'] * 8
-        squads+=['Soviet T34-85'] * 8
-        squads+=['Soviet 37mm Auto-Cannon'] * 4
-        squads+=['Soviet Medic'] * 2
-        squads+=['Soviet Mechanic'] * 2
-
-    # german and civilian only
     elif battle_option=='2':
+        points=5000
         squads=[]
-        #squads+=['German 1944 Panzergrenadier Mech'] * 8
-        squads+=['German Luftwaffe MG-15 Crew'] * 2
-        squads+=['German PAK 40'] * 2
-        squads+=['German Sd.kfz.251/22'] * 2
+        squads+=create_random_battlegroup('german',points)
+        squads+=create_random_battlegroup('soviet',points)
 
     
-    # soviet and civilian only 
     elif battle_option=='3':
+        points=10000
         squads=[]
-        squads+=['Soviet 1943 Assault SMG'] * 2
-        squads+=['Soviet 1944 Rifle Motorized'] * 3
-        squads+=['Soviet T20 Armored Tractor'] * 6
-        squads+=['Soviet PTRS-41 AT Squad'] * 6
-        squads+=['Soviet T34-76 Model 1943'] * 8
-        squads+=['Soviet T34-85'] * 8
-        squads+=['Soviet 37mm Auto-Cannon'] * 4
+        squads+=create_random_battlegroup('german',points)
+        squads+=create_random_battlegroup('soviet',points)
 
     # testing
     elif battle_option=='4':
