@@ -187,23 +187,24 @@ class GameMenu():
             self.text_queue.append('---------------')
             self.text_queue.append('Pick a Quick Battle Scenario')
             self.text_queue.append('Note - balance varies wildly with code updates.')
-            self.text_queue.append('1 - Large mixed unit battle (choose this) ')
+
+            self.text_queue.append('1 - 5k point random battle ')
             if key=='1':
                 engine.world_builder.load_quick_battle(self.graphics_engine.world,'1')
                 self.graphics_engine.switch_mode(1)
                 self.deactivate_menu()
-            if faction in ['german','civilian']:
-                self.text_queue.append('2 - German and Civilian only (No fighting)')
-                if key=='2':
-                    engine.world_builder.load_quick_battle(self.graphics_engine.world,'2')
-                    self.graphics_engine.switch_mode(1)
-                    self.deactivate_menu()
-            if faction in ['soviet','civilian']:
-                self.text_queue.append('3 - Soviet and Civilian only (No fighting)')
-                if key=='3':
-                    engine.world_builder.load_quick_battle(self.graphics_engine.world,'3')
-                    self.graphics_engine.switch_mode(1)
-                    self.deactivate_menu()
+
+            self.text_queue.append('2 - 10k point random battle')
+            if key=='2':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'2')
+                self.graphics_engine.switch_mode(1)
+                self.deactivate_menu()
+
+            self.text_queue.append('3 - 20k point random battle')
+            if key=='3':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'3')
+                self.graphics_engine.switch_mode(1)
+                self.deactivate_menu()
 
             self.text_queue.append('4 - Reserved for testing, content will vary')
             if key=='4':

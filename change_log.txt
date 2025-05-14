@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 13 2025
+- wrote a random battle creater 
+- quick battle options are now three sizes of random battle 
+- adjusted some squad costs 
+
+i could probably mix and match some things to add some more squad types 
+
+----------------------------------
 May 12 2025
 - split ai_human targeting system into _human_targets and _vehicle_targets
 - ai_human update_think will now look for AT targets if the human has a AT weapon 
