@@ -118,6 +118,7 @@ class Graphics_2D_Pygame(object):
         self.view_adjustment=400
 
         # -- key stuff --
+        # https://www.pygame.org/docs/ref/key.html
         self.key_press_actions = {
             pygame.K_w: lambda: self.world.handle_key_press('w'),
             pygame.K_s: lambda: self.world.handle_key_press('s'),
@@ -158,7 +159,7 @@ class Graphics_2D_Pygame(object):
             pygame.K_x: 'x',
             pygame.K_LEFTBRACKET: '[',
             pygame.K_RIGHTBRACKET: ']',
-            # Add more mappings as needed
+            pygame.K_SPACE: 'space'
         }
 
 
@@ -303,7 +304,7 @@ class Graphics_2D_Pygame(object):
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
                 if self.draw_collision:
-                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
+                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.scale)
 
         h=0
         for b in islice(self.world.text_queue,self.world.text_queue_display_size):
@@ -326,6 +327,23 @@ class Graphics_2D_Pygame(object):
             for b in self.world.vehicle_text_queue:
                 h+=15
                 self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
+
+        # might consider moving this to world and just returning a array of circles to draw
+        if self.world.display_weapon_range:
+            if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                for turret in vehicle.ai.turrets:
+                    if turret.ai.primary_weapon is not None:
+                        radius=turret.ai.primary_weapon.ai.range*self.scale
+                        pygame.draw.circle(self.screen,(236,64,122),turret.screen_coords,radius,width=5)
+            else:
+                if self.world.player.ai.primary_weapon is not None:
+                    radius=self.world.player.ai.primary_weapon.ai.range*self.scale
+                    pygame.draw.circle(self.screen,(236,64,122),self.world.player.screen_coords,radius,width=5)
+
+                if self.world.player.ai.antitank is not None:
+                    radius=self.world.player.ai.antitank.ai.range*self.scale
+                    pygame.draw.circle(self.screen,(236,64,50),self.world.player.screen_coords,radius,width=5)
 
         if self.double_buffering:
             pygame.display.flip()

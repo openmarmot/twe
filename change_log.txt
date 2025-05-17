@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+May 17 2025
+- added armor values to vehicle diagnostics page
+- added weapon range circles - toggle with space bar 
+
+noted that knocked out vehicle crew still seem to stay in the vehicle, not sure why. 
+i got one as a player character.
+
+----------------------------------
 May 14 2025
 - added standard kubelwagen with one solider as a squad type 
 - more squad cost adjustments 

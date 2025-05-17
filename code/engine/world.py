@@ -177,6 +177,9 @@ class World():
         # whether hit markers exist or not
         self.hit_markers=False
 
+        # checked by graphics_2d_pygame render
+        self.display_weapon_range=False
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -477,7 +480,7 @@ class World():
         '''handle keydown events. called by graphics engine'''
         # these are for one off (not repeating) key presses
 
-        #print('key ',KEY)
+        #print('key ',key)
         self.world_menu.handle_input(key)
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
@@ -501,6 +504,9 @@ class World():
 
         if key=='tab':
             self.activate_context_menu()
+
+        if key=='space':
+            self.display_weapon_range=not self.display_weapon_range
 
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None):

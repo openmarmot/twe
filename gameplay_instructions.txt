@@ -2,7 +2,20 @@ Gameplay Instructions / Tips / Notes
 
 ------- Controls --------------------------
 
--human-
+-- general controls --
+[ - zoom in 
+] - zoom out
+space bar - enable/disable weapon range circle(s) 
+
+tab - bring up a context menu or exit the current menu 
+esc - exit the current menu 
+
+~ - tilde brings up the debug menu. 
+    - turning on debug mode adds a info read out that can be interesting
+    - debug mode also lets you select objects at any range instead of having 
+        to be close.
+
+-- human --
 w - move north 
 s - move south 
 a - move west 
@@ -19,13 +32,13 @@ t - fire anti tank (if you have one)
 p - toggle prone 
 r - reload your equipped weapon if you have a compatible magazine in inventory
 
--vehicle-
+-- vehicle --
 w - gas 
 s - brake 
 a - steer left 
 d - steer right 
 
--airplane-
+-- airplane --
 w - elevator 
 s - elevator + brake (if on ground)
 a - aileron roll left + rudder + wheel (if on ground)
@@ -35,16 +48,7 @@ left arrow key - throttle down
 right arrow key - throttle up 
 
 
-[ - zoom in 
-] - zoom out 
 
-tab - bring up a context menu or exit the current menu 
-esc - exit the current menu 
-
-~ - tilde brings up the debug menu. 
-    - turning on debug mode adds a info read out that can be interesting
-    - debug mode also lets you select objects at any range instead of having 
-        to be close.
 
 
 ------- General Tips --------------------
