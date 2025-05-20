@@ -2373,12 +2373,14 @@ class AIHuman(object):
                     self.last_bleed_time=self.owner.world.world_seconds+random.uniform(0,2)
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'small_blood',True)
                     self.blood_pressure-=10+random.uniform(0,3)
-
-                    if random.randint(0,3)==0:
-                        for b in self.inventory:
-                            if b.is_medical:
-                                self.use_medical_object(b)
-                                break
+                    
+                    # only self heal if not passed out
+                    if self.blood_pressure>self.blood_pressure_min:
+                        if random.randint(0,3)==0:
+                            for b in self.inventory:
+                                if b.is_medical:
+                                    self.use_medical_object(b)
+                                    break
                 # possibly have a random stop bleed even if you don't have medical
 
             # -- body attribute stuff --
@@ -2711,6 +2713,7 @@ class AIHuman(object):
 
         # make sure we are visible again
         self.owner.render=True
+        self.owner.reset_image=True # needed for dead guys i think because they don't move
 
         # delete vehicle role memory 
         self.memory.pop('task_vehicle_crew',None)

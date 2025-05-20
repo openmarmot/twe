@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
+----------------------------------
+May 18 2025
+- minor changes to ai_human 
+- bumped up the pen on the soviet 85mm at max range a bit. (probably won't matter)
 
+reviewed the health code to figure out why some knocked out humans stay in the vehicle but I didn't figure it out.
+I also did not catch this happening in my play tests today, so maybe it is already fixed. 
+
+the current soviet tanks do not match up well against the current german tanks. this is only going to get worse as 
+i've basically just modelled the worst german tanks so far. i think this is basically accurate though, what is 
+missing is a massive numbers advantage on the soviet side, and the tank gunner/driver ai needs to know to drive around 
+to get side shots (which will pen on most german models)
+
+todo 
+- vehicle driver should probably wait while the turret is being reloaded 
 ----------------------------------
 May 17 2025
 - added armor values to vehicle diagnostics page
