@@ -323,6 +323,7 @@ class World_Menu(object):
             self.text_queue.append('6 - toggle_hit_markers')
             self.text_queue.append('7 - kill all humans except for the player')
             self.text_queue.append('8 - print squad info')
+            self.text_queue.append('9 - toggle after action report (AAR) mode (auto screenshots)')
 
             if key=='1':
                 self.world.toggle_map()
@@ -357,6 +358,9 @@ class World_Menu(object):
                         print(f'members: {len(squad.members)}')
                         
                         print('---------------------')
+            elif key=='9':
+                self.world.aar_mode_enabled = not self.world.aar_mode_enabled
+                engine.log.add_data('info',f'After Action Report mode : {self.world.aar_mode_enabled}',True)
         if self.menu_state=='spawn':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu --')
@@ -784,7 +788,12 @@ class World_Menu(object):
                 self.text_queue.append('- magazine count: '+str(magazine_count))
                 self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
             if self.selected_object.ai.throwable!=None:
-                self.text_queue.append('[throwing weapon]: '+self.selected_object.ai.throwable.name)
+                throwing_text=f'[throwing weapon]: {self.selected_object.ai.throwable.name}'
+                if self.selected_object.ai.throwable.ai.use_antitank:
+                    throwing_text+=' (AT)'
+                if self.selected_object.ai.throwable.ai.use_antipersonnel:
+                    throwing_text+=' (AP)'
+                self.text_queue.append(throwing_text)
             if self.selected_object.ai.antitank!=None:
                 self.text_queue.append('[anti-tank weapon]: '+self.selected_object.ai.antitank.name)
 

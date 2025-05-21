@@ -1,5 +1,50 @@
 TWE Project : Change Log
 
+----------------------------------
+May 21 2025
+- left control now takes a screenshot. saved in code/game_screenshots/*
+- logs now save in a date stamped folder 
+- AAR mode (creates screenshot every 15 seconds) toggle from debug menu 
+- in the human menu the throwing weapon now has (AP)/(AT) depending on its use 
+
+i kept forgetting what grenades do what on the soviet side so i added hints to the human context menu. 
+very helpful. i think that menu needs to be decluttered a bit as well. should only have essential info. 
+
+the screenshots work very well. i thought there would be some lag when it takes them but I haven't noticed any. 
+
+----------------------------------
+May 20 2025
+- gunners now request that driver wait while they reload 
+
+----------------------------------
+May 18 2025
+- minor changes to ai_human 
+- bumped up the pen on the soviet 85mm at max range a bit. (probably won't matter)
+
+reviewed the health code to figure out why some knocked out humans stay in vehicles but I didn't figure it out.
+I also did not catch this happening in my play tests today, so maybe it is already fixed. 
+
+the current soviet tanks do not match up well against the current german tanks. this is only going to get worse as 
+i've basically just modelled the worst german tanks so far. i think this is basically accurate though, what is 
+missing is a massive numbers advantage on the soviet side, and the tank gunner/driver ai needs to know to drive around 
+to get side shots (which will pen on most german models)
+
+todo 
+- vehicle driver should probably wait while the turret is being reloaded 
+----------------------------------
+May 17 2025
+- added armor values to vehicle diagnostics page
+- added weapon range circles - toggle with space bar 
+
+noted that knocked out vehicle crew still seem to stay in the vehicle, not sure why. 
+i got one as a player character.
+
+----------------------------------
+May 14 2025
+- added standard kubelwagen with one solider as a squad type 
+- more squad cost adjustments 
+
+feels like its time to add a couple more tanks. 
 
 ----------------------------------
 May 13 2025

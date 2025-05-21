@@ -683,7 +683,8 @@ def load_quick_battle(world,battle_option):
 
     # testing
     elif battle_option=='4':
-        squads=[]       
+        squads=[]
+        squads+=['German Kubelwagen']     
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)

@@ -14,7 +14,8 @@ data_log=[]
 # dictionaries are appended to this by ai_human upon death
 human_death_log=[]
 
-
+log_folder=f"logs/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+os.makedirs(log_folder, exist_ok=True)
 
 #---------------------------------------------------------------------------
 def add_data(classification,data,print_message):
@@ -35,7 +36,6 @@ def add_data(classification,data,print_message):
 #---------------------------------------------------------------------------
 def export_to_csv(dict_list,filename_prefix):
     '''export to csv'''
-    output_dir='logs'
     # Get current date and time for filename
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")  # Format: YYYYMMDD_HHMMSS
     filename = f"{filename_prefix}_{current_time}.csv"
@@ -48,8 +48,8 @@ def export_to_csv(dict_list,filename_prefix):
     # Get column names from first dictionary
     fieldnames = dict_list[0].keys()
 
-    os.makedirs(output_dir, exist_ok=True)
-    full_path = os.path.join(output_dir, filename)
+    os.makedirs(log_folder, exist_ok=True)
+    full_path = os.path.join(log_folder, filename)
     
     # Write to CSV file
     with open(full_path, 'w', newline='') as csvfile:

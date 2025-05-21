@@ -16,6 +16,8 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 #import built in modules
 from itertools import islice
 import os
+from datetime import datetime
+
 
 # import pip packages
 import pygame
@@ -53,6 +55,12 @@ class Graphics_2D_Pygame(object):
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
+
+        self.screenshot_folder=f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+        os.makedirs(self.screenshot_folder, exist_ok=True)
+
+        self.aar_screenshot_interval=10
+        self.last_aar_screenshot_time=0
 
         self.mode=0
         # 0 - game menu
@@ -118,6 +126,8 @@ class Graphics_2D_Pygame(object):
         self.view_adjustment=400
 
         # -- key stuff --
+        # https://www.pygame.org/docs/ref/key.html
+        # continuous
         self.key_press_actions = {
             pygame.K_w: lambda: self.world.handle_key_press('w'),
             pygame.K_s: lambda: self.world.handle_key_press('s'),
@@ -134,6 +144,7 @@ class Graphics_2D_Pygame(object):
             pygame.K_RIGHT: lambda: self.world.handle_key_press('right'),
         }
 
+        # one time
         self.key_down_translations = {
             pygame.K_BACKQUOTE: "tilde",
             pygame.K_0: "0",
@@ -158,12 +169,17 @@ class Graphics_2D_Pygame(object):
             pygame.K_x: 'x',
             pygame.K_LEFTBRACKET: '[',
             pygame.K_RIGHTBRACKET: ']',
-            # Add more mappings as needed
+            pygame.K_SPACE: 'space',
+            pygame.K_LCTRL: 'l_ctrl'
         }
 
 
         # load all images
         self.load_all_images('images')
+
+    #------------------------------------------------------------------------------
+    def create_screenshot(self):
+        pygame.image.save(self.screen, f"{self.screenshot_folder}/twe-{round(self.world.world_seconds,2)}.png")
 
     #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
@@ -217,6 +233,8 @@ class Graphics_2D_Pygame(object):
                         self.zoom_out()
                     elif translated_key==']':
                         self.zoom_in()
+                    elif translated_key=='l_ctrl':
+                        self.create_screenshot()
                     else:
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
                 elif self.mode==2:
@@ -303,7 +321,7 @@ class Graphics_2D_Pygame(object):
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
                 if self.draw_collision:
-                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius)
+                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.scale)
 
         h=0
         for b in islice(self.world.text_queue,self.world.text_queue_display_size):
@@ -326,6 +344,23 @@ class Graphics_2D_Pygame(object):
             for b in self.world.vehicle_text_queue:
                 h+=15
                 self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
+
+        # might consider moving this to world and just returning a array of circles to draw
+        if self.world.display_weapon_range:
+            if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                for turret in vehicle.ai.turrets:
+                    if turret.ai.primary_weapon is not None:
+                        radius=turret.ai.primary_weapon.ai.range*self.scale
+                        pygame.draw.circle(self.screen,(236,64,122),turret.screen_coords,radius,width=5)
+            else:
+                if self.world.player.ai.primary_weapon is not None:
+                    radius=self.world.player.ai.primary_weapon.ai.range*self.scale
+                    pygame.draw.circle(self.screen,(236,64,122),self.world.player.screen_coords,radius,width=5)
+
+                if self.world.player.ai.antitank is not None:
+                    radius=self.world.player.ai.antitank.ai.range*self.scale
+                    pygame.draw.circle(self.screen,(236,64,50),self.world.player.screen_coords,radius,width=5)
 
         if self.double_buffering:
             pygame.display.flip()
@@ -514,6 +549,12 @@ class Graphics_2D_Pygame(object):
             #self.game_menu.update(self.time_passed_seconds)
         elif self.mode==1:
             self.world.update(self.time_passed_seconds)
+
+            if self.world.aar_mode_enabled:
+                if self.world.world_seconds-self.last_aar_screenshot_time>self.aar_screenshot_interval:
+                    self.last_aar_screenshot_time=self.world.world_seconds
+                    self.create_screenshot()
+
             # insert graphic engine specific debug text (after world.update populated it)
             if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
