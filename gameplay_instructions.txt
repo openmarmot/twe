@@ -6,14 +6,11 @@ Gameplay Instructions / Tips / Notes
 [ - zoom in 
 ] - zoom out
 space bar - enable/disable weapon range circle(s) 
-
 tab - bring up a context menu or exit the current menu 
 esc - exit the current menu 
-
+left ctrl - take screenshot (saves to code/game_screenshots)
 ~ - tilde brings up the debug menu. 
-    - turning on debug mode adds a info read out that can be interesting
-    - debug mode also lets you select objects at any range instead of having 
-        to be close.
+
 
 -- human --
 w - move north 

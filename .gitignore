@@ -1,6 +1,7 @@
 # twe specific
 code/saves/save*
 code/logs/*
+code/game_screenshots/*
 
 .DS_Store
 **/.DS_Store

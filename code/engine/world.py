@@ -138,6 +138,9 @@ class World():
         #bool
         self.map_enabled=False
 
+        # automatic screenshots
+        self.aar_mode_enabled=False
+
         # checked by ai_gun.fire() and world_builder.spawn_shrapnel_cloud
         # True== get hurt, False== don't get hurt
         self.friendly_fire=False # complete friendly fire

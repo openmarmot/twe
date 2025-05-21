@@ -16,6 +16,8 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 #import built in modules
 from itertools import islice
 import os
+from datetime import datetime
+
 
 # import pip packages
 import pygame
@@ -53,6 +55,12 @@ class Graphics_2D_Pygame(object):
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
+
+        self.screenshot_folder=f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+        os.makedirs(self.screenshot_folder, exist_ok=True)
+
+        self.aar_screenshot_interval=10
+        self.last_aar_screenshot_time=0
 
         self.mode=0
         # 0 - game menu
@@ -119,6 +127,7 @@ class Graphics_2D_Pygame(object):
 
         # -- key stuff --
         # https://www.pygame.org/docs/ref/key.html
+        # continuous
         self.key_press_actions = {
             pygame.K_w: lambda: self.world.handle_key_press('w'),
             pygame.K_s: lambda: self.world.handle_key_press('s'),
@@ -135,6 +144,7 @@ class Graphics_2D_Pygame(object):
             pygame.K_RIGHT: lambda: self.world.handle_key_press('right'),
         }
 
+        # one time
         self.key_down_translations = {
             pygame.K_BACKQUOTE: "tilde",
             pygame.K_0: "0",
@@ -159,12 +169,17 @@ class Graphics_2D_Pygame(object):
             pygame.K_x: 'x',
             pygame.K_LEFTBRACKET: '[',
             pygame.K_RIGHTBRACKET: ']',
-            pygame.K_SPACE: 'space'
+            pygame.K_SPACE: 'space',
+            pygame.K_LCTRL: 'l_ctrl'
         }
 
 
         # load all images
         self.load_all_images('images')
+
+    #------------------------------------------------------------------------------
+    def create_screenshot(self):
+        pygame.image.save(self.screen, f"{self.screenshot_folder}/twe-{round(self.world.world_seconds,2)}.png")
 
     #------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
@@ -218,6 +233,8 @@ class Graphics_2D_Pygame(object):
                         self.zoom_out()
                     elif translated_key==']':
                         self.zoom_in()
+                    elif translated_key=='l_ctrl':
+                        self.create_screenshot()
                     else:
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
                 elif self.mode==2:
@@ -532,6 +549,12 @@ class Graphics_2D_Pygame(object):
             #self.game_menu.update(self.time_passed_seconds)
         elif self.mode==1:
             self.world.update(self.time_passed_seconds)
+
+            if self.world.aar_mode_enabled:
+                if self.world.world_seconds-self.last_aar_screenshot_time>self.aar_screenshot_interval:
+                    self.last_aar_screenshot_time=self.world.world_seconds
+                    self.create_screenshot()
+
             # insert graphic engine specific debug text (after world.update populated it)
             if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))

@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 21 2025
+- left control now takes a screenshot. saved in code/game_screenshots/*
+- logs now save in a date stamped folder 
+- AAR mode (creates screenshot every 15 seconds) toggle from debug menu 
+- in the human menu the throwing weapon now has (AP)/(AT) depending on its use 
+
+i kept forgetting what grenades do what on the soviet side so i added hints to the human context menu. 
+very helpful. i think that menu needs to be decluttered a bit as well. should only have essential info. 
+
+the screenshots work very well. i thought there would be some lag when it takes them but I haven't noticed any. 
+
+----------------------------------
 May 20 2025
 - gunners now request that driver wait while they reload 
 
