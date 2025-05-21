@@ -1972,6 +1972,11 @@ class AIHuman(object):
                 # start the reload process
                 self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                 self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+
+                if len(self.near_vehicle_targets)>0 or self.memory['task_vehicle_crew']['target'] is not None:
+                    # keep driver from moving the vehicle while we are reloading
+                    if vehicle.ai.vehicle_crew['driver'][0]:
+                        self.speak_vehicle_internal('driver','hold for engagement')
                 return
             else:
                 out_of_ammo_primary=True
@@ -1984,6 +1989,11 @@ class AIHuman(object):
                     # start the reload process
                     self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                     self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
+
+                    if len(self.near_vehicle_targets)>0 or self.memory['task_vehicle_crew']['target'] is not None:
+                        # keep driver from moving the vehicle while we are reloading
+                        if vehicle.ai.vehicle_crew['driver'][0]:
+                            self.speak_vehicle_internal('driver','hold for engagement')
                     return
                 else:
                     out_of_ammo_coax=True

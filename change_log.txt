@@ -1,11 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 20 2025
+- gunners now request that driver wait while they reload 
+
+----------------------------------
 May 18 2025
 - minor changes to ai_human 
 - bumped up the pen on the soviet 85mm at max range a bit. (probably won't matter)
 
-reviewed the health code to figure out why some knocked out humans stay in the vehicle but I didn't figure it out.
+reviewed the health code to figure out why some knocked out humans stay in vehicles but I didn't figure it out.
 I also did not catch this happening in my play tests today, so maybe it is already fixed. 
 
 the current soviet tanks do not match up well against the current german tanks. this is only going to get worse as 
