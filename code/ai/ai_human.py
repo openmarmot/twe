@@ -321,17 +321,17 @@ class AIHuman(object):
         if self.fatigue>3:
             adjust_max+=0.5
         if self.fatigue>5:
-            adjust_max+=3
+            adjust_max+=6
 
         # distance based
         if distance>500:
             adjust_max+=1
         if distance>1000:
-            adjust_max+=4
+            adjust_max+=5
         if distance>1500:
             adjust_max+=2
         if distance>2000:
-            adjust_max+=2
+            adjust_max+=10
 
         # prone bonus 
         if self.prone:
@@ -563,7 +563,7 @@ class AIHuman(object):
             else:
                 # vehicles are seen at this range
                 return True
-        if distance<3000:
+        if distance<4000:
             if target.is_human:
                 if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
                     return True
@@ -627,7 +627,7 @@ class AIHuman(object):
             if b.ai.blood_pressure>0:
                 d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
                 # 3000 is the max engagement range for anything
-                if d<3000:
+                if d<4000:
 
                     target=b
                     if 'task_vehicle_crew' in b.ai.memory:
@@ -653,11 +653,11 @@ class AIHuman(object):
                                 self.far_human_targets.append(target)
                         else:
                             #eventually these will be vehicle specific lists
-                            if d<800:
+                            if d<1000:
                                 self.near_vehicle_targets.append(target)
-                            elif d<1500:
+                            elif d<2000:
                                 self.mid_vehicle_targets.append(target)
-                            elif d<3000:
+                            elif d<4000:
                                 self.far_vehicle_targets.append(target)
 
 
