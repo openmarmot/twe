@@ -128,14 +128,12 @@ class AISquad(object):
         # next check any radios that are in the world for proximity
         # this is more expensive
         if self.radio_contact==False:
-            # unlikely to be very many of these
-            for b in self.world.wo_objects_radio:
-                if self.radio_contact:
-                    break
-                for c in self.members:
-                    if engine.math_2d.get_distance(b.world_coords,c.world_coords)<200:
+            for member in self.members:
+                for radio in member.grid_square.wo_objects_radio:
+                    if engine.math_2d.get_distance(member.world_coords,radio.world_coords)<300:
                         self.radio_contact=True
                         break
+
 
           
 

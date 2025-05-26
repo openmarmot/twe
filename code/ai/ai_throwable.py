@@ -192,7 +192,7 @@ class AIThrowable(object):
 
                 # give it a little time to get away from the thrower 
                 if self.flightTime>0.1:
-                    objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
+                    objects=self.owner.grid_square.wo_objects_projectile_collision
                     if self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True) !=None:
                         if self.explode_on_contact:
                             if self.unreliable_contact_fuse:

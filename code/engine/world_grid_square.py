@@ -39,6 +39,11 @@ class WorldGridSquare:
         self.wo_objects_human=[]
         self.wo_objects_building=[]
         self.wo_objects_vehicle=[]
+        self.wo_objects_gun_magazine=[]
+        self.wo_objects_gun=[]
+        self.wo_objects_container=[]
+        self.wo_objects_radio=[]
+        self.wo_objects_furniture=[]
 
         # special selection for projectile collision. used by ai_projectile
         self.wo_objects_projectile_collision=[]
@@ -57,6 +62,16 @@ class WorldGridSquare:
             elif wo_object.is_vehicle:
                 self.wo_objects_vehicle.append(wo_object)
                 self.wo_objects_projectile_collision.append(wo_object)
+            elif wo_object.is_gun_magazine:
+                self.wo_objects_gun_magazine.append(wo_object)
+            elif wo_object.is_gun:
+                self.wo_objects_gun.append(wo_object)
+            elif wo_object.is_container:
+                self.wo_objects_container.append(wo_object)
+            elif wo_object.is_radio:
+                self.wo_objects_radio.append(wo_object)
+            elif wo_object.is_furniture:
+                self.wo_objects_furniture.append(wo_object)
         else:
             text='world_grid_square.add_wo_object - '
             text+=f'{wo_object.name} is alreay in the wo_objects list'
@@ -78,6 +93,16 @@ class WorldGridSquare:
             elif wo_object.is_vehicle:
                 self.wo_objects_vehicle.remove(wo_object)
                 self.wo_objects_projectile_collision.remove(wo_object)
+            elif wo_object.is_gun_magazine:
+                self.wo_objects_gun_magazine.remove(wo_object)
+            elif wo_object.is_gun:
+                self.wo_objects_gun.remove(wo_object)
+            elif wo_object.is_container:
+                self.wo_objects_container.remove(wo_object)
+            elif wo_object.is_radio:
+                self.wo_objects_radio.remove(wo_object)
+            elif wo_object.is_furniture:
+                self.wo_objects_furniture.remove(wo_object)
         else:
             text='world_grid_square.remove_wo_object - '
             text+=f'{wo_object.name} is not in the wo_objects list'

@@ -78,22 +78,9 @@ class World():
         # object lists 
         self.wo_objects=[]
         self.wo_objects_human=[]
-        self.wo_objects_guns=[]
-        self.wo_objects_gun_magazines=[]
         self.wo_objects_vehicle=[]
-        self.wo_objects_grenade=[]
-        self.wo_objects_consumable=[]
-        self.wo_objects_building=[]
         self.wo_objects_map_pointer=[]
-        self.wo_objects_handheld_antitank=[]
-        self.wo_objects_melee=[]
-        self.wo_objects_airplane=[]
-        self.wo_objects_medical=[]
-        self.wo_objects_ammo_container=[]
-        self.wo_objects_container=[]
-        self.wo_objects_furniture=[]
         self.wo_objects_cleanup=[]
-        self.wo_objects_radio=[]
 
         #world areas
         self.world_areas=[]
@@ -163,7 +150,8 @@ class World():
 
 
         # number of objects over which the world starts to cleanup un-needed objects
-        self.cleanup_threshold=4000
+        # this likely won't be reached anymore as most objects self clean up
+        self.cleanup_threshold=5000
 
 
         # -- some stat counters for the debug info screen --
@@ -191,16 +179,11 @@ class World():
 
         if self.world_menu.active_menu=='none':
 
-            in_vehicle=None
-            vlist=self.wo_objects_vehicle+self.wo_objects_airplane
-            for b in vlist:
-                if b.ai.check_if_human_in_vehicle(self.player):
-                    in_vehicle=b
-            
-            if in_vehicle is None:
-                self.world_menu.activate_menu(self.player)
+            if self.player.ai.memory['current_task']=='task_vehicle_crew':
+                vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+                self.world_menu.activate_menu(vehicle)
             else:
-                self.world_menu.activate_menu(in_vehicle)
+                self.world_menu.activate_menu(self.player)
         else:
             self.world_menu.deactivate_menu()
 
@@ -225,38 +208,13 @@ class World():
             self.wo_objects.append(world_object)
             if world_object.is_human:
                 self.wo_objects_human.append(world_object)
-            if world_object.is_gun:
-                self.wo_objects_guns.append(world_object)
             if world_object.is_vehicle:
                 self.wo_objects_vehicle.append(world_object)
-            if world_object.is_grenade:
-                self.wo_objects_grenade.append(world_object)
-            if world_object.is_consumable:
-                self.wo_objects_consumable.append(world_object)
-            if world_object.is_building:
-                self.wo_objects_building.append(world_object)
             if world_object.is_map_pointer:
                 self.wo_objects_map_pointer.append(world_object)
-            if world_object.is_handheld_antitank:
-                self.wo_objects_handheld_antitank.append(world_object)
-            if world_object.is_airplane:
-                self.wo_objects_airplane.append(world_object)
-            if world_object.is_melee:
-                self.wo_objects_melee.append(world_object)
-            if world_object.is_medical:
-                self.wo_objects_medical.append(world_object)
-            if world_object.is_container:
-                self.wo_objects_container.append(world_object)
-            if world_object.is_ammo_container:
-                self.wo_objects_ammo_container.append(world_object)
-            if world_object.is_furniture:
-                self.wo_objects_furniture.append(world_object)
-            if world_object.is_gun_magazine:
-                self.wo_objects_gun_magazines.append(world_object)
             if world_object.can_be_deleted:
                 self.wo_objects_cleanup.append(world_object)
-            if world_object.is_radio:
-                self.wo_objects_radio.append(world_object)
+
         else:
             print('Error!! '+ world_object.name+' already in world.wo_objects. Add fails !!')
         
@@ -461,14 +419,7 @@ class World():
 
         return best_object
 
-    #---------------------------------------------------------------------------
-    def get_compatible_magazines_within_range(self,world_coords,gun,max_distance):
-        compatible_magazines=[]
-        for b in self.wo_objects_gun_magazines:
-            if gun.name in b.ai.compatible_guns:
-                if engine.math_2d.get_distance(world_coords,b.world_coords)<max_distance:
-                    compatible_magazines.append(b)
-        return compatible_magazines
+    
 
     
     #---------------------------------------------------------------------------
@@ -701,38 +652,13 @@ class World():
             self.wo_objects.remove(world_object)
             if world_object.is_human:
                 self.wo_objects_human.remove(world_object)
-            if world_object.is_gun:
-                self.wo_objects_guns.remove(world_object)
             if world_object.is_vehicle:
                 self.wo_objects_vehicle.remove(world_object)
-            if world_object.is_grenade:
-                self.wo_objects_grenade.remove(world_object)
-            if world_object.is_consumable:
-                self.wo_objects_consumable.remove(world_object)
-            if world_object.is_building:
-                self.wo_objects_building.remove(world_object)
             if world_object.is_map_pointer:
                 self.wo_objects_map_pointer.remove(world_object)
-            if world_object.is_handheld_antitank:
-                self.wo_objects_handheld_antitank.remove(world_object)
-            if world_object.is_airplane:
-                self.wo_objects_airplane.remove(world_object)
-            if world_object.is_melee:
-                self.wo_objects_melee.remove(world_object)
-            if world_object.is_medical:
-                self.wo_objects_medical.remove(world_object)
-            if world_object.is_container:
-                self.wo_objects_container.remove(world_object)
-            if world_object.is_ammo_container:
-                self.wo_objects_ammo_container.remove(world_object)
-            if world_object.is_furniture:
-                self.wo_objects_furniture.remove(world_object)
             if world_object.can_be_deleted:
                 self.wo_objects_cleanup.remove(world_object)
-            if world_object.is_gun_magazine:
-                self.wo_objects_gun_magazines.remove(world_object)
-            if world_object.is_radio:
-                self.wo_objects_radio.remove(world_object)
+
         else:
             print('Error!! '+ world_object.name+' not in world.wo_objects. Remove fails !!')
         

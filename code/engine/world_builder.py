@@ -2129,6 +2129,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Raupenschlepper Ost PAK'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[5,0,0]
         z.ai.vehicle_armor['bottom']=[5,0,0]
         z.ai.vehicle_armor['left']=[5,0,0]
@@ -2270,6 +2271,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Sd.Kfz.251/22'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.requires_afv_training=True
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
@@ -3759,7 +3761,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.can_be_deleted=True
         z.ai.self_remove=True  
     # steel bullet casing
@@ -3774,7 +3776,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.can_be_deleted=True
         z.ai.self_remove=True
     elif object_type=='small_smoke':
@@ -3827,6 +3829,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_flash'
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15
@@ -3855,7 +3858,7 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='blood_splatter':
         z=WorldObject(world,['blood_splatter'],AIAnimatedSprite)
         z.name='blood_splatter'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         # not a particle effect so it gets positioned as a 
         # default 2, which is under the bodies (containers)
         z.rotation_angle=float(random.randint(0,359))
@@ -3863,21 +3866,21 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
         z.ai.move_time_max=0
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.can_be_deleted=True
 
     elif object_type=='small_blood':
         z=WorldObject(world,['small_blood'],AINone)
         z.name='small_blood'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=0
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
         z.ai.move_time_max=0
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.can_be_deleted=True 
            

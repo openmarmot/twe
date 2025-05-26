@@ -2,7 +2,31 @@ TWE Project : Change Log
 
 ----------------------------------
 May 26 2025
+- misc minor changes + fixes
 - added a grid square system 
+- projectile collision now uses the grid square 
+- object visibility on the screen is now checked per grid square instead of per object
+- removed some unused object lists from world 
+- rewriting a lot of small things to look at objects from the current grid square 
+- throwables now use the same collision list as projectile so they will hit a building 
+- increased alive time for bullet casings and some other effects 
+- rso_pak and sd_kfz_251/22 get the passenger_compartment_ammo_racks attribute 
+- rewrote vehicle damage so passenger_compartment_ammo_racks bool is used 
+- vehicle body hits can also cause a ammo rack hit now 
+- vehicle wheel and passenger compartment hits now have a chance to hit the vehicle body as well
+- fixed turrets not being able to be hit 
+
+performance improvements for collision and rendering seem noticeable. I timed the old 
+rendering info code and the new grid square based code and there was a noticeable difference. 
+the possible downside is I am now rendering more objects, but it is worth it to not check positions 
+for every object.
+
+searching for nearby objects now mostly looks at the current grid square. 
+this will result in some odd behavior when near the edges of a grid square so 
+maybe i'll have to implement a way to check neighbors as well. 
+
+i'm trying to up the lethality of vehicle penetrations while still providing some possibility 
+of multiple hits being needed 
 
 ----------------------------------
 May 25 2025

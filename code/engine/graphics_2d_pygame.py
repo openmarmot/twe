@@ -475,7 +475,8 @@ class Graphics_2D_Pygame(object):
                     if (c.is_player is False 
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
-                        and c.can_be_deleted is False):
+                        and c.can_be_deleted is False
+                        and c.is_ground_texture is False):
                         possible_objects.append(c)
         elif self.mode==2:
             # for strategic map we want everything
@@ -490,7 +491,7 @@ class Graphics_2D_Pygame(object):
                 object_distance=distance
                 closest_object=b
         
-        if closest_object != None:
+        if closest_object is not None:
             #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
             #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
 
