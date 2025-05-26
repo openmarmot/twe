@@ -86,7 +86,7 @@ class AIProjectile(object):
             # check collision 
             if self.flightTime>self.last_collision_check+self.collision_check_interval:
                 self.last_collision_check=self.flightTime
-                objects=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle+self.owner.world.wo_objects_building
+                objects=self.owner.grid_square.wo_objects_projectile_collision
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
                 if collide_obj !=None:
                     if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':

@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 26 2025
+- added a grid square system 
+
+----------------------------------
 May 25 2025
 - added su-85
 - change to human accuracy formula to decrease accuracy 

@@ -119,6 +119,10 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 
     collided=None
     for b in collision_list:
+        if b.is_vehicle:
+            # no collision on disabled vehicles
+            if b.ai.vehicle_disabled:
+                continue
 
         distance=get_distance(wo.world_coords,b.world_coords)
 

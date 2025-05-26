@@ -17,6 +17,7 @@ The idea is to keep the graphics engine seperate from the rest of the code,
 from itertools import islice
 import os
 from datetime import datetime
+import time
 
 
 # import pip packages
@@ -311,7 +312,8 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def render_mode_1(self):
         '''render mode 1 : tactical mode'''
-        self.update_render_info()
+
+        self.update_render_info_new()
 
         self.screen.blit(self.background, (0, 0))
         for b in self.renderlists:
@@ -587,18 +589,17 @@ class Graphics_2D_Pygame(object):
 
             
     #------------------------------------------------------------------------------
-    def update_render_info(self):
+    def update_render_info_new(self):
         '''
             checks if world objects are within the viewable screen area,
               and if so, translates their world coordinates to screen coordinates
               only used by tactical mode
         '''
-        
+
         #clear out the render levels
         self.renderlists=[[] for _ in range(self.render_level_count)]
 
         self.render_count=0
-
 
         viewrange_x = (
             self.world.player.world_coords[0] + self.screen_size[0] + self.view_adjust,
@@ -608,26 +609,25 @@ class Graphics_2D_Pygame(object):
             self.world.player.world_coords[1] + self.screen_size[1] + self.view_adjust,
             self.world.player.world_coords[1] - self.screen_size[1] - self.view_adjust
         )
-        
         translation = self.get_translation()
-        
-        # More efficient filtering and rendering
-        renderable_objects = [
-            obj for obj in self.world.wo_objects 
-            if (obj.render and 
-                (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale and
-                viewrange_x[1] < obj.world_coords[0] < viewrange_x[0] and
-                viewrange_y[1] < obj.world_coords[1] < viewrange_y[0])
-        ]
-        
+        renderable_objects=[]
+
+        # make a visibility determination per grid square. this worked well with grid square size set to 1000
+        for grid_square in self.world.grid_manager.index_map.values():
+            if (grid_square.top_left[0] < viewrange_x[0] and grid_square.bottom_right[0] > viewrange_x[1] and
+                grid_square.top_left[1] < viewrange_y[0] and grid_square.bottom_right[1] > viewrange_y[1]):
+
+                for obj in grid_square.wo_objects:
+                    if (obj.render and (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale ):
+                        renderable_objects.append(obj)
+
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
             if not obj.is_player:
                 obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
                 obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
         
-        self.render_count = len(renderable_objects)
-
+        self.render_count = len(renderable_objects)                
 
     #------------------------------------------------------------------------------
     def zoom_out(self):

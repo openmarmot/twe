@@ -21,6 +21,7 @@ import engine.world_builder
 import engine.log
 from ai.ai_faction_tactical import AIFactionTactical
 import engine.world_radio
+from engine.world_grid_manager import WorldGridManager
 
 
 #global variables
@@ -76,8 +77,6 @@ class World():
 
         # object lists 
         self.wo_objects=[]
-        # not sure this one is used
-        self.wo_objects_collision=[]
         self.wo_objects_human=[]
         self.wo_objects_guns=[]
         self.wo_objects_gun_magazines=[]
@@ -183,6 +182,9 @@ class World():
         # checked by graphics_2d_pygame render
         self.display_weapon_range=False
 
+        # 
+        self.grid_manager=WorldGridManager()
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -211,13 +213,16 @@ class World():
         world_object.reset_image=True
 
         if world_object not in self.wo_objects:
+
+            world_object.in_world=True
+
+            # init the grid square
+            self.grid_manager.update_wo_object_square(world_object)
             
             # set or reset spawn time in world_seconds
             world_object.spawn_time=self.world_seconds
 
             self.wo_objects.append(world_object)
-            if world_object.collision:
-                self.wo_objects_collision.append(world_object)
             if world_object.is_human:
                 self.wo_objects_human.append(world_object)
             if world_object.is_gun:
@@ -264,7 +269,8 @@ class World():
         # ignore_list - list of objects to ignore
         # objects - array of objects to check collision against
 
-
+        
+        # note - this function skips collision on disabled vehicles
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
         if collided is not None:
             if collided.is_human:
@@ -277,10 +283,7 @@ class World():
                         if chance==1:
                             # missed due to prone
                             collided=None
-            elif collided.is_vehicle:
-                if collided.ai.vehicle_disabled:
-                    # this way a disabled vehicle doesn't block shots for something behind it
-                    collided=None
+            
 
         return collided
     
@@ -688,9 +691,14 @@ class World():
         # !! note - objects should add themselves to the remove_queue instead of calling this directly
 
         if world_object in self.wo_objects:
+
+            world_object.in_world=False
+
+            # remove from grid square
+            if world_object.grid_square is not None:
+                world_object.grid_square.remove_wo_object(world_object)
+
             self.wo_objects.remove(world_object)
-            if world_object.collision and world_object in self.wo_objects_collision:
-                self.wo_objects_collision.remove(world_object)
             if world_object.is_human:
                 self.wo_objects_human.remove(world_object)
             if world_object.is_gun:
@@ -938,6 +946,7 @@ class World():
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue = []
+        self.debug_text_queue.append(f"Grid Square Count: {len(self.grid_manager.index_map)}")
         self.debug_text_queue.append(f"World Objects: {len(self.wo_objects)}")
         self.debug_text_queue.append(f"wo_objects_cleanup: {len(self.wo_objects_cleanup)}")
         self.debug_text_queue.append(f"Exited objects count: {self.exited_object_count}")
