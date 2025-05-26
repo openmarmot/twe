@@ -24,7 +24,8 @@ loaded=False
 # {name:{projectile_material,case_material,grain_weight,velocity,contact_effect,shrapnel_count},}
 projectile_data={}
 
-max_distance=3000
+# the max distance in the penetration data 
+max_distance=4000
 
 #---------------------------------------------------------------------------
 def calculate_penetration(projectile,distance,armor_type,armor):
@@ -42,6 +43,7 @@ def calculate_penetration(projectile,distance,armor_type,armor):
     if distance>max_distance:
         # not sure how this is happening yet..
         engine.log.add_data('Error',f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance} armor: {armor} flightTime:{projectile.ai.flightTime} maxTime:{projectile.ai.maxTime}',True)
+        max_penetration=projectile_data[projectile.ai.projectile_type][str(max_distance)]
     else:
         max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
 

@@ -6,6 +6,7 @@ notes :
 '''
 
 #import built in modules
+import copy
 
 #import custom packages
 import engine.math_2d
@@ -58,6 +59,7 @@ class WorldObject(object):
 
         # updated by the object AI
         self.world_coords=[0,0]
+        self.last_world_coords=[0,0] # used to check for movement
         
         # altitude above ground in meters
         self.altitude=0
@@ -88,6 +90,13 @@ class WorldObject(object):
         self.render=True
 
         # ---- descriptor bools ----------------------------
+
+        # whether the object has been added to the world with world.add_object
+        # objects that are in a container are generally not in world
+        # however things like humans always are
+        # this is used for rendering and grid square placement
+        self.in_world=False
+
 
         # these are used by other objects to determine how this object can be interacted with
         # might just make this a string or something but bools are fast and easy to use 
@@ -164,6 +173,9 @@ class WorldObject(object):
         # is this used? pretty sure its not 
         self.id = 0
 
+        # the world_grid_square the object is in
+        self.grid_square=None
+
     #---------------------------------------------------------------------------
     def add_inventory(self, ITEM):
         self.ai.handle_event('add_inventory',ITEM)
@@ -204,6 +216,17 @@ class WorldObject(object):
         self.ai.update()
         self.update_scale()
         self.update_physics()
+        self.update_grid_square()
+
+    #---------------------------------------------------------------------------
+    def update_grid_square(self):
+        '''updates the grid square if movement is detected'''
+        # grid square controls rendering and collision, we do not want to be there if 
+        # we are technically not in the world
+        if self.in_world:
+            if self.last_world_coords!=self.world_coords:
+                self.last_world_coords=copy.copy(self.world_coords)
+                self.world.grid_manager.update_wo_object_square(self)
 
     #---------------------------------------------------------------------------
     def update_physics(self):

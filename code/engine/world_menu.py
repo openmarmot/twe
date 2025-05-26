@@ -110,7 +110,7 @@ class World_Menu(object):
             self.radio_menu(key)
         elif self.active_menu=='exit_world':
             self.exit_world_menu(key)
-        elif self.activate_menu=='hit_marker':
+        elif self.active_menu=='hit_marker':
             self.hit_marker_menu(key)
         else:
             if self.active_menu!='none':
@@ -668,6 +668,12 @@ class World_Menu(object):
     #---------------------------------------------------------------------------
     def generic_item_menu(self, key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+
+        # catching an occasional bug. not sure what this object is
+        if self.selected_object.name is None:
+            engine.log.add_data('error','world_menu.generic_item_menu - selected obj name is none')
+            self.deactivate_menu()
+            return
 
         # print out the basic menu
         self.text_queue=[]

@@ -322,14 +322,11 @@ class AIVehicle():
 
             area_hit='vehicle_body'
             
-
-            hit=random.randint(0,1)
-            if hit==1:
+            if random.randint(0,1):
                 area_hit='passenger_compartment'
             
             if len(self.turrets)>0:
-                hit=random.randint(0,4)
-                if hit==5:
+                if random.randint(0,4)==4:
                     area_hit='turret'
 
             if area_hit=='vehicle_body':
@@ -392,7 +389,7 @@ class AIVehicle():
     def handle_component_damage(self,damaged_component,projectile):
         '''handle damage to a component'''
         if damaged_component=='driver':
-            if self.vehicle_crew['driver_projectile'][0] is True:
+            if self.vehicle_crew['driver'][0] is True:
                 self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
         elif damaged_component=='engine':
             for b in self.engines:
@@ -427,6 +424,7 @@ class AIVehicle():
             temp=random.randint(0,self.ammo_rack_capacity)
             if temp<len(self.ammo_rack):
                 self.handle_component_damage('random_crew_explosion',None)
+                self.handle_component_damage('random_crew_explosion',None)
                 self.handle_component_damage('engine',None)
                 self.vehicle_disabled=True
                 for b in self.turrets:
@@ -445,8 +443,16 @@ class AIVehicle():
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
         if penetration:
-            damaged_component=random.choice(['random_crew_projectile','ammo_rack','miraculously unharmed'])
+            damage_options=['random_crew_projectile','miraculously unharmed']
+            if self.passenger_compartment_ammo_racks:
+                damage_options.append('ammo_rack')
+
+            damaged_component=random.choice(damage_options)
             self.handle_component_damage(damaged_component,projectile)
+
+            # chance to richochet into the body 
+            if random.randint(0,3)==3:
+                self.handle_vehicle_body_projectile_hit(projectile,side)
 
         else:
             # no penetration, but maybe we can have some other effect?
@@ -459,7 +465,7 @@ class AIVehicle():
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
         if penetration:
-            damaged_component=random.choice(['driver_projectile','engine','miraculously unharmed'])
+            damaged_component=random.choice(['driver_projectile','engine','ammo_rack','miraculously unharmed'])
             self.handle_component_damage(damaged_component,projectile)
 
         else:
@@ -625,6 +631,10 @@ class AIVehicle():
 
                     # check if that was enough to disable the vehicle
                     self.check_wheel_health()
+
+                # chance to continue into the body
+                if random.randint(0,3)==3:
+                    self.handle_vehicle_body_projectile_hit(projectile,side)
 
             else:
                 # no penetration, but maybe we can have some other effect?

@@ -289,7 +289,7 @@ class AIHuman(object):
         self.closest_building=None
 
         closest_distance=1000
-        for b in self.owner.world.wo_objects_building:
+        for b in self.owner.grid_square.wo_objects_building:
             distance=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
             if distance<closest_distance:
                 closest_distance=distance
@@ -321,17 +321,17 @@ class AIHuman(object):
         if self.fatigue>3:
             adjust_max+=0.5
         if self.fatigue>5:
-            adjust_max+=3
+            adjust_max+=6
 
         # distance based
         if distance>500:
             adjust_max+=1
         if distance>1000:
-            adjust_max+=4
+            adjust_max+=5
         if distance>1500:
             adjust_max+=2
         if distance>2000:
-            adjust_max+=2
+            adjust_max+=10
 
         # prone bonus 
         if self.prone:
@@ -563,7 +563,7 @@ class AIHuman(object):
             else:
                 # vehicles are seen at this range
                 return True
-        if distance<3000:
+        if distance<4000:
             if target.is_human:
                 if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
                     return True
@@ -627,7 +627,7 @@ class AIHuman(object):
             if b.ai.blood_pressure>0:
                 d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
                 # 3000 is the max engagement range for anything
-                if d<3000:
+                if d<4000:
 
                     target=b
                     if 'task_vehicle_crew' in b.ai.memory:
@@ -653,11 +653,11 @@ class AIHuman(object):
                                 self.far_human_targets.append(target)
                         else:
                             #eventually these will be vehicle specific lists
-                            if d<800:
+                            if d<1000:
                                 self.near_vehicle_targets.append(target)
-                            elif d<1500:
+                            elif d<2000:
                                 self.mid_vehicle_targets.append(target)
-                            elif d<3000:
+                            elif d<4000:
                                 self.far_vehicle_targets.append(target)
 
 
@@ -971,6 +971,15 @@ class AIHuman(object):
         return calc_speed
     
     #---------------------------------------------------------------------------
+    def get_compatible_magazines_within_range(self,gun,max_distance):
+        compatible_magazines=[]
+        for b in self.owner.grid_square.wo_objects_gun_magazine:
+            if gun.name in b.ai.compatible_guns:
+                if engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)<max_distance:
+                    compatible_magazines.append(b)
+        return compatible_magazines
+    
+    #---------------------------------------------------------------------------
     def get_nearby_damaged_vehicles(self,max_range):
         '''return a list of nearby disabled vehicles'''
         # this could be modified to return damaged vehicles that are not fully disabled
@@ -1229,7 +1238,7 @@ class AIHuman(object):
         else:
             if world_object.is_gun:
                 if self.owner.is_player is False:
-                    near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,200)
+                    near_magazines=self.get_compatible_magazines_within_range(self.primary_weapon,500)
                     if len(near_magazines)>0:
                         self.switch_task_pickup_objects(near_magazines)
 
@@ -3082,7 +3091,7 @@ class AIHuman(object):
             # don't want the soldiers wandering off too far 
             if self.squad.faction in ['german','soviet','american']:
                 distance=500
-            temp=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_furniture,distance)
+            temp=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.grid_square.wo_objects_furniture,distance)
 
             if temp is None:
                 # give up for now
@@ -3145,7 +3154,7 @@ class AIHuman(object):
 
             # this also means that humans without any targets will not get a gun
             if distance<4000:
-                gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.wo_objects_guns,distance)
+                gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.grid_square.wo_objects_gun,distance)
 
                 if gun is not None:
                     self.switch_task_pickup_objects([gun])
@@ -3162,13 +3171,13 @@ class AIHuman(object):
 
             else:
                 # need to get ammo. check for nearby magazines
-                near_magazines=self.owner.world.get_compatible_magazines_within_range(self.owner.world_coords,self.primary_weapon,500)
+                near_magazines=self.get_compatible_magazines_within_range(self.primary_weapon,500)
                 if len(near_magazines)>0:
                     self.switch_task_pickup_objects(near_magazines)
                     return
                 
                 # check containers for spare ammo
-                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,500)
+                containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.grid_square.wo_objects_container,500)
                 if len(containers)>0:
                     self.switch_task_loot_container(random.choice(containers))
                     return
@@ -3243,7 +3252,7 @@ class AIHuman(object):
             self.switch_task_move_to_location(coords,None)
         elif decision==2:
             # check containers
-            containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_container,1000)
+            containers=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.grid_square.wo_objects_container,1000)
             if len(containers)>0:
                 self.switch_task_loot_container(random.choice(containers))
         elif decision==3:

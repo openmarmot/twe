@@ -407,8 +407,8 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
-image_tool.image_objects.append(ImageObject(['dani'],0))
-image_tool.image_objects.append(ImageObject(['civilian_man'],0))
+image_tool.image_objects.append(ImageObject(['su_85_chassis'],0))
+image_tool.image_objects.append(ImageObject(['su_85_turret'],0))
 while image_tool.quit==False:
 
     image_tool.update()

@@ -684,7 +684,7 @@ def load_quick_battle(world,battle_option):
     # testing
     elif battle_option=='4':
         squads=[]
-        squads+=['German Kubelwagen']     
+        squads+=['soviet_su_85']     
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -1663,7 +1663,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'37mm_m1939_k61_magazine',False)
         z.ai.rate_of_fire=0.9
         z.ai.reload_speed=15
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='automatic cannon'
         z.ai.use_antipersonnel=True
         z.ai.use_antitank=True
@@ -1689,7 +1689,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'7.5cm_pak39_L48_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=20
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1715,7 +1715,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'76mm_m1940_f34_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=30
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1739,8 +1739,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'85mm_zis_s_53_magazine',False)
         z.ai.rate_of_fire=1
-        z.ai.reload_speed=28
-        z.ai.range=2418
+        z.ai.reload_speed=26
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1750,12 +1750,26 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='85mm_zis_s_53_magazine'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
-        z.ai.compatible_guns=['85mm_zis_s_53']
+        z.ai.compatible_guns=['85mm_zis_s_53','85mm_d_5s']
         z.ai.compatible_projectiles=['BR-365k']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
+
+    # for the su-85. same ammo as the t34-85 gun, same pen
+    elif object_type=='85mm_d_5s':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='85mm D-5S'
+        z.is_gun=True
+        z.ai.mechanical_accuracy=2
+        z.ai.magazine=spawn_object(world,world_coords,'85mm_zis_s_53_magazine',False)
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=20
+        z.ai.range=4000
+        z.ai.type='cannon'
+        z.ai.use_antitank=True
+        z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='mg15':
         z=WorldObject(world,['mg15'],AIGun)
@@ -2115,6 +2129,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Raupenschlepper Ost PAK'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.vehicle_armor['top']=[5,0,0]
         z.ai.vehicle_armor['bottom']=[5,0,0]
         z.ai.vehicle_armor['left']=[5,0,0]
@@ -2256,6 +2271,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Sd.Kfz.251/22'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.passenger_compartment_ammo_racks=True
         z.ai.requires_afv_training=True
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
@@ -2636,7 +2652,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l43_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=20
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=float(random.randint(0,359))
@@ -2661,7 +2677,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk40_l48_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=20
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=float(random.randint(0,359))
@@ -2961,6 +2977,85 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
 
+    elif object_type=='soviet_su_85':
+        # ref : https://wiki.warthunder.com/T-34-85
+        z=WorldObject(world,['su_85_chassis'],AIVehicle)
+        z.name='SU-85'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=True
+        z.ai.passenger_compartment_ammo_racks=True
+        z.ai.vehicle_armor['top']=[16,0,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[45,0,0]
+        z.ai.vehicle_armor['right']=[45,0,0]
+        z.ai.vehicle_armor['front']=[45,61,0]
+        z.ai.vehicle_armor['rear']=[45,47,0]
+        z.ai.passenger_compartment_armor['top']=[16,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[45,40,0]
+        z.ai.passenger_compartment_armor['right']=[45,40,0]
+        z.ai.passenger_compartment_armor['front']=[45,61,0]
+        z.ai.passenger_compartment_armor['rear']=[40,47,0]
+        main_turret=spawn_object(world,world_coords,'su_85_turret',True)
+        z.ai.turrets.append(main_turret)
+        main_turret.ai.vehicle=z
+        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
+        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
+        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False,None]
+        z.ai.max_speed=367.04
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=26500
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"kharkiv_v2-34_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.ammo_rack_capacity=60
+        for b in range(z.ai.ammo_rack_capacity):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
+        z.ai.min_wheels_per_side_front=2
+        z.ai.min_wheels_per_side_rear=2
+        z.ai.max_wheels=12
+        z.ai.max_spare_wheels=0
+        for b in range(3):
+            z.ai.front_left_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.front_right_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+
+    elif object_type=='su_85_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        z=WorldObject(world,['su_85_turret'],AITurret)
+        z.name='SU-85 Turret'
+        z.is_turret=True
+        z.ai.turret_armor['top']=[20,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[45,21,0]
+        z.ai.turret_armor['right']=[45,21,0]
+        z.ai.turret_armor['front']=[45,60,0]
+        z.ai.turret_armor['rear']=[45,9,0]
+        z.ai.position_offset=[-47,8]
+        z.ai.rotation_range=[-15,15]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_d_5s',False)
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-147,0]
+        z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
+
     elif object_type=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
         # ref : https://en.wikipedia.org/wiki/Hetzer
@@ -3207,7 +3302,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'75mm_pak40_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=19
-        z.ai.range=2418
+        z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
         z.rotation_angle=0
@@ -3666,7 +3761,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.can_be_deleted=True
         z.ai.self_remove=True  
     # steel bullet casing
@@ -3681,7 +3776,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=800
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.can_be_deleted=True
         z.ai.self_remove=True
     elif object_type=='small_smoke':
@@ -3734,6 +3829,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
         z.world_coords=copy.copy(w)
         z.name='small_flash'
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=15
@@ -3762,7 +3858,7 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='blood_splatter':
         z=WorldObject(world,['blood_splatter'],AIAnimatedSprite)
         z.name='blood_splatter'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         # not a particle effect so it gets positioned as a 
         # default 2, which is under the bodies (containers)
         z.rotation_angle=float(random.randint(0,359))
@@ -3770,21 +3866,21 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
         z.ai.move_time_max=0
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.can_be_deleted=True
 
     elif object_type=='small_blood':
         z=WorldObject(world,['small_blood'],AINone)
         z.name='small_blood'
-        z.minimum_visible_scale=0.3
+        z.minimum_visible_scale=0.2
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
         z.ai.speed=0
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0
         z.ai.move_time_max=0
-        z.ai.alive_time_max=120
+        z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.can_be_deleted=True 
            

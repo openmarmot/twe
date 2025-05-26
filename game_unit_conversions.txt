@@ -44,3 +44,17 @@ range : 1209 units
 
 # panzerfaust 100
 range : 1813
+
+
+# vehicle cannons 
+This is compressed for game play considerations 
+game units to real life units for determining penetration 
+0 - > 0 meters
+500
+1000 - 500 meters
+1500
+2000 -> 1000 meters
+2500
+3000 -> 1500 meters
+3500 
+4000 -> 2000 meters
