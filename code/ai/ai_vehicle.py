@@ -150,8 +150,7 @@ class AIVehicle():
         # -- crew --
  
 
-        # {'role',[occupied bool,human_object game_obj,seat_rotation angle float,seat_offset [0,0],visible bool],role_related_object}
-        self.vehicle_crew={}
+        self.vehicle_crew=[]
 
         # --
         # this gives the AI clues as to how they should use the vehicle
@@ -364,10 +363,6 @@ class AIVehicle():
             # we don't want humans in here
             print('! Error - human added to vehicle inventory')
         else:
-
-            if event_data.is_radio:
-                if self.radio==None:
-                    self.radio=event_data
 
             # put whatever it is in the inventory
             self.inventory.append(event_data) 

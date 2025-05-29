@@ -420,8 +420,6 @@ class World():
         return best_object
 
     
-
-    
     #---------------------------------------------------------------------------
     def get_objects_within_range(self,WORLD_COORDS,object_list,max_distance):
         '''check distance on objects from an array and returns the ones that are in range'''

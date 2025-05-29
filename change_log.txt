@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 28 2025
+- minor cleanup 
+- doing a rewrite of vehicle roles + vehicle role ai in humans 
+- made the sd.kfz.251 gunner visible while i was rewriting the roles
+
+the vehicle roles were too constraining. i need to do a rewrite so i can get closer to 
+historical vehicle roles. as part of this target identification and driver destination work 
+will move over to the vehicle commander role 
+
+!note that this is unfinished so dev will be broken for a bit 
+
+----------------------------------
 May 26 2025
 - misc minor changes + fixes
 - added a grid square system 

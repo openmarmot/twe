@@ -3283,22 +3283,23 @@ class AIHuman(object):
         if self.owner.is_player:
             # not sure what we need to to do here. controls are now handled by world
             
-            # handle vehicle turret gun reloads for the player
-            turret=self.memory['task_vehicle_crew']['turret']
-            if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
-                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                > turret.ai.primary_weapon.ai.reload_speed):
-                    self.reload_weapon(turret.ai.primary_weapon,vehicle)
-                    self.memory['task_vehicle_crew']['current_action']='none'
-                else:
-                    return
-            if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
-                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                > turret.ai.coaxial_weapon.ai.reload_speed):
-                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
-                    self.memory['task_vehicle_crew']['current_action']='none'
-                else:
-                    return
+            if 'gunner' in role:
+                # handle vehicle turret gun reloads for the player
+                turret=self.memory['task_vehicle_crew']['turret']
+                if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                    > turret.ai.primary_weapon.ai.reload_speed):
+                        self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                        self.memory['task_vehicle_crew']['current_action']='none'
+                    else:
+                        return
+                if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                    > turret.ai.coaxial_weapon.ai.reload_speed):
+                        self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                        self.memory['task_vehicle_crew']['current_action']='none'
+                    else:
+                        return
         else:
             last_think_time=self.memory['task_vehicle_crew']['last_think_time']
             think_interval=self.memory['task_vehicle_crew']['think_interval']

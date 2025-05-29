@@ -1217,6 +1217,10 @@ class World_Menu(object):
                     self.change_menu('storage')
                 if key=='4' and fuel_option:
                     self.change_menu('fuel')
+            else:
+                # we are clicking on a vehicle that is some distance away
+                if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                    pass
 
         if self.menu_state=='internal':
             if 'task_vehicle_crew' in self.world.player.ai.memory:
