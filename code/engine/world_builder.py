@@ -2436,27 +2436,17 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_gunner=True
         role.turret=mg_turret
         role.is_radio_operator=True
-        role.radio=radio
+        role.radio=z.ai.radio
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('commander',z)
         role.is_commander=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[4,10]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[12,10]
         z.ai.vehicle_crew.append(role)
 
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
-        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False,mg_turret]
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2572,21 +2562,15 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_gunner=True
         role.turret=mg_turret
         role.is_radio_operator=True
-        role.radio=radio
+        role.radio=z.ai.radio
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('commander',z)
         role.is_commander=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[4,10]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[12,10]
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -2688,21 +2672,15 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_gunner=True
         role.turret=mg_turret
         role.is_radio_operator=True
-        role.radio=radio
+        role.radio=z.ai.radio
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('commander',z)
         role.is_commander=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[4,10]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
-        role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[12,10]
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -2840,14 +2818,26 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret=spawn_object(world,world_coords,'t20_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,turret]
-        z.ai.vehicle_crew['passenger_1']=[False,None,90,[0,-17],True,None]
-        z.ai.vehicle_crew['passenger_2']=[False,None,90,[11,-17],True,None]
-        z.ai.vehicle_crew['passenger_3']=[False,None,90,[24,-17],True,None]
-        z.ai.vehicle_crew['passenger_4']=[False,None,270,[0,17],True,None]
-        z.ai.vehicle_crew['passenger_5']=[False,None,270,[11,17],True,None]
-        z.ai.vehicle_crew['passenger_6']=[False,None,270,[24,17],True,None]
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        z.ai.vehicle_crew.append(role)
+
+        passenger_positions=[[0,-17],[11,-17],[24,-17],[0,17],[11,17],[24,17]]
+        passenger_rotation=[90,90,90,270,270,270]
+        for x in range(6):
+            role=VehicleRole('passenger',z)
+            role.is_passenger=True
+            role.seat_visible=True
+            role.seat_rotation=passenger_rotation.pop()
+            role.seat_offset=passenger_positions.pop()
+            z.ai.vehicle_crew.append(role)
+
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2930,10 +2920,26 @@ def spawn_object(world,world_coords,object_type, spawn):
         mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
-        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False,mg_turret]
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        role.is_gunner=True
+        role.turret=main_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('bow_gunner',z)
+        role.is_gunner=True
+        role.turret=mg_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        z.ai.vehicle_crew.append(role)
+
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -3034,10 +3040,31 @@ def spawn_object(world,world_coords,object_type, spawn):
         mg_turret=spawn_object(world,world_coords,'t34_hull_mg_turret',True)
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
-        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False,mg_turret]
+        
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('bow_gunner',z)
+        role.is_gunner=True
+        role.turret=mg_turret
+        #role.is_radio_operator=True
+        #role.radio=radio
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        z.ai.vehicle_crew.append(role)
+
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -3124,10 +3151,23 @@ def spawn_object(world,world_coords,object_type, spawn):
         main_turret=spawn_object(world,world_coords,'su_85_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
-        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False,None]
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        z.ai.vehicle_crew.append(role)
+
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -3208,10 +3248,32 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         mg_turret.ai.position_offset=[-5,-15]
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,0],False,main_turret]
-        z.ai.vehicle_crew['gunner_2']=[False,None,0,[0,0],False,mg_turret]
+        z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
+        
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('radio_operator',z)
+        role.is_gunner=True
+        role.turret=mg_turret
+        role.is_radio_operator=True
+        role.radio=z.ai.radio
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        z.ai.vehicle_crew.append(role)
+
         z.ai.max_speed=367.04
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -3229,7 +3291,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
-        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
@@ -3301,8 +3362,20 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,-10],True,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[0,10],True,turret]
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        role.seat_visible=True
+        role.seat_offset=[0,-10]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        role.seat_visible=True
+        role.seat_offset=[0,10]
+        z.ai.vehicle_crew.append(role)
+
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.ai.max_speed=100
         z.ai.max_offroad_speed=100
@@ -3367,8 +3440,20 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret=spawn_object(world,world_coords,'pak40_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
-        z.ai.vehicle_crew['driver']=[False,None,0,[7.0, -9.0],True,None]
-        z.ai.vehicle_crew['gunner_1']=[False,None,0,[13,15],True,turret]
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        role.seat_visible=True
+        role.seat_offset=[7,-9]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        role.seat_visible=True
+        role.seat_offset=[13,15]
+        z.ai.vehicle_crew.append(role)
+
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.ai.max_speed=100
         z.ai.max_offroad_speed=100
@@ -3450,10 +3535,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.max_speed=592
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False,None]
+
+        driver=VehicleRole('driver',z)
+        driver.is_driver=True
+        z.ai.vehicle_crew.append(driver)
+
+        for x in range(3):
+            passenger=VehicleRole('passenger',z)
+            passenger.is_passenger=True
+            z.ai.vehicle_crew.append(passenger)
+
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
@@ -3485,7 +3576,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_german_military_equipment,False))
-        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='german_kubelwagen_camo':
@@ -3506,7 +3596,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=142.08
         z.ai.rotation_speed=50.
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],True,None]
+
+        driver=VehicleRole('driver',z)
+        driver.is_driver=True
+        z.ai.vehicle_crew.append(driver)
+
         z.ai.open_top=True
         z.collision_radius=50
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
@@ -3529,10 +3623,11 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='german_ju88':
         z=WorldObject(world,['ju88-winter-weathered','ju88-winter-weathered'],AIVehicle)
         z.name='Junkers Ju88'
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False,None]
+
+        driver=VehicleRole('driver',z)
+        driver.is_driver=True
+        z.ai.vehicle_crew.append(driver)
+
         z.ai.max_speed=4736
         z.ai.max_offroad_speed=177.6
         z.ai.stall_speed=100
@@ -3576,10 +3671,11 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='german_fa_223_drache':
         z=WorldObject(world,['fa_223_drache','fa_223_drache'],AIVehicle)
         z.name='Focke Achgelis 223 Drache'
-        z.ai.vehicle_crew['driver']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['radio_operator']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_1']=[False,None,0,[0,0],False,None]
-        z.ai.vehicle_crew['passenger_2']=[False,None,0,[0,0],False,None]
+
+        driver=VehicleRole('driver',z)
+        driver.is_driver=True
+        z.ai.vehicle_crew.append(driver)
+        
         z.ai.max_speed=4736
         z.ai.max_offroad_speed=177.6
         z.ai.stall_speed=100

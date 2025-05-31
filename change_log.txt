@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 30 2025
+- more vehicle crew rewrites
+- some vehicles will no longer have a radio 
+- pak40 and soviet 37mm aa no longer have a driver and therefore cannot self move 
+
+after some reading on pak guns i've determined that the pak40 (and likely the soviet 37)
+were really too heavy to move with man power. they will have to be towed. 
+the pak40 may have to get a driver re-added so it can rotate however. 
+
+----------------------------------
 May 28 2025
 - minor cleanup 
 - doing a rewrite of vehicle roles + vehicle role ai in humans 
