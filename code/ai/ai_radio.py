@@ -33,8 +33,7 @@ class AIRadio(object):
         # ampere-hour
         self.ah_discharge_rate=1.336
 
-        # human ai assigned to work the radio
-        self.radio_operator=None
+
 
         # used to prevent echoing 
         self.last_message=''

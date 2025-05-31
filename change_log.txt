@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+May 31 2025
+- more work on implementing crew changes
+
+todo 
+- radios need a rewrite because i've removed the radio_operator variable. 
+in place of that the radio should just keep a queue or idk something exciting
+
+----------------------------------
 May 30 2025
 - more vehicle crew rewrites
 - some vehicles will no longer have a radio 

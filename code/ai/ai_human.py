@@ -140,7 +140,7 @@ class AIHuman(object):
     def action_vehicle_driver(self):
         ''' the action the driver is taking when not thinking'''
         # some default values
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         vehicle.ai.throttle=0
         vehicle.ai.brake_power=1
 
@@ -429,7 +429,7 @@ class AIHuman(object):
 
         if target.is_human:
             if target.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
+                vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 if vehicle.ai.current_speed>0:
                     aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
             else:
@@ -631,7 +631,7 @@ class AIHuman(object):
 
                     target=b
                     if 'task_vehicle_crew' in b.ai.memory:
-                        target=b.ai.memory['task_vehicle_crew']['vehicle']
+                        target=b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                         # could do something further here to check armor pen
 
                     # vehicle crew target analysis
@@ -912,7 +912,7 @@ class AIHuman(object):
 
             if target.is_human:
                 if target.ai.memory['current_task']=='task_vehicle_crew':
-                    vehicle=target.ai.memory['task_vehicle_crew']['vehicle']
+                    vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                     if vehicle.ai.current_speed>0:
                         aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
                 else:
@@ -1138,8 +1138,8 @@ class AIHuman(object):
 
         # check if we are in a vehicle
         if self.memory['current_task']=='task_vehicle_crew':
-            turret=self.memory['task_vehicle_crew']['turret']
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
+            turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
+            vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
             # make sure the player is actually in a turret
             if turret!=None:
                 # basically if both are out of ammo the player will have to reload twice to get both done
@@ -1253,7 +1253,7 @@ class AIHuman(object):
         'player changes vehicle roles'
         # this is called by world_menu
         if self.memory['current_task']=='task_vehicle_crew':
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
+            vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
             # remove yourself from any existing roles 
             # first remove yourself from any existing crew spots
@@ -1284,7 +1284,7 @@ class AIHuman(object):
                 if vehicle.ai.vehicle_crew[role][0] is True:
                     # have the current crew member exit and re-enter
                     crew=vehicle.ai.vehicle_crew[role][1]
-                    crew.ai.switch_task_exit_vehicle(vehicle)
+                    crew.ai.switch_task_exit_vehicle()
                     crew.ai.update_task_exit_vehicle()
 
                 vehicle.ai.vehicle_crew[role][0]=True
@@ -1410,7 +1410,7 @@ class AIHuman(object):
         if receipient=='all':
             pass
         else:
-            vehicle=self.memory['task_vehicle_crew']['vehicle']
+            vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
             if receipient in vehicle.ai.vehicle_crew:
                 if vehicle.ai.vehicle_crew[receipient][0] is True:
                     role=self.memory['task_vehicle_crew']['role']
@@ -1458,11 +1458,10 @@ class AIHuman(object):
         self.owner.reset_image=True
 
     #---------------------------------------------------------------------------
-    def switch_task_exit_vehicle(self,vehicle):
+    def switch_task_exit_vehicle(self):
         '''switch task'''
         task_name='task_exit_vehicle'
         task_details = {
-            'vehicle': vehicle,
         }
 
         self.memory[task_name]=task_details
@@ -1669,74 +1668,29 @@ class AIHuman(object):
         # role should be NONE in most cases. 
 
         # first remove yourself from any existing crew spots
-        for key,value in vehicle.ai.vehicle_crew.items():
-            if value[1]==self.owner:
-                value[1]=None
-                value[0]=False
+        for role in vehicle.ai.vehicle_crew:
+            if role.human == self.owner:
+                role.human=None
+                role.role_occupied=False
 
-                if key=='driver':
+                if role.role_name=='driver':
                     # this may not do anything. i think it regresses to zero
                     # turn on the brakes to prevent roll away
                     vehicle.ai.brake_power=1
 
-                elif key=='radio_operator':
-                    if vehicle.ai.radio is not None:
-                        if vehicle.ai.radio.ai.radio_operator==self.owner:
-                            vehicle.ai.radio.ai.radio_operator=None
-                elif 'passenger' in key:
-                    pass
+        vehicle_role=None
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied is False:
+                vehicle_role=role
+                role.role_occupied=True
+                role.human=self.owner
+                self.owner.render=role.seat_visible
+                break
 
-        role=None
-        turret=None
-        # pick a role
-        if vehicle.ai.vehicle_crew['driver'][0] is False:
-            role='driver'
-            vehicle.ai.vehicle_crew['driver'][0]=True
-            vehicle.ai.vehicle_crew['driver'][1]=self.owner
-            self.owner.render=vehicle.ai.vehicle_crew['driver'][4]
-            self.speak("Taking over driving")
-
-        if role is None:
-            for key,value in vehicle.ai.vehicle_crew.items():
-                if 'gunner' in key:
-                    if value[0] is False:
-                        vehicle.ai.vehicle_crew[key][0]=True
-                        vehicle.ai.vehicle_crew[key][1]=self.owner
-                        self.owner.render=vehicle.ai.vehicle_crew[key][4]
-                        turret=vehicle.ai.vehicle_crew[key][5]
-                        role=key
-                        break
-
-        # note that some vehicles may not have this crew slot
-        if role is None and 'radio_operator' in vehicle.ai.vehicle_crew:
-            if vehicle.ai.vehicle_crew['radio_operator'][0] is False:
-                vehicle.ai.vehicle_crew['radio_operator'][0]=True
-                vehicle.ai.vehicle_crew['radio_operator'][1]=self.owner
-                self.owner.render=vehicle.ai.vehicle_crew['radio_operator'][4]
-                role='radio_operator'
-
-                
-        if role is None:
-            
-            # check if any passenger slots are open
-            for key,value in vehicle.ai.vehicle_crew.items():
-                if 'passenger' in key:
-                    if value[0] is False:
-                        role=key
-                        vehicle.ai.vehicle_crew[key][0]=True
-                        vehicle.ai.vehicle_crew[key][1]=self.owner
-                        self.owner.render=vehicle.ai.vehicle_crew[key][4]
-                        break
 
         if role is None:
             engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!! Vehicle is full='+str(vehicle.ai.check_if_vehicle_is_full()),True)
-            print('name: '+self.owner.name)
-            print('vehicle crew')
-            for key,value in vehicle.ai.vehicle_crew.items():
-                if value[0] is True:
-                    print(key,value[1].name)
-                else:
-                    print(key,'empty')
+
 
 
         # update the position to reflect the new seat
@@ -1744,16 +1698,13 @@ class AIHuman(object):
 
         task_name='task_vehicle_crew'
         task_details = {
-            'vehicle': vehicle,
-            'role': role,
+            'vehicle_role': vehicle_role,
             'current_action': 'none', # used to describe/inform the rest of the crew what this crew member is doing
             # other crew members update this to ask this crew member to do something
             # {vehicle crew role: action that is requested}
             'crew_communication':{}, 
-            'turret': turret,
-            'radio_recieve_queue': [], # this is populated by ai_radio
             'destination': copy.copy(destination),
-            'target': None, # target for tthe gunner role
+            'target': None, # target for the gunner role
             'calculated_turret_angle': None, #used by the gunner role
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
@@ -1778,7 +1729,7 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         
         crew_communication=self.memory['task_vehicle_crew']['crew_communication']
         
@@ -1870,12 +1821,12 @@ class AIHuman(object):
                     # lets jump out
                     # only jump out if you aren't dedicated afv crew
                     if self.is_afv_trained is False:
-                        self.switch_task_exit_vehicle(vehicle)
+                        self.switch_task_exit_vehicle()
             
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_respond_to_crew(self,respond_to_crew_member):
         '''driver responds to crew requests'''
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         crew_communication=self.memory['task_vehicle_crew']['crew_communication']
         request=crew_communication[respond_to_crew_member]
 
@@ -1945,8 +1896,8 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
-        turret=self.memory['task_vehicle_crew']['turret']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
 
         # handle the reloading action
         if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
@@ -2080,8 +2031,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_examine_target(self,out_of_ammo_primary,out_of_ammo_coax):
         '''thinking about the current target after other things have been thought about'''
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
-        turret=self.memory['task_vehicle_crew']['turret']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
         target=self.memory['task_vehicle_crew']['target']
 
         # check whether target is still a threat
@@ -2091,7 +2042,7 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
         elif target.is_vehicle:
-            if target.ai.check_if_vehicle_is_crewed()==False or target.ai.vehicle_disabled:
+            if target.ai.check_if_human_in_vehicle() is False or target.ai.vehicle_disabled:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
@@ -2196,7 +2147,7 @@ class AIHuman(object):
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
         # for whatever reason sometimes a vehicle will have a driver jump out
         # this will cause a passenger to take over. will also fill in any empty gunner spots
@@ -2210,14 +2161,14 @@ class AIHuman(object):
             # kind of a hack. left and right are likely symetric so its a good
             # general guess
             if vehicle.ai.passenger_compartment_armor['left'][0]<5:
-                self.switch_task_exit_vehicle(vehicle)
+                self.switch_task_exit_vehicle()
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_radio_operator(self):
         # note radio.ai.radio_operator set by switch_task_vehicle_crew
         # not a ton that we really need to do here atm
 
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         radio=vehicle.ai.radio
 
         if radio is None:
@@ -2414,7 +2365,7 @@ class AIHuman(object):
                     self.prone_state_change()
                 if self.memory['current_task']=='task_vehicle_crew':
                     # re-use this function to exit the vehicle cleanly
-                    self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                    self.switch_task_exit_vehicle()
                     self.update_task_exit_vehicle()
                 elif self.memory['current_task']=='task_exit_vehicle':
                     self.update_task_exit_vehicle()
@@ -2451,7 +2402,7 @@ class AIHuman(object):
 
             if self.memory['current_task']=='task_vehicle_crew':
                 # re-use this function to exit the vehicle cleanly
-                self.switch_task_exit_vehicle(self.memory['task_vehicle_crew']['vehicle'])
+                self.switch_task_exit_vehicle()
                 self.update_task_exit_vehicle()
             elif self.memory['current_task']=='task_exit_vehicle':
                 self.update_task_exit_vehicle()
@@ -2700,35 +2651,20 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def update_task_exit_vehicle(self):
-        vehicle=self.memory['task_exit_vehicle']['vehicle']
 
+        vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
+        vehicle_role.human=None
+        vehicle_role.role_occupied=False
+        if vehicle_role.role_name=='driver':
 
-        for key,value in vehicle.ai.vehicle_crew.items():
-            if value[1]==self.owner:
-                value[1]=None
-                value[0]=False
+            # this may not do anything. i think it regresses to zero
+            # turn on the brakes to prevent roll away
+            vehicle_role.vehicle.ai.brake_power=1
 
-                if key=='driver':
-                    # this may not do anything. i think it regresses to zero
-                    # turn on the brakes to prevent roll away
-                    vehicle.ai.brake_power=1
-
-                    # tell everyone else to GTFO
-                    for b in vehicle.ai.vehicle_crew.values():
-                        if b[0] is True:
-                            b[1].ai.switch_task_exit_vehicle(vehicle)
-                elif key=='radio_operator':
-                    if vehicle.ai.radio is not None:
-                        if vehicle.ai.radio.ai.radio_operator==self.owner:
-                            vehicle.ai.radio.ai.radio_operator=None
-                elif 'passenger' in key:
-                    pass
-                elif 'gunner' in key:
-                    pass
-
-                else:
-                    engine.log.add_data('error','ai_human.update_task_exit_vehicle no role found!',True)
-
+            # tell everyone else to GTFO
+            for b in vehicle_role.vehicle.ai.vehicle_crew:
+                if b.role_occupied:
+                    b.human.ai.switch_task_exit_vehicle()
 
         # make sure we are visible again
         self.owner.render=True
@@ -3273,9 +3209,9 @@ class AIHuman(object):
         '''update task_vehicle_crew'''
 
         # this is for all crew
-        vehicle=self.memory['task_vehicle_crew']['vehicle']
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         if vehicle.ai.vehicle_disabled:
-            self.switch_task_exit_vehicle(vehicle)
+            self.switch_task_exit_vehicle()
             return
 
         role=self.memory['task_vehicle_crew']['role']

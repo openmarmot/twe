@@ -235,32 +235,19 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def check_if_human_in_vehicle(self,human):
         '''returns a bool as to whether the human is in the vehicle'''
-        for value in self.vehicle_crew.values():
-            if value[0] is True:
-                if value[1]==human:
-                    return True
+        for role in self.vehicle_crew:
+            if role.role_occupied:
+                return True
         return False
 
     #---------------------------------------------------------------------------
     def check_if_vehicle_is_full(self):
         '''returns a bool as to whether the vehicle is full'''
 
-        # note - need to think how gunners fit into this
-
-        for value in self.vehicle_crew.values():
-            if value[0] is False:
+        for role in self.vehicle_crew:
+            if role.role_occupied is False:
                 return False
-            
         return True
-    
-    #---------------------------------------------------------------------------
-    def check_if_vehicle_is_crewed(self):
-        '''returns a bool as to whether there is live crew in the vehicle'''
-        for value in self.vehicle_crew.values():
-            if value[0] is True:
-                if value[1].ai.blood_pressure>0:
-                    return True
-        return False
     
     #---------------------------------------------------------------------------
     def check_wheel_health(self):
@@ -384,8 +371,10 @@ class AIVehicle():
     def handle_component_damage(self,damaged_component,projectile):
         '''handle damage to a component'''
         if damaged_component=='driver':
-            if self.vehicle_crew['driver'][0] is True:
-                self.vehicle_crew['driver'][1].ai.handle_event('collision',projectile)
+            for role in self.vehicle_crew:
+                if role.role_name=='driver' and role.role_occupied:
+                    role.human.ai.handle_event('collision',projectile)
+                    return
         elif damaged_component=='engine':
             for b in self.engines:
                 b.ai.damaged=True
@@ -397,24 +386,24 @@ class AIVehicle():
                     engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
             self.vehicle_disabled=True
         elif damaged_component=='all_crew':
-            for key,value in self.vehicle_crew.items():
-                if value[0] is True:
-                    value[1].ai.handle_event('collision',projectile)
+            for role in self.vehicle_crew:
+                if role.role_occupied:
+                    role.human.ai.handle_event('collision',projectile)
         elif damaged_component=='random_crew_projectile':
-            for key,value in self.vehicle_crew.items():
-                if value[0] is True:
+            for role in self.vehicle_crew:
+                if role.role_occupied:
                     if random.randint(0,1)==1:
-                        value[1].ai.handle_event('collision',projectile)
+                        role.human.ai.handle_event('collision',projectile)
         elif damaged_component=='random_crew_explosion':
-            for key,value in self.vehicle_crew.items():
-                if value[0] is True:
+            for role in self.vehicle_crew:
+                if role.role_occupied:
                     if random.randint(0,1)==1:
-                        value[1].ai.handle_event('explosion',random.randint(30,150))
+                        role.human.ai.handle_event('explosion',projectile)
         elif damaged_component=='random_crew_fire':
-            for key,value in self.vehicle_crew.items():
-                if value[0] is True:
+            for role in self.vehicle_crew:
+                if role.role_occupied:
                     if random.randint(0,1)==1:
-                        value[1].ai.handle_hit_with_flame()
+                        role.human.ai.handle_hit_with_flame()
         elif damaged_component=='ammo_rack':
             temp=random.randint(0,self.ammo_rack_capacity)
             if temp<len(self.ammo_rack):
@@ -751,21 +740,21 @@ class AIVehicle():
         # it is also called by human_ai when it enters the vehicle
 
         # update passenger rotation and position
-        for key,value in self.vehicle_crew.items():
+        for role in self.vehicle_crew:
             # if position is occupied
-            if value[0]==True:
+            if role.role_occupied:
 
                 # stuff to change no matter what
-                value[1].altitude=self.owner.altitude
+                role.human.altitude=self.owner.altitude
                 # if position is visible
-                if value[4]==True:
+                if role.seat_visible:
                     # set the world coords with the offset
-                    value[1].world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,value[3])
-                    value[1].rotation_angle=self.owner.rotation_angle+value[2]
-                    value[1].reset_image=True
+                    role.human.world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,role.seat_offset)
+                    role.human.rotation_angle=self.owner.rotation_angle+role.seat_rotation
+                    role.human.reset_image=True
                 else:
                     # just a simple position
-                    value[1].world_coords=copy.copy(self.owner.world_coords)
+                    role.human.world_coords=copy.copy(self.owner.world_coords)
 
 
 
