@@ -178,42 +178,28 @@ class World_Menu(object):
 
     #---------------------------------------------------------------------------
     def change_vehicle_role_menu(self, key):
-        if self.menu_state=='none':
-            # print out the basic menu
-            self.text_queue.append('-- Change Vehicle Role --')
-            currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
-            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
-            if currentRole==None:
-                currentRole='None!'
+        # print out the basic menu
+        self.text_queue.append('-- Change Vehicle Role --')
+        currentRole=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role']
+        if currentRole is None:
+            engine.log.add_data('error','world_menu.change_vehicle_role: current role is None')
+            return
+        
+        vehicle=currentRole.vehicle
+        self.text_queue.append('Vehicle : '+self.selected_object.name)
+        self.text_queue.append('Current Role : '+currentRole)
 
-            self.text_queue.append('Vehicle : '+self.selected_object.name)
-            self.text_queue.append('Current Role : '+currentRole)
-            if currentRole!='driver':
-                self.text_queue.append('1 - Driver')
-                if key=='1':
-                    self.world.player.ai.player_vehicle_role_change('driver')
-                    self.deactivate_menu()
-                    return
-            if currentRole!='gunner_1' and 'gunner_1' in vehicle.ai.vehicle_crew:
-                self.text_queue.append('2 - Turret: '+vehicle.ai.vehicle_crew['gunner_1'][5].name)
-                if key=='2':
-                    self.world.player.ai.player_vehicle_role_change('gunner_1')
-                    self.deactivate_menu()
-                    return
-            if currentRole!='gunner_2' and 'gunner_2' in vehicle.ai.vehicle_crew:
-                if len(vehicle.ai.turrets)>1:
-                    self.text_queue.append('3 - Turret: '+vehicle.ai.vehicle_crew['gunner_2'][5].name)
-                    if key=='3':
-                        self.world.player.ai.player_vehicle_role_change('gunner_2')
-                        self.deactivate_menu()
+        # i am highly amused that this works
+        role_key=1
+        for role in vehicle.ai.vehicle_crew:
+            if role_key<10:
+                if role!=currentRole:
+                    self.text_queue.append(f'{role_key} - {role.role_name}')
+                    if key==str(role_key):
+                        self.world.player.ai.player_vehicle_role_change(role)
+                        self.deactivate_menu
                         return
-
-            if currentRole!='passenger_1' and 'passenger_1' in vehicle.ai.vehicle_crew:
-                self.text_queue.append('4 - Passenger')
-                if key=='4':
-                    self.world.player.ai.player_vehicle_role_change('passenger_1')
-                    self.deactivate_menu()
-                    return
+                    role_key+=1
 
      #---------------------------------------------------------------------------
     def coffee_grinder_menu(self, key):
@@ -1224,7 +1210,7 @@ class World_Menu(object):
 
         if self.menu_state=='internal':
             if 'task_vehicle_crew' in self.world.player.ai.memory:
-                currentRole=self.world.player.ai.memory['task_vehicle_crew']['role']
+                currentRole=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role']
                 if currentRole==None:
                     currentRole='none'
 
@@ -1234,7 +1220,7 @@ class World_Menu(object):
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
                 self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
-                self.text_queue.append(f'Current Vehicle Role: {currentRole}')
+                self.text_queue.append(f'Current Vehicle Role: {currentRole.role_name}')
                 self.text_queue.append(f'Vehicle: {self.selected_object.name}')
                 self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
                 

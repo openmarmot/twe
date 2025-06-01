@@ -669,7 +669,7 @@ class AIHuman(object):
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
-                if 'gunner' in self.memory['task_vehicle_crew']['role']:
+                if elf.memory['task_vehicle_crew']['vehicle_role'].is_gunner:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
                     else:
@@ -1257,43 +1257,33 @@ class AIHuman(object):
 
             # remove yourself from any existing roles 
             # first remove yourself from any existing crew spots
-            for key,value in vehicle.ai.vehicle_crew.items():
-                if value[1]==self.owner:
-                    value[1]=None
-                    value[0]=False
+            for role in vehicle.ai.vehicle_crew:
+                if role.role_occupied:
+                    if role.human==self.owner:
+                        role.human=None
+                        role.role_occupied=False
 
-                    if key=='driver':
-                        # this may not do anything. i think it regresses to zero
-                        # turn on the brakes to prevent roll away
-                        vehicle.ai.brake_power=1
+                        if role.is_driver:
+                            # this may not do anything. i think it regresses to zero
+                            # turn on the brakes to prevent roll away
+                            vehicle.ai.brake_power=1
 
-                    elif key=='radio_operator':
-                        if vehicle.ai.radio is not None:
-                            if vehicle.ai.radio.ai.radio_operator==self.owner:
-                                vehicle.ai.radio.ai.radio_operator=None
-                    elif 'passenger' in key:
-                        pass
+
 
             # --- add to the desired role --
             if role in vehicle.ai.vehicle_crew:
                 # set the role in memory
-                self.memory['task_vehicle_crew']['role']=role
-                self.owner.render=vehicle.ai.vehicle_crew[role][4]
+                self.memory['task_vehicle_crew']['vehicle_role']=role
+                self.owner.render=vehicle.ai.vehicle_crew.seat_visible
 
                 # occupied?
-                if vehicle.ai.vehicle_crew[role][0] is True:
+                if role.role_occupied:
                     # have the current crew member exit and re-enter
-                    crew=vehicle.ai.vehicle_crew[role][1]
-                    crew.ai.switch_task_exit_vehicle()
-                    crew.ai.update_task_exit_vehicle()
+                    role.human.ai.switch_task_exit_vehicle()
+                    role.human.ai.update_task_exit_vehicle()
 
-                vehicle.ai.vehicle_crew[role][0]=True
-                vehicle.ai.vehicle_crew[role][1]=self.owner
-
-                if 'gunner' in role:
-                    self.memory['task_vehicle_crew']['turret']=vehicle.ai.vehicle_crew[role][5]
-
-                
+                role.role_occupied=True
+                role.human=self.owner                
 
             else:
                 engine.log.add_data('warn','ai_human.player_vehicle_role_change - role not available in vehicle',True)
@@ -3214,14 +3204,14 @@ class AIHuman(object):
             self.switch_task_exit_vehicle()
             return
 
-        role=self.memory['task_vehicle_crew']['role']
+        role=self.memory['task_vehicle_crew']['vehicle_role']
 
         if self.owner.is_player:
             # not sure what we need to to do here. controls are now handled by world
             
-            if 'gunner' in role:
+            if role.is_gunner:
                 # handle vehicle turret gun reloads for the player
-                turret=self.memory['task_vehicle_crew']['turret']
+                turret=role.turret
                 if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
                     if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
                     > turret.ai.primary_weapon.ai.reload_speed):
@@ -3245,31 +3235,30 @@ class AIHuman(object):
                 # reset time
                 self.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
                 
-
-                if role=='driver':
+                # note that roles can have multiple functions now
+                if role.is_driver:
                     # driver needs a fast refresh for smooth vehicle controls
                     self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
                     self.think_vehicle_role_driver()
-                elif 'gunner' in role:
+                if role.is_gunner:
                     self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
                     self.think_vehicle_role_gunner()
-                elif 'passenger' in role:
+                if role.is_passenger:
                     self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
                     self.think_vehicle_role_passenger()
-                elif 'radio_operator' in role:
+                if role.is_radio_operator:
                     self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                     self.think_vehicle_role_radio_operator()
-                else:
-                    engine.log.add_data('error','unknown vehicle role: '+role,True)
+
 
             else:
                 # some roles will want to do something every update cycle
 
-                if 'gunner' in role:
+                if role.is_gunner:
                     if self.memory['task_vehicle_crew']['target'] is not None:
                         if self.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
                             self.action_vehicle_gunner_engage_target()
-                elif 'driver' in role:
+                if role.is_driver:
                     self.action_vehicle_driver()
 
     #---------------------------------------------------------------------------
