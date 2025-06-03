@@ -1392,25 +1392,25 @@ class AIHuman(object):
                 self.owner.world.text_queue.insert(0,s)
 
     #---------------------------------------------------------------------------
-    def speak_vehicle_internal(self,receipient,message):
+    def speak_vehicle_internal(self,recipient,message):
         '''speak to the crew of the vehicle'''
-        # receipient - A vehicle crew role
+        # receipient - A human name
         # message - string - if None it will remove prior commands
 
-        if receipient=='all':
+        if recipient=='all':
             pass
         else:
             vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
-            if receipient in vehicle.ai.vehicle_crew:
-                if vehicle.ai.vehicle_crew[receipient][0] is True:
-                    role=self.memory['task_vehicle_crew']['role']
-                    if message is None:
-                        # remove any prior messages
-                        vehicle.ai.vehicle_crew[receipient][1].ai.memory['task_vehicle_crew']['crew_communication'].pop(role,None)
-                    else:
-                        vehicle.ai.vehicle_crew[receipient][1].ai.memory['task_vehicle_crew']['crew_communication'][role]=message
-                else:
-                    engine.log.add_data('warn','ai_human.speak_vehicle_internal - receipient not in vehicle crew',True)
+            for role in vehicle.ai.vehicle_crew:
+                if role.role_occupied:
+                    if role.human.name==recipient:
+                        if message is None:
+                            # remove any prior messages
+                            role.human.ai.memory['task_vehicle_crew']['crew_communication'].pop(self.owner.name,None)
+                        else:
+                            role.human.ai.memory['task_vehicle_crew']['crew_communication'][self.owner.name]=message
+                        return
+
           
     #---------------------------------------------------------------------------
     def switch_task_enter_vehicle(self,vehicle,destination):

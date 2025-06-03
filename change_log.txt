@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 02 2025
+- more work on implementing crew changes 
+
+probably need to axe crew communication for now. there aren't statically defined 
+vehicle roles anymore so the old logic won't work (and wasn't great anyways).
+I'd like to move to using speak for everything and have a general conversation queue for each humaan 
+
+todo 
+- crew communication had to change. needs further rewrites to accomodate 
+----------------------------------
 June 01 2025
 - more work on implementing crew changes 
 ----------------------------------

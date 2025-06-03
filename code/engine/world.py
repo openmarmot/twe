@@ -474,10 +474,10 @@ class World():
             # key - string  example 'w'
             if self.player.ai.memory['current_task']=='task_vehicle_crew':
                 vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
-                role=self.player.ai.memory['task_vehicle_crew']['role']
+                role=self.player.ai.memory['task_vehicle_crew']['vehicle_role']
                 turret=self.player.ai.memory['task_vehicle_crew']['turret']
 
-                if role=='driver':
+                if role.is_driver:
 
                     if vehicle.is_airplane:
                         # ---- controls for airplanes ------------
