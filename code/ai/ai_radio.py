@@ -33,7 +33,8 @@ class AIRadio(object):
         # ampere-hour
         self.ah_discharge_rate=1.336
 
-
+        # this gets popped by radio operators 
+        self.receive_queue=[]
 
         # used to prevent echoing 
         self.last_message=''
@@ -47,10 +48,7 @@ class AIRadio(object):
                 if distance<(50*self.volume):
                     self.owner.world.text_queue.append('[radio] '+message)
                     print(message)
-                if self.radio_operator!=None:
-                    # this should always be true
-                    if self.radio_operator.ai.memory['current_task']=='task_vehicle_crew':
-                        self.radio_operator.ai.memory['task_vehicle_crew']['radio_recieve_queue'].append(message)
+                self.receive_queue.append(message)
 
     #---------------------------------------------------------------------------
     def send_message(self,message):

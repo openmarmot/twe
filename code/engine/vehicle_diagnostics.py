@@ -71,11 +71,11 @@ class VehicleDiagnostics(object):
         coord=[40,100]
         self.text_queue.append(['crew role | crew member (blood pressure) | current task',copy.copy(coord),self.text_black])
         coord[1]+=spacing
-        for k,value in self.vehicle.ai.vehicle_crew.items():
-            text=k+': '
-            if value[0]==True:
-                text+=f'{value[1].name} ({value[1].ai.blood_pressure})'
-                text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
+        for role in self.vehicle.ai.vehicle_crew:
+            text=f'{role.role_name}: '
+            if role.role_occupied:
+                text+=f'{role.human.name} ({role.human.ai.blood_pressure})'
+                text+=f': {role.human.ai.memory['task_vehicle_crew']['current_action']}'
             else:
                 text+='unoccupied'
             self.text_queue.append([text,copy.copy(coord),self.text_black])

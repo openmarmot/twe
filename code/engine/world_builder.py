@@ -3365,7 +3365,7 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('gunner',z)
         role.is_gunner=True
-        role.turret=main_turret
+        role.turret=turret
         role.seat_visible=True
         role.seat_offset=[0,-10]
         z.ai.vehicle_crew.append(role)
@@ -3443,7 +3443,7 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('gunner',z)
         role.is_gunner=True
-        role.turret=main_turret
+        role.turret=turret
         role.seat_visible=True
         role.seat_offset=[7,-9]
         z.ai.vehicle_crew.append(role)

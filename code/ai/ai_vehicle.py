@@ -234,10 +234,11 @@ class AIVehicle():
 
     #---------------------------------------------------------------------------
     def check_if_human_in_vehicle(self,human):
-        '''returns a bool as to whether the human is in the vehicle'''
+        '''returns a bool as to whether a specific human is in the vehicle'''
         for role in self.vehicle_crew:
             if role.role_occupied:
-                return True
+                if role.human==human:
+                    return True
         return False
 
     #---------------------------------------------------------------------------
@@ -248,6 +249,14 @@ class AIVehicle():
             if role.role_occupied is False:
                 return False
         return True
+    
+    #---------------------------------------------------------------------------
+    def check_if_vehicle_is_occupied(self):
+        '''returns bool as to whether any humans are crewing the vehicle'''
+        for role in self.vehicle_crew:
+            if role.role_occupied:
+                return True
+        return False
     
     #---------------------------------------------------------------------------
     def check_wheel_health(self):

@@ -526,7 +526,7 @@ class World_Menu(object):
     #---------------------------------------------------------------------------            
     def engine_menu(self, key):
         if 'task_vehicle_crew' in self.world.player.ai.memory:
-            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
             # print out the basic menu
             self.text_queue=[]
@@ -851,7 +851,7 @@ class World_Menu(object):
             if key=='3':
                 self.selected_object.ai.handle_event('speak',['ask to upgrade gear',None])
             if key=='4' and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 self.selected_object.ai.handle_event('speak',['task_enter_vehicle',vehicle])
         elif self.menu_state == 'non_squad_member_menu':
             self.text_queue.append('1 - What are you up to ?')
@@ -1180,7 +1180,7 @@ class World_Menu(object):
                 if fuel_option:
                     self.text_queue.append('4 - fuel ')
                 if distance<300 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
-                    vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                    vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                     self.text_queue.append('5 - Tow Vehicle')
                     if key=='5':
                         self.world.text_queue.append('[You attach the vehicle for towing]')
@@ -1230,11 +1230,11 @@ class World_Menu(object):
 
 
                 self.text_queue.append('- crew -')
-                for k,value in self.selected_object.ai.vehicle_crew.items():
-                    text=k+': '
-                    if value[0]==True:
-                        text+=value[1].name
-                        text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
+                for role in self.selected_object.ai.vehicle_crew:
+                    text=f'{role.role_name}: '
+                    if role.role_occupied:
+                        text+=role.human.name
+                        text+=f': {role.human.ai.memory['task_vehicle_crew']['current_action']}'
                     else:
                         text+='unoccupied'
                     self.text_queue.append(text)
@@ -1261,7 +1261,7 @@ class World_Menu(object):
                     self.change_menu('change_vehicle_role')
                 if key=='2':
                     # exit the vehicle
-                    self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle'])
+                    self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
                     self.world.display_vehicle_text=False
                     self.world.text_queue.append('[ You exit the vehicle ]')
                     self.deactivate_menu()
@@ -1289,9 +1289,7 @@ class World_Menu(object):
                 self.text_queue.append('')
                 self.text_queue.append('--debug info --')
                 self.text_queue.append('distance from player: '+str(distance))
-                if self.selected_object.ai.vehicle_crew['driver'][0]==True:
-                    squad_dist=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.vehicle_crew['driver'][1].ai.squad.destination)
-                    self.text_queue.append('distance from driver squad destination: '+str(squad_dist))
+
                 self.text_queue.append('rotation angle: '+str(self.selected_object.rotation_angle))
                 #self.text_queue.append('fuel type: '+self.selected_object.ai.fuel_type)
                 #self.text_queue.append('fuel amount: '+str(self.selected_object.ai.fuel))
@@ -1301,16 +1299,6 @@ class World_Menu(object):
                 self.text_queue.append('vehicle speed: '+str(self.selected_object.ai.current_speed))
                 self.text_queue.append('acceleration: '+str(self.selected_object.ai.acceleration))
 
-                self.text_queue.append('- crew debug -')
-                for k,value in self.selected_object.ai.vehicle_crew.items():
-                    text=k+': '
-                    if value[0]==True:
-                        text+=value[1].name
-                        text+=': '+value[1].ai.memory['task_vehicle_crew']['current_action']
-                    else:
-                        text+='unoccupied'
-                    self.text_queue.append(text)
-                self.text_queue.append('----')
 
                 self.text_queue.append('- weapons debug -')
                 for b in self.selected_object.ai.turrets:

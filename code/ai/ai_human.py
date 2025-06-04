@@ -230,7 +230,7 @@ class AIHuman(object):
         # and has a target that is not None
         target=self.memory['task_vehicle_crew']['target']
         # the computed lead on the target
-        turret=self.memory['task_vehicle_crew']['turret']
+        turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
 
         # check actual turret rotation angle against angle to target
         needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
@@ -413,11 +413,11 @@ class AIHuman(object):
         self.speak('react to being shot')
 
     #---------------------------------------------------------------------------
-    def calculate_turret_aim(self):
+    def calculate_turret_aim(self,turret,target):
         '''calculates the correct turret angle to hit a target'''
 
-        target=self.memory['task_vehicle_crew']['target']
-        turret=self.memory['task_vehicle_crew']['turret']
+        # target : world_object
+        # turret : world_object with ai_turret
 
         aim_coords=target.world_coords
         # guess how long it will take for the bullet to arrive
@@ -471,10 +471,10 @@ class AIHuman(object):
         ammo_gun,ammo_inventory,magazine_count=self.check_ammo(gun,object_with_inventory)
         if ammo_gun>0:
             return True
-        elif ammo_inventory>0:
+        if ammo_inventory>0:
             return True
-        else:
-            return False  
+        #default
+        return False  
         
     #---------------------------------------------------------------------------
     def check_vehicle_turret_rotation_real_angle(self,rotation_angle,turret):
@@ -499,35 +499,30 @@ class AIHuman(object):
         if distance<800:
             # humans always see everything at this range
             return True
-        elif distance<1500:                        
+        if distance<1500:                        
             if target.is_human:
                 # if in building, only seen if noise/move
                 if target.ai.in_building:
                     if target.ai.recent_noise_or_move:
                         return True
-                    else:
-                        return False
-                else:
-                    # if not in building, everything is seen at this range
-                    return True
-            else:
-                # vehicles are ALWAYS seen by humans at this range
+                    return False
+                # if not in building, everything is seen at this range
                 return True
-        elif distance<2500:
+            # vehicles are ALWAYS seen by humans at this range
+            return True
+        if distance<2500:
             if target.is_human:
                 if target.ai.recent_noise_or_move and target.ai.in_building is False:
                     return True
                 else:
                     return False
-            else:
-                if target.ai.recent_noise_or_move:
-                    return True
-                else:
-                    return False
-        else:
+            #vehicle
+            if target.ai.recent_noise_or_move:
+                return True
             return False
-                
-
+        
+        # default
+        return False
 
     #---------------------------------------------------------------------------
     def check_visibility_from_vehicle(self,target,distance):
@@ -540,45 +535,34 @@ class AIHuman(object):
                 if target.ai.in_building:
                     if target.ai.recent_noise_or_move:
                         return True
-                    else:
-                        return False
-                else:
-                    return True
-            else:
-                # vehicles are ALWAYS seen at this range
+                    return False
                 return True
+            # vehicles are ALWAYS seen at this range
+            return True
         if distance<1500:                        
             if target.is_human:
                 # if in building, only seen if noise/move
                 if target.ai.in_building:
                     if target.ai.recent_noise_or_move:
                         return True
-                    else:
-                        return False
-                else:
-                    if target.ai.prone is False:
-                        return True
-                    else:
-                        return False
-            else:
-                # vehicles are seen at this range
-                return True
+                    return False
+                if target.ai.prone is False:
+                    return True
+                return False
+            # vehicles are seen at this range
+            return True
         if distance<4000:
             if target.is_human:
                 if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
                     return True
-                else:
-                    return False
-            else:
-                if target.ai.recent_noise_or_move:
-                    return True
-                else:
-                    return False
-        else:
+                return False
+            if target.ai.recent_noise_or_move:
+                return True
             return False
-        
 
-    
+        #default
+        return False
+        
     #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
@@ -669,7 +653,7 @@ class AIHuman(object):
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
 
-                if elf.memory['task_vehicle_crew']['vehicle_role'].is_gunner:
+                if self.memory['task_vehicle_crew']['vehicle_role'].is_gunner:
                     if self.memory['task_vehicle_crew']['target'] is None:
                         self.memory['task_vehicle_crew']['target']=closest_object
                     else:
@@ -720,7 +704,7 @@ class AIHuman(object):
                 engine.log.add_data('error', 'projectile '+event_data.name+' shooter is none',True)
 
             # react 
-            if 'vehicle' in self.memory['current_task']:
+            if self.memory['current_task'] in ['task_vehicle_crew','task_exit_vehicle']:
                 # - we are in a vehicle - 
                 pass
             else:
@@ -746,7 +730,7 @@ class AIHuman(object):
             if random.randint(1,5)==1:
                 event_data.ai.redirect(event_data.ai.equipper.world_coords)
             else:
-                if 'vehicle' in self.memory['current_task']:
+                if self.memory['current_task']=='task_vehicle_crew':
                     engine.log.add_data('warn','hit by a grenade while in a vehicle',True)
                 else:
                     # - we are on foot - 
@@ -1074,8 +1058,8 @@ class AIHuman(object):
             occupants=0
 
             # count the occupants already in the vehicle
-            for c in b.ai.vehicle_crew.values():
-                if c[0] is True:
+            for c in b.ai.vehicle_crew:
+                if c.role_occupied:
                     occupants+=1
 
             for c in self.owner.world.wo_objects_human:
@@ -1249,7 +1233,7 @@ class AIHuman(object):
             self.owner.world.remove_queue.append(world_object)
 
     #---------------------------------------------------------------------------
-    def player_vehicle_role_change(self,role):
+    def player_vehicle_role_change(self,requested_role):
         'player changes vehicle roles'
         # this is called by world_menu
         if self.memory['current_task']=='task_vehicle_crew':
@@ -1271,19 +1255,19 @@ class AIHuman(object):
 
 
             # --- add to the desired role --
-            if role in vehicle.ai.vehicle_crew:
+            if requested_role in vehicle.ai.vehicle_crew:
                 # set the role in memory
-                self.memory['task_vehicle_crew']['vehicle_role']=role
-                self.owner.render=vehicle.ai.vehicle_crew.seat_visible
+                self.memory['task_vehicle_crew']['vehicle_role']=requested_role
+                self.owner.render=requested_role.seat_visible
 
                 # occupied?
-                if role.role_occupied:
+                if requested_role.role_occupied:
                     # have the current crew member exit and re-enter
-                    role.human.ai.switch_task_exit_vehicle()
-                    role.human.ai.update_task_exit_vehicle()
+                    requested_role.human.ai.switch_task_exit_vehicle()
+                    requested_role.human.ai.update_task_exit_vehicle()
 
-                role.role_occupied=True
-                role.human=self.owner                
+                requested_role.role_occupied=True
+                requested_role.human=self.owner                
 
             else:
                 engine.log.add_data('warn','ai_human.player_vehicle_role_change - role not available in vehicle',True)
@@ -1390,27 +1374,6 @@ class AIHuman(object):
                     s+=what
 
                 self.owner.world.text_queue.insert(0,s)
-
-    #---------------------------------------------------------------------------
-    def speak_vehicle_internal(self,recipient,message):
-        '''speak to the crew of the vehicle'''
-        # receipient - A human name
-        # message - string - if None it will remove prior commands
-
-        if recipient=='all':
-            pass
-        else:
-            vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
-            for role in vehicle.ai.vehicle_crew:
-                if role.role_occupied:
-                    if role.human.name==recipient:
-                        if message is None:
-                            # remove any prior messages
-                            role.human.ai.memory['task_vehicle_crew']['crew_communication'].pop(self.owner.name,None)
-                        else:
-                            role.human.ai.memory['task_vehicle_crew']['crew_communication'][self.owner.name]=message
-                        return
-
           
     #---------------------------------------------------------------------------
     def switch_task_enter_vehicle(self,vehicle,destination):
@@ -1692,7 +1655,6 @@ class AIHuman(object):
             'current_action': 'none', # used to describe/inform the rest of the crew what this crew member is doing
             # other crew members update this to ask this crew member to do something
             # {vehicle crew role: action that is requested}
-            'crew_communication':{}, 
             'destination': copy.copy(destination),
             'target': None, # target for the gunner role
             'calculated_turret_angle': None, #used by the gunner role
@@ -1721,101 +1683,69 @@ class AIHuman(object):
     def think_vehicle_role_driver(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         
-        crew_communication=self.memory['task_vehicle_crew']['crew_communication']
-        
-        # respond to crew
-        if len(crew_communication)>0:
-            respond_to_crew_member=None
-
-            # commander gets priority
-            if 'commander' in crew_communication:
-                respond_to_crew_member='commander'
-            else:
-                # note - crew is added in order of importance so this just kinda works
-                for key,value in crew_communication.items():
-                    respond_to_crew_member=key
-                    break
-            
-            if respond_to_crew_member is not None:
-
-                # make sure the crew member is valid and in the vehicle
-                if respond_to_crew_member in vehicle.ai.vehicle_crew:
-                    if vehicle.ai.vehicle_crew[respond_to_crew_member][0] is True:
-                        self.think_vehicle_role_driver_respond_to_crew(respond_to_crew_member)
-                    else:
-                        # the crew member is no longer in the vehicle
-                        self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                        self.memory['task_vehicle_crew']['current_action']='waiting'
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-
-                else:
-                    engine.log.add_data('error',f'ai_human.think_vehicle_role_driver - unknown crew member: {respond_to_crew_member}',True)
-                    self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                    self.memory['task_vehicle_crew']['current_action']='waiting'
-                    vehicle.ai.brake_power=1
-                    vehicle.ai.throttle=0
-                
-
-        # nobody is talking. guess we need to think for ourself :(
-        else:
-
-            # first lets check if anyone is trying to get in 
-            if vehicle.ai.check_if_vehicle_is_full() is False:
-                new_passengers=False
-                for b in self.squad.faction_tactical.allied_humans:
-                    if 'task_enter_vehicle' in b.ai.memory:
-                        if vehicle is b.ai.memory['task_enter_vehicle']['vehicle']:
-                            new_passengers=True
-                            break
-
-                if new_passengers:
-                    # wait for new passengers
-                    # no need to check this again for a bit
-                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
-                    vehicle.ai.brake_power=1
-                    vehicle.ai.throttle=0
-                    self.memory['task_vehicle_crew']['current_action']='waiting for passengers'
-                    return
-            
-            # next lets think if we should drive somewhere
-            
-            # how far are we from the squad tactical destination?
-            distance_to_squad_destination=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
-            if distance_to_squad_destination > 200:
-                # we are far from the squad destination
-                # lets drive to it
-                self.memory['task_vehicle_crew']['destination']=self.squad.destination
-                self.memory['task_vehicle_crew']['current_action']='driving'
-                self.memory['task_vehicle_crew']['calculated_distance_to_target']=distance_to_squad_destination
-                self.memory['task_vehicle_crew']['calculated_vehicle_angle']=engine.math_2d.get_rotation(vehicle.world_coords,self.squad.destination)
-                # turn engines on
-                # could do smarter checks here once engines have more stats
-                need_start=False
-                for b in vehicle.ai.engines:
-                    if b.ai.engine_on is False:
-                        need_start=True
+        # first lets check if anyone is trying to get in 
+        if vehicle.ai.check_if_vehicle_is_full() is False:
+            new_passengers=False
+            for b in self.squad.faction_tactical.allied_humans:
+                if 'task_enter_vehicle' in b.ai.memory:
+                    if vehicle is b.ai.memory['task_enter_vehicle']['vehicle']:
+                        new_passengers=True
                         break
-                if need_start:
-                    vehicle.ai.handle_start_engines()
 
-                return
-            else:
-                # we are close to the squad destination
-                # lets wait i guess??
-                self.memory['task_vehicle_crew']['current_action']='Waiting at destination'
+            if new_passengers:
+                # wait for new passengers
+                # no need to check this again for a bit
+                self.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1)
                 vehicle.ai.brake_power=1
                 vehicle.ai.throttle=0
+                self.memory['task_vehicle_crew']['current_action']='waiting for passengers'
+                return
+        
+        # next lets think if we should drive somewhere
+        
+        # how far are we from the squad tactical destination?
+        distance_to_squad_destination=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
+        if distance_to_squad_destination > 200:
+            # we are far from the squad destination
+            # lets drive to it
+            self.memory['task_vehicle_crew']['destination']=self.squad.destination
+            self.memory['task_vehicle_crew']['current_action']='driving'
+            self.memory['task_vehicle_crew']['calculated_distance_to_target']=distance_to_squad_destination
+            self.memory['task_vehicle_crew']['calculated_vehicle_angle']=engine.math_2d.get_rotation(vehicle.world_coords,self.squad.destination)
+            # turn engines on
+            # could do smarter checks here once engines have more stats
+            need_start=False
+            for b in vehicle.ai.engines:
+                if b.ai.engine_on is False:
+                    need_start=True
+                    break
+            if need_start:
+                vehicle.ai.handle_start_engines()
 
-                if vehicle.ai.current_speed<1:
-                    # lets jump out
-                    # only jump out if you aren't dedicated afv crew
-                    if self.is_afv_trained is False:
-                        self.switch_task_exit_vehicle()
+            return
+        
+        # default behavior after everything else 
+        # we are close to the squad destination
+        # lets wait i guess??
+        self.memory['task_vehicle_crew']['current_action']='Waiting at destination'
+        vehicle.ai.brake_power=1
+        vehicle.ai.throttle=0
+
+        if vehicle.ai.current_speed<1:
+            # lets jump out
+            # only jump out if you aren't dedicated afv crew
+            if self.is_afv_trained is False:
+                self.switch_task_exit_vehicle()
             
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_respond_to_crew(self,respond_to_crew_member):
         '''driver responds to crew requests'''
+
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # note this code is from the legacy crew communication system
+        # not currently used.will leave it here hoping to replace it in the near future
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         crew_communication=self.memory['task_vehicle_crew']['crew_communication']
         request=crew_communication[respond_to_crew_member]
@@ -1905,10 +1835,6 @@ class AIHuman(object):
             else:
                 return    
 
-
-        # cancel any current requests for the driver
-        self.speak_vehicle_internal('driver',None)
-
         out_of_ammo_primary=False
         out_of_ammo_coax=False
         turret_jammed=turret.ai.turret_jammed
@@ -1923,10 +1849,6 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                 self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
 
-                if len(self.near_vehicle_targets)>0 or self.memory['task_vehicle_crew']['target'] is not None:
-                    # keep driver from moving the vehicle while we are reloading
-                    if vehicle.ai.vehicle_crew['driver'][0]:
-                        self.speak_vehicle_internal('driver','hold for engagement')
                 return
             else:
                 out_of_ammo_primary=True
@@ -1940,10 +1862,6 @@ class AIHuman(object):
                     self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                     self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
 
-                    if len(self.near_vehicle_targets)>0 or self.memory['task_vehicle_crew']['target'] is not None:
-                        # keep driver from moving the vehicle while we are reloading
-                        if vehicle.ai.vehicle_crew['driver'][0]:
-                            self.speak_vehicle_internal('driver','hold for engagement')
                     return
                 else:
                     out_of_ammo_coax=True
@@ -2032,7 +1950,7 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
         elif target.is_vehicle:
-            if target.ai.check_if_human_in_vehicle() is False or target.ai.vehicle_disabled:
+            if target.ai.check_if_vehicle_is_occupied() is False or target.ai.vehicle_disabled:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
@@ -2063,12 +1981,9 @@ class AIHuman(object):
         # - results: all good -
         if rotation_check and distance_check and penetration_check:
             # we are clear to engage
-            # ask the driver to hold position
-            if vehicle.ai.vehicle_crew['driver'][0]:
-                self.speak_vehicle_internal('driver','hold for engagement')
 
             # update the turret angle for the target
-            self.calculate_turret_aim()
+            self.calculate_turret_aim(turret,target)
             self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
 
             return
@@ -2083,21 +1998,10 @@ class AIHuman(object):
         if distance_check is False:
             # lets only drive closer if we are the main turret
             if turret.ai.primary_turret:
-                if vehicle.ai.vehicle_crew['driver'][0]:
-                    # ask the driver to drive towards the target
-                    
-                    self.speak_vehicle_internal('driver','drive to destination')
-                    # calculate a destination closer to the target
-                    self.memory['task_vehicle_crew']['destination']=engine.math_2d.moveTowardsTarget(300,vehicle.world_coords,target.world_coords,1)
-                    # wait for a couple seconds before rechecking
-                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                    return
-                else:
-                    # no driver so we can't rotate the vehicle. 
-                    # maybe we should bail out?
-                    self.memory['task_vehicle_crew']['target']=None
-                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                    return
+                # we used to have the driver drive towards the target here
+                self.memory['task_vehicle_crew']['target']=None
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                return
             else:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
@@ -2107,25 +2011,24 @@ class AIHuman(object):
         if rotation_check is False:
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
-                if vehicle.ai.vehicle_crew['driver'][0]:
-                    # ask the driver to rotate towards the target
-                    if target.is_vehicle or random.randint(0,1)==1:
-                        self.speak_vehicle_internal('driver','rotate to target')
-                        # wait for a couple seconds before rechecking
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                        self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
-                        return
-                    else:
-                        self.memory['task_vehicle_crew']['target']=None
-                        self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                        return
+                # check if there is a driver
+                # ask the driver to rotate towards the target
+                if target.is_vehicle or random.randint(0,1)==1:
 
+                    self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+
+                    #self.speak_vehicle_internal('driver','rotate to target')
+                    # wait for a couple seconds before rechecking
+                    #self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                    #self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
+                    return
                 else:
-                    # no driver so we can't rotate the vehicle. 
-                    # maybe we should bail out?
                     self.memory['task_vehicle_crew']['target']=None
                     self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                     return
+
+
             else:
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
@@ -2139,18 +2042,20 @@ class AIHuman(object):
     def think_vehicle_role_passenger(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-        # for whatever reason sometimes a vehicle will have a driver jump out
-        # this will cause a passenger to take over. will also fill in any empty gunner spots
-        if vehicle.ai.vehicle_crew['driver'][0] is False:
-            self.switch_task_vehicle_crew(vehicle,self.squad.destination)
-        
+        # check if there are any empty roles
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied is False:
+                self.switch_task_vehicle_crew(vehicle,self.squad.destination)
+                return
+
         if len(self.near_human_targets)>0:
             # check if we should be worried about small arms fire
             # near targets will absolutely chew up a unarmored vehicle
 
             # kind of a hack. left and right are likely symetric so its a good
             # general guess
-            if vehicle.ai.passenger_compartment_armor['left'][0]<5:
+            # but only jump out if the vehicle is going slow. otherwise it might get away 
+            if vehicle.ai.current_speed<20 and vehicle.ai.passenger_compartment_armor['left'][0]<5:
                 self.switch_task_exit_vehicle()
 
     #---------------------------------------------------------------------------
@@ -2186,8 +2091,8 @@ class AIHuman(object):
                     radio.ai.turn_power_on()
 
                 # -- receive radio messages --
-                if len(self.memory['task_vehicle_crew']['radio_recieve_queue'])>0:
-                    message=self.memory['task_vehicle_crew']['radio_recieve_queue'].pop()
+                if len(radio.ai.receive_queue)>0:
+                    message=radio.ai.receive_queue.pop()
                     
                     # avoid duplicates from other radio operators
                     if message not in self.squad.radio_receive_queue:
@@ -2608,9 +2513,10 @@ class AIHuman(object):
                 self.speak('No more room in this vehicle!')
             
             if precheck:
-                for value in vehicle.ai.vehicle_crew.values():
-                    if value[0] is True:
-                        if value[1].ai.squad.faction!=self.squad.faction:
+                # check that everyone is the same faction
+                for role in vehicle.ai.vehicle_crew:
+                    if role.role_occupied:
+                        if role.human.ai.squad.faction!=self.squad.faction:
                             precheck=False
                             self.speak('This vehicle is crewed by the enemy!')
                             break
@@ -2797,8 +2703,8 @@ class AIHuman(object):
         current_vehicle=self.memory['task_mechanic']['current_vehicle']
         distance=engine.math_2d.get_distance(self.owner.world_coords,current_vehicle.world_coords)
         if distance>1000:
-             self.memory['task_mechanic']['current_vehicle']=None
-             return
+            self.memory['task_mechanic']['current_vehicle']=None
+            return
         if distance>self.max_distance_to_interact_with_object:
             self.switch_task_move_to_location(current_vehicle.world_coords,current_vehicle)
             return         
@@ -2834,8 +2740,8 @@ class AIHuman(object):
         patient=self.memory['task_medic']['current_patient']
         distance=engine.math_2d.get_distance(self.owner.world_coords,patient.world_coords)
         if distance>1000:
-             self.memory['task_medic']['current_patient']=None
-             return
+            self.memory['task_medic']['current_patient']=None
+            return
         if distance>self.max_distance_to_interact_with_object:
             self.switch_task_move_to_location(patient.world_coords,patient)
             return         
@@ -3009,8 +2915,6 @@ class AIHuman(object):
     def update_task_sit_down(self):
         '''update task_sit_down'''
         
-        # searching, moving to, sitting
-        self.memory['task_sit_down']['status']
 
         if self.memory['task_sit_down']['status']=='searching':
             distance=1000

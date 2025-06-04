@@ -1,6 +1,33 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 03 2025
+- more work on implementing crew changes 
+- removed vehicle crew communication 
+- passengers in low armor vehicles with near enemies will now only bail out of the 
+vehicle is moving slowly 
+- some pylint and misc cleanup
+
+it pains me to remove the crew communication code, definitely a step backwards. if i ever get 
+these crew changes finished it is going to result in vehicle handling that is worse than it was 
+before the changes. 
+
+i have some thoughts about creating a general conversation system that can be used both in and out 
+of vehicles. the challenges are great though. really a ton of logic for verbal communication between 
+two AIs to work. i think i'd liek to shelve this for now and get back to it at a later date 
+
+i did a ton of bug fix work here and the game is back to being more or less stable. 
+
+todo before a merge back into main 
+- more play testing to catch any more bugs 
+- driver behavior probably needs to pause while gunner is firing/reloading 
+
+todo to fix lost functionality 
+- need a generalized chat system - probably with a chat class and bools for common asks 
+- gunner needs to be able to ask the driver to rotate vehicle 
+- gunner needs to be able to ask the driver to get closer 
+
+----------------------------------
 June 02 2025
 - more work on implementing crew changes 
 
