@@ -180,7 +180,7 @@ class World():
         if self.world_menu.active_menu=='none':
 
             if self.player.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+                vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 self.world_menu.activate_menu(vehicle)
             else:
                 self.world_menu.activate_menu(self.player)
@@ -233,7 +233,7 @@ class World():
         if collided is not None:
             if collided.is_human:
                 if collided.ai.memory['current_task']=='task_vehicle_crew':
-                    collided=collided.ai.memory['task_vehicle_crew']['vehicle']
+                    collided=collided.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 else:
                     # check if object misses due to prone
                     if consider_prone:
@@ -328,10 +328,10 @@ class World():
 
         if obj.is_turret:
             if obj.ai.vehicle is not None:
-                # reset to a human that is crewing the vehicle
-                for key,value in obj.ai.vehicle.ai.vehicle_crew.items():
-                    if value[0] is True:
-                        obj=value[1]
+                # reset to (any) human that is crewing the vehicle
+                for role in obj.ai.vehicle.ai.vehicle_crew:
+                    if role.role_occupied:
+                        obj=role.human
                         break
         
         # this should always be true at this point
@@ -351,14 +351,14 @@ class World():
 
             if obj.ai.memory['current_task']=='task_vehicle_crew':
                 # add the vehicle otherwise it tends to get hit
-                ignore_list.append(obj.ai.memory['task_vehicle_crew']['vehicle'])
-                for b in obj.ai.memory['task_vehicle_crew']['vehicle'].ai.turrets:
+                ignore_list.append(obj.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
+                for b in obj.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle.ai.turrets:
                     ignore_list.append(b)
 
                 # add the vehicle crew
-                for b in obj.ai.memory['task_vehicle_crew']['vehicle'].ai.vehicle_crew.values():
-                    if b[0] is True:
-                        ignore_list.append(b[1])
+                for b in obj.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle.ai.vehicle_crew:
+                    if b.role_occupied:
+                        ignore_list.append(b.human)
 
             if obj.ai.in_building:
                 # add possible buildings the equipper is in.
@@ -406,9 +406,9 @@ class World():
                 continue
 
             # factions
-            for value in b.ai.vehicle_crew.values():
-                if value[0] is True:
-                    if value[1].ai.squad.faction!=human.ai.squad.faction:
+            for role in b.ai.vehicle_crew:
+                if role.role_occupied:
+                    if role.human.ai.squad.faction!=human.ai.squad.faction:
                         acceptable=False
 
             if acceptable:
@@ -418,8 +418,6 @@ class World():
                     best_object=b
 
         return best_object
-
-    
 
     
     #---------------------------------------------------------------------------
@@ -441,9 +439,9 @@ class World():
         self.world_menu.handle_input(key)
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
-            if self.player.ai.memory['task_vehicle_crew']['vehicle'].is_airplane:
+            if self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle.is_airplane:
                 if key=='p':
-                    self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle'])
+                    self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
                     self.player.ai.speak('bailing out!')
                     # note - physics needs to be udpdate to handle falling
         else:
@@ -475,11 +473,11 @@ class World():
             # key press is when a key is held down
             # key - string  example 'w'
             if self.player.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
-                role=self.player.ai.memory['task_vehicle_crew']['role']
-                turret=self.player.ai.memory['task_vehicle_crew']['turret']
+                role=self.player.ai.memory['task_vehicle_crew']['vehicle_role']
+                vehicle=role.vehicle
+                turret=role.turret
 
-                if role=='driver':
+                if role.is_driver:
 
                     if vehicle.is_airplane:
                         # ---- controls for airplanes ------------
@@ -521,7 +519,7 @@ class World():
                         elif key=='d':
                             vehicle.ai.handle_steer_right()
 
-                elif 'gunner' in role:
+                elif role.is_gunner:
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':
@@ -687,25 +685,25 @@ class World():
         print('------------------------------------')
         print('--- vehicle crew check ---')
         for b in self.wo_objects_vehicle:
-            for key,value in b.ai.vehicle_crew.items():
-                if value[0]==True:
+            for role in b.ai.vehicle_crew:
+                if role.role_occupied:
                     error_found=False
                     # check for passengers that are not in the world
                     # all passengers should also be in the world
-                    if self.check_object_exists(value[1])==False:
-                        print(value[1].name+' is a passenger but is not in the world')
+                    if self.check_object_exists(role.human)==False:
+                        print(role.human.name+' is a passenger but is not in the world')
                         error_found=True
 
                     # check for passengers that are missing the correct memory
                     if 'task_vehicle_crew' not in value[1].ai.memory:
-                        print(value[1].name,'missing task_vehicle_crew_memory')
+                        print(role.human.name,'missing task_vehicle_crew_memory')
                         error_found=True
 
                     if error_found:
                         print('---')
-                        print('name',value[1].name)
-                        print('exists in world',self.check_object_exists(value[1]))
-                        print('blood pressure',value[1].ai.blood_pressure)
+                        print('name',role.human.name)
+                        print('exists in world',self.check_object_exists(role.human))
+                        print('blood pressure',role.human.ai.blood_pressure)
                         print('memory dump:')
                         print(value[1].ai.memory)
                         print('---')
@@ -756,7 +754,7 @@ class World():
         if len(candidates)>0:
             self.player=random.choice(candidates)
             self.player.is_player=True
-            if 'vehicle' in self.player.ai.memory['current_task']:
+            if self.player.ai.memory['current_task']=='task_vehicle_crew':
                 # not sure if we have to do anything if in a vehicle 
                 pass
             else:

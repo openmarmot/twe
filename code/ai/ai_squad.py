@@ -111,7 +111,7 @@ class AISquad(object):
 
             # check if anyone is in a vehicle with a working radio
             if b.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=b.ai.memory['task_vehicle_crew']['vehicle']
+                vehicle=b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 for c in vehicle.ai.inventory:
                     if c.is_radio:
                         if c.ai.power_on:

@@ -350,7 +350,7 @@ class Graphics_2D_Pygame(object):
         # might consider moving this to world and just returning a array of circles to draw
         if self.world.display_weapon_range:
             if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle']
+                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 for turret in vehicle.ai.turrets:
                     if turret.ai.primary_weapon is not None:
                         radius=turret.ai.primary_weapon.ai.range*self.scale

@@ -387,8 +387,8 @@ class AIFactionTactical():
 
                     # if they are in a vehicle add it to the list
                     if 'task_vehicle_crew' in b.ai.memory:
-                        if b.ai.memory['task_vehicle_crew']['vehicle'] not in self.allied_crewed_vehicles:
-                            self.allied_crewed_vehicles.append(b.ai.memory['task_vehicle_crew']['vehicle'])
+                        if b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle not in self.allied_crewed_vehicles:
+                            self.allied_crewed_vehicles.append(b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
                 else:
                     if b.ai.squad.faction in self.hostile_factions:
                         self.hostile_humans.append(b)

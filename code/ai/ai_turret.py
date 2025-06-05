@@ -119,11 +119,10 @@ class AITurret(object):
                             self.coaxial_weapon.ai.damaged=True
                 elif damaged_component=='crew':
                     if self.remote_operated==False and self.vehicle:
-                        for key,value in self.vehicle.ai.vehicle_crew.items():
-                            if value[5]==self.owner:
-                                if value[0]==True:
-                                    value[1].ai.handle_event('collision',projectile)
-
+                        for role in self.vehicle.ai.vehicle_crew:
+                            if role.role_occupied:
+                                if role.turret==self.owner:
+                                    role.human.ai.handle_event('collision',projectile)
 
             else:
                 # bounced the projectile
