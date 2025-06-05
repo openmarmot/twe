@@ -179,6 +179,7 @@ class World_Menu(object):
     #---------------------------------------------------------------------------
     def change_vehicle_role_menu(self, key):
         # print out the basic menu
+        self.text_queue=[]
         self.text_queue.append('-- Change Vehicle Role --')
         currentRole=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role']
         if currentRole is None:
@@ -187,7 +188,7 @@ class World_Menu(object):
         
         vehicle=currentRole.vehicle
         self.text_queue.append('Vehicle : '+self.selected_object.name)
-        self.text_queue.append('Current Role : '+currentRole)
+        self.text_queue.append('Current Role : '+currentRole.role_name)
 
         # i am highly amused that this works
         role_key=1
@@ -197,7 +198,7 @@ class World_Menu(object):
                     self.text_queue.append(f'{role_key} - {role.role_name}')
                     if key==str(role_key):
                         self.world.player.ai.player_vehicle_role_change(role)
-                        self.deactivate_menu
+                        self.deactivate_menu()
                         return
                     role_key+=1
 
@@ -657,7 +658,7 @@ class World_Menu(object):
 
         # catching an occasional bug. not sure what this object is
         if self.selected_object.name is None:
-            engine.log.add_data('error','world_menu.generic_item_menu - selected obj name is none')
+            engine.log.add_data('error','world_menu.generic_item_menu - selected obj name is none',True)
             self.deactivate_menu()
             return
 
@@ -1261,7 +1262,7 @@ class World_Menu(object):
                     self.change_menu('change_vehicle_role')
                 if key=='2':
                     # exit the vehicle
-                    self.world.player.ai.switch_task_exit_vehicle(self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
+                    self.world.player.ai.switch_task_exit_vehicle()
                     self.world.display_vehicle_text=False
                     self.world.text_queue.append('[ You exit the vehicle ]')
                     self.deactivate_menu()

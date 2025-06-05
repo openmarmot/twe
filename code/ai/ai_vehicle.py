@@ -407,7 +407,7 @@ class AIVehicle():
             for role in self.vehicle_crew:
                 if role.role_occupied:
                     if random.randint(0,1)==1:
-                        role.human.ai.handle_event('explosion',projectile)
+                        role.human.ai.handle_event('explosion',100)
         elif damaged_component=='random_crew_fire':
             for role in self.vehicle_crew:
                 if role.role_occupied:
@@ -416,9 +416,9 @@ class AIVehicle():
         elif damaged_component=='ammo_rack':
             temp=random.randint(0,self.ammo_rack_capacity)
             if temp<len(self.ammo_rack):
-                self.handle_component_damage('random_crew_explosion',None)
-                self.handle_component_damage('random_crew_explosion',None)
-                self.handle_component_damage('engine',None)
+                self.handle_component_damage('random_crew_explosion',projectile)
+                self.handle_component_damage('random_crew_explosion',projectile)
+                self.handle_component_damage('engine',projectile)
                 self.vehicle_disabled=True
                 for b in self.turrets:
                     b.ai.turret_jammed=True

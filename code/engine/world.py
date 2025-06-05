@@ -519,7 +519,7 @@ class World():
                         elif key=='d':
                             vehicle.ai.handle_steer_right()
 
-                elif 'gunner' in role:
+                elif role.is_gunner:
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':

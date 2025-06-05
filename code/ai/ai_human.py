@@ -1682,8 +1682,46 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+
+        # precheck to make sure we aren't in combat 
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied:
+                if role.is_gunner:
+                    if role.turret.ai.primary_weapon:
+                        current_action=role.human.ai.memory['task_vehicle_crew']['current_action']
+                        if 'reloading' in current_action:
+                            self.memory['task_vehicle_crew']['current_action']='waiting on crew to finish reloading'
+                            vehicle.ai.brake_power=1
+                            vehicle.ai.throttle=0
+                            # wait to think for a bit so we don't end up doing something else immediately
+                            self.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                            return
+                        if 'Engaging' in current_action:
+                            self.memory['task_vehicle_crew']['current_action']='waiting on crew to finish engagement'
+                            vehicle.ai.brake_power=1
+                            vehicle.ai.throttle=0
+                            # wait to think for a bit so we don't end up doing something else immediately
+                            self.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                            return
+                        if current_action=='Waiting for driver to rotate the vehicle':
+                            target=role.human.ai.memory['task_vehicle_crew']['target']
+                            if target is not None:
+                                rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
+                                v=vehicle.rotation_angle
+                                if rotation_required>v-1 and rotation_required<v+1:
+                                    # we are close enough
+                                    self.memory['task_vehicle_crew']['current_action']='waiting'
+                                    vehicle.ai.brake_power=1
+                                    vehicle.ai.throttle=0
+                                    # wait to think for a bit so we don't end up doing something else immediately
+                                    self.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                                    return
+                                #default
+                                self.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
+                                self.memory['task_vehicle_crew']['current_action']='rotating'
+                                return
         
-        # first lets check if anyone is trying to get in 
+        # next lets check if anyone is trying to get in 
         if vehicle.ai.check_if_vehicle_is_full() is False:
             new_passengers=False
             for b in self.squad.faction_tactical.allied_humans:
@@ -1737,83 +1775,6 @@ class AIHuman(object):
             if self.is_afv_trained is False:
                 self.switch_task_exit_vehicle()
             
-    #---------------------------------------------------------------------------
-    def think_vehicle_role_driver_respond_to_crew(self,respond_to_crew_member):
-        '''driver responds to crew requests'''
-
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # note this code is from the legacy crew communication system
-        # not currently used.will leave it here hoping to replace it in the near future
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        crew_communication=self.memory['task_vehicle_crew']['crew_communication']
-        request=crew_communication[respond_to_crew_member]
-
-        if request=='rotate to target':
-            target=vehicle.ai.vehicle_crew[respond_to_crew_member][1].ai.memory['task_vehicle_crew']['target']
-
-            if target is None:
-                self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                self.memory['task_vehicle_crew']['current_action']='waiting'
-                vehicle.ai.brake_power=1
-                vehicle.ai.throttle=0
-                return
-
-            rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
-            v=vehicle.rotation_angle
-            if rotation_required>v-1 and rotation_required<v+1:
-                # we are close enough
-                self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                self.memory['task_vehicle_crew']['current_action']='waiting'
-                vehicle.ai.brake_power=1
-                vehicle.ai.throttle=0
-                # wait to think for a bit so we don't end up doing something else immediately
-                self.memory['task_vehicle_crew']['think_interval']=random.uniform(20,35)
-            else:
-                self.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
-                self.memory['task_vehicle_crew']['current_action']='rotating'
-        elif request=='drive to destination':
-            destination=vehicle.ai.vehicle_crew[respond_to_crew_member][1].ai.memory['task_vehicle_crew']['destination']
-            distance=engine.math_2d.get_distance(self.owner.world_coords,destination)
-            if distance<150:
-                # we are close enough
-                self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                self.memory['task_vehicle_crew']['current_action']='Waiting at destination'
-                vehicle.ai.brake_power=1
-                vehicle.ai.throttle=0
-            else:
-                self.memory['task_vehicle_crew']['current_action']='driving'
-                self.memory['task_vehicle_crew']['calculated_distance_to_target']=distance
-                self.memory['task_vehicle_crew']['calculated_vehicle_angle']=engine.math_2d.get_rotation(vehicle.world_coords,destination)
-                # turn engines on
-                # could do smarter checks here once engines have more stats
-                need_start=False
-                for b in vehicle.ai.engines:
-                    if b.ai.engine_on is False:
-                        need_start=True
-                        break
-                if need_start:
-                    vehicle.ai.handle_start_engines()
-        elif request=='hold for engagement':
-            # keep the vehicle still while the gunner engages
-            target=vehicle.ai.vehicle_crew[respond_to_crew_member][1].ai.memory['task_vehicle_crew']['target']
-            vehicle.ai.brake_power=1
-            vehicle.ai.throttle=0
-            self.memory['task_vehicle_crew']['current_action']='holding for engagement'
-
-            if target is None:
-                self.memory['task_vehicle_crew']['crew_communication'].pop(respond_to_crew_member,None)
-                self.memory['task_vehicle_crew']['current_action']='waiting'
-                return
-            else:
-                # wait to think for a bit so we don't end up doing something else
-                self.memory['task_vehicle_crew']['think_interval']=random.uniform(15,25)
-
-
-        else:
-            engine.log.add_data('warn','ai_human.think_vehicle_role_driver_respond_to_crew - unknown request: '+request,True)          
-
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
@@ -2012,31 +1973,22 @@ class AIHuman(object):
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
                 # check if there is a driver
+                if vehicle.ai.vehicle_crew[0].is_driver and vehicle.ai.vehicle_crew[0].role_occupied:
                 # ask the driver to rotate towards the target
-                if target.is_vehicle or random.randint(0,1)==1:
+                    if target.is_vehicle or random.randint(0,1)==1:
 
-                    self.memory['task_vehicle_crew']['target']=None
-                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-
-                    #self.speak_vehicle_internal('driver','rotate to target')
-                    # wait for a couple seconds before rechecking
-                    #self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                    #self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
-                    return
-                else:
-                    self.memory['task_vehicle_crew']['target']=None
-                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                    return
+                        # wait for a couple seconds before rechecking
+                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                        self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
+                        return
 
 
-            else:
-                self.memory['task_vehicle_crew']['target']=None
-                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                return
+
+        # default
+        self.memory['task_vehicle_crew']['target']=None
+        self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
             
-        # shouldn't get this far
-        engine.log.add_data('error','ai_human.think_vehicle_role_gunner_examine_target - unknown state',True)
-        engine.log.add_data('error',f'rotation check: {rotation_check} distance check:{distance_check} penetration check: {penetration_check} target name:{target.name}',True)
+
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):

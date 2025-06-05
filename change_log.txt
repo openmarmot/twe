@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 04 2025
+- bug fix 
+- gunner has a new status for when the vehicle needs to rotate
+- driver now checks gunner status for engagement/reloading/rotation 
+
+the new driver code implements most of the useful stuff from the removed vehicle 
+communication code. importantly vehicles stop to fire main guns and rotate as needed.
+
+this seems good. will merge. from a gameplay perspective there are minimal changes from main branch
+
+----------------------------------
 June 03 2025
 - more work on implementing crew changes 
 - removed vehicle crew communication 
