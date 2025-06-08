@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 08 2025
+- added walther p38 
+
+hard to draw pistols in their correct scaled size. they are too small. 
+i'll probably just re-use the same art for a lot of them. 
+
+the pistols don't have a lot to differentiate each other. will have to think about that 
+
+----------------------------------
 June 04 2025
 - bug fix 
 - gunner has a new status for when the vehicle needs to rotate
