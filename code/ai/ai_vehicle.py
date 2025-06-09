@@ -26,6 +26,10 @@ class AIVehicle():
     def __init__(self, owner):
         self.owner=owner
 
+        # -- vehicle sub categories --
+        # this signals to the ai that they should tow this
+        self.is_towed_gun=False
+
         # --- armor ---
         #[side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal

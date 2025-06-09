@@ -3,11 +3,17 @@ TWE Project : Change Log
 ----------------------------------
 June 08 2025
 - added walther p38 
+- started work on a new tactical_order system 
 
 hard to draw pistols in their correct scaled size. they are too small. 
 i'll probably just re-use the same art for a lot of them. 
 
 the pistols don't have a lot to differentiate each other. will have to think about that 
+
+for now tactical orders are only going to be handled by the squad lead. they should replace 
+squad.destination. in fact most of the squad stuff should go away. 
+
+tactical orders are given via radio and/or when a unit is spawned. 
 
 ----------------------------------
 June 04 2025

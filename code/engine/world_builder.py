@@ -3387,6 +3387,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='37mm_m1939_61k_aa_gun'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_towed_gun=True
         z.ai.requires_afv_training=True
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
@@ -3459,6 +3460,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='PAK 40'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_towed_gun=True
         z.ai.requires_afv_training=False
         z.ai.vehicle_armor['top']=[0,0,0]
         z.ai.vehicle_armor['bottom']=[13,0,0]

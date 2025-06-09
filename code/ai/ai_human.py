@@ -43,6 +43,7 @@ class AIHuman(object):
             'task_wait':self.update_task_wait
         }
 
+        # memory a dictionary with a ton of stuff in it. 
         self.memory={}
         self.memory['current_task']='task_think'
 
@@ -1348,7 +1349,17 @@ class AIHuman(object):
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
             return False
 
+    #---------------------------------------------------------------------------
+    def review_tactical_orders(self):
+        tactical_orders=self.memory['task_squad_leader']['tactical_orders']
+
+        if len(tactical_orders)==0:
+            return
         
+         # i think we will just focus on teh first one
+        order=tactical_orders[0]
+
+
     #---------------------------------------------------------------------------
     def speak(self,what):
         ''' say something if the ai is close to the player '''
@@ -1567,7 +1578,7 @@ class AIHuman(object):
             task_details = {
                 'last_think_time': 0,
                 'think_interval': 0.5,
-                'tactical_orders':['none','none'] 
+                'tactical_orders':[] # a list of tactical_order objects 
             }
 
             self.memory[task_name]=task_details
@@ -1653,8 +1664,6 @@ class AIHuman(object):
         task_details = {
             'vehicle_role': vehicle_role,
             'current_action': 'none', # used to describe/inform the rest of the crew what this crew member is doing
-            # other crew members update this to ask this crew member to do something
-            # {vehicle crew role: action that is requested}
             'destination': copy.copy(destination),
             'target': None, # target for the gunner role
             'calculated_turret_angle': None, #used by the gunner role
@@ -2853,6 +2862,13 @@ class AIHuman(object):
             # check in with HQ ?
                 
             # read and reply to radio messages
+                
+            tactical_orders=self.memory['task_squad_leader']['tactical_orders']
+            if len(tactical_orders)>0:
+                self.review_tactical_orders()
+            else:
+                # radio for orders?
+                pass
             
         else:
             # -- do the shorter thing --
