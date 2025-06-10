@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 10 2025
+- work on vehicle orders 
+
+i found that vehicle destination is not really used. that is interesting. rather the best destination is 
+recalculated every time the driver thinks. i wonder if this was the cause of the zig zagging.
+
+more thought is probably needed about when it is appropriate to exit a vehicle. might be worth classifying 
+vehicles (is_tank, is_transport etc)
+
+at the moment i'm not really sure if vehicle movement is going to work. it used to work with squad 
+destination, but now its really dependent on squad leads handing out vehicle orders. 
+
+----------------------------------
 June 09 2025
 - working on removing destination from squad 
 - task_enter_vehicle now checks if the vehicle is further away then when the task started 

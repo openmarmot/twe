@@ -17,6 +17,7 @@ import copy
 from ai.ai_squad import AISquad
 import engine.world_builder
 from engine.tactical_order import TacticalOrder
+from engine.vehicle_order import VehicleOrder
 
 #global variables
 
@@ -198,7 +199,14 @@ class AIFactionTactical():
                     # randomize position a bit
                     #engine.math_2d.randomize_position_and_rotation(c,170)
 
-                # handle squad attached vehicles
+                # - handle squad attached vehicles -
+                    
+                # set an initial vehicle order. after this vehicle orders will be 
+                # created by ai_human dynamically based on what the ai is trying to do
+                vehicle_order=VehicleOrder()
+                vehicle_order.order_drive_to_coords=True
+                vehicle_order.world_coords=b.squad_leader.ai.memory['task_squad_leader']['orders'][0].world_coords
+
                 for vehicle in b.vehicles:
                     vehicle.world_coords=squad_coords
                     # set initial rotation
@@ -211,7 +219,7 @@ class AIFactionTactical():
                     crew_count=len(vehicle.ai.vehicle_crew)
                     while len(member_vehicle_assignments)>0 and crew_count>0:
                         crew_count-=1
-                        member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,None)
+                        member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,vehicle_order)
 
     #---------------------------------------------------------------------------
     def update(self):

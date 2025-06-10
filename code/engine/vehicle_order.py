@@ -1,7 +1,8 @@
 '''
 repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
-notes : describes a tactical role
+notes : VehicleOrder is a simplified task for a vehicle driver
+it is set on vehicle entry, and wiped on vehicle exit
 '''
 
 class VehicleOrder():
@@ -13,6 +14,6 @@ class VehicleOrder():
         self.order_tow_object=False
 
         # additional details
-
+        self.exit_vehicle_when_finished=False
         self.world_coords=[0,0]
         self.target_object=None # a world_object
