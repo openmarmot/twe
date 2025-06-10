@@ -16,6 +16,7 @@ import engine.math_2d
 import engine.world_builder
 import engine.log
 import engine.penetration_calculator
+from engine.vehicle_order import VehicleOrder
 #import engine.global_exchange_rates
 
 #global variables
@@ -859,7 +860,7 @@ class AIHuman(object):
         # event_data ['command',relevant_data]
         if event_data[0]=='task_enter_vehicle':
             # should probably sanity check this first
-            self.switch_task_enter_vehicle(event_data[1],self.squad.destination)
+            self.switch_task_enter_vehicle(event_data[1],None)
         elif event_data[0]=='ask to join squad':
             if event_data[1]==self.squad:
                 self.speak("I'm already in that squad")
@@ -1027,7 +1028,7 @@ class AIHuman(object):
         return target
     
     #---------------------------------------------------------------------------
-    def give_squad_transportation_orders(self,destination):
+    def give_squad_transportation_orders(self,vehicle_order):
         '''assign transportation for the squad'''
 
         near_squad=self.owner.world.get_objects_within_range(self.owner.world_coords,self.squad.members,800)
@@ -1081,7 +1082,7 @@ class AIHuman(object):
                             #already in a vehicle, so no further action needed
                             near_squad.pop(0)
                         else:
-                            near_squad[0].ai.switch_task_enter_vehicle(b,destination)
+                            near_squad[0].ai.switch_task_enter_vehicle(b,vehicle_order)
                             occupants+=1
                             near_squad.pop(0)
                 else:
@@ -1351,13 +1352,23 @@ class AIHuman(object):
 
     #---------------------------------------------------------------------------
     def review_tactical_orders(self):
+        '''review tactical orders return true if a action was taken'''
         tactical_orders=self.memory['task_squad_leader']['tactical_orders']
 
         if len(tactical_orders)==0:
-            return
+            # maybe radio for new orders?
+            return False
         
-         # i think we will just focus on teh first one
+         # i think we will just focus on the first one
         order=tactical_orders[0]
+
+        if order.order_defend_area:
+            distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
+            if distance>150:
+                self.switch_task_move_to_location(self.squad.destination,None)
+                return True
+            else: 
+                return False
 
 
     #---------------------------------------------------------------------------
@@ -1387,12 +1398,15 @@ class AIHuman(object):
                 self.owner.world.text_queue.insert(0,s)
           
     #---------------------------------------------------------------------------
-    def switch_task_enter_vehicle(self,vehicle,destination):
+    def switch_task_enter_vehicle(self,vehicle,vehicle_order):
         '''switch task'''
+        # vehicle_order a VehicleOrder object. can be None if there are no orders
+        distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
         task_name='task_enter_vehicle'
         task_details = {
             'vehicle': vehicle,
-            'destination': copy.copy(destination)
+            'vehicle_order': vehicle_order,
+            'original_distance_to_vehicle':distance
         }
 
         self.memory[task_name]=task_details
@@ -1401,7 +1415,7 @@ class AIHuman(object):
         if self.squad.squad_leader==self.owner:
             # for now the afv stuff just confuses stuff. we don't want them joining up as passengers
             if self.is_afv_trained is False:
-                self.give_squad_transportation_orders(destination)
+                self.give_squad_transportation_orders(vehicle_order)
 
     #---------------------------------------------------------------------------
     def switch_task_engage_enemy(self,enemy):
@@ -1567,19 +1581,23 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_squad_leader(self):
+    def switch_task_squad_leader(self,order):
         '''switch task'''
+        # order - a TacticalOrder object. can be none
         task_name='task_squad_leader'
 
         if task_name in self.memory:
             # something here eventually?
-            pass
+            if order is not None:
+                self.memory['task_squad_leader']['orders']=[order]
         else:
             task_details = {
                 'last_think_time': 0,
                 'think_interval': 0.5,
-                'tactical_orders':[] # a list of tactical_order objects 
+                'orders':[]
             }
+            if order is not None:
+                task_details['orders']=[order]
 
             self.memory[task_name]=task_details
 
@@ -1624,7 +1642,7 @@ class AIHuman(object):
         self.memory['current_task']=task_name
 
     #---------------------------------------------------------------------------
-    def switch_task_vehicle_crew(self,vehicle,destination):
+    def switch_task_vehicle_crew(self,vehicle,vehicle_order):
         '''switch task to vehicle crew and determine role'''
         # this should always overwrite if it exists
         # A player can go through this if they enter a vehicle
@@ -1664,14 +1682,15 @@ class AIHuman(object):
         task_details = {
             'vehicle_role': vehicle_role,
             'current_action': 'none', # used to describe/inform the rest of the crew what this crew member is doing
-            'destination': copy.copy(destination),
+            'destination': None,
             'target': None, # target for the gunner role
             'calculated_turret_angle': None, #used by the gunner role
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
             'last_think_time': 0,
             'think_interval': 0.5,
-            'reload_start_time':0
+            'reload_start_time':0,
+            'vehicle_order':vehicle_order
         }
 
         self.memory[task_name]=task_details
@@ -1750,26 +1769,27 @@ class AIHuman(object):
         
         # next lets think if we should drive somewhere
         
-        # how far are we from the squad tactical destination?
-        distance_to_squad_destination=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
-        if distance_to_squad_destination > 200:
-            # we are far from the squad destination
-            # lets drive to it
-            self.memory['task_vehicle_crew']['destination']=self.squad.destination
-            self.memory['task_vehicle_crew']['current_action']='driving'
-            self.memory['task_vehicle_crew']['calculated_distance_to_target']=distance_to_squad_destination
-            self.memory['task_vehicle_crew']['calculated_vehicle_angle']=engine.math_2d.get_rotation(vehicle.world_coords,self.squad.destination)
-            # turn engines on
-            # could do smarter checks here once engines have more stats
-            need_start=False
-            for b in vehicle.ai.engines:
-                if b.ai.engine_on is False:
-                    need_start=True
-                    break
-            if need_start:
-                vehicle.ai.handle_start_engines()
+        # how far are we from the squad leader?
+        if self.squad.squad_leader is not None:
+            distance_to_squad_lead=engine.math_2d.get_distance(self.owner.world_coords,self.squad.squad_leader.world_coords)
+            if distance_to_squad_lead > 200:
+                # we are far from the squad destination
+                # lets drive to it
+                self.memory['task_vehicle_crew']['destination']=copy.copy(self.squad.squad_leader.world_coords)
+                self.memory['task_vehicle_crew']['current_action']='driving'
+                self.memory['task_vehicle_crew']['calculated_distance_to_target']=distance_to_squad_lead
+                self.memory['task_vehicle_crew']['calculated_vehicle_angle']=engine.math_2d.get_rotation(vehicle.world_coords,self.squad.squad_leader.world_coords)
+                # turn engines on
+                # could do smarter checks here once engines have more stats
+                need_start=False
+                for b in vehicle.ai.engines:
+                    if b.ai.engine_on is False:
+                        need_start=True
+                        break
+                if need_start:
+                    vehicle.ai.handle_start_engines()
 
-            return
+                return
         
         # default behavior after everything else 
         # we are close to the squad destination
@@ -2005,8 +2025,8 @@ class AIHuman(object):
 
         # check if there are any empty roles
         for role in vehicle.ai.vehicle_crew:
-            if role.role_occupied is False:
-                self.switch_task_vehicle_crew(vehicle,self.squad.destination)
+            if role.role_occupied is False and role.is_passenger is False:
+                self.switch_task_vehicle_crew(vehicle,None)
                 return
 
         if len(self.near_human_targets)>0:
@@ -2423,7 +2443,7 @@ class AIHuman(object):
         # Note - this task can also handle the player trying to enter a vehicle 
 
         vehicle=self.memory['task_enter_vehicle']['vehicle']
-        destination=self.memory['task_enter_vehicle']['destination']
+        
 
         if self.owner.world.check_object_exists(vehicle) is False:
             self.speak('Where did that '+vehicle.name+' go?')
@@ -2438,27 +2458,15 @@ class AIHuman(object):
             return
 
         distance=engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)
-        distance_to_destination=engine.math_2d.get_distance(self.owner.world_coords,destination)
 
-        if distance_to_destination<distance and self.owner.is_player is False:
-            # vehicle is further away than our actual destination
-            # lets just walk
-
-            # first cancel the task
+        # check if the vehicle is getting further away
+        if distance>self.memory['task_enter_vehicle']['original_distance_to_vehicle']+100:
+            self.speak('My ride is driving away!')
             self.memory.pop('task_enter_vehicle',None)
-            
-            # double check its walkable
-            if distance_to_destination<self.max_walk_distance:
-                self.speak(f"Forget the {vehicle.name}. I'm walking")
-                self.switch_task_move_to_location(destination,None)
-                return
-            else:
-                # this is probably a loop at this point, lets just cancel the original task
-                self.speak("I've lost track of what I was doing..")
-                self.memory.pop('task_move_to_location',None)
-                self.switch_task_think()
-                return
+            self.switch_task_think()
 
+
+        # check if we are close enough to enter
         if distance<self.max_distance_to_interact_with_object or self.owner.is_player:
 
             # no matter what at this point this task is complete
@@ -2490,7 +2498,8 @@ class AIHuman(object):
                     self.large_pickup=None
 
                 # this will decide crew position as well
-                self.switch_task_vehicle_crew(vehicle,destination)
+                vehicle_order=self.memory['task_enter_vehicle']['vehicle_order']
+                self.switch_task_vehicle_crew(vehicle,vehicle_order)
             else:
                 # something went wrong, cancel the task
                 self.memory.pop('task_enter_vehicle',None)
@@ -2761,8 +2770,10 @@ class AIHuman(object):
                     # get_closest_vehicle only returns vehicles that aren't full
                     # won't return planes if not a pilot
                     # won't return AFVs if not AFV trained
-                    self.switch_task_enter_vehicle(b,self.memory['task_move_to_location']['destination'])
-
+                    vehicle_order=VehicleOrder()
+                    vehicle_order.order_drive_to_coords=True
+                    vehicle_order.world_coords=self.memory['task_move_to_location']['destination']
+                    self.switch_task_enter_vehicle(b,vehicle_order)
 
                 else:
                     # no vehicles ? guess we are walking
@@ -2839,6 +2850,10 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def update_task_squad_leader(self):
 
+        # this is a task that is checked temporarily if there is nothing better to do.
+        # as such it should always switch_task_think() after doing what it planned on doing, 
+        # unless if it switched to something else
+
         last_think_time=self.memory['task_squad_leader']['last_think_time']
         think_interval=self.memory['task_squad_leader']['think_interval']
 
@@ -2848,27 +2863,12 @@ class AIHuman(object):
             self.memory['task_squad_leader']['last_think_time']=self.owner.world.world_seconds
 
             # -- do the longer thing ---
-            action=False
-            
-            distance=engine.math_2d.get_distance(self.owner.world_coords,self.squad.destination)
-            if distance>150:
-                self.switch_task_move_to_location(self.squad.destination,None)
-                action=True
+            if self.review_tactical_orders() is False:
+                # this means the tactical orders didn't result in any new actions
 
-            # check on squad members?
+                self.switch_task_think()
                 
-            # coordinate with nearby squad lead?
-                
-            # check in with HQ ?
-                
-            # read and reply to radio messages
-                
-            tactical_orders=self.memory['task_squad_leader']['tactical_orders']
-            if len(tactical_orders)>0:
-                self.review_tactical_orders()
-            else:
-                # radio for orders?
-                pass
+
             
         else:
             # -- do the shorter thing --
@@ -2878,6 +2878,8 @@ class AIHuman(object):
             if decision==1:
                 coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
                 self.switch_task_move_to_location(coords,None)
+
+            self.switch_task_think()
 
     #---------------------------------------------------------------------------
     def update_task_sit_down(self):

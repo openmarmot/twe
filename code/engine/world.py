@@ -813,9 +813,6 @@ class World():
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
 
-            #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
-            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
-
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):

@@ -4,13 +4,13 @@ email : andrew@openmarmot.com
 notes : describes a tactical role
 '''
 
-class TacticalOrder():
+class VehicleOrder():
 
     def __init__(self):
 
         # - order type : should be exactly one of these -
-        self.order_move_towed_object=False
-        self.order_defend_area=False
+        self.order_drive_to_coords=False
+        self.order_tow_object=False
 
         # additional details
 

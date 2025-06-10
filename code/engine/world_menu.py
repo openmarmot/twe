@@ -1193,7 +1193,7 @@ class World_Menu(object):
                     return
                 if key=='2':
                     # enter the vehicle 
-                    self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
+                    self.world.player.ai.switch_task_enter_vehicle(self.selected_object,None)
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
                     self.world.text_queue.append('[ You climb into the vehicle ]')
