@@ -2059,6 +2059,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
 
         driver=VehicleRole('driver',z)
         driver.is_driver=True
@@ -2110,6 +2111,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Raupenschlepper Ost'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
 
         driver=VehicleRole('driver',z)
         driver.is_driver=True
@@ -2224,6 +2226,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[8,19,0]
@@ -2832,6 +2836,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='T20 Komsomolets armored tractor'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.vehicle_armor['top']=[5,0,0]
         z.ai.vehicle_armor['bottom']=[7,0,0]
         z.ai.vehicle_armor['left']=[7,19,0]
@@ -3565,6 +3571,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.max_speed=592
 
         driver=VehicleRole('driver',z)
@@ -3624,6 +3632,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
         z.name='red_bicycle'
         z.is_vehicle=True
+        z.ai.is_transport=True
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=142.08
         z.ai.rotation_speed=50.

@@ -705,6 +705,12 @@ class World_Menu(object):
         self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
         self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
         self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
+        self.text_queue.append('1 - Vehicle Diagnostics')
+        if key=='1':
+            self.world.vehicle_diagnostics=True
+            self.world.vehicle_diagnostics_vehicle=self.selected_object.ai.hit_object
+            self.deactivate_menu
+            return
 
 
 

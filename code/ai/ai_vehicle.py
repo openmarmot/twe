@@ -29,6 +29,7 @@ class AIVehicle():
         # -- vehicle sub categories --
         # this signals to the ai that they should tow this
         self.is_towed_gun=False
+        self.is_transport=False # ai generally will exit these when reaching a destination
 
         # --- armor ---
         #[side][armor thickness,armor slope,spaced_armor_thickness]

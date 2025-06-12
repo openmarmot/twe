@@ -91,7 +91,13 @@ class AIFactionTactical():
                 squad.add_to_squad(c)
             
             # set the initial squad leader
-            squad.squad_leader=squad.members[0]
+            if len(squad.members)>0:
+                squad.squad_leader=squad.members[0]
+            else:
+                print(f'squad error. member count:{len(squad.members)}, vehicle count:{len(squad.vehicles)}')
+                for v in squad.vehicles:
+                    print(v.name)
+                
 
             self.squads.append(squad)
 
@@ -172,8 +178,10 @@ class AIFactionTactical():
             if squad.squad_leader:
                 order=TacticalOrder()
                 order.order_defend_area=True
-                order.world_coords=engine.math_2d.randomize_coordinates(random.choice(self.world.world_areas).world_coords,200)
-                squad.squad_leader.switch_task_squad_leader(order)
+                random_world_area=random.choice(self.world.world_areas)
+                order.world_area=random_world_area
+                order.world_coords=engine.math_2d.randomize_coordinates(random_world_area.world_coords,300)
+                squad.squad_leader.ai.switch_task_squad_leader(order)
 
     #---------------------------------------------------------------------------
     def set_starting_positions(self):
@@ -203,9 +211,12 @@ class AIFactionTactical():
                     
                 # set an initial vehicle order. after this vehicle orders will be 
                 # created by ai_human dynamically based on what the ai is trying to do
-                vehicle_order=VehicleOrder()
-                vehicle_order.order_drive_to_coords=True
-                vehicle_order.world_coords=b.squad_leader.ai.memory['task_squad_leader']['orders'][0].world_coords
+                if b.squad_leader:
+                    vehicle_order=VehicleOrder()
+                    vehicle_order.order_drive_to_coords=True
+                    vehicle_order.world_coords=b.squad_leader.ai.memory['task_squad_leader']['orders'][0].world_coords
+                else:
+                    vehicle_order=None
 
                 for vehicle in b.vehicles:
                     vehicle.world_coords=squad_coords

@@ -1,5 +1,30 @@
 TWE Project : Change Log
 
+
+----------------------------------
+June 11 2025
+- bug fix
+- work on tactical and vehicle orders 
+- squad leader can now take initative and create new tactical orders 
+- hit marker menu now lets you open vehicle diagnostics for the hit vehicle 
+
+hit marker menu letting you open vehicle diagnostics is super handy. when a vehicle 
+is hit its often very hard to select otherwise because there tends to be bodies and gear 
+surrounding it.
+
+play test notes 
+- seems like some gunners get stuck on engaging. not sure why 
+- saw a nearly full sd.kfz.251 with the driver on waiting and the gunner on 'turret jammed' 
+    it was surrounded by enemy troops. that should probably trigger a bail out 
+
+I did a bunch of test launches and the code seems fairly stable and error free. 
+the battle dynamic has changed quite a bit. it is more chaotic now with a bunch 
+of smaller engagements. for whatever reason there is more infantry vs infantry fights.
+ definitely more fun. 
+
+definitely some regressions - especially in exiting vehicles, but i think this is good 
+enough to merge. 
+
 ----------------------------------
 June 10 2025
 - work on vehicle orders 
