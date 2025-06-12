@@ -103,6 +103,7 @@ class WorldObject(object):
         self.is_player=False
         self.is_human=False # something that has ai_human
         
+        # note - more specific vehicle categories done in the ai_vehicle class
         self.is_vehicle=False
         self.is_airplane=False
         self.is_gun=False

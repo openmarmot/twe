@@ -20,13 +20,9 @@ import engine.log
 class AISquad(object):
     def __init__(self,world):
 
+        # !! NOTE - this should have as little as possible in it. most stuff should be in ai_human
+
         self.world=world
-
-        # destination - this is set by the faction tactical ai
-        self.destination=[0.,0.]
-
-        # text explanation of current orders 
-        #self.current_orders=''
         
         # people in the squad 
         # ai_human will remove itself on death 

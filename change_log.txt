@@ -1,5 +1,81 @@
 TWE Project : Change Log
 
+
+----------------------------------
+June 11 2025
+- bug fix
+- work on tactical and vehicle orders 
+- squad leader can now take initative and create new tactical orders 
+- hit marker menu now lets you open vehicle diagnostics for the hit vehicle 
+
+hit marker menu letting you open vehicle diagnostics is super handy. when a vehicle 
+is hit its often very hard to select otherwise because there tends to be bodies and gear 
+surrounding it.
+
+play test notes 
+- seems like some gunners get stuck on engaging. not sure why 
+- saw a nearly full sd.kfz.251 with the driver on waiting and the gunner on 'turret jammed' 
+    it was surrounded by enemy troops. that should probably trigger a bail out 
+
+I did a bunch of test launches and the code seems fairly stable and error free. 
+the battle dynamic has changed quite a bit. it is more chaotic now with a bunch 
+of smaller engagements. for whatever reason there is more infantry vs infantry fights.
+ definitely more fun. 
+
+definitely some regressions - especially in exiting vehicles, but i think this is good 
+enough to merge. 
+
+----------------------------------
+June 10 2025
+- work on vehicle orders 
+
+i found that vehicle destination is not really used. that is interesting. rather the best destination is 
+recalculated every time the driver thinks. i wonder if this was the cause of the zig zagging.
+
+more thought is probably needed about when it is appropriate to exit a vehicle. might be worth classifying 
+vehicles (is_tank, is_transport etc)
+
+at the moment i'm not really sure if vehicle movement is going to work. it used to work with squad 
+destination, but now its really dependent on squad leads handing out vehicle orders. 
+
+----------------------------------
+June 09 2025
+- working on removing destination from squad 
+- task_enter_vehicle now checks if the vehicle is further away then when the task started 
+- as part of removing destination from squad, it is also being removed from enter vehicle 
+- vehicle_orders are now a thing 
+- new simpler initial tactical orders 
+- (temporary?) removal of ai_faction_tactical giving out orders on a regular interval 
+
+note ! - dev branch will be broken for awhile again 
+
+I wasn't sure whether tactical orders and vehicle orders needed to be seperate, but i eventually decided 
+that tactical orders will only be kept in the squad leader's memory. 
+
+In order for the vehicle use ai to work a ai must be able to set a destination when they enter a vehicle 
+thus vehicle_orders were still needed as a seperate (and less complicated) thing. 
+
+todo 
+- tactical order processing by squad lead 
+- what to do when no tactical orders (probably review world areas and move toward one)
+- vehicle driver processing of vehicle orders 
+    - if none, check if the crew have any 
+
+----------------------------------
+June 08 2025
+- added walther p38 
+- started work on a new tactical_order system 
+
+hard to draw pistols in their correct scaled size. they are too small. 
+i'll probably just re-use the same art for a lot of them. 
+
+the pistols don't have a lot to differentiate each other. will have to think about that 
+
+for now tactical orders are only going to be handled by the squad lead. they should replace 
+squad.destination. in fact most of the squad stuff should go away. 
+
+tactical orders are given via radio and/or when a unit is spawned. 
+
 ----------------------------------
 June 04 2025
 - bug fix 

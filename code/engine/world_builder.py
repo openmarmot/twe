@@ -80,13 +80,13 @@ list_guns=['kar98k','stg44','mp40','mg34','mg42','mosin_nagant','ppsh43','dp28',
 list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w','c96']
 list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911','mg15','c96_red_9']
-list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2']
+list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2','walther_p38']
 
 list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
 list_guns_smg=['mp40','ppsh43']
 list_guns_assault_rifles=['stg44']
 list_guns_machine_guns=['mg34','mg42','dp28','mg15','fg42-type1','fg42-type2']
-list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9']
+list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9','walther_p38']
 list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
@@ -104,7 +104,7 @@ squad_data={}
 #------------------------------------------------------------------------------
 def add_random_pistol_to_inventory(wo,world):
     '''adds a random pistol to the inventory'''
-    pistol=random.randint(0,5)
+    pistol=random.randint(0,6)
     if pistol==0:
         wo.add_inventory(spawn_object(world,wo.world_coords,'ppk',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'ppk_magazine',False))
@@ -129,6 +129,10 @@ def add_random_pistol_to_inventory(wo,world):
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
+    elif pistol==6:
+        wo.add_inventory(spawn_object(world,wo.world_coords,'walther_p38',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
 
 #------------------------------------------------------------------------------
 def add_standard_loadout(wo,world,loadout):
@@ -685,7 +689,6 @@ def load_quick_battle(world,battle_option):
     # testing
     elif battle_option=='4':
         squads=[]
-        squads+=['soviet_su_85']     
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -1504,6 +1507,32 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif object_type=='walther_p38':
+        z=WorldObject(world,['walther_p38'],AIGun)
+        z.name='Walther P38'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=4
+        z.ai.magazine=spawn_object(world,world_coords,'p38_magazine',False)
+        z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
+        z.ai.range=604
+        z.ai.type='pistol'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    # NOTE - this should be 32 ACP or something
+    elif object_type=='p38_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='p38_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['walther_p38']
+        z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
+        z.ai.capacity=8
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif object_type=='c96':
         z=WorldObject(world,['c96'],AIGun)
         z.name='C96 Mauser Pistol'
@@ -2030,6 +2059,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Dodge G505 WC Truck'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
 
         driver=VehicleRole('driver',z)
         driver.is_driver=True
@@ -2081,6 +2111,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Raupenschlepper Ost'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
 
         driver=VehicleRole('driver',z)
         driver.is_driver=True
@@ -2195,6 +2226,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Sd.Kfz.251'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[8,19,0]
@@ -2803,6 +2836,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='T20 Komsomolets armored tractor'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.vehicle_armor['top']=[5,0,0]
         z.ai.vehicle_armor['bottom']=[7,0,0]
         z.ai.vehicle_armor['left']=[7,19,0]
@@ -3358,6 +3393,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='37mm_m1939_61k_aa_gun'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_towed_gun=True
         z.ai.requires_afv_training=True
         turret=spawn_object(world,world_coords,'37mm_m1939_61k_turret',True)
         z.ai.turrets.append(turret)
@@ -3430,6 +3466,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='PAK 40'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_towed_gun=True
         z.ai.requires_afv_training=False
         z.ai.vehicle_armor['top']=[0,0,0]
         z.ai.vehicle_armor['bottom']=[13,0,0]
@@ -3534,6 +3571,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='kubelwagen'
         z.is_vehicle=True
         z.is_towable=True
+        z.ai.is_transport=True
+
         z.ai.max_speed=592
 
         driver=VehicleRole('driver',z)
@@ -3593,6 +3632,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
         z.name='red_bicycle'
         z.is_vehicle=True
+        z.ai.is_transport=True
         z.ai.max_speed=177.6
         z.ai.max_offroad_speed=142.08
         z.ai.rotation_speed=50.

@@ -370,11 +370,11 @@ class World():
         return ignore_list
 
     #---------------------------------------------------------------------------
-    def get_closest_object(self, world_coords,objECT_LIST,max_distance):
+    def get_closest_object(self, world_coords,object_list,max_distance):
         ''' can be used on its own or referenced like get_closest_gun() does'''
         best_distance=max_distance
         best_object=None
-        for b in objECT_LIST:
+        for b in object_list:
             d=engine.math_2d.get_distance(world_coords,b.world_coords)
             if d<best_distance:
                 best_distance=d 
@@ -812,9 +812,6 @@ class World():
 
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')
-
-            #engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.world_coords,'blue')
-            engine.world_builder.spawn_map_pointer(self,self.player.ai.squad.destination,'orange')
 
 
     #---------------------------------------------------------------------------

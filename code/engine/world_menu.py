@@ -402,7 +402,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
-            self.text_queue.append('1 - MG34 ')
+            self.text_queue.append('1 - walther p38 ')
             self.text_queue.append('2 - Panzerschreck')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
             self.text_queue.append('4 - molotov')
@@ -410,10 +410,9 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mg34_belt',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'walther_p38',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'p38_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'p38_magazine',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
@@ -706,6 +705,12 @@ class World_Menu(object):
         self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
         self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
         self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
+        self.text_queue.append('1 - Vehicle Diagnostics')
+        if key=='1':
+            self.world.vehicle_diagnostics=True
+            self.world.vehicle_diagnostics_vehicle=self.selected_object.ai.hit_object
+            self.deactivate_menu
+            return
 
 
 
@@ -1194,7 +1199,7 @@ class World_Menu(object):
                     return
                 if key=='2':
                     # enter the vehicle 
-                    self.world.player.ai.switch_task_enter_vehicle(self.selected_object,[0,0])
+                    self.world.player.ai.switch_task_enter_vehicle(self.selected_object,None)
                     # honestly this menu is kinda ugly. maybe better to leave it off
                     #self.world.display_vehicle_text=True
                     self.world.text_queue.append('[ You climb into the vehicle ]')
