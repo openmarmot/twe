@@ -86,7 +86,7 @@ list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
 list_guns_smg=['mp40','ppsh43']
 list_guns_assault_rifles=['stg44']
 list_guns_machine_guns=['mg34','mg42','dp28','mg15','fg42-type1','fg42-type2']
-list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9','walther_p38']
+list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9','walther_p38','luger_p08']
 list_guns_at_rifles=['ptrs_41']
 
 list_german_military_equipment=['german_folding_shovel','german_field_shovel']
@@ -133,6 +133,10 @@ def add_random_pistol_to_inventory(wo,world):
         wo.add_inventory(spawn_object(world,wo.world_coords,'walther_p38',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
+    elif pistol==7:
+        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
+        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
 
 #------------------------------------------------------------------------------
 def add_standard_loadout(wo,world,loadout):
@@ -1495,7 +1499,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
-    # NOTE - this should be 32 ACP or something
     elif object_type=='ppk_magazine':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
         z.name='ppk_magazine'
@@ -1521,13 +1524,37 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
-    # NOTE - this should be 32 ACP or something
     elif object_type=='p38_magazine':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
         z.name='p38_magazine'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['walther_p38']
+        z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
+        z.ai.capacity=8
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
+    elif object_type=='luger_p08':
+        z=WorldObject(world,['walther_p38'],AIGun)
+        z.name='Luger P08'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=4
+        z.ai.magazine=spawn_object(world,world_coords,'luger_p08_magazine',False)
+        z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
+        z.ai.range=604
+        z.ai.type='pistol'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='luger_p08_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='Luger P08 Magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['luger_p08']
         z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
         z.ai.capacity=8
         z.rotation_angle=float(random.randint(0,359))

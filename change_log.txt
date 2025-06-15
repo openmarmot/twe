@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 15 2025
+- added the p08 luger in 9mm 
+- increased 37mm AT pen a bit at range
+- increased 14.mm AT pen at range a bit  
+
+i'd like to add most of the pistols used in the war but the stats are all the same. really 
+hard to differentiate. 
+
+----------------------------------
 June 11 2025
 - bug fix
 - work on tactical and vehicle orders 
