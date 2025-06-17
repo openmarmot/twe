@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 16 2025
+- some gunner ai fixes to attempt to fix issues with getting stuck engaging targets 
+
+did some play testing. i think gunners getting stuck on engaging is fixed. however 
+vehicles still probably don't move enough. most matches end up in a stalemate with nobody 
+moving. 
+
+t34-85 and t34-76 are winning some engagements now - which is good. 
+
+self debug needs to be fixed.
+----------------------------------
 June 15 2025
 - added the p08 luger in 9mm 
 - increased 37mm AT pen a bit at range

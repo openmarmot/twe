@@ -260,8 +260,10 @@ class AIHuman(object):
                             fire_primary=True
                         else:
                             self.memory['task_vehicle_crew']['target']=None
+                            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 else:
                     self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
             else:
                 if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
                     fire_coax=True
@@ -274,6 +276,7 @@ class AIHuman(object):
                 if self.current_burst>self.max_burst:
                     self.current_burst=0
                     self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
                 if fire_primary:
                     turret.ai.handle_fire()
