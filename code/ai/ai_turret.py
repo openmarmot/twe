@@ -32,6 +32,10 @@ class AITurret(object):
         self.turret_armor['front']=[0,0,0]
         self.turret_armor['rear']=[0,0,0]
 
+        # turret accuracy. 0 is perfect accuracy
+        # basically a measure of how easy/hard it is to aim
+        self.turret_accuracy=0
+
         # this means that it can no longer rotate
         self.turret_jammed=False
 
@@ -73,11 +77,12 @@ class AITurret(object):
 
         adjust_max=0
         adjust_max+=weapon.ai.mechanical_accuracy
+        adjust_max+=self.turret_accuracy
 
         if self.vehicle.ai.current_speed>0:
             adjust_max+=10
         if self.vehicle.ai.current_speed>100:
-            adjust_max+=10
+            adjust_max+=20
 
         # apply adjustment
         far_coords=[far_coords[0]+random.uniform(-adjust_max,adjust_max),far_coords[1]+random.uniform(-adjust_max,adjust_max)]

@@ -2,6 +2,22 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 18 2025
+- fixed self debug code 
+- added clutter generation back to quick battle 
+- minor changes to mechanical accuracy for some weapons 
+- turrets now have their own accuracy variable 
+- added some debug checks for vehicle turret reloads failing 
+- fixed bicycle driver visibility 
+
+at some point clutter generation was removed from quick battle. this explains why 
+i wasn't seeing anyone riding bicycles around 
+
+playtest notes 
+- it seems sometimes gunners get stuck reloading. unsure why 
+- need more vehicle damage. sometimes vehicles can take a absurd amount of shots 
+
+----------------------------------
 June 16 2025
 - some gunner ai fixes to attempt to fix issues with getting stuck engaging targets 
 

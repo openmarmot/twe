@@ -695,8 +695,11 @@ class World():
                         error_found=True
 
                     # check for passengers that are missing the correct memory
-                    if 'task_vehicle_crew' not in value[1].ai.memory:
+                    if 'task_vehicle_crew' not in role.human.ai.memory:
                         print(role.human.name,'missing task_vehicle_crew_memory')
+                        error_found=True
+                    if role.human.ai.memory['current_task']!='task_vehicle_crew':
+                        print(role.human.name,'task_vehicle_crew is not current_task')
                         error_found=True
 
                     if error_found:
@@ -705,7 +708,7 @@ class World():
                         print('exists in world',self.check_object_exists(role.human))
                         print('blood pressure',role.human.ai.blood_pressure)
                         print('memory dump:')
-                        print(value[1].ai.memory)
+                        print(role.human.ai.memory)
                         print('---')
 
                     # maybe also check faction against other passengers

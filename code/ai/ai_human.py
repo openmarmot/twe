@@ -1966,15 +1966,19 @@ class AIHuman(object):
         if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
             > turret.ai.primary_weapon.ai.reload_speed):
-                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                reload_success=self.reload_weapon(turret.ai.primary_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
+                if reload_success is False:
+                    engine.log.add_data('Error','think_vehicle_role_gunner primary weapon reload failed',)
             else:
                 return
         if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
             > turret.ai.coaxial_weapon.ai.reload_speed):
-                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                reload_success=self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
+                if reload_success is False:
+                    engine.log.add_data('Error','think_vehicle_role_gunner coax weapon reload failed',)
             else:
                 return    
 
