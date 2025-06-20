@@ -43,6 +43,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - American/Soviet Lend-Lease truck
 - Soviet T34-76 (late)
 - Soviet T34-85
+- Soviet SU-85
 - Soviet 37mm AA gun
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.

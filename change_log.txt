@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 19 2025
+- minor logic fixes in ai_human 
+
+spent some time trying to figure out why tanks seems to get stuck reloading sometimes. 
+added some code to maybe fix some possible issues. not 100% sure yet what the issue is 
+or if it even exists 
+
+todo 
+- turret reload speeds should be set as a turret variable to allow for more variation 
+- bicycles are hilariously damage resistant. need to add some sort of structural damage. 
+
+----------------------------------
 June 18 2025
 - fixed self debug code 
 - added clutter generation back to quick battle 

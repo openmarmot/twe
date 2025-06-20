@@ -572,7 +572,6 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
-        # any distance calculation would be made before this function is called
         if OBJECT_TO_DROP.is_large_human_pickup:
             self.large_pickup=None
         else:
@@ -658,14 +657,9 @@ class AIHuman(object):
         # note that we should double check that we can actually see the closest target
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
-
-                if self.memory['task_vehicle_crew']['vehicle_role'].is_gunner:
-                    if self.memory['task_vehicle_crew']['target'] is None:
-                        self.memory['task_vehicle_crew']['target']=closest_object
-                    else:
-                        # only switch targets if we aren't currently firing at a vehicle
-                        if self.memory['task_vehicle_crew']['target'].is_vehicle is False:
-                            self.memory['task_vehicle_crew']['target']=closest_object
+                # i think its better to NOT do anything here.
+                # vehicle gunners have a lot of logic to pick new targets now
+                pass 
 
             else:
 
@@ -1995,7 +1989,7 @@ class AIHuman(object):
                 # start the reload process
                 self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                 self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-
+                self.memory['task_vehicle_crew']['target']=None
                 return
             else:
                 out_of_ammo_primary=True
@@ -2008,7 +2002,7 @@ class AIHuman(object):
                     # start the reload process
                     self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                     self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
-
+                    self.memory['task_vehicle_crew']['target']=None
                     return
                 else:
                     out_of_ammo_coax=True
@@ -3090,9 +3084,9 @@ class AIHuman(object):
             distance=4000
             if len(self.near_human_targets)>0:
                 distance=400
-            elif len(self.near_human_targets)>0:
+            elif len(self.mid_human_targets)>0:
                 distance=600
-            elif len(self.near_human_targets)>0:
+            elif len(self.far_human_targets)>0:
                 distance=900
 
             # this also means that humans without any targets will not get a gun
