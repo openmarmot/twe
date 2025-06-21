@@ -7,9 +7,7 @@ June 21 2025
 - working on vehicle HUD 
 
 todo 
--turret rotation angle seems kinda messed up. need to add rotation angle 
-to the hud and figure out whats up. using the 'w' key it doesn't like to go 
-to some angles 
+-definitely something buggy with turret rotation angles, probably around 360
 
 ----------------------------------
 June 20 2025

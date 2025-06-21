@@ -945,6 +945,8 @@ class World():
 
             if vehicle_role.is_gunner:
                 turret=vehicle_role.turret
+                self.vehicle_text_queue.append(f'Vehicle angle: {vehicle.rotation_angle}')
+                self.vehicle_text_queue.append(f'Turret angle: {turret.rotation_angle}')
 
                 if turret.ai.primary_weapon:
                     self.vehicle_text_queue.append('')
