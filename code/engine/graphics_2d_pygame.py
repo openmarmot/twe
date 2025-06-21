@@ -130,7 +130,7 @@ class Graphics_2D_Pygame(object):
         # https://www.pygame.org/docs/ref/key.html
         # continuous
         self.key_press_actions = {
-            pygame.K_w: lambda: self.world.handle_key_press('w'),
+            pygame.K_w: lambda: self.world.handle_key_press('w',self.get_mouse_screen_coords()),
             pygame.K_s: lambda: self.world.handle_key_press('s'),
             pygame.K_a: lambda: self.world.handle_key_press('a'),
             pygame.K_d: lambda: self.world.handle_key_press('d'),

@@ -929,7 +929,10 @@ class AIHuman(object):
             # this function was meant for world coords.
             # because it is mouse coords distance won't apply, which may even it out a bit
             adjusted_coords=self.calculate_human_accuracy(mouse_coords,0,weapon)
-            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+            rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+            weapon.rotation_angle=rotation_angle
+            self.owner.rotation_angle=rotation_angle
+            self.owner.reset_image=True
             weapon.ai.fire()
 
     #---------------------------------------------------------------------------
@@ -3218,25 +3221,7 @@ class AIHuman(object):
         role=self.memory['task_vehicle_crew']['vehicle_role']
 
         if self.owner.is_player:
-            # not sure what we need to to do here. controls are now handled by world
-            
-            if role.is_gunner:
-                # handle vehicle turret gun reloads for the player
-                turret=role.turret
-                if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
-                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                    > turret.ai.primary_weapon.ai.reload_speed):
-                        self.reload_weapon(turret.ai.primary_weapon,vehicle)
-                        self.memory['task_vehicle_crew']['current_action']='none'
-                    else:
-                        return
-                if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
-                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                    > turret.ai.coaxial_weapon.ai.reload_speed):
-                        self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
-                        self.memory['task_vehicle_crew']['current_action']='none'
-                    else:
-                        return
+            self.update_task_vehicle_crew_player()
         else:
             last_think_time=self.memory['task_vehicle_crew']['last_think_time']
             think_interval=self.memory['task_vehicle_crew']['think_interval']
@@ -3277,7 +3262,43 @@ class AIHuman(object):
                             self.action_vehicle_gunner_engage_target()
                 if role.is_driver:
                     self.action_vehicle_driver()
-
+    #---------------------------------------------------------------------------
+    def update_task_vehicle_crew_player(self):
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        role=self.memory['task_vehicle_crew']['vehicle_role']
+        if role.is_gunner:
+            # handle vehicle turret gun reloads for the player
+            turret=role.turret
+            if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.primary_weapon.ai.reload_speed):
+                    self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
+            if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.coaxial_weapon.ai.reload_speed):
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
+                
+            if self.memory['task_vehicle_crew']['current_action']=='rotate turret':
+                # check actual turret rotation angle against angle to target
+                needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
+                
+                if round(needed_rotation,1)!=round(turret.rotation_angle,1):
+                    # if its fairly close, set it equal to avoid constant tiny turret movement
+                    if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
+                        turret.rotation_angle=needed_rotation
+                        turret.ai.rotation_change=0
+                        self.memory['task_vehicle_crew']['current_action']=''
+                    else:
+                        if needed_rotation>turret.rotation_angle:
+                            turret.ai.handle_rotate_left()
+                        else:
+                            turret.ai.handle_rotate_right()
     #---------------------------------------------------------------------------
     def update_task_wait(self):
         '''update task wait'''

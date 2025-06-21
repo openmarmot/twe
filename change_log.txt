@@ -2,6 +2,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 20 2025
+- minor world_menu changes 
+- player now faces the direction they are firing 
+- if the player is a vehicle gunner, w now rotates the turret towards the mouse cursor 
+- if the player is a vehicle gunner, s now fires the coax weapon if equipped 
+- minor readme updates
+
+for some reason it took me forever to implement player mouse turret tracking, but it 
+ended up being pretty easy. i kept 'a' and 'd' as manual control because i still 
+wanted it to feel real - but it is basically impossible for the humans to aim the 
+turrets at any range because the rotation isn't fine enough and theres no aiming 
+mechanism. 
+
+todo 
+- probably need a centralized turret rotation function as its now used by player and ai . 
+- would like the ai to rotate the turret back to zero occasionally 
+
+----------------------------------
 June 19 2025
 - minor logic fixes in ai_human 
 

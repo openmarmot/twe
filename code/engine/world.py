@@ -520,6 +520,13 @@ class World():
                             vehicle.ai.handle_steer_right()
 
                 elif role.is_gunner:
+                    if key=='w':
+                        self.player.ai.memory['task_vehicle_crew']['current_action']='rotate turret'
+                        angle=engine.math_2d.get_rotation(turret.screen_coords,mouse_screen_coords)
+                        self.player.ai.memory['task_vehicle_crew']['calculated_turret_angle']=angle
+                    if key=='s':
+                        if turret.ai.coaxial_weapon:
+                            turret.ai.handle_fire_coax()
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':

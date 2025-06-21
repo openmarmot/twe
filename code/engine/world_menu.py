@@ -1225,10 +1225,12 @@ class World_Menu(object):
                     radio=True
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
-                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
-                self.text_queue.append(f'Current Vehicle Role: {currentRole.role_name}')
                 self.text_queue.append(f'Vehicle: {self.selected_object.name}')
-                self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
+                self.text_queue.append(f'Current Vehicle Role: {currentRole.role_name}')
+                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
+                self.text_queue.append('')
+                
+                
                 
                 if radio:
                     self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)
