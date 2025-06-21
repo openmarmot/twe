@@ -235,20 +235,8 @@ class AIHuman(object):
         # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
 
-        # check actual turret rotation angle against angle to target
-        needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
-        
-        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            # if its fairly close, set it equal to avoid constant tiny turret movement
-            if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
-                turret.rotation_angle=needed_rotation
-                turret.ai.rotation_change=0
-            else:
-                if needed_rotation>turret.rotation_angle:
-                    turret.ai.handle_rotate_left()
-                else:
-                    turret.ai.handle_rotate_right()
-        else:
+        # rotate turrent towards target. true if rotation matches
+        if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
             fire_primary=False
             fire_coax=False
             if target.is_human:
@@ -1350,6 +1338,25 @@ class AIHuman(object):
         else:
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
             return False
+        
+    #---------------------------------------------------------------------------
+    def rotate_turret(self,turret,desired_angle):
+        '''rotates a turret. returns True/False as to whether the turret is at the desired angle'''
+        if round(desired_angle,1)!=round(turret.rotation_angle,1):
+            # if its fairly close, set it equal to avoid constant tiny turret movement
+            if desired_angle > turret.rotation_angle -2 and desired_angle < turret.rotation_angle +2:
+                turret.rotation_angle=desired_angle
+                turret.ai.rotation_change=0
+                return True
+            
+            if desired_angle>turret.rotation_angle:
+                turret.ai.handle_rotate_left()
+                return False
+            
+            turret.ai.handle_rotate_right()
+            return False
+        return True
+    
 
     #---------------------------------------------------------------------------
     def speak(self,what):
@@ -3283,22 +3290,13 @@ class AIHuman(object):
                     self.memory['task_vehicle_crew']['current_action']='none'
                 else:
                     return
-                
+            
+            # this action is set by world. triggered by hitting 'w'
             if self.memory['task_vehicle_crew']['current_action']=='rotate turret':
-                # check actual turret rotation angle against angle to target
-                needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
+                if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
+                    # rotation achieved. we can remove this action
+                    self.memory['task_vehicle_crew']['current_action']=''
                 
-                if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-                    # if its fairly close, set it equal to avoid constant tiny turret movement
-                    if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
-                        turret.rotation_angle=needed_rotation
-                        turret.ai.rotation_change=0
-                        self.memory['task_vehicle_crew']['current_action']=''
-                    else:
-                        if needed_rotation>turret.rotation_angle:
-                            turret.ai.handle_rotate_left()
-                        else:
-                            turret.ai.handle_rotate_right()
     #---------------------------------------------------------------------------
     def update_task_wait(self):
         '''update task wait'''
