@@ -70,6 +70,10 @@ class AITurret(object):
         self.primary_weapon=None
         self.coaxial_weapon=None
 
+        # these are here because reload speed is heavily affected by turret design
+        self.primary_weapon_reload_speed=0
+        self.coaxial_weapon_reload_speed=0
+
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)

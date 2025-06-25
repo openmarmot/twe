@@ -1969,7 +1969,7 @@ class AIHuman(object):
         # handle the reloading action
         if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-            > turret.ai.primary_weapon.ai.reload_speed):
+            > turret.ai.primary_weapon_reload_speed):
                 reload_success=self.reload_weapon(turret.ai.primary_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
                 if reload_success is False:
@@ -1978,7 +1978,7 @@ class AIHuman(object):
                 return
         if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-            > turret.ai.coaxial_weapon.ai.reload_speed):
+            > turret.ai.coaxial_weapon_reload_speed):
                 reload_success=self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
                 if reload_success is False:
@@ -3278,14 +3278,14 @@ class AIHuman(object):
             turret=role.turret
             if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
                 if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                > turret.ai.primary_weapon.ai.reload_speed):
+                > turret.ai.primary_weapon_reload_speed):
                     self.reload_weapon(turret.ai.primary_weapon,vehicle)
                     self.memory['task_vehicle_crew']['current_action']='none'
                 else:
                     return
             if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
                 if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                > turret.ai.coaxial_weapon.ai.reload_speed):
+                > turret.ai.coaxial_weapon_reload_speed):
                     self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                     self.memory['task_vehicle_crew']['current_action']='none'
                 else:

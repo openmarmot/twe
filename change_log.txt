@@ -2,6 +2,16 @@ TWE Project : Change Log
 
 
 ----------------------------------
+June 24 2025
+- turret weapon reloads now use reload speed values from turret class 
+- turret reload speeds adjusted from old weapon reload speeds. 
+
+the SU-85 now reloads a bit faster than the T34-85, which makes sense given its 
+casemate design with a lot more space than a cramped turret. This gives the su-85 some 
+reason to exist / flavor. both are way better than the t34-76.
+
+
+----------------------------------
 June 21 2025
 - added a turret rotation function to ai_human 
 - working on vehicle HUD 

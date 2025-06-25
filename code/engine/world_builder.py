@@ -2345,6 +2345,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-20,20]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=10
         z.ai.primary_turret=True
 
     elif object_type=='german_sd_kfz_251/22':
@@ -2458,6 +2459,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=20
         z.ai.primary_turret=True
 
     elif object_type=='german_panzer_iv_ausf_g':
@@ -2562,6 +2564,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_weapon_reload_speed=10
 
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2587,6 +2590,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
+        z.ai.coaxial_weapon_reload_speed=10
 
     elif object_type=='german_panzer_iv_ausf_h':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2697,6 +2702,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
+        z.ai.coaxial_weapon_reload_speed=10
 
     # J is a H with simplicication. schurtzen are replaced with wire schurtzen on the hull (thin)
     elif object_type=='german_panzer_iv_ausf_j':
@@ -2814,6 +2821,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
+        z.ai.coaxial_weapon_reload_speed=10
 
     elif object_type=='75mm_kwk40_l43':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2965,6 +2974,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=10
 
     elif object_type=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -3062,6 +3072,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=10
 
     elif object_type=='t34_76_model_1943_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -3087,6 +3098,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=30
+        z.ai.coaxial_weapon_reload_speed=10
 
     elif object_type=='soviet_t34_85':
         # ref : https://wiki.warthunder.com/T-34-85
@@ -3202,6 +3215,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.coaxial_weapon.ai.equipper=z
         z.ai.coaxial_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=24
+        z.ai.coaxial_weapon_reload_speed=10
 
     elif object_type=='soviet_su_85':
         # ref : https://wiki.warthunder.com/T-34-85
@@ -3295,6 +3310,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-147,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
+        z.ai.coaxial_weapon_reload_speed=10
 
     elif object_type=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
@@ -3407,6 +3424,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotation_range=[-360,360]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=10
 
     elif object_type=='jagdpanzer_38t_main_gun':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -3429,6 +3447,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-83,-1]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
 
     elif object_type=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -3503,6 +3522,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-54,1]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=10
 
     elif object_type=='german_pak40':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -3583,6 +3603,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-76,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=20
 
     elif object_type=='75mm_pak40':
         # this is the gun, not the whole pak40 object
