@@ -109,8 +109,14 @@ class AITurret(object):
                 self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret')
             if penetration:                
                 # component damage
-                damaged_component=random.choice(['turret track','primary weapon',
-                    'coaxial weapon','crew','miraculously unharmed'])
+                damage_options=['turret track','gunner']
+                
+                if self.primary_weapon:
+                    damage_options.append('primary weapon')
+                if self.coaxial_weapon:
+                    damage_options.append('coaxial weapon')
+
+                damaged_component=random.choice(damage_options)
                 
                 if damaged_component=='turret track':
                     self.turret_jammed=True
@@ -126,10 +132,11 @@ class AITurret(object):
                             self.coaxial_weapon.ai.action_jammed=True
                         else:
                             self.coaxial_weapon.ai.damaged=True
-                elif damaged_component=='crew':
+                elif damaged_component=='gunner':
                     if self.remote_operated==False and self.vehicle:
                         for role in self.vehicle.ai.vehicle_crew:
                             if role.role_occupied:
+                                # for some roles turret is none
                                 if role.turret==self.owner:
                                     role.human.ai.handle_event('collision',projectile)
 

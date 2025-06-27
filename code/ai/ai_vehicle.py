@@ -463,7 +463,7 @@ class AIVehicle():
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
         if penetration:
-            damaged_component=random.choice(['driver_projectile','engine','ammo_rack','miraculously unharmed'])
+            damaged_component=random.choice(['driver_projectile','engine','ammo_rack'])
             self.handle_component_damage(damaged_component,projectile)
 
         else:

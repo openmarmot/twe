@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+----------------------------------
+June 26 2025
+- minor changes to turret damage 
+- removed 'miraculously unharmed' option from damage choices for vehicle body and turret
+
+i'd like damage to be less random, or at least add another layer of modeling and logic 
+that happens after a penetration occurs. 
+
+for now removing the no-damage chance from vehicle body and turret penetrations will up 
+the lethality a little. I don't get the impression that ww2 tanks shrugged off multiple penetrations well.
 
 ----------------------------------
 June 24 2025
@@ -10,7 +20,8 @@ the SU-85 now reloads a bit faster than the T34-85, which makes sense given its
 casemate design with a lot more space than a cramped turret. This gives the su-85 some 
 reason to exist / flavor. both are way better than the t34-76.
 
-
+todo 
+- should add more damage options from turret pen 
 ----------------------------------
 June 21 2025
 - added a turret rotation function to ai_human 
