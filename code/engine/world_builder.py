@@ -3849,6 +3849,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['civilian_man','civilian_prone','civilian_dead'],AIHuman)
         z.name=engine.name_gen.get_name('civilian')
         z.ai.speed=30
+        z.ai.morale=70
         z.collision_radius=15
         z.is_human=True
         if random.randint(0,1)==1:
@@ -3874,12 +3875,14 @@ def spawn_object(world,world_coords,object_type, spawn):
 
     elif object_type=='german_luftwaffe_ground_crew_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
+        z.ai.morale=95
         z.image_list=['luftwaffe_ground_crew','luftwaffe_ground_crew_prone','luftwaffe_ground_crew_dead']
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'kar98k')
 
     elif object_type=='german_luftwaffe_ground_crew_mg15':
         z=spawn_object(world,world_coords,'german_soldier',False)
+        z.ai.morale=95
         z.image_list=['luftwaffe_ground_crew','luftwaffe_ground_crew_prone','luftwaffe_ground_crew_dead']
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'mg15')

@@ -28,6 +28,9 @@ vehicle penetration lethality should be up. Additional error handling has helped
 
 vehicle hits can now result in the crew abandoning the vehicle - depending on morale checks 
 
+civilians have lower morale, making them more likely to flee dangerous situations (when this is implemented)
+luftwaffe ground crew have slightly reduced morale as they were not originally combat soldiers
+
 todo 
 - use the morale system for more things 
 - more vehicle hit reactions 
