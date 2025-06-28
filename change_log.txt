@@ -1,6 +1,38 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 28 2025
+- misc cleanup / updates / error handling 
+- added new hit_data attribute : result
+    for now this is the description of the damage done by the hit 
+- rewrite of hit area determination code for vehicles 
+    main change is turret hit is based on side hit and high/low shot now 
+- added turret vehicle mount position attribute 
+- fixed spelling error with min_wheels parameters 
+- turret hits now have a chance to penetrate into the vehicle if the turret is not on top 
+- fixed missing damage type driver_projectile
+- added human morale system 
+- humans now react to vehicle hits 
+- now some objects only self delete when they are no longer visible (ex brass)
+
+some turrets are now marked as 'front'. this includes hull machine guns and assault gun style turrets. 
+being marked front means they will only be hit by shots that hit a front angle. the downside is penetrations can 
+then enter and damage the vehicle 
+
+top turrets can be hit from any angle, and are a bit more likely to be hit now. 
+
+there is a general issue with this project where spelling errors on object init can cause parameters to not be set. 
+i need some way to check parameters in world_builder to make sure they actually exist in the object -- or rewrite object initialization 
+
+vehicle penetration lethality should be up. Additional error handling has helped me find a handful of bugs with it. 
+
+vehicle hits can now result in the crew abandoning the vehicle - depending on morale checks 
+
+todo 
+- use the morale system for more things 
+- more vehicle hit reactions 
+
+----------------------------------
 June 26 2025
 - minor changes to turret damage 
 - removed 'miraculously unharmed' option from damage choices for vehicle body and turret

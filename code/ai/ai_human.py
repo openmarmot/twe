@@ -73,6 +73,7 @@ class AIHuman(object):
         self.thirst_rate=0.1
         self.prone=False
         self.speed = 0
+        self.morale=100 # lower is worse
 
         # -- distance tuning --
         # max distance that is walkable before deciding a vehicle is better
@@ -662,6 +663,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
         if event_data.is_projectile:
+            # morale damage
+            self.morale-=random.randint(10,20)
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.blood_pressure
@@ -792,6 +795,8 @@ class AIHuman(object):
 
         # this will likely just kill the human
 
+        self.morale-=random.randint(20,40)
+
         self.blood_pressure-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
@@ -864,6 +869,31 @@ class AIHuman(object):
         else:
             self.speak("I don't understand")
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
+
+    #---------------------------------------------------------------------------
+    def event_vehicle_hit(self,hit):
+        ''' react to a vehicle we are in being hit'''
+        # hit is hit_data.py 
+
+        if self.memory['current_task']=='task_vehicle_crew':
+            if hit.penetrated:
+                self.morale-=10
+                if self.morale_check()==False:
+                    self.speak('The vehicle is hit! Bail out!!')
+                    self.switch_task_exit_vehicle()
+            else:
+                # hit bounced, could still effect morale
+                if self.morale<100:
+                    self.morale-=random.randint(0,5)
+
+                    if self.morale<60:
+                        if self.morale_check()==False:
+                            self.speak('We are taking fire! I cannot take it anymore! Abandon the vehicle!!')
+                            self.switch_task_exit_vehicle()
+    
+
+
+
 
     #---------------------------------------------------------------------------
     def fire(self,weapon,target):
@@ -1095,6 +1125,8 @@ class AIHuman(object):
             self.event_speak(event_data)
         elif event=='explosion':
             self.event_explosion(event_data)
+        elif event=='vehicle_hit':
+            self.event_vehicle_hit(event_data)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
@@ -1193,6 +1225,14 @@ class AIHuman(object):
                     self.drop_object(self.antitank)
                 elif ammo_gun==0 and ammo_inventory>0:
                     self.switch_task_reload(self.antitank)
+
+    #---------------------------------------------------------------------------
+    def morale_check(self):
+        '''checks morale, returns results'''
+        check=random.randint(0,100)
+        if self.morale<check:
+            return False
+        return True
 
     #---------------------------------------------------------------------------
     def pickup_object(self,world_object):

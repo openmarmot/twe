@@ -2118,8 +2118,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        z.ai.min_weels_per_side_front=1
-        z.ai.min_weels_per_side_rear=1
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
         z.ai.max_wheels=6
         z.ai.max_spare_wheels=0
         z.ai.front_left_wheels.append(spawn_object(world,world_coords,"g505_wheel",False))
@@ -2170,8 +2170,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        z.ai.min_weels_per_side_front=1
-        z.ai.min_weels_per_side_rear=1
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
         z.ai.max_wheels=8
         z.ai.max_spare_wheels=0
         for b in range(2):
@@ -2234,8 +2234,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
         z.rotation_angle=float(random.randint(0,359))
-        z.ai.min_weels_per_side_front=1
-        z.ai.min_weels_per_side_rear=1
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
         z.ai.max_wheels=8
         z.ai.max_spare_wheels=0
         for b in range(2):
@@ -2318,7 +2318,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
-        z.ai.min_weels_per_side_front=1
+        z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=5
         z.ai.max_wheels=18
         z.ai.max_spare_wheels=0
@@ -2334,6 +2334,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
         z.name='Sd.Kfz.251 MG34 Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[0,0,0]
         z.ai.turret_armor['bottom']=[13,0,0]
@@ -2421,7 +2422,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
-        z.ai.min_weels_per_side_front=1
+        z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=5
         z.ai.max_wheels=18
         z.ai.max_spare_wheels=0
@@ -2444,6 +2445,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['pak40_vehicle_turret','pak40_vehicle_turret'],AITurret)
         z.name='PAK 40 turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[0,0,0]
         z.ai.turret_armor['bottom']=[13,0,0]
@@ -2552,6 +2554,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzer_iv_hull_mg','panzer_iv_hull_mg'],AITurret)
         z.name='Panzer IV Hull MG'
         z.is_turret=True
+        z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[16,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -2571,6 +2574,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzer_iv_g_turret','panzer_iv_g_turret'],AITurret)
         z.name='Panzer IV Ausf. G Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[16,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -2683,6 +2687,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzer_iv_h_turret','panzer_iv_h_turret'],AITurret)
         z.name='Panzer IV Ausf. H Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[16,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -2802,6 +2807,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzer_iv_j_turret','panzer_iv_j_turret'],AITurret)
         z.name='Panzer IV Ausf. J Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[16,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -2961,6 +2967,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t20_turret','t20_turret'],AITurret)
         z.name='T20 Turret Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[5,31,0]
         z.ai.turret_armor['bottom']=[5,31,0]
@@ -3060,6 +3067,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t34_hull_mg_turret','t34_hull_mg_turret'],AITurret)
         z.name='T34 hull mg turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[15,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -3079,6 +3087,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t34_76_model_1943_turret','t34_76_model_1943_turret'],AITurret)
         z.name='T34-76 Model 1943 turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=2
         z.ai.turret_armor['top']=[15,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -3196,6 +3205,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t34_85_turret','t34_85_turret'],AITurret)
         z.name='T34-85 Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=2
         z.ai.turret_armor['top']=[20,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -3294,6 +3304,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['su_85_turret'],AITurret)
         z.name='SU-85 Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=2
         z.ai.turret_armor['top']=[20,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
@@ -3411,6 +3422,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['remote_mg34_turret','remote_mg34_turret'],AITurret)
         z.name='Remote MG34 Turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=12
         z.ai.remote_operated=True
         z.ai.turret_armor['top']=[0,0,0]
@@ -3431,6 +3443,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['jagdpanzer_38t_main_gun','jagdpanzer_38t_main_gun'],AITurret)
         z.name='Jagdpanzer 38t Main Gun'
         z.is_turret=True
+        z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[70,60,0]
         z.ai.turret_armor['bottom']=[70,60,0]
@@ -3512,6 +3525,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['37mm_m1939_61k_turret','37mm_m1939_61k_turret'],AITurret)
         z.name='37mm_m1939_61k_turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=3
         z.ai.position_offset=[0,0]
         z.ai.rotation_range=[-360,360]
@@ -3587,6 +3601,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['pak40_turret','pak40_turret'],AITurret)
         z.name='PAK 40 turret'
         z.is_turret=True
+        z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[0,0,0]
         z.ai.turret_armor['bottom']=[13,0,0]
@@ -4090,7 +4105,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=0.3
         z.ai.alive_time_max=300
         z.can_be_deleted=True
-        z.ai.self_remove=True  
+        z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True 
     # steel bullet casing
     elif object_type=='steel_case':
         z=WorldObject(world,['steel_case'],AIAnimatedSprite)
@@ -4106,6 +4122,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.alive_time_max=300
         z.can_be_deleted=True
         z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True
     elif object_type=='small_smoke':
         z=WorldObject(world,['small_smoke'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4195,6 +4212,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=0
         z.ai.alive_time_max=300
         z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True
         z.can_be_deleted=True
 
     elif object_type=='small_blood':
@@ -4209,6 +4227,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=0
         z.ai.alive_time_max=300
         z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True
         z.can_be_deleted=True 
            
     elif object_type=='dirt':
@@ -4223,6 +4242,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=0
         z.ai.alive_time_max=75
         z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True
         z.can_be_deleted=True
     
     elif object_type=='brown_chair':

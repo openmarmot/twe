@@ -699,12 +699,13 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- hit marker --')
-        self.text_queue.append('object: ' +self.selected_object.ai.hit_data.hit_object_name)
-        self.text_queue.append('projectile: ' +self.selected_object.ai.hit_data.projectile_name)
-        self.text_queue.append('penetration: ' +str(self.selected_object.ai.hit_data.penetrated))
-        self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
-        self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
-        self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
+        self.text_queue.append(f'object: {self.selected_object.ai.hit_data.hit_object_name}')
+        self.text_queue.append(f'projectile: {self.selected_object.ai.hit_data.projectile_name}')
+        self.text_queue.append(f'penetration: {self.selected_object.ai.hit_data.penetrated}')
+        self.text_queue.append(f'hit side: {self.selected_object.ai.hit_data.hit_side}')
+        self.text_queue.append(f'hit compartment: {self.selected_object.ai.hit_data.hit_compartment}')
+        self.text_queue.append(f'distance: {self.selected_object.ai.hit_data.distance}')
+        self.text_queue.append(f'result/damage: {self.selected_object.ai.hit_data.result}')
         self.text_queue.append('1 - Vehicle Diagnostics')
         if key=='1':
             self.world.vehicle_diagnostics=True
