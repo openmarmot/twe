@@ -100,8 +100,8 @@ class AIVehicle():
 
         # wheels 
         self.max_wheels=0 # maximum wheels that can be fitted to the vehicle
-        self.min_weels_per_side_front=0 # minimum number of healthy wheels to move
-        self.min_weels_per_side_rear=0 # minimum number of healthy wheels to move
+        self.min_wheels_per_side_front=0 # minimum number of healthy wheels to move
+        self.min_wheels_per_side_rear=0 # minimum number of healthy wheels to move
 
         self.front_left_wheels=[]
         self.front_right_wheels=[]
@@ -219,13 +219,18 @@ class AIVehicle():
         self.vehicle_disabled=False
 
     #---------------------------------------------------------------------------
-    def add_hit_data(self,projectile,penetration,side,distance,compartment_hit):
+    def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result):
         '''add hit data to the collision log'''
-        hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit)
+        hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result)
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
             marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
             marker.ai.setup(self.owner,hit)
+
+        # allow human to respond to hit
+        for b in self.vehicle_crew:
+            if b.role_occupied:
+                b.human.ai.handle_event('vehicle_hit',hit)
     #---------------------------------------------------------------------------
     def attach_tow_object(self,tow_object):
         '''attach an object for towing'''
@@ -272,7 +277,7 @@ class AIVehicle():
         for b in self.front_left_wheels:
             if b.ai.destroyed:
                 wheel_count-=1
-        if wheel_count<self.min_weels_per_side_front:
+        if wheel_count<self.min_wheels_per_side_front:
             self.vehicle_disabled=True
             return
         
@@ -281,7 +286,7 @@ class AIVehicle():
         for b in self.front_right_wheels:
             if b.ai.destroyed:
                 wheel_count-=1
-        if wheel_count<self.min_weels_per_side_front:
+        if wheel_count<self.min_wheels_per_side_front:
             self.vehicle_disabled=True
             return
         
@@ -290,7 +295,7 @@ class AIVehicle():
         for b in self.rear_left_wheels:
             if b.ai.destroyed:
                 wheel_count-=1
-        if wheel_count<self.min_weels_per_side_rear:
+        if wheel_count<self.min_wheels_per_side_rear:
             self.vehicle_disabled=True
             return
         
@@ -299,7 +304,7 @@ class AIVehicle():
         for b in self.rear_right_wheels:
             if b.ai.destroyed:
                 wheel_count-=1
-        if wheel_count<self.min_weels_per_side_rear:
+        if wheel_count<self.min_wheels_per_side_rear:
             self.vehicle_disabled=True
             return
     #---------------------------------------------------------------------------
@@ -315,41 +320,7 @@ class AIVehicle():
         '''handle a collision event'''
 
         if event_data.is_projectile:
-            # avoids hits on dead vehicles that haven't been removed from the game yet
-            
-            # -- determine what area the projectile hit --
-            side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,event_data.rotation_angle)
-
-            area_hit='vehicle_body'
-            
-            if random.randint(0,1):
-                area_hit='passenger_compartment'
-            
-            if len(self.turrets)>0:
-                if random.randint(0,4)==4:
-                    area_hit='turret'
-
-            if area_hit=='vehicle_body':
-                # vehicle body has a chance for a wheel hit
-                if side in ['left','right']:
-                    if random.randint(0,1)==1:
-                        self.handle_wheel_projectile_hit(event_data,side)
-                    else: 
-                        self.handle_vehicle_body_projectile_hit(event_data,side)
-                else:
-                    self.handle_vehicle_body_projectile_hit(event_data,side)
-            elif area_hit=='passenger_compartment':
-                self.handle_passenger_compartment_projectile_hit(event_data,side)
-            elif area_hit=='turret':
-                # pass it on for the turret to handle
-                turret=random.choice(self.turrets)
-                turret.ai.handle_event('collision',event_data)
-            else:
-                engine.log.add_data('Error','ai_vehicle.calculate_projectile_damage - unknown area hit: '+area_hit,True)
-
-            #engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
-            engine.world_builder.spawn_sparks(self.owner.world,event_data.world_coords,random.randint(1,2))
-
+            self.handle_projectile_collision(event_data)
 
         elif event_data.is_grenade:
             print('bonk')
@@ -384,7 +355,7 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_component_damage(self,damaged_component,projectile):
         '''handle damage to a component'''
-        if damaged_component=='driver':
+        if damaged_component=='driver_projectile':
             for role in self.vehicle_crew:
                 if role.role_name=='driver' and role.role_occupied:
                     role.human.ai.handle_event('collision',projectile)
@@ -432,6 +403,10 @@ class AIVehicle():
                     if b.ai.coaxial_weapon:
                         b.ai.coaxial_weapon.ai.damaged=True
                 engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
+        elif damaged_component=='miraculously unharmed':
+            pass
+        else:
+            engine.log.add_data('error',f'ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}',True)
 
 
     #---------------------------------------------------------------------------
@@ -439,14 +414,15 @@ class AIVehicle():
         '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
-        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment')
+        
+        result=''
         if penetration:
             damage_options=['random_crew_projectile','miraculously unharmed']
             if self.passenger_compartment_ammo_racks:
                 damage_options.append('ammo_rack')
 
-            damaged_component=random.choice(damage_options)
-            self.handle_component_damage(damaged_component,projectile)
+            result=random.choice(damage_options)
+            self.handle_component_damage(result,projectile)
 
             # chance to richochet into the body 
             if random.randint(0,3)==3:
@@ -455,20 +431,69 @@ class AIVehicle():
         else:
             # no penetration, but maybe we can have some other effect?
             pass
+        
+        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result)
+
+    #---------------------------------------------------------------------------
+    def handle_projectile_collision(self,projectile):
+        
+        # -- determine what area the projectile hit --
+        hit_side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        hit_height=random.choice(['high','low'])
+
+        area_hit_options=[]
+        possible_turrets=[]
+        if hit_height=='high':
+            for b in self.turrets:
+                if b.ai.vehicle_mount_side=='top':
+                    possible_turrets.append(b)
+            area_hit_options.append('passenger_compartment')
+        if hit_height=='low':
+            for b in self.turrets:
+                if b.ai.vehicle_mount_side==hit_side:
+                    possible_turrets.append(b)
+            area_hit_options.append('vehicle_body')
+
+            if hit_side in ['left','right']:
+                area_hit_options.append('wheels')
+
+        if len(possible_turrets)>0:
+            area_hit_options.append('turret')
+
+        area_hit=random.choice(area_hit_options)
+
+        if area_hit=='vehicle_body':
+            self.handle_vehicle_body_projectile_hit(projectile,hit_side)
+        elif area_hit=='passenger_compartment':
+            self.handle_passenger_compartment_projectile_hit(projectile,hit_side)
+        elif area_hit=='wheels':
+            self.handle_wheel_projectile_hit(projectile,hit_side)
+        elif area_hit=='turret':
+            turret=random.choice(possible_turrets)
+            turret.ai.handle_event('collision',projectile)
+        else:
+            engine.log.add_data('error',f'ai_vehicle.handle_projectile_collision unknown area_hit:{area_hit}',True)
+        
+
+        #engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
+        engine.world_builder.spawn_sparks(self.owner.world,projectile.world_coords,random.randint(1,2))
 
     #---------------------------------------------------------------------------
     def handle_vehicle_body_projectile_hit(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
         penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
-        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body')
+        
+        result=''
         if penetration:
-            damaged_component=random.choice(['driver_projectile','engine','ammo_rack','miraculously unharmed'])
-            self.handle_component_damage(damaged_component,projectile)
+            result=random.choice(['driver_projectile','engine','ammo_rack'])
+            self.handle_component_damage(result,projectile)
 
         else:
             # no penetration, but maybe we can have some other effect?
             pass
+
+        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result)
 
     #---------------------------------------------------------------------------
     def handle_aileron_left(self):
@@ -620,13 +645,15 @@ class AIVehicle():
         if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
-            self.add_hit_data(projectile,penetration,side,distance,'Wheel')
+            
+            result=''
             if penetration:
                 if random.randint(0,1)==0:
                     wheel.ai.damaged=True
+                    result='wheel damaged'
                 else:
                     wheel.ai.destroyed=True
-
+                    result='wheel destroyed'
                     # check if that was enough to disable the vehicle
                     self.check_wheel_health()
 
@@ -638,6 +665,7 @@ class AIVehicle():
                 # no penetration, but maybe we can have some other effect?
                 pass
 
+            self.add_hit_data(projectile,penetration,side,distance,'Wheel',result)
     #---------------------------------------------------------------------------
     def neutral_controls(self):
         ''' return controls to neutral over time'''

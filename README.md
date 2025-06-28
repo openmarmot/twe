@@ -30,6 +30,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 ### Current List of Vehicles Simulated
 - German Kubelwagen
 - German Raupenschlepper OST (RSO) tractor
+- German RSO PAK
 - German Panzer IV Ausf G
 - German Panzer IV Ausf H
 - German Panzer IV Ausf J
@@ -43,7 +44,9 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - American/Soviet Lend-Lease truck
 - Soviet T34-76 (late)
 - Soviet T34-85
+- Soviet SU-85
 - Soviet 37mm AA gun
+- Civilian Red Bicycle
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
   
@@ -69,11 +72,7 @@ See gameplay_instructions.txt for a full list
 - ']' zoom in 
 
 
-### License / Whatever
-- I want to do this project completely by myself to improve my python skills and just as a fun hobby. 
-- However - I put it on github for a reason. Feel free to copy code from it if you find it useful. If you use a lot of code I'd appreciate a little shout out or note as to where you got it. Thanks! 
-- On this project it is rare that I copy code from the internet, almost all of it is from scratch (that is why the math is so bad) - 
-but when I have copied code I will try to include references from where I got it
+
 
 
 ![screenshot](/screenshots/twe-mar-26-2025.png "TWE screenshot")

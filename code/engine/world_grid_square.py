@@ -35,6 +35,9 @@ class WorldGridSquare:
             (top_left[1] + bottom_right[1]) / 2
         )
 
+        # set by graphic engine - whether the square is visible to the player
+        self.visible=True
+
         self.wo_objects=[]
         self.wo_objects_human=[]
         self.wo_objects_building=[]

@@ -73,6 +73,7 @@ class AIHuman(object):
         self.thirst_rate=0.1
         self.prone=False
         self.speed = 0
+        self.morale=100 # lower is worse
 
         # -- distance tuning --
         # max distance that is walkable before deciding a vehicle is better
@@ -235,20 +236,8 @@ class AIHuman(object):
         # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
 
-        # check actual turret rotation angle against angle to target
-        needed_rotation=self.memory['task_vehicle_crew']['calculated_turret_angle']
-        
-        if round(needed_rotation,1)!=round(turret.rotation_angle,1):
-            # if its fairly close, set it equal to avoid constant tiny turret movement
-            if needed_rotation > turret.rotation_angle -2 and needed_rotation < turret.rotation_angle +2:
-                turret.rotation_angle=needed_rotation
-                turret.ai.rotation_change=0
-            else:
-                if needed_rotation>turret.rotation_angle:
-                    turret.ai.handle_rotate_left()
-                else:
-                    turret.ai.handle_rotate_right()
-        else:
+        # rotate turrent towards target. true if rotation matches
+        if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
             fire_primary=False
             fire_coax=False
             if target.is_human:
@@ -260,8 +249,10 @@ class AIHuman(object):
                             fire_primary=True
                         else:
                             self.memory['task_vehicle_crew']['target']=None
+                            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 else:
                     self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
             else:
                 if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
                     fire_coax=True
@@ -274,6 +265,7 @@ class AIHuman(object):
                 if self.current_burst>self.max_burst:
                     self.current_burst=0
                     self.memory['task_vehicle_crew']['target']=None
+                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
                 if fire_primary:
                     turret.ai.handle_fire()
@@ -569,7 +561,6 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def drop_object(self,OBJECT_TO_DROP):
         ''' drop object into the world '''
-        # any distance calculation would be made before this function is called
         if OBJECT_TO_DROP.is_large_human_pickup:
             self.large_pickup=None
         else:
@@ -655,14 +646,9 @@ class AIHuman(object):
         # note that we should double check that we can actually see the closest target
         if closest_object is not None:
             if self.memory['current_task']=='task_vehicle_crew':
-
-                if self.memory['task_vehicle_crew']['vehicle_role'].is_gunner:
-                    if self.memory['task_vehicle_crew']['target'] is None:
-                        self.memory['task_vehicle_crew']['target']=closest_object
-                    else:
-                        # only switch targets if we aren't currently firing at a vehicle
-                        if self.memory['task_vehicle_crew']['target'].is_vehicle is False:
-                            self.memory['task_vehicle_crew']['target']=closest_object
+                # i think its better to NOT do anything here.
+                # vehicle gunners have a lot of logic to pick new targets now
+                pass 
 
             else:
 
@@ -677,6 +663,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
         if event_data.is_projectile:
+            # morale damage
+            self.morale-=random.randint(10,20)
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.blood_pressure
@@ -807,6 +795,8 @@ class AIHuman(object):
 
         # this will likely just kill the human
 
+        self.morale-=random.randint(20,40)
+
         self.blood_pressure-=event_data
         engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
 
@@ -881,6 +871,31 @@ class AIHuman(object):
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
     #---------------------------------------------------------------------------
+    def event_vehicle_hit(self,hit):
+        ''' react to a vehicle we are in being hit'''
+        # hit is hit_data.py 
+
+        if self.memory['current_task']=='task_vehicle_crew':
+            if hit.penetrated:
+                self.morale-=10
+                if self.morale_check()==False:
+                    self.speak('The vehicle is hit! Bail out!!')
+                    self.switch_task_exit_vehicle()
+            else:
+                # hit bounced, could still effect morale
+                if self.morale<100:
+                    self.morale-=random.randint(0,5)
+
+                    if self.morale<60:
+                        if self.morale_check()==False:
+                            self.speak('We are taking fire! I cannot take it anymore! Abandon the vehicle!!')
+                            self.switch_task_exit_vehicle()
+    
+
+
+
+
+    #---------------------------------------------------------------------------
     def fire(self,weapon,target):
         ''' fires a weapon '''
 
@@ -932,7 +947,10 @@ class AIHuman(object):
             # this function was meant for world coords.
             # because it is mouse coords distance won't apply, which may even it out a bit
             adjusted_coords=self.calculate_human_accuracy(mouse_coords,0,weapon)
-            weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+            rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+            weapon.rotation_angle=rotation_angle
+            self.owner.rotation_angle=rotation_angle
+            self.owner.reset_image=True
             weapon.ai.fire()
 
     #---------------------------------------------------------------------------
@@ -1107,6 +1125,8 @@ class AIHuman(object):
             self.event_speak(event_data)
         elif event=='explosion':
             self.event_explosion(event_data)
+        elif event=='vehicle_hit':
+            self.event_vehicle_hit(event_data)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
@@ -1205,6 +1225,14 @@ class AIHuman(object):
                     self.drop_object(self.antitank)
                 elif ammo_gun==0 and ammo_inventory>0:
                     self.switch_task_reload(self.antitank)
+
+    #---------------------------------------------------------------------------
+    def morale_check(self):
+        '''checks morale, returns results'''
+        check=random.randint(0,100)
+        if self.morale<check:
+            return False
+        return True
 
     #---------------------------------------------------------------------------
     def pickup_object(self,world_object):
@@ -1350,6 +1378,25 @@ class AIHuman(object):
         else:
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)
             return False
+        
+    #---------------------------------------------------------------------------
+    def rotate_turret(self,turret,desired_angle):
+        '''rotates a turret. returns True/False as to whether the turret is at the desired angle'''
+        if round(desired_angle,1)!=round(turret.rotation_angle,1):
+            # if its fairly close, set it equal to avoid constant tiny turret movement
+            if desired_angle > turret.rotation_angle -2 and desired_angle < turret.rotation_angle +2:
+                turret.rotation_angle=desired_angle
+                turret.ai.rotation_change=0
+                return True
+            
+            if desired_angle>turret.rotation_angle:
+                turret.ai.handle_rotate_left()
+                return False
+            
+            turret.ai.handle_rotate_right()
+            return False
+        return True
+    
 
     #---------------------------------------------------------------------------
     def speak(self,what):
@@ -1962,16 +2009,20 @@ class AIHuman(object):
         # handle the reloading action
         if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-            > turret.ai.primary_weapon.ai.reload_speed):
-                self.reload_weapon(turret.ai.primary_weapon,vehicle)
+            > turret.ai.primary_weapon_reload_speed):
+                reload_success=self.reload_weapon(turret.ai.primary_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
+                if reload_success is False:
+                    engine.log.add_data('Error','think_vehicle_role_gunner primary weapon reload failed',)
             else:
                 return
         if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-            > turret.ai.coaxial_weapon.ai.reload_speed):
-                self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+            > turret.ai.coaxial_weapon_reload_speed):
+                reload_success=self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
+                if reload_success is False:
+                    engine.log.add_data('Error','think_vehicle_role_gunner coax weapon reload failed',)
             else:
                 return    
 
@@ -1988,7 +2039,7 @@ class AIHuman(object):
                 # start the reload process
                 self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                 self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-
+                self.memory['task_vehicle_crew']['target']=None
                 return
             else:
                 out_of_ammo_primary=True
@@ -2001,7 +2052,7 @@ class AIHuman(object):
                     # start the reload process
                     self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                     self.memory['task_vehicle_crew']['current_action']='reloading coax gun'
-
+                    self.memory['task_vehicle_crew']['target']=None
                     return
                 else:
                     out_of_ammo_coax=True
@@ -3083,9 +3134,9 @@ class AIHuman(object):
             distance=4000
             if len(self.near_human_targets)>0:
                 distance=400
-            elif len(self.near_human_targets)>0:
+            elif len(self.mid_human_targets)>0:
                 distance=600
-            elif len(self.near_human_targets)>0:
+            elif len(self.far_human_targets)>0:
                 distance=900
 
             # this also means that humans without any targets will not get a gun
@@ -3217,25 +3268,7 @@ class AIHuman(object):
         role=self.memory['task_vehicle_crew']['vehicle_role']
 
         if self.owner.is_player:
-            # not sure what we need to to do here. controls are now handled by world
-            
-            if role.is_gunner:
-                # handle vehicle turret gun reloads for the player
-                turret=role.turret
-                if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
-                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                    > turret.ai.primary_weapon.ai.reload_speed):
-                        self.reload_weapon(turret.ai.primary_weapon,vehicle)
-                        self.memory['task_vehicle_crew']['current_action']='none'
-                    else:
-                        return
-                if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
-                    if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
-                    > turret.ai.coaxial_weapon.ai.reload_speed):
-                        self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
-                        self.memory['task_vehicle_crew']['current_action']='none'
-                    else:
-                        return
+            self.update_task_vehicle_crew_player()
         else:
             last_think_time=self.memory['task_vehicle_crew']['last_think_time']
             think_interval=self.memory['task_vehicle_crew']['think_interval']
@@ -3276,7 +3309,34 @@ class AIHuman(object):
                             self.action_vehicle_gunner_engage_target()
                 if role.is_driver:
                     self.action_vehicle_driver()
-
+    #---------------------------------------------------------------------------
+    def update_task_vehicle_crew_player(self):
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        role=self.memory['task_vehicle_crew']['vehicle_role']
+        if role.is_gunner:
+            # handle vehicle turret gun reloads for the player
+            turret=role.turret
+            if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.primary_weapon_reload_speed):
+                    self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
+            if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
+                if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
+                > turret.ai.coaxial_weapon_reload_speed):
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    self.memory['task_vehicle_crew']['current_action']='none'
+                else:
+                    return
+            
+            # this action is set by world. triggered by hitting 'w'
+            if self.memory['task_vehicle_crew']['current_action']=='rotate turret':
+                if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
+                    # rotation achieved. we can remove this action
+                    self.memory['task_vehicle_crew']['current_action']=''
+                
     #---------------------------------------------------------------------------
     def update_task_wait(self):
         '''update task wait'''

@@ -410,9 +410,9 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'walther_p38',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'p38_magazine',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'p38_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
@@ -699,12 +699,13 @@ class World_Menu(object):
         # print out the basic menu
         self.text_queue=[]
         self.text_queue.append('-- hit marker --')
-        self.text_queue.append('object: ' +self.selected_object.ai.hit_data.hit_object_name)
-        self.text_queue.append('projectile: ' +self.selected_object.ai.hit_data.projectile_name)
-        self.text_queue.append('penetration: ' +str(self.selected_object.ai.hit_data.penetrated))
-        self.text_queue.append('hit side: ' +self.selected_object.ai.hit_data.hit_side)
-        self.text_queue.append('hit compartment: ' +self.selected_object.ai.hit_data.hit_compartment)
-        self.text_queue.append('distance: ' +str(self.selected_object.ai.hit_data.distance))
+        self.text_queue.append(f'object: {self.selected_object.ai.hit_data.hit_object_name}')
+        self.text_queue.append(f'projectile: {self.selected_object.ai.hit_data.projectile_name}')
+        self.text_queue.append(f'penetration: {self.selected_object.ai.hit_data.penetrated}')
+        self.text_queue.append(f'hit side: {self.selected_object.ai.hit_data.hit_side}')
+        self.text_queue.append(f'hit compartment: {self.selected_object.ai.hit_data.hit_compartment}')
+        self.text_queue.append(f'distance: {self.selected_object.ai.hit_data.distance}')
+        self.text_queue.append(f'result/damage: {self.selected_object.ai.hit_data.result}')
         self.text_queue.append('1 - Vehicle Diagnostics')
         if key=='1':
             self.world.vehicle_diagnostics=True
@@ -1225,10 +1226,12 @@ class World_Menu(object):
                     radio=True
                 self.text_queue=[]
                 self.text_queue.append('--Internal Vehicle Menu --')
-                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
-                self.text_queue.append(f'Current Vehicle Role: {currentRole.role_name}')
                 self.text_queue.append(f'Vehicle: {self.selected_object.name}')
-                self.text_queue.append('Disabled : '+str(self.selected_object.ai.vehicle_disabled))
+                self.text_queue.append(f'Current Vehicle Role: {currentRole.role_name}')
+                self.text_queue.append(f'Your BP: {self.world.player.ai.blood_pressure}')
+                self.text_queue.append('')
+                
+                
                 
                 if radio:
                     self.text_queue.append('Radio : '+self.selected_object.ai.radio.name)

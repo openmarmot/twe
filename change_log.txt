@@ -1,5 +1,135 @@
 TWE Project : Change Log
 
+----------------------------------
+June 28 2025
+- misc cleanup / updates / error handling 
+- added new hit_data attribute : result
+    for now this is the description of the damage done by the hit 
+- rewrite of hit area determination code for vehicles 
+    main change is turret hit is based on side hit and high/low shot now 
+- added turret vehicle mount position attribute 
+- fixed spelling error with min_wheels parameters 
+- turret hits now have a chance to penetrate into the vehicle if the turret is not on top 
+- fixed missing damage type driver_projectile
+- added human morale system 
+- humans now react to vehicle hits 
+- now some objects only self delete when they are no longer visible (ex brass)
+
+some turrets are now marked as 'front'. this includes hull machine guns and assault gun style turrets. 
+being marked front means they will only be hit by shots that hit a front angle. the downside is penetrations can 
+then enter and damage the vehicle 
+
+top turrets can be hit from any angle, and are a bit more likely to be hit now. 
+
+there is a general issue with this project where spelling errors on object init can cause parameters to not be set. 
+i need some way to check parameters in world_builder to make sure they actually exist in the object -- or rewrite object initialization 
+
+vehicle penetration lethality should be up. Additional error handling has helped me find a handful of bugs with it. 
+
+vehicle hits can now result in the crew abandoning the vehicle - depending on morale checks 
+
+civilians have lower morale, making them more likely to flee dangerous situations (when this is implemented)
+luftwaffe ground crew have slightly reduced morale as they were not originally combat soldiers
+
+todo 
+- use the morale system for more things 
+- more vehicle hit reactions 
+
+----------------------------------
+June 26 2025
+- minor changes to turret damage 
+- removed 'miraculously unharmed' option from damage choices for vehicle body and turret
+
+i'd like damage to be less random, or at least add another layer of modeling and logic 
+that happens after a penetration occurs. 
+
+for now removing the no-damage chance from vehicle body and turret penetrations will up 
+the lethality a little. I don't get the impression that ww2 tanks shrugged off multiple penetrations well.
+
+----------------------------------
+June 24 2025
+- turret weapon reloads now use reload speed values from turret class 
+- turret reload speeds adjusted from old weapon reload speeds. 
+
+the SU-85 now reloads a bit faster than the T34-85, which makes sense given its 
+casemate design with a lot more space than a cramped turret. This gives the su-85 some 
+reason to exist / flavor. both are way better than the t34-76.
+
+todo 
+- should add more damage options from turret pen 
+----------------------------------
+June 21 2025
+- added a turret rotation function to ai_human 
+- working on vehicle HUD 
+
+todo 
+-definitely something buggy with turret rotation angles, probably around 360
+
+----------------------------------
+June 20 2025
+- minor world_menu changes 
+- player now faces the direction they are firing 
+- if the player is a vehicle gunner, w now rotates the turret towards the mouse cursor 
+- if the player is a vehicle gunner, s now fires the coax weapon if equipped 
+- minor readme updates
+
+for some reason it took me forever to implement player mouse turret tracking, but it 
+ended up being pretty easy. i kept 'a' and 'd' as manual control because i still 
+wanted it to feel real - but it is basically impossible for the humans to aim the 
+turrets at any range because the rotation isn't fine enough and theres no aiming 
+mechanism. 
+
+todo 
+- probably need a centralized turret rotation function as its now used by player and ai . 
+- would like the ai to rotate the turret back to zero occasionally 
+
+----------------------------------
+June 19 2025
+- minor logic fixes in ai_human 
+
+spent some time trying to figure out why tanks seems to get stuck reloading sometimes. 
+added some code to maybe fix some possible issues. not 100% sure yet what the issue is 
+or if it even exists 
+
+todo 
+- turret reload speeds should be set as a turret variable to allow for more variation 
+- bicycles are hilariously damage resistant. need to add some sort of structural damage. 
+
+----------------------------------
+June 18 2025
+- fixed self debug code 
+- added clutter generation back to quick battle 
+- minor changes to mechanical accuracy for some weapons 
+- turrets now have their own accuracy variable 
+- added some debug checks for vehicle turret reloads failing 
+- fixed bicycle driver visibility 
+
+at some point clutter generation was removed from quick battle. this explains why 
+i wasn't seeing anyone riding bicycles around 
+
+playtest notes 
+- it seems sometimes gunners get stuck reloading. unsure why 
+- need more vehicle damage. sometimes vehicles can take a absurd amount of shots 
+
+----------------------------------
+June 16 2025
+- some gunner ai fixes to attempt to fix issues with getting stuck engaging targets 
+
+did some play testing. i think gunners getting stuck on engaging is fixed. however 
+vehicles still probably don't move enough. most matches end up in a stalemate with nobody 
+moving. 
+
+t34-85 and t34-76 are winning some engagements now - which is good. 
+
+self debug needs to be fixed.
+----------------------------------
+June 15 2025
+- added the p08 luger in 9mm 
+- increased 37mm AT pen a bit at range
+- increased 14.mm AT pen at range a bit  
+
+i'd like to add most of the pistols used in the war but the stats are all the same. really 
+hard to differentiate. 
 
 ----------------------------------
 June 11 2025

@@ -130,7 +130,7 @@ class Graphics_2D_Pygame(object):
         # https://www.pygame.org/docs/ref/key.html
         # continuous
         self.key_press_actions = {
-            pygame.K_w: lambda: self.world.handle_key_press('w'),
+            pygame.K_w: lambda: self.world.handle_key_press('w',self.get_mouse_screen_coords()),
             pygame.K_s: lambda: self.world.handle_key_press('s'),
             pygame.K_a: lambda: self.world.handle_key_press('a'),
             pygame.K_d: lambda: self.world.handle_key_press('d'),
@@ -618,9 +618,13 @@ class Graphics_2D_Pygame(object):
             if (grid_square.top_left[0] < viewrange_x[0] and grid_square.bottom_right[0] > viewrange_x[1] and
                 grid_square.top_left[1] < viewrange_y[0] and grid_square.bottom_right[1] > viewrange_y[1]):
 
+                grid_square.visible=True
+
                 for obj in grid_square.wo_objects:
                     if (obj.render and (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale ):
                         renderable_objects.append(obj)
+            else:
+                grid_square.visible=False
 
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)

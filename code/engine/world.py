@@ -520,6 +520,13 @@ class World():
                             vehicle.ai.handle_steer_right()
 
                 elif role.is_gunner:
+                    if key=='w':
+                        self.player.ai.memory['task_vehicle_crew']['current_action']='rotate turret'
+                        angle=engine.math_2d.get_rotation(turret.screen_coords,mouse_screen_coords)
+                        self.player.ai.memory['task_vehicle_crew']['calculated_turret_angle']=angle
+                    if key=='s':
+                        if turret.ai.coaxial_weapon:
+                            turret.ai.handle_fire_coax()
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':
@@ -695,8 +702,11 @@ class World():
                         error_found=True
 
                     # check for passengers that are missing the correct memory
-                    if 'task_vehicle_crew' not in value[1].ai.memory:
+                    if 'task_vehicle_crew' not in role.human.ai.memory:
                         print(role.human.name,'missing task_vehicle_crew_memory')
+                        error_found=True
+                    if role.human.ai.memory['current_task']!='task_vehicle_crew':
+                        print(role.human.name,'task_vehicle_crew is not current_task')
                         error_found=True
 
                     if error_found:
@@ -705,7 +715,7 @@ class World():
                         print('exists in world',self.check_object_exists(role.human))
                         print('blood pressure',role.human.ai.blood_pressure)
                         print('memory dump:')
-                        print(value[1].ai.memory)
+                        print(role.human.ai.memory)
                         print('---')
 
                     # maybe also check faction against other passengers
@@ -901,31 +911,61 @@ class World():
         self.vehicle_text_queue=[]
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
-            vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle']
+            vehicle_role=self.player.ai.memory['task_vehicle_crew']['vehicle_role']
+            vehicle=vehicle_role.vehicle
             self.vehicle_text_queue.append('Vehicle: '+vehicle.name)
 
-            for b in vehicle.ai.engines:
-                self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
+            if vehicle_role.is_driver:
 
-            for b in vehicle.ai.fuel_tanks:
-                fuel=0
-                if len(b.ai.inventory)>0:
-                    if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
-                        fuel=b.ai.inventory[0].volume
-                fuel_text=str(b.volume) + '|' + str(round(fuel,2))
-                self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
+                for b in vehicle.ai.engines:
+                    self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
 
-            self.vehicle_text_queue.append(f'max speed | current speed: {round(vehicle.ai.max_speed, 1)} | {round(vehicle.ai.current_speed, 1)}')
-            self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
-            self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
-            self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
-            self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
+                for b in vehicle.ai.fuel_tanks:
+                    fuel=0
+                    if len(b.ai.inventory)>0:
+                        if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
+                            fuel=b.ai.inventory[0].volume
+                    fuel_text=str(b.volume) + '|' + str(round(fuel,2))
+                    self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-            # airplane specific 
-            if vehicle.is_airplane:
-                self.vehicle_text_queue.append(f'altitude: {round(vehicle.altitude, 1)}')
-                self.vehicle_text_queue.append(f'rate of climb: {round(vehicle.ai.rate_of_climb, 1)}')
-                self.vehicle_text_queue.append(f'ailerons: {round(vehicle.ai.ailerons, 1)}')
-                self.vehicle_text_queue.append(f'elevator: {round(vehicle.ai.elevator, 1)}')
-                self.vehicle_text_queue.append(f'rudder: {round(vehicle.ai.rudder, 1)}')
-                self.vehicle_text_queue.append(f'flaps: {round(vehicle.ai.flaps, 1)}')
+                self.vehicle_text_queue.append(f'max speed | current speed: {round(vehicle.ai.max_speed, 1)} | {round(vehicle.ai.current_speed, 1)}')
+                self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
+                self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
+                self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
+                self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
+
+                # airplane specific 
+                if vehicle.is_airplane:
+                    self.vehicle_text_queue.append(f'altitude: {round(vehicle.altitude, 1)}')
+                    self.vehicle_text_queue.append(f'rate of climb: {round(vehicle.ai.rate_of_climb, 1)}')
+                    self.vehicle_text_queue.append(f'ailerons: {round(vehicle.ai.ailerons, 1)}')
+                    self.vehicle_text_queue.append(f'elevator: {round(vehicle.ai.elevator, 1)}')
+                    self.vehicle_text_queue.append(f'rudder: {round(vehicle.ai.rudder, 1)}')
+                    self.vehicle_text_queue.append(f'flaps: {round(vehicle.ai.flaps, 1)}')
+
+            if vehicle_role.is_gunner:
+                turret=vehicle_role.turret
+                self.vehicle_text_queue.append(f'Vehicle angle: {vehicle.rotation_angle}')
+                self.vehicle_text_queue.append(f'Turret angle: {turret.rotation_angle}')
+
+                if turret.ai.primary_weapon:
+                    self.vehicle_text_queue.append('')
+                    weapon=turret.ai.primary_weapon
+                    self.vehicle_text_queue.append(f'Weapon: {weapon.name}')
+                    if weapon.ai.action_jammed:
+                        self.vehicle_text_queue.append(' - action jammed')
+                    if weapon.ai.damaged:
+                        self.vehicle_text_queue.append(' - damaged')
+                    ammo_gun,ammo_inventory,magazine_count=self.player.ai.check_ammo(weapon,vehicle)
+                    self.vehicle_text_queue.append(f' - ammo {ammo_gun}/{ammo_inventory}')
+
+                if turret.ai.coaxial_weapon:
+                    self.vehicle_text_queue.append('')
+                    weapon=turret.ai.coaxial_weapon
+                    self.vehicle_text_queue.append(f'Weapon: {weapon.name}')
+                    if weapon.ai.action_jammed:
+                        self.vehicle_text_queue.append(' - action jammed')
+                    if weapon.ai.damaged:
+                        self.vehicle_text_queue.append(' - damaged')
+                    ammo_gun,ammo_inventory,magazine_count=self.player.ai.check_ammo(weapon,vehicle)
+                    self.vehicle_text_queue.append(f' - ammo {ammo_gun}/{ammo_inventory}')

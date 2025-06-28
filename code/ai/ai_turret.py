@@ -32,6 +32,14 @@ class AITurret(object):
         self.turret_armor['front']=[0,0,0]
         self.turret_armor['rear']=[0,0,0]
 
+        # the side of the vehicle the turret is mounted on top/bottom/left/right/front/rear
+        # most turrets should be mounted on the top
+        self.vehicle_mount_side='top'
+        
+        # turret accuracy. 0 is perfect accuracy
+        # basically a measure of how easy/hard it is to aim
+        self.turret_accuracy=0
+
         # this means that it can no longer rotate
         self.turret_jammed=False
 
@@ -66,6 +74,10 @@ class AITurret(object):
         self.primary_weapon=None
         self.coaxial_weapon=None
 
+        # these are here because reload speed is heavily affected by turret design
+        self.primary_weapon_reload_speed=0
+        self.coaxial_weapon_reload_speed=0
+
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
@@ -73,11 +85,12 @@ class AITurret(object):
 
         adjust_max=0
         adjust_max+=weapon.ai.mechanical_accuracy
+        adjust_max+=self.turret_accuracy
 
         if self.vehicle.ai.current_speed>0:
             adjust_max+=10
         if self.vehicle.ai.current_speed>100:
-            adjust_max+=10
+            adjust_max+=20
 
         # apply adjustment
         far_coords=[far_coords[0]+random.uniform(-adjust_max,adjust_max),far_coords[1]+random.uniform(-adjust_max,adjust_max)]
@@ -96,38 +109,59 @@ class AITurret(object):
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
-            if self.vehicle!=None:
-                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret')
+            result=''
             if penetration:                
                 # component damage
-                damaged_component=random.choice(['turret track','primary weapon',
-                    'coaxial weapon','crew','miraculously unharmed'])
+                damage_options=['turret track','gunner hit']
                 
-                if damaged_component=='turret track':
+                if self.primary_weapon:
+                    damage_options.append('primary weapon')
+                if self.coaxial_weapon:
+                    damage_options.append('coaxial weapon')
+
+                if self.vehicle:
+                    if self.vehicle_mount_side!='top':
+                        damage_options.append('penetration into vehicle')
+
+                result=random.choice(damage_options)
+                
+                if result=='turret track':
                     self.turret_jammed=True
-                elif damaged_component=='primary weapon':
+                elif result=='primary weapon':
                     if self.primary_weapon:
                         if random.randint(0,1)==1:
                             self.primary_weapon.ai.action_jammed=True
                         else:
                             self.primary_weapon.ai.damaged=True
-                elif damaged_component=='coaxial weapon':
+                elif result=='coaxial weapon':
                     if self.coaxial_weapon:
                         if random.randint(0,1)==1:
                             self.coaxial_weapon.ai.action_jammed=True
                         else:
                             self.coaxial_weapon.ai.damaged=True
-                elif damaged_component=='crew':
+                elif result=='gunner hit':
+                    # note - should rewrite result if gunner is not present
                     if self.remote_operated==False and self.vehicle:
                         for role in self.vehicle.ai.vehicle_crew:
                             if role.role_occupied:
+                                # for some roles turret is none
                                 if role.turret==self.owner:
                                     role.human.ai.handle_event('collision',projectile)
+                elif result=='penetration into vehicle':
+                    # this has to match a valid option in vehicle.ai.handle_component_damage
+                    extra_damage_options=['random_crew_projectile','random_crew_fire','engine']
+                    extra_damage=random.choice(extra_damage_options)
+                    result+=f': {extra_damage}'
+                    self.vehicle.ai.handle_component_damage(extra_damage,projectile)
+                else:
+                    engine.log.add_data('error',f'ai_turret.event_collision unknown result: {result}',True)
 
             else:
                 # bounced the projectile
                 pass
 
+            if self.vehicle!=None:
+                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret',result)
         elif EVENT_DATA.is_grenade:
             print('bonk')
         else:

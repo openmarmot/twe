@@ -39,8 +39,19 @@ class AIAnimatedSprite(object):
         # remove from world when alive time runs out
         self.self_remove=False
 
+        # set to true to only remove when not visible
+        self.only_remove_when_not_visible=False
+
+        # set when the object is ready to be deleted as soon as it is not visible
+        self.self_delete_when_not_visible=False
+
     #---------------------------------------------------------------------------
     def update(self):
+        if self.self_delete_when_not_visible:
+            if self.owner.grid_square.visible==False:
+                self.owner.wo_stop()
+                return
+            return
         
         if self.alive:
             time_passed=self.owner.world.time_passed_seconds
@@ -52,7 +63,11 @@ class AIAnimatedSprite(object):
                 
                 # self terminate
                 if self.self_remove:
-                    self.owner.wo_stop()
+                    if self.only_remove_when_not_visible:
+                        self.self_delete_when_not_visible=True
+                    else:
+                        self.owner.wo_stop()
+                        return
 
             else:
                 if self.alive_time<self.rotate_time_max:
