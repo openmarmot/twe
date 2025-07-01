@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 1 2025
+- moved self debug to its own file and rewrote 
+- fixed a issue with items not properly being removed from grid manager. 
+    this mostly effected items that get dropped from inventory 
+- grenades have a chance to get stuck on/in a vehicle. they will explode on the 
+top armor - which is zero for some vehicles 
+- ai should be more likely to throw grenades at vehicles now 
+
+Grenades are now VERY VERY dangerous to the german half tracks at close range. 
+
+
+todo 
+- open top vehicle crew should have a option to expose themselves and shoot out 
+- open top vehicles should have a chance to injure crew with fire 
+
+----------------------------------
 June 30 2025
 - added HE projectiles for cannons 
 - added gunner logic for choosing at/ap/both when reloading
@@ -18,6 +34,7 @@ likely get some magazines loaded with AP
 todo 
 - likely pitfall with the current code is if HE is loaded and the target has armor the gun will not be used
     correct action is to probably reload - IF there is AT ammo that can pen 
+- HE damage needs a boost - probably 
 
 ----------------------------------
 June 28 2025

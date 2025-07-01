@@ -651,8 +651,7 @@ class World():
             world_object.in_world=False
 
             # remove from grid square
-            if world_object.grid_square is not None:
-                world_object.grid_square.remove_wo_object(world_object)
+            self.grid_manager.remove_object_from_world_grid(world_object)
 
             self.wo_objects.remove(world_object)
             if world_object.is_human:
@@ -667,84 +666,6 @@ class World():
         else:
             print('Error!! '+ world_object.name+' not in world.wo_objects. Remove fails !!')
         
-    #---------------------------------------------------------------------------
-    def run_self_debug(self):
-        '''run self debug'''
-        # kind of a sanity check. 
-        # run a debug on everything in the world and print out results
-
-        print('------- Self Debug Report --------')
-
-        # -- world object count 
-        print('------------------------------------')
-        print('--- object count ---')
-        wo_list={}
-        for b in self.wo_objects:
-            if b.world_builder_identity in wo_list:
-                wo_list[b.world_builder_identity]+=1
-            else:
-                wo_list[b.world_builder_identity]=1
-
-        for key,value in wo_list.items():
-            print(key,'count:',value)
-        print('------------------------------------')
-
-        print('------------------------------------')
-        print('--- vehicle crew check ---')
-        for b in self.wo_objects_vehicle:
-            for role in b.ai.vehicle_crew:
-                if role.role_occupied:
-                    error_found=False
-                    # check for passengers that are not in the world
-                    # all passengers should also be in the world
-                    if self.check_object_exists(role.human)==False:
-                        print(role.human.name+' is a passenger but is not in the world')
-                        error_found=True
-
-                    # check for passengers that are missing the correct memory
-                    if 'task_vehicle_crew' not in role.human.ai.memory:
-                        print(role.human.name,'missing task_vehicle_crew_memory')
-                        error_found=True
-                    if role.human.ai.memory['current_task']!='task_vehicle_crew':
-                        print(role.human.name,'task_vehicle_crew is not current_task')
-                        error_found=True
-
-                    if error_found:
-                        print('---')
-                        print('name',role.human.name)
-                        print('exists in world',self.check_object_exists(role.human))
-                        print('blood pressure',role.human.ai.blood_pressure)
-                        print('memory dump:')
-                        print(role.human.ai.memory)
-                        print('---')
-
-                    # maybe also check faction against other passengers
-
-        print('------------------------------------')
-
-        print('------------------------------------')
-        print('--- human check ---')
-        for b in self.wo_objects_human:
-            error_found=False
-
-            # check for zombies
-            if b.ai.blood_pressure<1:
-                print(b.name,'is dead !!')
-                error_found=True
-            
-            # check for invisible people
-            if b.render is False and 'task_vehicle_crew' not in b.ai.memory:
-                print(b.name,'is invisible and does not have task_vehicle_crew memory')
-                error_found=True
-            
-            if error_found:
-                print('---')
-                print('name',b.name)
-                print('exists in world',self.check_object_exists(b))
-                print('blood pressure',b.ai.blood_pressure)
-                print('memory dump:')
-                print(b.ai.memory)
-                print('---')
 
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):

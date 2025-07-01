@@ -35,6 +35,14 @@ class WorldGridManager:
         return self.add_square(i, j)
     
     #---------------------------------------------------------------------------
+    def remove_object_from_world_grid(self,wo_object):
+        if wo_object.grid_square is None:
+            pass
+        else:
+            wo_object.grid_square.remove_wo_object(wo_object)
+            wo_object.grid_square=None
+
+    #---------------------------------------------------------------------------
     def update_wo_object_square(self,wo_object):
         '''update the square the wo object is in'''
 
@@ -54,4 +62,6 @@ class WorldGridManager:
             wo_object.grid_square.add_wo_object(wo_object)
 
         # otherwise it is already in the right square
+            
+    
 

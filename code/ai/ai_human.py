@@ -2677,9 +2677,9 @@ class AIHuman(object):
                 if distance<self.throwable.ai.range and distance>150:
 
                     # grenades will miss if the vehicle is moving fast
-                    if enemy.ai.current_speed<5:
+                    if enemy.ai.current_speed<130:
                         # check pen
-                        if enemy.ai.passenger_compartment_armor['left'][0]<4 or self.throwable.ai.use_antitank:
+                        if enemy.ai.passenger_compartment_armor['top'][0]<5 or self.throwable.ai.use_antitank:
                             self.speak(f'Throwing {self.throwable.name} !!!!')
                             self.throw(enemy.world_coords)
                             

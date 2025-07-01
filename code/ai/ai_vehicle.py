@@ -339,6 +339,7 @@ class AIVehicle():
             # put whatever it is in the inventory
             self.inventory.append(event_data) 
 
+
     #---------------------------------------------------------------------------
     def event_remove_inventory(self,event_data):
         '''remove an object from the inventory'''
@@ -351,6 +352,33 @@ class AIVehicle():
 
             # make sure the obj world_coords reflect the obj that had it in inventory
             event_data.world_coords=copy.copy(self.owner.world_coords)
+
+    #---------------------------------------------------------------------------
+    def event_throwable_explosion_on_top_of_vehicle(self,throwable):
+        '''handle a throwable exploding on the top of the vehicle'''
+
+        if self.open_top:
+            # extra damage as it likely fell inside before exploding
+            self.handle_component_damage('random_crew_explosion',None)
+        
+        # special code to make sure the shrapnel hits the top armor
+        shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
+        shrapnel.ai.projectile_type='shrapnel'
+        shrapnel.name='shrapnel'
+        shrapnel.ai.starting_coords=self.owner.world_coords
+
+        compartment=random.choice(['vehicle_body','passenger_compartment'])
+
+        if compartment=='vehicle_body':
+            for b in range(throwable.ai.shrapnel_count):
+                self.handle_vehicle_body_projectile_hit(shrapnel,'top')
+        elif compartment=='passenger_compartment':
+            for b in range(throwable.ai.shrapnel_count):
+                self.handle_passenger_compartment_projectile_hit(shrapnel,'top')
+        else:
+            engine.log.add_data('error',f'ai_vehicle.event_throwable_explosion_on_top_of_vehicle unknown compartment {compartment}',True)
+                
+
 
     #---------------------------------------------------------------------------
     def handle_component_damage(self,damaged_component,projectile):
@@ -528,6 +556,8 @@ class AIVehicle():
             self.event_collision(event_data)
         elif event=='remove_inventory':
             self.event_remove_inventory(event_data)
+        elif event=='throwable_explosion_on_top_of_vehicle':
+            self.event_throwable_explosion_on_top_of_vehicle(event_data)
         else:
             print('Error: '+self.owner.name+' cannot handle event '+event)
 

@@ -78,6 +78,10 @@ class AIThrowable(object):
         self.use_antitank=False
         self.use_antipersonnel=False
 
+        # this is when the throwable is stuck on a vehicle and is moving with it
+        self.on_vehicle=False
+        self.vehicle=None
+
     #---------------------------------------------------------------------------
     def handle_explosion(self):
         '''handles all the various explosion types and effects'''
@@ -88,6 +92,9 @@ class AIThrowable(object):
             self.explode_flame()
         if self.heat:
             self.explode_heat()
+
+        if self.on_vehicle:
+            self.vehicle.ai.handle_event('throwable_explosion_on_top_of_vehicle',self.owner)
 
         self.owner.world.remove_queue.append(self.owner)
 
@@ -119,7 +126,8 @@ class AIThrowable(object):
     #---------------------------------------------------------------------------
     def redirect(self,target_coords):
         ''' redirect/rethrow after grenade has been thrown'''
-        print('redirect')
+        self.on_vehicle=False
+        self.vehicle=None
         # grenade should already be thrown
         if self.thrown==False:
             print('grenade error, redirect w/o thrown')
@@ -187,37 +195,51 @@ class AIThrowable(object):
                     self.flightTime=0
                     self.speed=self.max_speed
             else:
-                # move along path
-                self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
+                if self.on_vehicle:
+                    # moves with the vehicle it is on
+                    self.owner.world_coords=copy.copy(self.vehicle.world_coords)
+                else:
 
-                # give it a little time to get away from the thrower 
-                if self.flightTime>0.1:
-                    objects=self.owner.grid_square.wo_objects_projectile_collision
-                    if self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True) !=None:
-                        if self.explode_on_contact:
-                            if self.unreliable_contact_fuse:
-                                if random.randint(0,1)==1:
-                                    self.handle_explosion()
+                    # move along path
+                    self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+                    # give it a little time to get away from the thrower 
+                    if self.flightTime>0.1:
+                        objects=self.owner.grid_square.wo_objects_projectile_collision
+                        hit_object=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
+                        if hit_object is not None:
+                            if self.explode_on_contact:
+                                if self.unreliable_contact_fuse:
+                                    if random.randint(0,1)==1:
+                                        self.handle_explosion()
+                                    else:
+                                        # contact explosion failed, just reset the grenade
+                                        self.thrown=False
+                                        self.flightTime=0
+                                        self.speed=self.max_speed
                                 else:
-                                    # contact explosion failed, just reset the grenade
-                                    self.thrown=False
-                                    self.flightTime=0
-                                    self.speed=self.max_speed
-                            else:
-                                self.handle_explosion()
-
-                        else:
-                            # just stop the grenade. maybe some spin or reverse movement?
-                            if self.redirected==False:
-                                self.speed=-20
-                                self.flightTime=self.max_flight_time-1
-
-                                # clear the ignore list so it can collide with anything
-                                self.ignore_list=[]
+                                    self.handle_explosion()
 
                             else:
-                                # basically give it another chance to collide
-                                self.redirected=False
+
+                                if hit_object.is_vehicle:
+                                    # chance to get stuck on vehicle
+                                    if random.randint(0,1)==1:
+                                        self.on_vehicle=True
+                                        self.vehicle=hit_object
+                                        return
+
+                                # just stop the grenade. maybe some spin or reverse movement?
+                                if self.redirected==False:
+                                    self.speed=-20
+                                    self.flightTime=self.max_flight_time-1
+
+                                    # clear the ignore list so it can collide with anything but what it just hit
+                                    self.ignore_list=[hit_object]
+
+                                else:
+                                    # basically give it another chance to collide
+                                    self.redirected=False
 
 
 
