@@ -238,39 +238,27 @@ class AIHuman(object):
 
         # rotate turrent towards target. true if rotation matches
         if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
-            fire_primary=False
-            fire_coax=False
             if target.is_human:
-                if target.ai.blood_pressure>0:
-                    if turret.ai.coaxial_weapon is not None:
-                        fire_coax=True
-                    else:
-                        if turret.ai.primary_weapon.ai.use_antipersonnel:
-                            fire_primary=True
-                        else:
-                            self.memory['task_vehicle_crew']['target']=None
-                            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                else:
+                if target.ai.blood_pressure<1:
                     self.memory['task_vehicle_crew']['target']=None
                     self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-            else:
-                if target.ai.passenger_compartment_armor['left'][0]<5 and turret.ai.coaxial_weapon:
-                    fire_coax=True
-                else:
-                    fire_primary=True
+                    return
+
 
             # handle bursts and fire weapon
-            if fire_primary or fire_coax:
-                self.current_burst+=1
-                if self.current_burst>self.max_burst:
-                    self.current_burst=0
-                    self.memory['task_vehicle_crew']['target']=None
-                    self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+            if self.memory['task_vehicle_crew']['engage_primary_weapon']:
+                if turret.ai.handle_fire():
+                    self.current_burst+=1
 
-                if fire_primary:
-                    turret.ai.handle_fire()
-                if fire_coax:
-                    turret.ai.handle_fire_coax()
+            if self.memory['task_vehicle_crew']['engage_coaxial_weapon']:
+                if turret.ai.handle_fire_coax():
+                    self.current_burst+=1
+
+            if self.current_burst>self.max_burst:
+                # randomize burst length a little
+                self.current_burst=random.randint(-2,int(self.max_burst*0.5))
+                self.memory['task_vehicle_crew']['target']=None
+                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
 
     #---------------------------------------------------------------------------
@@ -294,6 +282,28 @@ class AIHuman(object):
             if distance<(self.owner.collision_radius+b.collision_radius):
                 self.building_list.append(b)
                 self.in_building=True
+
+    #---------------------------------------------------------------------------
+    def calculate_engagement(self,weapon,target):
+        '''calculate bool as to whether a target can be successfully engaged with a weapon'''
+        # only consider the round currently loaded in the gun 
+        if weapon.ai.damaged or weapon.ai.action_jammed:
+            return False
+        if weapon.ai.magazine is None:
+            return False
+        if len(weapon.ai.magazine.ai.projectiles)==0:
+            return False
+        
+        distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
+        if distance>weapon.ai.range:
+            return False
+        
+        if target.is_vehicle:
+            penetration=engine.penetration_calculator.calculate_penetration(weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left'])
+            return penetration
+        
+        # default
+        return True
                 
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
@@ -1326,8 +1336,11 @@ class AIHuman(object):
         # add some fatigue, not sure how much
         self.fatigue+=15
     #-----------------------------------------------------------------------
-    def reload_weapon(self,weapon,obj_with_inventory):
+    def reload_weapon(self,weapon,obj_with_inventory,new_magazine):
         '''reload weapon. return bool as to whether it was successful'''
+
+        # new_magazine - magazine obj that you want to reload with. if None the function finds a compatible one
+
         self.speak('reloading!')
         if weapon.is_gun or weapon.is_handheld_antitank:
             # first get the current magazine
@@ -1337,14 +1350,14 @@ class AIHuman(object):
                     old_magazine=weapon.ai.magazine
 
             # find a new magazine, sorting by size
-            new_magazine=None
-            biggest=0
-            for b in obj_with_inventory.ai.inventory:
-                if b.is_gun_magazine:
-                    if weapon.world_builder_identity in b.ai.compatible_guns:
-                        if len(b.ai.projectiles)>biggest:
-                            new_magazine=b
-                            biggest=len(b.ai.projectiles)
+            if new_magazine is None:
+                biggest=0
+                for b in obj_with_inventory.ai.inventory:
+                    if b.is_gun_magazine:
+                        if weapon.world_builder_identity in b.ai.compatible_guns:
+                            if len(b.ai.projectiles)>biggest:
+                                new_magazine=b
+                                biggest=len(b.ai.projectiles)
 
             if new_magazine is None and obj_with_inventory.is_vehicle:
                 for b in obj_with_inventory.ai.ammo_rack:
@@ -1824,6 +1837,8 @@ class AIHuman(object):
             'current_action': 'none', # used to describe/inform the rest of the crew what this crew member is doing
             'target': None, # target for the gunner role
             'calculated_turret_angle': None, #used by the gunner role
+            'engage_primary_weapon': False, # used by gunner
+            'engage_coaxial_weapon': False, #used by gunner
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
             'last_think_time': 0,
@@ -2010,19 +2025,16 @@ class AIHuman(object):
         if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
             > turret.ai.primary_weapon_reload_speed):
-                reload_success=self.reload_weapon(turret.ai.primary_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
-                if reload_success is False:
-                    engine.log.add_data('Error','think_vehicle_role_gunner primary weapon reload failed',)
+                self.think_vehicle_role_gunner_reload(turret.ai.primary_weapon)
             else:
                 return
         if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
             if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
             > turret.ai.coaxial_weapon_reload_speed):
-                reload_success=self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
                 self.memory['task_vehicle_crew']['current_action']='none'
-                if reload_success is False:
-                    engine.log.add_data('Error','think_vehicle_role_gunner coax weapon reload failed',)
+                self.think_vehicle_role_gunner_reload(turret.ai.coaxial_weapon)
+                
             else:
                 return    
 
@@ -2145,83 +2157,127 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['target']=None
                 self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                 return
-            
-        rotation_check=False
-        distance_check=False
-        penetration_check=False
 
         # check rotation
         rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
         rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
-
-        # check distance
-        distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-        distance_check=distance<turret.ai.primary_weapon.ai.range
-
-        # check penetration
-        if target.is_vehicle:
-            if out_of_ammo_primary is False:
-                if engine.penetration_calculator.calculate_penetration(turret.ai.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                    penetration_check=True
-            elif out_of_ammo_coax is False:
-                if engine.penetration_calculator.calculate_penetration(turret.ai.coaxial_weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left']):
-                    penetration_check=True
-        else:
-            penetration_check=True
-
-        # - results: all good -
-        if rotation_check and distance_check and penetration_check:
-            # we are clear to engage
-
-            # update the turret angle for the target
-            self.calculate_turret_aim(turret,target)
-            self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
-
-            return
         
-        # - results: can't penetrate -
-        if penetration_check is False:
-            self.memory['task_vehicle_crew']['target']=None
-            self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-            return
+        # check engagement for each weapon
+        engage_primary=False
+        engage_coaxial=False
+        if out_of_ammo_primary is False:
+            engage_primary=self.calculate_engagement(turret.ai.primary_weapon,target)
+        if out_of_ammo_coax is False:
+            engage_coaxial=self.calculate_engagement(turret.ai.coaxial_weapon,target)
         
-        # - results: distance issue
-        if distance_check is False:
-            # lets only drive closer if we are the main turret
-            if turret.ai.primary_turret:
-                # we used to have the driver drive towards the target here
-                self.memory['task_vehicle_crew']['target']=None
-                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                return
-            else:
-                self.memory['task_vehicle_crew']['target']=None
-                self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-                return
+
+        if rotation_check:
+
+                if engage_primary:
+                    
+                    if engage_coaxial:
+                        if target.is_human:
+                            # don't waste the main gun shot
+                            engage_primary=False
+                    else:
+                        if target.is_human:
+                            # only use AP mag 
+                            if turret.ai.primary_weapon.ai.magazine:
+                                if turret.ai.primary_weapon.ai.magazine.ai.use_antipersonnel==False:
+                                    engage_primary=False
+
+                # save the engagement commands for the gunner actions
+                self.memory['task_vehicle_crew']['engage_primary_weapon']=engage_primary
+                self.memory['task_vehicle_crew']['engage_coaxial_weapon']=engage_coaxial
+
+                if engage_primary or engage_coaxial:
+
+                    # update the turret angle for the target
+                    self.calculate_turret_aim(turret,target)
+                    self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+
+                    return
         
+
         # - results: rotation issue
         if rotation_check is False:
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
-                # check if there is a driver
-                if vehicle.ai.vehicle_crew[0].is_driver and vehicle.ai.vehicle_crew[0].role_occupied:
-                # ask the driver to rotate towards the target
-                    if target.is_vehicle or random.randint(0,1)==1:
+                if engage_primary or engage_coaxial:
+                    # check if there is a driver
+                    if vehicle.ai.vehicle_crew[0].is_driver and vehicle.ai.vehicle_crew[0].role_occupied:
+                    # ask the driver to rotate towards the target
+                        if target.is_vehicle or random.randint(0,1)==1:
 
-                        # wait for a couple seconds before rechecking
-                        self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
-                        self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
-                        return
-
+                            # wait for a couple seconds before rechecking
+                            self.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                            self.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
+                            return
 
 
         # default
         self.memory['task_vehicle_crew']['target']=None
         self.memory['task_vehicle_crew']['current_action']='Scanning for targets'
             
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_gunner_reload(self,weapon):
+        '''think about how we want to reload'''
+        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
+        target=self.memory['task_vehicle_crew']['target']
+        self.memory['task_vehicle_crew']['current_action']='none'
 
+        for_at=[]
+        for_ap=[]
+        for_both=[]
+
+        for m in vehicle.ai.ammo_rack:
+            if m.is_gun_magazine:
+                if weapon.world_builder_identity in m.ai.compatible_guns:
+                    if len(m.ai.projectiles)>0:
+                        if m.ai.use_antitank and m.ai.use_antipersonnel:
+                            for_both.append(m)
+                        elif m.ai.use_antitank:
+                            for_at.append(m)
+                        elif m.ai.use_antipersonnel:
+                            for_ap.append(m)
+                        else:
+                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use')
+
+        new_magazine=None
+        prefer_at=False
+        prefer_ap=False
+
+        if len(for_both)>0:
+            new_magazine=for_both[0]
+        else:
+            if target is None:
+                # could check if vehicles are near
+                if len(self.near_vehicle_targets)>0 or len(self.mid_vehicle_targets)>0:
+                    prefer_at=True
+                elif len(self.near_human_targets)>0:
+                    prefer_ap=True
+
+            else:
+                if target.is_vehicle:
+                    prefer_at=True
+                else:
+                    prefer_ap=True
+
+        if prefer_at and len(for_at)>0:
+            new_magazine=for_at[0]
+        
+        if prefer_ap and len(for_ap)>0:
+            new_magazine=for_ap(0)
+
+
+        reload_success=self.reload_weapon(weapon,vehicle,new_magazine)
+        if reload_success is False:
+            engine.log.add_data('Error','think_vehicle_role_gunner reload failed',True)
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
+        '''think.. as a passenger'''
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
         # check if there are any empty roles
@@ -2245,17 +2301,19 @@ class AIHuman(object):
         # note radio.ai.radio_operator set by switch_task_vehicle_crew
         # not a ton that we really need to do here atm
 
-        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
+        vehicle=vehicle_role.vehicle
         radio=vehicle.ai.radio
 
         if radio is None:
-            # radio dissapeared. get a different vehicle task
 
-            # as of Dec 2024 there can be a radio spot with no radio 
-            self.memory['task_vehicle_crew']['current_action']='Hmm did someone steal the radio?'
+            # should we try to do something else?
+            return
             
         else:
-            self.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
+            # gunner also uses this, do not want to over write 
+            if vehicle_role.is_gunner is False:
+                self.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
             if radio.ai.power_on is False:
                 radio.ai.current_frequency=self.squad.faction_tactical.radio_frequency
                 radio.ai.turn_power_on()
@@ -3032,7 +3090,7 @@ class AIHuman(object):
         # this is used to reload a hand held gun or at weapon 
         if (self.owner.world.world_seconds-self.memory['task_reload']['reload_start_time'] > 
             self.memory['task_reload']['weapon'].ai.reload_speed):
-            self.reload_weapon(self.memory['task_reload']['weapon'],self.owner)
+            self.reload_weapon(self.memory['task_reload']['weapon'],self.owner,None)
             self.memory.pop('task_reload',None)
             self.switch_task_think()
             
@@ -3319,14 +3377,14 @@ class AIHuman(object):
             if self.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
                 if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
                 > turret.ai.primary_weapon_reload_speed):
-                    self.reload_weapon(turret.ai.primary_weapon,vehicle)
+                    self.reload_weapon(turret.ai.primary_weapon,vehicle,None)
                     self.memory['task_vehicle_crew']['current_action']='none'
                 else:
                     return
             if self.memory['task_vehicle_crew']['current_action']=='reloading coax gun':
                 if (self.owner.world.world_seconds-self.memory['task_vehicle_crew']['reload_start_time'] 
                 > turret.ai.coaxial_weapon_reload_speed):
-                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle)
+                    self.reload_weapon(turret.ai.coaxial_weapon,vehicle,None)
                     self.memory['task_vehicle_crew']['current_action']='none'
                 else:
                     return

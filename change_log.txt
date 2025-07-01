@@ -1,6 +1,25 @@
 TWE Project : Change Log
 
 ----------------------------------
+June 30 2025
+- added HE projectiles for cannons 
+- added gunner logic for choosing at/ap/both when reloading
+- magazines can now be labeled at at/ap/both 
+- projectiles now have a use attribute at/ap/both 
+- added some randomness to burst length 
+- burst length only increments when the weapon fires now 
+- rewrote engagement decisions for vehicle primary and coax weapons 
+- fixed radio man who is also a gunner overwriting gunner actions 
+
+labeling the magazine so that searching ammo is faster. 
+doesn't really matter for cannons, but eventually machine guns will 
+likely get some magazines loaded with AP 
+
+todo 
+- likely pitfall with the current code is if HE is loaded and the target has armor the gun will not be used
+    correct action is to probably reload - IF there is AT ammo that can pen 
+
+----------------------------------
 June 28 2025
 - misc cleanup / updates / error handling 
 - added new hit_data attribute : result

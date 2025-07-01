@@ -34,6 +34,11 @@ class AIMagazine(object):
         # disentegrating magazines dissapear from the world when they are emptied 
         # done by the ai_human reloading code
         self.disintegrating=False
+
+        # gives the AI hints on how to use this weapon
+        # set by worldbuilder.load_magazine
+        self.use_antitank=False
+        self.use_antipersonnel=False
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
