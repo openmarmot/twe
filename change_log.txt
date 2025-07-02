@@ -15,7 +15,7 @@ Grenades are now VERY VERY dangerous to the german half tracks at close range.
 todo 
 - open top vehicle crew should have a option to expose themselves and shoot out 
 - open top vehicles should have a chance to injure crew with fire 
-
+- debug morale check and adjust to be less likely for non-pen from shrapnel 
 ----------------------------------
 June 30 2025
 - added HE projectiles for cannons 
