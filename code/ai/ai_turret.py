@@ -110,7 +110,8 @@ class AITurret(object):
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
             result=''
-            if penetration:                
+            if penetration:
+                EVENT_DATA.wo_stop()
                 # component damage
                 damage_options=['turret track','gunner hit']
                 

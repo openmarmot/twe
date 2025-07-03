@@ -652,7 +652,9 @@ def load_magazine(world,magazine,projectile_type=None):
     else:
         engine.log.add_data('Error','world_builder.load_magazine incompatible projectile type: '+projectile_type,True)
     
-    # set use case 
+    # set use case. first reset defaults as this function can be called multiple times
+    magazine.ai.use_antitank=False
+    magazine.ai.use_antipersonnel=False
     if engine.penetration_calculator.projectile_data[projectile_type]['use']=='at':
         magazine.ai.use_antitank=True
     elif engine.penetration_calculator.projectile_data[projectile_type]['use']=='ap':

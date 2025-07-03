@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 2 2025
+- projectiles now have a chance to bounce/richochet off a vehicle if they do not penetrate
+- added some code to force reloads when a gun has AP loaded but AT available and can't pen 
+- fixed ai vehicle reloads not checking vehicle inventory
+
+the richochet is very dangerous but does not travel far. 
+
+todo 
+- reload code needs more tuning. i think the gunners are still getting stuck on HE sometimes 
+
+----------------------------------
 July 1 2025
 - moved self debug to its own file and rewrote 
 - fixed a issue with items not properly being removed from grid manager. 

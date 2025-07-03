@@ -97,9 +97,8 @@ class AIProjectile(object):
                         collide_obj.ai.handle_event('collision',self.owner)
 
                         if collide_obj.is_vehicle:
-
-                            # hit a live vehicle
-                            self.owner.world.remove_queue.append(self.owner)
+                            # vehicles will remove or redirect projectiles based on penetration
+                            pass
                         else:
                             if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
                                 # add the collided object to ignore list so we don't hit it again

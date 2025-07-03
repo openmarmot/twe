@@ -2167,6 +2167,26 @@ class AIHuman(object):
         engage_coaxial=False
         if out_of_ammo_primary is False:
             engage_primary=self.calculate_engagement(turret.ai.primary_weapon,target)
+
+            # this is necessary to force a reload if we are
+            # trying to engage a vehicle with HE and have AT in the inventory
+            # otherwise the gunner will just drop all vehicle targets because he can't pen
+            if engage_primary is False and target.is_vehicle:
+                # do we have HE loaded and do we have AT available?
+                if turret.ai.primary_weapon.ai.magazine:
+                    if turret.ai.primary_weapon.ai.magazine.ai.use_antitank is False:
+                        for m in vehicle.ai.ammo_rack:
+                            if len(m.ai.projectiles)>0:
+                                if m.ai.use_antitank:
+                                    # start the reload process
+                                    self.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                                    self.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                                    self.memory['task_vehicle_crew']['target']=None
+                                    return
+
+            # possibly should also check if we are engaging a soft skinned vehicle with AT
+                
+
         if out_of_ammo_coax is False:
             engage_coaxial=self.calculate_engagement(turret.ai.coaxial_weapon,target)
         
@@ -2231,7 +2251,21 @@ class AIHuman(object):
         for_ap=[]
         for_both=[]
 
+        # ammo rack
         for m in vehicle.ai.ammo_rack:
+            if m.is_gun_magazine:
+                if weapon.world_builder_identity in m.ai.compatible_guns:
+                    if len(m.ai.projectiles)>0:
+                        if m.ai.use_antitank and m.ai.use_antipersonnel:
+                            for_both.append(m)
+                        elif m.ai.use_antitank:
+                            for_at.append(m)
+                        elif m.ai.use_antipersonnel:
+                            for_ap.append(m)
+                        else:
+                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use')
+
+        for m in vehicle.ai.inventory:
             if m.is_gun_magazine:
                 if weapon.world_builder_identity in m.ai.compatible_guns:
                     if len(m.ai.projectiles)>0:
@@ -2268,8 +2302,9 @@ class AIHuman(object):
             new_magazine=for_at[0]
         
         if prefer_ap and len(for_ap)>0:
-            new_magazine=for_ap(0)
+            new_magazine=for_ap[0]
 
+        #print(f'{vehicle.name} {weapon.name} AT:{len(for_at)}, AP: {len(for_ap)}, BOTH: {len(for_both)}')
 
         reload_success=self.reload_weapon(weapon,vehicle,new_magazine)
         if reload_success is False:
