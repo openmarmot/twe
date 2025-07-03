@@ -110,7 +110,8 @@ class AITurret(object):
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
             penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
             result=''
-            if penetration:                
+            if penetration:
+                EVENT_DATA.wo_stop()
                 # component damage
                 damage_options=['turret track','gunner hit']
                 
@@ -202,6 +203,8 @@ class AITurret(object):
             self.primary_weapon.ai.fire()
             self.vehicle.ai.recent_noise_or_move=True
             self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
+            return True
+        return False
 
     #---------------------------------------------------------------------------
     def handle_fire_coax(self):
@@ -210,6 +213,8 @@ class AITurret(object):
             self.coaxial_weapon.ai.fire()
             self.vehicle.ai.recent_noise_or_move=True
             self.vehicle.ai.recent_noise_or_move_time=self.owner.world.world_seconds
+            return True
+        return False
 
     #---------------------------------------------------------------------------
     def neutral_controls(self):

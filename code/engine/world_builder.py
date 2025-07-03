@@ -651,6 +651,19 @@ def load_magazine(world,magazine,projectile_type=None):
             count+=1
     else:
         engine.log.add_data('Error','world_builder.load_magazine incompatible projectile type: '+projectile_type,True)
+    
+    # set use case. first reset defaults as this function can be called multiple times
+    magazine.ai.use_antitank=False
+    magazine.ai.use_antipersonnel=False
+    if engine.penetration_calculator.projectile_data[projectile_type]['use']=='at':
+        magazine.ai.use_antitank=True
+    elif engine.penetration_calculator.projectile_data[projectile_type]['use']=='ap':
+        magazine.ai.use_antipersonnel=True
+    elif engine.penetration_calculator.projectile_data[projectile_type]['use']=='both':
+        magazine.ai.use_antipersonnel=True
+        magazine.ai.use_antitank=True
+    else:
+        engine.log.add_data('Error','world_builder.load_magazine unknown use for projectile: '+projectile_type,True)
 
 #------------------------------------------------------------------------------
 def load_quick_battle(world,battle_option):
@@ -1752,6 +1765,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='7.5cm_pak39_L48_magazine':
@@ -1760,7 +1774,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['7.5cm_pak39_L48']
-        z.ai.compatible_projectiles=['PzGr39_75_L48']
+        z.ai.compatible_projectiles=['PzGr39_75_L48','Sprgr_34_75_L48']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1778,6 +1792,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
     
     elif object_type=='76mm_m1940_f34_magazine':
@@ -1786,7 +1801,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['76mm_m1940_f34']
-        z.ai.compatible_projectiles=['76x385_AP']
+        z.ai.compatible_projectiles=['76x385_AP','OF-350M']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1803,6 +1818,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='85mm_zis_s_53_magazine':
@@ -1811,7 +1827,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['85mm_zis_s_53','85mm_d_5s']
-        z.ai.compatible_projectiles=['BR-365k']
+        z.ai.compatible_projectiles=['BR-365k','O365k']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1829,6 +1845,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='mg15':
@@ -2231,8 +2248,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.ai.ammo_rack_capacity=24
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(20):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        for b in range(4):
+            temp=spawn_object(world,world_coords,"75mm_pak40_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.rotation_angle=float(random.randint(0,359))
         z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=1
@@ -2417,8 +2438,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         z.ai.ammo_rack_capacity=24
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(20):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        for b in range(4):
+            temp=spawn_object(world,world_coords,"75mm_pak40_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
@@ -2537,8 +2562,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         z.ai.ammo_rack_capacity=87
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False))
+        for b in range(27):
+            temp=spawn_object(world,world_coords,"75mm_kwk40_l43_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L43')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=3
         z.ai.min_wheels_per_side_rear=3
         z.ai.max_wheels=16
@@ -2670,8 +2699,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         z.ai.ammo_rack_capacity=87
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        for b in range(27):
+            temp=spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=3
         z.ai.min_wheels_per_side_rear=3
         z.ai.max_wheels=16
@@ -2784,8 +2817,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         z.ai.ammo_rack_capacity=87
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
+        for b in range(27):
+            temp=spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=3
         z.ai.min_wheels_per_side_rear=3
         z.ai.max_wheels=16
@@ -2841,6 +2878,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='75mm_kwk40_l43_magazine':
@@ -2849,7 +2887,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['75mm_kwk40_l43']
-        z.ai.compatible_projectiles=['PzGr39_75_L43']
+        z.ai.compatible_projectiles=['PzGr39_75_L43','Sprgr_34_75_L43']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
@@ -2866,6 +2904,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='75mm_kwk40_l48_magazine':
@@ -2874,7 +2913,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['75mm_kwk40_l48']
-        z.ai.compatible_projectiles=['PzGr39_75_L48']
+        z.ai.compatible_projectiles=['PzGr39_75_L48','Sprgr_34_75_L48']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
@@ -3050,8 +3089,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
         z.ai.ammo_rack_capacity=77
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False))
+        for b in range(17):
+            temp=spawn_object(world,world_coords,"76mm_m1940_f34_magazine",False)
+            load_magazine(world,temp,'OF-350M')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=2
         z.ai.min_wheels_per_side_rear=2
         z.ai.max_wheels=12
@@ -3182,8 +3225,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
         z.ai.ammo_rack_capacity=57
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(50):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
+        for b in range(7):
+            temp=spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False)
+            load_magazine(world,temp,'O365k')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=2
         z.ai.min_wheels_per_side_rear=2
         z.ai.max_wheels=12
@@ -3287,8 +3334,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
         z.ai.ammo_rack_capacity=60
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(50):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False))
+        for b in range(10):
+            temp=spawn_object(world,world_coords,"85mm_zis_s_53_magazine",False)
+            load_magazine(world,temp,'O365k')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=2
         z.ai.min_wheels_per_side_rear=2
         z.ai.max_wheels=12
@@ -3401,6 +3452,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=41
         for b in range(z.ai.ammo_rack_capacity):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
+        for b in range(30):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
+        for b in range(11):
+            temp=spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=1
         z.ai.max_wheels=8
@@ -3581,8 +3638,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.frontal_area=5
         z.rotation_angle=float(random.randint(0,359))
         z.ai.ammo_rack_capacity=30
-        for b in range(z.ai.ammo_rack_capacity):
+        for b in range(20):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
+        for b in range(10):
+            temp=spawn_object(world,world_coords,"75mm_pak40_magazine",False)
+            load_magazine(world,temp,'Sprgr_34_75_L48')
+            z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=0
         z.ai.max_wheels=4
@@ -3632,6 +3693,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
         z.rotation_angle=0
 
     elif object_type=='75mm_pak40_magazine':
@@ -3640,7 +3702,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['75mm_pak40']
-        z.ai.compatible_projectiles=['PzGr39_75_PAK40']
+        z.ai.compatible_projectiles=['PzGr39_75_PAK40','Sprgr_34_75_L48']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))

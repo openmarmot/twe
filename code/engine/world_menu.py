@@ -19,6 +19,7 @@ import engine.world_builder
 import engine.math_2d
 import engine.world_radio
 import engine.log
+import engine.self_debug_world
 
 #global variables
 
@@ -327,7 +328,7 @@ class World_Menu(object):
                 engine.log.add_data('info','comms check sent on all tactical_ai channels',True)
 
             elif key=='5':
-                self.world.run_self_debug()
+                engine.self_debug_world.start(self.world)
             elif key=='6':
                 self.world.toggle_hit_markers()
                 return

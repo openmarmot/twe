@@ -1,6 +1,53 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 2 2025
+- projectiles now have a chance to bounce/richochet off a vehicle if they do not penetrate
+- added some code to force reloads when a gun has AP loaded but AT available and can't pen 
+- fixed ai vehicle reloads not checking vehicle inventory
+
+the richochet is very dangerous but does not travel far. 
+
+todo 
+- reload code needs more tuning. i think the gunners are still getting stuck on HE sometimes 
+
+----------------------------------
+July 1 2025
+- moved self debug to its own file and rewrote 
+- fixed a issue with items not properly being removed from grid manager. 
+    this mostly effected items that get dropped from inventory 
+- grenades have a chance to get stuck on/in a vehicle. they will explode on the 
+top armor - which is zero for some vehicles 
+- ai should be more likely to throw grenades at vehicles now 
+
+Grenades are now VERY VERY dangerous to the german half tracks at close range. 
+
+
+todo 
+- open top vehicle crew should have a option to expose themselves and shoot out 
+- open top vehicles should have a chance to injure crew with fire 
+- debug morale check and adjust to be less likely for non-pen from shrapnel 
+----------------------------------
+June 30 2025
+- added HE projectiles for cannons 
+- added gunner logic for choosing at/ap/both when reloading
+- magazines can now be labeled at at/ap/both 
+- projectiles now have a use attribute at/ap/both 
+- added some randomness to burst length 
+- burst length only increments when the weapon fires now 
+- rewrote engagement decisions for vehicle primary and coax weapons 
+- fixed radio man who is also a gunner overwriting gunner actions 
+
+labeling the magazine so that searching ammo is faster. 
+doesn't really matter for cannons, but eventually machine guns will 
+likely get some magazines loaded with AP 
+
+todo 
+- likely pitfall with the current code is if HE is loaded and the target has armor the gun will not be used
+    correct action is to probably reload - IF there is AT ammo that can pen 
+- HE damage needs a boost - probably 
+
+----------------------------------
 June 28 2025
 - misc cleanup / updates / error handling 
 - added new hit_data attribute : result
