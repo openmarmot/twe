@@ -2287,7 +2287,7 @@ class AIHuman(object):
         else:
             if target is None:
                 # could check if vehicles are near
-                if len(self.near_vehicle_targets)>0 or len(self.mid_vehicle_targets)>0:
+                if len(self.near_vehicle_targets)>0 or len(self.mid_vehicle_targets)>0 or len(self.far_vehicle_targets)>0:
                     prefer_at=True
                 elif len(self.near_human_targets)>0:
                     prefer_ap=True
@@ -2785,6 +2785,9 @@ class AIHuman(object):
                 # this will decide crew position as well
                 vehicle_order=self.memory['task_enter_vehicle']['vehicle_order']
                 self.memory.pop('task_enter_vehicle',None)
+                # make sure we aren't prone
+                if self.prone:
+                    self.prone_state_change()
                 self.switch_task_vehicle_crew(vehicle,vehicle_order)
             else:
                 # something went wrong, cancel the task

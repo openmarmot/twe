@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 4 2025
+- adjust reload mechanism to prefer AT if there are any identified vehicle enemies 
+- minor updates
+
+----------------------------------
 July 2 2025
 - projectiles now have a chance to bounce/richochet off a vehicle if they do not penetrate
 - added some code to force reloads when a gun has AP loaded but AT available and can't pen 
