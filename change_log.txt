@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 5 2025
+- 'miraculously unharmed' damage option for passenger compartment now only possible with 0 armor (no spalling)
+- extended '1' penetration of rifle rounds out one extra unit of range 
+- remove the cleanup function - objects will self delete instead 
+- removed all world object lists from world - these are now fully handled by grid_manager
+- added some grid square functionality 
+- now some static objects like terrain don't get updated. 
+
+0 armor vehicles bounce rifle rounds towards the end of their range. probably should fix but ehh..
+
+todo 
+- need a world_object tag to tag objects that should not be saved (brass, turrets, blood, etc)
+
+----------------------------------
 July 4 2025
 - adjust reload mechanism to prefer AT if there are any identified vehicle enemies 
 - minor updates

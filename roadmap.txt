@@ -36,7 +36,7 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 - (done) gunners should be able to ask the driver to pause (so they can shoot)
 - (done) gunners should be able to ask the driver to rotate and then pause (for shooting/angling)
 - tanks should be able to rotate without moving forwards 
-- gunners should be able to switch between tank round types 
+- (done) gunners should be able to switch between tank round types 
 - (done) stabilization / lack of should be taken into account with gun accuracy 
 
 
@@ -47,8 +47,8 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 - german AP mine launchers for AFVs 
     https://en.wikipedia.org/wiki/Nahverteidigungswaffe
     https://en.wikipedia.org/wiki/Minenabwurfvorrichtung
-- p38 
-- po8 luger 
+- (done) p38 
+- (done) po8 luger 
 - high power 
 
 

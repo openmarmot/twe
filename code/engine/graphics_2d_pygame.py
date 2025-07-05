@@ -460,7 +460,7 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def reset_all(self):
         ''' resize all world_objects'''
-        for b in self.world.wo_objects:
+        for b in self.world.grid_manager.get_all_objects():
             b.reset_image=True
 
     #---------------------------------------------------------------------------
@@ -475,7 +475,6 @@ class Graphics_2D_Pygame(object):
                     if (c.is_player is False 
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
-                        and c.can_be_deleted is False
                         and c.is_ground_texture is False):
                         possible_objects.append(c)
         elif self.mode==2:

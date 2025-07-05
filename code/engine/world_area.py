@@ -72,7 +72,7 @@ class WorldArea(object):
         self.american_count=0
         self.civilian_count=0
 
-        for b in self.world.wo_objects_human:
+        for b in self.world.grid_manager.get_objects_from_all_grid_squares(True,False):
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
             if d < self.size:
                 if b.ai.squad.faction_tactical.faction=='german':

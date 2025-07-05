@@ -73,7 +73,7 @@ class AIFactionTactical():
 
         # create a list of squad objects
         squad_objects=[]
-        for b in self.world.wo_objects:
+        for b in self.world.grid_manager.get_objects_from_all_grid_squares(True,True):
             if b.world_builder_identity.startswith(self.faction):
                 if b.is_human or b.is_vehicle:
                     squad_objects.append(b)
@@ -256,7 +256,7 @@ class AIFactionTactical():
         self.hostile_humans=[]
         self.allied_crewed_vehicles=[]
 
-        for b in self.world.wo_objects_human:
+        for b in self.world.grid_manager.get_objects_from_all_grid_squares(True,False):
             if b.ai.squad!=None:
                 if b.ai.squad.faction==self.faction or b.ai.squad.faction in self.allied_factions:
                     self.allied_humans.append(b)

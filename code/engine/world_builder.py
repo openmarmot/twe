@@ -284,12 +284,9 @@ def convert_world_objects_to_map_objects(world,map_square):
             map_square.map_objects.append(temp)
 
     # convert world objects to map objects
-    for b in world.wo_objects:
+    for b in world.grid_manager.get_all_objects():
         # a couple objects we don't want to save
-        if (b.is_projectile is False and b.is_map_pointer is False and
-            b.can_be_deleted is False and b.is_particle_effect is False 
-            and b.is_turret is False and b.is_hit_marker is False 
-            and b.is_body is False and b.is_vehicle_wreck is False):
+        if b.no_save is False:
             # assemble inventory name list
             inventory=[]
             if hasattr(b.ai,'inventory'):
@@ -2369,6 +2366,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon_reload_speed=10
         z.ai.primary_turret=True
+        z.no_save=True
 
     elif object_type=='german_sd_kfz_251/22':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -2488,6 +2486,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon_reload_speed=20
         z.ai.primary_turret=True
+        z.no_save=True
 
     elif object_type=='german_panzer_iv_ausf_g':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2597,6 +2596,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2625,6 +2625,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='german_panzer_iv_ausf_h':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
@@ -2742,6 +2743,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     # J is a H with simplicication. schurtzen are replaced with wire schurtzen on the hull (thin)
     elif object_type=='german_panzer_iv_ausf_j':
@@ -2866,6 +2868,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='75mm_kwk40_l43':
         z=WorldObject(world,['mg34'],AIGun)
@@ -3021,6 +3024,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -3124,6 +3128,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='t34_76_model_1943_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -3152,6 +3157,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=30
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='soviet_t34_85':
         # ref : https://wiki.warthunder.com/T-34-85
@@ -3274,6 +3280,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=24
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='soviet_su_85':
         # ref : https://wiki.warthunder.com/T-34-85
@@ -3374,6 +3381,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='german_jagdpanzer_38t_hetzer':
         # ref : https://wiki.warthunder.com/Jagdpanzer_38(t)
@@ -3494,6 +3502,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='jagdpanzer_38t_main_gun':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -3518,6 +3527,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
+        z.no_save=True
 
     elif object_type=='soviet_37mm_m1939_61k_aa_gun_carriage':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -3594,6 +3604,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=10
+        z.no_save=True
 
     elif object_type=='german_pak40':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
@@ -3680,6 +3691,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
+        z.no_save=True
 
     elif object_type=='75mm_pak40':
         # this is the gun, not the whole pak40 object
@@ -4169,9 +4181,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
         z.ai.alive_time_max=300
-        z.can_be_deleted=True
         z.ai.self_remove=True
-        z.ai.only_remove_when_not_visible=True 
+        z.ai.only_remove_when_not_visible=True
+        z.no_save=True
     # steel bullet casing
     elif object_type=='steel_case':
         z=WorldObject(world,['steel_case'],AIAnimatedSprite)
@@ -4185,9 +4197,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rotate_time_max=0.8
         z.ai.move_time_max=0.3
         z.ai.alive_time_max=300
-        z.can_be_deleted=True
         z.ai.self_remove=True
         z.ai.only_remove_when_not_visible=True
+        z.no_save=True
     elif object_type=='small_smoke':
         z=WorldObject(world,['small_smoke'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4202,7 +4214,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True
+        z.no_save=True
     elif object_type=='small_fire':
         z=WorldObject(world,['small_fire'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4217,7 +4229,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True
+        z.no_save=True
     elif object_type=='small_explosion':
         z=WorldObject(world,['small_explosion'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4232,7 +4244,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True
+        z.no_save=True
     elif object_type=='small_flash':
         z=WorldObject(world,['explosion_flash'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4247,7 +4259,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True
+        z.no_save=True
     elif object_type=='spark':
         z=WorldObject(world,['spark'],AIAnimatedSprite)
         w=[world_coords[0]+float(random.randint(-7,7)),world_coords[1]+float(random.randint(-7,7))]
@@ -4262,7 +4274,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.move_time_max=3
         z.ai.alive_time_max=3
         z.ai.self_remove=True
-        z.can_be_deleted=True 
+        z.no_save=True
     
     elif object_type=='blood_splatter':
         z=WorldObject(world,['blood_splatter'],AIAnimatedSprite)
@@ -4278,10 +4290,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.ai.only_remove_when_not_visible=True
-        z.can_be_deleted=True
+        z.no_save=True
 
     elif object_type=='small_blood':
-        z=WorldObject(world,['small_blood'],AINone)
+        z=WorldObject(world,['small_blood'],AIAnimatedSprite)
         z.name='small_blood'
         z.minimum_visible_scale=0.2
         z.is_particle_effect=True
@@ -4293,7 +4305,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.alive_time_max=300
         z.ai.self_remove=True
         z.ai.only_remove_when_not_visible=True
-        z.can_be_deleted=True 
+        z.no_save=True
            
     elif object_type=='dirt':
         z=WorldObject(world,['small_dirt'],AIAnimatedSprite)
@@ -4308,7 +4320,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.alive_time_max=75
         z.ai.self_remove=True
         z.ai.only_remove_when_not_visible=True
-        z.can_be_deleted=True
+        z.no_save=True
     
     elif object_type=='brown_chair':
         z=WorldObject(world,['brown_chair'],AINone)
@@ -4316,7 +4328,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_furniture=True
         z.is_large_human_pickup=True
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='german_field_shovel':
         z=WorldObject(world,['german_field_shovel'],AIThrowable)
         z.name='german field shovel'
@@ -4407,74 +4420,88 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='projectile'
         z.ai.speed=1000.
         z.is_projectile=True
+        z.no_save=True
     elif object_type=='gas_80_octane':
         z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='gas_80_octane'
         z.is_liquid=True
         z.is_solid=False
+        z.no_update=True
     elif object_type=='diesel':
         z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='diesel'
         z.is_liquid=True
         z.is_solid=False
+        z.no_update=True
     elif object_type=='water':
         z=WorldObject(world,['small_clear_spill'],AINone)
         z.name='water'
         z.is_liquid=True
         z.is_solid=False
+        z.no_update=True
     elif object_type=='concrete_square':
         z=WorldObject(world,['concrete_square'],AINone)
         z.name='concrete_square'
         z.rotation_angle=0
+        z.no_update=True
     elif object_type=='ground_cover':
         #z=WorldObject(world,['ground_dirt_vlarge'],AINone)
         z=WorldObject(world,['terrain_light_sand'],AINone)
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0
+        z.no_update=True
     elif object_type=='terrain_mottled_transparent':
         z=WorldObject(world,['terrain_mottled_transparent'],AINone)
         z.name='ground_dirt_vlarge'
         z.is_ground_texture=True
         z.rotation_angle=0
         z.default_scale=1
+        z.no_update=True
     elif object_type=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'
         z.minimum_visible_scale=0.4
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='wood_quarter':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'
         z.minimum_visible_scale=0.4
         z.is_large_human_pickup=True
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='coffee_beans':
         z=WorldObject(world,['coffee_beans'],AINone)
         z.name='coffee_beans'
         z.minimum_visible_scale=0.4
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='ground_coffee':
         z=WorldObject(world,['coffee_beans'],AINone)
         z.name='ground_coffee'
         z.minimum_visible_scale=0.4
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='coffee_grinder':
         z=WorldObject(world,['coffee_grinder'],AICoffeeGrinder)
         z.name='coffee_grinder'
         z.minimum_visible_scale=0.4
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='bomb_sc250':
         z=WorldObject(world,['sc250'],AINone)
         z.name='bomb_sc250'
         z.weight=250
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
     elif object_type=='grid_50_foot':
         z=WorldObject(world,['grid_50_foot'],AINone)
         z.name='grid_50_foot'
         z.weight=250
         z.rotation_angle=0
+        z.no_update=True
     elif object_type=='battery_feldfunk_2v':
         z=WorldObject(world,['battery_vehicle_6v'],AIBattery)
         z.name='Feldfunk 2V battery'

@@ -1000,7 +1000,8 @@ class AIHuman(object):
         # this could be modified to return damaged vehicles that are not fully disabled
 
         damaged_vehicles=[]
-        for vehicle in self.owner.world.wo_objects_vehicle:
+        # could instead search a range from grid_manager
+        for vehicle in self.owner.grid_square.wo_objects_vehicle:
             if vehicle.ai.vehicle_disabled:
                 if engine.math_2d.get_distance(self.owner.world_coords,vehicle.world_coords)<max_range:
                     damaged_vehicles.append(vehicle)
@@ -1071,8 +1072,9 @@ class AIHuman(object):
 
         # remove yourself to prevent recursion
         near_squad.remove(self.owner)
-
-        near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,self.owner.world.wo_objects_vehicle,500)
+        vehicle_distance=600
+        possible_vehicles=self.owner.world.grid_manager.get_objects_from_grid_squares_near_world_coords(self.owner.world_coords,vehicle_distance,False,True)
+        near_vehicle=self.owner.world.get_objects_within_range(self.owner.world_coords,possible_vehicles,vehicle_distance)
 
         for b in near_vehicle:
             # skip disabled vehicles
@@ -1093,7 +1095,7 @@ class AIHuman(object):
                 if c.role_occupied:
                     occupants+=1
 
-            for c in self.owner.world.wo_objects_human:
+            for c in self.owner.world.grid_manager.get_objects_from_all_grid_squares(True,False):
                 if 'task_enter_vehicle' in c.ai.memory:
                     if c.ai.memory['task_enter_vehicle']['vehicle']==b:
                         occupants+=1
@@ -1252,7 +1254,7 @@ class AIHuman(object):
 
             # need to make sure nobody else is already carrying it
             in_use=False
-            for b in self.owner.world.wo_objects_human:
+            for b in self.owner.world.grid_manager.get_objects_from_all_grid_squares(True,False):
                 if b.ai.large_pickup==b:
                     in_use=True
 
@@ -3048,7 +3050,6 @@ class AIHuman(object):
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
             if distance>self.max_walk_distance:
-                
                 b=self.owner.world.get_closest_vehicle(self.owner,(self.max_walk_distance*0.6))
                 if b is not None:
                     # get_closest_vehicle only returns vehicles that aren't full

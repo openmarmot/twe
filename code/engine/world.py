@@ -75,16 +75,8 @@ class World():
         # objects to be removed from the world
         self.remove_queue=[]
 
-        # object lists 
-        self.wo_objects=[]
-        self.wo_objects_human=[]
-        self.wo_objects_vehicle=[]
-        self.wo_objects_map_pointer=[]
-        self.wo_objects_cleanup=[]
-
         #world areas
         self.world_areas=[]
-
         
 
         # size of the map in every direction from 0,0
@@ -148,12 +140,6 @@ class World():
         # seconds between the last update. updated by self.update()
         self.time_passed_seconds=0
 
-
-        # number of objects over which the world starts to cleanup un-needed objects
-        # this likely won't be reached anymore as most objects self clean up
-        self.cleanup_threshold=5000
-
-
         # -- some stat counters for the debug info screen --
         self.panzerfaust_launches=0
         # incremented when a medic heals someone
@@ -195,28 +181,15 @@ class World():
         # reset the image so that the graphics engine can make sure it matches the current view scale
         world_object.reset_image=True
 
-        if world_object not in self.wo_objects:
 
-            world_object.in_world=True
+        world_object.in_world=True
 
-            # init the grid square
-            self.grid_manager.update_wo_object_square(world_object)
-            
-            # set or reset spawn time in world_seconds
-            world_object.spawn_time=self.world_seconds
+        # init the grid square
+        self.grid_manager.update_wo_object_square(world_object)
+        
+        # set or reset spawn time in world_seconds
+        world_object.spawn_time=self.world_seconds
 
-            self.wo_objects.append(world_object)
-            if world_object.is_human:
-                self.wo_objects_human.append(world_object)
-            if world_object.is_vehicle:
-                self.wo_objects_vehicle.append(world_object)
-            if world_object.is_map_pointer:
-                self.wo_objects_map_pointer.append(world_object)
-            if world_object.can_be_deleted:
-                self.wo_objects_cleanup.append(world_object)
-
-        else:
-            print('Error!! '+ world_object.name+' already in world.wo_objects. Add fails !!')
         
     #---------------------------------------------------------------------------
     def check_collision_return_object(self,collider,ignore_list, objects,consider_prone=False):
@@ -248,7 +221,9 @@ class World():
     #---------------------------------------------------------------------------
     def check_map_bounds(self):
         '''check if anything is out of bounds'''
-        check_objects=self.wo_objects_human+self.wo_objects_vehicle
+        # this could be better
+
+        check_objects=self.grid_manager.get_objects_from_all_grid_squares(True,True)
         for b in check_objects:
             if b.world_coords[0]>self.map_size or b.world_coords[0]<-self.map_size \
                 or b.world_coords[1]>self.map_size or b.world_coords[1]<-self.map_size:
@@ -259,38 +234,18 @@ class World():
     def check_object_exists(self,wo_obj):
         '''returns a bool as to whether the object is in the world'''
 
-        if wo_obj in self.wo_objects:
-            if wo_obj in self.remove_queue:
-                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in remove_queue',True)
-                return False
-            elif wo_obj in self.exit_queue:
-                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in exit_queue',True)
-                return False
-            else:
-                return True
-        else:
+        # note this has been neutered a bit. no longer checks if the object is really in world
+
+        if wo_obj in self.remove_queue:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in remove_queue',True)
             return False
+        elif wo_obj in self.exit_queue:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in exit_queue',True)
+            return False
+        else:
+            return True
+
             
-    #------------------------------------------------------------------------------
-    def cleanup(self):
-        '''cleanup routine for when performance is hurting'''
-
-        # find the oldest time (which is the lowest number, as spawn_time counts up from zero)
-        oldest_time=10000
-        for b in self.wo_objects_cleanup:
-            if b.spawn_time<oldest_time:
-                oldest_time=b.spawn_time
-                #oldest_object=b
-        
-        # remove objects that are in the same approximate spawn time
-        remove_list=[]
-        for b in self.wo_objects_cleanup:
-            if b.spawn_time>oldest_time-1 and b.spawn_time<oldest_time+1:
-                remove_list.append(b)
-
-        print('Cleanup function removing '+str(len(remove_list))+' objects')
-        self.remove_queue+=remove_list
-
 
     #------------------------------------------------------------------------------
     def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon_name,fire_duration,smoke_duration):
@@ -299,14 +254,17 @@ class World():
         # weaponName - the weapon that created the explosion
 
         # damage objects within damage radius 
-        possible=self.wo_objects_human+self.wo_objects_vehicle
+        possible=self.grid_manager.get_objects_from_grid_squares_near_world_coords(world_coords,explosion_radius,True,True)
+
         for b in possible:
             distance=engine.math_2d.get_distance(world_coords,b.world_coords)
             if distance<explosion_radius:
                 # power reverse scales with distance
                 power=100*(distance/explosion_radius)
                 if b.is_human:
-                    b.ai.handle_event('explosion',power)        
+                    b.ai.handle_event('explosion',power) 
+                if b.is_vehicle:
+                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon_name} unhandled')       
 
         # stun objects within stun radius 
                     
@@ -389,7 +347,10 @@ class World():
         # max_distance - maximum distance away that is ok
         best_distance=max_distance
         best_object=None
-        for b in self.wo_objects_vehicle:
+
+        possible_vehicles=self.grid_manager.get_objects_from_grid_squares_near_world_coords(human.world_coords,max_distance,False,True)
+
+        for b in possible_vehicles:
             acceptable=True
             
             if b.ai.vehicle_disabled:
@@ -570,18 +531,10 @@ class World():
 
     #---------------------------------------------------------------------------
     def kill_all_nonplayer_humans(self):
-        for b in self.wo_objects_human:
+        for b in self.grid_manager.get_objects_from_all_grid_squares(True,False):
             if b.is_player is False:
                 b.ai.blood_pressure=0
         engine.log.add_data('note','world.kill_all_nonplayer_humans executed',True)
-
-    #---------------------------------------------------------------------------
-    def log_world_data(self):
-        '''print out a bunch of world info'''
-
-        engine.log.add_data('debug','wo_objects : '+str(len(self.wo_objects)),True)
-        engine.log.add_data('debug','wo_objects_human : '+str(len(self.wo_objects_human)),True)
-        engine.log.add_data('debug','wo_objects_vehicle : '+str(len(self.wo_objects_vehicle)),True)
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
@@ -637,7 +590,7 @@ class World():
     #---------------------------------------------------------------------------
     def remove_hit_markers(self):
         # if this is slow we could create our own wo_ category for hit markers
-        for b in self.wo_objects:
+        for b in self.grid_manager.get_all_objects():
             if b.is_hit_marker:
                 self.remove_queue.append(b)
 
@@ -646,30 +599,14 @@ class World():
         ''' remove object from world. '''
         # !! note - objects should add themselves to the remove_queue instead of calling this directly
 
-        if world_object in self.wo_objects:
+        world_object.in_world=False
 
-            world_object.in_world=False
-
-            # remove from grid square
-            self.grid_manager.remove_object_from_world_grid(world_object)
-
-            self.wo_objects.remove(world_object)
-            if world_object.is_human:
-                self.wo_objects_human.remove(world_object)
-            if world_object.is_vehicle:
-                self.wo_objects_vehicle.remove(world_object)
-            if world_object.is_map_pointer:
-                self.wo_objects_map_pointer.remove(world_object)
-            if world_object.can_be_deleted:
-                self.wo_objects_cleanup.remove(world_object)
-
-        else:
-            print('Error!! '+ world_object.name+' not in world.wo_objects. Remove fails !!')
+        # remove from grid square
+        self.grid_manager.remove_object_from_world_grid(world_object)
         
-
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
-        for b in self.wo_objects:
+        for b in self.grid_manager.get_all_objects():
             if b.is_vehicle or b.is_vehicle_wreck:
                 for hit in b.ai.collision_log:
                     marker=engine.world_builder.spawn_object(self,b.world_coords,'hit_marker',True)
@@ -705,9 +642,6 @@ class World():
         for ai in self.tactical_ai.values():
             ai.start()
 
-        # print debug info
-        self.log_world_data()
-
         # spawn player
         self.spawn_player()
 
@@ -730,13 +664,9 @@ class World():
 
         if self.map_enabled:
             self.map_enabled=False
-            # because removing items from the same list you are 
-            # iterating through causes odd issues. working with a copy is much 
-            # better
-            temp=copy.copy(self.wo_objects_map_pointer)
-            
-            # remove map objects
-            self.remove_queue+=temp
+            for b in self.grid_manager.get_all_objects():
+                if b.is_map_pointer:
+                    self.remove_queue.append(b)
         else:
             self.map_enabled=True
             print('map enabled :','green= world area','blue= squad','green= squad destination')
@@ -760,8 +690,8 @@ class World():
                 if len(self.text_queue)>0:
                     self.text_queue.pop(0)
 
-            for b in self.wo_objects:
-                b.update()
+            # update the world objects
+            self.grid_manager.update_world_objects()
 
             # update world areas
             for b in self.world_areas:
@@ -778,10 +708,6 @@ class World():
 
             if self.display_vehicle_text:
                 self.update_vehicle_text()
-
-            # check if we need to start cleaning up old objects for performance
-            if len(self.wo_objects_cleanup)>self.cleanup_threshold:
-                self.cleanup()
             
             # check if anything is out of map bounds
             if self.world_seconds-self.last_map_check>self.map_check_interval:
@@ -799,10 +725,9 @@ class World():
     def update_debug_info(self):
         self.debug_text_queue = []
         self.debug_text_queue.append(f"Grid Square Count: {len(self.grid_manager.index_map)}")
-        self.debug_text_queue.append(f"World Objects: {len(self.wo_objects)}")
-        self.debug_text_queue.append(f"wo_objects_cleanup: {len(self.wo_objects_cleanup)}")
+        self.debug_text_queue.append(f"World Objects: {len(self.grid_manager.get_all_objects())}")
+        self.debug_text_queue.append(f"World Objects that Update: {len(self.grid_manager.get_all_wo_update())}")
         self.debug_text_queue.append(f"Exited objects count: {self.exited_object_count}")
-        self.debug_text_queue.append(f"Vehicles: {len(self.wo_objects_vehicle)}")
         self.debug_text_queue.append(f"Panzerfaust launches: {self.panzerfaust_launches}")
         self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
         self.debug_text_queue.append(f'Medic Heals: {self.medic_heals}')
