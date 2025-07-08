@@ -787,6 +787,7 @@ class World_Menu(object):
                 self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
                 self.text_queue.append('- magazine count: '+str(magazine_count))
                 self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+                self.text_queue.append(f'- accuracy: {self.selected_object.ai.primary_weapon.ai.get_accuracy()}')
             if self.selected_object.ai.throwable!=None:
                 throwing_text=f'[throwing weapon]: {self.selected_object.ai.throwable.name}'
                 if self.selected_object.ai.throwable.ai.use_antitank:

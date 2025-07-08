@@ -5,6 +5,7 @@ July 7 2025
 - misc minor updates/refactoring 
 - weapons now have a hit counter 
 - vehicle diagnostics now displays accuracy (hits/shots) for weapons 
+- humans now display weapon accuracy in selection menu when nearby 
 
 might enhance the aigun class to also keep track of round counts fired for various projectile types.
 this will help with understanding if tanks are using HE. the overhead is relatively low 
