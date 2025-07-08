@@ -100,7 +100,7 @@ class AIThrowable(object):
 
     #---------------------------------------------------------------------------
     def explode(self):        
-        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name,0.5,1)
+        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner,0.5,1)
 
     #---------------------------------------------------------------------------
     def explode_flame(self):
@@ -118,7 +118,7 @@ class AIThrowable(object):
     def explode_heat(self):
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
         engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
-        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,1,self.heat_projectile_type,self.equipper,self.owner.name)
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,1,self.heat_projectile_type,self.equipper,self.owner)
         engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
 
     #---------------------------------------------------------------------------

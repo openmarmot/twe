@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 7 2025
+- misc minor updates/refactoring 
+- weapons now have a hit counter 
+- vehicle diagnostics now displays accuracy (hits/shots) for weapons 
+
+might enhance the aigun class to also keep track of round counts fired for various projectile types.
+this will help with understanding if tanks are using HE. the overhead is relatively low 
+
+----------------------------------
 July 5 2025
 - 'miraculously unharmed' damage option for passenger compartment now only possible with 0 armor (no spalling)
 - extended '1' penetration of rifle rounds out one extra unit of range 

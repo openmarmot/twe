@@ -55,6 +55,7 @@ class AIGun(object):
 
         # internal counter of rounds fired
         self.rounds_fired=0
+        self.rounds_hit=0
 
         # the object that actually equipped this weapon. either a turret or a human
         # set by ai_man.event_inventory or worldbuilder for turrets
@@ -101,7 +102,7 @@ class AIGun(object):
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
             
-            projectile.ai.weapon_name=self.owner.name
+            projectile.ai.weapon=self.owner
             projectile.ai.shooter=self.equipper
             projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
             projectile.world_coords=copy.copy(self.equipper.world_coords)
@@ -148,6 +149,14 @@ class AIGun(object):
             if len(self.magazine.ai.projectiles)==0:
                 if 'panzerfaust' in self.owner.name:
                     self.owner.image_index=1
+
+    #---------------------------------------------------------------------------
+    def get_accuracy(self):
+        '''get the accuracy of the weapon'''
+
+        if self.rounds_fired==0:
+            return "0.0%"
+        return f'{round(self.rounds_hit/self.rounds_fired,1)*100}%'
 
     #---------------------------------------------------------------------------
     def update(self):

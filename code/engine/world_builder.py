@@ -4597,7 +4597,7 @@ def spawn_map_pointer(world,TARGET_COORDS,TYPE):
 
 #------------------------------------------------------------------------------
 # basically just a different kind of projectile
-def spawn_shrapnel(world,world_coords,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,MIN_TIME,MAX_TIME,ORIGINATOR,WEAPON_NAME):
+def spawn_shrapnel(world,world_coords,target_coords,ignore_list,projectile_type,min_time,max_time,originator,weapon):
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     # MOUSE_AIM bool as to whether to use mouse aim for calculations
     z=WorldObject(world,['shrapnel'],AIProjectile)
@@ -4605,36 +4605,36 @@ def spawn_shrapnel(world,world_coords,TARGET_COORDS,IGNORE_LIST,PROJECTILE_TYPE,
     z.world_coords=copy.copy(world_coords)
     z.ai.starting_coords=copy.copy(world_coords)
     z.ai.speed=300.
-    z.ai.maxTime=random.uniform(MIN_TIME, MAX_TIME)
+    z.ai.maxTime=random.uniform(min_time, max_time)
     z.is_projectile=True
     z.render_level=3
-    z.ai.ignore_list=copy.copy(IGNORE_LIST)
-    z.ai.projectile_type=PROJECTILE_TYPE
-    z.rotation_angle=engine.math_2d.get_rotation(world_coords,TARGET_COORDS)
-    z.heading=engine.math_2d.get_heading_vector(world_coords,TARGET_COORDS)
+    z.ai.ignore_list=copy.copy(ignore_list)
+    z.ai.projectile_type=projectile_type
+    z.rotation_angle=engine.math_2d.get_rotation(world_coords,target_coords)
+    z.heading=engine.math_2d.get_heading_vector(world_coords,target_coords)
     # increase the collision radius to make sure we get hits
     z.collision_radius=10
-    z.ai.shooter=ORIGINATOR
-    z.ai.weapon_name=WEAPON_NAME
+    z.ai.shooter=originator
+    z.ai.weapon=weapon
     z.wo_start()
 
 #------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(world,world_coords,AMOUNT,ORIGINATOR,WEAPON_NAME):
+def spawn_shrapnel_cloud(world,world_coords,amount,originator,weapon):
     ''' creates a shrapnel starburst pattern. used for grenades '''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     ignore_list=[]
     if world.friendly_fire_explosive is False:
-        if ORIGINATOR.is_human:
-            ignore_list+=ORIGINATOR.ai.squad.faction_tactical.allied_humans
+        if originator.is_human:
+            ignore_list+=originator.ai.squad.faction_tactical.allied_humans
 
     elif world.friendly_fire_explosive_squad is False:
-        if ORIGINATOR.is_human:
+        if originator.is_human:
             # just add the squad
-            ignore_list+=ORIGINATOR.ai.squad.members
+            ignore_list+=originator.ai.squad.members
 
-    for x in range(AMOUNT):
+    for x in range(amount):
         target_coords=[float(random.randint(-150,150))+world_coords[0],float(random.randint(-150,150))+world_coords[1]]
-        spawn_shrapnel(world,world_coords,target_coords,ignore_list,'shrapnel',0.1,0.4,ORIGINATOR,WEAPON_NAME)
+        spawn_shrapnel(world,world_coords,target_coords,ignore_list,'shrapnel',0.1,0.4,originator,weapon)
 
 #------------------------------------------------------------------------------
 def spawn_smoke_cloud(world,world_coords,heading,amount=30):
@@ -4667,13 +4667,13 @@ def spawn_sparks(world,world_coords,amount=30):
         z.ai.alive_time_max=random.uniform(1.1,1.3)
 
 #------------------------------------------------------------------------------
-def spawn_heat_jet(world,world_coords,target_coords,AMOUNT,heat_projectile_type,originator,weapon_name):
+def spawn_heat_jet(world,world_coords,target_coords,AMOUNT,heat_projectile_type,originator,weapon):
     ''' creates a cone/line of shrapnel. used for panzerfaust'''
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
     # heat_projectile_type - a heat name from the projectile database that corresponds to the correct heat jet for the weapon
     for x in range(AMOUNT):
         target_coords=[float(random.randint(-5,5))+target_coords[0],float(random.randint(-5,5))+target_coords[1]]
-        spawn_shrapnel(world,world_coords,target_coords,[],heat_projectile_type,0.1,0.3,originator,weapon_name)
+        spawn_shrapnel(world,world_coords,target_coords,[],heat_projectile_type,0.1,0.3,originator,weapon)
 
 # load squad data 
 load_sqlite_squad_data()

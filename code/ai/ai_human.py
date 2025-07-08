@@ -685,7 +685,7 @@ class AIHuman(object):
             if event_data.ai.shooter is not None:
                 collision_description+=(' from '+event_data.ai.shooter.name)
                 if event_data.ai.shooter.ai.primary_weapon is not None:
-                    collision_description+=("'s "+event_data.ai.weapon_name)
+                    collision_description+=("'s "+event_data.ai.weapon.name)
                 self.collision_log.append(collision_description)   
 
                 # kill tracking

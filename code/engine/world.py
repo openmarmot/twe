@@ -248,7 +248,7 @@ class World():
             
 
     #------------------------------------------------------------------------------
-    def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon_name,fire_duration,smoke_duration):
+    def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon,fire_duration,smoke_duration):
         '''create a explosion that deals damage'''
         # originator - the ai_human that fired the weapon
         # weaponName - the weapon that created the explosion
@@ -264,13 +264,13 @@ class World():
                 if b.is_human:
                     b.ai.handle_event('explosion',power) 
                 if b.is_vehicle:
-                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon_name} unhandled')       
+                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon.name} unhandled')       
 
         # stun objects within stun radius 
                     
         # shrapnel
         if shrapnel_count>0:
-            engine.world_builder.spawn_shrapnel_cloud(self,world_coords,shrapnel_count,originator,weapon_name)
+            engine.world_builder.spawn_shrapnel_cloud(self,world_coords,shrapnel_count,originator,weapon)
 
 
         # spawn effects 
