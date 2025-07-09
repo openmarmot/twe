@@ -324,20 +324,19 @@ class AIHuman(object):
 
         # fatigue
         if self.fatigue>3:
-            adjust_max+=0.5
+            adjust_max+=3
         if self.fatigue>5:
             adjust_max+=6
 
         # distance based
         if distance>500:
-            adjust_max+=1
+            adjust_max+=3
         if distance>1000:
             adjust_max+=5
         if distance>1500:
-            adjust_max+=2
+            adjust_max+=5
         if distance>2000:
-            adjust_max+=10
-
+            adjust_max+=15
         # prone bonus 
         if self.prone:
             adjust_max-=1

@@ -264,7 +264,7 @@ class World():
                 if b.is_human:
                     b.ai.handle_event('explosion',power) 
                 if b.is_vehicle:
-                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon.name} unhandled')       
+                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon.name} unhandled',True)       
 
         # stun objects within stun radius 
                     

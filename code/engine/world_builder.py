@@ -1277,7 +1277,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=4
         z.ai.speed=300
         z.is_handheld_antitank=True
-        z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
+        z.ai.magazine=spawn_object(world,world_coords,'panzerschreck_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=25
         z.ai.range=2000
@@ -2268,7 +2268,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_vehicles=['german_rso_pak','german_rso']
         z.ai.armor=[5,0,0]
 
-    elif object_type=='german_sd_kfz_251':
+    # this is the base object for the sd.kfz.251 variants. It is not meant to be spawned by itself
+    elif object_type=='german_sd_kfz_251_base':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
         z.name='Sd.Kfz.251'
@@ -2288,31 +2289,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.passenger_compartment_armor['right']=[8,35,0]
         z.ai.passenger_compartment_armor['front']=[14.5,30,0]
         z.ai.passenger_compartment_armor['rear']=[8,31,0]
-        turret=spawn_object(world,world_coords,'sd_kfz_251_mg34_turret',True)
-        z.ai.turrets.append(turret)
-        turret.ai.vehicle=z
-
-        role=VehicleRole('driver',z)
-        role.is_driver=True
-        z.ai.vehicle_crew.append(role)
-
-        role=VehicleRole('gunner',z)
-        role.is_gunner=True
-        role.turret=turret
-        role.seat_visible=True
-        role.seat_offset=[-3,0]
-        z.ai.vehicle_crew.append(role)
-
-        passenger_positions=[[4,10],[12,10],[21,10],[35,10],[51,10],[4,-10],[12,-10],[21,-10],[35,-10],[51,-10]]
-        passenger_rotation=[90,90,90,90,90,270,270,270,270,270]
-        for x in range(10):
-            role=VehicleRole('passenger',z)
-            role.is_passenger=True
-            role.seat_visible=True
-            role.seat_rotation=passenger_rotation.pop()
-            role.seat_offset=passenger_positions.pop()
-            z.ai.vehicle_crew.append(role)
-
         z.ai.max_speed=385.9
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
@@ -2331,8 +2307,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        for b in range(11):
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
         z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
@@ -2345,6 +2319,35 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(8):
             z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
             z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+
+    elif object_type=='german_sd_kfz_251/1':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=spawn_object(world,world_coords,'german_sd_kfz_251_base',False)
+        z.name='Sd.Kfz.251/1'
+        turret=spawn_object(world,world_coords,'sd_kfz_251_mg34_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        role.seat_visible=True
+        role.seat_offset=[-3,0]
+        z.ai.vehicle_crew.append(role)
+        passenger_positions=[[4,10],[12,10],[21,10],[35,10],[51,10],[4,-10],[12,-10],[21,-10],[35,-10],[51,-10]]
+        passenger_rotation=[90,90,90,90,90,270,270,270,270,270]
+        for x in range(10):
+            role=VehicleRole('passenger',z)
+            role.is_passenger=True
+            role.seat_visible=True
+            role.seat_rotation=passenger_rotation.pop()
+            role.seat_offset=passenger_positions.pop()
+            z.ai.vehicle_crew.append(role)
+        for b in range(11):
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+
 
     elif object_type=='sd_kfz_251_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2367,27 +2370,120 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.ai.primary_turret=True
         z.no_save=True
+        
+    elif object_type=='251_wheel':
+        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
+        z.name='251 Wheel'
+        z.ai.compatible_vehicles=['german_sd_kfz_251/22','german_sd_kfz_251']
+        z.ai.armor=[5,0,0]
+
+    elif object_type=='german_sd_kfz_251/9':
+        # ref : https://wiki.warthunder.com/unit/germ_sdkfz_251_9
+        # https://en.wikipedia.org/wiki/Sd.Kfz._251
+        z=spawn_object(world,world_coords,'german_sd_kfz_251_base',False)
+        z.name='Sd.Kfz.251/9 Stummel'
+        z.ai.passenger_compartment_ammo_racks=True
+        z.ai.requires_afv_training=True
+        z.ai.is_transport=False
+        turret=spawn_object(world,world_coords,'251_9_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        role.seat_visible=True
+        role.seat_offset=[17,0]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        role.seat_visible=True
+        role.seat_rotation=90
+        role.seat_offset=[24,10]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        role.seat_visible=True
+        role.seat_rotation=90
+        role.seat_offset=[12,10]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.ammo_rack_capacity=52
+        # HE
+        for b in range(40):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk37_l24_magazine",False))
+        # HEAT
+        for b in range(12):
+            temp=spawn_object(world,world_coords,"75mm_kwk37_l24_magazine",False)
+            load_magazine(world,temp,'HL_Gr_38A_L24')
+            z.ai.ammo_rack.append(temp)
+
+    elif object_type=='251_9_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['251_9_turret','251_9_turret'],AITurret)
+        z.name='Sd.Kfz.251/9 Turret'
+        z.is_turret=True
+        z.ai.vehicle_mount_side='top'
+        z.ai.turret_accuracy=1
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[13,0,0]
+        z.ai.turret_armor['left']=[6,22,0]
+        z.ai.turret_armor['right']=[6,22,0]
+        z.ai.turret_armor['front']=[6,36,0]
+        z.ai.turret_armor['rear']=[0,0,0]
+        z.ai.position_offset=[-10,0]
+        z.ai.rotation_range=[-12,12]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'75mm_kwk37_l24',False)
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-70,0]
+        z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=20
+        z.ai.primary_turret=True
+        z.no_save=True
+
+    elif object_type=='75mm_kwk37_l24':
+        # ref : https://en.wikipedia.org/wiki/7.5_cm_KwK_37
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='75mm KWK 37 L24'
+        z.is_gun=True
+        z.ai.mechanical_accuracy=10
+        z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk37_l24_magazine',False)
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=17
+        z.ai.range=4000
+        z.ai.type='cannon'
+        z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=0
+
+    elif object_type=='75mm_kwk37_l24_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='75mm_kwk40_l48_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['75mm_kwk37_l24']
+        z.ai.compatible_projectiles=['Sprgr_34_75_L24','HL_Gr_38A_L24']
+        z.ai.capacity=1
+        z.ai.disintegrating=True
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
 
     elif object_type=='german_sd_kfz_251/22':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
-        z=WorldObject(world,['sd_kfz_251','sd_kfz_251_destroyed'],AIVehicle)
+        z=spawn_object(world,world_coords,'german_sd_kfz_251_base',False)
         z.name='Sd.Kfz.251/22'
-        z.is_vehicle=True
-        z.is_towable=True
         z.ai.passenger_compartment_ammo_racks=True
         z.ai.requires_afv_training=True
-        z.ai.vehicle_armor['top']=[8,8,0]
-        z.ai.vehicle_armor['bottom']=[8,0,0]
-        z.ai.vehicle_armor['left']=[8,19,0]
-        z.ai.vehicle_armor['right']=[8,19,0]
-        z.ai.vehicle_armor['front']=[14.5,20,0]
-        z.ai.vehicle_armor['rear']=[8,31,0]
-        z.ai.passenger_compartment_armor['top']=[0,0,0]
-        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
-        z.ai.passenger_compartment_armor['left']=[8,35,0]
-        z.ai.passenger_compartment_armor['right']=[8,35,0]
-        z.ai.passenger_compartment_armor['front']=[14.5,30,0]
-        z.ai.passenger_compartment_armor['rear']=[8,31,0]
+        z.ai.is_transport=False
         turret=spawn_object(world,world_coords,'251_pak40_turret',True)
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
@@ -2417,24 +2513,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[12,10]
         z.ai.vehicle_crew.append(role)
 
-        z.ai.max_speed=385.9
-        z.ai.max_offroad_speed=177.6
-        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
-        z.ai.rotation_speed=40.
-        z.collision_radius=50
-        z.weight=7800
-        z.drag_coefficient=0.9
-        z.frontal_area=5
-        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
-        z.ai.fuel_tanks[0].volume=114
-        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
-        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
-        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
-        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
-        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
-        z.rotation_angle=float(random.randint(0,359))
         z.ai.ammo_rack_capacity=24
         for b in range(20):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_pak40_magazine",False))
@@ -2442,25 +2520,6 @@ def spawn_object(world,world_coords,object_type, spawn):
             temp=spawn_object(world,world_coords,"75mm_pak40_magazine",False)
             load_magazine(world,temp,'Sprgr_34_75_L48')
             z.ai.ammo_rack.append(temp)
-        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
-        if random.randint(0,1)==1:
-            z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
-        z.ai.min_wheels_per_side_front=1
-        z.ai.min_wheels_per_side_rear=5
-        z.ai.max_wheels=18
-        z.ai.max_spare_wheels=0
-        z.ai.front_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
-        z.ai.front_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
-        for b in range(8):
-            z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
-            z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
-
-    elif object_type=='251_wheel':
-        z=WorldObject(world,['volkswagen_wheel'],AIWheel)
-        z.name='251 Wheel'
-        z.ai.compatible_vehicles=['german_sd_kfz_251/22','german_sd_kfz_251']
-        z.ai.armor=[5,0,0]
-        
 
     elif object_type=='251_pak40_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world

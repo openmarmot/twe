@@ -91,7 +91,8 @@ class AIProjectile(object):
                 if collide_obj !=None:
                     
                     # update hit counter
-                    self.weapon.ai.rounds_hit+=1
+                    if self.weapon.is_gun:
+                        self.weapon.ai.rounds_hit+=1
 
                     if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
                         # bullet has collided and exploded

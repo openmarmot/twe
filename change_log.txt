@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 8 2025
+- rewrote sd.kfz.251 spawn to reduce duplicate code 
+- added sd.kfz.251/9 'Stummel'
+- added HEAT tank rounds for the stummel 
+- minor fix and updates 
+- fixed panzerschreck having wrong magazine 
+- some adjustments to human accuracy 
+
+Interesting thing about HEAT tank rounds is they need to have a penetration value on the round so 
+the logic that tells the gunner if he can take the shot. however when the round hits it triggers the 
+HEAT effect and its those projectiles that penetrate 
+
+I'd like to make all the infantry guns more inaccurate. the current accuracy system is not super useful 
+It needs to scale with range 
+
+
+----------------------------------
 July 7 2025
 - misc minor updates/refactoring 
 - weapons now have a hit counter 
