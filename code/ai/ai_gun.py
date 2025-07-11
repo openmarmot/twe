@@ -38,8 +38,10 @@ class AIGun(object):
         # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
 
-        # muzzle velocity (not used)
-        self.muzzle_velocity=0
+        # muzzle velocity
+        # this is in game units and sets the projectile speed
+        # max currently is 1000
+        self.muzzle_velocity=1000
 
         # mechanical accuracy from a stable mount. 0 is perfectly accurate
         # 0 is perfect. 5 is terrible
@@ -110,6 +112,7 @@ class AIGun(object):
             projectile.ai.maxTime=self.range/projectile.ai.speed
             projectile.rotation_angle=self.owner.rotation_angle
             projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+            projectile.ai.speed=self.muzzle_velocity
             
             self.owner.world.add_queue.append(projectile)
 

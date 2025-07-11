@@ -28,8 +28,6 @@ import sqlite3
 import engine.math_2d
 import engine.name_gen
 import engine.log
-from ai.ai_vehicle import AIVehicle
-from ai.ai_human import AIHuman
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
@@ -40,6 +38,7 @@ from engine.vehicle_role import VehicleRole
 
 # load AI
 from ai.ai_human import AIHuman
+from ai.ai_vehicle import AIVehicle
 from ai.ai_gun import AIGun
 from ai.ai_magazine import AIMagazine
 from ai.ai_none import AINone
@@ -706,6 +705,10 @@ def load_quick_battle(world,battle_option):
     # testing
     elif battle_option=='4':
         squads=[]
+        squads.append('Soviet 1944 Assault Engineers')
+        squads.append('Soviet 1944 Assault Engineers')
+        squads.append('Soviet 1944 Assault Engineers')
+        squads.append('Soviet 1944 Assault Engineers')
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -4153,6 +4156,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         add_standard_loadout(z,world,'standard_soviet_gear')
         add_standard_loadout(z,world,'ppsh43')
 
+    elif object_type=='soviet_assault_engineer_ppsh43':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        add_standard_loadout(z,world,'ppsh43')
+        z.add_inventory(spawn_object(world,world_coords,'sn_42_body_armor',False))
+        z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
+
     elif object_type=='soviet_ppsh43_rpg43':
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
@@ -4575,7 +4585,16 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['battery_vehicle_6v'],AIBattery)
         z.name='battery_vehicle_24v'
         z.weight=25
-        z.rotation_angle=float(random.randint(0,359)) 
+        z.rotation_angle=float(random.randint(0,359))
+    elif object_type=='sn_42_body_armor':
+        z=WorldObject(world,['sn_42_body_armor'],AIWearable)
+        z.name='SN 42 Body Armor'
+        z.minimum_visible_scale=0.4
+        z.weight=0.98
+        z.is_wearable=True
+        z.ai.wearable_region='upper_body'
+        z.ai.armor=[3,0,0]
+        z.rotation_angle=float(random.randint(0,359))
     elif object_type=='helmet_stahlhelm':
         z=WorldObject(world,['helmet_stahlhelm'],AIWearable)
         z.name='helmet_stahlhelm'

@@ -148,6 +148,8 @@ class World():
         self.mechanic_fixes=0
         # count on how many times a helmet bounces a projectile
         self.helmet_bounces=0
+        # count how many times a body armor bounces a projectile
+        self.body_armor_bounces=0
 
 
         # whether hit markers exist or not
@@ -730,6 +732,7 @@ class World():
         self.debug_text_queue.append(f"Exited objects count: {self.exited_object_count}")
         self.debug_text_queue.append(f"Panzerfaust launches: {self.panzerfaust_launches}")
         self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
+        self.debug_text_queue.append(f"Body armor bounces: {self.body_armor_bounces}")
         self.debug_text_queue.append(f'Medic Heals: {self.medic_heals}')
         self.debug_text_queue.append(f'Mechanic Fixes: {self.mechanic_fixes}')
         self.debug_text_queue.append("----- Player Stats -----")

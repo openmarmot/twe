@@ -79,6 +79,8 @@ class AIHuman(object):
         # max distance that is walkable before deciding a vehicle is better
         self.max_walk_distance=2000
         self.max_distance_to_interact_with_object=8
+        # when a vehicle is < this distance to a target it is considered arrived
+        self.vehicle_arrival_distance=150
 
         # -- equipment --
         self.inventory=[]
@@ -144,88 +146,89 @@ class AIHuman(object):
     def action_vehicle_driver(self):
         ''' the action the driver is taking when not thinking'''
         # some default values
-        vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        vehicle.ai.throttle=0
-        vehicle.ai.brake_power=1
+        vehicle = self.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        vehicle.ai.throttle = 0
+        vehicle.ai.brake_power = 1
 
-        if self.memory['task_vehicle_crew']['current_action']=='driving':
-            calculated_distance=self.memory['task_vehicle_crew']['calculated_distance_to_target']
-            calculated_vehicle_angle=self.memory['task_vehicle_crew']['calculated_vehicle_angle']
+        if self.memory['task_vehicle_crew']['current_action'] == 'driving':
+            calculated_distance = self.memory['task_vehicle_crew']['calculated_distance_to_target']
+            calculated_vehicle_angle = self.memory['task_vehicle_crew']['calculated_vehicle_angle']
+            
             # initial throttle settings
-            if calculated_distance<150:
+            if calculated_distance < 150:
                 # apply brakes. bot will only exit when speed is zero
                 # note this number should be < the minimum distance to jump out
                 # or you can end up with drivers stuck in the vehicle if they slow down fast
-                vehicle.ai.throttle=0
-                vehicle.ai.brake_power=1
-            elif calculated_distance<300:
-                vehicle.ai.throttle=0.5
-                vehicle.ai.brake_power=0
+                vehicle.ai.throttle = 0
+                vehicle.ai.brake_power = 1
+            elif calculated_distance < 300:
+                vehicle.ai.throttle = 0.5
+                vehicle.ai.brake_power = 0
             else:
-                vehicle.ai.throttle=1
-                vehicle.ai.brake_power=0
+                vehicle.ai.throttle = 1
+                vehicle.ai.brake_power = 0
 
-            v=vehicle.rotation_angle
-
-            # if its close just set it equal
-            if calculated_vehicle_angle>v-4 and calculated_vehicle_angle<v+4:
-                # neutral out steering 
+            # Normalize both angles to [0, 360)
+            current_angle = engine.math_2d.get_normalized_angle(vehicle.rotation_angle)
+            desired_angle = engine.math_2d.get_normalized_angle(calculated_vehicle_angle)
+            
+            # Compute shortest signed difference (-180 to +180)
+            diff = (desired_angle - current_angle + 180) % 360 - 180
+            
+            # If close enough, snap to exact angle and neutral steering
+            if abs(diff) <= 4:  # Adjusted threshold to match original logic
                 vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=calculated_vehicle_angle
+                vehicle.rotation_angle = desired_angle
                 vehicle.ai.update_heading()
             else:
-
-                if calculated_vehicle_angle>v:
-                    vehicle.ai.handle_steer_left()
+                # Steer in the direction of the shortest diff
+                if diff > 0:
+                    vehicle.ai.handle_steer_left()  # Assuming this increases angle
                     # helps turn faster
-                    if vehicle.ai.throttle>0.5:
-                        vehicle.ai.throttle=0.5
-
-                if calculated_vehicle_angle<v:
-                    vehicle.ai.handle_steer_right()
+                    if vehicle.ai.throttle > 0.5:
+                        vehicle.ai.throttle = 0.5
+                else:
+                    vehicle.ai.handle_steer_right()  # Assuming this decreases angle
                     # helps turn faster
-                    if vehicle.ai.throttle>0.5:
-                        vehicle.ai.throttle=0.5
-                
-
-                if (calculated_vehicle_angle>355 and v<5) or (calculated_vehicle_angle<5 and v>355):
-                    # i think the rotation angle wrapping 360->0 and 0->360 is goofing stuff
-                    vehicle.ai.handle_steer_neutral()
-                    vehicle.rotation_angle=calculated_vehicle_angle
-                    vehicle.ai.update_heading()
-                    engine.log.add_data('warn','fixing 360 vehicle steering issue',False)
+                    if vehicle.ai.throttle > 0.5:
+                        vehicle.ai.throttle = 0.5
+            
             return
         
-        if self.memory['task_vehicle_crew']['current_action']=='rotating':
+        if self.memory['task_vehicle_crew']['current_action'] == 'rotating':
             # rotating in place with minimal movement
             # throttle + brake seems to be working here fairly well
 
-            calculated_vehicle_angle=self.memory['task_vehicle_crew']['calculated_vehicle_angle']
-            v=vehicle.rotation_angle
+            calculated_vehicle_angle = self.memory['task_vehicle_crew']['calculated_vehicle_angle']
 
-            if vehicle.ai.current_speed>10:
-                vehicle.ai.throttle=0
-                vehicle.ai.brake_power=1
+            if vehicle.ai.current_speed > 10:
+                vehicle.ai.throttle = 0
+                vehicle.ai.brake_power = 1
             else:
-                vehicle.ai.throttle=0.2
-                vehicle.ai.brake_power=1
+                vehicle.ai.throttle = 0.2
+                vehicle.ai.brake_power = 1
 
-            # if its close just set it equal
-            if calculated_vehicle_angle>v-6 and calculated_vehicle_angle<v+6:
-                # neutral out steering 
+            # Normalize both angles to [0, 360)
+            current_angle = engine.math_2d.get_normalized_angle(vehicle.rotation_angle)
+            desired_angle = engine.math_2d.get_normalized_angle(calculated_vehicle_angle)
+            
+            # Compute shortest signed difference (-180 to +180)
+            diff = (desired_angle - current_angle + 180) % 360 - 180
+            
+            # If close enough, snap to exact angle and stop
+            if abs(diff) <= 6:  # Adjusted threshold to match original logic
                 vehicle.ai.handle_steer_neutral()
-                vehicle.rotation_angle=calculated_vehicle_angle
+                vehicle.rotation_angle = desired_angle
                 vehicle.ai.update_heading()
-                vehicle.ai.throttle=0
-                vehicle.ai.brake_power=1
+                vehicle.ai.throttle = 0
+                vehicle.ai.brake_power = 1
                 # this action is now done
-                self.memory['task_vehicle_crew']['current_action']='idle'
+                self.memory['task_vehicle_crew']['current_action'] = 'idle'
             else:
-
-                if calculated_vehicle_angle>v:
+                # Rotate in the direction of the shortest diff
+                if diff > 0:
                     vehicle.ai.handle_steer_left()
-
-                if calculated_vehicle_angle<v:
+                else:
                     vehicle.ai.handle_steer_right()
 
     #---------------------------------------------------------------------------
@@ -236,7 +239,7 @@ class AIHuman(object):
         # the computed lead on the target
         turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
 
-        # rotate turrent towards target. true if rotation matches
+        # rotate turret towards target. true if rotation matches
         if self.rotate_turret(turret,self.memory['task_vehicle_crew']['calculated_turret_angle']):
             if target.is_human:
                 if target.ai.blood_pressure<1:
@@ -380,11 +383,25 @@ class AIHuman(object):
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.helmet_bounces+=1
+                    self.morale-=5
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
-            self.blood_pressure-=random.randint(50,80)
-            bleeding_hit=True
+            if self.wearable_upper_body is None:
+                self.blood_pressure-=random.randint(50,80)
+                bleeding_hit=True
+            else:
+                penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor)
+                if penetration:
+                    self.blood_pressure-=random.randint(30,75)
+                    bleeding_hit=True
+                else:
+                    # armor stopped the hit
+                    engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
+                    self.owner.world.body_armor_bounces+=1
+                    self.morale-=5
+                    self.speak('A projectile just bounced off my body armor!!')
+
         elif hit==3:
             #lower body
             self.blood_pressure-=random.randint(30,60)
@@ -409,6 +426,8 @@ class AIHuman(object):
             bleeding_hit=True
         
         if bleeding_hit:
+            # morale damage
+            self.morale-=random.randint(10,20)
             self.bleeding=True
             engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'blood_splatter',True)
             if self.owner.is_player:
@@ -417,7 +436,7 @@ class AIHuman(object):
         self.speak('react to being shot')
 
     #---------------------------------------------------------------------------
-    def calculate_turret_aim(self,turret,target):
+    def calculate_turret_aim(self,turret,target,weapon):
         '''calculates the correct turret angle to hit a target'''
 
         # target : world_object
@@ -426,7 +445,7 @@ class AIHuman(object):
         aim_coords=target.world_coords
         # guess how long it will take for the bullet to arrive
         distance=engine.math_2d.get_distance(turret.world_coords,target.world_coords)
-        time_passed=distance/1000
+        time_passed=distance/weapon.ai.muzzle_velocity
         if target.is_vehicle:
             if target.ai.current_speed>0:
                 aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
@@ -672,8 +691,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
         if event_data.is_projectile:
-            # morale damage
-            self.morale-=random.randint(10,20)
+            
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
             collision_description='hit by '+event_data.ai.projectile_type + ' projectile at a distance of '+ str(distance)
             starting_health=self.blood_pressure
@@ -758,8 +776,9 @@ class AIHuman(object):
                 # this does NOT happen when an object is picked up from the world as it is intercepted
                 # before it gets this far
 
-                #add to world. (the object was in a inventory array)
-                self.owner.world.add_queue.append(event_data)
+                #add to world.
+                if event_data.in_world is False:
+                    self.owner.world.add_queue.append(event_data)
 
                 self.large_pickup=event_data
 
@@ -794,6 +813,9 @@ class AIHuman(object):
                     if event_data.ai.wearable_region=='head':
                         if self.wearable_head is None:
                             self.wearable_head=event_data
+                    elif event_data.ai.wearable_region=='upper_body':
+                        if self.wearable_upper_body is None:
+                            self.wearable_upper_body=event_data
         else:
             engine.log.add_data('error','ai_human.event_add_inventory - obj already in inventory: '+event_data.name,True)
 
@@ -914,9 +936,8 @@ class AIHuman(object):
 
             aim_coords=target.world_coords
             # guess how long it will take for the bullet to arrive
-            #time_passed=random.uniform(0.8,1.5)
             distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-            time_passed=distance/1000
+            time_passed=distance/weapon.ai.muzzle_velocity
             if target.is_vehicle:
                 if target.ai.current_speed>0:
                     aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
@@ -943,7 +964,7 @@ class AIHuman(object):
                 # stop firing, give the ai a chance to rethink and re-engage
                 self.current_burst=0
 
-                # note - this may be detrimental. needs a rething - 11/14/24
+                # note - this may be detrimental. needs a rethink - 11/14/24
                 self.memory['current_task']='None'
     
     #---------------------------------------------------------------------------
@@ -1394,22 +1415,30 @@ class AIHuman(object):
             return False
         
     #---------------------------------------------------------------------------
-    def rotate_turret(self,turret,desired_angle):
+    def rotate_turret(self, turret, desired_angle):
         '''rotates a turret. returns True/False as to whether the turret is at the desired angle'''
-        if round(desired_angle,1)!=round(turret.rotation_angle,1):
-            # if its fairly close, set it equal to avoid constant tiny turret movement
-            if desired_angle > turret.rotation_angle -2 and desired_angle < turret.rotation_angle +2:
-                turret.rotation_angle=desired_angle
-                turret.ai.rotation_change=0
-                return True
-            
-            if desired_angle>turret.rotation_angle:
-                turret.ai.handle_rotate_left()
-                return False
-            
-            turret.ai.handle_rotate_right()
-            return False
-        return True
+        
+        # Normalize both angles to [0, 360)
+        current_angle = engine.math_2d.get_normalized_angle(turret.rotation_angle)
+        desired_angle = engine.math_2d.get_normalized_angle(desired_angle)
+        
+        # Compute shortest signed difference (-180 to +180)
+        diff = (desired_angle - current_angle + 180) % 360 - 180
+        
+        # If close enough, snap to exact angle and stop
+        if abs(diff) <= 2:  # Adjust threshold if needed for precision
+            turret.rotation_angle = desired_angle
+            turret.ai.rotation_change = 0
+            return True
+        
+        # Rotate in the direction of the shortest diff
+        # Assumption: positive rotation_change increases angle (e.g., clockwise); adjust signs if your coord system is counterclockwise
+        if diff > 0:
+            turret.ai.handle_rotate_left()  # Increases angle
+        else:
+            turret.ai.handle_rotate_right()  # Decreases angle
+        
+        return False
     
 
     #---------------------------------------------------------------------------
@@ -1442,6 +1471,10 @@ class AIHuman(object):
     def squad_leader_review_orders(self):
         '''review tactical orders return true if a action was taken'''
 
+        # the distance that is considered close enough to have arrived at a target distance
+        # this should be greater than the distance a vehicle driver stops at.
+        close_distance=300
+
         # note this can be called from inside a vehicle or from on foot
 
         # this is a list of TacticalOrder objects
@@ -1457,7 +1490,7 @@ class AIHuman(object):
 
         if order.order_defend_area:
             distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
-            if distance>150:
+            if distance>close_distance:
                 # in a vehicle
                 if self.memory['current_task']=='task_vehicle_crew':
                     vehicle_order=VehicleOrder()
@@ -1478,7 +1511,7 @@ class AIHuman(object):
                 return False
         if order.order_move_to_location:
             distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
-            if distance>150:
+            if distance>close_distance:
                 # in a vehicle
                 if self.memory['current_task']=='task_vehicle_crew':
                     vehicle_order=VehicleOrder()
@@ -1497,6 +1530,8 @@ class AIHuman(object):
                 orders.remove(order)
                 return False
 
+        # default 
+        return False
             
     #---------------------------------------------------------------------------
     def squad_leader_tactical_decision(self):
@@ -1968,6 +2003,11 @@ class AIHuman(object):
             if crew_squad_lead is False:
                 # no squad lead so no new vehicle orders unless if the squad lead moves
                 # might as well get out for a bit
+
+                # this might cause issues if the crew has conditions that cause them 
+                # to re-enter the vehicle 
+                
+
                 for role in vehicle.ai.vehicle_crew:
                     if role.role_occupied:
                         role.human.ai.switch_task_exit_vehicle()
@@ -1996,7 +2036,7 @@ class AIHuman(object):
         vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
         if order.order_drive_to_coords:
             distance=engine.math_2d.get_distance(vehicle.world_coords,order.world_coords)
-            if distance<250 and vehicle.ai.current_speed<10:
+            if distance<self.vehicle_arrival_distance and vehicle.ai.current_speed<10:
                 # we have arrived and can delete the order.
                 self.memory['task_vehicle_crew']['current_action']='waiting'
                 vehicle.ai.brake_power=1
@@ -2211,13 +2251,15 @@ class AIHuman(object):
                 self.memory['task_vehicle_crew']['engage_primary_weapon']=engage_primary
                 self.memory['task_vehicle_crew']['engage_coaxial_weapon']=engage_coaxial
 
-                if engage_primary or engage_coaxial:
-
-                    # update the turret angle for the target
-                    self.calculate_turret_aim(turret,target)
+                if engage_primary:
+                    self.calculate_turret_aim(turret,target,turret.ai.primary_weapon)
                     self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
-
                     return
+                if engage_coaxial:
+                    self.calculate_turret_aim(turret,target,turret.ai.coaxial_weapon)
+                    self.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+                    return
+
         
 
         # - results: rotation issue
@@ -2522,6 +2564,10 @@ class AIHuman(object):
                                     self.use_medical_object(b)
                                     break
                 # possibly have a random stop bleed even if you don't have medical
+            else:
+                # regain morale if not bleeding
+                self.morale+=0.5*self.owner.world.time_passed_seconds
+
 
             # -- body attribute stuff --
             if self.fatigue>0:

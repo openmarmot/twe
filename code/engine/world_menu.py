@@ -403,7 +403,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
-            self.text_queue.append('1 - walther p38 ')
+            self.text_queue.append('1 - mp40 ')
             self.text_queue.append('2 - Panzerschreck')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
             self.text_queue.append('4 - molotov')
@@ -411,9 +411,7 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
@@ -780,6 +778,10 @@ class World_Menu(object):
             
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
+            if self.selected_object.ai.wearable_head is not None:
+                self.text_queue.append(f'Head: {self.selected_object.ai.wearable_head.name}')
+            if self.selected_object.ai.wearable_upper_body is not None:
+                self.text_queue.append(f'Head: {self.selected_object.ai.wearable_upper_body.name}')
             if self.selected_object.ai.primary_weapon != None:
                 ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon,self.selected_object)
                 self.text_queue.append('[primary weapon]: '+self.selected_object.ai.primary_weapon.name)
