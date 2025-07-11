@@ -38,8 +38,10 @@ class AIGun(object):
         # bullet diameter in mm (not used. yet!)
         self.bullet_diameter=0
 
-        # muzzle velocity (not used)
-        self.muzzle_velocity=0
+        # muzzle velocity
+        # this is in game units and sets the projectile speed
+        # max currently is 1000
+        self.muzzle_velocity=1000
 
         # mechanical accuracy from a stable mount. 0 is perfectly accurate
         # 0 is perfect. 5 is terrible
@@ -55,6 +57,7 @@ class AIGun(object):
 
         # internal counter of rounds fired
         self.rounds_fired=0
+        self.rounds_hit=0
 
         # the object that actually equipped this weapon. either a turret or a human
         # set by ai_man.event_inventory or worldbuilder for turrets
@@ -101,7 +104,7 @@ class AIGun(object):
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
             
-            projectile.ai.weapon_name=self.owner.name
+            projectile.ai.weapon=self.owner
             projectile.ai.shooter=self.equipper
             projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
             projectile.world_coords=copy.copy(self.equipper.world_coords)
@@ -109,6 +112,7 @@ class AIGun(object):
             projectile.ai.maxTime=self.range/projectile.ai.speed
             projectile.rotation_angle=self.owner.rotation_angle
             projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
+            projectile.ai.speed=self.muzzle_velocity
             
             self.owner.world.add_queue.append(projectile)
 
@@ -148,6 +152,14 @@ class AIGun(object):
             if len(self.magazine.ai.projectiles)==0:
                 if 'panzerfaust' in self.owner.name:
                     self.owner.image_index=1
+
+    #---------------------------------------------------------------------------
+    def get_accuracy(self):
+        '''get the accuracy of the weapon'''
+
+        if self.rounds_fired==0:
+            return "0.0%"
+        return f'{round(self.rounds_hit/self.rounds_fired,1)*100}%'
 
     #---------------------------------------------------------------------------
     def update(self):

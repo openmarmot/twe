@@ -297,6 +297,10 @@ class VehicleDiagnostics(object):
                 ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.primary_weapon,self.vehicle)
                 self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
                 coord[1]+=spacing
+                self.text_queue.append([f' --> rounds fired: {b.ai.primary_weapon.ai.rounds_fired}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+                self.text_queue.append([f' --> accuracy: {b.ai.primary_weapon.ai.get_accuracy()}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
 
             if b.ai.coaxial_weapon!=None:
                 self.text_queue.append([f' -> {b.ai.coaxial_weapon.name}',copy.copy(coord),self.text_black])
@@ -309,6 +313,10 @@ class VehicleDiagnostics(object):
                     coord[1]+=spacing
                 ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.vehicle)
                 self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+                self.text_queue.append([f' --> rounds fired: {b.ai.coaxial_weapon.ai.rounds_fired}',copy.copy(coord),self.text_black])
+                coord[1]+=spacing
+                self.text_queue.append([f' --> accuracy: {b.ai.coaxial_weapon.ai.get_accuracy()}',copy.copy(coord),self.text_black])
                 coord[1]+=spacing
 
             coord[1]+=spacing

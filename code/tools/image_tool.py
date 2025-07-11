@@ -408,7 +408,7 @@ image_tool=ImageTool(screen_size)
 
 
 image_tool.image_objects.append(ImageObject(['sd_kfz_251'],0))
-image_tool.image_objects.append(ImageObject(['sd_kfz_251_mg34_turret'],0))
+image_tool.image_objects.append(ImageObject(['251_9_turret'],0))
 image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 while image_tool.quit==False:
 

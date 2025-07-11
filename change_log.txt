@@ -1,5 +1,80 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 10 2025
+- added soviet SN42 steel body armor 
+- added new soviet assault engineer squad with the body armor, ppsh43, and AT grenades 
+- upped rifle penetration at mid range a bit 
+- new turret rotation code 
+- new vehicle rotation code
+- some updates to magic numbers for various distance checks 
+- misc updates
+- added morale regen
+- added support for different weapon velocities - set at the ai_gun level 
+
+the body armor was a little difficult to test because currently human hits are a random choice of several body 
+regions. i need to add some probabilities to this so that a hit to the hands or feet isn't as likely as a hit to the 
+upper body. 
+
+i think the armor will be somewhat useful. it should repel 9mm and lesser calibers pretty well. 
+at the edge of rifle ranges it will probably bounce rifle shells as well. this is probably a stretch - but i am ok with this.
+
+I spent a lot of time reviewing the code with the newly released grok4. among other things 
+grok pointed out some issues in the rotation code that was likely causing the odd porpoising 
+behaviour that vehicle drivers sometimes exhibited. 
+
+todo 
+- maybe change velocity on some guns 
+- consider splitting human vehicle code into its own class 
+
+
+----------------------------------
+July 8 2025
+- rewrote sd.kfz.251 spawn to reduce duplicate code 
+- added sd.kfz.251/9 'Stummel'
+- added HEAT tank rounds for the stummel 
+- minor fix and updates 
+- fixed panzerschreck having wrong magazine 
+- some adjustments to human accuracy 
+
+Interesting thing about HEAT tank rounds is they need to have a penetration value on the round so 
+the logic that tells the gunner if he can take the shot. however when the round hits it triggers the 
+HEAT effect and its those projectiles that penetrate 
+
+I'd like to make all the infantry guns more inaccurate. the current accuracy system is not super useful 
+It needs to scale with range 
+
+
+----------------------------------
+July 7 2025
+- misc minor updates/refactoring 
+- weapons now have a hit counter 
+- vehicle diagnostics now displays accuracy (hits/shots) for weapons 
+- humans now display weapon accuracy in selection menu when nearby 
+
+might enhance the aigun class to also keep track of round counts fired for various projectile types.
+this will help with understanding if tanks are using HE. the overhead is relatively low 
+
+----------------------------------
+July 5 2025
+- 'miraculously unharmed' damage option for passenger compartment now only possible with 0 armor (no spalling)
+- extended '1' penetration of rifle rounds out one extra unit of range 
+- remove the cleanup function - objects will self delete instead 
+- removed all world object lists from world - these are now fully handled by grid_manager
+- added some grid square functionality 
+- now some static objects like terrain don't get updated. 
+
+0 armor vehicles bounce rifle rounds towards the end of their range. probably should fix but ehh..
+
+todo 
+- need a world_object tag to tag objects that should not be saved (brass, turrets, blood, etc)
+
+----------------------------------
+July 4 2025
+- adjust reload mechanism to prefer AT if there are any identified vehicle enemies 
+- minor updates
+
 ----------------------------------
 July 2 2025
 - projectiles now have a chance to bounce/richochet off a vehicle if they do not penetrate

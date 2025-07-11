@@ -662,7 +662,13 @@ class AIVehicle():
         
         result=''
         if penetration:
-            damage_options=['random_crew_projectile','miraculously unharmed']
+            damage_options=['random_crew_projectile']
+
+            # no armor also means no spalling
+            # chance for bullets to just sail through without hitting 
+            if self.passenger_compartment_armor['left'][0]<1:
+                damage_options.append('miraculously unharmed')
+
             if self.passenger_compartment_ammo_racks:
                 damage_options.append('ammo_rack')
 

@@ -90,6 +90,13 @@ class WorldObject(object):
         self.render=True
 
         # ---- descriptor bools ----------------------------
+        
+        # for objects with no logic. update() will not be called
+        self.no_update=False
+
+        # objects that should not be saved
+        self.no_save=False
+
 
         # whether the object has been added to the world with world.add_object
         # objects that are in a container are generally not in world
@@ -142,8 +149,7 @@ class WorldObject(object):
         self.is_melee=False # melee close combat weapon like a dagger 
         self.is_gun_mag_carrier=False
 
-        # denotes objects that can be deleted for performance reasons
-        self.can_be_deleted=False
+
 
         # wearables are clothing, helmets, etc 
         self.is_wearable=False

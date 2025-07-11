@@ -39,6 +39,7 @@ class WorldGridSquare:
         self.visible=True
 
         self.wo_objects=[]
+        self.wo_objects_update=[] #objects with no_update=False
         self.wo_objects_human=[]
         self.wo_objects_building=[]
         self.wo_objects_vehicle=[]
@@ -55,6 +56,9 @@ class WorldGridSquare:
         ''' add a wo_object to the grid square'''
         if wo_object not in self.wo_objects:
             self.wo_objects.append(wo_object)
+
+            if wo_object.no_update is False:
+                self.wo_objects_update.append(wo_object)
 
             if wo_object.is_human:
                 self.wo_objects_human.append(wo_object)
@@ -86,6 +90,9 @@ class WorldGridSquare:
     def remove_wo_object(self,wo_object):
         if wo_object in self.wo_objects:
             self.wo_objects.remove(wo_object)
+
+            if wo_object.no_update is False:
+                self.wo_objects_update.remove(wo_object)
 
             if wo_object.is_human:
                 self.wo_objects_human.remove(wo_object)

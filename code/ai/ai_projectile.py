@@ -37,7 +37,7 @@ class AIProjectile(object):
 
 
         # the weapon that created this
-        self.weapon_name=''
+        self.weapon=None
         # the equipper of the gun that fired the projectile. this can be a human or a turret
         self.shooter=None
 
@@ -52,11 +52,11 @@ class AIProjectile(object):
         contact_effect=engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
         if 'HEAT' in contact_effect:
             engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
-            engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,contact_effect,self.shooter,self.owner.name)
+            engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,contact_effect,self.shooter,self.weapon)
             engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
         elif contact_effect=='explosion':
             # note all this info should be added to the projectile data
-            self.owner.world.create_explosion(self.owner.world_coords,15,shrapnel_count,self.shooter,self.owner.name,0.5,1)
+            self.owner.world.create_explosion(self.owner.world_coords,15,shrapnel_count,self.shooter,self.weapon,0.5,1)
         else:
             print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 
@@ -89,6 +89,11 @@ class AIProjectile(object):
                 objects=self.owner.grid_square.wo_objects_projectile_collision
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
                 if collide_obj !=None:
+                    
+                    # update hit counter
+                    if self.weapon.is_gun:
+                        self.weapon.ai.rounds_hit+=1
+
                     if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
                         # bullet has collided and exploded
                         self.contact_effect()

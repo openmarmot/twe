@@ -373,9 +373,9 @@ class World_Menu(object):
         if self.menu_state=='spawn_vehicles':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
-            self.text_queue.append('1 - Kubelwagen ')
-            self.text_queue.append('2 - german_sd_kfz_251-22')
-            self.text_queue.append('3 - soviet_37mm_m1939_61k_aa_gun_carriage')
+            self.text_queue.append('1 - german_sd_kfz_251/9 ')
+            self.text_queue.append('2 - german_sd_kfz_251/22')
+            self.text_queue.append('3 - german_sd_kfz_251/1')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - rso pak')
             self.text_queue.append('6 - T20 armored tractor')
@@ -383,11 +383,11 @@ class World_Menu(object):
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - german_fa_223_drache')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_kubelwagen',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/9',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_37mm_m1939_61k_aa_gun_carriage',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/1',True)
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
@@ -403,7 +403,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
-            self.text_queue.append('1 - walther p38 ')
+            self.text_queue.append('1 - mp40 ')
             self.text_queue.append('2 - Panzerschreck')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
             self.text_queue.append('4 - molotov')
@@ -411,9 +411,7 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'luger_p08_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
@@ -780,6 +778,10 @@ class World_Menu(object):
             
             self.text_queue.append('')
             self.text_queue.append('--- Equipment Info ---')
+            if self.selected_object.ai.wearable_head is not None:
+                self.text_queue.append(f'Head: {self.selected_object.ai.wearable_head.name}')
+            if self.selected_object.ai.wearable_upper_body is not None:
+                self.text_queue.append(f'Head: {self.selected_object.ai.wearable_upper_body.name}')
             if self.selected_object.ai.primary_weapon != None:
                 ammo_gun,ammo_inventory,magazine_count=self.selected_object.ai.check_ammo(self.selected_object.ai.primary_weapon,self.selected_object)
                 self.text_queue.append('[primary weapon]: '+self.selected_object.ai.primary_weapon.name)
@@ -787,6 +789,7 @@ class World_Menu(object):
                 self.text_queue.append('- ammo in inventory: '+str(ammo_inventory))
                 self.text_queue.append('- magazine count: '+str(magazine_count))
                 self.text_queue.append('- rounds Fired: '+str(self.selected_object.ai.primary_weapon.ai.rounds_fired))
+                self.text_queue.append(f'- accuracy: {self.selected_object.ai.primary_weapon.ai.get_accuracy()}')
             if self.selected_object.ai.throwable!=None:
                 throwing_text=f'[throwing weapon]: {self.selected_object.ai.throwable.name}'
                 if self.selected_object.ai.throwable.ai.use_antitank:

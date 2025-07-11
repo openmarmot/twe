@@ -100,18 +100,16 @@ class AIThrowable(object):
 
     #---------------------------------------------------------------------------
     def explode(self):        
-        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner.name,0.5,1)
+        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner,0.5,1)
 
     #---------------------------------------------------------------------------
     def explode_flame(self):
-
+        flame_radius=20
+        possible=self.owner.self.owner.world.grid_manager.get_objects_from_grid_squares_near_world_coords(self.owner.world_coords,flame_radius,False,True)
         for flame in range(self.flame_amount):
             coords=engine.math_2d.randomize_coordinates(self.owner.world_coords,random.randint(15,75))
             engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,5)
-
-            possible=self.owner.world.wo_objects_human+self.owner.world.wo_objects_vehicle
-
-            hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,10,possible,[])
+            hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,flame_radius,possible,[])
 
             for hit in hit_list:
                 hit.ai.handle_hit_with_flame()
@@ -120,7 +118,7 @@ class AIThrowable(object):
     def explode_heat(self):
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
         engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
-        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,1,self.heat_projectile_type,self.equipper,self.owner.name)
+        engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,1,self.heat_projectile_type,self.equipper,self.owner)
         engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
 
     #---------------------------------------------------------------------------
