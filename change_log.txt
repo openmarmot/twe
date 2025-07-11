@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 11 2025
+- split ai_human vehicle control code off into its own class 
+
+ai_human is too big for current LLMs to parse effectively. I honestly didn't 
+mind myself, but seperating out the vehicle stuff might be useful. 
+unfortunately ai_human is still 2700 lines by itself, and i'm not sure what 
+else I would pull out.. 
+
+----------------------------------
 July 10 2025
 - added soviet SN42 steel body armor 
 - added new soviet assault engineer squad with the body armor, ppsh43, and AT grenades 
