@@ -473,11 +473,11 @@ class AIHumanVehicle():
                 engine.log.add_data('info','ai_human.think_vehicle_role_gunner - fixing jammed gun',True)
                 if turret.ai.primary_weapon:
                     if turret.ai.primary_weapon.ai.action_jammed:
-                        self.self.owner.ai.speak('fixing jammed gun')
+                        self.owner.ai.speak('fixing jammed gun')
                         turret.ai.primary_weapon.ai.action_jammed=False
                 if turret.ai.coaxial_weapon:
                     if turret.ai.coaxial_weapon.ai.action_jammed:
-                        self.self.owner.ai.speak('fixing jammed gun')
+                        self.owner.ai.speak('fixing jammed gun')
                         turret.ai.coaxial_weapon.ai.action_jammed=False
                 # wait for a bit to simulate fixing
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
