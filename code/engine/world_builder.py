@@ -705,10 +705,17 @@ def load_quick_battle(world,battle_option):
     # testing
     elif battle_option=='4':
         squads=[]
-        squads.append('Soviet 1944 Assault Engineers')
-        squads.append('Soviet 1944 Assault Engineers')
-        squads.append('Soviet 1944 Assault Engineers')
-        squads.append('Soviet 1944 Assault Engineers')
+
+        squads.append('Soviet T34-76 Model 1943')
+
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
+        squads.append('German Sd.kfz.251/9')
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
@@ -2449,7 +2456,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon.ai.smoke_offset=[-70,0]
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z
-        z.ai.primary_weapon_reload_speed=20
+        z.ai.primary_weapon_reload_speed=15
         z.ai.primary_turret=True
         z.no_save=True
 
@@ -2461,7 +2468,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mechanical_accuracy=10
         z.ai.magazine=spawn_object(world,world_coords,'75mm_kwk37_l24_magazine',False)
         z.ai.rate_of_fire=1
-        z.ai.reload_speed=17
         z.ai.range=4000
         z.ai.type='cannon'
         z.ai.use_antitank=True

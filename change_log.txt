@@ -4,11 +4,21 @@ TWE Project : Change Log
 ----------------------------------
 July 11 2025
 - split ai_human vehicle control code off into its own class 
+- bug fix 
+- increased stummel reload speed 
 
 ai_human is too big for current LLMs to parse effectively. I honestly didn't 
 mind myself, but seperating out the vehicle stuff might be useful. 
 unfortunately ai_human is still 2700 lines by itself, and i'm not sure what 
 else I would pull out.. 
+
+did some stummel vs t34 testing and the stummel is capable of taking out 
+the t34 but it is unlikely as it has to switch to HEAT first. also the 80mm pen 
+HEAT does not penetrate front plates of the t34. this should be fixed 
+
+todo 
+more armor effects. spalling. etc 
+- heat should be re-done to be one projectile 
 
 ----------------------------------
 July 10 2025

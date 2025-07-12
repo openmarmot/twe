@@ -549,6 +549,7 @@ class AIHumanVehicle():
                                     self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                                     self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
                                     self.owner.ai.memory['task_vehicle_crew']['target']=None
+                                    print('reloading because engaging vehicle and HE loaded')
                                     return
 
             # possibly should also check if we are engaging a soft skinned vehicle with AT
