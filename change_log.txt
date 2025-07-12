@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 12 2025
+- added 251/9 late (with coax mg42)
+
+----------------------------------
 July 11 2025
 - split ai_human vehicle control code off into its own class 
 - bug fix 

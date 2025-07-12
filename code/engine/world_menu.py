@@ -373,7 +373,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_vehicles':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
-            self.text_queue.append('1 - german_sd_kfz_251/9 ')
+            self.text_queue.append('1 - german_sd_kfz_251/9_late ')
             self.text_queue.append('2 - german_sd_kfz_251/22')
             self.text_queue.append('3 - german_sd_kfz_251/1')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
@@ -383,7 +383,7 @@ class World_Menu(object):
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - german_fa_223_drache')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/9',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/9_late',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
             elif key=='3':
