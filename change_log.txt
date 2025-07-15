@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 14 2025
+- HEAT projectiles only produce 1 HEAT jet now 
+
+the HEAT change was needed because the old solution spawned 30 jets which would 
+unrealistically hit different sections of the vehicle. HEAT should be a single hole.
+
+
+----------------------------------
 July 12 2025
 - added 251/9 late (with coax mg42)
 
