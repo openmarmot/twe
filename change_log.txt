@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+----------------------------------
+July 15 2025
+- minor adjustments to vehicle damage 
+
+my plan was to add % chance but it didn't work out that 
+way because the possible things hit are all dynamic based 
+on a bunch of criteria 
+
+need to add more damage types 
+- electrical ?
+- vehicle frame damage 
+- fuel leaks 
+- fuel fire 
+
+need to add stuff like what happens if something that is already 
+damaged gets hit again. 
 
 ----------------------------------
 July 14 2025

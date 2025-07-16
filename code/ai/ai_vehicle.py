@@ -752,6 +752,10 @@ class AIVehicle():
                 self.projectile_bounce(projectile)
 
             self.add_hit_data(projectile,penetration,side,distance,'Wheel',result)
+        else:
+            # no wheels hit 
+            # pass it to the vehicle body
+            self.projectile_hit_vehicle_body(projectile,side)
 
 
     #---------------------------------------------------------------------------
