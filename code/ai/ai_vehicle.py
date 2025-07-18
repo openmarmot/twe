@@ -218,6 +218,9 @@ class AIVehicle():
         # note this is just a clue for the AI and does not do anything
         self.vehicle_disabled=False
 
+        # tracks whether there is a fuel leak. true means increased risk of explosion
+        self.fuel_leak=False
+
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result):
         '''add hit data to the collision log'''
@@ -433,6 +436,13 @@ class AIVehicle():
                 engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
         elif damaged_component=='miraculously unharmed':
             pass
+        elif damaged_component=='fuel_tank':
+            tank=random.choice(self.fuel_leak)
+            self.fuel_leak=True
+            # fuel tank should be a ai_container
+            tank.ai.punctured=True
+            # the more hits the more leaks. 
+            tank.ai.container_integrity-=0.01
         else:
             engine.log.add_data('error',f'ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}',True)
 
@@ -697,7 +707,10 @@ class AIVehicle():
         result=''
         if penetration:
             projectile.wo_stop()
-            result=random.choice(['driver_projectile','engine','ammo_rack'])
+            damage_options=['driver_projectile','engine','ammo_rack']
+            if len(self.fuel_tanks)>0:
+                damage_options.append('fuel_tank')
+            result=random.choice(damage_options)
             self.handle_component_damage(result,projectile)
 
         else:

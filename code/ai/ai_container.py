@@ -27,8 +27,8 @@ class AIContainer(object):
 
         self.punctured=False
         
-        # decimal percent. 0 is none, 1 is uh maximum puncture
-        self.punctured_percent=0
+        # 1 is fully intact, 0 is full of holes
+        self.container_integrity=1
 
         # this is in the base object
         # these are in liters 
@@ -40,6 +40,11 @@ class AIContainer(object):
         ''' overrides base update '''
 
         # check if leaking 
+        if self.punctured:
+            for b in self.inventory:
+                if b.is_liquid:
+                    if b.volume>0:
+                        b.volume=round(b.volume*(self.container_integrity*self.owner.world.time_passed_seconds),2)
 
         # check if contaminated 
         if not self.contaminated:
