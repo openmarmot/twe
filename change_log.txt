@@ -6,6 +6,10 @@ July 19 2025
 - fixed fire grenades no longer damaging humans that aren't in vehicles 
 - added new vehicle on fire mechanic 
 - updated how fires are created 
+- fixed power scaling error in explosion damage 
+
+vehicles can now light on fire, although its not super common. 
+a fuel_leak makes it more likely 
 
 todo 
 - most crew positions need to check for gunner/driver kills and re-crew intelligently 
