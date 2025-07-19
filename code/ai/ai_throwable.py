@@ -105,14 +105,7 @@ class AIThrowable(object):
     #---------------------------------------------------------------------------
     def explode_flame(self):
         flame_radius=20
-        possible=self.owner.self.owner.world.grid_manager.get_objects_from_grid_squares_near_world_coords(self.owner.world_coords,flame_radius,False,True)
-        for flame in range(self.flame_amount):
-            coords=engine.math_2d.randomize_coordinates(self.owner.world_coords,random.randint(15,75))
-            engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,5)
-            hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,flame_radius,possible,[])
-
-            for hit in hit_list:
-                hit.ai.handle_hit_with_flame()
+        self.owner.world.create_fire(self.owner.world_coords,self.flame_amount,flame_radius,10,5)
 
     #---------------------------------------------------------------------------
     def explode_heat(self):

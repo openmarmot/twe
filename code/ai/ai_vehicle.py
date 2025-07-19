@@ -218,6 +218,13 @@ class AIVehicle():
         # note this is just a clue for the AI and does not do anything
         self.vehicle_disabled=False
 
+        # tracks whether there is a fuel leak. true means increased risk of explosion
+        self.fuel_leak=False
+
+        self.on_fire=False
+        self.last_fire_check=0
+        self.fire_check_interval=15
+
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result):
         '''add hit data to the collision log'''
@@ -408,11 +415,17 @@ class AIVehicle():
                     if random.randint(0,1)==1:
                         role.human.ai.handle_event('collision',projectile)
         elif damaged_component=='random_crew_explosion':
+            if self.fuel_leak and self.on_fire is False:
+                if random.randint(0,1)==0:
+                    self.on_fire=True
             for role in self.vehicle_crew:
                 if role.role_occupied:
                     if random.randint(0,1)==1:
                         role.human.ai.handle_event('explosion',100)
         elif damaged_component=='random_crew_fire':
+            if self.fuel_leak and self.on_fire is False:
+                if random.randint(0,1)==0:
+                    self.on_fire=True
             for role in self.vehicle_crew:
                 if role.role_occupied:
                     if random.randint(0,1)==1:
@@ -433,6 +446,17 @@ class AIVehicle():
                 engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
         elif damaged_component=='miraculously unharmed':
             pass
+        elif damaged_component=='fuel_tank':
+            
+            tank=random.choice(self.fuel_tanks)
+            self.fuel_leak=True
+            # fuel tank should be a ai_container
+            tank.ai.punctured=True
+            # the more hits the more leaks. 
+            tank.ai.container_integrity-=0.01
+
+            if random.randint(0,1)==0:
+                self.handle_component_damage('random_crew_fire',projectile)
         else:
             engine.log.add_data('error',f'ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}',True)
 
@@ -493,6 +517,7 @@ class AIVehicle():
 
         if self.open_top:
             self.handle_component_damage('random_crew_fire',None)
+            self.on_fire=True
         else:
             if random.randint(0,3)==3:
                 self.handle_component_damage('random_crew_fire',None)
@@ -664,6 +689,9 @@ class AIVehicle():
         if penetration:
             damage_options=['random_crew_projectile']
 
+            if self.fuel_leak:
+                damage_options.append('random_crew_fire')
+
             # no armor also means no spalling
             # chance for bullets to just sail through without hitting 
             if self.passenger_compartment_armor['left'][0]<1:
@@ -697,7 +725,10 @@ class AIVehicle():
         result=''
         if penetration:
             projectile.wo_stop()
-            result=random.choice(['driver_projectile','engine','ammo_rack'])
+            damage_options=['driver_projectile','engine','ammo_rack']
+            if len(self.fuel_tanks)>0:
+                damage_options.append('fuel_tank')
+            result=random.choice(damage_options)
             self.handle_component_damage(result,projectile)
 
         else:
@@ -752,11 +783,18 @@ class AIVehicle():
                 self.projectile_bounce(projectile)
 
             self.add_hit_data(projectile,penetration,side,distance,'Wheel',result)
+        else:
+            # no wheels hit 
+            # pass it to the vehicle body
+            self.projectile_hit_vehicle_body(projectile,side)
 
 
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
+
+        if self.on_fire:
+            self.update_vehicle_fire()
 
         # update engines
         for b in self.engines:
@@ -1014,6 +1052,31 @@ class AIVehicle():
                 # if elevator is zero then rate of climb will be zero
                 # if elevator is up (-1) then rate of climb will be negative
                 self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
+
+    #---------------------------------------------------------------------------
+    def update_vehicle_fire(self):
+        if self.last_fire_check+self.fire_check_interval<self.owner.world.world_seconds:
+            # reset time
+            self.last_fire_check=self.owner.world.world_seconds
+
+            chance=0
+
+            if self.fuel_leak:
+                chance+=1
+
+            if random.randint(0,2)<=chance:
+
+                # new fire!
+                flame_radius=20
+                flame_amount=5
+                coords=engine.math_2d.randomize_coordinates(self.owner.world_coords,random.randint(5,10))
+                self.owner.world.create_fire(coords,flame_amount,flame_radius,10,5)
+                # not sure at what point the vehicle just becomes disabled
+                self.vehicle_disabled=True
+            else:
+                self.on_fire=False
+                
+
 
 
 

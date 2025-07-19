@@ -2,6 +2,82 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 19 2025
+- fixed fire grenades no longer damaging humans that aren't in vehicles 
+- added new vehicle on fire mechanic 
+- updated how fires are created 
+- fixed power scaling error in explosion damage 
+
+vehicles can now light on fire, although its not super common. 
+a fuel_leak makes it more likely 
+
+todo 
+- most crew positions need to check for gunner/driver kills and re-crew intelligently 
+
+----------------------------------
+July 17 2025
+- added fuel tank hit as a vehicle damage option 
+- vehicles also get a fuel_leak flag 
+
+lack of fuel will eventually shut down an engine but that 
+will not trigger the disabled flag, so more logic will probably 
+be needed so the AI understands how to handle out of fuel conditions.
+this logic was needed anyways..
+
+todo 
+- add out of fuel logic 
+- add explosion triggered by a vehicle hit that has a fuel_leak 
+- add vehicle fire mechanic 
+
+----------------------------------
+July 15 2025
+- minor adjustments to vehicle damage 
+
+my plan was to add % chance but it didn't work out that 
+way because the possible things hit are all dynamic based 
+on a bunch of criteria 
+
+need to add more damage types 
+- electrical ?
+- vehicle frame damage 
+- fuel leaks 
+- fuel fire 
+
+need to add stuff like what happens if something that is already 
+damaged gets hit again. 
+
+----------------------------------
+July 14 2025
+- HEAT projectiles only produce 1 HEAT jet now 
+
+the HEAT change was needed because the old solution spawned 30 jets which would 
+unrealistically hit different sections of the vehicle. HEAT should be a single hole.
+
+
+----------------------------------
+July 12 2025
+- added 251/9 late (with coax mg42)
+
+----------------------------------
+July 11 2025
+- split ai_human vehicle control code off into its own class 
+- bug fix 
+- increased stummel reload speed 
+
+ai_human is too big for current LLMs to parse effectively. I honestly didn't 
+mind myself, but seperating out the vehicle stuff might be useful. 
+unfortunately ai_human is still 2700 lines by itself, and i'm not sure what 
+else I would pull out.. 
+
+did some stummel vs t34 testing and the stummel is capable of taking out 
+the t34 but it is unlikely as it has to switch to HEAT first. also the 80mm pen 
+HEAT does not penetrate front plates of the t34. this should be fixed 
+
+todo 
+more armor effects. spalling. etc 
+- heat should be re-done to be one projectile 
+
+----------------------------------
 July 10 2025
 - added soviet SN42 steel body armor 
 - added new soviet assault engineer squad with the body armor, ppsh43, and AT grenades 
