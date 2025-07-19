@@ -2,6 +2,15 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 19 2025
+- fixed fire grenades no longer damaging humans that aren't in vehicles 
+- added new vehicle on fire mechanic 
+- updated how fires are created 
+
+todo 
+- most crew positions need to check for gunner/driver kills and re-crew intelligently 
+
+----------------------------------
 July 17 2025
 - added fuel tank hit as a vehicle damage option 
 - vehicles also get a fuel_leak flag 

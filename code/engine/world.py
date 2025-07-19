@@ -10,7 +10,6 @@ It should not have any specific graphic engine code (pygame, etc)
 #import built in modules
 import random
 import copy
-#from unittest import result  # no idea why this was here. disabled 8/2023
 
 
 #import custom packages
@@ -262,7 +261,7 @@ class World():
             distance=engine.math_2d.get_distance(world_coords,b.world_coords)
             if distance<explosion_radius:
                 # power reverse scales with distance
-                power=100*(distance/explosion_radius)
+                power=100*(1-(distance/explosion_radius))
                 if b.is_human:
                     b.ai.handle_event('explosion',power) 
                 if b.is_vehicle:
@@ -278,6 +277,23 @@ class World():
         # spawn effects 
         engine.world_builder.spawn_object(self,world_coords,'dirt',True)
         engine.world_builder.spawn_explosion_and_fire(self,world_coords,fire_duration,smoke_duration)
+
+    #------------------------------------------------------------------------------
+    def create_fire(self,world_coords,flame_amount,flame_radius,fire_duration,smoke_duration):
+        '''create a fire that does damage'''
+        possible=self.grid_manager.get_objects_from_grid_squares_near_world_coords(world_coords,flame_radius,True,True)
+        for flame in range(flame_amount):
+            coords=engine.math_2d.randomize_coordinates(world_coords,random.randint(1,15))
+            engine.world_builder.spawn_explosion_and_fire(self,world_coords,fire_duration,smoke_duration)
+            hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,flame_radius,possible,[])
+
+            for hit in hit_list:
+                if hit.is_vehicle:
+                    hit.ai.handle_hit_with_flame()
+                elif hit.is_human:
+                    if hit.ai.memory['current_task']!= 'task_vehicle_crew':
+                        hit.ai.handle_hit_with_flame()
+
 
     #---------------------------------------------------------------------------
     def generate_ignore_list(self,obj):
