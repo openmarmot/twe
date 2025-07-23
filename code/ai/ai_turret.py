@@ -107,7 +107,7 @@ class AITurret(object):
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
             side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-            penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
+            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side])
             result=''
             if penetration:
                 EVENT_DATA.wo_stop()
@@ -161,7 +161,7 @@ class AITurret(object):
                 pass
 
             if self.vehicle!=None:
-                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,f'Turret {self.owner.name}',result)
+                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,f'Turret {self.owner.name}',result,pen_value,armor_value)
         elif EVENT_DATA.is_grenade:
             print('bonk')
         else:

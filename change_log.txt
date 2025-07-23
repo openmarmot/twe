@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 23 2025
+- added projectile penetration and calculated armor value to hit data 
+
+troubleshooting HEAT not penetrating when i think it should, it turns out 
+80 pen is not enough for the t34 sloped surfaces with calculate out to about 90 armor value.
+
+will have to think about this. maybe it is fine 
+
+----------------------------------
 July 22 2025
 - added universal switch role code for empty driver and gunner spots 
 - misc cleanup and minor updates

@@ -226,9 +226,9 @@ class AIVehicle():
         self.fire_check_interval=15
 
     #---------------------------------------------------------------------------
-    def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result):
+    def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value):
         '''add hit data to the collision log'''
-        hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result)
+        hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value)
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
             marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
@@ -683,7 +683,7 @@ class AIVehicle():
     def projectile_hit_passenger_compartment(self,projectile,side):
         '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
+        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
         
         result=''
         if penetration:
@@ -712,7 +712,7 @@ class AIVehicle():
         else:
             self.projectile_bounce(projectile)
         
-        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result)
+        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
 
 
 
@@ -720,7 +720,7 @@ class AIVehicle():
     def projectile_hit_vehicle_body(self,projectile,side):
         '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
+        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
         
         result=''
         if penetration:
@@ -734,7 +734,7 @@ class AIVehicle():
         else:
             self.projectile_bounce(projectile)
 
-        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result)
+        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
 
     #---------------------------------------------------------------------------
     def projectile_hit_wheel(self,projectile,side):
@@ -760,7 +760,7 @@ class AIVehicle():
                     wheel=random.choice(self.rear_right_wheels)
         if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-            penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
+            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
             
             result=''
             if penetration:
@@ -782,7 +782,7 @@ class AIVehicle():
             else:
                 self.projectile_bounce(projectile)
 
-            self.add_hit_data(projectile,penetration,side,distance,'Wheel',result)
+            self.add_hit_data(projectile,penetration,side,distance,'Wheel',result,pen_value,armor_value)
         else:
             # no wheels hit 
             # pass it to the vehicle body

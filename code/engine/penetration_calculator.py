@@ -49,7 +49,7 @@ def calculate_penetration(projectile,distance,armor_type,armor):
 
     # fast check first
     if max_penetration<(armor_thickness+spaced_armor):
-        return False
+        return False,max_penetration,(armor_thickness+spaced_armor)
     else:
         # more complicated penetration check
 
@@ -60,9 +60,9 @@ def calculate_penetration(projectile,distance,armor_type,armor):
         effective_thickness = (armor_thickness / math.cos(math.radians(armor_slope))) + spaced_armor
         
         if max_penetration>effective_thickness:
-            return True
+            return True,max_penetration,effective_thickness
         else:
-            return False
+            return False,max_penetration,effective_thickness
 
 
 #---------------------------------------------------------------------------

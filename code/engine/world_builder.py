@@ -706,16 +706,10 @@ def load_quick_battle(world,battle_option):
     elif battle_option=='4':
         squads=[]
 
-        squads.append('Soviet T34-76 Model 1943')
+        #squads.append('Soviet T34-76 Model 1943')
 
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
-        squads.append('German Sd.kfz.251/9')
+        #squads.append('German Sd.kfz.251/9')
+
 
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
