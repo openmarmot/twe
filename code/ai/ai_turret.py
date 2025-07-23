@@ -7,13 +7,12 @@ notes : the turret for a tank, or the mg mount on a vehicle
 
 #import built in modules
 import copy
+import random
 
 #import custom packages
 import engine.math_2d
 import engine.log
 import engine.penetration_calculator
-import random
-
 
 #global variables
 
@@ -162,7 +161,7 @@ class AITurret(object):
                 pass
 
             if self.vehicle!=None:
-                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,'Turret',result)
+                self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,f'Turret {self.owner.name}',result)
         elif EVENT_DATA.is_grenade:
             print('bonk')
         else:
@@ -229,10 +228,6 @@ class AITurret(object):
 
     #---------------------------------------------------------------------------
     def update(self):
-
-        if self.primary_weapon!=None:
-            # needs updates for time tracking and other stuff
-            self.primary_weapon.update()
         
         self.update_physics()
 
@@ -268,5 +263,3 @@ class AITurret(object):
             if self.vehicle!=None:
                 self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.vehicle.rotation_angle+self.turret_rotation)
                 self.owner.world_coords=engine.math_2d.calculate_relative_position(self.vehicle.world_coords,self.vehicle.rotation_angle,self.position_offset)
-
-

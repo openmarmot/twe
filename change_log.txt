@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+----------------------------------
+July 22 2025
+- added universal switch role code for empty driver and gunner spots 
+- misc cleanup and minor updates
+- increased the ranged damage on the 37mm AT round a bit 
+
+for the first time ever I saw the soviet 37mm AA gun actually engaging something. 
+It took out a sd.kfz.251 by piercing the turret. It was bouncing off the main body due to 
+the range. I bumped the range penetration up a bit so it should have less trouble in the future 
+
+i'd like to see more hummel action. it is very outclassed by tanks - mostly because it starts 
+with a HE round loaded so it has to reload before it can shoot. Also the base HEAT shell it gets 
+isn't really that great. 
+
+I think one of the next things to be added will be a indirect fire weapon.
+probably a sd.kfz.251 with a mortar. 
 
 ----------------------------------
 July 19 2025
