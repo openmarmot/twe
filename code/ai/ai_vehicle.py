@@ -637,7 +637,7 @@ class AIVehicle():
     def projectile_collision(self,projectile):
         
         # -- determine what area the projectile hit --
-        hit_side=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+        hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
         hit_height=random.choice(['high','low'])
 
         area_hit_options=[]
@@ -664,11 +664,11 @@ class AIVehicle():
 
         # ! Note : it is important that these subfunctions remove projectile from world if it doesn't bounce
         if area_hit=='vehicle_body':
-            self.projectile_hit_vehicle_body(projectile,hit_side)
+            self.projectile_hit_vehicle_body(projectile,hit_side,relative_angle)
         elif area_hit=='passenger_compartment':
-            self.projectile_hit_passenger_compartment(projectile,hit_side)
+            self.projectile_hit_passenger_compartment(projectile,hit_side,relative_angle)
         elif area_hit=='wheels':
-            self.projectile_hit_wheel(projectile,hit_side)
+            self.projectile_hit_wheel(projectile,hit_side,relative_angle)
         elif area_hit=='turret':
             turret=random.choice(possible_turrets)
             turret.ai.handle_event('collision',projectile)
@@ -680,10 +680,10 @@ class AIVehicle():
         engine.world_builder.spawn_sparks(self.owner.world,projectile.world_coords,random.randint(1,2))
 
     #---------------------------------------------------------------------------
-    def projectile_hit_passenger_compartment(self,projectile,side):
+    def projectile_hit_passenger_compartment(self,projectile,side,relative_angle):
         '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side])
+        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side],side,relative_angle)
         
         result=''
         if penetration:
@@ -705,7 +705,7 @@ class AIVehicle():
 
             # chance to richochet into the body 
             if random.randint(0,3)==3:
-                self.projectile_hit_vehicle_body(projectile,side)
+                self.projectile_hit_vehicle_body(projectile,side,relative_angle)
             else:
                 projectile.wo_stop()
 
@@ -717,10 +717,10 @@ class AIVehicle():
 
 
     #---------------------------------------------------------------------------
-    def projectile_hit_vehicle_body(self,projectile,side):
+    def projectile_hit_vehicle_body(self,projectile,side,relative_angle):
         '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side])
+        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side],side,relative_angle)
         
         result=''
         if penetration:
@@ -737,7 +737,7 @@ class AIVehicle():
         self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
 
     #---------------------------------------------------------------------------
-    def projectile_hit_wheel(self,projectile,side):
+    def projectile_hit_wheel(self,projectile,side,relative_angle):
         '''handle a projectile hit to the vehicle body'''
 
         # note - vehicles that only have wheels in some of the groups will fair 
@@ -760,7 +760,7 @@ class AIVehicle():
                     wheel=random.choice(self.rear_right_wheels)
         if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor)
+            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor,side,relative_angle)
             
             result=''
             if penetration:
@@ -775,7 +775,7 @@ class AIVehicle():
 
                 # chance to continue into the body
                 if random.randint(0,3)==3:
-                    self.projectile_hit_vehicle_body(projectile,side)
+                    self.projectile_hit_vehicle_body(projectile,side,relative_angle)
                 else:
                     projectile.wo_stop()
 
@@ -786,7 +786,7 @@ class AIVehicle():
         else:
             # no wheels hit 
             # pass it to the vehicle body
-            self.projectile_hit_vehicle_body(projectile,side)
+            self.projectile_hit_vehicle_body(projectile,side,relative_angle)
 
 
     #---------------------------------------------------------------------------

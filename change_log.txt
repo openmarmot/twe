@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 24 2025
+- work on adding horizontal angle between armor and projectile to penetration calculation 
+
+these changes have resulted in the t34-85 turret bouncing rounds on a regular basis 
+
+todo 
+- change human armor to have values for each side 
+- change human penetration to use hit side calculation 
+- add more data to the hit_data 
+- reformat vehicle diagnostics ui for hits 
+
+----------------------------------
 July 23 2025
 - added projectile penetration and calculated armor value to hit data 
 
