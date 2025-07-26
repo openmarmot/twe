@@ -378,10 +378,10 @@ class AIVehicle():
 
         if compartment=='vehicle_body':
             for b in range(throwable.ai.shrapnel_count):
-                self.projectile_hit_vehicle_body(shrapnel,'top')
+                self.projectile_hit_vehicle_body(shrapnel,'top',0)
         elif compartment=='passenger_compartment':
             for b in range(throwable.ai.shrapnel_count):
-                self.projectile_hit_passenger_compartment(shrapnel,'top')
+                self.projectile_hit_passenger_compartment(shrapnel,'top',0)
         else:
             engine.log.add_data('error',f'ai_vehicle.event_throwable_explosion_on_top_of_vehicle unknown compartment {compartment}',True)
                 

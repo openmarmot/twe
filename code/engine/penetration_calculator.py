@@ -58,7 +58,9 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
             "rear": 0,
             "right": 90,
             "front": 180,
-            "left": 270
+            "left": 270,
+            "top": 0,
+            "bottom": 0
         }
         # Handle wrap-around for rear
         if side == "rear" and relative_angle > 180:
