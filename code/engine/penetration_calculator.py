@@ -28,41 +28,54 @@ projectile_data={}
 max_distance=4000
 
 #---------------------------------------------------------------------------
-def calculate_penetration(projectile,distance,armor_type,armor):
+def calculate_penetration(projectile, distance, armor_type, armor, side, relative_angle):
     '''calculate penetration, return bool'''
     # for slope 0 is vertical, whereas 90 is full horizontal armor
     # normalize distance to nearest 500
-    distance=round(distance/500)*500
+    distance = round(distance / 500) * 500
 
-    armor_thickness=armor[0]
-    armor_slope=armor[1]
-    spaced_armor=armor[2]
+    armor_thickness = armor[0]
+    armor_slope = armor[1]
+    spaced_armor = armor[2]
 
     # get penetration value for projectile at range
-    max_penetration=0
-    if distance>max_distance:
+    max_penetration = 0
+    if distance > max_distance:
         # not sure how this is happening yet..
-        engine.log.add_data('Error',f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance} armor: {armor} flightTime:{projectile.ai.flightTime} maxTime:{projectile.ai.maxTime}',True)
-        max_penetration=projectile_data[projectile.ai.projectile_type][str(max_distance)]
+        engine.log.add_data('Error', f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance} armor: {armor} flightTime:{projectile.ai.flightTime} maxTime:{projectile.ai.maxTime}', True)
+        max_penetration = projectile_data[projectile.ai.projectile_type][str(max_distance)]
     else:
-        max_penetration=projectile_data[projectile.ai.projectile_type][str(distance)]
+        max_penetration = projectile_data[projectile.ai.projectile_type][str(distance)]
 
-    # fast check first
-    if max_penetration<(armor_thickness+spaced_armor):
-        return False
+    # fast check first (unchanged, but now uses full effective thickness later)
+    if max_penetration < (armor_thickness + spaced_armor):
+        return False, max_penetration, (armor_thickness + spaced_armor)
     else:
         # more complicated penetration check
 
-        # calculate effective thickness
-        # here we could also take into account elevation differences between the shooter and the target
-        # to adjust the armor angle
-        # taking the cosine means that the slope is more beneficial as it approaches 90 degrees (full horizontal)
-        effective_thickness = (armor_thickness / math.cos(math.radians(armor_slope))) + spaced_armor
+        # Compute horizontal obliquity
+        centers = {
+            "rear": 0,
+            "right": 90,
+            "front": 180,
+            "left": 270,
+            "top": 0,
+            "bottom": 0
+        }
+        # Handle wrap-around for rear
+        if side == "rear" and relative_angle > 180:
+            relative_angle -= 360
+        phi_h = abs(relative_angle - centers[side])
+        cos_phi_h = math.cos(math.radians(phi_h))
         
-        if max_penetration>effective_thickness:
-            return True
+        # calculate effective thickness, including both the vertical angle of the armor and 
+        # the horizontal angle relative to the projectile
+        effective_thickness = (armor_thickness / (math.cos(math.radians(armor_slope)) * cos_phi_h)) + spaced_armor
+        
+        if max_penetration > effective_thickness:
+            return True, max_penetration, effective_thickness
         else:
-            return False
+            return False, max_penetration, effective_thickness
 
 
 #---------------------------------------------------------------------------

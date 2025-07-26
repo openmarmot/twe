@@ -72,16 +72,18 @@ def calculate_hit_side(vehicle_angle,projectile_angle):
     # ! Note - this is very roughly accurate
     # for example if you hit the side while in front of the vehicle
     # it will tend to record as front
-
+    
     relative_angle = (projectile_angle - vehicle_angle) % 360
     if 0 <= relative_angle < 45 or 315 <= relative_angle < 360:
-        return "rear"
+        side = "rear"
     elif 45 <= relative_angle < 135:
-        return "right"
+        side = "right"
     elif 135 <= relative_angle < 225:
-        return "front"
+        side = "front"
     else:  # 225 <= relative_angle < 315
-        return "left"
+        side = "left"
+    
+    return side, relative_angle
 
 #------------------------------------------------------------------------------
 def calculate_offset_coords_and_rotation(base_coords,base_rotation,offset_obj_coords,offset_obj_rotation):

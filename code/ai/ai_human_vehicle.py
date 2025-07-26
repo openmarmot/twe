@@ -586,7 +586,6 @@ class AIHumanVehicle():
                     self.calculate_turret_aim(turret,target,turret.ai.coaxial_weapon)
                     self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Targets'
                     return
-
         
 
         # - results: rotation issue
@@ -685,11 +684,6 @@ class AIHumanVehicle():
         '''think.. as a passenger'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-        # check if there are any empty roles
-        for role in vehicle.ai.vehicle_crew:
-            if role.role_occupied is False and role.is_passenger is False:
-                self.owner.ai.switch_task_vehicle_crew(vehicle,None)
-                return
 
         if len(self.owner.ai.near_human_targets)>0:
             # check if we should be worried about small arms fire
@@ -771,6 +765,16 @@ class AIHumanVehicle():
             if self.owner.world.world_seconds-last_think_time>think_interval:
                 # reset time
                 self.owner.ai.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
+
+                # universal check for empty priority spots
+                if role.is_driver is False and role.is_gunner is False:
+                    # check if there are any empty roles
+                    for role in vehicle.ai.vehicle_crew:
+                        if role.role_occupied is False:
+                            if role.is_driver or role.is_gunner:
+                                self.owner.ai.switch_task_vehicle_crew(vehicle,None)
+                                return
+
                 
                 # note that roles can have multiple functions now
                 if role.is_driver:

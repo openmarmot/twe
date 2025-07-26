@@ -14,7 +14,7 @@ import engine.math_2d
 
 class HitData(object):
     '''Hit Data'''
-    def __init__(self,hit_object,projectile,penetrated,hit_side,distance,hit_compartment,result):
+    def __init__(self,hit_object,projectile,penetrated,hit_side,distance,hit_compartment,result,penetration_value,armor_value):
         # calculate offsets. this is used later to display a visual representation of the hit
         self.position_offset,self.rotation_offset=engine.math_2d.calculate_offset_coords_and_rotation(hit_object.world_coords,hit_object.rotation_angle,projectile.world_coords,projectile.rotation_angle)
 
@@ -34,6 +34,9 @@ class HitData(object):
 
         # what happened because of the hit (damage effects)
         self.result=result
+
+        self.penetration_value=penetration_value
+        self.armor_value=round(armor_value,2)
         
 
         

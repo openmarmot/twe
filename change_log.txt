@@ -1,5 +1,54 @@
 TWE Project : Change Log
 
+----------------------------------
+July 25 2025
+- added top and bottom to new penetration calculation 
+
+some good playtesting of the new armor angle calculations. 
+the poor initial detection of what side is hit is becoming a bit of an issue. 
+
+seeing some non-pens due to high angle shots, which is great and was the main point of this upgrade 
+
+todo 
+- add passenger compartment armor to vehicle diagnostics 
+
+----------------------------------
+July 24 2025
+- work on adding horizontal angle between armor and projectile to penetration calculation 
+
+these changes have resulted in the t34-85 turret bouncing rounds on a regular basis 
+
+todo 
+- change human armor to have values for each side 
+- change human penetration to use hit side calculation 
+- add more data to the hit_data 
+- reformat vehicle diagnostics ui for hits 
+
+----------------------------------
+July 23 2025
+- added projectile penetration and calculated armor value to hit data 
+
+troubleshooting HEAT not penetrating when i think it should, it turns out 
+80 pen is not enough for the t34 sloped surfaces with calculate out to about 90 armor value.
+
+will have to think about this. maybe it is fine 
+
+----------------------------------
+July 22 2025
+- added universal switch role code for empty driver and gunner spots 
+- misc cleanup and minor updates
+- increased the ranged damage on the 37mm AT round a bit 
+
+for the first time ever I saw the soviet 37mm AA gun actually engaging something. 
+It took out a sd.kfz.251 by piercing the turret. It was bouncing off the main body due to 
+the range. I bumped the range penetration up a bit so it should have less trouble in the future 
+
+i'd like to see more hummel action. it is very outclassed by tanks - mostly because it starts 
+with a HE round loaded so it has to reload before it can shoot. Also the base HEAT shell it gets 
+isn't really that great. 
+
+I think one of the next things to be added will be a indirect fire weapon.
+probably a sd.kfz.251 with a mortar. 
 
 ----------------------------------
 July 19 2025

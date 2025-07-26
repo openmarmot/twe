@@ -100,7 +100,6 @@ class AIGun(object):
         ''' fire the gun. run check_if_can_fire first if you have calculations to do'''
         if self.check_if_can_fire():
             self.last_fired_time=self.owner.world.world_seconds
-            fired=True
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
             
@@ -163,6 +162,6 @@ class AIGun(object):
 
     #---------------------------------------------------------------------------
     def update(self):
-        ''' overrides base update '''
+        '''update'''
         pass
 

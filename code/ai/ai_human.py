@@ -185,7 +185,7 @@ class AIHuman(object):
             return False
         
         if target.is_vehicle:
-            penetration=engine.penetration_calculator.calculate_penetration(weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left'])
+            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
             return penetration
         
         # default
@@ -258,7 +258,7 @@ class AIHuman(object):
                 self.blood_pressure-=random.randint(30,100)
                 bleeding_hit=True
             else:
-                penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor)
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor,'front',180)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -274,7 +274,7 @@ class AIHuman(object):
                 self.blood_pressure-=random.randint(50,80)
                 bleeding_hit=True
             else:
-                penetration=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor)
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor,'front',180)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -2057,10 +2057,9 @@ class AIHuman(object):
             ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
             # can we penetrate it in a best case scenario?
             if ammo_gun>0:
-                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left']):
-                    penetration=True
-                if engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left']):
-                    penetration=True
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left'],'front',180)
+                if penetration is False:
+                    penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left'],'front',180)
 
         if penetration is False:
             self.memory.pop('task_engage_enemy',None)
