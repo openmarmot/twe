@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+July 26 2025
+- converted human wearable armor to the 6 side vehicle standard 
+- human body armor and helmets now take into account angle and side when determining armor pen 
+- added passenger compart armor to vehicle diagnostics 
+- some turrets (mg turrets at the moment) now have a small flag, which makes them less likely to be hit 
+- map activation moved from the debug menu to the 'm' key 
+
+todo 
+- engines are running without fuel 
+- fuel seems to deplete immediately when there is a leak 
+
+----------------------------------
 July 25 2025
 - added top and bottom to new penetration calculation 
 

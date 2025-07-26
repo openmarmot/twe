@@ -2359,6 +2359,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
         z.name='Sd.Kfz.251 MG34 Turret'
         z.is_turret=True
+        z.ai.small=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[0,0,0]
@@ -2722,6 +2723,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzer_iv_hull_mg','panzer_iv_hull_mg'],AITurret)
         z.name='Panzer IV Hull MG'
         z.is_turret=True
+        z.ai.small=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[16,0,0]
@@ -3149,6 +3151,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t20_turret','t20_turret'],AITurret)
         z.name='T20 Turret Turret'
         z.is_turret=True
+        z.ai.small=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[5,31,0]
@@ -3254,6 +3257,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['t34_hull_mg_turret','t34_hull_mg_turret'],AITurret)
         z.name='T34 hull mg turret'
         z.is_turret=True
+        z.ai.small=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=10
         z.ai.turret_armor['top']=[15,0,0]
@@ -3627,6 +3631,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['remote_mg34_turret','remote_mg34_turret'],AITurret)
         z.name='Remote MG34 Turret'
         z.is_turret=True
+        z.ai.small=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=12
         z.ai.remote_operated=True
@@ -4670,7 +4675,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.weight=0.98
         z.is_wearable=True
         z.ai.wearable_region='upper_body'
-        z.ai.armor=[3,0,0]
+        z.ai.armor['top']=[0,0,0]
+        z.ai.armor['bottom']=[0,0,0]
+        z.ai.armor['left']=[0,0,0]
+        z.ai.armor['right']=[0,0,0]
+        z.ai.armor['front']=[3,0,0]
+        z.ai.armor['rear']=[0,0,0]
         z.rotation_angle=float(random.randint(0,359))
     elif object_type=='helmet_stahlhelm':
         z=WorldObject(world,['helmet_stahlhelm'],AIWearable)
@@ -4679,7 +4689,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.weight=0.98
         z.is_wearable=True
         z.ai.wearable_region='head'
-        z.ai.armor=[3,0,0]
+        z.ai.armor['top']=[3,0,0]
+        z.ai.armor['bottom']=[0,0,0]
+        z.ai.armor['left']=[3,0,0]
+        z.ai.armor['right']=[3,0,0]
+        z.ai.armor['front']=[3,0,0]
+        z.ai.armor['rear']=[3,0,0]
         z.rotation_angle=float(random.randint(0,359))
     elif object_type=='helmet_ssh40':
         z=WorldObject(world,['helmet_ssh40'],AIWearable)
@@ -4688,7 +4703,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.weight=0.98
         z.is_wearable=True
         z.ai.wearable_region='head'
-        z.ai.armor=[1.5,0,0]
+        z.ai.armor['top']=[1.5,0,0]
+        z.ai.armor['bottom']=[0,0,0]
+        z.ai.armor['left']=[1.5,0,0]
+        z.ai.armor['right']=[1.5,0,0]
+        z.ai.armor['front']=[1.5,0,0]
+        z.ai.armor['rear']=[1.5,0,0]
         z.rotation_angle=float(random.randint(0,359))
     elif object_type=='radio_feldfu_b':
         # ref https://feldfunker-la7sna.com/wehrm_foto.htm

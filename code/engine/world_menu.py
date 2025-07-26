@@ -293,8 +293,6 @@ class World_Menu(object):
                     return
                 else:
                     self.text_queue.append('! No more humans left on your team')
-            
-
 
     #---------------------------------------------------------------------------
     def debug_menu(self, key):
@@ -303,7 +301,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.text_queue=[]
             self.text_queue.append('--Debug Menu (~ to exit) --')
-            self.text_queue.append('1 - toggle map ')
+            self.text_queue.append('1 -  ')
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - send test radio messages')
@@ -314,7 +312,7 @@ class World_Menu(object):
             self.text_queue.append('9 - toggle after action report (AAR) mode (auto screenshots)')
 
             if key=='1':
-                self.world.toggle_map()
+                #unused
                 return
             elif key=='2':
                 self.world.debug_mode=not self.world.debug_mode

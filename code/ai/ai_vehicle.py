@@ -671,7 +671,14 @@ class AIVehicle():
             self.projectile_hit_wheel(projectile,hit_side,relative_angle)
         elif area_hit=='turret':
             turret=random.choice(possible_turrets)
-            turret.ai.handle_event('collision',projectile)
+            # small gives a 50% chance to miss and hit the vehicle body instead
+            if turret.ai.small:
+                if random.randint(0,1)==1:
+                    turret.ai.handle_event('collision',projectile)
+                else:
+                    self.projectile_hit_vehicle_body(projectile,hit_side,relative_angle)
+            else:
+                turret.ai.handle_event('collision',projectile)
         else:
             engine.log.add_data('error',f'ai_vehicle.projectile_collision unknown area_hit:{area_hit}',True)
         

@@ -10,6 +10,7 @@ tab - bring up a context menu or exit the current menu
 esc - exit the current menu 
 left ctrl - take screenshot (saves to code/game_screenshots)
 ~ - tilde brings up the debug menu. 
+m - toggle map
 
 
 -- human --
@@ -45,6 +46,7 @@ r - reload (coax or main gun )
 
 
 -- airplane --
+# note that airplane code hasn't been worked on extensively.
 w - elevator 
 s - elevator + brake (if on ground)
 a - aileron roll left + rudder + wheel (if on ground)

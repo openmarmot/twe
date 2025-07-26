@@ -77,6 +77,9 @@ class AITurret(object):
         self.primary_weapon_reload_speed=0
         self.coaxial_weapon_reload_speed=0
 
+        # turrets with the small attribute are less likely to be hit
+        self.small=False
+
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)

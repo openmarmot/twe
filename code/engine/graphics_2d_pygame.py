@@ -171,7 +171,8 @@ class Graphics_2D_Pygame(object):
             pygame.K_LEFTBRACKET: '[',
             pygame.K_RIGHTBRACKET: ']',
             pygame.K_SPACE: 'space',
-            pygame.K_LCTRL: 'l_ctrl'
+            pygame.K_LCTRL: 'l_ctrl',
+            pygame.K_m: 'm'
         }
 
 

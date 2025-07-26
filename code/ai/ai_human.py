@@ -258,7 +258,8 @@ class AIHuman(object):
                 self.blood_pressure-=random.randint(30,100)
                 bleeding_hit=True
             else:
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor,'front',180)
+                hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor[hit_side],hit_side,relative_angle)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -266,7 +267,7 @@ class AIHuman(object):
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.helmet_bounces+=1
-                    self.morale-=5
+                    self.morale-=2
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
@@ -274,7 +275,8 @@ class AIHuman(object):
                 self.blood_pressure-=random.randint(50,80)
                 bleeding_hit=True
             else:
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor,'front',180)
+                hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor[hit_side],hit_side,relative_angle)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -282,7 +284,7 @@ class AIHuman(object):
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.body_armor_bounces+=1
-                    self.morale-=5
+                    self.morale-=2
                     self.speak('A projectile just bounced off my body armor!!')
 
         elif hit==3:
