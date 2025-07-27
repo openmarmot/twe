@@ -44,7 +44,7 @@ class AIContainer(object):
             for b in self.inventory:
                 if b.is_liquid:
                     if b.volume>0:
-                        b.volume=round(b.volume*(self.container_integrity*self.owner.world.time_passed_seconds),2)
+                        b.volume=round(b.volume*(self.container_integrity*0.1*self.owner.world.time_passed_seconds),2)
 
         # check if contaminated 
         if not self.contaminated:

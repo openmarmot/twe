@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+
+----------------------------------
+July 27 2025
+- minor changes to container leak rates 
+- reduced engine fuel reservoir 
+
+
 ----------------------------------
 July 26 2025
 - converted human wearable armor to the 6 side vehicle standard 
