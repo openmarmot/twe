@@ -16,6 +16,7 @@ so you either pre-emptively re-target, or dump a ton of ammo at one target if yo
 
 todo 
 - check armor values for sd.kfz.251 turrets. 6 is likely too low 
+- gunner that is not primary should move to the driver seat if its unoccupied 
 ----------------------------------
 July 27 2025
 - minor changes to container leak rates 
