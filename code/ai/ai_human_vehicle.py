@@ -148,8 +148,8 @@ class AIHumanVehicle():
                     self.current_burst+=1
 
             if self.current_burst>self.max_burst:
-                # randomize burst length a little
-                self.current_burst=random.randint(-2,int(self.max_burst*0.5))
+                # randomize burst length a little. this should create a random burst length from 3 to the max burst
+                self.current_burst=random.randint(0,self.max_burst-3)
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
@@ -241,6 +241,13 @@ class AIHumanVehicle():
                         return
                     if 'Engaging' in current_action:
                         self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting on crew to finish engagement'
+                        vehicle.ai.brake_power=1
+                        vehicle.ai.throttle=0
+                        # wait to think for a bit so we don't end up doing something else immediately
+                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                        return
+                    if 'jam' in current_action:
+                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting on gunner to finish clearing weapon jam'
                         vehicle.ai.brake_power=1
                         vehicle.ai.throttle=0
                         # wait to think for a bit so we don't end up doing something else immediately
@@ -382,7 +389,6 @@ class AIHumanVehicle():
             # future 
             return
 
-
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner(self):
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
@@ -469,7 +475,7 @@ class AIHumanVehicle():
         if weapons_jammed:
             # this we can fix ourselves
             #if we are already in this state then consider it fixed 
-            if self.owner.ai.memory['task_vehicle_crew']['current_action']=='Weapons Jammed':
+            if self.owner.ai.memory['task_vehicle_crew']['current_action']=='Clearing weapon jam':
                 engine.log.add_data('info','ai_human.think_vehicle_role_gunner - fixing jammed gun',True)
                 if turret.ai.primary_weapon:
                     if turret.ai.primary_weapon.ai.action_jammed:
@@ -482,7 +488,7 @@ class AIHumanVehicle():
                 # wait for a bit to simulate fixing
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
             else:
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Weapons Jammed'
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='Clearing weapon jam'
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
 
             return

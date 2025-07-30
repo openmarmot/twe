@@ -2,10 +2,24 @@ TWE Project : Change Log
 
 
 ----------------------------------
+July 29 2025
+- adjusted vehicle burst lengths to get more variation and shorter bursts 
+- added a driver wait state for when the gunner is working on a jammed gun 
+- updated gunner jam status to make it clear it will be fixed 
+
+its possible that vehicle burst lengths occasionally cause issues with tanks. 
+reaching the end of a burst could cause the gunner to switch target without destroying the tank 
+
+vehicle burst lengths are still too long. need to think about that. i'd like more short bursts i think, but 
+that would probably require some significant code changes.the callenge is it takes too long for a burst to hit, 
+so you either pre-emptively re-target, or dump a ton of ammo at one target if you have a fast gun 
+
+todo 
+- check armor values for sd.kfz.251 turrets. 6 is likely too low 
+----------------------------------
 July 27 2025
 - minor changes to container leak rates 
 - reduced engine fuel reservoir 
-
 
 ----------------------------------
 July 26 2025
