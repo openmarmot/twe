@@ -1252,6 +1252,7 @@ class AIHuman(object):
                 return True
             else:
                 self.speak("No new magazines available")
+                engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- no suitable magazines found',True)
                 return False
         else:
             engine.log.add_data('error',f'ai_human.reload_weapon {weapon.name}- not supported',True)

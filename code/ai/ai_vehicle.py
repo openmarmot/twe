@@ -716,13 +716,12 @@ class AIVehicle():
             else:
                 projectile.wo_stop()
 
+            self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
+
         else:
+            self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
             self.projectile_bounce(projectile)
         
-        self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
-
-
-
     #---------------------------------------------------------------------------
     def projectile_hit_vehicle_body(self,projectile,side,relative_angle):
         '''handle a projectile hit to the vehicle body'''
@@ -738,10 +737,11 @@ class AIVehicle():
             result=random.choice(damage_options)
             self.handle_component_damage(result,projectile)
 
-        else:
-            self.projectile_bounce(projectile)
+            self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
 
-        self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
+        else:
+            self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
+            self.projectile_bounce(projectile)
 
     #---------------------------------------------------------------------------
     def projectile_hit_wheel(self,projectile,side,relative_angle):
@@ -794,6 +794,21 @@ class AIVehicle():
             # no wheels hit 
             # pass it to the vehicle body
             self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+
+
+    #---------------------------------------------------------------------------
+    def read_fuel_gauge(self):
+        '''returns current fuel volume and maximum fuel volume combined across all tanks'''
+        max_volume=0
+        current_volume=0
+
+        for tank in self.fuel_tanks:
+            max_volume+=tank.volume
+            if len(tank.ai.inventory)>0:
+                if 'gas' in tank.ai.inventory[0].name or 'diesel' in tank.ai.inventory[0].name:
+                    current_volume+=tank.ai.inventory[0].volume
+
+        return current_volume,max_volume
 
 
     #---------------------------------------------------------------------------

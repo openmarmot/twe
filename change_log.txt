@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 02 2025
+- updated some angles for the panzer iv armor 
+- reduced t34-85 turrent armor angle 
+- fixed projectile bounces resulting in improper hit data angles 
+- potentially fixed a HE->AT reload bug where the target was being dropped 
+- fixed panzerschreck loadout which was adding a mp40 instead of a panzerschreck 
+- fixed misc errors 
+- fixed a bug that caused a reload loop if a MG was engaging something it couldn't penetrate and it was a mg turret 
+
+maybe i need to do something different to simulate rounded armor with variable angles. not sure 
+
+the reload logic is problematic and needs more analysis.
+
+todo 
+- fuel still seems to leak really fast 
+- investigate possible errors on role change
+- reloading the bow mg for the player doesn't do anything if its not completely empty 
+- review why we are resetting target on reload. this may be more harmful than helpful 
+
+----------------------------------
 August 01 2025
 - quick resize of the hetzer
 - setup some art folders for future vehicles 

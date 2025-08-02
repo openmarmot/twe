@@ -125,14 +125,10 @@ def add_random_pistol_to_inventory(wo,world):
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
     elif pistol==5:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-    elif pistol==6:
         wo.add_inventory(spawn_object(world,wo.world_coords,'walther_p38',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
-    elif pistol==7:
+    elif pistol==6:
         wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
         wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
@@ -184,7 +180,7 @@ def add_standard_loadout(wo,world,loadout):
         for _ in range(6):
             wo.add_inventory(spawn_object(world,[0,0],'mp40_magazine',False))
     elif loadout=='panzerschreck':
-        wo.add_inventory(spawn_object(world,[0,0],'mp40',False))
+        wo.add_inventory(spawn_object(world,[0,0],'panzerschreck',False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world,[0,0],'panzerschreck_magazine',False))
     elif loadout=='ppsh43':
@@ -2707,13 +2703,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[30,0,0]
         z.ai.vehicle_armor['right']=[30,0,0]
-        z.ai.vehicle_armor['front']=[80,11,0]
+        z.ai.vehicle_armor['front']=[80,64,0]
         z.ai.vehicle_armor['rear']=[30,15,0]
         z.ai.passenger_compartment_armor['top']=[16,0,0]
         z.ai.passenger_compartment_armor['bottom']=[8,0,0]
         z.ai.passenger_compartment_armor['left']=[30,0,0]
         z.ai.passenger_compartment_armor['right']=[30,0,0]
-        z.ai.passenger_compartment_armor['front']=[80,64,0]
+        z.ai.passenger_compartment_armor['front']=[80,11,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
         main_turret=spawn_object(world,world_coords,'panzer_iv_g_turret',True)
         z.ai.turrets.append(main_turret)
@@ -2847,13 +2843,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[30,0,5]
         z.ai.vehicle_armor['right']=[30,0,5]
-        z.ai.vehicle_armor['front']=[80,11,0]
+        z.ai.vehicle_armor['front']=[80,64,0]
         z.ai.vehicle_armor['rear']=[30,15,0]
         z.ai.passenger_compartment_armor['top']=[16,0,0]
         z.ai.passenger_compartment_armor['bottom']=[8,0,0]
         z.ai.passenger_compartment_armor['left']=[30,0,5]
         z.ai.passenger_compartment_armor['right']=[30,0,5]
-        z.ai.passenger_compartment_armor['front']=[80,64,0]
+        z.ai.passenger_compartment_armor['front']=[80,11,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
         main_turret=spawn_object(world,world_coords,'panzer_iv_h_turret',True)
         z.ai.turrets.append(main_turret)
@@ -2966,13 +2962,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[30,0,1]
         z.ai.vehicle_armor['right']=[30,0,1]
-        z.ai.vehicle_armor['front']=[80,11,0]
+        z.ai.vehicle_armor['front']=[80,64,0]
         z.ai.vehicle_armor['rear']=[30,15,0]
         z.ai.passenger_compartment_armor['top']=[16,0,0]
         z.ai.passenger_compartment_armor['bottom']=[8,0,0]
         z.ai.passenger_compartment_armor['left']=[30,0,1]
         z.ai.passenger_compartment_armor['right']=[30,0,1]
-        z.ai.passenger_compartment_armor['front']=[80,64,0]
+        z.ai.passenger_compartment_armor['front']=[80,11,0]
         z.ai.passenger_compartment_armor['rear']=[30,15,0]
         main_turret=spawn_object(world,world_coords,'panzer_iv_j_turret',True)
         z.ai.turrets.append(main_turret)
@@ -3474,7 +3470,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['bottom']=[8,0,0]
         z.ai.turret_armor['left']=[75,21,0]
         z.ai.turret_armor['right']=[75,21,0]
-        z.ai.turret_armor['front']=[90,60,0]
+        z.ai.turret_armor['front']=[90,20,0]
         z.ai.turret_armor['rear']=[52,9,0]
         z.ai.position_offset=[5,0]
         z.ai.rotation_range=[-360,360]

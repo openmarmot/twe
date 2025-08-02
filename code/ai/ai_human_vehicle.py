@@ -361,7 +361,17 @@ class AIHumanVehicle():
                 need_start=True
                 break
         if need_start:
-            vehicle.ai.handle_start_engines()
+            current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
+            if current_fuel>0:
+                vehicle.ai.handle_start_engines()
+            else:
+                # there might be some cases where this happens and we should have turned the engine on anyways (some engines don't use fuel)
+                if max_fuel==0:
+                    engine.log.add_data('warn',f'ai_human_vehicle think_vehicle_role_driver_drive_to_destination max_fuel==0 for vehicle {vehicle.name}',True)
+
+                # out of fuel.
+                # disable the vehicle for now. in the future we will want to try and get fuel and refuel
+                vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):
         '''think about the drivers current vehicle order'''
@@ -542,21 +552,21 @@ class AIHumanVehicle():
             engage_primary=self.owner.ai.calculate_engagement(turret.ai.primary_weapon,target)
 
             # this is necessary to force a reload if we are
-            # trying to engage a vehicle with HE and have AT in the inventory
+            # trying to engage a vehicle with HE and have compatible AT in the inventory
             # otherwise the gunner will just drop all vehicle targets because he can't pen
             if engage_primary is False and target.is_vehicle:
                 # do we have HE loaded and do we have AT available?
                 if turret.ai.primary_weapon.ai.magazine:
                     if turret.ai.primary_weapon.ai.magazine.ai.use_antitank is False:
                         for m in vehicle.ai.ammo_rack:
-                            if len(m.ai.projectiles)>0:
-                                if m.ai.use_antitank:
-                                    # start the reload process
-                                    self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
-                                    self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-                                    self.owner.ai.memory['task_vehicle_crew']['target']=None
-                                    print('reloading because engaging vehicle and HE loaded')
-                                    return
+                            if turret.ai.primary_weapon.world_builder_identity in m.ai.compatible_guns:
+                                if len(m.ai.projectiles)>0:
+                                    if m.ai.use_antitank:
+                                        # start the reload process
+                                        self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                                        self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                                        print(f'reloading {turret.ai.primary_weapon.name} because engaging vehicle and HE loaded')
+                                        return
 
             # possibly should also check if we are engaging a soft skinned vehicle with AT
                 
@@ -638,7 +648,7 @@ class AIHumanVehicle():
                         elif m.ai.use_antipersonnel:
                             for_ap.append(m)
                         else:
-                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use')
+                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use',True)
 
         for m in vehicle.ai.inventory:
             if m.is_gun_magazine:
@@ -651,7 +661,7 @@ class AIHumanVehicle():
                         elif m.ai.use_antipersonnel:
                             for_ap.append(m)
                         else:
-                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use')
+                            engine.log.add_data('error',f'ai_human.think_vehicle_role_gunner_reload magazine {m.name} unknown use',True)
 
         new_magazine=None
         prefer_at=False
