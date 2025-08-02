@@ -29,7 +29,7 @@ class AIEngine(object):
         self.exhaust_position_offset=[0,0]
 
         # fuel consumptuion as liters per second
-        self.fuel_consumption_rate=0
+        self.fuel_consumption_rate=0.003
 
         # idle fuel consumption rate when throttle is at zero
         self.idle_fuel_consumption_rate=0.001
@@ -41,7 +41,7 @@ class AIEngine(object):
 
         # amount of fuel the engine has internally (L)
         # basically the amount it can burn before running dry if not hooked up to a tank
-        self.fuel_reservoir=1
+        self.fuel_reservoir=0.1
 
         # bool. is the engine on or off ?
         self.engine_on=False

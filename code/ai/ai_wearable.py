@@ -20,7 +20,13 @@ class AIWearable(object):
         self.wearable_region='none'
         #[side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal
-        self.armor=[0,0,0]
+        self.armor={}
+        self.armor['top']=[0,0,0]
+        self.armor['bottom']=[0,0,0]
+        self.armor['left']=[0,0,0]
+        self.armor['right']=[0,0,0]
+        self.armor['front']=[0,0,0]
+        self.armor['rear']=[0,0,0]
 
     #---------------------------------------------------------------------------
     def update(self):

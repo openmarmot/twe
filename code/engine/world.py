@@ -442,6 +442,9 @@ class World():
         if key=='space':
             self.display_weapon_range=not self.display_weapon_range
 
+        if key=='m':
+            self.toggle_map()
+
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None):
         '''handle key press'''

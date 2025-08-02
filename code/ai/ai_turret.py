@@ -77,6 +77,9 @@ class AITurret(object):
         self.primary_weapon_reload_speed=0
         self.coaxial_weapon_reload_speed=0
 
+        # turrets with the small attribute are less likely to be hit
+        self.small=False
+
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
@@ -112,7 +115,10 @@ class AITurret(object):
             if penetration:
                 EVENT_DATA.wo_stop()
                 # component damage
-                damage_options=['turret track','gunner hit']
+                damage_options=['turret track']
+
+                if self.remote_operated is False:
+                    damage_options.append('gunner hit')
                 
                 if self.primary_weapon:
                     damage_options.append('primary weapon')
@@ -141,12 +147,11 @@ class AITurret(object):
                             self.coaxial_weapon.ai.damaged=True
                 elif result=='gunner hit':
                     # note - should rewrite result if gunner is not present
-                    if self.remote_operated==False and self.vehicle:
-                        for role in self.vehicle.ai.vehicle_crew:
-                            if role.role_occupied:
-                                # for some roles turret is none
-                                if role.turret==self.owner:
-                                    role.human.ai.handle_event('collision',projectile)
+                    for role in self.vehicle.ai.vehicle_crew:
+                        if role.role_occupied:
+                            # for some roles turret is none
+                            if role.turret==self.owner:
+                                role.human.ai.handle_event('collision',projectile)
                 elif result=='penetration into vehicle':
                     # this has to match a valid option in vehicle.ai.handle_component_damage
                     extra_damage_options=['random_crew_projectile','random_crew_fire','engine']

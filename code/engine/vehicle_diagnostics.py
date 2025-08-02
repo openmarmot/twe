@@ -150,12 +150,19 @@ class VehicleDiagnostics(object):
         coord[1]+=spacing
         self.text_queue.append(['[armor, slope, spaced armor]',copy.copy(coord),self.text_black])
         coord[1]+=spacing
+        self.text_queue.append(['vehicle body armor',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
         for key,value in self.vehicle.ai.vehicle_armor.items():
+            self.text_queue.append([f'{key} : {value}',copy.copy(coord),self.text_black])
+            coord[1]+=spacing
+        self.text_queue.append(['passenger compartment armor',copy.copy(coord),self.text_black])
+        coord[1]+=spacing
+        for key,value in self.vehicle.ai.passenger_compartment_armor.items():
             self.text_queue.append([f'{key} : {value}',copy.copy(coord),self.text_black])
             coord[1]+=spacing
 
         # diagnostics 
-        coord=[40,350]
+        coord=[40,450]
         self.text_queue.append(['-- diagnostics --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         for b in self.vehicle.ai.turrets:
@@ -207,7 +214,7 @@ class VehicleDiagnostics(object):
         # - fuel tank data -
         # this should move to its own page
         
-        coord=[40,450]
+        coord=[40,600]
         self.text_queue.append(['-- fuel data --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         for b in self.vehicle.ai.fuel_tanks:

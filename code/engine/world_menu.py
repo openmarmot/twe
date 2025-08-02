@@ -293,8 +293,6 @@ class World_Menu(object):
                     return
                 else:
                     self.text_queue.append('! No more humans left on your team')
-            
-
 
     #---------------------------------------------------------------------------
     def debug_menu(self, key):
@@ -303,7 +301,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.text_queue=[]
             self.text_queue.append('--Debug Menu (~ to exit) --')
-            self.text_queue.append('1 - toggle map ')
+            self.text_queue.append('1 -  ')
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - send test radio messages')
@@ -314,7 +312,7 @@ class World_Menu(object):
             self.text_queue.append('9 - toggle after action report (AAR) mode (auto screenshots)')
 
             if key=='1':
-                self.world.toggle_map()
+                #unused
                 return
             elif key=='2':
                 self.world.debug_mode=not self.world.debug_mode
@@ -373,8 +371,8 @@ class World_Menu(object):
         if self.menu_state=='spawn_vehicles':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
-            self.text_queue.append('1 - german_sd_kfz_251/9_late ')
-            self.text_queue.append('2 - german_sd_kfz_251/22')
+            self.text_queue.append('1 - red_bicycle')
+            self.text_queue.append('2 - su-85')
             self.text_queue.append('3 - german_sd_kfz_251/1')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - rso pak')
@@ -383,9 +381,9 @@ class World_Menu(object):
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - t34-85')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/9_late',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'red_bicycle',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/22',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_su_85',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/1',True)
             elif key=='4':
@@ -403,7 +401,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
-            self.text_queue.append('1 - mp40 ')
+            self.text_queue.append('1 - ppsh41 ')
             self.text_queue.append('2 - Panzerschreck')
             self.text_queue.append('3 - Model 24 Stick Grenade ')
             self.text_queue.append('4 - molotov')
@@ -411,7 +409,7 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'mp40',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ppsh41',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)

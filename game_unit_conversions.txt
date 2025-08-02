@@ -49,6 +49,8 @@ range : 1813
 # vehicle cannons 
 This is compressed for game play considerations 
 game units to real life units for determining penetration 
+
+game unit -> meters
 0 - > 0 meters
 500
 1000 - 500 meters
