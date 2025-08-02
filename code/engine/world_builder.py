@@ -74,15 +74,15 @@ list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
 
-list_guns=['kar98k','stg44','mp40','mg34','mg42','mosin_nagant','ppsh43','dp28','1911','ppk','tt33','g41w','k43',
+list_guns=['kar98k','stg44','mp40','mg34','mg42','mosin_nagant','ppsh43','ppsh41','dp28','1911','ppk','tt33','g41w','k43',
     'svt40','svt40-sniper','mg15','fg42-type1','fg42-type2','c96','c96_red_9']
-list_guns_common=['kar98k','mosin_nagant','ppsh43','tt33','svt40']
+list_guns_common=['kar98k','mosin_nagant','ppsh43','ppsh41','tt33','svt40']
 list_guns_rare=['mp40','ppk','stg44','mg34','dp28','k43','g41w','c96']
 list_guns_ultra_rare=['fg42-type1','fg42-type2','svt40-sniper','1911','mg15','c96_red_9']
 list_german_guns=['kar98k','stg44','mp40','mg34','ppk','k43','g41w','fg42-type1','fg42-type2','walther_p38']
 
 list_guns_rifles=['kar98k','mosin_nagant','g41w','k43','svt40','svt40-sniper']
-list_guns_smg=['mp40','ppsh43']
+list_guns_smg=['mp40','ppsh43','ppsh41']
 list_guns_assault_rifles=['stg44']
 list_guns_machine_guns=['mg34','mg42','dp28','mg15','fg42-type1','fg42-type2']
 list_guns_pistols=['1911','ppk','tt33','c96','c96_red_9','walther_p38','luger_p08']
@@ -191,6 +191,10 @@ def add_standard_loadout(wo,world,loadout):
         wo.add_inventory(spawn_object(world,[0,0],'ppsh43',False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world,[0,0],'ppsh43_magazine',False))
+    elif loadout=='ppsh41':
+        wo.add_inventory(spawn_object(world,[0,0],'ppsh41',False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world,[0,0],'ppsh41_box_magazine',False))
     elif loadout=='ptrs_41':
         wo.add_inventory(spawn_object(world,[0,0],'ptrs_41',False))
         for _ in range(6):
@@ -1399,6 +1403,42 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif object_type=='ppsh41':
+        z=WorldObject(world,['ppsh41'],AIGun)
+        z.name='ppsh41'
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=3
+        z.ai.magazine=spawn_object(world,world_coords,'ppsh41_drum_magazine',False)
+        z.ai.rate_of_fire=0.048
+        z.ai.reload_speed=7
+        z.ai.range=1209
+        z.ai.type='submachine gun'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='ppsh41_drum_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='ppsh41_drum_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['ppsh41']
+        z.ai.compatible_projectiles=['7.62x25']
+        z.ai.capacity=71
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+    
+    elif object_type=='ppsh41_box_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='ppsh41_drum_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['ppsh41']
+        z.ai.compatible_projectiles=['7.62x25']
+        z.ai.capacity=35
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif object_type=='ppsh43':
         z=WorldObject(world,['ppsh43'],AIGun)
         z.name='ppsh43'
@@ -1848,6 +1888,32 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.use_antitank=True
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='100mm_d_10':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='100mm D 10'
+        z.is_gun=True
+        z.ai.mechanical_accuracy=2
+        z.ai.magazine=spawn_object(world,world_coords,'100mm_d_10_magazine',False)
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=26
+        z.ai.range=4000
+        z.ai.type='cannon'
+        z.ai.use_antitank=True
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='100mm_d_10_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='100mm_d_10_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['100mm_d_10']
+        z.ai.compatible_projectiles=['BR-412','OF-412']
+        z.ai.capacity=1
+        z.ai.disintegrating=True
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
 
     elif object_type=='mg15':
         z=WorldObject(world,['mg15'],AIGun)
@@ -3438,7 +3504,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[45,0,0]
         z.ai.vehicle_armor['right']=[45,0,0]
-        z.ai.vehicle_armor['front']=[45,61,0]
+        z.ai.vehicle_armor['front']=[45,50,0]
         z.ai.vehicle_armor['rear']=[45,47,0]
         z.ai.passenger_compartment_armor['top']=[16,0,0]
         z.ai.passenger_compartment_armor['bottom']=[8,0,0]
@@ -3512,10 +3578,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['bottom']=[8,0,0]
         z.ai.turret_armor['left']=[45,21,0]
         z.ai.turret_armor['right']=[45,21,0]
-        z.ai.turret_armor['front']=[45,60,0]
+        z.ai.turret_armor['front']=[45,10,0]
         z.ai.turret_armor['rear']=[45,9,0]
         z.ai.position_offset=[-47,8]
-        z.ai.rotation_range=[-15,15]
+        z.ai.rotation_range=[-10,10]
         z.ai.primary_weapon=spawn_object(world,world_coords,'85mm_d_5s',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
@@ -3525,6 +3591,106 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=20
         z.ai.coaxial_weapon_reload_speed=10
+        z.no_save=True
+
+    elif object_type=='soviet_su_100':
+        # ref : https://wiki.warthunder.com/T-34-85
+        z=WorldObject(world,['su_85_chassis'],AIVehicle)
+        z.name='SU-100'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.requires_afv_training=True
+        z.ai.passenger_compartment_ammo_racks=True
+        z.ai.vehicle_armor['top']=[16,0,0]
+        z.ai.vehicle_armor['bottom']=[8,0,0]
+        z.ai.vehicle_armor['left']=[45,0,0]
+        z.ai.vehicle_armor['right']=[45,0,0]
+        z.ai.vehicle_armor['front']=[75,50,0]
+        z.ai.vehicle_armor['rear']=[45,47,0]
+        z.ai.passenger_compartment_armor['top']=[16,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[8,0,0]
+        z.ai.passenger_compartment_armor['left']=[45,40,0]
+        z.ai.passenger_compartment_armor['right']=[45,40,0]
+        z.ai.passenger_compartment_armor['front']=[75,50,0]
+        z.ai.passenger_compartment_armor['rear']=[40,47,0]
+        main_turret=spawn_object(world,world_coords,'su_100_turret',True)
+        z.ai.turrets.append(main_turret)
+        main_turret.ai.vehicle=z
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=main_turret
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('commander',z)
+        role.is_commander=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.max_speed=367.04
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=26500
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'diesel')
+        z.ai.engines.append(spawn_object(world,world_coords,"kharkiv_v2-34_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.ammo_rack_capacity=60
+        for b in range(25):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"100mm_d_10_magazine",False))
+        for b in range(5):
+            temp=spawn_object(world,world_coords,"100mm_d_10_magazine",False)
+            load_magazine(world,temp,'OF-412')
+            z.ai.ammo_rack.append(temp)
+        z.ai.min_wheels_per_side_front=2
+        z.ai.min_wheels_per_side_rear=2
+        z.ai.max_wheels=12
+        z.ai.max_spare_wheels=0
+        for b in range(3):
+            z.ai.front_left_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.front_right_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+            z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
+
+    elif object_type=='su_100_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        z=WorldObject(world,['su_100_turret'],AITurret)
+        z.name='SU-100 Turret'
+        z.is_turret=True
+        z.ai.vehicle_mount_side='front'
+        z.ai.turret_accuracy=2
+        z.ai.turret_armor['top']=[20,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[45,21,0]
+        z.ai.turret_armor['right']=[45,21,0]
+        z.ai.turret_armor['front']=[75,10,0]
+        z.ai.turret_armor['rear']=[45,9,0]
+        z.ai.position_offset=[-67,8]
+        z.ai.rotation_range=[-8,8]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'100mm_d_10',False)
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.smoke_on_fire=True
+        z.ai.primary_weapon.ai.smoke_type='cannon'
+        z.ai.primary_weapon.ai.smoke_offset=[-147,0]
+        z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_turret=True
+        z.ai.primary_weapon_reload_speed=30
         z.no_save=True
 
     elif object_type=='german_jagdpanzer_38t_hetzer':
@@ -4237,6 +4403,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
         add_standard_loadout(z,world,'ppsh43')
+
+    elif object_type=='soviet_ppsh41':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        add_standard_loadout(z,world,'ppsh41')
 
     elif object_type=='soviet_assault_engineer_ppsh43':
         z=spawn_object(world,world_coords,'soviet_soldier',False)

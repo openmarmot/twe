@@ -39,6 +39,8 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - German FA223 Drache helicopter
 - German Sd.kfz.251
 - German Sd.kfz.251/22
+- German Sd.kfz.251/9
+- German Sd.kfz.251/9 Late
 - German PAK 40
 - Soviet T20 "Komsomolets" armored tractor
 - American/Soviet Lend-Lease truck
@@ -46,6 +48,7 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - Soviet T34-85
 - Soviet SU-85
 - Soviet 37mm AA gun
+- Soviet SU-100
 - Civilian Red Bicycle
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.

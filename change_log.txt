@@ -1,5 +1,28 @@
 TWE Project : Change Log
 
+----------------------------------
+August 01 2025
+- quick resize of the hetzer
+- setup some art folders for future vehicles 
+- added ppsh41
+- some soviet squad changes to switch some weapons to ppsh41
+- added su100 
+- su85 turret gets some grey outlining to stand out better 
+- updated turret damage so the 'gunner hit' damage option is only possible if the turret isn't remote controlled 
+- some armor adjustments 
+
+quick and dirty scaling of the hetzer to get it sized better, it turned out good enough.
+I could go in and clean it up a bit at some point.
+
+The Su100 is basically the same as the Su85 with a longer gun and more frontal armor so I was able to re-use the chassis art, which is nice. 
+The Su-100 is probably the best tank in the game at the moment as far as armor and armament go 
+
+I might add the Su85m which is a su100 with the 85mm gun 
+
+todo 
+- projectiles that deflect have the deflection angle on the hit marker instead of the original hit angle 
+- rethink angles on turret armor 
+- maybe turret jam on a primary turret should be a disable 
 
 ----------------------------------
 July 29 2025
