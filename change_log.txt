@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 03 2025
+started work on the sd.kfz.251/2 (mortar carrier)
+
+at some point i'd like to take the sdk.kfz.251 base image and create a GIMP file out of it again.
+it is a shame i lost the original.
+
+----------------------------------
 August 02 2025
 - updated some angles for the panzer iv armor 
 - reduced t34-85 turrent armor angle 
