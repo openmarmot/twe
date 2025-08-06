@@ -2496,7 +2496,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['right']=[0,0,0]
         z.ai.turret_armor['front']=[0,0,0]
         z.ai.turret_armor['rear']=[0,0,0]
-        z.ai.position_offset=[-30,0]
+        z.ai.position_offset=[-31,0]
         z.ai.rotation_range=[-30,30]
         z.ai.primary_weapon=spawn_object(world,world_coords,'8cmGrW34',False)
         z.ai.primary_weapon.ai.smoke_on_fire=True
@@ -2528,7 +2528,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
         z.ai.compatible_guns=['8cmGrW34']
-        z.ai.compatible_projectiles=['Sprgr_34_75_L24','HL_Gr_38A_L24']
+        z.ai.compatible_projectiles=['Wurfgranate_34']
         z.ai.capacity=1
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))

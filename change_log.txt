@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 05 2025
+- more work on the sd.kfz.251/2
+
+----------------------------------
 August 03 2025
 started work on the sd.kfz.251/2 (mortar carrier)
 
