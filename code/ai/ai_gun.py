@@ -81,6 +81,11 @@ class AIGun(object):
         self.damaged=False # gun is damaged and cannot operate
         self.action_jammed=False # gun action is jammed witha shell in the chamber
 
+
+        # what type of fire mode the weapon supports
+        self.direct_fire=True
+        self.indirect_fire=False
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''

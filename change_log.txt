@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 08 2025
+- added sd.kfz.251/2 squad 
+- readme updates
+
+the code is not in for using the 251/2 mortar yet, so its kinda useless. 
+will probably circle back to indirect fire code when i feel like it. its nice 
+to at least have the vehicle and weapon ready to go.
+
+----------------------------------
+August 06 2025
+- added direct_fire and indirect_fire bools to ai_gun 
+- new indirect_fire_gunner vehicle role for indirect fire only weapons 
+
+todo 
+- calculate flight time for projectiles from vehicles so they hit the dirt near their targets if they miss 
+- add a squad for the 251/2 once it is functional 
+- add ai code for indirect weapons 
+- add a settings file and code+ui for screen resolutions 
+
+----------------------------------
 August 05 2025
 - more work on the sd.kfz.251/2
 
