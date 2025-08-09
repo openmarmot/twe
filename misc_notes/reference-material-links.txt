@@ -3,6 +3,10 @@ helpful links for research
 # -- notes on scale --
 for sizing it is probably best to go with width, as length is sometimes including the gun, and sometimes not 
 
+
+
+# -- general links --
+
 https://truck-encyclopedia.com/ww2/germany/german-trucks.php
 
 https://tank-afv.com/ww2/germany/german-tanks-armored-vehicles.php
@@ -10,12 +14,8 @@ https://tank-afv.com/ww2/germany/german-tanks-armored-vehicles.php
 https://tanks-encyclopedia.com/
 
 
-# update 11-26-2024 - the wiki seems to have been updated and most of the useful armor info is gone. 
-# good source for armor / gun data.
-# seems to more or less line up with what ive found from wikipedia or other sources
-https://wiki.warthunder.com/
-
 # old warthunder wiki is still live and has better info 
+# the new one has way less info 
 https://old-wiki.warthunder.com/
 
 # great source for diagrams 
@@ -25,23 +25,28 @@ https://drawingdatabase.com
 # german afv production years 
 https://www.feldgrau.com/WW2-German-Armoured-Vehicle-Production/
 
-
-# german gantry crane 
-https://www.landmarkscout.com/strabokran-german-mobile-gantry-crane/
-
-
 # list of german WW2 equipment 
 https://en.wikipedia.org/wiki/List_of_German_military_equipment_of_World_War_II
 
 # list of soviet ww2 equipment 
 https://en.wikipedia.org/wiki/List_of_Soviet_Union_military_equipment_of_World_War_II
 
+# -- specific links --
+
+# german z series computers 
+https://www.youtube.com/watch?v=0x-gm-kBiZs
+
+# german gantry crane 
+https://www.landmarkscout.com/strabokran-german-mobile-gantry-crane/
 
 # german military bicycle 
 https://www.youtube.com/watch?v=jLjLhMphBf4
 
 # german heavy rail cars 
 https://www.youtube.com/watch?v=iX2805j89JM
+
+# german field radio 
+https://www.youtube.com/watch?v=-xU3o83ddi8
 
 
 

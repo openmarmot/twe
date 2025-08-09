@@ -241,10 +241,11 @@ class AIHuman(object):
 
 
         # final results
-        if adjust_max>0:
-            return [target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
-        else:
-            return target_coords
+        target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+        calculated_range=distance+random.uniform(-adjust_max,adjust_max+500)
+
+        return target_coords,calculated_range
+            
 
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile,distance):
@@ -744,30 +745,6 @@ class AIHuman(object):
             self.speak("I don't understand")
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
-    #---------------------------------------------------------------------------
-    def event_vehicle_hit(self,hit):
-        ''' react to a vehicle we are in being hit'''
-        # hit is hit_data.py 
-
-        if self.memory['current_task']=='task_vehicle_crew':
-            if hit.penetrated:
-                self.morale-=10
-                if self.morale_check()==False:
-                    self.speak('The vehicle is hit! Bail out!!')
-                    self.switch_task_exit_vehicle()
-            else:
-                # hit bounced, could still effect morale
-                if self.morale<100:
-                    self.morale-=random.randint(0,5)
-
-                    if self.morale<60:
-                        if self.morale_check()==False:
-                            self.speak('We are taking fire! I cannot take it anymore! Abandon the vehicle!!')
-                            self.switch_task_exit_vehicle()
-    
-
-
-
 
     #---------------------------------------------------------------------------
     def fire(self,weapon,target):
@@ -797,8 +774,9 @@ class AIHuman(object):
 
 
             # adjust for human accuracy factors
-            aim_coords=self.calculate_human_accuracy(aim_coords,distance,weapon)
+            aim_coords,calculated_range=self.calculate_human_accuracy(aim_coords,distance,weapon)
             weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,aim_coords)
+            weapon.ai.calculated_range=calculated_range
             weapon.ai.fire()
 
             self.current_burst+=1
@@ -819,9 +797,11 @@ class AIHuman(object):
             # adjusted coords
             # this function was meant for world coords.
             # because it is mouse coords distance won't apply, which may even it out a bit
-            adjusted_coords=self.calculate_human_accuracy(mouse_coords,0,weapon)
+            adjusted_coords,calculated_range=self.calculate_human_accuracy(mouse_coords,0,weapon)
             rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
             weapon.rotation_angle=rotation_angle
+            # we discard calculated range for the player
+            weapon.ai.calculated_range=weapon.ai.range
             self.owner.rotation_angle=rotation_angle
             self.owner.reset_image=True
             weapon.ai.fire()
@@ -1001,7 +981,11 @@ class AIHuman(object):
         elif event=='explosion':
             self.event_explosion(event_data)
         elif event=='vehicle_hit':
-            self.event_vehicle_hit(event_data)
+            # this is called by ai_vehicle.add_hit_data
+            if self.memory['current_task']=='task_vehicle_crew':
+                self.memory['task_vehicle_crew']['vehicle_hits'].append(event_data)
+            else:
+                engine.log.add_data('warn','ai_human.handle_event vehicle_hit but user is not in vehicle',True)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
@@ -1082,13 +1066,16 @@ class AIHuman(object):
         if self.antitank is not None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                adjusted_coords=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
+                adjusted_coords,calculated_range=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+                # discard calculated range for player
+                self.antitank.ai.calculated_range=self.antitank.ai.range
 
             else :
                 distance=engine.math_2d.get_distance(self.owner.world_coords,target_coords)
-                adjusted_coords=self.calculate_human_accuracy(target_coords,distance,self.antitank)
+                adjusted_coords,calculated_range=self.calculate_human_accuracy(target_coords,distance,self.antitank)
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,adjusted_coords)
+                self.antitank.ai.calculated_range=calculated_range
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches+=1
 
@@ -1698,7 +1685,8 @@ class AIHuman(object):
             'last_think_time': 0,
             'think_interval': 0.5,
             'reload_start_time':0,
-            'vehicle_order':vehicle_order
+            'vehicle_order':vehicle_order,
+            'vehicle_hits':[] # array of HitData. gets added to when the vehicle is hit
         }
 
         self.memory[task_name]=task_details

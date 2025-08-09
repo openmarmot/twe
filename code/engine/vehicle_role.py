@@ -18,6 +18,7 @@ class VehicleRole():
         self.is_radio_operator=False
         self.is_commander=False
         self.is_passenger=False
+        self.is_indirect_fire_gunner=False
 
         # object references 
         self.vehicle=vehicle

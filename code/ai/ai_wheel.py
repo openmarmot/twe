@@ -13,6 +13,7 @@ class AIWheel(object):
     def __init__(self, owner):
         self.owner=owner
 
+        # note as of 8/5/2025 this isn't used for anything yet
         self.compatible_vehicles=[] # list of compatibile world_builder_identity (vehicles)
 
         self.damaged=False # can be repaired

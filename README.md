@@ -11,13 +11,43 @@ I am developing this game by just randomly working on whatever I feel like on a 
 
 ![screenshot](/screenshots/twe-oct-22-2024.png "TWE screenshot")
 
-
 ### General Concepts
 - eastern front around 1944-1945. roughly historical
 - two modes : real time tactical environment and a strategic map
 - strategic map size is not limited, each tile with be generated as needed
 - not balanced on purpose. russians should inevitably push the germans west
+- vehicle / armor / weapon values are based on the actual real world values and not on perceptions of how things should be or modified for fun/balance.
+- everything is simulated as much as possible, including individual bullets in magazines.
 - emphasis on iron man mode. strategic game doesn't start over when player dies they just take over a new bot
+
+### Armor Penetration System
+
+I am aiming to have a armor penetration system that generates understandable repeatable results that 
+simulate real world results as accurately as possible for a real time 2d game.  
+
+Every projectile fired from a gun in the game is fully simulated with a visible object that has its own collision.  The result of firing the gun is not pre-calculated, it just depends on what the projectile runs into.  
+
+Vehicles generally have several sections that can be hit 
+- vehicle body : the lower portion of the vehicle 
+- passenger compartment : the upper portion of the vehicle
+- wheels
+- turret(s) : the side of the vehicle that the turret is mounted on is also considered
+
+Each side of a vehicle section has a value for 
+- armor thickness 
+- angle of armor (0 being vertical armor)
+- armor thickness for any spaced armor (mostly German armor skirts)
+
+When a projectile hits a vehicle the following is assessed
+- The side of the vehicle that is hit
+- THe affect of any spaced armor
+- The affect of the armors angle on its calculated thickness
+- The affect of the angle between the projectile and the armor on the armor thickness
+
+Vehicles do not have a health value. Instead each vehicle section has unique damage effects.  
+A projectile that does not penetrate has a chance to richochet off and hit something else.  
+
+Hit data is saved and can be viewed with green and orange arrows showing hits through a debug menu option.  
 
 ### Things to do
 - spawn different objects with the debug menu
@@ -28,28 +58,35 @@ I am developing this game by just randomly working on whatever I feel like on a 
 - check out the (very early) campaign mode
 
 ### Current List of Vehicles Simulated
-- German Kubelwagen
-- German Raupenschlepper OST (RSO) tractor
-- German RSO PAK
-- German Panzer IV Ausf G
-- German Panzer IV Ausf H
-- German Panzer IV Ausf J
-- German Jagdpanzer 38t "Hetzer"
-- German Ju88 bomber
-- German FA223 Drache helicopter
-- German Sd.kfz.251
-- German Sd.kfz.251/22
-- German Sd.kfz.251/9
-- German Sd.kfz.251/9 Late
-- German PAK 40
-- Soviet T20 "Komsomolets" armored tractor
-- American/Soviet Lend-Lease truck
-- Soviet T34-76 (late)
-- Soviet T34-85
-- Soviet SU-85
-- Soviet 37mm AA gun
-- Soviet SU-100
-- Civilian Red Bicycle
+
+| Faction | Name | Type | Notes |
+|---|---|---|---|
+| Civilian | Red Bicycle | Bike | |
+| German | Fa223 Drache | Helicopter | |
+| German | Jagdpanzer 38t 'Hetzer' | Tank | |
+| German | Ju 88 | Airplane | |
+| German | Kubelwagen | Utility | Also available in a camo version | 
+| German | Pak 40 | AT Gun | |
+| German | Panzer IV Ausf G | Tank | 75mm L43 |
+| German | Panzer IV Ausf H | Tank | 75mm L48 |
+| German | Panzer IV Ausf J | Tank | Minor differences from the H |
+| German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
+| German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
+| German | Sd.kfz.251/1 | APC | The famous German half-track |
+| German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
+| German | Sd.kfz.251/9 'Stummel' | AFV | 75mm L24 |
+| German | Sd.kfz.251/9 Late | AFV | gains a MG |
+| German | Sd.kfz.251/22 | APC | Pak 40 |
+| Soviet | Lend Lease American Truck | Utility | |
+| Soviet | Su-85 | Tank | Basically a turretless T34-85 |
+| Soviet | Su-100 | Tank | Better armor and gun than the Su-85 |
+| Soviet | T20 'Komsomolets' | Utility | Armored Tractor |
+| Soviet | T34-76 | Tank | A late model T34-76 |
+| Soviet | T34-85 | Tank | |
+| Soviet | 37mm AA Gun | AA | |
+
+
+
 
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
   

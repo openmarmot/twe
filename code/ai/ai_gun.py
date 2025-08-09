@@ -49,8 +49,15 @@ class AIGun(object):
         self.mechanical_accuracy=0
 
         # range - how far the bullet will go before hitting the ground
-        # used by the ai and used to calculate projectile flight time
+        # used by the ai and used to calculate projectile flight time.
+        # this is esentially the max range for the weapon
         self.range=0
+
+        # this is set by the human firing the weapon and is a way to set the 
+        # vertical angle of the gun - basically how far the projectile will fly
+        # this is the actual value used by the projectile
+        self.calculated_range=0
+
 
         # spread
         #self.spread=15
@@ -81,6 +88,11 @@ class AIGun(object):
         self.damaged=False # gun is damaged and cannot operate
         self.action_jammed=False # gun action is jammed witha shell in the chamber
 
+
+        # what type of fire mode the weapon supports
+        self.direct_fire=True
+        self.indirect_fire=False
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''
@@ -108,7 +120,7 @@ class AIGun(object):
             projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
             projectile.world_coords=copy.copy(self.equipper.world_coords)
             projectile.ai.starting_coords=copy.copy(self.equipper.world_coords)
-            projectile.ai.maxTime=self.range/projectile.ai.speed
+            projectile.ai.maxTime=self.calculated_range/projectile.ai.speed
             projectile.rotation_angle=self.owner.rotation_angle
             projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
             projectile.ai.speed=self.muzzle_velocity
