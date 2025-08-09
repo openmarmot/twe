@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 09 2025
+- added calculated range to weapons - which is aiming in the vertical direction. 
+
+calculated range should reduce the amount of overshoots, but it will be somewhat random.
+
+it was originally intended to help make HE against humans more effective as a HE shell can now collide with the 
+ground near a target instead of just flying past. I have not been able to observe this effect yet though as HE 
+usage is relatively rare compared to MG use. 
+
+----------------------------------
 August 08 2025
 - added sd.kfz.251/2 squad 
 - readme updates

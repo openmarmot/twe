@@ -241,10 +241,11 @@ class AIHuman(object):
 
 
         # final results
-        if adjust_max>0:
-            return [target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
-        else:
-            return target_coords
+        target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+        calculated_range=distance+random.uniform(-adjust_max,adjust_max+500)
+
+        return target_coords,calculated_range
+            
 
     #---------------------------------------------------------------------------
     def calculate_projectile_damage(self,projectile,distance):
@@ -797,8 +798,9 @@ class AIHuman(object):
 
 
             # adjust for human accuracy factors
-            aim_coords=self.calculate_human_accuracy(aim_coords,distance,weapon)
+            aim_coords,calculated_range=self.calculate_human_accuracy(aim_coords,distance,weapon)
             weapon.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,aim_coords)
+            weapon.ai.calculated_range=calculated_range
             weapon.ai.fire()
 
             self.current_burst+=1
@@ -819,9 +821,11 @@ class AIHuman(object):
             # adjusted coords
             # this function was meant for world coords.
             # because it is mouse coords distance won't apply, which may even it out a bit
-            adjusted_coords=self.calculate_human_accuracy(mouse_coords,0,weapon)
+            adjusted_coords,calculated_range=self.calculate_human_accuracy(mouse_coords,0,weapon)
             rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
             weapon.rotation_angle=rotation_angle
+            # we discard calculated range for the player
+            weapon.ai.calculated_range=weapon.ai.range
             self.owner.rotation_angle=rotation_angle
             self.owner.reset_image=True
             weapon.ai.fire()
@@ -1082,13 +1086,16 @@ class AIHuman(object):
         if self.antitank is not None:
             if self.owner.is_player :
                 # do computations based off of where the mouse is. TARGET_COORDS is ignored
-                adjusted_coords=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
+                adjusted_coords,calculated_range=self.calculate_human_accuracy(mouse_screen_coords,0,self.antitank)
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.screen_coords,adjusted_coords)
+                # discard calculated range for player
+                self.antitank.ai.calculated_range=self.antitank.ai.range
 
             else :
                 distance=engine.math_2d.get_distance(self.owner.world_coords,target_coords)
-                adjusted_coords=self.calculate_human_accuracy(target_coords,distance,self.antitank)
+                adjusted_coords,calculated_range=self.calculate_human_accuracy(target_coords,distance,self.antitank)
                 self.antitank.rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,adjusted_coords)
+                self.antitank.ai.calculated_range=calculated_range
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches+=1
 

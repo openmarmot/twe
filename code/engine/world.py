@@ -508,12 +508,16 @@ class World():
                         self.player.ai.memory['task_vehicle_crew']['calculated_turret_angle']=angle
                     if key=='s':
                         if turret.ai.coaxial_weapon:
+                            # no calculated range for player
+                            turret.ai.coaxial_weapon.ai.calculated_range=turret.ai.coaxial_weapon.ai.range
                             turret.ai.handle_fire_coax()
                     if key=='a':
                         turret.ai.handle_rotate_left()
                     elif key=='d':
                         turret.ai.handle_rotate_right()
                     elif key=='f':
+                        # no calculated range for player
+                        turret.ai.primary_weapon.ai.calculated_range=turret.ai.primary_weapon.ai.range
                         turret.ai.handle_fire()
             else:
                 # ---- controls for walking around ------------

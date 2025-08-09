@@ -163,8 +163,11 @@ class AIHumanVehicle():
         aim_coords=target.world_coords
         # guess how long it will take for the bullet to arrive
         distance=engine.math_2d.get_distance(turret.world_coords,target.world_coords)
+         # we want the projectile to collide so aim point will be a bit past it
+        weapon.ai.calculated_range=distance+random.randint(0,500)
         time_passed=distance/weapon.ai.muzzle_velocity
         if target.is_vehicle:
+
             if target.ai.current_speed>0:
                 aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
 
@@ -177,6 +180,8 @@ class AIHumanVehicle():
                 if target.ai.memory['current_task']=='task_move_to_location':
                     destination=target.ai.memory['task_move_to_location']['destination']
                     aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
+
+        
 
         self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
 
