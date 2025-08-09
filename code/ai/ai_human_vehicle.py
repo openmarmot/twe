@@ -227,6 +227,66 @@ class AIHumanVehicle():
             turret.ai.handle_rotate_right()  # Decreases angle
         
         return False
+    
+    #---------------------------------------------------------------------------
+    def think_vehicle_hit(self):
+        '''vehicle occupant reacts to the vehicle being hit'''
+        # for this to be called the vehicle_hits list is not empty
+        
+        # set it to whatever the first one is
+        important_hit=self.owner.ai.memory['task_vehicle_crew']['vehicle_hits'][0]
+
+        # check if anything is more important
+        for hit in self.owner.ai.memory['task_vehicle_crew']['vehicle_hits']:
+            if hit.penetrated:
+                important_hit=hit
+                break
+
+            if hit.projectile_shooter:
+                if hit.projectile_shooter.is_turret:
+                    important_hit=hit
+        
+        # we can now clear the list
+        self.owner.ai.memory['task_vehicle_crew']['vehicle_hits']=[]
+
+        role=self.owner.ai.memory['task_vehicle_crew']['vehicle_role']
+
+        if important_hit.penetrated:
+            self.owner.ai.morale-=10
+            if self.owner.ai.morale_check() is False:
+                self.owner.ai.speak('The vehicle is hit! Bail out!!')
+                self.owner.ai.switch_task_exit_vehicle()
+                return
+            
+            if role.is_gunner:
+                if hit.projectile_shooter:
+                    if hit.projectile_shooter.is_turret:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter.ai.vehicle
+                    else:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter
+                    return
+            if role.is_passenger:
+                # i feel that passengers should probably bail if there is a penetration 
+                # really no reason for them to do anything else
+                self.owner.ai.speak('The vehicle is hit! Bail out!!')
+                self.owner.ai.switch_task_exit_vehicle()
+                return
+        else:
+            # not a penetration, so less of a reaction 
+
+            if role.is_gunner:
+                if hit.projectile_shooter:
+                    if hit.projectile_shooter.is_turret:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter.ai.vehicle
+                        return
+                    # only engage humans if we aren't doing anything else
+                    if self.owner.ai.memory['task_vehicle_crew']['target'] is None:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter
+                        return
+                    
+            # maybe add some morale damage?
+
+
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver(self):
@@ -778,56 +838,65 @@ class AIHumanVehicle():
 
         if self.owner.is_player:
             self.update_task_vehicle_crew_player()
+            return
+        
+        last_think_time=self.owner.ai.memory['task_vehicle_crew']['last_think_time']
+        think_interval=self.owner.ai.memory['task_vehicle_crew']['think_interval']
+
+        # --- think ----
+        if self.owner.world.world_seconds-last_think_time>think_interval:
+            # reset time
+            self.owner.ai.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
+
+            # universal check for empty priority spots
+            if role.is_driver is False and role.is_gunner is False:
+                # check if there are any empty roles
+                for role in vehicle.ai.vehicle_crew:
+                    if role.role_occupied is False:
+                        if role.is_driver or role.is_gunner:
+                            self.owner.ai.switch_task_vehicle_crew(vehicle,None)
+                            return
+                        
+            # universal respond to vehicle being hit
+            # this probably needs to be kept seperate from the role thinks as there is role overlap
+            if len(self.owner.ai.memory['task_vehicle_crew']['vehicle_hits'])>0:
+                self.think_vehicle_hit()
+            
+            # double check that we haven't decided to do something else like exit the vehicle
+            if self.owner.ai.memory['current_task']!='task_vehicle_crew':
+                return
+
+            # note that roles can have multiple functions now
+            if role.is_driver:
+                # driver needs a fast refresh for smooth vehicle controls
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
+                self.think_vehicle_role_driver()
+            if role.is_gunner:
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
+                self.think_vehicle_role_gunner()
+            if role.is_passenger:
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
+                self.think_vehicle_role_passenger()
+            if role.is_radio_operator:
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
+                self.think_vehicle_role_radio_operator()
+
+            if self.owner==self.owner.ai.squad.squad_leader:
+                # if we don't have a vehicle order, check to see if we can create 
+                # one from tactical orders
+                if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
+                    self.owner.ai.squad_leader_review_orders()
+
+
         else:
-            last_think_time=self.owner.ai.memory['task_vehicle_crew']['last_think_time']
-            think_interval=self.owner.ai.memory['task_vehicle_crew']['think_interval']
+            # some roles will want to do something every update cycle
 
-            # think
-            if self.owner.world.world_seconds-last_think_time>think_interval:
-                # reset time
-                self.owner.ai.memory['task_vehicle_crew']['last_think_time']=self.owner.world.world_seconds
-
-                # universal check for empty priority spots
-                if role.is_driver is False and role.is_gunner is False:
-                    # check if there are any empty roles
-                    for role in vehicle.ai.vehicle_crew:
-                        if role.role_occupied is False:
-                            if role.is_driver or role.is_gunner:
-                                self.owner.ai.switch_task_vehicle_crew(vehicle,None)
-                                return
-
-                
-                # note that roles can have multiple functions now
-                if role.is_driver:
-                    # driver needs a fast refresh for smooth vehicle controls
-                    self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
-                    self.think_vehicle_role_driver()
-                if role.is_gunner:
-                    self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
-                    self.think_vehicle_role_gunner()
-                if role.is_passenger:
-                    self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
-                    self.think_vehicle_role_passenger()
-                if role.is_radio_operator:
-                    self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
-                    self.think_vehicle_role_radio_operator()
-
-                if self.owner==self.owner.ai.squad.squad_leader:
-                    # if we don't have a vehicle order, check to see if we can create 
-                    # one from tactical orders
-                    if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
-                        self.owner.ai.squad_leader_review_orders()
-
-
-            else:
-                # some roles will want to do something every update cycle
-
-                if role.is_gunner:
-                    if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:
-                        if self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
-                            self.action_vehicle_gunner_engage_target()
-                if role.is_driver:
-                    self.action_vehicle_driver()
+            if role.is_gunner:
+                if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:
+                    if self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
+                        self.action_vehicle_gunner_engage_target()
+            if role.is_driver:
+                self.action_vehicle_driver()
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew_player(self):

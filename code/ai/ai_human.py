@@ -745,30 +745,6 @@ class AIHuman(object):
             self.speak("I don't understand")
             engine.log.add_data('error','speak inscruction: '+event_data[0]+' not handled',True)
 
-    #---------------------------------------------------------------------------
-    def event_vehicle_hit(self,hit):
-        ''' react to a vehicle we are in being hit'''
-        # hit is hit_data.py 
-
-        if self.memory['current_task']=='task_vehicle_crew':
-            if hit.penetrated:
-                self.morale-=10
-                if self.morale_check()==False:
-                    self.speak('The vehicle is hit! Bail out!!')
-                    self.switch_task_exit_vehicle()
-            else:
-                # hit bounced, could still effect morale
-                if self.morale<100:
-                    self.morale-=random.randint(0,5)
-
-                    if self.morale<60:
-                        if self.morale_check()==False:
-                            self.speak('We are taking fire! I cannot take it anymore! Abandon the vehicle!!')
-                            self.switch_task_exit_vehicle()
-    
-
-
-
 
     #---------------------------------------------------------------------------
     def fire(self,weapon,target):
@@ -1005,7 +981,11 @@ class AIHuman(object):
         elif event=='explosion':
             self.event_explosion(event_data)
         elif event=='vehicle_hit':
-            self.event_vehicle_hit(event_data)
+            # this is called by ai_vehicle.add_hit_data
+            if self.memory['current_task']=='task_vehicle_crew':
+                self.memory['task_vehicle_crew']['vehicle_hits'].append(event_data)
+            else:
+                engine.log.add_data('warn','ai_human.handle_event vehicle_hit but user is not in vehicle',True)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)
@@ -1705,7 +1685,8 @@ class AIHuman(object):
             'last_think_time': 0,
             'think_interval': 0.5,
             'reload_start_time':0,
-            'vehicle_order':vehicle_order
+            'vehicle_order':vehicle_order,
+            'vehicle_hits':[] # array of HitData. gets added to when the vehicle is hit
         }
 
         self.memory[task_name]=task_details

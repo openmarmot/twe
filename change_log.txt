@@ -3,12 +3,23 @@ TWE Project : Change Log
 ----------------------------------
 August 09 2025
 - added calculated range to weapons - which is aiming in the vertical direction. 
+- rewrite the ai_human systems that respond to vehicle hits 
 
 calculated range should reduce the amount of overshoots, but it will be somewhat random.
 
 it was originally intended to help make HE against humans more effective as a HE shell can now collide with the 
 ground near a target instead of just flying past. I have not been able to observe this effect yet though as HE 
 usage is relatively rare compared to MG use. 
+
+There is now some reaction to the vehicle being hit. 
+Significantly gunners should not target vehicles that are hitting the vehicle they are in. 
+This should help cover up some of the quirks of the current targeting system and provide 
+more natural  reactions.
+
+Passengers now exit the vehicle if there is a penetration, which seems like the correct move as 
+with the current damage system they are HIGHLY vulnerable to penetrations 
+
+feeling like its time to add some 20mm. also need to add some stuff for 20mm to eat 
 
 ----------------------------------
 August 08 2025

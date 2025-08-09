@@ -20,6 +20,10 @@ class HitData(object):
 
         # - projectile data - 
         self.projectile_name=projectile.ai.projectile_type
+        self.projectile_shooter=projectile.ai.shooter
+        self.projectile_weapon=projectile.ai.weapon
+
+
         # distance the projectile traveled to make the hit
         self.distance=round(distance,1)
 
