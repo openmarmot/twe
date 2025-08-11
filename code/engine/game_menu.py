@@ -137,8 +137,8 @@ class GameMenu():
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (preview: work in progess)')
-            self.text_queue.append('2 - Load Campaign (preview: work in progress)')
+            self.text_queue.append('1 - New Campaign (preview)')
+            self.text_queue.append('2 - Load Campaign (preview)')
             self.text_queue.append('3 - Quick Battle (choose this)')
             self.text_queue.append('4 - Exit')
 

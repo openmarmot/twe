@@ -1,5 +1,21 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 10 2025
+- added tools/armor_thickness
+- added random background images to the main screen 
+
+added the new tool because i keep confusing whether 0 or 90 degrees is full slope and 
+I wanted to double check that it is being calculated correctly. It is really helpful for 
+understanding actual armor values. 
+
+I spent a lot of time browsing for diagrams. there is not one good source for these. 
+i really wonder how anyone makes professional ww2 models. this is one area where 2d 
+is a blessing.
+
+spent a lot more time adding formatting for background images. good enough for now 
+
 ----------------------------------
 August 09 2025
 - added calculated range to weapons - which is aiming in the vertical direction. 

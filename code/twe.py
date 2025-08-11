@@ -30,6 +30,7 @@ def run():
     '''main function'''
 
     graphic_engine=Graphics_2D_Pygame(screen_size)
+    graphic_engine.switch_mode(0)
 
     # main game loop
     while graphic_engine.quit is False:

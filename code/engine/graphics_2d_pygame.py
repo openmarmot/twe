@@ -18,6 +18,7 @@ from itertools import islice
 import os
 from datetime import datetime
 import time
+import random
 
 
 # import pip packages
@@ -179,6 +180,10 @@ class Graphics_2D_Pygame(object):
         # load all images
         self.load_all_images('images')
 
+        # setup and scale the background images
+        self.menu_background_image=None
+        self.menu_background_rect=None
+
     #------------------------------------------------------------------------------
     def create_screenshot(self):
         pygame.image.save(self.screen, f"{self.screenshot_folder}/twe-{round(self.world.world_seconds,2)}.png")
@@ -300,7 +305,8 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def render_mode_0(self):
         '''render mode 0 : main game menu'''
-        self.screen.blit(self.background, (0, 0))
+        self.screen.fill((255, 255, 255))
+        self.screen.blit(self.menu_background_image, self.menu_background_rect)
         h=0
         for b in self.game_menu.text_queue:
             h+=15
@@ -503,6 +509,40 @@ class Graphics_2D_Pygame(object):
                 self.strategic_map.strategic_menu.activate_menu(closest_object)
 
     #------------------------------------------------------------------------------
+    def set_background_image(self,image_name):
+        '''sets and scales the background image'''
+        # Load and scale the menu background image, preserving aspect ratio
+        try:
+            background_image = self.images.get(image_name, self.background)
+            # Calculate scaling to fit right 3/4 of screen width
+            img_width, img_height = background_image.get_size()
+            target_width = self.screen_size[0] * 3 / 4  # Right 3/4 of screen
+            target_height = self.screen_size[1]  # Full screen height
+            aspect_ratio = img_width / img_height
+            target_aspect = target_width / target_height
+
+            if aspect_ratio > target_aspect:
+                # Image is wider than target area, scale by width
+                new_width = int(target_width)
+                new_height = int(new_width / aspect_ratio)
+            else:
+                # Image is taller than target area, scale by height
+                new_height = int(target_height)
+                new_width = int(new_height * aspect_ratio)
+
+            self.menu_background_image = pygame.transform.scale(background_image, (new_width, new_height))
+            # Position the image in the right 3/4 of the screen
+            # Left edge starts at 1/4 screen width, centered vertically
+            left_edge = self.screen_size[0] / 4
+            self.menu_background_rect = self.menu_background_image.get_rect(
+                center=(left_edge + target_width / 2, self.screen_size[1] / 2)
+            )
+        except Exception as e:
+            engine.log.add_data('error', f'Failed to load or scale menu background image: {e}', True)
+            self.menu_background_image = self.background
+            self.menu_background_rect = self.menu_background_image.get_rect()
+
+    #------------------------------------------------------------------------------
     def switch_mode(self,desired_mode):
         '''switch the graphic engine mode '''
 
@@ -514,7 +554,11 @@ class Graphics_2D_Pygame(object):
         # main menu
         if desired_mode==0:
             self.mode=0
-            self.background.fill((255, 255, 255))
+            random_image=random.choice(['background_kubelwagen',
+                'background_panther','background_t34_column',
+                'background_t34_76','background_ju88'])
+            self.set_background_image(random_image)
+
         # tactical battle
         elif desired_mode==1:
             self.mode=1
