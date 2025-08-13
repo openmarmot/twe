@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+August 13 2025
+- working on indirect fire mode 
+
+just starting to work on how indirect fire will work. patching it into ai_gun and ai_projectile turned 
+out to be simpler than I expected, however the ai logic is going to be a beast and likely involve the radio 
+code -- which i haven't touched for a long time. hmmm 
 
 ----------------------------------
 August 10 2025

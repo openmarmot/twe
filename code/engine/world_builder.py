@@ -2439,6 +2439,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_save=True
 
     elif object_type=='german_sd_kfz_251/2':
+        # the mortar carrier variant
         # https://en.wikipedia.org/wiki/Sd.Kfz._251
         z=spawn_object(world,world_coords,'german_sd_kfz_251_base',False)
         z.name='Sd.Kfz.251/2'
