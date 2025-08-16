@@ -293,48 +293,49 @@ def get_optimal_column_count(amount):
 
 
 #------------------------------------------------------------------------------
-def get_random_constrained_coords(starting_coordinate, max_size, minimum_separation, count):
+def get_random_constrained_coords(starting_coordinate, max_size, minimum_separation, count, avoid_coords, avoid_coords_separation):
     """
     Generates a list of map coordinates with specified constraints.
     Coordinates are whole numbers (integers).
     If max_attempts are exhausted, increases max_size by 1000 and retries.
-
     Parameters:
     - starting_coordinate (list or tuple): The starting coordinates [x, y]. should usually be [0,0]
     - max_size (int): The initial maximum absolute value for x or y.
     - minimum_separation (int): The minimum Euclidean distance between any two coordinates.
     - count (int): The number of coordinates to generate.
-
+    - avoid_coords (array): list of coords to avoid
+    - avoid_coords_separation: minimum distance from a avoided coordinate
     Returns:
     - list of lists: A list containing coordinate pairs [x, y].
-
     Raises:
     - ValueError: If it's impossible to place the desired number of points after multiple retries.
     """
-        
+       
     # Initialize variables
     current_max_size = max_size
-    size_increment = 1000  # Increment to add to max_size upon failure
-    retry_limit = 10        # Maximum number of retries to prevent infinite loops
+    size_increment = 1000 # Increment to add to max_size upon failure
+    retry_limit = 10 # Maximum number of retries to prevent infinite loops
     retries = 0
-
     while retries < retry_limit:
-        # Initialize the list with the starting coordinate
-        coordinates = [starting_coordinate.copy()]
-        
+        # Initialize the list
+        coordinates = []
+       
         # Precompute the square of minimum separation to avoid sqrt in distance calculation
         min_sep_sq = minimum_separation ** 2
-        
+        min_avoid_sep_sq = avoid_coords_separation ** 2
+       
         # Define the maximum number of attempts to prevent infinite loops
         max_attempts = count * 1000
         attempts = 0
-        
+       
         while len(coordinates) < count and attempts < max_attempts:
-            # Generate a random x and y within the specified range as integers
-            x = random.randint(-current_max_size, current_max_size)
-            y = random.randint(-current_max_size, current_max_size)
+            # Generate a random x and y within the specified range as integers, offset around starting_coordinate
+            offset_x = random.randint(-current_max_size, current_max_size)
+            offset_y = random.randint(-current_max_size, current_max_size)
+            x = starting_coordinate[0] + offset_x
+            y = starting_coordinate[1] + offset_y
             new_coord = [x, y]
-            
+           
             # Check if the new coordinate is too close to any existing ones
             too_close = False
             for coord in coordinates:
@@ -343,14 +344,22 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
                 distance_sq = dx * dx + dy * dy
                 if distance_sq < min_sep_sq:
                     too_close = True
-                    break  # No need to check further if one is too close
-            
+                    break # No need to check further if one is too close
+            if not too_close:
+                for coord in avoid_coords:
+                    dx = coord[0] - x
+                    dy = coord[1] - y
+                    distance_sq = dx * dx + dy * dy
+                    if distance_sq < min_avoid_sep_sq:
+                        too_close = True
+                        break # No need to check further if one is too close
+           
             # If the new coordinate is sufficiently far from all existing ones, add it
             if not too_close:
                 coordinates.append(new_coord)
-            
+           
             attempts += 1
-        
+       
         if len(coordinates) == count:
             # Successfully generated the required number of coordinates
             return coordinates
@@ -359,7 +368,7 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
             retries += 1
             current_max_size += size_increment
             print(f"Attempt {retries}: Could only generate {len(coordinates)} coordinates with max_size={current_max_size - size_increment}. Increasing max_size to {current_max_size} and retrying...")
-    
+   
     # If all retries are exhausted, raise an error
     raise ValueError(f"Failed to generate {count} coordinates after {retries} retries with max_size up to {current_max_size}.")
         

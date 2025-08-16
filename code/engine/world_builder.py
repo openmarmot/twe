@@ -514,11 +514,13 @@ def generate_terrain(world):
             engine.math_2d.randomize_position_and_rotation(temp,1200)
 
 #------------------------------------------------------------------------------
-def generate_vegetation(map_objects):
-    max_size=7000
-    min_seperation=50
-    coord_count=2000
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],max_size,min_seperation,coord_count)
+def generate_vegetation(map_objects,world_size):
+    '''generates vegetation
+    this should be run after buildings are created
+    map_objects - list of existing map objects
+    world_size - size of map in all directions. should be > than town generation size
+    '''
+    vegetation=[]
 
     # generate a list of coordinates to avoid
     coordinates_to_avoid=[]
@@ -527,6 +529,27 @@ def generate_vegetation(map_objects):
         if obj.world_builder_identity in names_to_avoid:
             coordinates_to_avoid.append(obj.world_coords)
 
+    # generate coord list of forested areas
+    max_size=world_size
+    min_seperation=1000
+    coord_count=random.randint(50,200)
+    forest_areas=engine.math_2d.get_random_constrained_coords([0,0],max_size,
+        min_seperation,coord_count,coordinates_to_avoid,600)
+
+    # generate each forest clump 
+    for area in forest_areas:
+        # - generate trees -
+        max_size=1000
+        min_seperation=100
+        coord_count=random.randint(1,20)
+        tree_coords=engine.math_2d.get_random_constrained_coords(area,max_size,
+            min_seperation,coord_count,[],0)
+        
+        for coords in tree_coords:
+            rotation=random.randint(0,359)
+            vegetation.append(MapObject('pinus_sylvestris','pinus_sylvestris',coords,rotation,[]))
+
+    return vegetation
 
 #------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
@@ -684,7 +707,7 @@ def load_quick_battle(world,battle_option):
 
     # generate towns
     town_count=4
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],7000,5000,town_count)
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],7000,5000,town_count,[],0)
     for _ in range(town_count):
         coords=coord_list.pop()
         name='Town' # should generate a interesting name
@@ -692,6 +715,9 @@ def load_quick_battle(world,battle_option):
 
     # generate clutter 
     map_objects+=generate_clutter(map_objects)
+
+    # generate vegetation
+    map_objects+=generate_vegetation(map_objects,30000)
 
     # generate civilians
     map_objects+=generate_civilians(map_objects)

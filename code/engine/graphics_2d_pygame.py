@@ -121,11 +121,8 @@ class Graphics_2D_Pygame(object):
         # scale. normal is 1. this is set by the player with []
         self.scale=self.scale_limit[1]
 
-        # adjustment to viewing area. > == more visible
-        # 100 seems to be about the minimum where there is no popping in and out of objects
-        self.view_adjust_minimum=100
-        self.view_adjust=self.view_adjust_minimum
-        self.view_adjustment=400
+        # buffer to make objects start rendering slightly off screen
+        self.view_buffer=100
 
         # -- key stuff --
         # https://www.pygame.org/docs/ref/key.html
@@ -320,7 +317,7 @@ class Graphics_2D_Pygame(object):
     def render_mode_1(self):
         '''render mode 1 : tactical mode'''
 
-        self.update_render_info_new()
+        self.update_render_info()
 
         self.screen.blit(self.background, (0, 0))
         for b in self.renderlists:
@@ -548,7 +545,6 @@ class Graphics_2D_Pygame(object):
 
         # reset scale to defaults
         self.scale=self.scale_limit[1]
-        self.view_adjust=self.view_adjust_minimum
         self.reset_all()
         
         # main menu
@@ -606,7 +602,6 @@ class Graphics_2D_Pygame(object):
             if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
                 self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
-                self.world.debug_text_queue.insert(2,'View Adjust: '+str(self.view_adjust))
                 self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
 
                 
@@ -632,43 +627,50 @@ class Graphics_2D_Pygame(object):
                 self.vehicle_diagnostics.exit=False
                 self.switch_mode(1)
 
-            
     #------------------------------------------------------------------------------
-    def update_render_info_new(self):
+    def update_render_info(self):
         '''
             checks if world objects are within the viewable screen area,
-              and if so, translates their world coordinates to screen coordinates
-              only used by tactical mode
+            and if so, translates their world coordinates to screen coordinates
+            only used by tactical mode
         '''
 
-        #clear out the render levels
-        self.renderlists=[[] for _ in range(self.render_level_count)]
+        # clear out the render levels
+        self.renderlists = [[] for _ in range(self.render_level_count)]
 
-        self.render_count=0
+        self.render_count = 0
 
-        viewrange_x = (
-            self.world.player.world_coords[0] + self.screen_size[0] + self.view_adjust,
-            self.world.player.world_coords[0] - self.screen_size[0] - self.view_adjust
-        )
-        viewrange_y = (
-            self.world.player.world_coords[1] + self.screen_size[1] + self.view_adjust,
-            self.world.player.world_coords[1] - self.screen_size[1] - self.view_adjust
-        )
+        # Calculate half the visible world distance (accounting for scale)
+        half_width_world = (self.screen_size[0] / 2.0) / self.scale
+        half_height_world = (self.screen_size[1] / 2.0) / self.scale
+
+        # Buffer in world coordinates 
+        buffer_world = self.view_buffer / self.scale
+
+        # Visible ranges in world coordinates (min/max with buffer)
+        max_x = self.world.player.world_coords[0] + half_width_world + buffer_world
+        min_x = self.world.player.world_coords[0] - half_width_world - buffer_world
+        max_y = self.world.player.world_coords[1] + half_height_world + buffer_world
+        min_y = self.world.player.world_coords[1] - half_height_world - buffer_world
+
+        viewrange_x = (max_x, min_x)
+        viewrange_y = (max_y, min_y)
+
         translation = self.get_translation()
-        renderable_objects=[]
+        renderable_objects = []
 
         # make a visibility determination per grid square. this worked well with grid square size set to 1000
         for grid_square in self.world.grid_manager.index_map.values():
             if (grid_square.top_left[0] < viewrange_x[0] and grid_square.bottom_right[0] > viewrange_x[1] and
                 grid_square.top_left[1] < viewrange_y[0] and grid_square.bottom_right[1] > viewrange_y[1]):
 
-                grid_square.visible=True
+                grid_square.visible = True
 
                 for obj in grid_square.wo_objects:
-                    if (obj.render and (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale ):
+                    if (obj.render and (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale):
                         renderable_objects.append(obj)
             else:
-                grid_square.visible=False
+                grid_square.visible = False
 
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
@@ -676,26 +678,19 @@ class Graphics_2D_Pygame(object):
                 obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
                 obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
         
-        self.render_count = len(renderable_objects)                
+        self.render_count = len(renderable_objects)      
 
     #------------------------------------------------------------------------------
     def zoom_out(self):
         '''zoom out'''
         if self.scale>self.scale_limit[0]:
             self.scale=round(self.scale-0.1,1)
-            self.view_adjust+=self.view_adjustment
-            #print('zoom out',self.scale)
             self.reset_all()
     #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
         if self.scale<self.scale_limit[1]:
             self.scale=round(self.scale+0.1,1)
-            self.view_adjust-=self.view_adjustment
-            # otherwise stuff starts getting clipped when its <0
-            if self.view_adjust<self.view_adjust_minimum:
-                self.view_adjust=self.view_adjust_minimum
-            #print('zoom in',self.scale)
             self.reset_all()
 
 

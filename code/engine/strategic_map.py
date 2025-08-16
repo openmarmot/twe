@@ -424,6 +424,8 @@ class StrategicMap(object):
     def generate_initial_map_objects(self):
         '''generate objects for the map features'''
 
+        # this should be rewritten and the code combined with teh code for generating quick battles
+
         for map in self.map_squares:
             map_area_count=0
             if map.rail_yard:
@@ -434,7 +436,7 @@ class StrategicMap(object):
                 map_area_count+=1
 
             if map_area_count>0:
-                coord_list=engine.math_2d.get_random_constrained_coords([0,0],6000,5000,map_area_count)
+                coord_list=engine.math_2d.get_random_constrained_coords([0,0],6000,5000,map_area_count,[],0)
 
                 if map.rail_yard:
                     coords=coord_list.pop()
@@ -451,6 +453,9 @@ class StrategicMap(object):
 
             # generate clutter
             map.map_objects+=engine.world_builder.generate_clutter(map.map_objects)
+
+            # generate vegetation
+            map.map_objects+=engine.world_builder.generate_vegetation(map.map_objects,30000)
 
     #------------------------------------------------------------------------------
     def generate_initial_units(self):
