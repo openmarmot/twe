@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 15 2025
+- adding a static 100v100 tank quick battle for benchmarking purposes 
+- turned on hit markers by default. you can still turn them off from the debug menu 
+
 ----------------------------------
 August 13 2025
 - working on indirect fire mode 

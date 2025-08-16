@@ -210,7 +210,13 @@ class GameMenu():
             if key=='4':
                 engine.world_builder.load_quick_battle(self.graphics_engine.world,'4')
                 self.graphics_engine.switch_mode(1)
-                self.deactivate_menu() 
+                self.deactivate_menu()
+
+            self.text_queue.append('5 - 100v100 tank battle for benchmarking')
+            if key=='5':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'5')
+                self.graphics_engine.switch_mode(1)
+                self.deactivate_menu()
 
 
 

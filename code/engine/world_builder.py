@@ -682,33 +682,38 @@ def load_quick_battle(world,battle_option):
     map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
+    squads=[]
 
     if battle_option=='1':
         points=2500
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     elif battle_option=='2':
         points=5000
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     
     elif battle_option=='3':
         points=10000
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     # testing
     elif battle_option=='4':
-        squads=[]
-
+        pass
         #squads.append('Soviet T34-76 Model 1943')
 
         #squads.append('German Sd.kfz.251/9')
+
+    # bench mark
+    elif battle_option=='5':
+        world.debug_mode=True
+
+        for b in range(100):
+            squads.append('Soviet T34-76 Model 1943')
+            squads.append('German Panzer IV Ausf G')
 
 
     for squad in squads:
@@ -2520,8 +2525,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rate_of_fire=1
         z.ai.range=4000
         z.ai.type='cannon'
-        z.ai.use_antitank=True
+        z.ai.use_antitank=False
         z.ai.use_antipersonnel=True
+        z.ai.direct_fire=False
+        z.ai.indirect_fire=True
+        z.ai.indirect_fire_mode=True
         z.rotation_angle=0
 
     elif object_type=='GrW34_magazine':
