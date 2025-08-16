@@ -5,6 +5,10 @@ TWE Project : Change Log
 August 15 2025
 - adding a static 100v100 tank quick battle for benchmarking purposes 
 - turned on hit markers by default. you can still turn them off from the debug menu 
+- changed the resolution to 1920x1080 
+
+the best resolution is really screen dependent. the game doesn't scale so the more resolution, 
+the mmore you can see while zoomed in. 
 
 ----------------------------------
 August 13 2025

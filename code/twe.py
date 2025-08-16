@@ -22,8 +22,8 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 
 #global variables
 
-screen_size = (1200,900)
-#screen_size = (1920,1080)
+#screen_size = (1200,900)
+screen_size = (1920,1080)
 
 #------------------------------------------------------------------------------
 def run():
