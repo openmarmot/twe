@@ -514,6 +514,21 @@ def generate_terrain(world):
             engine.math_2d.randomize_position_and_rotation(temp,1200)
 
 #------------------------------------------------------------------------------
+def generate_vegetation(map_objects):
+    max_size=7000
+    min_seperation=50
+    coord_count=2000
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],max_size,min_seperation,coord_count)
+
+    # generate a list of coordinates to avoid
+    coordinates_to_avoid=[]
+    names_to_avoid=['warehouse','square_building','hangar','concrete_square']
+    for obj in map_objects:
+        if obj.world_builder_identity in names_to_avoid:
+            coordinates_to_avoid.append(obj.world_coords)
+
+
+#------------------------------------------------------------------------------
 def generate_world_area(world_coords,area_type,name):
     ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
     # area_type town, airport, bunkers, field_depot, train_depot 
@@ -672,7 +687,7 @@ def load_quick_battle(world,battle_option):
     coord_list=engine.math_2d.get_random_constrained_coords([0,0],7000,5000,town_count)
     for _ in range(town_count):
         coords=coord_list.pop()
-        name='Town' # should generate a interessting name
+        name='Town' # should generate a interesting name
         map_objects+=generate_world_area(coords,'town',name)
 
     # generate clutter 
@@ -5006,6 +5021,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Hit marker'
         z.minimum_visible_scale=0.2
         z.is_hit_marker=True
+    elif object_type=='pinus_sylvestris':
+        # scots pine
+        z=WorldObject(world,['pinus_sylvestris'],AINone)
+        z.name='pinus_sylvestris'
+        z.weight=1000
+        z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
 
     else:
         print('!! Spawn Error: '+object_type+' is not recognized.')  

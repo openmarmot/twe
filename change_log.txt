@@ -1,5 +1,7 @@
 TWE Project : Change Log
-
+- added 'pinus_sylvestris' aka scots pine 
+- work on vegetation generation code
+- reorganized art folder
 
 ----------------------------------
 August 15 2025
