@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 17 2025
+- added some fixes for vehicles firing on disabled vehicles 
+- misc fixes and updates
+
 ----------------------------------
 August 16 2025
 - added 'pinus_sylvestris' aka scots pine 

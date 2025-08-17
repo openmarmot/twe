@@ -136,7 +136,11 @@ class AIHumanVehicle():
                     self.owner.ai.memory['task_vehicle_crew']['target']=None
                     self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
                     return
-
+            if target.is_vehicle:
+                if target.ai.check_if_vehicle_is_occupied() is False or target.ai.vehicle_disabled:
+                    self.owner.ai.memory['task_vehicle_crew']['target']=None
+                    self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                    return
 
             # handle bursts and fire weapon
             if self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon']:
@@ -661,11 +665,14 @@ class AIHumanVehicle():
 
                 if engage_primary:
                     self.calculate_turret_aim(turret,target,turret.ai.primary_weapon)
-                    self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+                    target_name=target.name
+                    if target.is_human:
+                        target_name='soldiers'
+                    self.owner.ai.memory['task_vehicle_crew']['current_action']=f'Engaging {target_name}'
                     return
                 if engage_coaxial:
                     self.calculate_turret_aim(turret,target,turret.ai.coaxial_weapon)
-                    self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Targets'
+                    self.owner.ai.memory['task_vehicle_crew']['current_action']=f'Engaging {target_name}'
                     return
         
 
