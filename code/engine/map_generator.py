@@ -17,6 +17,7 @@ import engine.log
 #------------------------------------------------------------------------------
 def generate_map(map_areas):
     '''
+    entry point 
     generate a map. return a list of map objects
 
     map_areas : list of map areas to be created 
@@ -29,13 +30,30 @@ def generate_map(map_areas):
 
     world_size=max(min_world_size,len(map_areas)*4000)
 
+    coord_list=engine.math_2d.get_random_constrained_coords([0,0],8000,5000,len(map_areas),[],0) 
+
     for map_area in map_areas:
         if map_area=='airport':
-            pass
+            map_objects+=generate_map_area_airport(coord_list.pop(),'airport')
+        elif map_area=='rail_yard':
+            map_objects+=generate_map_area_rail_yard(coord_list.pop(),'rail_yard')
+        elif map_area=='town':
+            map_objects+=generate_map_area_town(coord_list.pop(),'town')
+
+    # generate clutter 
+    map_objects+=engine.world_builder.generate_clutter(map_objects)
+
+    # generate vegetation
+    map_objects+=engine.world_builder.generate_vegetation(map_objects,world_size)  
+
+    # generate civilians
+    map_objects+=engine.world_builder.generate_civilians(map_objects)
+
+    return map_objects
 
 
 #------------------------------------------------------------------------------
-def generate_map_area_airport(world_coords):
+def generate_map_area_airport(world_coords,name):
     map_objects=[]
     # create a long runway 
     count=400
@@ -49,16 +67,21 @@ def generate_map_area_airport(world_coords):
     map_objects.append(MapObject('hangar','',[world_coords[0]+3500,world_coords[1]+600],0,[]))
 
     # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
-    world_area=MapObject('world_area_'+area_type,name,world_coords,0,[])
+    world_area=MapObject('world_area_'+'airport',name,world_coords,0,[])
     map_objects.append(world_area)
 
     return map_objects
 
 #------------------------------------------------------------------------------
-def generate_map_area_rail_yard(world_coords):
+def generate_map_area_rail_yard(world_coords,name):
     '''generate rail yard map area'''
     engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented',True)
-    return []
+    map_objects=[]
+
+    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
+    world_area=MapObject('world_area_'+'rail_yard',name,world_coords,0,[])
+    map_objects.append(world_area)
+    return map_objects
 
 #------------------------------------------------------------------------------
 def generate_map_area_simple(world_coords,count,diameter,world_builder_identity,name,rotation):
@@ -73,7 +96,7 @@ def generate_map_area_simple(world_coords,count,diameter,world_builder_identity,
     return map_objects
 
 #------------------------------------------------------------------------------
-def generate_map_area_town(world_coords):
+def generate_map_area_town(world_coords,name):
     count_warehouse=random.randint(1,5)
     count_building=random.randint(2,14)
     coords=engine.math_2d.get_grid_coords(world_coords,600,count_warehouse+count_building)
@@ -84,6 +107,10 @@ def generate_map_area_town(world_coords):
     
     for _ in range(count_building):
         map_objects.append(MapObject('square_building','some sort of building',coords.pop(),rotation,[]))
+
+    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
+    world_area=MapObject('world_area_'+'town',name,world_coords,0,[])
+    map_objects.append(world_area)
 
     return map_objects
 

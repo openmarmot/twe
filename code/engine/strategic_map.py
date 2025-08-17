@@ -22,6 +22,7 @@ from engine.map_square import MapSquare
 from engine.map_object import MapObject
 from ai.ai_faction_strategic import AIFactionStrategic
 from ai.ai_bank import AIBank
+import engine.map_generator
 
 #global variables
 
@@ -357,8 +358,7 @@ class StrategicMap(object):
     #---------------------------------------------------------------------------
     def generate_initial_civilians(self):
 
-        for map in self.map_squares:
-            map.map_objects+=engine.world_builder.generate_civilians(map.map_objects)
+        # regular civilians are added as part of initial map object generation
 
         # -- add some unique one offs --
 
@@ -424,38 +424,18 @@ class StrategicMap(object):
     def generate_initial_map_objects(self):
         '''generate objects for the map features'''
 
-        # this should be rewritten and the code combined with teh code for generating quick battles
-
         for map in self.map_squares:
-            map_area_count=0
+            map_areas=[]
             if map.rail_yard:
-                map_area_count+=1
+                map_areas.append('rail_yard')
             if map.airport:
-                map_area_count+=1
+                map_areas.append('airport')
             if map.town:
-                map_area_count+=1
+                map_areas.append('town')
 
-            if map_area_count>0:
-                coord_list=engine.math_2d.get_random_constrained_coords([0,0],6000,5000,map_area_count,[],0)
+            # used += but i think map.map_objects is empty at this point 
+            map.map_objects+=engine.map_generator.generate_map(map_areas)
 
-                if map.rail_yard:
-                    coords=coord_list.pop()
-                    name='Rail Yard' # should generate a interessting name
-                    map.map_objects+=engine.world_builder.generate_world_area(coords,'rail_yard',name)
-                if map.airport:
-                    coords=coord_list.pop()
-                    name='Airport' # should generate a interessting name
-                    map.map_objects+=engine.world_builder.generate_world_area(coords,'airport',name)
-                if map.town:
-                    coords=coord_list.pop()
-                    name='Town' # should generate a interessting name
-                    map.map_objects+=engine.world_builder.generate_world_area(coords,'town',name)
-
-            # generate clutter
-            map.map_objects+=engine.world_builder.generate_clutter(map.map_objects)
-
-            # generate vegetation
-            map.map_objects+=engine.world_builder.generate_vegetation(map.map_objects,30000)
 
     #------------------------------------------------------------------------------
     def generate_initial_units(self):

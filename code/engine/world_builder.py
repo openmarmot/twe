@@ -34,6 +34,7 @@ from engine.map_object import MapObject
 import engine.world_radio
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
+import engine.map_generator
 
 
 # load AI
@@ -513,51 +514,6 @@ def generate_terrain(world):
             temp=spawn_object(world,coords.pop(),'terrain_mottled_transparent',True)
             engine.math_2d.randomize_position_and_rotation(temp,1200)
 
-
-
-#------------------------------------------------------------------------------
-def generate_world_area(world_coords,area_type,name):
-    ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
-    # area_type town, airport, bunkers, field_depot, train_depot 
-    map_objects=[]
-    if area_type=='town':
-        map_objects=generate_world_area_town(world_coords)
-    elif area_type=='airport':
-        map_objects=generate_world_area_airport(world_coords)
-    elif area_type=='rail_yard':
-        map_objects=generate_world_area_rail_yard(world_coords)
-    elif area_type=='fuel_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'55_gallon_drum','fuel drum',rotation)
-    elif area_type=='german_ammo_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_mg_ammo_can','German Ammo Can',rotation)
-    elif area_type=='german_fuel_can_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_fuel_can','German Fuel Can',rotation)
-    else:
-        engine.log.add_data('error','worldbuilder.generate_world_area type '+area_type+' not recognized',True)
-
-    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
-    world_area=MapObject('world_area_'+area_type,name,world_coords,0,[])
-    map_objects.append(world_area)
-
-    return map_objects
-
-
-
-
-
-
-
-
-
 #------------------------------------------------------------------------------
 def get_random_from_list(world,world_coords,OBJECT_LIST,spawn):
     ''' returns a random object from a list'''
@@ -627,24 +583,11 @@ def load_magazine(world,magazine,projectile_type=None):
 def load_quick_battle(world,battle_option):
     ''' load quick battle. called by game menu'''
 
-    map_objects=[]
+    map_areas=['town','town','town']
 
-    # generate towns
-    town_count=4
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],7000,5000,town_count,[],0)
-    for _ in range(town_count):
-        coords=coord_list.pop()
-        name='Town' # should generate a interesting name
-        map_objects+=generate_world_area(coords,'town',name)
+    map_objects=engine.map_generator.generate_map(map_areas)
 
-    # generate clutter 
-    map_objects+=generate_clutter(map_objects)
 
-    # generate vegetation
-    map_objects+=generate_vegetation(map_objects,30000)
-
-    # generate civilians
-    map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
     squads=[]
@@ -3113,7 +3056,7 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='panzeriv_wheel':
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='Panzer IV Wheel'
-        z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h''german_panzer_iv_ausf_j']
+        z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h','german_panzer_iv_ausf_j']
         z.ai.armor=[10,0,0]
 
     elif object_type=='panzer_iv_j_turret':
