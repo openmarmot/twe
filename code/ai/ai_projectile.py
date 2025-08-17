@@ -44,6 +44,9 @@ class AIProjectile(object):
         # speed in game units per second
         self.speed=0
 
+        # indirect fire mode ignores collision
+        self.indirect_fire_mode=False
+
     #---------------------------------------------------------------------------
     def contact_effect(self):
         # add the shrapnel
@@ -82,6 +85,10 @@ class AIProjectile(object):
 
             # move along path
             self.owner.world_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,time_passed)
+
+            if self.indirect_fire_mode:
+                # indirect fire mode ignores collision, so no further processing needed
+                return
 
             # check collision 
             if self.flightTime>self.last_collision_check+self.collision_check_interval:

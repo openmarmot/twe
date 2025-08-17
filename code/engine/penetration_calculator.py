@@ -2,6 +2,15 @@
 repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
 notes : various penetration "calculations"
+
+see tools/armor_thickness.py for a simple tool to help visualize the effects of armor and armor slope
+
+remember for armor
+0 - vertical. no slope. no advantage to effective armor
+90 - full slope. (impossible)
+the closer to 90 the more effective armor you get as the shell has 
+to travel through more armor place to pierce through
+
 '''
 
 

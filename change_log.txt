@@ -1,5 +1,52 @@
 TWE Project : Change Log
 
+
+----------------------------------
+August 17 2025
+- added some fixes for vehicles firing on disabled vehicles 
+- misc fixes and updates
+
+----------------------------------
+August 16 2025
+- added 'pinus_sylvestris' aka scots pine 
+- work on vegetation generation code
+- reorganized art folder
+- rewrite of visibility mechanism to actually work with different screen sizes 
+- working on rewrite of map generation 
+- misc cleanup 
+
+----------------------------------
+August 15 2025
+- adding a static 100v100 tank quick battle for benchmarking purposes 
+- turned on hit markers by default. you can still turn them off from the debug menu 
+- changed the resolution to 1920x1080 
+
+the best resolution is really screen dependent. the game doesn't scale so the more resolution, 
+the mmore you can see while zoomed in. 
+
+----------------------------------
+August 13 2025
+- working on indirect fire mode 
+
+just starting to work on how indirect fire will work. patching it into ai_gun and ai_projectile turned 
+out to be simpler than I expected, however the ai logic is going to be a beast and likely involve the radio 
+code -- which i haven't touched for a long time. hmmm 
+
+----------------------------------
+August 10 2025
+- added tools/armor_thickness
+- added random background images to the main screen 
+
+added the new tool because i keep confusing whether 0 or 90 degrees is full slope and 
+I wanted to double check that it is being calculated correctly. It is really helpful for 
+understanding actual armor values. 
+
+I spent a lot of time browsing for diagrams. there is not one good source for these. 
+i really wonder how anyone makes professional ww2 models. this is one area where 2d 
+is a blessing.
+
+spent a lot more time adding formatting for background images. good enough for now 
+
 ----------------------------------
 August 09 2025
 - added calculated range to weapons - which is aiming in the vertical direction. 

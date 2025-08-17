@@ -504,11 +504,14 @@ class AIHuman(object):
                         else:
                             #eventually these will be vehicle specific lists
                             if d<1000:
-                                self.near_vehicle_targets.append(target)
+                                if target not in self.near_vehicle_targets:
+                                    self.near_vehicle_targets.append(target)
                             elif d<2000:
-                                self.mid_vehicle_targets.append(target)
+                                if target not in self.mid_vehicle_targets:
+                                    self.mid_vehicle_targets.append(target)
                             elif d<4000:
-                                self.far_vehicle_targets.append(target)
+                                if target not in self.far_vehicle_targets:
+                                    self.far_vehicle_targets.append(target)
 
 
                     if d<closest_distance:

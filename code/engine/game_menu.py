@@ -137,8 +137,8 @@ class GameMenu():
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
             self.text_queue.append('')
-            self.text_queue.append('1 - New Campaign (preview: work in progess)')
-            self.text_queue.append('2 - Load Campaign (preview: work in progress)')
+            self.text_queue.append('1 - New Campaign (preview)')
+            self.text_queue.append('2 - Load Campaign (preview)')
             self.text_queue.append('3 - Quick Battle (choose this)')
             self.text_queue.append('4 - Exit')
 
@@ -210,7 +210,13 @@ class GameMenu():
             if key=='4':
                 engine.world_builder.load_quick_battle(self.graphics_engine.world,'4')
                 self.graphics_engine.switch_mode(1)
-                self.deactivate_menu() 
+                self.deactivate_menu()
+
+            self.text_queue.append('5 - 100v100 tank battle for benchmarking')
+            if key=='5':
+                engine.world_builder.load_quick_battle(self.graphics_engine.world,'5')
+                self.graphics_engine.switch_mode(1)
+                self.deactivate_menu()
 
 
 

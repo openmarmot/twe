@@ -92,6 +92,9 @@ class AIGun(object):
         # what type of fire mode the weapon supports
         self.direct_fire=True
         self.indirect_fire=False
+        
+        # indirect fire weapons can set this to true to fire projectiles that don't have collision checking
+        self.indirect_fire_mode=False
 
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
@@ -124,6 +127,7 @@ class AIGun(object):
             projectile.rotation_angle=self.owner.rotation_angle
             projectile.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
             projectile.ai.speed=self.muzzle_velocity
+            projectile.ai.indirect_fire_mode=self.indirect_fire_mode
             
             self.owner.world.add_queue.append(projectile)
 

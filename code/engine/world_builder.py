@@ -34,6 +34,7 @@ from engine.map_object import MapObject
 import engine.world_radio
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
+import engine.map_generator
 
 
 # load AI
@@ -358,100 +359,7 @@ def fill_container(world,container,fill_name):
     fill.weight=container.volume
     container.ai.inventory.append(fill)
 
-#------------------------------------------------------------------------------
-def generate_clutter(map_objects):
-    '''generates and auto places small objects around the map'''
-    # map_objects - array of map_objects
-    # returns array of map_objects
-    clutter=[]
 
-    for b in map_objects:
-
-        # industrial clutter
-        if b.world_builder_identity=='warehouse':
-            chance=random.randint(1,15)
-            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-            rotation=random.randint(0,359)
-            if chance==1 or chance==2:
-                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
-            if chance==1 or chance==3 or chance==4:
-                # some overlap
-                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
-            if chance==5:
-                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
-            if chance==6:
-                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
-            if chance==7:
-                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
-            if chance==8 or chance==9:
-                clutter.append(MapObject('crate_random_consumables','crate',coords,rotation,[]))
-            if chance==10 or chance==11:
-                coords[0]+=random.randint(-50,50)
-                coords[1]+=random.randint(-50,50)
-                count=random.randint(1,6)
-                rotation=random.choice([0,90,180,270])
-                coord_list=engine.math_2d.get_column_coords(coords,80,count,rotation,2)
-                for _ in range(count):
-                    clutter.append(MapObject('concrete_square','concrete_square',coord_list.pop(),rotation,[]))
-
-        # house clutter 
-        elif b.world_builder_identity=='square_building':
-            chance=random.randint(1,15)
-            coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-            rotation=random.randint(0,359)
-            if chance==1 or chance==2:
-                clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
-            if chance==1 or chance==3 or chance==4:
-                # some overlap
-                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
-            if chance==5:
-                clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
-            if chance==6:
-                clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
-            if chance==7:
-                clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
-
-    # add some crates 
-                
-    # add some vehicles 
-                
-    return clutter
-
-#------------------------------------------------------------------------------
-def generate_civilians(map_objects):
-    '''generates and returns a array of civilian map_objects'''
-    civilians=[]
-
-    for b in map_objects:
-        if b.world_builder_identity=='warehouse':
-            count=random.randint(0,10)
-            for _ in range(count):
-                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-                rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
-
-        elif b.world_builder_identity=='square_building':
-            count=random.randint(1,3)
-            for _ in range(count):
-                coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
-                rotation=random.randint(0,359)
-                civilians.append(MapObject('civilian_man','',coords,rotation,[]))
-
-    # unique civilian big cheese
-    if random.randint(1,100)<5:
-        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
-        rotation=random.randint(0,359)
-        civilians.append(MapObject('civilian_big_cheese','',coords,rotation,[]))
-        engine.log.add_data('note','big_cheese added to map',True)
-
-    # unique civilian shovel_man
-    if random.randint(1,100)<5:
-        coords=[random.randint(-1000,1000),random.randint(-1000,1000)]
-        rotation=random.randint(0,359)
-        civilians.append(MapObject('civilian_shovel_man','',coords,rotation,[]))
-        engine.log.add_data('note','shovel_man added to map',True)
-
-    return civilians
 
 #------------------------------------------------------------------------------
 def generate_dynamic_world_areas(world):
@@ -512,89 +420,6 @@ def generate_terrain(world):
         for _ in range(count*count):
             temp=spawn_object(world,coords.pop(),'terrain_mottled_transparent',True)
             engine.math_2d.randomize_position_and_rotation(temp,1200)
-
-#------------------------------------------------------------------------------
-def generate_world_area(world_coords,area_type,name):
-    ''' generates the world areas on a NEW map. existing maps will pull this from the database '''
-    # area_type town, airport, bunkers, field_depot, train_depot 
-    map_objects=[]
-    if area_type=='town':
-        map_objects=generate_world_area_town(world_coords)
-    elif area_type=='airport':
-        map_objects=generate_world_area_airport(world_coords)
-    elif area_type=='rail_yard':
-        map_objects=generate_world_area_rail_yard(world_coords)
-    elif area_type=='fuel_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'55_gallon_drum','fuel drum',rotation)
-    elif area_type=='german_ammo_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_mg_ammo_can','German Ammo Can',rotation)
-    elif area_type=='german_fuel_can_dump':
-        count=random.randint(11,157)
-        diameter=20
-        rotation=0
-        map_objects=generate_world_area_simple(world_coords,count,diameter,'german_fuel_can','German Fuel Can',rotation)
-    else:
-        engine.log.add_data('error','worldbuilder.generate_world_area type '+area_type+' not recognized',True)
-
-    # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
-    world_area=MapObject('world_area_'+area_type,name,world_coords,0,[])
-    map_objects.append(world_area)
-
-    return map_objects
-
-#------------------------------------------------------------------------------
-def generate_world_area_airport(world_coords):
-    map_objects=[]
-    # create a long runway 
-    count=400
-    coords=engine.math_2d.get_column_coords(world_coords,80,count,270,4)
-    for _ in range(count):
-        map_objects.append(MapObject('concrete_square','',coords.pop(),random.choice([0,90,180,270]),[]))
-
-    # add hangars
-    map_objects.append(MapObject('hangar','',[world_coords[0]+1500,world_coords[1]+600],0,[]))
-    map_objects.append(MapObject('hangar','',[world_coords[0]+2500,world_coords[1]+600],0,[]))
-    map_objects.append(MapObject('hangar','',[world_coords[0]+3500,world_coords[1]+600],0,[]))
-
-    return map_objects
-
-#------------------------------------------------------------------------------
-def generate_world_area_simple(world_coords,count,diameter,world_builder_identity,name,rotation):
-    '''generates a simple one object type world area '''
-    # count: int
-    # diameter : int - rough size of the object
-    coords=engine.math_2d.get_grid_coords(world_coords,diameter,count)
-    map_objects=[]
-    for _ in range(count):
-        map_objects.append(MapObject(world_builder_identity,name,coords.pop(),rotation,[]))
-    
-    return map_objects
-
-#------------------------------------------------------------------------------
-def generate_world_area_rail_yard(world_coords):
-    engine.log.add_data('warn','world_builder.generate_world_area_rail_yard: not implemented',True)
-    return []
-
-#------------------------------------------------------------------------------
-def generate_world_area_town(world_coords):
-    count_warehouse=random.randint(1,5)
-    count_building=random.randint(2,14)
-    coords=engine.math_2d.get_grid_coords(world_coords,600,count_warehouse+count_building)
-    map_objects=[]
-    rotation=random.choice([0,90,180,270])
-    for _ in range(count_warehouse):
-        map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
-    
-    for _ in range(count_building):
-        map_objects.append(MapObject('square_building','some sort of building',coords.pop(),rotation,[]))
-
-    return map_objects
 
 #------------------------------------------------------------------------------
 def get_random_from_list(world,world_coords,OBJECT_LIST,spawn):
@@ -665,50 +490,45 @@ def load_magazine(world,magazine,projectile_type=None):
 def load_quick_battle(world,battle_option):
     ''' load quick battle. called by game menu'''
 
-    map_objects=[]
+    map_areas=['town','town','town']
 
-    # generate towns
-    town_count=4
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],7000,5000,town_count)
-    for _ in range(town_count):
-        coords=coord_list.pop()
-        name='Town' # should generate a interessting name
-        map_objects+=generate_world_area(coords,'town',name)
+    map_objects=engine.map_generator.generate_map(map_areas)
 
-    # generate clutter 
-    map_objects+=generate_clutter(map_objects)
 
-    # generate civilians
-    map_objects+=generate_civilians(map_objects)
 
     # -- initial troops --
+    squads=[]
 
     if battle_option=='1':
         points=2500
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     elif battle_option=='2':
         points=5000
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     
     elif battle_option=='3':
         points=10000
-        squads=[]
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points)
 
     # testing
     elif battle_option=='4':
-        squads=[]
-
+        pass
         #squads.append('Soviet T34-76 Model 1943')
 
         #squads.append('German Sd.kfz.251/9')
+
+    # bench mark
+    elif battle_option=='5':
+        world.debug_mode=True
+
+        for b in range(100):
+            squads.append('Soviet T34-76 Model 1943')
+            squads.append('German Panzer IV Ausf G')
 
 
     for squad in squads:
@@ -2439,6 +2259,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_save=True
 
     elif object_type=='german_sd_kfz_251/2':
+        # the mortar carrier variant
         # https://en.wikipedia.org/wiki/Sd.Kfz._251
         z=spawn_object(world,world_coords,'german_sd_kfz_251_base',False)
         z.name='Sd.Kfz.251/2'
@@ -2519,8 +2340,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.rate_of_fire=1
         z.ai.range=4000
         z.ai.type='cannon'
-        z.ai.use_antitank=True
+        z.ai.use_antitank=False
         z.ai.use_antipersonnel=True
+        z.ai.direct_fire=False
+        z.ai.indirect_fire=True
+        z.ai.indirect_fire_mode=True
         z.rotation_angle=0
 
     elif object_type=='GrW34_magazine':
@@ -3139,7 +2963,7 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='panzeriv_wheel':
         z=WorldObject(world,['volkswagen_wheel'],AIWheel)
         z.name='Panzer IV Wheel'
-        z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h''german_panzer_iv_ausf_j']
+        z.ai.compatible_vehicles=['german_panzer_iv_ausf_g','german_panzer_iv_ausf_h','german_panzer_iv_ausf_j']
         z.ai.armor=[10,0,0]
 
     elif object_type=='panzer_iv_j_turret':
@@ -4997,6 +4821,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='Hit marker'
         z.minimum_visible_scale=0.2
         z.is_hit_marker=True
+    elif object_type=='pinus_sylvestris':
+        # scots pine
+        z=WorldObject(world,['pinus_sylvestris'],AINone)
+        z.name='pinus_sylvestris'
+        z.weight=1000
+        z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
 
     else:
         print('!! Spawn Error: '+object_type+' is not recognized.')  
