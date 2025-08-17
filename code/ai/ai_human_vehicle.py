@@ -672,6 +672,9 @@ class AIHumanVehicle():
                     return
                 if engage_coaxial:
                     self.calculate_turret_aim(turret,target,turret.ai.coaxial_weapon)
+                    target_name=target.name
+                    if target.is_human:
+                        target_name='soldiers'
                     self.owner.ai.memory['task_vehicle_crew']['current_action']=f'Engaging {target_name}'
                     return
         
