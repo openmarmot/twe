@@ -2,6 +2,17 @@ TWE Project : Change Log
 
 
 ----------------------------------
+August 19 2025
+- moved gameplay instructions to the readme 
+- minor misc readme updates 
+
+I have lately been leaning in the direction that most documentation should 
+just be in the readme, otherwise its never going to get read. I will have to 
+re-evaluate if it gets too big. I would like to document more of the features, or 
+have the game give more clues as to why things happen. I don't want the player to 
+guess about game mechanics. 
+
+----------------------------------
 August 17 2025
 - added some fixes for vehicles firing on disabled vehicles 
 - misc fixes and updates
