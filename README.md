@@ -66,7 +66,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Jagdpanzer 38t 'Hetzer' | Tank | |
 | German | Ju 88 | Airplane | |
 | German | Kubelwagen | Utility | Also available in a camo version | 
-| German | Pak 40 | AT Gun | |
+| German | Pak 40 | AT Gun | Towed gun |
 | German | Panzer IV Ausf G | Tank | 75mm L43 |
 | German | Panzer IV Ausf H | Tank | 75mm L48 |
 | German | Panzer IV Ausf J | Tank | Minor differences from the H |
@@ -83,34 +83,93 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | T20 'Komsomolets' | Utility | Armored Tractor |
 | Soviet | T34-76 | Tank | A late model T34-76 |
 | Soviet | T34-85 | Tank | |
-| Soviet | 37mm AA Gun | AA | |
+| Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
+
+### A note on Infantry Weapons 
+I already have a large amount of infantry weapons in game, but currently infantry weapons just don't matter much - the game is dominated by vehicle warfare. 
 
 
-
-
-### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main based on how buggy it is.
+### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main when I feel like it.
   
-### To Play 
+### Install Instructions
 - install python3 and pygame
 - download code
 - change directory to the code directory
 - python3 twe.py (windows would be: py twe.py)
 - tested on Windows 10, Linux, Apple (M2)
+- if you need to change the screen resolution, it is currently set in code/twe.py
+- more notes in misc_notes/install_notes.txt
 
 ### Controls
-See gameplay_instructions.txt for a full list
-- '~' opens/closes debug menu 
-- 'w/s/a/d' movement
-- left click on a object to open context menu
-- tab close the active menu or open a player context menu
-- 'esc' to exit menu
-- 1-0 number keys are used in menus
-- 'f' to fire weapon (if you have one)
-- 'g' throw grenade (if you have one)
-- 't' launch panzerfaust (if you have one)
-- '[' zoom out
-- ']' zoom in 
 
+#### General Controls  
+| Key | Use |
+|---|---|
+| '[' | Zoom in | 
+| ']' | Zoom out |
+| 'space bar' | Toggle a circle that shows your weapon range | 
+| 'tab' | Bring up a context menu or exit the current mehu |
+| 'esc' | Exit the current menu | 
+| 'left ctrl' | Take a screenshot (saves to code/game_screenshots) |
+| '~' | Brings up the debug menue |
+| 'm' | Toggles Map (colored pointers to world areas) |
+
+
+#### Human (on foot) Controls
+| Key | Use |
+|---|---|
+| 'w/s/a/d' | Movement | 
+| 'f' | Fire primary weapon if equipped |
+| 'g' | Throw grenade or other throwable item | 
+| 't' | Fire antitank weapon if equipped |
+| 'p' | Toggle prone | 
+| 'r' | Reload your prmary weapon with a compatible magazine from your inventory |
+| 'tab' | Human context menu |
+
+#### Vehicle Driver Role Controls
+| Key | Use |
+|---|---|
+| 'w' | Gas | 
+| 's' | Brake |
+| 'a' | Steer left | 
+| 'd' | Steer right |
+| 'tab' | Vehicle context menu |
+
+#### Vehicle Gunner Controls
+| Key | Use |
+|---|---|
+| 'w' | Rotates the turret to aim where the mouse is (if possible) | 
+| 's' | Fire coaxial weapon if equipped |
+| 'a' | Rotates the turret counter-clockwise | 
+| 'd' | Rotates the turret clockwise |
+| 'f' | Fires main gun | 
+| 'r' | Reloads whatever weapon is empty |
+| 'tab' | Vehicle context menu |
+
+#### Airplane Controls
+Note that airplanes haven't been worked on recently and this code likely has issues
+| Key | Use |
+|---|---|
+| 'w' | Elevator | 
+| 's' | Elevator and brake if on the ground |
+| 'a' | Aileron roll left | 
+| 'd' | Aileron roll right |
+| 'left arrow' | Throttle down | 
+| 'right arrow' | Throttle up |
+| 'tab' | Vehicle context menu |
+
+### Getting Started 
+From the main menu
+- choose Quick Battle
+- choose civilian faction
+- choose 5k point random battle. This should run on most systems
+- you will now spawn. your character is always in the center of the screen
+- play around with movement, then use the debug menu ('~') to spawn in a vehicle
+- walk up close to the vehicle, click on it, and choose 'enter vehicle'
+- hit 'tab' to open the vehicle context menu. use the engine menu to start the engine
+- use the '[' key to zoom out a bit and see if there are german or soviet troops near you
+- observe the ai fighting over the towns
+- use the debug menu to spawn in guns or tanks and try them out
 
 
 
