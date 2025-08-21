@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+----------------------------------
+August 20 2025
+- a penetrating hit on a jammed turret weapon will damage it now 
+- turret now has the 'ammo_rack' damage option which gets passed through to the vehicle 
+- rewrote the order of operations for clearing weapon jams - which seemed buggy 
+- rewrote wheel damage to make it more cumulative and increase chance of passthrough hit 
+
+Added ammo_rack as a damage option to turrets as I want to give them more chances for catastrophic failure 
+
+I observed a Soviet 37mm AA gun very successfully engaging a half track and some troops. The new ability to switch 
+between AP and HE shells make that gun very useful. 
+
+I watched a t34 take 4 wheel hits in a row with zero real damage with the old code. hopefully that is reduced with the new code. 
+
+todo 
+- look into ai gear upgrades, they don't seem to do it anymore. especially AT weapons 
+- at weapons should probably drop onto the ground when a ai dies
 
 ----------------------------------
 August 19 2025
