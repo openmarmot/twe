@@ -144,6 +144,8 @@ def generate_map(map_areas):
     # generate civilians
     map_objects+=generate_civilians(map_objects)
 
+    # generate terrain 
+
     return map_objects
 
 
