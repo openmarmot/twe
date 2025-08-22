@@ -393,33 +393,6 @@ def generate_dynamic_world_areas(world):
     w.area_type='dynamic'
     world.world_areas.append(w)
 
-    # now generate a couple based on the world objects
-
-#------------------------------------------------------------------------------
-def generate_terrain(world):
-    ''' generate ground cover '''
-    
-    # 50 results in about 24,000 world coords in any direction
-
-    terrain_type=1
-
-    # full size 1000 pixel squares. full color
-    if terrain_type==0:
-        count=50
-        size=1015
-        coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
-        for _ in range(count*count):
-            temp=spawn_object(world,coords.pop(),'ground_cover',True)
-            temp.rotation_angle=random.choice([0,90,180,270])
-
-    # 500 pixel squares. transparent with semi-transparent textures. random location and rotation
-    if terrain_type==1:
-        count=50
-        size=1015
-        coords=engine.math_2d.get_grid_coords([-(count*size)*0.5,-(count*size)*0.5],size,count*count)
-        for _ in range(count*count):
-            temp=spawn_object(world,coords.pop(),'terrain_mottled_transparent',True)
-            engine.math_2d.randomize_position_and_rotation(temp,1200)
 
 #------------------------------------------------------------------------------
 def get_random_from_list(world,world_coords,OBJECT_LIST,spawn):
@@ -574,9 +547,6 @@ def load_world(world,map_objects):
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
     
-    # generate the terrain tiles
-    generate_terrain(world)
-
     # perform all world start tasks
     world.start()
 
@@ -1442,7 +1412,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'c96_magazine',False)
         z.ai.rate_of_fire=0.7
         z.ai.reload_speed=8
-        z.ai.range=604
+        z.ai.range=700
         z.ai.type='pistol'
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1467,7 +1437,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'c96_red_9_magazine',False)
         z.ai.rate_of_fire=0.7
         z.ai.reload_speed=8
-        z.ai.range=604
+        z.ai.range=700
         z.ai.type='pistol'
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
@@ -1975,7 +1945,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.mag_capacity=10
         z.ai.rate_of_fire=0.8
         z.ai.reload_speed=10
-        z.ai.range=2418
+        z.ai.range=2500
         z.ai.type='semi auto rifle'
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
@@ -4166,6 +4136,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
+        z.ai.is_small_arms_trained=True
 
     elif object_type=='soviet_soldier':
         z=WorldObject(world,['soviet_soldier','soviet_soldier_prone','soviet_dead'],AIHuman)
@@ -4173,6 +4144,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.speed=30
         z.collision_radius=15
         z.is_human=True
+        z.ai.is_small_arms_trained=True
 
     elif object_type=='german_luftwaffe_ground_crew_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -4315,6 +4287,19 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'soviet_soldier',False)
         add_standard_loadout(z,world,'standard_soviet_gear')
         add_standard_loadout(z,world,'svt40')
+
+    elif object_type=='soviet_svt40':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        add_standard_loadout(z,world,'svt40')
+
+    elif object_type=='soviet_svt40_sniper':
+        z=spawn_object(world,world_coords,'soviet_soldier',False)
+        add_standard_loadout(z,world,'standard_soviet_gear')
+        z.ai.is_expert_marksman=True
+        z.add_inventory(spawn_object(world,[0,0],'svt40-sniper',False))
+        for _ in range(6):
+            z.add_inventory(spawn_object(world,[0,0],'svt40_magazine',False))
         
     elif object_type=='soviet_ppsh43':
         z=spawn_object(world,world_coords,'soviet_soldier',False)

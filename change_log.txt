@@ -1,5 +1,55 @@
 TWE Project : Change Log
 
+----------------------------------
+August 22 2025
+- updated town generation so buildings don't overlap and smaller buildings are more random 
+- adjusted initial squad spacing to reduce overlap 
+- refreshed some of the readme screenshots 
+
+thinking about maybe having world_areas pre-compute a list of good world_coords for vehicles to park, and also 
+get a list of nearby building world coords. biggest challenge with this is the logic for determining when a object is 
+near a world_area would conflict with this as it uses closer distances. 
+
+----------------------------------
+August 21 2025
+- misc minor fixes and cleanup 
+- removed terrain generation (the large splotchy squares ) for now ..
+- added is_small_arms_trained human skill 
+- bumped up effect of is_expert_marksman
+- updated human accuracy calculation a bit to make it less accurate 
+- bumped the range of the c96 pistols up slightly 
+- added soviet svt-40 sniper squad 
+- slight bump to svt40-sniper rifle range
+
+ai.is_small_arms_trained determines whether a unarmed ai will pick up a weapon if they 
+have no targets. It also effects accuracy
+
+realized the expert marksman trait isn't actually used anywhere so i added a soviet 
+sniper squad. I'm not sure how I want to treat sniper rifles. for now i bumped the 
+range slightly
+
+humans should probably be way way less accurate 
+
+no german snipers yet as i need to add german sniper weapons. 
+
+----------------------------------
+August 20 2025
+- a penetrating hit on a jammed turret weapon will damage it now 
+- turret now has the 'ammo_rack' damage option which gets passed through to the vehicle 
+- rewrote the order of operations for clearing weapon jams - which seemed buggy 
+- rewrote wheel damage to make it more cumulative and increase chance of passthrough hit 
+
+Added ammo_rack as a damage option to turrets as I want to give them more chances for catastrophic failure 
+
+I observed a Soviet 37mm AA gun very successfully engaging a half track and some troops. The new ability to switch 
+between AP and HE shells make that gun very useful. 
+
+I watched a t34 take 4 wheel hits in a row with zero real damage with the old code. hopefully that is reduced with the new code. 
+
+todo 
+- look into ai gear upgrades, they don't seem to do it anymore. especially AT weapons 
+- at weapons should probably drop onto the ground when a ai dies
+- consider moving terrain over to map generation 
 
 ----------------------------------
 August 19 2025

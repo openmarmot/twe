@@ -662,6 +662,8 @@ class World():
     def start(self):
         '''performs world tasks necessary for a new world to start'''
         # called by world_builder.load_world()
+
+        # maybe pre-compute world_area coords for vehicles here
         
         # tactical_ai start. create squads, figure out initial coords, orders, etc 
         for ai in self.tactical_ai.values():

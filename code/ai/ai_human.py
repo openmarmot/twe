@@ -102,6 +102,7 @@ class AIHuman(object):
         self.is_afv_trained=False # afv=armored fighting vehicle
         self.is_medic=False
         self.is_mechanic=False
+        self.is_small_arms_trained=False # this is true for soldiers. determines if they will pick up a gun with no enemy
 
         # -- stats --
         self.confirmed_kills=0
@@ -207,6 +208,8 @@ class AIHuman(object):
         if self.blood_pressure<50:
             adjust_max+=10
 
+        if self.is_small_arms_trained is False:
+            adjust_max+=15
 
         # fatigue
         if self.fatigue>3:
@@ -218,18 +221,18 @@ class AIHuman(object):
         if distance>500:
             adjust_max+=3
         if distance>1000:
-            adjust_max+=5
+            adjust_max+=7
         if distance>1500:
-            adjust_max+=5
+            adjust_max+=7
         if distance>2000:
-            adjust_max+=15
+            adjust_max+=18
         # prone bonus 
         if self.prone:
             adjust_max-=1
 
         # skills 
         if self.is_expert_marksman:
-            adjust_max-=2
+            adjust_max-=10
 
         # recent experience
         if self.confirmed_kills>0:
@@ -1801,7 +1804,7 @@ class AIHuman(object):
     def update_equipment_slots(self):
         '''update any empty equipment slots'''
 
-        # primmary weapon
+        # primary weapon
         # could also take ammo into account here 
         if self.primary_weapon is None:
             for b in self.inventory:
@@ -2551,7 +2554,6 @@ class AIHuman(object):
                     self.switch_task_engage_enemy(vehicle_target)
                     return
 
-
         # primary weapon
         if self.primary_weapon is None:
             # need to get a gun
@@ -2562,8 +2564,13 @@ class AIHuman(object):
                 distance=600
             elif len(self.far_human_targets)>0:
                 distance=900
+            else:
+                # no human targets
+                # ai that is small arms trained will pick up weapons
+                if self.is_small_arms_trained:
+                    distance=1200
 
-            # this also means that humans without any targets will not get a gun
+            # this also means that humans that are not small armed trained, and have no targets will not pickup guns
             if distance<4000:
                 gun=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.grid_square.wo_objects_gun,distance)
 

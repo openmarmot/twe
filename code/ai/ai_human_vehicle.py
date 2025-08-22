@@ -555,7 +555,6 @@ class AIHumanVehicle():
             # this we can fix ourselves
             #if we are already in this state then consider it fixed 
             if self.owner.ai.memory['task_vehicle_crew']['current_action']=='Clearing weapon jam':
-                engine.log.add_data('info','ai_human.think_vehicle_role_gunner - fixing jammed gun',True)
                 if turret.ai.primary_weapon:
                     if turret.ai.primary_weapon.ai.action_jammed:
                         self.owner.ai.speak('fixing jammed gun')
@@ -564,13 +563,15 @@ class AIHumanVehicle():
                     if turret.ai.coaxial_weapon.ai.action_jammed:
                         self.owner.ai.speak('fixing jammed gun')
                         turret.ai.coaxial_weapon.ai.action_jammed=False
-                # wait for a bit to simulate fixing
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                # this should then flow through to getting a new target
             else:
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Clearing weapon jam'
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
-
-            return
+                # wait for a bit to simulate fixing.
+                # on the next loop it will be fixed
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
+                return
 
         if self.owner.ai.memory['task_vehicle_crew']['target'] is None:
             target=None

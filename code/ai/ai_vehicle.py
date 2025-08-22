@@ -771,24 +771,32 @@ class AIVehicle():
             
             result=''
             if penetration:
-                if random.randint(0,1)==0:
-                    wheel.ai.damaged=True
-                    result='wheel damaged'
-                else:
-                    wheel.ai.destroyed=True
-                    result='wheel destroyed'
-                    # check if that was enough to disable the vehicle
-                    self.check_wheel_health()
-
-                # chance to continue into the body
-                if random.randint(0,3)==3:
+                if wheel.ai.destroyed:
+                    # pass hit through to vehicle body
                     self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+                    result='projectile passes through destroyed wheel'
+
                 else:
-                    projectile.wo_stop()
+                    if wheel.ai.damaged:
+                        wheel.ai.destroyed=True
+                        result='wheel destroyed'
+                    else:
+                        wheel.ai.damaged=True
+                        result='wheel damaged'
+
+                    # chance to continue into the body
+                    if random.randint(0,2)==2:
+                        self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+                    else:
+                        projectile.wo_stop()
+
+                # check if that was enough damage to disable the vehicle
+                self.check_wheel_health()
 
             else:
                 self.projectile_bounce(projectile)
 
+            
             self.add_hit_data(projectile,penetration,side,distance,'Wheel',result,pen_value,armor_value)
         else:
             # no wheels hit 

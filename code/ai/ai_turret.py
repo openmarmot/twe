@@ -129,6 +129,12 @@ class AITurret(object):
                     if self.vehicle_mount_side!='top':
                         damage_options.append('penetration into vehicle')
 
+                    # remote operated doesn't have a chance to do this as the turret is sealed 
+                    # from the rest of the vehicle
+                    if len(self.vehicle.ai.ammo_rack)>0 and self.remote_operated is False:
+                        damage_options.append('ammo_rack')
+
+
                 result=random.choice(damage_options)
                 
                 if result=='turret track':
@@ -136,13 +142,19 @@ class AITurret(object):
                 elif result=='primary weapon':
                     if self.primary_weapon:
                         if random.randint(0,1)==1:
-                            self.primary_weapon.ai.action_jammed=True
+                            if self.primary_weapon.ai.action_jammed:
+                                self.primary_weapon.ai.damaged=True
+                            else:
+                                self.primary_weapon.ai.action_jammed=True
                         else:
                             self.primary_weapon.ai.damaged=True
                 elif result=='coaxial weapon':
                     if self.coaxial_weapon:
                         if random.randint(0,1)==1:
-                            self.coaxial_weapon.ai.action_jammed=True
+                            if self.coaxial_weapon.ai.action_jammed:
+                                self.coaxial_weapon.ai.damaged=True
+                            else:
+                                self.coaxial_weapon.ai.action_jammed=True
                         else:
                             self.coaxial_weapon.ai.damaged=True
                 elif result=='gunner hit':
@@ -158,6 +170,8 @@ class AITurret(object):
                     extra_damage=random.choice(extra_damage_options)
                     result+=f': {extra_damage}'
                     self.vehicle.ai.handle_component_damage(extra_damage,projectile)
+                elif result=='ammo_rack':
+                    self.vehicle.ai.handle_component_damage('ammo_rack',projectile)
                 else:
                     engine.log.add_data('error',f'ai_turret.event_collision unknown result: {result}',True)
 

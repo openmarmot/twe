@@ -144,6 +144,8 @@ def generate_map(map_areas):
     # generate civilians
     map_objects+=generate_civilians(map_objects)
 
+    # generate terrain 
+
     return map_objects
 
 
@@ -192,16 +194,28 @@ def generate_map_area_simple(world_coords,count,diameter,world_builder_identity,
 
 #------------------------------------------------------------------------------
 def generate_map_area_town(world_coords,name):
-    count_warehouse=random.randint(1,5)
+    count_warehouse=random.randint(2,5)
     count_building=random.randint(2,14)
-    coords=engine.math_2d.get_grid_coords(world_coords,600,count_warehouse+count_building)
-    map_objects=[]
-    rotation=random.choice([0,90,180,270])
-    for _ in range(count_warehouse):
-        map_objects.append(MapObject('warehouse','a old warehouse',coords.pop(),rotation,[]))
     
+    map_objects=[]
+    
+    # add warehouses in a grid
+    warehouse_seperation=850
+    coords=engine.math_2d.get_grid_coords(world_coords,warehouse_seperation,count_warehouse)
+    rotation=random.choice([0,90,180,270])
+    coords_to_avoid=[]
+    for _ in range(count_warehouse):
+        warehouse_coord=coords.pop()
+        coords_to_avoid.append(warehouse_coord)
+        map_objects.append(MapObject('warehouse','a old warehouse',warehouse_coord,rotation,[]))
+    
+    # add smaller square buildings in a more random pattern, avoiding the warehouses 
+    building_max_area=2000
+    building_seperation=200
+    building_coords=engine.math_2d.get_random_constrained_coords(world_coords,building_max_area,
+        building_seperation,count_building,coords_to_avoid,warehouse_seperation)
     for _ in range(count_building):
-        map_objects.append(MapObject('square_building','some sort of building',coords.pop(),rotation,[]))
+        map_objects.append(MapObject('square_building','some sort of building',building_coords.pop(),rotation,[]))
 
     # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
     world_area=MapObject('world_area_'+'town',name,world_coords,0,[])
