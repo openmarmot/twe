@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 22 2025
+- updated town generation so buildings don't overlap and smaller buildings are more random 
+- adjusted initial squad spacing to reduce overlap 
+- refreshed some of the readme screenshots 
+
+thinking about maybe having world_areas pre-compute a list of good world_coords for vehicles to park, and also 
+get a list of nearby building world coords. biggest challenge with this is the logic for determining when a object is 
+near a world_area would conflict with this as it uses closer distances. 
+
+----------------------------------
 August 21 2025
 - misc minor fixes and cleanup 
 - removed terrain generation (the large splotchy squares ) for now ..

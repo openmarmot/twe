@@ -85,6 +85,9 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | T34-85 | Tank | |
 | Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
 
+![screenshot](/screenshots/twe-aug-22-2-2025-german-group-at-spawn.png "TWE screenshot")
+In this screenshot a large German group moves out of the spawn point. 
+
 ### A note on Infantry Weapons 
 I already have a large amount of infantry weapons in game, but currently infantry weapons just don't matter much - the game is dominated by vehicle warfare. 
 
@@ -174,5 +177,5 @@ From the main menu
 
 
 
-![screenshot](/screenshots/twe-mar-26-2025.png "TWE screenshot")
-In this screenshot a large battle unfolds between Soviet and German forces. 
+![screenshot](/screenshots/twe-aug-22-2025-forest-engagement.png "TWE screenshot")
+In this screenshot a Soviet T34-85 fires at a German Hetzer in a forest. 

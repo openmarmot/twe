@@ -191,7 +191,8 @@ class AIFactionTactical():
         if self.faction=='civilian':
             pass
         else:
-            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,150,len(self.squads))
+            squad_spacing=250
+            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,squad_spacing,len(self.squads))
 
             for b in self.squads:
 
