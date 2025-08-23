@@ -463,7 +463,10 @@ def load_magazine(world,magazine,projectile_type=None):
 def load_quick_battle(world,battle_option):
     ''' load quick battle. called by game menu'''
 
-    map_areas=['town','town','town']
+    world_area_options=[]
+    world_area_options.append(['town','town','town'])
+    world_area_options.append(['airport'])
+    map_areas=random.choice(world_area_options)
 
     map_objects=engine.map_generator.generate_map(map_areas)
 
@@ -937,7 +940,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'mp40_magazine',False))
 
     elif object_type=='crate_random_consumables':
-        z=spawn_object(world,world_coords,'small_crate',False)
+        z=spawn_object(world,world_coords,'crate',False)
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))
         z.add_inventory(spawn_object(world,world_coords,random.choice(list_consumables),False))

@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 23 2025
+- square buildings now get 1-2 cupboards placed randomly from a selection of specific relative locations and rotations 
+- warehouse gets crates in specific positions 
+- added on_fire chance to some vehicle penetration damage types.
+- quick battle will sometimes be the airport type environment now 
+
+adding aligned clutter is somewhat labor intensive but the end result is far better than the complete random placement i was 
+using before. 
+
+i will need to add more misc stuff to fill crates with. the current options are empty, mp40s, or random food 
+
+the airport world type spawns a drache and ju88. amusingly the ai_tactical startup code grabs them and puts them at the german 
+spawn and the troops use them (poorly). this will have to fixed in the future. 
+
+----------------------------------
 August 22 2025
 - updated town generation so buildings don't overlap and smaller buildings are more random 
 - adjusted initial squad spacing to reduce overlap 
