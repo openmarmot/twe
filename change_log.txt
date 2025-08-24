@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 24 2025
+- working on adding the sd.kfz.234 
+
+----------------------------------
 August 23 2025
 - square buildings now get 1-2 cupboards placed randomly from a selection of specific relative locations and rotations 
 - warehouse gets crates in specific positions 
