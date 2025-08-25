@@ -1,6 +1,39 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 24 2025
+- added sd.kfz.234/1
+- turret track jammed on a primary turret now disables the vehicle 
+- weapon damaged on a primary weapon in a primary turret will now disable vehicle. 
+
+added vehicle disable for a couple combinations that basically make the vehicle combat ineffective 
+
+The 234/1 has a long 20mm with armor piercing ammo. The germans produced a lot of 20mm vehicles so it must have been a useful gun, but 
+there aren't a lot of good targets in game for it at the moment. 
+
+the 20mm does seem to have a niche in engagement range >rifle for low armor targets. soviet trucks getting wrecked even harder than previously 
+i need to review how the primary weapon gets used if a coax is available. it might be that it is not often used when the coax is out of range 
+for soft targets. 
+
+the 234/1 is randomly one of the best models i've done so far. not sure why, it just looks good. The long bursts of 20mm are fun as well, 
+they feel properly dangerous. 
+
+----------------------------------
+August 23 2025
+- square buildings now get 1-2 cupboards placed randomly from a selection of specific relative locations and rotations 
+- warehouse gets crates in specific positions 
+- added on_fire chance to some vehicle penetration damage types.
+- quick battle will sometimes be the airport type environment now 
+
+adding aligned clutter is somewhat labor intensive but the end result is far better than the complete random placement i was 
+using before. 
+
+i will need to add more misc stuff to fill crates with. the current options are empty, mp40s, or random food 
+
+the airport world type spawns a drache and ju88. amusingly the ai_tactical startup code grabs them and puts them at the german 
+spawn and the troops use them (poorly). this will have to fixed in the future. 
+
+----------------------------------
 August 22 2025
 - updated town generation so buildings don't overlap and smaller buildings are more random 
 - adjusted initial squad spacing to reduce overlap 

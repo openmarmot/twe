@@ -48,6 +48,16 @@ def generate_civilians(map_objects):
         civilians.append(MapObject('civilian_shovel_man','',coords,rotation,[]))
         engine.log.add_data('note','shovel_man added to map',True)
 
+    # just in case there aren't any buildings of the right type
+    if len(civilians)==0:
+        count=random.randint(20,100)
+        for _ in range(count):
+            map_size=2000
+            coords=[random.randint(-map_size,map_size),random.randint(-map_size,map_size)]
+            rotation=random.randint(0,359)
+            civilians.append(MapObject('civilian_man','',coords,rotation,[]))
+
+
     return civilians
 
 #------------------------------------------------------------------------------
@@ -61,7 +71,25 @@ def generate_clutter(map_objects):
 
         # industrial clutter
         if b.world_builder_identity=='warehouse':
-            chance=random.randint(1,15)
+
+            # - add crate with specific locations - 
+            locations=[] # [position,rotation]
+            locations.append([[36.0, 162.0],0])
+            locations.append([[-30.0, 170.0],0])
+            locations.append([[-85.0, 170.0],0])
+            locations.append([[-150.0, 170.0],0])
+            locations.append([[-86.0, 354.0],90])
+
+            crate_amount=random.randint(1,3)
+            for _ in range(crate_amount):
+                location=locations.pop()
+                coords=engine.math_2d.calculate_relative_position(b.world_coords,b.rotation,location[0])
+                rotation=b.rotation+location[1]
+                crate=random.choice(['crate','crate_mp40','crate_random_consumables'])
+                clutter.append(MapObject(crate,'crate',coords,rotation,[]))
+
+            # add other random stuff
+            chance=random.randint(1,7)
             coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
             rotation=random.randint(0,359)
             if chance==1 or chance==2:
@@ -75,27 +103,32 @@ def generate_clutter(map_objects):
                 clutter.append(MapObject('barrel','barrel',coords,rotation,[]))
             if chance==7:
                 clutter.append(MapObject('red_bicycle','red bicycle',coords,rotation,[]))
-            if chance==8 or chance==9:
-                clutter.append(MapObject('crate_random_consumables','crate',coords,rotation,[]))
-            if chance==10 or chance==11:
-                coords[0]+=random.randint(-50,50)
-                coords[1]+=random.randint(-50,50)
-                count=random.randint(1,6)
-                rotation=random.choice([0,90,180,270])
-                coord_list=engine.math_2d.get_column_coords(coords,80,count,rotation,2)
-                for _ in range(count):
-                    clutter.append(MapObject('concrete_square','concrete_square',coord_list.pop(),rotation,[]))
+
 
         # house clutter 
         elif b.world_builder_identity=='square_building':
-            chance=random.randint(1,15)
+
+            # - add cupboard with specific locations - 
+            cupboard_locations=[] # [position,rotation]
+            cupboard_locations.append([[-46.0, 0.0],0])
+            cupboard_locations.append([[-26.0, 48.0],90])
+            cupboard_locations.append([[-33.0, -48.0],90])
+            cupboard_locations.append([[9.0, -48.0],90])
+            cupboard_locations.append([[31.0, -20.0],0])
+
+            cupboard_amount=random.randint(1,2)
+            for _ in range(cupboard_amount):
+                location=cupboard_locations.pop()
+                coords=engine.math_2d.calculate_relative_position(b.world_coords,b.rotation,location[0])
+                rotation=b.rotation+location[1]
+                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
+
+            # - add other junk -
+            chance=random.randint(1,8)
             coords=[b.world_coords[0]+random.randint(-20,20),b.world_coords[1]+random.randint(-20,20)]
             rotation=random.randint(0,359)
             if chance==1 or chance==2:
                 clutter.append(MapObject('brown_chair','brown chair',coords,rotation,[]))
-            if chance==1 or chance==3 or chance==4:
-                # some overlap
-                clutter.append(MapObject('cupboard','cupboard',coords,rotation,[]))
             if chance==5:
                 clutter.append(MapObject('wood_log','wood log',coords,rotation,[]))
             if chance==6:
@@ -159,9 +192,13 @@ def generate_map_area_airport(world_coords,name):
         map_objects.append(MapObject('concrete_square','',coords.pop(),random.choice([0,90,180,270]),[]))
 
     # add hangars
-    map_objects.append(MapObject('hangar','',[world_coords[0]+1500,world_coords[1]+600],0,[]))
-    map_objects.append(MapObject('hangar','',[world_coords[0]+2500,world_coords[1]+600],0,[]))
-    map_objects.append(MapObject('hangar','',[world_coords[0]+3500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('hangar','hangar',[world_coords[0]+1500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('hangar','hangar',[world_coords[0]+2500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('hangar','hangar',[world_coords[0]+3500,world_coords[1]+600],0,[]))
+
+    # add some planes
+    map_objects.append(MapObject('german_fa_223_drache','Drache',[world_coords[0]+1500,world_coords[1]+600],0,[]))
+    map_objects.append(MapObject('german_ju88','JU-88',[world_coords[0]+2500,world_coords[1]+600],0,[]))
 
     # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
     world_area=MapObject('world_area_'+'airport',name,world_coords,0,[])

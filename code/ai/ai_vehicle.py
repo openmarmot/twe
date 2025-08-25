@@ -395,6 +395,8 @@ class AIVehicle():
                 if role.role_name=='driver' and role.role_occupied:
                     role.human.ai.handle_event('collision',projectile)
                     return
+            if random.randint(0,1)==0:
+                self.on_fire=True
         elif damaged_component=='engine':
             for b in self.engines:
                 b.ai.damaged=True
@@ -454,6 +456,9 @@ class AIVehicle():
             tank.ai.punctured=True
             # the more hits the more leaks. 
             tank.ai.container_integrity-=0.01
+
+            if random.randint(0,1)==0:
+                self.on_fire=True
 
             if random.randint(0,1)==0:
                 self.handle_component_damage('random_crew_fire',projectile)
@@ -953,8 +958,17 @@ class AIVehicle():
         # charge batteries with the alternator 
         # theoretically the charge should be divided up amongst all the batteries?
         # but then we should be modelling multiple alternators 
-        for b in self.batteries:
-            b.ai.recharge(charge)
+
+        engine_on=False
+        for b in self.engines:
+            if b.ai.engine_on:
+                engine_on=True
+                break
+
+        if engine_on:
+            for b in self.batteries:
+                b.ai.recharge(charge)
+        
 
     #---------------------------------------------------------------------------
     def update_fuel_system(self):

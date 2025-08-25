@@ -100,7 +100,7 @@ class ImageTool(object):
                 #pygame.quit()
                 self.quit=True
             if event.type==pygame.KEYDOWN:
-                print(event.key)
+                #print(event.key)
                 translated_key='none'
                 if event.key==119: #w
                     if self.selected_object!=None:
@@ -407,8 +407,14 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
+#image_tool.image_objects.append(ImageObject(['sd_kfz_251'],0))
+#image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
+
+#image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
+#image_tool.image_objects.append(ImageObject(['crate'],0))
+
 image_tool.image_objects.append(ImageObject(['sd_kfz_251'],0))
-image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
+image_tool.image_objects.append(ImageObject(['sd_kfz_234_1_turret'],0))
 
 
 while image_tool.quit==False:

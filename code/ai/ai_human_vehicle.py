@@ -541,7 +541,7 @@ class AIHumanVehicle():
             return
         
         if turret_jammed:
-            # we should probably bail out
+            # # if this was the primary turret the vehicle will be marked disabled.
             self.owner.ai.memory['task_vehicle_crew']['current_action']='Turret Jammed'
             self.owner.ai.memory['task_vehicle_crew']['target']=None
             return
