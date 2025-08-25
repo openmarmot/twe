@@ -958,8 +958,17 @@ class AIVehicle():
         # charge batteries with the alternator 
         # theoretically the charge should be divided up amongst all the batteries?
         # but then we should be modelling multiple alternators 
-        for b in self.batteries:
-            b.ai.recharge(charge)
+
+        engine_on=False
+        for b in self.engines:
+            if b.ai.engine_on:
+                engine_on=True
+                break
+
+        if engine_on:
+            for b in self.batteries:
+                b.ai.recharge(charge)
+        
 
     #---------------------------------------------------------------------------
     def update_fuel_system(self):

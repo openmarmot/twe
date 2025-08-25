@@ -139,6 +139,10 @@ class AITurret(object):
                 
                 if result=='turret track':
                     self.turret_jammed=True
+                    # mark the vehicle as disabled if this was the main turret
+                    if self.primary_turret:
+                        if self.vehicle:
+                            self.vehicle.ai.is_disabled=True
                 elif result=='primary weapon':
                     if self.primary_weapon:
                         if random.randint(0,1)==1:
@@ -148,6 +152,13 @@ class AITurret(object):
                                 self.primary_weapon.ai.action_jammed=True
                         else:
                             self.primary_weapon.ai.damaged=True
+
+                        if self.primary_turret and self.primary_weapon.ai.damaged:
+                            if self.vehicle:
+                                # if its a transport than the turret doesn't really matter
+                                if self.vehicle.ai.is_transport is False:
+                                    self.vehicle.ai.is_disabled=True
+
                 elif result=='coaxial weapon':
                     if self.coaxial_weapon:
                         if random.randint(0,1)==1:
