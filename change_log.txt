@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 25 2025
+- minor cleanup 
+- damaged coax weapon no longer prevents use of primary weapon 
+
+made some small changes to the gunner logic. it used to be a coax weapon that was damaged would trigger the weapon damaged action 
+which would soft lock the gunner. now it results in a out_of_ammo_coax, which just means it won't be used. 
+
+a primary gun being damaged will still prevent coax use - but in most cases this will now result in a vehicle bail out. 
+
+I need to step through target acquisition. sometimes tanks just don't seem to target eachother. perhaps its the visibility code?
+
+----------------------------------
 August 24 2025
 - added sd.kfz.234/1
 - turret track jammed on a primary turret now disables the vehicle 

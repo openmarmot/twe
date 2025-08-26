@@ -531,7 +531,10 @@ class AIHumanVehicle():
                 weapons_jammed=True
         if turret.ai.coaxial_weapon:
             if turret.ai.coaxial_weapon.ai.damaged:
-                weapons_damaged=True
+                # don't want this because it soft locks the gunner
+                #weapons_damaged=True
+                # do this instead which will prevent engaging with the coax, but will still allow primary weapon engagement
+                out_of_ammo_coax=True
             if turret.ai.coaxial_weapon.ai.action_jammed:
                 weapons_jammed=True
 
@@ -546,7 +549,9 @@ class AIHumanVehicle():
             self.owner.ai.memory['task_vehicle_crew']['target']=None
             return
 
+        # need to figure out what we do if anything for a damaged coax 
         if weapons_damaged:
+            # if this was the primary weapon in a primary turret the vehicle will be marked disabled (if not a transport)
             self.owner.ai.memory['task_vehicle_crew']['current_action']='Weapons Damaged'
             self.owner.ai.memory['task_vehicle_crew']['target']=None
             return
@@ -640,7 +645,7 @@ class AIHumanVehicle():
 
             # possibly should also check if we are engaging a soft skinned vehicle with AT
                 
-
+        # out_of_ammo_coax will be true if there is no coax, or the coax is damaged
         if out_of_ammo_coax is False:
             engage_coaxial=self.owner.ai.calculate_engagement(turret.ai.coaxial_weapon,target)
         
