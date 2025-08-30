@@ -1,6 +1,29 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 29 2025
+- minor changes and cleanup 
+- rewrote the container leak algo. it probably works correctly now 
+- rewrote container liquid merging code which was crazy broken 
+
+maybe fuel leaks too slowly now. i'll probably have to rig up a debug menu option to cause fuel leaks 
+
+
+----------------------------------
+August 28 2025
+- added battery data to the vehicle HUD 
+- minor fixes/cleanup
+- turning on a vehicle engine now requires a battery with charge 
+
+amusingly i learned that vehicle batteries are not being discharged at the moment.
+
+todo 
+- implement powered and manual turret moves, powered takes battery (or engine on??)
+- probably a bool for electrical power so batteries don't need to be individually checked 
+- rewrite mouse select. shouldn't select dirt, concrete, etc 
+- 'r' review of ai_vehicle found a ton of stuff that needs to be checked 
+
+----------------------------------
 August 25 2025
 - minor cleanup 
 - damaged coax weapon no longer prevents use of primary weapon 

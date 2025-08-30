@@ -782,6 +782,9 @@ class World():
 
     #------------------------------------------------------------------------------
     def update_vehicle_text(self):
+        '''this is the vehicle HUD text. basically debug text'''
+        # at the moment this is turned on from the vehicle context menu 
+        
         self.vehicle_text_queue=[]
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
@@ -802,7 +805,10 @@ class World():
                     fuel_text=str(b.volume) + '|' + str(round(fuel,2))
                     self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
 
-                self.vehicle_text_queue.append(f'max speed | current speed: {round(vehicle.ai.max_speed, 1)} | {round(vehicle.ai.current_speed, 1)}')
+                for b in vehicle.ai.batteries:
+                    self.vehicle_text_queue.append(f'Battery : {b.name} charge: {round(b.ai.state_of_charge,2)} max capacity: {b.ai.max_capacity}')
+
+                self.vehicle_text_queue.append(f'max speed: {round(vehicle.ai.max_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
                 self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
                 self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
                 self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')

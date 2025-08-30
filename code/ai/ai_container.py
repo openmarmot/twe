@@ -39,12 +39,14 @@ class AIContainer(object):
     def update(self):
         ''' overrides base update '''
 
-        # check if leaking 
+        # if puctured apply leak to liquid contents
         if self.punctured:
             for b in self.inventory:
                 if b.is_liquid:
-                    if b.volume>0:
-                        b.volume=round(b.volume*(self.container_integrity*0.1*self.owner.world.time_passed_seconds),2)
+                    if b.volume > 0:
+                        leak_rate = 1 - self.container_integrity  # Assuming integrity reduces flow rate
+                        loss = b.volume * leak_rate * self.owner.world.time_passed_seconds
+                        b.volume = max(0, round(b.volume - loss, 2))  # Clamp to avoid negative
 
         # check if contaminated 
         if not self.contaminated:
@@ -75,11 +77,12 @@ class AIContainer(object):
             existing_liquid=None
             for b in self.inventory:
                 if b.name==event_data.name:
-                    existing_liquid=event_data
+                    existing_liquid=b
+                    break
             
             if existing_liquid==None:
                 # no existing liquid so just add the new liquid
-                self.inventory.add(event_data)
+                self.inventory.append(event_data)
             else:
                 #combine them
                 existing_liquid.volume+=event_data.volume

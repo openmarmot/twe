@@ -385,8 +385,6 @@ class AIVehicle():
         else:
             engine.log.add_data('error',f'ai_vehicle.event_throwable_explosion_on_top_of_vehicle unknown compartment {compartment}',True)
                 
-
-
     #---------------------------------------------------------------------------
     def handle_component_damage(self,damaged_component,projectile):
         '''handle damage to a component'''
@@ -455,7 +453,8 @@ class AIVehicle():
             # fuel tank should be a ai_container
             tank.ai.punctured=True
             # the more hits the more leaks. 
-            tank.ai.container_integrity-=0.01
+            tank.ai.container_integrity-=random.uniform(0.01,0.03)
+
 
             if random.randint(0,1)==0:
                 self.on_fire=True
@@ -464,8 +463,6 @@ class AIVehicle():
                 self.handle_component_damage('random_crew_fire',projectile)
         else:
             engine.log.add_data('error',f'ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}',True)
-
-
 
 
     #---------------------------------------------------------------------------
@@ -540,6 +537,18 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_start_engines(self):
         '''handle starting the engines'''
+
+        # check batteries
+        # for now we are just checking if any of the batteries have any juice
+        batteries_ok=False
+        for b in self.batteries:
+            if b.ai.state_of_charge>0:
+                batteries_ok=True
+                break
+        if batteries_ok is False:
+            # we should probably return a error 
+            return
+
         for b in self.engines:
             if b.ai.engine_on==False:
                 if b.ai.damaged is False:
@@ -594,7 +603,7 @@ class AIVehicle():
             self.throttle=0
 
         if self.throttle_zero:
-            print('Warning - throttle_zero interferes with throttle up')
+            print('Warning - throttle_zero interferes with throttle down')
 
 
     #---------------------------------------------------------------------------
@@ -1118,6 +1127,8 @@ class AIVehicle():
                 # not sure at what point the vehicle just becomes disabled
                 self.vehicle_disabled=True
             else:
+
+                # note this also puts out the existing fire
                 self.on_fire=False
                 
 
