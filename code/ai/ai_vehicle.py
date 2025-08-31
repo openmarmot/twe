@@ -214,8 +214,17 @@ class AIVehicle():
         self.last_noise_or_move_time=0 # in world.world_seconds
         self.recent_noise_or_move_reset_seconds=30
 
+
+        # --- system checks ---
+        # these are useful for the ai to understand system status without having to query a bunch of things
+
+        # this means one or more engine is on
+        self.engines_on=False
+
+        self.electrical_system_functioning=False
+
         # vehicle is damaged to the point that it is out of action
-        # note this is just a clue for the AI and does not do anything
+        # this causes the ai humans to bail out, but the vehicle still updates.
         self.vehicle_disabled=False
 
         # tracks whether there is a fuel leak. true means increased risk of explosion
@@ -368,19 +377,23 @@ class AIVehicle():
             # extra damage as it likely fell inside before exploding
             self.handle_component_damage('random_crew_explosion',None)
         
-        # special code to make sure the shrapnel hits the top armor
-        shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
-        shrapnel.ai.projectile_type='shrapnel'
-        shrapnel.name='shrapnel'
-        shrapnel.ai.starting_coords=self.owner.world_coords
-
         compartment=random.choice(['vehicle_body','passenger_compartment'])
 
         if compartment=='vehicle_body':
             for b in range(throwable.ai.shrapnel_count):
+                # special code to make sure the shrapnel hits the top armor
+                shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
+                shrapnel.ai.projectile_type='shrapnel'
+                shrapnel.name='shrapnel'
+                shrapnel.ai.starting_coords=self.owner.world_coords
                 self.projectile_hit_vehicle_body(shrapnel,'top',0)
         elif compartment=='passenger_compartment':
             for b in range(throwable.ai.shrapnel_count):
+                # special code to make sure the shrapnel hits the top armor
+                shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
+                shrapnel.ai.projectile_type='shrapnel'
+                shrapnel.name='shrapnel'
+                shrapnel.ai.starting_coords=self.owner.world_coords
                 self.projectile_hit_passenger_compartment(shrapnel,'top',0)
         else:
             engine.log.add_data('error',f'ai_vehicle.event_throwable_explosion_on_top_of_vehicle unknown compartment {compartment}',True)
@@ -540,13 +553,9 @@ class AIVehicle():
 
         # check batteries
         # for now we are just checking if any of the batteries have any juice
-        batteries_ok=False
-        for b in self.batteries:
-            if b.ai.state_of_charge>0:
-                batteries_ok=True
-                break
-        if batteries_ok is False:
-            # we should probably return a error 
+        # note - once the engines use magnetos or compression and dont need 
+        # a functioning battery to keep going once started.
+        if self.electrical_system_functioning is False:
             return
 
         for b in self.engines:
@@ -956,8 +965,12 @@ class AIVehicle():
     def update_electrical_system(self):
         '''update the electrical system'''
         # update batteries
+        self.electrical_system_functioning=False
         for b in self.batteries:
             b.update()
+            # quick and dirty check that at least one battery is functioning
+            if b.ai.state_of_charge>0:
+                self.electrical_system_functioning=True
         
         #electrical units are in hours for whatever reason. gotta get the conversion
         time_passed_hours=self.owner.world.time_passed_seconds/3600
@@ -968,13 +981,7 @@ class AIVehicle():
         # theoretically the charge should be divided up amongst all the batteries?
         # but then we should be modelling multiple alternators 
 
-        engine_on=False
-        for b in self.engines:
-            if b.ai.engine_on:
-                engine_on=True
-                break
-
-        if engine_on:
+        if self.engines_on:
             for b in self.batteries:
                 b.ai.recharge(charge)
         

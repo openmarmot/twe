@@ -27,24 +27,19 @@ class AIBattery(object):
 
     #---------------------------------------------------------------------------
     def discharge(self,amount_ah):
+        '''discharge battery'''
         # note amount_ah should already be normalized for time_passed
-        self.state_of_charge-=amount_ah
+        self.state_of_charge = max(0, self.state_of_charge - amount_ah)
 
     #---------------------------------------------------------------------------
     def recharge(self,amount_ah):
+        '''recharge battery'''
         # note amount_ah should already be normalized for time_passed
-        self.state_of_charge+=amount_ah
-
+        self.state_of_charge=min(self.state_of_charge+amount_ah,self.max_capacity*self.health)
 
     #---------------------------------------------------------------------------
     def update(self):
-        
-        # normalize battery values
-        # more efficient to do it once here as we may have multiple discharge/charge calls
-        if self.state_of_charge<0:
-            self.state_of_charge=0
-        elif self.state_of_charge>self.max_capacity*self.health:
-            self.state_of_charge=self.max_capacity*self.health
+        '''updates battery'''
+        # all logic got moved to subfunctions
+        pass
     
-
-    #---------------------------------------------------------------------------

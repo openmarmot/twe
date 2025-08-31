@@ -1,14 +1,20 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 30 2025
+- misc changes and cleanup
+- rewrite of the battery code to add better min and max checks 
+
+was going to add a battery damage option but it turns out it barely matters.
+i guess i need to figure out more systems that would use electric power first. 
+
+----------------------------------
 August 29 2025
 - minor changes and cleanup 
 - rewrote the container leak algo. it probably works correctly now 
 - rewrote container liquid merging code which was crazy broken 
 
 maybe fuel leaks too slowly now. i'll probably have to rig up a debug menu option to cause fuel leaks 
-
-
 ----------------------------------
 August 28 2025
 - added battery data to the vehicle HUD 
