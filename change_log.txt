@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+August 31 2025
+- added the sd.kfz.251/23
+
+the 251/23 was the last offical subvariant of the 251. It has the 2cm turret from the 234/1
+it will behave about the same but has a bit less armor. it should be able to carry more 
+ammo though. 
+
+----------------------------------
 August 30 2025
 - misc changes and cleanup
 - rewrite of the battery code to add better min and max checks 

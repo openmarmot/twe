@@ -72,11 +72,13 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Panzer IV Ausf J | Tank | Minor differences from the H |
 | German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
 | German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
+| German | Sd.kfz.234/1 | AFV | Heavy recon car with a 2cm turret |
 | German | Sd.kfz.251/1 | APC | The famous German half-track |
 | German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
 | German | Sd.kfz.251/9 'Stummel' | AFV | 75mm L24 |
 | German | Sd.kfz.251/9 Late | AFV | gains a MG |
-| German | Sd.kfz.251/22 | APC | Pak 40 |
+| German | Sd.kfz.251/22 | AFV | Pak 40 |
+| German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
 | Soviet | Lend Lease American Truck | Utility | |
 | Soviet | Su-85 | Tank | Basically a turretless T34-85 |
 | Soviet | Su-100 | Tank | Better armor and gun than the Su-85 |
