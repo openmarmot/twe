@@ -555,7 +555,7 @@ class AIVehicle():
         # for now we are just checking if any of the batteries have any juice
         # note - once the engines use magnetos or compression and dont need 
         # a functioning battery to keep going once started.
-        if self.electrical_system_functioning is False:
+        if self.electrical_system_functioning is False and self.engines[0].ai.internal_combustion:
             return
 
         for b in self.engines:
@@ -853,6 +853,9 @@ class AIVehicle():
         for b in self.engines:
             b.throttle_control=self.throttle
             b.update()
+            # simple check for now
+            if b.ai.engine_on:
+                self.engines_on=True
 
         # updates fuel tanks and handles fuel flow to engines
         self.update_fuel_system()

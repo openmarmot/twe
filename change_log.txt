@@ -3,10 +3,22 @@ TWE Project : Change Log
 ----------------------------------
 August 31 2025
 - added the sd.kfz.251/23
+- only ice engines require electric to start now 
+- misc minor changes and fixes
+- fixed turret rotation getting stuck on 360 turrets 
+- updated vehicle hud for drivers 
 
 the 251/23 was the last offical subvariant of the 251. It has the 2cm turret from the 234/1
 it will behave about the same but has a bit less armor. it should be able to carry more 
 ammo though. 
+
+there are only a couple more 251 variants to add. i'd like to add the variant with the triple 
+15mm mount but i don't have the code to handle a triple or double gun yet. 
+
+i thought turret rotation was already fixed but apparently not. fixed it ... again for 360 turrets 
+
+todo 
+- looks like panzerfaust 60 might not be dropping for the player when fired - need to check 
 
 ----------------------------------
 August 30 2025
