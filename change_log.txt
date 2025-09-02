@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 02 2025
+- fixed panzerfaust drop issue for player 
+- panzerfaust (tubes) are now deactivated when fired so the ai doesn't pick them up as they cannot be reloaded 
+
+
+----------------------------------
 August 31 2025
 - added the sd.kfz.251/23
 - only ice engines require electric to start now 

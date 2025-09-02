@@ -166,7 +166,11 @@ class AIGun(object):
             # handle special case for weapons that change appearance when empty
             if len(self.magazine.ai.projectiles)==0:
                 if 'panzerfaust' in self.owner.name:
+                    # deactivate so no one else picks it up
                     self.owner.image_index=1
+                    self.owner.is_handheld_antitank=False
+                    self.owner.no_save=True
+                    self.owner.no_update=True
 
     #---------------------------------------------------------------------------
     def get_accuracy(self):

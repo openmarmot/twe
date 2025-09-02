@@ -1085,6 +1085,11 @@ class AIHuman(object):
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches+=1
 
+            # drop panzerfausts always
+            if 'panzerfaust' in self.antitank.name:
+                self.drop_object(self.antitank)
+                return
+
             # attempt reload. drop if fail
             if self.owner.is_player is False:
                 ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.antitank,self.owner)
@@ -1093,6 +1098,7 @@ class AIHuman(object):
                     self.drop_object(self.antitank)
                 elif ammo_gun==0 and ammo_inventory>0:
                     self.switch_task_reload(self.antitank)
+
 
     #---------------------------------------------------------------------------
     def morale_check(self):
