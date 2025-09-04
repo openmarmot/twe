@@ -12,12 +12,9 @@ have a ever increasing variety of armored vehicles that will be easily penetrate
 the soviets stopped making them in 1943, but they made >8000 of them so i think they would have still been somewhat common 
 in the late war period.
 
-
-
 todo 
 - need to look into this and add some vehicle explosion damage 
     "warn : world.create_explosion Sd.Kfz.251/2 hit by RG-42 Grenade unhandled"
-
 
 ----------------------------------
 September 02 2025
