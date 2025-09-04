@@ -1,10 +1,28 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 03 2025
+- added t70 
+- some adjustment to reload speeds 
+
+it will be interesting to see how the t70 does in game. The 45 is slow firing due to the one man turret 
+and its penetration is bad, but it should have no problem going through german side armor at mid ranges and the germans 
+have a ever increasing variety of armored vehicles that will be easily penetrated by the T70. 
+
+the soviets stopped making them in 1943, but they made >8000 of them so i think they would have still been somewhat common 
+in the late war period.
+
+
+
+todo 
+- need to look into this and add some vehicle explosion damage 
+    "warn : world.create_explosion Sd.Kfz.251/2 hit by RG-42 Grenade unhandled"
+
+
+----------------------------------
 September 02 2025
 - fixed panzerfaust drop issue for player 
 - panzerfaust (tubes) are now deactivated when fired so the ai doesn't pick them up as they cannot be reloaded 
-
 
 ----------------------------------
 August 31 2025

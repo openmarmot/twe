@@ -91,7 +91,7 @@ class AIVehicle():
         # if i lose more of my sanity it would be nice to model individual alternators
         self.alternator_amps=15
         
-        # open top aka passengers are viewable
+        # open top. mostly refers to the passenger section. results in some extra damage options
         self.open_top=False
 
         # only stores main gun ammo

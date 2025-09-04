@@ -85,6 +85,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | T20 'Komsomolets' | Utility | Armored Tractor |
 | Soviet | T34-76 | Tank | A late model T34-76 |
 | Soviet | T34-85 | Tank | |
+| Soviet | T70 | Tank | light tank with a 45mm gun |
 | Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
 
 ![screenshot](/screenshots/twe-aug-22-2-2025-german-group-at-spawn.png "TWE screenshot")
