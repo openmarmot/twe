@@ -1,6 +1,88 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 03 2025
+- added t70 
+- some adjustment to reload speeds 
+
+it will be interesting to see how the t70 does in game. The 45 is slow firing due to the one man turret 
+and its penetration is bad, but it should have no problem going through german side armor at mid ranges and the germans 
+have a ever increasing variety of armored vehicles that will be easily penetrated by the T70. 
+
+the soviets stopped making them in 1943, but they made >8000 of them so i think they would have still been somewhat common 
+in the late war period.
+
+todo 
+- need to look into this and add some vehicle explosion damage 
+    "warn : world.create_explosion Sd.Kfz.251/2 hit by RG-42 Grenade unhandled"
+
+----------------------------------
+September 02 2025
+- fixed panzerfaust drop issue for player 
+- panzerfaust (tubes) are now deactivated when fired so the ai doesn't pick them up as they cannot be reloaded 
+
+----------------------------------
+August 31 2025
+- added the sd.kfz.251/23
+- only ice engines require electric to start now 
+- misc minor changes and fixes
+- fixed turret rotation getting stuck on 360 turrets 
+- updated vehicle hud for drivers 
+
+the 251/23 was the last offical subvariant of the 251. It has the 2cm turret from the 234/1
+it will behave about the same but has a bit less armor. it should be able to carry more 
+ammo though. 
+
+there are only a couple more 251 variants to add. i'd like to add the variant with the triple 
+15mm mount but i don't have the code to handle a triple or double gun yet. 
+
+i thought turret rotation was already fixed but apparently not. fixed it ... again for 360 turrets 
+
+todo 
+- looks like panzerfaust 60 might not be dropping for the player when fired - need to check 
+
+----------------------------------
+August 30 2025
+- misc changes and cleanup
+- rewrite of the battery code to add better min and max checks 
+
+was going to add a battery damage option but it turns out it barely matters.
+i guess i need to figure out more systems that would use electric power first. 
+
+----------------------------------
+August 29 2025
+- minor changes and cleanup 
+- rewrote the container leak algo. it probably works correctly now 
+- rewrote container liquid merging code which was crazy broken 
+
+maybe fuel leaks too slowly now. i'll probably have to rig up a debug menu option to cause fuel leaks 
+----------------------------------
+August 28 2025
+- added battery data to the vehicle HUD 
+- minor fixes/cleanup
+- turning on a vehicle engine now requires a battery with charge 
+
+amusingly i learned that vehicle batteries are not being discharged at the moment.
+
+todo 
+- implement powered and manual turret moves, powered takes battery (or engine on??)
+- probably a bool for electrical power so batteries don't need to be individually checked 
+- rewrite mouse select. shouldn't select dirt, concrete, etc 
+- 'r' review of ai_vehicle found a ton of stuff that needs to be checked 
+
+----------------------------------
+August 25 2025
+- minor cleanup 
+- damaged coax weapon no longer prevents use of primary weapon 
+
+made some small changes to the gunner logic. it used to be a coax weapon that was damaged would trigger the weapon damaged action 
+which would soft lock the gunner. now it results in a out_of_ammo_coax, which just means it won't be used. 
+
+a primary gun being damaged will still prevent coax use - but in most cases this will now result in a vehicle bail out. 
+
+I need to step through target acquisition. sometimes tanks just don't seem to target eachother. perhaps its the visibility code?
+
+----------------------------------
 August 24 2025
 - added sd.kfz.234/1
 - turret track jammed on a primary turret now disables the vehicle 

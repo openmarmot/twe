@@ -372,8 +372,8 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - red_bicycle')
-            self.text_queue.append('2 - su-85')
-            self.text_queue.append('3 - german_sd_kfz_251/1')
+            self.text_queue.append('2 - t70')
+            self.text_queue.append('3 - german_sd_kfz_251/23')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - german_sd_kfz_234/1')
             self.text_queue.append('6 - T20 armored tractor')
@@ -383,9 +383,9 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'red_bicycle',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_su_85',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_t70',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/1',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/23',True)
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_panzer_iv_ausf_j',True)
             elif key=='5':
@@ -403,7 +403,7 @@ class World_Menu(object):
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
             self.text_queue.append('1 - ppsh41 ')
             self.text_queue.append('2 - Panzerschreck')
-            self.text_queue.append('3 - Model 24 Stick Grenade ')
+            self.text_queue.append('3 - Panzerfaust 60 ')
             self.text_queue.append('4 - molotov')
             self.text_queue.append('5 - MG42')
             self.text_queue.append('6 - ptrs-41')
@@ -416,7 +416,7 @@ class World_Menu(object):
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)
             elif key=='3':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'model24',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerfaust_60',True)
             elif key=='4':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'molotov_cocktail',True)
             elif key=='5':

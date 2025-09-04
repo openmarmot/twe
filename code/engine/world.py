@@ -191,7 +191,6 @@ class World():
         # set or reset spawn time in world_seconds
         world_object.spawn_time=self.world_seconds
 
-        
     #---------------------------------------------------------------------------
     def check_collision_return_object(self,collider,ignore_list, objects,consider_prone=False):
         ''' collision check. returns colliding object or None'''
@@ -245,8 +244,6 @@ class World():
             return False
         else:
             return True
-
-            
 
     #------------------------------------------------------------------------------
     def create_explosion(self,world_coords,explosion_radius,shrapnel_count,originator,weapon,fire_duration,smoke_duration):
@@ -782,6 +779,9 @@ class World():
 
     #------------------------------------------------------------------------------
     def update_vehicle_text(self):
+        '''this is the vehicle HUD text. basically debug text'''
+        # at the moment this is turned on from the vehicle context menu 
+        
         self.vehicle_text_queue=[]
 
         if self.player.ai.memory['current_task']=='task_vehicle_crew':
@@ -790,23 +790,18 @@ class World():
             self.vehicle_text_queue.append('Vehicle: '+vehicle.name)
 
             if vehicle_role.is_driver:
+                # gauges
+                self.vehicle_text_queue.append(f'Engines on: {vehicle.ai.engines_on}')
+                self.vehicle_text_queue.append(f'Electrical system on: {vehicle.ai.electrical_system_functioning}')
+                current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
+                self.vehicle_text_queue.append(f'Fuel Gauge: {current_fuel}/{max_fuel}')
+                self.vehicle_text_queue.append(f'Speed: {round(vehicle.ai.current_speed, 1)}')
 
-                for b in vehicle.ai.engines:
-                    self.vehicle_text_queue.append('Engine: ' + b.name + ' ' + str(b.ai.engine_on))
-
-                for b in vehicle.ai.fuel_tanks:
-                    fuel=0
-                    if len(b.ai.inventory)>0:
-                        if 'gas' in b.ai.inventory[0].name or 'diesel' in b.ai.inventory[0].name:
-                            fuel=b.ai.inventory[0].volume
-                    fuel_text=str(b.volume) + '|' + str(round(fuel,2))
-                    self.vehicle_text_queue.append('Fuel Tank: ' + b.name + ' ' + fuel_text)
-
-                self.vehicle_text_queue.append(f'max speed | current speed: {round(vehicle.ai.max_speed, 1)} | {round(vehicle.ai.current_speed, 1)}')
-                self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
-                self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
-                self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
-                self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
+                #self.vehicle_text_queue.append(f'max speed: {round(vehicle.ai.max_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
+                #self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
+                #self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
+                #self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
+                #self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
 
                 # airplane specific 
                 if vehicle.is_airplane:
@@ -816,6 +811,13 @@ class World():
                     self.vehicle_text_queue.append(f'elevator: {round(vehicle.ai.elevator, 1)}')
                     self.vehicle_text_queue.append(f'rudder: {round(vehicle.ai.rudder, 1)}')
                     self.vehicle_text_queue.append(f'flaps: {round(vehicle.ai.flaps, 1)}')
+
+            if vehicle_role.is_driver:
+                for role in vehicle.ai.vehicle_crew:
+                    if role.role_occupied:
+                        if role.is_gunner:
+                            self.vehicle_text_queue.append(f'Gunner {role.human.name}: {role.human.ai.memory['task_vehicle_crew']['current_action']}')
+
 
             if vehicle_role.is_gunner:
                 turret=vehicle_role.turret

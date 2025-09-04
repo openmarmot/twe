@@ -142,7 +142,7 @@ class AITurret(object):
                     # mark the vehicle as disabled if this was the main turret
                     if self.primary_turret:
                         if self.vehicle:
-                            self.vehicle.ai.is_disabled=True
+                            self.vehicle.ai.vehicle_disabled=True
                 elif result=='primary weapon':
                     if self.primary_weapon:
                         if random.randint(0,1)==1:
@@ -157,7 +157,7 @@ class AITurret(object):
                             if self.vehicle:
                                 # if its a transport than the turret doesn't really matter
                                 if self.vehicle.ai.is_transport is False:
-                                    self.vehicle.ai.is_disabled=True
+                                    self.vehicle.ai.vehicle_disabled=True
 
                 elif result=='coaxial weapon':
                     if self.coaxial_weapon:
@@ -271,14 +271,18 @@ class AITurret(object):
         if self.rotation_change!=0:
             moved=True
             self.turret_rotation+=(self.rotation_change*self.rotation_speed*time_passed)
-            
-            # make sure rotation is within bounds
-            if self.turret_rotation<self.rotation_range[0]:
-                self.turret_rotation=self.rotation_range[0]
-                self.rotation_change=0
-            elif self.turret_rotation>self.rotation_range[1]:
-                self.turret_rotation=self.rotation_range[1]
-                self.rotation_change=0
+
+
+            # Check if turret allows full 360-degree rotation
+            if self.rotation_range == [-360, 360]:
+                # Normalize rotation to stay within [0, 360) for continuous rotation
+                self.turret_rotation = engine.math_2d.get_normalized_angle(self.turret_rotation)
+            else:
+                # Enforce restricted rotation range without resetting rotation_change
+                if self.turret_rotation < self.rotation_range[0]:
+                    self.turret_rotation = self.rotation_range[0]
+                elif self.turret_rotation > self.rotation_range[1]:
+                    self.turret_rotation = self.rotation_range[1]
 
         if self.vehicle!=None:
             if self.last_vehicle_position!=self.vehicle.world_coords:

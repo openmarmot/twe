@@ -479,7 +479,8 @@ class Graphics_2D_Pygame(object):
                     if (c.is_player is False 
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
-                        and c.is_ground_texture is False):
+                        and c.is_ground_texture is False
+                        and c.is_particle_effect is False):
                         possible_objects.append(c)
         elif self.mode==2:
             # for strategic map we want everything
