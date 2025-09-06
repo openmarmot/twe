@@ -887,51 +887,62 @@ class World_Menu(object):
             self.text_queue.append('Battery State of Charge: '+str(round(self.selected_object.ai.battery.ai.state_of_charge,2))
                 +'/'+str(self.selected_object.ai.battery.ai.max_capacity))
         
+        if self.menu_state=='none':
+            if self.world.check_object_exists(self.selected_object):
+                self.text_queue.append('1 - pick up')
+                if key=='1':
+                    self.world.player.ai.pickup_object(self.selected_object)
+                    self.deactivate_menu()
+                    # we don't want to process anyhting after this so nothing else prints
+                    return
 
-        if self.world.check_object_exists(self.selected_object):
-            self.text_queue.append('1 - pick up')
-            if key=='1':
-                self.world.player.ai.pickup_object(self.selected_object)
-                self.deactivate_menu()
-                # we don't want to process anyhting after this so nothing else prints
-                return
+            self.text_queue.append('2 - Toggle power')
+            if key=='2':
+                if self.selected_object.ai.power_on:
+                    self.selected_object.ai.turn_power_off()
+                else:
+                    self.selected_object.ai.turn_power_on()
 
-        self.text_queue.append('2 - Toggle power')
-        if key=='2':
-            if self.selected_object.ai.power_on:
-                self.selected_object.ai.turn_power_off()
-            else:
-                self.selected_object.ai.turn_power_on()
-
-            self.radio_menu(None)
-            return
-
-        self.text_queue.append('3 - Frequency Up')
-        if key=='3':
-            self.selected_object.ai.turn_frequency_up()
-            self.radio_menu(None)
-            return
-
-        self.text_queue.append('4 - Frequency Down')
-        if key=='4':
-            self.selected_object.ai.turn_frequency_down()
-            self.radio_menu(None)
-            return
-
-        self.text_queue.append('5 - Volume Up')
-        if key=='5':
-            if self.selected_object.ai.volume<self.selected_object.ai.volume_range[1]:
-                self.selected_object.ai.volume+=1
                 self.radio_menu(None)
                 return
-        
-        self.text_queue.append('6 - Volume Down')
-        if key=='6':
-            if self.selected_object.ai.volume>self.selected_object.ai.volume_range[0]:
-                self.selected_object.ai.volume-=1
+
+            self.text_queue.append('3 - Frequency Up')
+            if key=='3':
+                self.selected_object.ai.turn_frequency_up()
                 self.radio_menu(None)
                 return
+
+            self.text_queue.append('4 - Frequency Down')
+            if key=='4':
+                self.selected_object.ai.turn_frequency_down()
+                self.radio_menu(None)
+                return
+
+            self.text_queue.append('5 - Volume Up')
+            if key=='5':
+                if self.selected_object.ai.volume<self.selected_object.ai.volume_range[1]:
+                    self.selected_object.ai.volume+=1
+                    self.radio_menu(None)
+                    return
             
+            self.text_queue.append('6 - Volume Down')
+            if key=='6':
+                if self.selected_object.ai.volume>self.selected_object.ai.volume_range[0]:
+                    self.selected_object.ai.volume-=1
+                    self.radio_menu(None)
+                    return
+            
+            self.text_queue.append('7 - Send Message')
+            if key=='7':
+                self.menu_state='send_message'
+                self.radio_menu(None)
+                return
+        if self.menu_state=='send_message':
+            self.text_queue.append('1 - Comms check with HQ')
+            if key=='1':
+                squad_name=self.world.player.ai.squad.name
+                message=f"HQ,{squad_name},Comms check,"
+                self.selected_object.ai.send_message(message)
 
     #---------------------------------------------------------------------------
     def squad_menu(self,key):

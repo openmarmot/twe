@@ -1,5 +1,27 @@
 TWE Project : Change Log
 
+
+----------------------------------
+September 05 2025
+- misc minor updates 
+- started work on ai indirect fire gunner code 
+- working on radios 
+- squads now get names assigned 
+- turret weapons have a new accuracy calculation. 
+
+messing around with radios a bit. came up with a standardized message format 
+
+I need to do something about weapon range. currently range maxes out at 4000. 
+I might move that out to 5000 but only give that to a couple weapons. probably only 
+the long 88s 
+
+----------------------------------
+September 04 2025
+
+spent some time looking for diagrams and reference material. 
+
+might do a sd.kfz.10, a 20mm flak, and a combo of the 10 and the flak 
+
 ----------------------------------
 September 03 2025
 - added t70 

@@ -161,25 +161,52 @@ class AIHumanVehicle():
     def calculate_turret_aim(self,turret,target,weapon):
         '''calculates the correct turret angle to hit a target'''
 
+        # this is where we should be applying the majority of the aim adjustments
+
         # target : world_object
         # turret : world_object with ai_turret
 
         aim_coords=target.world_coords
         # guess how long it will take for the bullet to arrive
         distance=engine.math_2d.get_distance(turret.world_coords,target.world_coords)
+
+        # - determine adjustment - 
+        adjust_max=0
+        adjust_max+=weapon.ai.mechanical_accuracy
+
+        if self.owner.ai.blood_pressure<100:
+            adjust_max+=1
+        if self.owner.ai.blood_pressure<50:
+            adjust_max+=10
+
+        if distance>1000:
+            adjust_max+=1
+        if distance>2000:
+            adjust_max+=2
+        if distance>3000:
+            adjust_max+=5
+        if distance>3500:
+            adjust_max+=5
+
+        if adjust_max<0:
+            adjust_max=0
+
+        # final results
+        aim_coords=[aim_coords[0]+random.uniform(-adjust_max,adjust_max),aim_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
          # we want the projectile to collide so aim point will be a bit past it
         weapon.ai.calculated_range=distance+random.randint(0,500)
         time_passed=distance/weapon.ai.muzzle_velocity
         if target.is_vehicle:
 
             if target.ai.current_speed>0:
-                aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
+                aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,aim_coords,target.heading,time_passed)
 
         if target.is_human:
             if target.ai.memory['current_task']=='task_vehicle_crew':
                 vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 if vehicle.ai.current_speed>0:
-                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
+                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,aim_coords,vehicle.heading,time_passed)
             else:
                 if target.ai.memory['current_task']=='task_move_to_location':
                     destination=target.ai.memory['task_move_to_location']['destination']
@@ -775,7 +802,58 @@ class AIHumanVehicle():
         reload_success=self.owner.ai.reload_weapon(weapon,vehicle,new_magazine)
         if reload_success is False:
             engine.log.add_data('Error','think_vehicle_role_gunner reload failed',True)
-                
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_indirect_gunner(self):
+        '''think vehicle role indirect fire gunner'''
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+
+        # handle the reloading action
+        if self.owner.ai.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
+            if (self.owner.world.world_seconds-self.owner.ai.memory['task_vehicle_crew']['reload_start_time'] 
+            > turret.ai.primary_weapon_reload_speed):
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='none'
+                self.think_vehicle_role_gunner_reload(turret.ai.primary_weapon)
+            else:
+                return
+
+        # check main gun ammo
+        ammo_gun,ammo_inventory,magazine_count=self.owner.ai.check_ammo(turret.ai.primary_weapon,vehicle)
+        if ammo_gun==0:
+            if ammo_inventory>0:
+                # start the reload process
+                self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                self.owner.ai.memory['task_vehicle_crew']['target']=None
+                return
+            else:
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='Out of ammo'
+                return
+        
+        if turret.ai.primary_weapon.ai.action_jammed:
+            # this we can fix ourselves
+            #if we are already in this state then consider it fixed 
+            if self.owner.ai.memory['task_vehicle_crew']['current_action']=='Clearing weapon jam':
+                if turret.ai.primary_weapon:
+                    if turret.ai.primary_weapon.ai.action_jammed:
+                        self.owner.ai.speak('fixing jammed gun')
+                        turret.ai.primary_weapon.ai.action_jammed=False
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for fire mission'
+                return
+            else:
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='Clearing weapon jam'
+                self.owner.ai.memory['task_vehicle_crew']['target']=None
+                # wait for a bit to simulate fixing.
+                # on the next loop it will be fixed
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
+                return
+            
+        # if we got this far we have ammo, and the weapon is functional 
+        
+
+
+
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         '''think.. as a passenger'''
@@ -796,6 +874,9 @@ class AIHumanVehicle():
     def think_vehicle_role_radio_operator(self):
         # note radio.ai.radio_operator set by switch_task_vehicle_crew
         # not a ton that we really need to do here atm
+
+        # !! radio specific stuff should be handled under a ai_human role so that humans with 
+        # radios who are not in vehicles can also call it
 
         vehicle_role=self.owner.ai.memory['task_vehicle_crew']['vehicle_role']
         vehicle=vehicle_role.vehicle
@@ -896,6 +977,10 @@ class AIHumanVehicle():
             if role.is_radio_operator:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                 self.think_vehicle_role_radio_operator()
+            if role.is_indirect_fire_gunner:
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
+                self.think_vehicle_role_indirect_gunner()
+
 
             if self.owner==self.owner.ai.squad.squad_leader:
                 # if we don't have a vehicle order, check to see if we can create 

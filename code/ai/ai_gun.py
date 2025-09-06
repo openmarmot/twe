@@ -53,6 +53,9 @@ class AIGun(object):
         # this is esentially the max range for the weapon
         self.range=0
 
+        # minimum range - mostly used for indirect fire weapons
+        self.minimum_range=0
+
         # this is set by the human firing the weapon and is a way to set the 
         # vertical angle of the gun - basically how far the projectile will fly
         # this is the actual value used by the projectile

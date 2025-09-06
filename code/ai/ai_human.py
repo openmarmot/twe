@@ -136,6 +136,14 @@ class AIHuman(object):
         self.squad_max_distance=300
 
         # # target lists. these are refreshed periodically
+        self.near_human_range=800
+        self.mid_human_range=1500
+        self.far_human_range=2500
+
+        self.near_vehicle_range=1000
+        self.mid_vehicle_range=2500
+        self.far_vehicle_range=4100
+
         self.near_human_targets=[]
         self.mid_human_targets=[]
         self.far_human_targets=[]
@@ -498,21 +506,20 @@ class AIHuman(object):
 
                     if spotted:
                         if target.is_human:
-                            if d<800:
+                            if d<self.near_human_range:
                                 self.near_human_targets.append(target)
-                            elif d<1500:
+                            elif d<self.mid_human_range:
                                 self.mid_human_targets.append(target)
-                            elif d<2500:
+                            elif d<self.far_human_range:
                                 self.far_human_targets.append(target)
                         else:
-                            #eventually these will be vehicle specific lists
-                            if d<1000:
+                            if d<self.near_vehicle_range:
                                 if target not in self.near_vehicle_targets:
                                     self.near_vehicle_targets.append(target)
-                            elif d<2000:
+                            elif d<self.mid_vehicle_range:
                                 if target not in self.mid_vehicle_targets:
                                     self.mid_vehicle_targets.append(target)
-                            elif d<4000:
+                            elif d<self.far_vehicle_range:
                                 if target not in self.far_vehicle_targets:
                                     self.far_vehicle_targets.append(target)
 

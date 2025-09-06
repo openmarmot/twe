@@ -82,6 +82,11 @@ class AITurret(object):
 
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
+        '''calculate mechanical accuracy. '''
+
+        # note most accuracy calculation should be done in ai_human_vehicle.calculate_turret_aim
+        # this is smaller variations that get added when the bullet is fired
+
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
         far_coords=engine.math_2d.moveAlongVector(1000,self.owner.world_coords,temp_heading,1)
 

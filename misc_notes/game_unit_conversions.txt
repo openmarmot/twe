@@ -50,7 +50,7 @@ range : 1813
 This is compressed for game play considerations 
 game units to real life units for determining penetration 
 
-game unit -> meters
+game unit -> meters conversion for penetration data 
 0 - > 0 meters
 500
 1000 - 500 meters

@@ -39,8 +39,12 @@ class AIRadio(object):
         # used to prevent echoing 
         self.last_message=''
 
+        # message format is designed to string.split(',')
+        # "who you are sending to,who you are,the message,data"
+
     #---------------------------------------------------------------------------
     def receive_message(self,message):
+        print(f'debug: received message: {message}')
         if self.power_on:
             # prevents echos. we don't want to receive our own message
             if message!=self.last_message:
@@ -52,6 +56,7 @@ class AIRadio(object):
 
     #---------------------------------------------------------------------------
     def send_message(self,message):
+        print(f'debug: sent message: {message}')
         if self.power_on:
             self.last_message=message
             engine.world_radio.send_message(self.current_frequency,message)
@@ -70,11 +75,15 @@ class AIRadio(object):
 
     #---------------------------------------------------------------------------
     def turn_power_on(self):
+        # reset receive queue 
+        self.receive_queue=[]
         self.power_on=True
         engine.world_radio.add_radio(self.current_frequency,self.owner)
 
     #---------------------------------------------------------------------------
     def turn_power_off(self):
+        # reset receive queue 
+        self.receive_queue=[]
         self.power_on=False
         engine.world_radio.remove_radio(self.owner)
 
