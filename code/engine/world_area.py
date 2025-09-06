@@ -28,7 +28,7 @@ class WorldArea(object):
 
         # radius? circumference?
         # this is used to determine the sphere of coverage for what is considered 'in' the area
-        self.size=1000
+        self.size=2000
 
         # center of the area
         self.world_coords=[0,0]
@@ -53,15 +53,50 @@ class WorldArea(object):
 
         self.control_update_interval=0
 
+        # locations are used when a vehicle or squad travels to a world area
+        # this keeps vehicles from all being on top of each other
+        self.locations=[]
+        self.used_locations=[]
+
+    #---------------------------------------------------------------------------
+    def compute_locations(self):
+        '''compute locations, avoiding existing objects'''
+        # note this is called by world.start and is pre-computed before the game starts
+        
+        # build a list of coordinates to avoid. avoid all objects roughly near the world area
+        coords_to_avoid=[]
+        grids=self.world.grid_manager.get_grid_squares_near_world_coords(self.world_coords,self.size)
+        for grid in grids:
+            for wo_object in grid.wo_objects:
+                coords_to_avoid.append(wo_object.world_coords)
+
+        seperation=100
+        count=200 # this should be plenty. locations are mostly used at a squad or vehicle level
+        self.locations=engine.math_2d.get_random_constrained_coords(self.world_coords,
+            self.size,seperation,count,coords_to_avoid,600)
+        
+    #---------------------------------------------------------------------------
+    def get_location(self):
+        '''get a random unused location'''
+
+        if len(self.locations)==0:
+            # reset 
+            self.locations=self.used_locations
+            self.used_locations=[]
+
+        location=self.locations.pop(random.randint(0, len(self.locations) - 1))
+        self.used_locations.append(location)
+        return location
+
     #---------------------------------------------------------------------------
     def update(self):
         time_passed=self.world.time_passed_seconds
         self.time_since_control_update+=time_passed
 
-        if self.time_since_control_update>5:
+        if self.time_since_control_update>self.control_update_interval:
             self.update_control()
             self.time_since_control_update=0
-            self.control_update_interval=random.randint(5,25)
+            self.control_update_interval=random.randint(5,13)
         
 
     #---------------------------------------------------------------------------
@@ -71,8 +106,9 @@ class WorldArea(object):
         self.soviet_count=0
         self.american_count=0
         self.civilian_count=0
-
-        for b in self.world.grid_manager.get_objects_from_all_grid_squares(True,False):
+        
+        # get the humans from the grid squares that cover the world_area bounds
+        for b in self.world.grid_manager.get_objects_from_grid_squares_near_world_coords(self.world_coords,self.size,True,False):
             d=engine.math_2d.get_distance(self.world_coords,b.world_coords)
             if d < self.size:
                 if b.ai.squad.faction_tactical.faction=='german':

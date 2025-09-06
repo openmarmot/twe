@@ -37,6 +37,9 @@ class GameMenu():
         # used for multiple page layouts
         self.current_page=0
 
+        #
+        self.player_spawn_faction=""
+
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -169,19 +172,18 @@ class GameMenu():
             # note 1 is missing as americans are not implemented
             if key in ['2','3','4']:
                 if key=='1':
-                    self.graphics_engine.world.player_spawn_faction='american'
+                    self.gplayer_spawn_faction='american'
                 elif key=='2':
-                    self.graphics_engine.world.player_spawn_faction='german'
+                    self.player_spawn_faction='german'
                 elif key=='3':
-                    self.graphics_engine.world.player_spawn_faction='soviet'
+                    self.player_spawn_faction='soviet'
                 elif key=='4':
-                    self.graphics_engine.world.player_spawn_faction='civilian'
+                    self.player_spawn_faction='civilian'
 
                 self.menu_state='battle_select'
                 key='none'
 
         if self.menu_state=='battle_select':
-            faction=self.graphics_engine.world.player_spawn_faction
             self.text_queue=[]
             self.text_queue.append('TWE: To Whatever End')
             self.text_queue.append('---------------')
@@ -189,34 +191,15 @@ class GameMenu():
             self.text_queue.append('Note - balance varies wildly with code updates.')
 
             self.text_queue.append('1 - 5k point random battle ')
-            if key=='1':
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,'1')
-                self.graphics_engine.switch_mode(1)
-                self.deactivate_menu()
-
             self.text_queue.append('2 - 10k point random battle')
-            if key=='2':
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,'2')
-                self.graphics_engine.switch_mode(1)
-                self.deactivate_menu()
-
             self.text_queue.append('3 - 20k point random battle')
-            if key=='3':
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,'3')
-                self.graphics_engine.switch_mode(1)
-                self.deactivate_menu()
-
             self.text_queue.append('4 - Reserved for testing, content will vary')
-            if key=='4':
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,'4')
-                self.graphics_engine.switch_mode(1)
-                self.deactivate_menu()
-
             self.text_queue.append('5 - 100v100 tank battle for benchmarking')
-            if key=='5':
-                engine.world_builder.load_quick_battle(self.graphics_engine.world,'5')
-                self.graphics_engine.switch_mode(1)
+
+            if key in ['1','2','3','4','5']:
                 self.deactivate_menu()
+                self.graphics_engine.load_quick_battle(self.player_spawn_faction,key)
+                
 
 
 

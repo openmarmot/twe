@@ -192,7 +192,7 @@ class AIFactionTactical():
                 order.order_defend_area=True
                 random_world_area=random.choice(self.world.world_areas)
                 order.world_area=random_world_area
-                order.world_coords=engine.math_2d.randomize_coordinates(random_world_area.world_coords,300)
+                order.world_coords=random_world_area.get_location()
                 squad.squad_leader.ai.switch_task_squad_leader(order)
 
     #---------------------------------------------------------------------------

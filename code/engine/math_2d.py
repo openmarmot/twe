@@ -264,8 +264,6 @@ def get_normalized(vec2):
         pass
     return b
 
-
-
 #------------------------------------------------------------------------------
 def get_normalized_angle(degrees):
     return round(degrees % 360,2)

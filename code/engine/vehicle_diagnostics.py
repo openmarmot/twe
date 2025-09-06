@@ -242,11 +242,12 @@ class VehicleDiagnostics(object):
         self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
         for b in self.vehicle.ai.collision_log[-10:]:
+            pen_text=f'[penetrated: {b.penetrated}] [distance: {b.distance}] [projectile: {b.projectile_name}] [penetration value: {b.penetration_value}] [armor value: {b.armor_value}] [side: {b.hit_side}] [compartment: {b.hit_compartment}] [result: {b.result}]'
             if b.penetrated:
-                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} penetration value: {b.penetration_value} armor value: {b.armor_value} side: {b.hit_side} compartment: {b.hit_compartment} result: {b.result}',copy.copy(coord),self.text_red])
+                self.text_queue.append([pen_text,copy.copy(coord),self.text_red])
                 coord[1]+=spacing
             else:
-                self.text_queue.append([f'penetrated: {b.penetrated} distance: {b.distance} projectile: {b.projectile_name} penetration value: {b.penetration_value} armor value: {b.armor_value} side: {b.hit_side} compartment: {b.hit_compartment} result: {b.result}',copy.copy(coord),self.text_black])
+                self.text_queue.append([pen_text,copy.copy(coord),self.text_black])
                 coord[1]+=spacing
 
 

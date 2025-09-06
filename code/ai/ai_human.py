@@ -1378,7 +1378,7 @@ class AIHuman(object):
                 if friendly_area is not None:
                     tactical_order=TacticalOrder()
                     tactical_order.order_move_to_location=True
-                    tactical_order.world_coords=engine.math_2d.randomize_coordinates(friendly_area.world_coords,300)
+                    tactical_order.world_coords=friendly_area.get_location()
                     self.memory['task_squad_leader']['orders'].append(tactical_order)
                     return
 
@@ -1394,7 +1394,7 @@ class AIHuman(object):
         if contested_area is not None:
             tactical_order=TacticalOrder()
             tactical_order.order_defend_area=True
-            tactical_order.world_coords=engine.math_2d.randomize_coordinates(contested_area.world_coords,300)
+            tactical_order.world_coords=contested_area.get_location()
             tactical_order.world_area=contested_area
             self.memory['task_squad_leader']['orders'].append(tactical_order)
             return
@@ -1403,7 +1403,7 @@ class AIHuman(object):
         random_area=random.choice(self.owner.world.world_areas)
         tactical_order=TacticalOrder()
         tactical_order.order_move_to_location=True
-        tactical_order.world_coords=engine.math_2d.randomize_coordinates(random_area.world_coords,300)
+        tactical_order.world_coords=random_area.get_location()
         self.memory['task_squad_leader']['orders'].append(tactical_order)
         return
 

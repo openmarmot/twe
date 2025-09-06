@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 
+
+----------------------------------
+September 06 2025
+- misc minor fixes and updates
+- randomized world_area control check 
+- world area now generates 'locations' that can be used when traveling to it to spread out vehicles 
+so they don't pile up on each other 
+- world area locations are now used when creating tactical orders 
+- loading quick battle and world now uses threads to avoid pygame locking up 
+
 ----------------------------------
 September 05 2025
 - misc minor updates 

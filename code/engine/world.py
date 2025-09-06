@@ -215,7 +215,6 @@ class World():
                             # missed due to prone
                             collided=None
             
-
         return collided
     
     #---------------------------------------------------------------------------
@@ -281,7 +280,7 @@ class World():
         possible=self.grid_manager.get_objects_from_grid_squares_near_world_coords(world_coords,flame_radius,True,True)
         for flame in range(flame_amount):
             coords=engine.math_2d.randomize_coordinates(world_coords,random.randint(1,15))
-            engine.world_builder.spawn_explosion_and_fire(self,world_coords,fire_duration,smoke_duration)
+            engine.world_builder.spawn_explosion_and_fire(self,coords,fire_duration,smoke_duration)
             hit_list=engine.math_2d.checkCollisionCircleCoordsAllResults(coords,flame_radius,possible,[])
 
             for hit in hit_list:
@@ -660,7 +659,10 @@ class World():
         '''performs world tasks necessary for a new world to start'''
         # called by world_builder.load_world()
 
-        # maybe pre-compute world_area coords for vehicles here
+        # precompute world_area locations
+        engine.log.add_data('note','Computing World Area locations..',True)
+        for area in self.world_areas:
+            area.compute_locations()
         
         # tactical_ai start. create squads, figure out initial coords, orders, etc 
         for ai in self.tactical_ai.values():

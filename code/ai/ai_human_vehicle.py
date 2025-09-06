@@ -981,7 +981,7 @@ class AIHumanVehicle():
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                 self.think_vehicle_role_indirect_gunner()
 
-
+            # the squad lead has some stuff to do independent of their vehicle role
             if self.owner==self.owner.ai.squad.squad_leader:
                 # if we don't have a vehicle order, check to see if we can create 
                 # one from tactical orders
