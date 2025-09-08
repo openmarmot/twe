@@ -4503,6 +4503,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         add_standard_loadout(z,world,'panzerschreck')
         add_random_pistol_to_inventory(z,world)
 
+    elif object_type=='german_mp40_panzerschreck':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'panzerschreck')
+        add_standard_loadout(z,world,'mp40')
+
     elif object_type=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
@@ -4518,6 +4524,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'k43')
+
+    elif object_type=='german_k43_panzerfaust_100':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'k43')
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_100',False))
         
     elif object_type=='german_g41w':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -4570,6 +4582,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'stg44')
+
+    elif object_type=='german_stg44_rpg43':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'stg44')
+        z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
+        z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
         
     elif object_type=='german_stg44_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)

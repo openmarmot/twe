@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 
+----------------------------------
+September 07 2025
+- made some new german soldier and weapon combos 
+- new german 1945 panzerjager squad 
+
+i'm having a really hard time coming up with squad load outs. 
+i'm not sure what from other games was actually based on historical facts, 
+research has not been conclusive. There are some weapons that are in game and 
+basically unused at the moment like the g41w and one of the fg42 variants. 
+
+
 
 ----------------------------------
 September 06 2025
