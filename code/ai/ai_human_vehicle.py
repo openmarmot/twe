@@ -487,6 +487,9 @@ class AIHumanVehicle():
                             role.human.ai.switch_task_exit_vehicle()
                             # this will also clear out any vehicle_orders they had
 
+                # delete the order
+                self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=None
+
                 return
             #default
             self.think_vehicle_role_driver_drive_to_destination(order.world_coords,distance)
@@ -851,7 +854,7 @@ class AIHumanVehicle():
             
         # if we got this far we have ammo, and the weapon is functional 
         
-
+        # note this is unfinished
 
 
     #---------------------------------------------------------------------------

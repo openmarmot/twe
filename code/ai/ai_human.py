@@ -1319,6 +1319,7 @@ class AIHuman(object):
                 if self.memory['current_task']=='task_vehicle_crew':
                     vehicle_order=VehicleOrder()
                     vehicle_order.order_drive_to_coords=True
+                    vehicle_order.world_coords=copy.copy(order.world_coords)
                     if self.memory['task_vehicle_crew']['vehicle_role'].vehicle.ai.is_transport:
                         vehicle_order.exit_vehicle_when_finished=True
                     
@@ -1340,6 +1341,7 @@ class AIHuman(object):
                 if self.memory['current_task']=='task_vehicle_crew':
                     vehicle_order=VehicleOrder()
                     vehicle_order.order_drive_to_coords=True
+                    vehicle_order.world_coords=copy.copy(order.world_coords)
                     if self.memory['task_vehicle_crew']['vehicle_role'].vehicle.ai.is_transport:
                         vehicle_order.exit_vehicle_when_finished=True
                     
@@ -1683,7 +1685,7 @@ class AIHuman(object):
                 break
 
 
-        if role is None:
+        if vehicle_role is None:
             engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!! Vehicle is full='+str(vehicle.ai.check_if_vehicle_is_full()),True)
 
 
@@ -2400,7 +2402,7 @@ class AIHuman(object):
                     # won't return AFVs if not AFV trained
                     vehicle_order=VehicleOrder()
                     vehicle_order.order_drive_to_coords=True
-                    vehicle_order.world_coords=self.memory['task_move_to_location']['destination']
+                    vehicle_order.world_coords=copy.copy(self.memory['task_move_to_location']['destination'])
                     vehicle_order.exit_vehicle_when_finished=True
                     self.switch_task_enter_vehicle(b,vehicle_order)
 

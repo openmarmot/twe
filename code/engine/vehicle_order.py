@@ -15,5 +15,5 @@ class VehicleOrder():
 
         # additional details
         self.exit_vehicle_when_finished=False
-        self.world_coords=[0,0]
+        self.world_coords=None # [0,0]
         self.target_object=None # a world_object
