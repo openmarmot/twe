@@ -1,5 +1,67 @@
 TWE Project : Change Log
 
+
+
+----------------------------------
+September 08 2025
+- bug fixes with vehicle orders 
+
+vehicle orders that were created from tactical orders weren't getting world_coords set. 
+this likely resulted in a lot of vehicles heading towards [0,0] but im not sure if that was 
+happening or not. 
+
+ive set the default world_coords to None for tactical and vehicle orders so if the world_coords 
+aren't set it will error out. a better option would probably be to set all these on init 
+
+vehicle crews seem to be exiting vehicles more often than they should - although 
+i probably need to add some debug statements to understand why. 
+
+for the most part these bug fixes worked -- vehicles are behaving a lot more like i 
+expected and battles remain interesting and dynamic after the first engagement. i think 
+this is good enough for now and i can keep working on other things. once i get radio 
+working i can add faction tactical orders back in - which should make squad movement 
+a little more coordinated.
+
+----------------------------------
+September 07 2025
+- made some new german soldier and weapon combos 
+- new german 1945 panzerjager squad 
+
+i'm having a really hard time coming up with squad load outs. 
+i'm not sure what from other games was actually based on historical facts, 
+research has not been conclusive. There are some weapons that are in game and 
+basically unused at the moment like the g41w and one of the fg42 variants. 
+
+----------------------------------
+September 06 2025
+- misc minor fixes and updates
+- randomized world_area control check 
+- world area now generates 'locations' that can be used when traveling to it to spread out vehicles 
+so they don't pile up on each other 
+- world area locations are now used when creating tactical orders 
+- loading quick battle and world now uses threads to avoid pygame locking up 
+
+----------------------------------
+September 05 2025
+- misc minor updates 
+- started work on ai indirect fire gunner code 
+- working on radios 
+- squads now get names assigned 
+- turret weapons have a new accuracy calculation. 
+
+messing around with radios a bit. came up with a standardized message format 
+
+I need to do something about weapon range. currently range maxes out at 4000. 
+I might move that out to 5000 but only give that to a couple weapons. probably only 
+the long 88s 
+
+----------------------------------
+September 04 2025
+
+spent some time looking for diagrams and reference material. 
+
+might do a sd.kfz.10, a 20mm flak, and a combo of the 10 and the flak 
+
 ----------------------------------
 September 03 2025
 - added t70 

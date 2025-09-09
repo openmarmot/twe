@@ -18,5 +18,5 @@ class TacticalOrder():
 
         # additional details
         self.world_area=None
-        self.world_coords=[0,0]
+        self.world_coords=None # [0,0]
         self.target_object=None # a world_object

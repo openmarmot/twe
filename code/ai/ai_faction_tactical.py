@@ -82,11 +82,13 @@ class AIFactionTactical():
         squad_lists=engine.squad_builder.create_squads(squad_objects)
 
         # create the squads
+        squad_number=0
         for b in squad_lists:
             squad=AISquad(self.world)
             squad.faction=self.faction
             squad.faction_tactical=self
-
+            squad.name=f"squad{squad_number}"
+            squad_number+=0
             for c in b:
                 squad.add_to_squad(c)
             
@@ -133,8 +135,18 @@ class AIFactionTactical():
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
     #---------------------------------------------------------------------------
+    def process_radio_messages(self):
+        for message in self.radio.ai.receive_queue:
+            if message.startswith('HQ'):
+                message=message.split(',')
+                self.radio.ai.send_message(f"{message[1]},HQ,Message Received, ")
+
+        # clear queue
+        self.radio.ai.receive_queue=[]
+
+    #---------------------------------------------------------------------------
     def send_radio_comms_check(self):
-        self.radio.ai.send_message('This is '+self.faction+' HQ. Sending a comms check')
+        self.radio.ai.send_message('HQ,ALL,Sending a comms check, ')
     #---------------------------------------------------------------------------
     def split_squad(self,members):
         '''removes members from their current squad and puts them in a new squad'''
@@ -180,7 +192,7 @@ class AIFactionTactical():
                 order.order_defend_area=True
                 random_world_area=random.choice(self.world.world_areas)
                 order.world_area=random_world_area
-                order.world_coords=engine.math_2d.randomize_coordinates(random_world_area.world_coords,300)
+                order.world_coords=random_world_area.get_location()
                 squad.squad_leader.ai.switch_task_squad_leader(order)
 
     #---------------------------------------------------------------------------
@@ -241,6 +253,8 @@ class AIFactionTactical():
         # run the update for each squad
         for b in self.squads:
             b.update()
+
+        self.process_radio_messages()
 
         if self.time_since_update>self.think_rate:
             self.time_since_update=0

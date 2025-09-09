@@ -611,22 +611,9 @@ class StrategicMap(object):
     def load_world(self,map_square,spawn_faction):
         '''called by strategic_menu. handles handoff from strategic map to world mode and loads a map->world'''
 
-        # create a fresh world 
-        self.graphics_engine.world=World()
+        # should look into just moving this into strategic menu
 
-        # set spawn faction
-        self.graphics_engine.world.player_spawn_faction=spawn_faction
-
-        # set the map name so we can unload it to the correct map when we are done playing
-        self.graphics_engine.world.map_square_name=map_square.name
-
-        # send to world_builder to convert map_objects to world_objects (this spawns them)
-        engine.world_builder.load_world(self.graphics_engine.world,map_square.map_objects)
-
-        # clear maps?
-
-        # switch to world mode
-        self.graphics_engine.switch_mode(1)
+        self.graphics_engine.load_world(spawn_faction,map_square.name,map_square.map_objects)
 
     #------------------------------------------------------------------------------
     def save_all_maps(self):

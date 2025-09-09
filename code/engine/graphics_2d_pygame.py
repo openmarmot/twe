@@ -19,6 +19,7 @@ import os
 from datetime import datetime
 import time
 import random
+import threading
 
 
 # import pip packages
@@ -285,6 +286,75 @@ class Graphics_2D_Pygame(object):
             print('Image loading complete')
         except Exception as e:
             engine.log.add_data('error', f'Failed to load images: {e}', True)
+
+    #------------------------------------------------------------------------------
+    def load_quick_battle(self,player_spawn_faction,battle_option):
+        '''load a quick battle'''
+
+        # called by game_menu.start_menu
+
+        # this uses a thread to prevent the game from going unresponsive while 
+        # all the data is being generated
+
+        # Start computation in a separate thread
+        # Container to store result from thread
+        result_container = [None]
+        thread = threading.Thread(target=engine.world_builder.load_quick_battle_map_objects, args=(battle_option,result_container))
+        thread.start()
+
+        self.game_menu.text_queue=['Creating quick battle map objects...']
+        # render
+        self.render_mode_0()
+
+        loading=True
+        while loading:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    loading = False
+                    self.quit=True
+
+            # Check if thread is done
+            if not thread.is_alive():
+                loading=False
+
+        self.load_world(player_spawn_faction,"Quick battle",result_container[0])
+
+    
+    #------------------------------------------------------------------------------
+    def load_world(self,player_spawn_faction,map_square_name,map_objects):
+        ''' this is the central load_world function. calls other load_world functions'''
+
+        # one of the main points of this function is to keep pygame responsive while 
+        # all the heavy world gen computation is done so the os doesn't think its not 
+        # responding
+
+        # create a new world
+        self.world=World()
+        self.world.player_spawn_faction=player_spawn_faction
+        self.world.map_square_name=map_square_name
+
+        # Start computation in a separate thread
+        thread = threading.Thread(target=engine.world_builder.load_world, args=(self.world, map_objects))
+        thread.start()
+
+        self.game_menu.text_queue=['Loading world ...']
+        # render
+        self.render_mode_0()
+
+        loading=True
+        while loading:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    loading = False
+                    self.quit=True
+
+            # Check if thread is done
+            if not thread.is_alive():
+                loading=False
+
+        # switch to world mode
+        self.switch_mode(1)
+
 
 
     #------------------------------------------------------------------------------

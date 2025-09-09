@@ -460,8 +460,10 @@ def load_magazine(world,magazine,projectile_type=None):
         engine.log.add_data('Error','world_builder.load_magazine unknown use for projectile: '+projectile_type,True)
 
 #------------------------------------------------------------------------------
-def load_quick_battle(world,battle_option):
-    ''' load quick battle. called by game menu'''
+def load_quick_battle_map_objects(battle_option,result_container):
+    ''' load quick battle map objects. called by game menu'''
+
+    # this is called in a thread by graphics_2d_pygame.load_quick_battle
 
     world_area_options=[]
     world_area_options.append(['town','town','town'])
@@ -469,8 +471,6 @@ def load_quick_battle(world,battle_option):
     map_areas=random.choice(world_area_options)
 
     map_objects=engine.map_generator.generate_map(map_areas)
-
-
 
     # -- initial troops --
     squads=[]
@@ -500,8 +500,6 @@ def load_quick_battle(world,battle_option):
 
     # bench mark
     elif battle_option=='5':
-        world.debug_mode=True
-
         for b in range(100):
             squads.append('Soviet T34-76 Model 1943')
             squads.append('German Panzer IV Ausf G')
@@ -510,7 +508,7 @@ def load_quick_battle(world,battle_option):
     for squad in squads:
         map_objects+=get_squad_map_objects(squad)
 
-    load_world(world,map_objects)
+    result_container[0]=map_objects
 
 
 #------------------------------------------------------------------------------
@@ -543,6 +541,8 @@ def load_sqlite_squad_data():
 def load_world(world,map_objects):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
 
+    # this is called in a thread by graphics_2d_pygame.load_world()
+
     # convert map_objects to world_objects
     # note - this also spawns them and creates the world_area objects
     convert_map_objects_to_world_objects(world,map_objects)
@@ -552,9 +552,6 @@ def load_world(world,map_objects):
     
     # perform all world start tasks
     world.start()
-
-    
-    
 
 #------------------------------------------------------------------------------
 def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,count,second_layer=True):
@@ -4506,6 +4503,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         add_standard_loadout(z,world,'panzerschreck')
         add_random_pistol_to_inventory(z,world)
 
+    elif object_type=='german_mp40_panzerschreck':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'panzerschreck')
+        add_standard_loadout(z,world,'mp40')
+
     elif object_type=='german_kar98k':
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
@@ -4521,6 +4524,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'k43')
+
+    elif object_type=='german_k43_panzerfaust_100':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'k43')
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_100',False))
         
     elif object_type=='german_g41w':
         z=spawn_object(world,world_coords,'german_soldier',False)
@@ -4573,6 +4582,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'stg44')
+
+    elif object_type=='german_stg44_rpg43':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'stg44')
+        z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
+        z.add_inventory(spawn_object(world,world_coords,'rpg43',False))
         
     elif object_type=='german_stg44_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)
