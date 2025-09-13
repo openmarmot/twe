@@ -413,8 +413,13 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['crate'],0))
 
-image_tool.image_objects.append(ImageObject(['t70_chassis'],0))
-image_tool.image_objects.append(ImageObject(['t70_turret'],0))
+image_tool.image_objects.append(ImageObject(['sd_kfz_10_chassis'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
 while image_tool.quit==False:
