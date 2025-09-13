@@ -1753,7 +1753,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         load_magazine(world,z)
 
     elif object_type=='g41w':
-        z=WorldObject(world,['g41w'],AIGun)
+        z=WorldObject(world,['k43'],AIGun)
         z.name='g41w'
         z.minimum_visible_scale=0.4
         z.is_gun=True
@@ -2123,6 +2123,89 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='RSO Wheel'
         z.ai.compatible_vehicles=['german_rso_pak','german_rso']
         z.ai.armor=[5,0,0]
+
+    # this is the base object for the sd.kfz.10 variants. It is not meant to be spawned by itself
+    elif object_type=='german_sd_kfz_10_base':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['sd_kfz_10_chassis'],AIVehicle)
+        z.name='Sd.Kfz.10'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.is_transport=True
+
+        # driver and assistant driver positions are the same for all variants
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[-18,-13]
+        z.ai.vehicle_crew.append(role)
+        role=VehicleRole('passenger',z)
+        role.is_passenger=True
+        role.seat_visible=True
+        role.seat_offset=[-18,12]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.vehicle_armor['top']=[1,0,0]
+        z.ai.vehicle_armor['bottom']=[1,0,0]
+        z.ai.vehicle_armor['left']=[1,0,0]
+        z.ai.vehicle_armor['right']=[1,0,0]
+        z.ai.vehicle_armor['front']=[1,0,0]
+        z.ai.vehicle_armor['rear']=[1,0,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[0,0,0]
+        z.ai.passenger_compartment_armor['left']=[0,0,0]
+        z.ai.passenger_compartment_armor['right']=[0,0,0]
+        z.ai.passenger_compartment_armor['front']=[0.0,0,0]
+        z.ai.passenger_compartment_armor['rear']=[0,0,0]
+        z.ai.max_speed=385.9
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"panzerfaust_60",False))
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=5
+        z.ai.max_wheels=18
+        z.ai.max_spare_wheels=0
+        z.ai.front_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.front_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        for b in range(8):
+            z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+            z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+
+    # this is the default transport model
+    elif object_type=='german_sd_kfz_10':
+        z=spawn_object(world,world_coords,'german_sd_kfz_10_base',False)
+        z.name='Sd.Kfz.10'
+
+        passenger_positions=[ [15.0, -13.0],[15.0, 0.0],[15.0, 12.0],[43.0, -13.0],[42.0, 0.0],[42.0, 14.0]]
+        for x in range(6):
+            role=VehicleRole('passenger',z)
+            role.is_passenger=True
+            role.seat_visible=True
+            role.seat_offset=passenger_positions.pop()
+            z.ai.vehicle_crew.append(role)
+
+    # this is the default transport model with camo
+    elif object_type=='german_sd_kfz_10_camo':
+        z=spawn_object(world,world_coords,'german_sd_kfz_10_base',False)
+        z.name='Sd.Kfz.10'
+        z.image_list=["sd_kfz_10_chassis_camo"]
+
 
     # this is the base object for the sd.kfz.234 variants. It is not meant to be spawned by itself
     elif object_type=='german_sd_kfz_234_base':
@@ -3323,6 +3406,71 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
+
+    # this is the base object for the sd.kfz.10 variants. It is not meant to be spawned by itself
+    elif object_type=='soviet_zis_5':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['zis_5'],AIVehicle)
+        z.name='Zis 5 Truck'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.is_transport=True
+
+        # driver and assistant driver positions are the same for all variants
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+        role=VehicleRole('passenger',z)
+        z.ai.vehicle_crew.append(role)
+
+        passenger_positions=[[2.0, -22.0],[20.0, -22.0],[40.0, -22.0],[61.0, -22.0],[21.0, 0.0],[40.0, 19.0],[20.0, 19.0],[0.0, 19.0],[1.0, -1.0],[62.0, 0.0],[61.0, 20.0],[40.0, 0.0]]
+        for x in range(12):
+            role=VehicleRole('passenger',z)
+            role.is_passenger=True
+            role.seat_visible=True
+            role.seat_offset=passenger_positions.pop()
+            z.ai.vehicle_crew.append(role)
+
+        z.ai.vehicle_armor['top']=[1,0,0]
+        z.ai.vehicle_armor['bottom']=[1,0,0]
+        z.ai.vehicle_armor['left']=[1,0,0]
+        z.ai.vehicle_armor['right']=[1,0,0]
+        z.ai.vehicle_armor['front']=[1,0,0]
+        z.ai.vehicle_armor['rear']=[1,0,0]
+        z.ai.passenger_compartment_armor['top']=[0,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[0,0,0]
+        z.ai.passenger_compartment_armor['left']=[0,0,0]
+        z.ai.passenger_compartment_armor['right']=[0,0,0]
+        z.ai.passenger_compartment_armor['front']=[0.0,0,0]
+        z.ai.passenger_compartment_armor['rear']=[0,0,0]
+        z.ai.max_speed=385.9
+        z.ai.max_offroad_speed=177.6
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=7800
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"tt33",False))
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
+        z.ai.max_wheels=4
+        z.ai.max_spare_wheels=0
+        z.ai.front_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.front_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
 
     elif object_type=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -4595,6 +4743,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'stg44')
         z.add_inventory(spawn_object(world,world_coords,'panzerfaust_60',False))
+
+    elif object_type=='german_stg44_panzerfaust_100':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'stg44')
+        z.add_inventory(spawn_object(world,world_coords,'panzerfaust_100',False))
         
     elif object_type=='german_fg42-type2':
         z=spawn_object(world,world_coords,'german_soldier',False)

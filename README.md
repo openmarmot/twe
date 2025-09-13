@@ -65,13 +65,14 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Fa223 Drache | Helicopter | |
 | German | Jagdpanzer 38t 'Hetzer' | Tank | |
 | German | Ju 88 | Airplane | |
-| German | Kubelwagen | Utility | Also available in a camo version | 
+| German | Kubelwagen | Utility | unarmored light all terrain car | 
 | German | Pak 40 | AT Gun | Towed gun |
 | German | Panzer IV Ausf G | Tank | 75mm L43 |
 | German | Panzer IV Ausf H | Tank | 75mm L48 |
 | German | Panzer IV Ausf J | Tank | Minor differences from the H |
 | German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
 | German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
+| German | Sd.kfz.10 | Halftrack | unarmored prime mover |
 | German | Sd.kfz.234/1 | AFV | Heavy recon car with a 2cm turret |
 | German | Sd.kfz.251/1 | APC | The famous German half-track |
 | German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
