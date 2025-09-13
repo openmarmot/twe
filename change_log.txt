@@ -4,6 +4,7 @@ TWE Project : Change Log
 ----------------------------------
 September 13 2025
 - added base model sd.kfz.10 to the game and addeed several squads that have one 
+- swapped a kar98k for a g41w on the fallschirmjager squad 
 
 I plan on adding the 2cm flak variant but I'm in no rush. 
 I need to add some soviet light vehicles. I have less soviet vehicles in general, but that 
