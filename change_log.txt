@@ -9,6 +9,8 @@ September 13 2025
 - added some squads that use the zis 5
 - added a stg44+panzerfaust100 soldier
 - adjusted german 1945 panzerjager squad 
+- adjusted vehicle driver thinking to only order a vehicle exit at the end of 
+a vehicle order if the vehicle is a transport 
 
 I plan on adding the 2cm flak variant but I'm in no rush. 
 I need to add some soviet light vehicles. I have less soviet vehicles in general, but that 
