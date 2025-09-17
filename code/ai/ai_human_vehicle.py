@@ -482,10 +482,11 @@ class AIHumanVehicle():
                 vehicle.ai.throttle=0
 
                 if order.exit_vehicle_when_finished:
-                    for role in vehicle.ai.vehicle_crew:
-                        if role.role_occupied:
-                            role.human.ai.switch_task_exit_vehicle()
-                            # this will also clear out any vehicle_orders they had
+                    if vehicle.ai.is_transport:
+                        for role in vehicle.ai.vehicle_crew:
+                            if role.role_occupied:
+                                role.human.ai.switch_task_exit_vehicle()
+                                # this will also clear out any vehicle_orders they had
 
                 # delete the order
                 self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=None

@@ -41,7 +41,10 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
     '''calculate penetration, return bool'''
     # for slope 0 is vertical, whereas 90 is full horizontal armor
     # normalize distance to nearest 500
-    distance = round(distance / 500) * 500
+
+    if distance<0:
+        engine.log.add_data('error',f'penetration_calculator.calculate_penetration() error negative distance {distance}',True)
+        distance=0
 
     armor_thickness = armor[0]
     armor_slope = armor[1]
@@ -54,7 +57,16 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
         engine.log.add_data('Error', f'penetration_calculator.calculate_penetration {projectile.ai.projectile_type} excess range: {distance} armor: {armor} flightTime:{projectile.ai.flightTime} maxTime:{projectile.ai.maxTime}', True)
         max_penetration = projectile_data[projectile.ai.projectile_type][str(max_distance)]
     else:
-        max_penetration = projectile_data[projectile.ai.projectile_type][str(distance)]
+        # Calculate the lower and upper 500 increments
+        lower_distance = int((distance // 500) * 500)
+        upper_distance = int(lower_distance + 500)
+        # Use linear interpolation between lower and upper distance penetration values
+        lower_penetration = projectile_data[projectile.ai.projectile_type][str(lower_distance)]
+        upper_penetration = projectile_data[projectile.ai.projectile_type][str(upper_distance)]
+        # Calculate interpolation factor
+        t = (distance - lower_distance) / 500
+        # Linearly interpolate between lower and upper penetration values
+        max_penetration = round(lower_penetration + t * (upper_penetration - lower_penetration),2)
 
     # fast check first (unchanged, but now uses full effective thickness later)
     if max_penetration < (armor_thickness + spaced_armor):
