@@ -5178,6 +5178,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=0
         z.default_scale=1
         z.no_update=True
+    elif object_type=='terrain_green':
+        z=WorldObject(world,['terrain_green'],AINone)
+        z.name='terrain_green'
+        z.is_ground_texture=True
+        z.rotation_angle=0
+        z.default_scale=1
+        z.no_update=True
     elif object_type=='wood_log':
         z=WorldObject(world,['wood_log'],AINone)
         z.name='wood_log'

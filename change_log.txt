@@ -1,5 +1,16 @@
 TWE Project : Change Log
 
+----------------------------------
+September 16 2025
+- added generation of green terrain tiles around forest areas 
+
+the green terrain uses a new algorithm that takes a max separation distance. 
+this allows me to place a bunch of random green terrain tiles that touch 
+each other. 
+
+the effect is decent. not perfect but good enough for now. 
+
+need to probably figure out a way to generate farm fields. 
 
 ----------------------------------
 September 13 2025

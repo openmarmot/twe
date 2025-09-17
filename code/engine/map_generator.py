@@ -277,6 +277,9 @@ def generate_vegetation(map_objects,world_size):
         if obj.world_builder_identity in names_to_avoid:
             coordinates_to_avoid.append(obj.world_coords)
 
+
+    # -- forest area --
+
     # generate coord list of forested areas
     max_size=world_size
     min_seperation=1000
@@ -291,11 +294,30 @@ def generate_vegetation(map_objects,world_size):
         min_seperation=100
         coord_count=random.randint(1,20)
         tree_coords=engine.math_2d.get_random_constrained_coords(area,max_size,
-            min_seperation,coord_count,[],0)
+            min_seperation,coord_count,coordinates_to_avoid,100)
         
         for coords in tree_coords:
             rotation=random.randint(0,359)
             vegetation.append(MapObject('pinus_sylvestris','pinus_sylvestris',coords,rotation,[]))
+            if random.randint(0,1)==1:
+                rotation=random.randint(0,359)
+                vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+
+
+        # - add green areas 
+        max_size=random.randint(1000,3000)
+        min_seperation=150
+        max_seperation=300
+        coord_count=random.randint(20,60)
+        terrain_coords=engine.math_2d.get_random_constrained_coords_with_max_sep(area,max_size,
+            min_seperation,max_seperation,coord_count,coordinates_to_avoid,100)
+        
+        for coords in terrain_coords:
+            rotation=random.randint(0,359)
+            vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+            
+
+
 
     return vegetation
 
