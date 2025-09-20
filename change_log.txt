@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 19 2025
+- minor readme update
+- gave pak40 and 37mm driver positions again so they can move 
+
+driver position was more important for the pak40 as it has limited traverse. this will 
+make it useful again. 
+
+did some more diagram hunting. 
+not sure what im going to make next. possibly a nashorn or a ba64
+
+----------------------------------
 September 16 2025
 - added generation of green terrain tiles around forest areas 
 - penetration is now interpolated between the nearest two distances in the database 

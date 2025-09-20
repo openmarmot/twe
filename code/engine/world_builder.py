@@ -4222,6 +4222,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[0,10]
         z.ai.vehicle_crew.append(role)
 
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[10,10]
+        z.ai.vehicle_crew.append(role)
+
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.ai.max_speed=100
         z.ai.max_offroad_speed=100
@@ -4303,6 +4309,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_assistant_gunner=True
         role.seat_visible=True
         role.seat_offset=[13,15]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[13,20]
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
