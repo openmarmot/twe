@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 21 2025
+- added Panzer IV Ausf E Tiger 
+- adjusted the random battle group builder to add categories for support infantry and vehicles 
+
+the tiger is good but it isn't destabilizing. it gets knocked out fairly easily 
+at mid range by shots that don't have a lot of angle to them, and the su100 is 
+a big threat to it. 
+
+todo 
+- "because engaging vehicle and HE loaded" this should be adjusted to fire HE against soft vehicles 
+
+
+----------------------------------
 September 19 2025
 - minor readme update
 - gave pak40 and 37mm driver positions again so they can move 
