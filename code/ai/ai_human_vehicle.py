@@ -29,7 +29,7 @@ class AIHumanVehicle():
         # -- firing pattern stuff
         # burst control keeps ai from shooting continuous streams
         self.current_burst=0 # int number of bullets shot in current burst
-        self.max_burst=10
+        self.max_burst=5
 
     #---------------------------------------------------------------------------
     def action_vehicle_driver(self):
@@ -154,6 +154,9 @@ class AIHumanVehicle():
             if self.current_burst>self.max_burst:
                 # randomize burst length a little. this should create a random burst length from 3 to the max burst
                 self.current_burst=random.randint(0,self.max_burst-3)
+
+                # prevents the next burst from being sent at the same target while bullets are in flight
+                # less of an issue with vehicle targets
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
@@ -366,6 +369,23 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
                             return
+                    if current_action=='Waiting for driver to close distance with target':
+                        target=role.human.ai.memory['task_vehicle_crew']['target']
+                        if target is not None:
+                            need_vehicle_order=False
+                            if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
+                                need_vehicle_order=True
+                            else:
+                                if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'].order_close_with_enemy is False:
+                                    need_vehicle_order=True
+                            # ensuring we only do this once
+                            if need_vehicle_order:
+                                vehicle_order=VehicleOrder()
+                                vehicle_order.order_close_with_enemy=True
+                                vehicle_order.world_coords=copy.copy(target.world_coords)
+                                if vehicle.ai.is_transport:
+                                    vehicle_order.exit_vehicle_when_finished=True
+                                self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
         
         # next lets check if anyone is trying to get in 
         if vehicle.ai.check_if_vehicle_is_full() is False:
@@ -473,7 +493,7 @@ class AIHumanVehicle():
         '''think about the drivers current vehicle order'''
         order=self.owner.ai.memory['task_vehicle_crew']['vehicle_order']
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        if order.order_drive_to_coords:
+        if order.order_drive_to_coords or order.order_close_with_enemy:
             distance=engine.math_2d.get_distance(vehicle.world_coords,order.world_coords)
             if distance<self.vehicle_arrival_distance and vehicle.ai.current_speed<10:
                 # we have arrived and can delete the order.
@@ -482,10 +502,11 @@ class AIHumanVehicle():
                 vehicle.ai.throttle=0
 
                 if order.exit_vehicle_when_finished:
-                    for role in vehicle.ai.vehicle_crew:
-                        if role.role_occupied:
-                            role.human.ai.switch_task_exit_vehicle()
-                            # this will also clear out any vehicle_orders they had
+                    if vehicle.ai.is_transport:
+                        for role in vehicle.ai.vehicle_crew:
+                            if role.role_occupied:
+                                role.human.ai.switch_task_exit_vehicle()
+                                # this will also clear out any vehicle_orders they had
 
                 # delete the order
                 self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=None
@@ -652,33 +673,51 @@ class AIHumanVehicle():
         
         # check engagement for each weapon
         engage_primary=False
+        engage_primary_reason=''
         engage_coaxial=False
+        engage_coaxial_reason=''
         if out_of_ammo_primary is False:
-            engage_primary=self.owner.ai.calculate_engagement(turret.ai.primary_weapon,target)
+            engage_primary,engage_primary_reason=self.owner.ai.calculate_engagement(turret.ai.primary_weapon,target)
 
             # this is necessary to force a reload if we are
             # trying to engage a vehicle with HE and have compatible AT in the inventory
             # otherwise the gunner will just drop all vehicle targets because he can't pen
             if engage_primary is False and target.is_vehicle:
-                # do we have HE loaded and do we have AT available?
-                if turret.ai.primary_weapon.ai.magazine:
-                    if turret.ai.primary_weapon.ai.magazine.ai.use_antitank is False:
-                        for m in vehicle.ai.ammo_rack:
-                            if turret.ai.primary_weapon.world_builder_identity in m.ai.compatible_guns:
-                                if len(m.ai.projectiles)>0:
-                                    if m.ai.use_antitank:
-                                        # start the reload process
-                                        self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
-                                        self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-                                        print(f'reloading {turret.ai.primary_weapon.name} because engaging vehicle and HE loaded')
-                                        return
+                if engage_primary_reason=='':
+                    # do we have HE loaded and do we have AT available?
+                    if turret.ai.primary_weapon.ai.magazine:
+                        if turret.ai.primary_weapon.ai.magazine.ai.use_antitank is False:
+                            for m in vehicle.ai.ammo_rack:
+                                if turret.ai.primary_weapon.world_builder_identity in m.ai.compatible_guns:
+                                    if len(m.ai.projectiles)>0:
+                                        if m.ai.use_antitank:
+                                            if random.randint(0,1)==0:
+                                                # fire to clear the shell out 
+                                                return
+                                            else:
+                                                #reload to clear the shell out
+                                            # start the reload process
+                                                self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
+                                                self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
+                                                print(f'reloading {turret.ai.primary_weapon.name} because engaging vehicle and HE loaded')
+                                                return
+                elif engage_primary_reason=='need to get closer to penetrate':
+                    if turret.ai.primary_turret:
+                        # wait for a couple seconds before rechecking
+                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,1)
+                        self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to close distance with target'
+                        return
+            
+            # if we can't pen occasionally send a round out anyways. 
+            if engage_primary is False and engage_primary_reason=='':
+                if random.randint(0,4)==0:
+                    engage_primary=True
 
             # possibly should also check if we are engaging a soft skinned vehicle with AT
                 
         # out_of_ammo_coax will be true if there is no coax, or the coax is damaged
         if out_of_ammo_coax is False:
-            engage_coaxial=self.owner.ai.calculate_engagement(turret.ai.coaxial_weapon,target)
-        
+            engage_coaxial,engage_coaxial_reason=self.owner.ai.calculate_engagement(turret.ai.coaxial_weapon,target)
 
         if rotation_check:
 
@@ -721,6 +760,7 @@ class AIHumanVehicle():
             if turret.ai.primary_turret:
                 if engage_primary or engage_coaxial:
                     # check if there is a driver
+                    # note this should be fixed in the future. we shouldn't assume driver is in position 0 
                     if vehicle.ai.vehicle_crew[0].is_driver and vehicle.ai.vehicle_crew[0].role_occupied:
                     # ask the driver to rotate towards the target
                         if target.is_vehicle or random.randint(0,1)==1:

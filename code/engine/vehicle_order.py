@@ -12,6 +12,7 @@ class VehicleOrder():
         # - order type : should be exactly one of these -
         self.order_drive_to_coords=False
         self.order_tow_object=False
+        self.order_close_with_enemy=False # drive closer to a enemy
 
         # additional details
         self.exit_vehicle_when_finished=False

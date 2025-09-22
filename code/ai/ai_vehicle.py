@@ -240,8 +240,9 @@ class AIVehicle():
         hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value)
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
-            marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
-            marker.ai.setup(self.owner,hit)
+            if penetration or self.owner.world.hit_markers_non_pen:
+                marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
+                marker.ai.setup(self.owner,hit)
 
         # allow human to respond to hit
         for b in self.vehicle_crew:

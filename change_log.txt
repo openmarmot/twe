@@ -1,5 +1,54 @@
 TWE Project : Change Log
 
+----------------------------------
+September 21 2025
+- added Panzer IV Ausf E Tiger 
+- adjusted the random battle group builder to add categories for support infantry and vehicles 
+- decreased panzerfaust accuracy 
+- some changes to engagement procedures
+    - gunners can request driver get closer if that will result in a penetration 
+    - gunners will occasionally fire at objects they can't pen 
+    - gunners will sometimes fire a shell instead of reloading to change shell type 
+    - gunners now consider the vehicle side they will hit when deciding if they should engage 
+- ive disabled non-pen markers for now as they were getting disruptive with the increase in mg fire 
+
+the tiger is good but it isn't destabilizing. it gets knocked out fairly easily 
+at mid range by shots that don't have a lot of angle to them, and the su100 is 
+a big threat to it. 
+
+with the new vehicle engagement code soviet tanks will occasionally drive up and shoot tigers at near 
+point blank ranges, with mixed success. this is an imporvement over endlessly bouncing shots 
+
+todo 
+- add pen+non-pen hit markers to the vehicle diagnostics page 
+
+----------------------------------
+September 19 2025
+- minor readme update
+- gave pak40 and 37mm driver positions again so they can move 
+
+driver position was more important for the pak40 as it has limited traverse. this will 
+make it useful again. 
+
+did some more diagram hunting. 
+not sure what im going to make next. possibly a nashorn or a ba64
+
+----------------------------------
+September 16 2025
+- added generation of green terrain tiles around forest areas 
+- penetration is now interpolated between the nearest two distances in the database 
+- adjustment to heat damage values so they are not affected by the new penetration interpolation 
+
+the green terrain uses a new algorithm that takes a max separation distance. 
+this allows me to place a bunch of random green terrain tiles that touch 
+each other. 
+
+the effect is decent. not perfect but good enough for now. 
+
+need to probably figure out a way to generate farm fields. 
+
+the new damage interpolation likely helps the soviets significantly as they have the 
+most penetration trouble. 
 
 ----------------------------------
 September 13 2025
@@ -9,6 +58,8 @@ September 13 2025
 - added some squads that use the zis 5
 - added a stg44+panzerfaust100 soldier
 - adjusted german 1945 panzerjager squad 
+- adjusted vehicle driver thinking to only order a vehicle exit at the end of 
+a vehicle order if the vehicle is a transport 
 
 I plan on adding the 2cm flak variant but I'm in no rush. 
 I need to add some soviet light vehicles. I have less soviet vehicles in general, but that 
