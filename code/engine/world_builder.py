@@ -513,7 +513,13 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     # testing
     elif battle_option=='4':
-        pass
+        for b in range(50):
+            squads.append('Soviet T-70')
+        squads.append('German Panzer VI Ausf E camo1')
+        squads.append('German Panzer VI Ausf E camo1')
+        squads.append('German Panzer VI Ausf E camo1')
+
+        
         #squads.append('Soviet T34-76 Model 1943')
 
         #squads.append('German Sd.kfz.251/9')
@@ -1028,7 +1034,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzerfaust','panzerfaust_empty'],AIGun)
         z.name='panzerfaust 60'
         z.minimum_visible_scale=0.4
-        z.ai.mechanical_accuracy=4
+        z.ai.mechanical_accuracy=15
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_60_magazine',False)
@@ -1058,7 +1064,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzerfaust','panzerfaust_empty'],AIGun)
         z.name='panzerfaust 100'
         z.minimum_visible_scale=0.4
-        z.ai.mechanical_accuracy=4
+        z.ai.mechanical_accuracy=15
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerfaust_100_magazine',False)
@@ -1088,7 +1094,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=WorldObject(world,['panzerschreck','panzerschreck'],AIGun)
         z.name='panzerschreck'
         z.minimum_visible_scale=0.4
-        z.ai.mechanical_accuracy=4
+        z.ai.mechanical_accuracy=10
         z.ai.speed=300
         z.is_handheld_antitank=True
         z.ai.magazine=spawn_object(world,world_coords,'panzerschreck_magazine',False)
@@ -3334,7 +3340,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[26,0,0]
         z.ai.vehicle_armor['left']=[62,0,0]
         z.ai.vehicle_armor['right']=[62,0,0]
-        z.ai.vehicle_armor['front']=[130,25,0]
+        z.ai.vehicle_armor['front']=[100,25,0]
         z.ai.vehicle_armor['rear']=[82,9,0]
         z.ai.passenger_compartment_armor['top']=[26,0,0]
         z.ai.passenger_compartment_armor['bottom']=[26,0,0]
@@ -4490,6 +4496,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
 
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[13,20]
+        z.ai.vehicle_crew.append(role)
+
         role=VehicleRole('gunner',z)
         role.is_gunner=True
         role.turret=turret
@@ -4501,12 +4513,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_assistant_gunner=True
         role.seat_visible=True
         role.seat_offset=[13,15]
-        z.ai.vehicle_crew.append(role)
-
-        role=VehicleRole('driver',z)
-        role.is_driver=True
-        role.seat_visible=True
-        role.seat_offset=[13,20]
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))

@@ -183,22 +183,36 @@ class AIHuman(object):
         '''calculate bool as to whether a target can be successfully engaged with a weapon'''
         # only consider the round currently loaded in the gun 
         if weapon.ai.damaged or weapon.ai.action_jammed:
-            return False
+            return False,'weapon damaged'
         if weapon.ai.magazine is None:
-            return False
+            return False,'no magazine'
         if len(weapon.ai.magazine.ai.projectiles)==0:
-            return False
+            return False,'no ammo'
         
         distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
         if distance>weapon.ai.range:
-            return False
+            return False,'out of range'
         
         if target.is_vehicle:
-            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(weapon.ai.magazine.ai.projectiles[0],distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
-            return penetration
+            projectile=weapon.ai.magazine.ai.projectiles[0]
+            rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
+            hit_side,relative_angle=engine.math_2d.calculate_hit_side(target.rotation_angle,rotation_angle)
+            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor[hit_side],hit_side,relative_angle)
+            if penetration is True:
+                return penetration,''
+            else:
+                if distance>2000:
+                    distance=500
+                    penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
+                    if penetration:
+                        return False,'need to get closer to penetrate'
+                    else:
+                        return False,''
+                else:
+                    return False,''
         
         # default
-        return True
+        return True,''
                 
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
@@ -2057,25 +2071,23 @@ class AIHuman(object):
 
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
-                if distance<self.throwable.ai.range and distance>150:
+                if distance<self.throwable.ai.range and distance>60:
 
                     # grenades will miss if the vehicle is moving fast
-                    if enemy.ai.current_speed<130:
+                    if enemy.ai.current_speed<160:
                         # check pen
-                        if enemy.ai.passenger_compartment_armor['top'][0]<5 or self.throwable.ai.use_antitank:
+                        if enemy.ai.passenger_compartment_armor['top'][0]<6 or self.throwable.ai.use_antitank:
                             self.speak(f'Throwing {self.throwable.name} !!!!')
                             self.throw(enemy.world_coords)
                             
-            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
-            # can we penetrate it in a best case scenario?
-            if ammo_gun>0:
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.vehicle_armor['left'],'front',180)
-                if penetration is False:
-                    penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(self.primary_weapon.ai.magazine.ai.projectiles[0],distance,'steel',enemy.ai.passenger_compartment_armor['left'],'front',180)
 
-        if penetration is False:
-            self.memory.pop('task_engage_enemy',None)
-            self.switch_task_think()
+            engage,engage_reason=self.calculate_engagement(self.primary_weapon,enemy)
+
+
+            if engage is False:
+                # could speak the reason possibly
+                self.memory.pop('task_engage_enemy',None)
+                self.switch_task_think()
 
     #---------------------------------------------------------------------------
     def update_task_enter_vehicle(self):
