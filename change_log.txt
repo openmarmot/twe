@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 22 2025
+- added hit markers to the vehicle diagnostics screen 
+
+shorter burst sizes and switching targets at the end of a burst seem to have 
+really made gun battles feel better and more chaotic/exciting 
+
+----------------------------------
 September 21 2025
 - added Panzer IV Ausf E Tiger 
 - adjusted the random battle group builder to add categories for support infantry and vehicles 
