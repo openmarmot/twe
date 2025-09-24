@@ -153,7 +153,6 @@ class World():
 
         # whether hit markers exist or not
         self.hit_markers=True
-        self.hit_markers_non_pen=False
 
         # checked by graphics_2d_pygame render
         self.display_weapon_range=False

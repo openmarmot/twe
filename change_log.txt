@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 23 2025
+- green (non-pen) hit markers are re-enabled but they self remove after 30 seconds 
+- some performance improvements for hit markers 
+
+re-added the green markers because they are fun and its useful to see bounces.
+
+----------------------------------
 September 22 2025
 - added hit markers to the vehicle diagnostics screen 
 
