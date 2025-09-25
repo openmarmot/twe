@@ -550,7 +550,8 @@ class Graphics_2D_Pygame(object):
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
                         and c.is_ground_texture is False
-                        and c.is_particle_effect is False):
+                        and c.is_particle_effect is False
+                        and c.no_save is False):
                         possible_objects.append(c)
         elif self.mode==2:
             # for strategic map we want everything
@@ -623,7 +624,8 @@ class Graphics_2D_Pygame(object):
             self.mode=0
             random_image=random.choice(['background_kubelwagen',
                 'background_panther','background_t34_column',
-                'background_t34_76','background_ju88'])
+                'background_t34_76','background_ju88','background_me163',
+                'background_su85'])
             self.set_background_image(random_image)
 
         # tactical battle

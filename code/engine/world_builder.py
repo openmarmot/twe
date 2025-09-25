@@ -321,7 +321,7 @@ def create_random_battlegroup(faction,funds):
                 squad_options_tanks[key]=value
             elif value['type'] in ['infantry','motorized_infantry','mechanized_infantry']:
                 squad_options_infantry[key]=value
-            elif value['type'] in ['medic','mechanic','sniper','infantry radio','mg']:
+            elif value['type'] in ['medic','mechanic','sniper','infantry radio','mg','antitank_infantry']:
                 squad_options_support_infantry[key]=value
             elif value['type'] in ['antitank_vehicle','fire_support_vehicle','towed_antiair','scout car']:
                 squad_options_support_vehicle[key]=value
@@ -1567,7 +1567,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=50
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,'7.92x57_SME')
 
     elif object_type=='mg34_belt':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
@@ -1579,7 +1579,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.capacity=250
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,'7.92x57_SME')
 
     elif object_type=='37mm_m1939_k61':
         z=WorldObject(world,['mg34'],AIGun)
@@ -2316,6 +2316,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         # mg ammo
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        # armor piercing belt
+        if random.randint(0,1)==1:
+            belt=spawn_object(world,world_coords,"mg34_belt",False)
+            load_magazine(world,belt,'7.92x57_SMK')
+            z.add_inventory(belt)
 
         z.ai.ammo_rack_capacity=25
         # AP
@@ -2462,7 +2467,12 @@ def spawn_object(world,world_coords,object_type, spawn):
             z.ai.vehicle_crew.append(role)
         for b in range(11):
             z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
-
+        
+        # armor piercing belt
+        if random.randint(0,1)==1:
+            belt=spawn_object(world,world_coords,"mg34_belt",False)
+            load_magazine(world,belt,'7.92x57_SMK')
+            z.add_inventory(belt)
 
     elif object_type=='sd_kfz_251_mg34_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -2731,6 +2741,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_crew.append(role)
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        # armor piercing belt
+        if random.randint(0,1)==1:
+            belt=spawn_object(world,world_coords,"mg34_belt",False)
+            load_magazine(world,belt,'7.92x57_SMK')
+            z.add_inventory(belt)
+
         z.ai.ammo_rack_capacity=52
         # HE
         for b in range(40):
@@ -2882,6 +2898,12 @@ def spawn_object(world,world_coords,object_type, spawn):
          # mg ammo
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+
+        # armor piercing belt
+        if random.randint(0,1)==1:
+            belt=spawn_object(world,world_coords,"mg34_belt",False)
+            load_magazine(world,belt,'7.92x57_SMK')
+            z.add_inventory(belt)
 
         z.ai.ammo_rack_capacity=30
         # AP
@@ -3400,6 +3422,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        # armor piercing belt
+        if random.randint(0,1)==1:
+            belt=spawn_object(world,world_coords,"mg34_belt",False)
+            load_magazine(world,belt,'7.92x57_SMK')
+            z.add_inventory(belt)
         z.ai.ammo_rack_capacity=92
         for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,'8.8cm_kwk36_l56_magazine',False))

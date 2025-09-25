@@ -44,8 +44,11 @@ class AIContainer(object):
             for b in self.inventory:
                 if b.is_liquid:
                     if b.volume > 0:
-                        leak_rate = 1 - self.container_integrity  # Assuming integrity reduces flow rate
-                        loss = b.volume * leak_rate * self.owner.world.time_passed_seconds
+                        leak_rate = 1 - self.container_integrity
+                        fractional_loss = b.volume * leak_rate * self.owner.world.time_passed_seconds
+                        min_leak_rate = 0.5  # Fixed L/s baseline (tune this; e.g., 1.0 for faster)
+                        fixed_loss = min_leak_rate * self.owner.world.time_passed_seconds
+                        loss = max(fractional_loss, fixed_loss)  # Use the larger of fractional or fixed
                         b.volume = max(0, round(b.volume - loss, 2))  # Clamp to avoid negative
 
         # check if contaminated 

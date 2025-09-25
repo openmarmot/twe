@@ -1,6 +1,38 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 24 2025
+- added a couple new backgrounds 
+- updated screenshots in readme 
+- increased fuel leak minimul rate
+- minor change to mouse select to filter out more items 
+- mg34 drums and belts got switched over the the SME iron core bullet 
+- some german vehicles now have a chance to have a belt of SMK armor piercing 7.92 ammo 
+- added additional driver catch for out of fuel now that its possbile
+
+the ammo changes are going to have almost zero effect - mostly for flavor. 
+the penetration differences between the bullets is pretty minor. it might occasionally 
+make a difference against soft skinned targets at mid distance 
+
+when the driver realizes a vehicle is out of fuel the vehicle gets marked as disabled. 
+in the future perhaps the ai will be able to refuel vehicles. a lot of the code needed for 
+this already exists 
+
+----------------------------------
+September 23 2025
+- green (non-pen) hit markers are re-enabled but they self remove after 30 seconds 
+- some performance improvements for hit markers 
+
+re-added the green markers because they are fun and its useful to see bounces.
+
+----------------------------------
+September 22 2025
+- added hit markers to the vehicle diagnostics screen 
+
+shorter burst sizes and switching targets at the end of a burst seem to have 
+really made gun battles feel better and more chaotic/exciting 
+
+----------------------------------
 September 21 2025
 - added Panzer IV Ausf E Tiger 
 - adjusted the random battle group builder to add categories for support infantry and vehicles 

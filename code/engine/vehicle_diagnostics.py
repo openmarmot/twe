@@ -5,6 +5,8 @@ notes :
 '''
 import copy
 
+import engine.math_2d
+
 class VehicleDiagnostics(object):
 
     def __init__(self):
@@ -127,6 +129,18 @@ class VehicleDiagnostics(object):
         v.image_list=self.vehicle.image_list
         v.screen_coords=self.screen_center
         self.image_objects.append(v)
+
+        # load collision markers
+        for hit in self.vehicle.ai.collision_log:
+            v=VehicleDiagnosticObject()
+            if hit.penetrated:
+                v.image_list=['hit_orange']
+            else:
+                v.image_list=['hit_green']
+            v.rotation_angle=engine.math_2d.get_normalized_angle(hit.rotation_offset)
+            # note this is meant to calculate world coords, but it works well enough as screen coords
+            v.screen_coords=engine.math_2d.calculate_relative_position(self.screen_center,0,hit.position_offset)
+            self.image_objects.append(v)
 
 
         self.text_queue=[]

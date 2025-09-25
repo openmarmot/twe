@@ -240,9 +240,8 @@ class AIVehicle():
         hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value)
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
-            if penetration or self.owner.world.hit_markers_non_pen:
-                marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
-                marker.ai.setup(self.owner,hit)
+            marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
+            marker.ai.setup(self.owner,hit)
 
         # allow human to respond to hit
         for b in self.vehicle_crew:
@@ -467,7 +466,7 @@ class AIVehicle():
             # fuel tank should be a ai_container
             tank.ai.punctured=True
             # the more hits the more leaks. 
-            tank.ai.container_integrity-=random.uniform(0.01,0.03)
+            tank.ai.container_integrity-= random.uniform(0.1, 0.3)
 
 
             if random.randint(0,1)==0:
@@ -942,8 +941,8 @@ class AIVehicle():
 
                 # stuff to change no matter what
                 role.human.altitude=self.owner.altitude
-                # if position is visible
-                if role.seat_visible:
+                # if position is visible and grid square we are in is visible
+                if role.seat_visible and self.owner.grid_square.visible:
                     # set the world coords with the offset
                     role.human.world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,role.seat_offset)
                     role.human.rotation_angle=self.owner.rotation_angle+role.seat_rotation
