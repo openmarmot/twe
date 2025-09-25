@@ -355,6 +355,15 @@ class AIHumanVehicle():
                     if current_action=='Waiting for driver to rotate the vehicle':
                         target=role.human.ai.memory['task_vehicle_crew']['target']
                         if target is not None:
+                            
+                            # catch out of fuel 
+                            current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
+                            if current_fuel==0 and max_fuel>0:
+                                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver waiting for driver to rotate and out of fuel, marking vehicle disabled',True)
+                                vehicle.ai.vehicle_disabled=True
+                                return
+
+
                             rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
                             v=vehicle.rotation_angle
                             if rotation_required>v-1 and rotation_required<v+1:
@@ -487,6 +496,7 @@ class AIHumanVehicle():
 
                 # out of fuel.
                 # disable the vehicle for now. in the future we will want to try and get fuel and refuel
+                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel, marking vehicle disabled',True)
                 vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):

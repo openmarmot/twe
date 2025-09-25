@@ -466,7 +466,7 @@ class AIVehicle():
             # fuel tank should be a ai_container
             tank.ai.punctured=True
             # the more hits the more leaks. 
-            tank.ai.container_integrity-=random.uniform(0.01,0.03)
+            tank.ai.container_integrity-= random.uniform(0.1, 0.3)
 
 
             if random.randint(0,1)==0:

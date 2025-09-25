@@ -9,7 +9,7 @@ other than their brain.
 
 I am developing this game by just randomly working on whatever I feel like on a particular day. This means that game development does not progress in any normal fashion and I often add small features that I can insert with a couple hours of work. Read the change_log in the dev branch to keep up with the latest progress. 
 
-![screenshot](/screenshots/twe-oct-22-2024.png "TWE screenshot")
+![screenshot](/screenshots/twe_panzer_iv.png "TWE screenshot")
 
 ### General Concepts
 - eastern front around 1944-1945. roughly historical
@@ -47,7 +47,9 @@ When a projectile hits a vehicle the following is assessed
 Vehicles do not have a health value. Instead each vehicle section has unique damage effects.  
 A projectile that does not penetrate has a chance to richochet off and hit something else.  
 
-Hit data is saved and can be viewed with green and orange arrows showing hits through a debug menu option.  
+Hit data is saved and can be viewed with green and orange arrows showing hits through a debug menu option.
+
+![screenshot](/screenshots/su100_vehicle_diag_screen.png "Vehicle Diagnostics screen for Su100")
 
 ### Things to do
 - spawn different objects with the debug menu
@@ -91,8 +93,6 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | Zis 5 Trunk | Utility | |
 | Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
 
-![screenshot](/screenshots/twe-aug-22-2-2025-german-group-at-spawn.png "TWE screenshot")
-In this screenshot a large German group moves out of the spawn point. 
 
 ### A note on Infantry Weapons 
 I already have a large amount of infantry weapons in game, but currently infantry weapons just don't matter much - the game is dominated by vehicle warfare. 
@@ -183,5 +183,5 @@ From the main menu
 
 
 
-![screenshot](/screenshots/twe-aug-22-2025-forest-engagement.png "TWE screenshot")
-In this screenshot a Soviet T34-85 fires at a German Hetzer in a forest. 
+![screenshot](/screenshots/twe_forest_battle.png "TWE screenshot")
+This screenshot shows the end of a large battle in a forested area. 
