@@ -391,7 +391,7 @@ def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, mi
     Raises:
     - ValueError: If it's impossible to place the desired number of points after multiple retries.
     """
-       
+
     # Initialize variables
     current_max_size = max_size
     size_increment = 1000 # Increment to add to max_size upon failure
@@ -400,16 +400,28 @@ def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, mi
     while retries < retry_limit:
         # Initialize the list
         coordinates = []
-       
+
         # Precompute the square of minimum separation to avoid sqrt in distance calculation
         min_sep_sq = minimum_separation ** 2
         max_sep_sq = maximum_separation ** 2
         min_avoid_sep_sq = avoid_coords_separation ** 2
-       
+
+        # Grid setup for spatial indexing
+        cell_size = minimum_separation / math.sqrt(2)
+        grid_avoid = {}  # (cx, cy): list of avoid_coords
+        for coord in avoid_coords:
+            cx = int(coord[0] // cell_size)
+            cy = int(coord[1] // cell_size)
+            key = (cx, cy)
+            if key not in grid_avoid:
+                grid_avoid[key] = []
+            grid_avoid[key].append(coord)
+        grid_existing = {}  # (cx, cy): list of existing coordinates
+
         # Define the maximum number of attempts to prevent infinite loops
         max_attempts = count * 1000
         attempts = 0
-       
+
         while len(coordinates) < count and attempts < max_attempts:
             # Generate a random x and y within the specified range as integers, offset around starting_coordinate
             offset_x = random.randint(-current_max_size, current_max_size)
@@ -417,25 +429,45 @@ def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, mi
             x = starting_coordinate[0] + offset_x
             y = starting_coordinate[1] + offset_y
             new_coord = [x, y]
-           
-            # Check if the new coordinate is too close to any existing ones
+
+            # Check if the new coordinate is too close using spatial grid
+            cx = int(new_coord[0] // cell_size)
+            cy = int(new_coord[1] // cell_size)
             too_close = False
-            for coord in coordinates:
-                dx = coord[0] - x
-                dy = coord[1] - y
-                distance_sq = dx * dx + dy * dy
-                if distance_sq < min_sep_sq:
-                    too_close = True
-                    break # No need to check further if one is too close
+            # Check against avoid_coords
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    key = (cx + dx, cy + dy)
+                    if key in grid_avoid:
+                        for coord in grid_avoid[key]:
+                            dx_ = coord[0] - new_coord[0]
+                            dy_ = coord[1] - new_coord[1]
+                            distance_sq = dx_ * dx_ + dy_ * dy_
+                            if distance_sq < min_avoid_sep_sq:
+                                too_close = True
+                                break
+                        if too_close:
+                            break
+                if too_close:
+                    break
             if not too_close:
-                for coord in avoid_coords:
-                    dx = coord[0] - x
-                    dy = coord[1] - y
-                    distance_sq = dx * dx + dy * dy
-                    if distance_sq < min_avoid_sep_sq:
-                        too_close = True
-                        break # No need to check further if one is too close
-           
+                # Check against existing coordinates
+                for dx in [-1, 0, 1]:
+                    for dy in [-1, 0, 1]:
+                        key = (cx + dx, cy + dy)
+                        if key in grid_existing:
+                            for coord in grid_existing[key]:
+                                dx_ = coord[0] - new_coord[0]
+                                dy_ = coord[1] - new_coord[1]
+                                distance_sq = dx_ * dx_ + dy_ * dy_
+                                if distance_sq < min_sep_sq:
+                                    too_close = True
+                                    break
+                            if too_close:
+                                break
+                    if too_close:
+                        break
+
             # If not too close, check if it's within maximum separation from at least one existing coordinate
             if not too_close:
                 within_max = (len(coordinates) == 0)
@@ -449,9 +481,14 @@ def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, mi
                             break
                 if within_max:
                     coordinates.append(new_coord)
-           
+                    # Add to grid_existing
+                    key = (cx, cy)
+                    if key not in grid_existing:
+                        grid_existing[key] = []
+                    grid_existing[key].append(new_coord)
+
             attempts += 1
-       
+
         if len(coordinates) == count:
             # Successfully generated the required number of coordinates
             return coordinates
@@ -460,7 +497,7 @@ def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, mi
             retries += 1
             current_max_size += size_increment
             print(f"Attempt {retries}: Could only generate {len(coordinates)} coordinates with max_size={current_max_size - size_increment}. Increasing max_size to {current_max_size} and retrying...")
-   
+
     # If all retries are exhausted, raise an error
     raise ValueError(f"Failed to generate {count} coordinates after {retries} retries with max_size up to {current_max_size}.")
         
@@ -570,4 +607,3 @@ def regress_to_zero(var=None,time_passed=None,dead_zone=0.05):
     var=round(var,2)
 
     return var
-    

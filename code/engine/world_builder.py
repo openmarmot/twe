@@ -4815,6 +4815,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='FA 223 Drache Rotor'
         z.is_rotor=True
 
+    # dani cat. wow!
     elif object_type=='dani':
         z=WorldObject(world,['dani'],AIDani)
         z.name='Dani'

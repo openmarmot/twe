@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 25 2025
+- increased zoom 
+- increased font size
+- repositioned debug text 
+- updated some of the map generation code to make it way faster 
+- added spalling damage on hits that almost penetrate 
+
+the spalling damage is probably op but in initial play testing i didn't 
+see it trigger. 
+
+----------------------------------
 September 24 2025
 - added a couple new backgrounds 
 - updated screenshots in readme 
