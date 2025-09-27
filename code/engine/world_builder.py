@@ -300,72 +300,62 @@ def convert_world_objects_to_map_objects(world,map_square):
     # TBD - handle objects that exited the map
 
 #------------------------------------------------------------------------------
-def create_random_battlegroup(faction,funds):
-    '''create random battlegroup for a faction'''
 
-    battlegroup=[]
-    cost=0
-
-    squad_options={}
-    squad_options_tanks={}
-    squad_options_infantry={}
-    squad_options_support_infantry={}
-    squad_options_support_vehicle={}
-    squad_options_other={}
-    # sort for faction specific data
-    for key,value in squad_data.items():
-        if value['faction']==faction:
-            squad_options[key]=value
-
-            if value['type']=='tank':
-                squad_options_tanks[key]=value
-            elif value['type'] in ['infantry','motorized_infantry','mechanized_infantry']:
-                squad_options_infantry[key]=value
-            elif value['type'] in ['medic','mechanic','sniper','infantry radio','mg','antitank_infantry']:
-                squad_options_support_infantry[key]=value
-            elif value['type'] in ['antitank_vehicle','fire_support_vehicle','towed_antiair','scout car']:
-                squad_options_support_vehicle[key]=value
-            else:
-                squad_options_other[key]=value
+def create_random_battlegroup(faction, funds):
+    '''Create random battlegroup for a faction'''
     
-    while cost<funds:
-        if squad_options_infantry:
-            random_key = random.choice(list(squad_options_infantry.keys()))
-            for i in range(random.randint(3,5)):
-                if cost<funds:
-                    cost+=squad_options_infantry[random_key]['cost']
-                    battlegroup.append(random_key)
+    battlegroup = []
+    cost = 0
 
-        if squad_options_tanks:
-            random_key = random.choice(list(squad_options_tanks.keys()))
-            for i in range(random.randint(1,3)):
-                if cost<funds:
-                    cost+=squad_options_tanks[random_key]['cost']
-                    battlegroup.append(random_key)
-
-        if squad_options_support_infantry:
-            random_key = random.choice(list(squad_options_support_infantry.keys()))
-            for i in range(random.randint(1,2)):
-                if cost<funds:
-                    cost+=squad_options_support_infantry[random_key]['cost']
-                    battlegroup.append(random_key)
-
-        if squad_options_support_vehicle:
-            random_key = random.choice(list(squad_options_support_vehicle.keys()))
-            for i in range(random.randint(1,2)):
-                if cost<funds:
-                    cost+=squad_options_support_vehicle[random_key]['cost']
-                    battlegroup.append(random_key)
-
-        if squad_options_other:
-            random_key = random.choice(list(squad_options_other.keys()))
-            for i in range(random.randint(1,2)):
-                if cost<funds:
-                    cost+=squad_options_other[random_key]['cost']
-                    battlegroup.append(random_key)
+    # Sort faction-specific data into categories
+    squad_options_tanks = {}
+    squad_options_infantry = {}
+    squad_options_support_infantry = {}
+    squad_options_support_vehicle = {}
+    squad_options_other = {}
+    
+    for key, value in squad_data.items():
+        if value['faction'] == faction:
+            if value['type'] == 'tank':
+                squad_options_tanks[key] = value
+            elif value['type'] in ['infantry', 'motorized_infantry', 'mechanized_infantry']:
+                squad_options_infantry[key] = value
+            elif value['type'] in ['medic', 'mechanic', 'sniper', 'infantry radio', 'mg', 'antitank_infantry']:
+                squad_options_support_infantry[key] = value
+            elif value['type'] in ['antitank_vehicle', 'fire_support_vehicle', 'towed_antiair', 'scout car']:
+                squad_options_support_vehicle[key] = value
+            else:
+                squad_options_other[key] = value
+    
+    # Define categories with their batch ranges (min, max)
+    categories = [
+        (squad_options_infantry, 3, 5),
+        (squad_options_tanks, 1, 3),
+        (squad_options_support_infantry, 1, 2),
+        (squad_options_support_vehicle, 1, 2),
+        (squad_options_other, 1, 2)
+    ]
+    
+    while cost < funds:
+        added = False
+        random.shuffle(categories)  # Randomize order to avoid bias
+        
+        for cat_dict, min_num, max_num in categories:
+            if cat_dict:
+                random_key = random.choice(list(cat_dict.keys()))
+                unit_cost = cat_dict[random_key]['cost']
+                for i in range(random.randint(min_num, max_num)):
+                    if cost + unit_cost <= funds:
+                        cost += unit_cost
+                        battlegroup.append(random_key)
+                        added = True
+                    else:
+                        break  # No need to try more in this batch
+        
+        if not added:
+            break  # Prevent infinite loop if can't afford anything
     
     return battlegroup
-
 
 #------------------------------------------------------------------------------
 def fill_container(world,container,fill_name):

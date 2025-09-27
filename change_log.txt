@@ -5,6 +5,9 @@ September 27 2025
 - minor changes 
 - added more checks to the self debug (~ option 5)
 - fixed hetzer excessive ammo misconfig 
+- new create_random_battlegroup code
+
+new battlegroup code should at least keep battle groups from going over budget - which tended to favor the germans 
 
 spent a good amount of time troubleshooting driver ai code but didn't find any issues 
 
