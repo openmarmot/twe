@@ -4351,8 +4351,6 @@ def spawn_object(world,world_coords,object_type, spawn):
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
         z.ai.ammo_rack_capacity=41
-        for b in range(z.ai.ammo_rack_capacity):
-            z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
         for b in range(30):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"7.5cm_pak39_L48_magazine",False))
         for b in range(11):

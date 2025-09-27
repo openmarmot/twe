@@ -359,7 +359,7 @@ class AIHumanVehicle():
                             # catch out of fuel 
                             current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
                             if current_fuel==0 and max_fuel>0:
-                                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver waiting for driver to rotate and out of fuel, marking vehicle disabled',True)
+                                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
                                 vehicle.ai.vehicle_disabled=True
                                 return
 
@@ -474,6 +474,11 @@ class AIHumanVehicle():
     def think_vehicle_role_driver_drive_to_destination(self,destination,distance):
         '''perform actions necessary to start driving somewhere'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+
+        # temp for testing
+        if vehicle.ai.vehicle_disabled:
+            print(f'debug !! vehicle {vehicle.name} is already disabled!!')
+
         rotation=engine.math_2d.get_rotation(vehicle.world_coords,destination)
         self.owner.ai.memory['task_vehicle_crew']['current_action']='driving'
         self.owner.ai.memory['task_vehicle_crew']['calculated_distance_to_target']=distance
@@ -496,7 +501,7 @@ class AIHumanVehicle():
 
                 # out of fuel.
                 # disable the vehicle for now. in the future we will want to try and get fuel and refuel
-                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel, marking vehicle disabled',True)
+                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
                 vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):

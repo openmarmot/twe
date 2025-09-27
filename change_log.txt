@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 27 2025
+- minor changes 
+- added more checks to the self debug (~ option 5)
+- fixed hetzer excessive ammo misconfig 
+
+spent a good amount of time troubleshooting driver ai code but didn't find any issues 
+
+----------------------------------
 September 26 2025
 - fixed discrepancy with some vehicles having a radio in inventory instead of vehicle.ai.radio
 - ai_faction_tactical now tunes the faction radios on start 
@@ -9,7 +17,6 @@ September 26 2025
 todo 
 - seeing a series of these. should only be one and then a bail out 
 ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel, marking vehicle disabled
-
 
 ----------------------------------
 September 25 2025
