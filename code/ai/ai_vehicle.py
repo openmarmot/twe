@@ -509,6 +509,8 @@ class AIVehicle():
             self.event_add_inventory(event_data)
         elif event=='collision':
             self.event_collision(event_data)
+        elif event=='explosion':
+            self.handle_explosion(event_data)
         elif event=='remove_inventory':
             self.event_remove_inventory(event_data)
         elif event=='throwable_explosion_on_top_of_vehicle':
@@ -525,6 +527,24 @@ class AIVehicle():
     def handle_flaps_up(self):
         '''handle flaps up event'''
         self.flaps=0
+
+    #---------------------------------------------------------------------------
+    def handle_explosion(self,event_data):
+        '''handle the vehicle being hit by an explosion'''
+        power = event_data['power']
+        explosion_coords = event_data['coords']
+
+        # Calculate which side of the vehicle was hit
+        hit_side, relative_angle = engine.math_2d.calculate_hit_side(self.owner.rotation_angle,
+            engine.math_2d.get_rotation(self.owner.world_coords, explosion_coords))
+
+        # Get armor thickness for the hit side (including spaced armor)
+        armor_thickness = self.vehicle_armor[hit_side][0] + self.vehicle_armor[hit_side][2]
+
+        # honestly not sure how to handle explosions yet, this is mostly a placeholder function
+
+        if armor_thickness<5:
+            self.handle_component_damage('random_crew_explosion', None)
 
     #---------------------------------------------------------------------------
     def handle_hit_with_flame(self):

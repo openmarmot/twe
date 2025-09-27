@@ -147,6 +147,7 @@ class AIFactionTactical():
     #---------------------------------------------------------------------------
     def send_radio_comms_check(self):
         self.radio.ai.send_message('HQ,ALL,Sending a comms check, ')
+
     #---------------------------------------------------------------------------
     def split_squad(self,members):
         '''removes members from their current squad and puts them in a new squad'''
@@ -171,6 +172,9 @@ class AIFactionTactical():
         '''do all ai_faction_tactical starting tasks needed after world creation'''
         # create squads 
         self.create_squads()
+
+        # tune radios to the correct channel
+        self.tune_radios()
         
         # create initial tactical orders
         self.set_initial_orders()
@@ -244,6 +248,21 @@ class AIFactionTactical():
                     while len(member_vehicle_assignments)>0 and crew_count>0:
                         crew_count-=1
                         member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,vehicle_order)
+
+    #---------------------------------------------------------------------------
+    def tune_radios(self):
+        '''tune any radios that squad members or squad vehicles have to the faction radio_frequency'''
+        for squad in self.squads:
+            # tune radios in squad members' inventories
+            for member in squad.members:
+                if member.ai.large_pickup is not None:
+                    if member.ai.large_pickup.is_radio:
+                        member.ai.large_pickup.ai.current_frequency = self.radio_frequency
+            # tune radios in squad vehicles
+            for vehicle in squad.vehicles:
+                # check dedicated radio slot
+                if vehicle.ai.radio is not None:
+                    vehicle.ai.radio.ai.current_frequency = self.radio_frequency
 
     #---------------------------------------------------------------------------
     def update(self):

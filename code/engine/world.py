@@ -259,9 +259,9 @@ class World():
                 # power reverse scales with distance
                 power=100*(1-(distance/explosion_radius))
                 if b.is_human:
-                    b.ai.handle_event('explosion',power) 
+                    b.ai.handle_event('explosion',power)
                 if b.is_vehicle:
-                    engine.log.add_data('warn',f'world.create_explosion {b.name} hit by {weapon.name} unhandled',True)       
+                    b.ai.handle_event('explosion',{'power': power, 'coords': world_coords})
 
         # stun objects within stun radius 
                     

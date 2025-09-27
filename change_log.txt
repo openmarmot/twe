@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 26 2025
+- fixed discrepancy with some vehicles having a radio in inventory instead of vehicle.ai.radio
+- ai_faction_tactical now tunes the faction radios on start 
+- added support for explosions damaging vehicles - mostly a placeholder at the moment 
+
+todo 
+- seeing a series of these. should only be one and then a bail out 
+ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel, marking vehicle disabled
+
+
+----------------------------------
 September 25 2025
 - increased zoom 
 - increased font size

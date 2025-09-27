@@ -2271,7 +2271,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
+        z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
         z.ai.min_wheels_per_side_front=1
@@ -2427,7 +2427,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        z.add_inventory(spawn_object(world,world_coords,'radio_feldfu_b',False))
+        z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
         if random.randint(0,1)==1:
             z.add_inventory(spawn_object(world,world_coords,"panzerfaust_100",False))
         z.ai.min_wheels_per_side_front=1
