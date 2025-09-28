@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 28 2025
+-updated check visibility from vehicle to increase vehicle engagement rangees 
+
+I saw some 7.92 SMK hits on a T20 so vehicles that get them are using the armor piercing belts. 
+
+----------------------------------
 September 27 2025
 - minor changes 
 - added more checks to the self debug (~ option 5)
