@@ -443,10 +443,20 @@ class AIHuman(object):
                 return False
             # vehicles are seen at this range
             return True
-        if distance<4000:
+        if distance<2000:
             if target.is_human:
                 if target.ai.recent_noise_or_move and target.ai.in_building is False and target.ai.prone is False:
                     return True
+                return False
+            # vehicles are visible at this range
+            return True
+        if distance<3200:
+            if target.is_human:
+                return False
+            # vehicles are visible at this range
+            return True
+        if distance<4500:
+            if target.is_human:
                 return False
             if target.ai.recent_noise_or_move:
                 return True

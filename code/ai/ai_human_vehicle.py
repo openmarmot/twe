@@ -359,7 +359,7 @@ class AIHumanVehicle():
                             # catch out of fuel 
                             current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
                             if current_fuel==0 and max_fuel>0:
-                                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver waiting for driver to rotate and out of fuel, marking vehicle disabled',True)
+                                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
                                 vehicle.ai.vehicle_disabled=True
                                 return
 
@@ -474,6 +474,11 @@ class AIHumanVehicle():
     def think_vehicle_role_driver_drive_to_destination(self,destination,distance):
         '''perform actions necessary to start driving somewhere'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+
+        # temp for testing
+        if vehicle.ai.vehicle_disabled:
+            print(f'debug !! vehicle {vehicle.name} is already disabled!!')
+
         rotation=engine.math_2d.get_rotation(vehicle.world_coords,destination)
         self.owner.ai.memory['task_vehicle_crew']['current_action']='driving'
         self.owner.ai.memory['task_vehicle_crew']['calculated_distance_to_target']=distance
@@ -496,7 +501,7 @@ class AIHumanVehicle():
 
                 # out of fuel.
                 # disable the vehicle for now. in the future we will want to try and get fuel and refuel
-                engine.log.add_data('warn','ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel, marking vehicle disabled',True)
+                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
                 vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):
@@ -828,30 +833,35 @@ class AIHumanVehicle():
         prefer_at=False
         prefer_ap=False
 
-        if len(for_both)>0:
-            new_magazine=for_both[0]
-        else:
-            if target is None:
-                # could check if vehicles are near
-                if len(self.owner.ai.near_vehicle_targets)>0 or len(self.owner.ai.mid_vehicle_targets)>0 or len(self.owner.ai.far_vehicle_targets)>0:
-                    prefer_at=True
-                elif len(self.owner.ai.near_human_targets)>0:
-                    prefer_ap=True
 
-            else:
-                if target.is_vehicle:
+        if target is None:
+            if len(self.owner.ai.near_vehicle_targets)>0 or len(self.owner.ai.mid_vehicle_targets)>0 or len(self.owner.ai.far_vehicle_targets)>0:
+                prefer_at=True
+            elif len(self.owner.ai.near_human_targets)>0:
+                prefer_ap=True
+
+        else:
+            if target.is_vehicle:
+                if target.ai.vehicle_armor['front'][0]>4:
                     prefer_at=True
                 else:
                     prefer_ap=True
+            else:
+                prefer_ap=True
 
-        if prefer_at and len(for_at)>0:
-            new_magazine=for_at[0]
+        if prefer_at:
+            if len(for_at)>0:
+                new_magazine=for_at[0]
+            elif len(for_both)>0:
+                new_magazine=for_both[0]
         
-        if prefer_ap and len(for_ap)>0:
-            new_magazine=for_ap[0]
+        elif prefer_ap:
+            if len(for_ap)>0:
+                new_magazine=for_ap[0]
+            elif len(for_both)>0:
+                new_magazine=for_both[0]
 
-        #print(f'{vehicle.name} {weapon.name} AT:{len(for_at)}, AP: {len(for_ap)}, BOTH: {len(for_both)}')
-
+        # if we don't specify a magazine the reload process picks one
         reload_success=self.owner.ai.reload_weapon(weapon,vehicle,new_magazine)
         if reload_success is False:
             engine.log.add_data('Error','think_vehicle_role_gunner reload failed',True)

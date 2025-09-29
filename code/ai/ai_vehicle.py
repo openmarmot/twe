@@ -509,6 +509,8 @@ class AIVehicle():
             self.event_add_inventory(event_data)
         elif event=='collision':
             self.event_collision(event_data)
+        elif event=='explosion':
+            self.handle_explosion(event_data)
         elif event=='remove_inventory':
             self.event_remove_inventory(event_data)
         elif event=='throwable_explosion_on_top_of_vehicle':
@@ -527,6 +529,24 @@ class AIVehicle():
         self.flaps=0
 
     #---------------------------------------------------------------------------
+    def handle_explosion(self,event_data):
+        '''handle the vehicle being hit by an explosion'''
+        power = event_data['power']
+        explosion_coords = event_data['coords']
+
+        # Calculate which side of the vehicle was hit
+        hit_side, relative_angle = engine.math_2d.calculate_hit_side(self.owner.rotation_angle,
+            engine.math_2d.get_rotation(self.owner.world_coords, explosion_coords))
+
+        # Get armor thickness for the hit side (including spaced armor)
+        armor_thickness = self.vehicle_armor[hit_side][0] + self.vehicle_armor[hit_side][2]
+
+        # honestly not sure how to handle explosions yet, this is mostly a placeholder function
+
+        if armor_thickness<5:
+            self.handle_component_damage('random_crew_explosion', None)
+
+    #---------------------------------------------------------------------------
     def handle_hit_with_flame(self):
         '''handle the vehicle being hit with flame'''
 
@@ -536,6 +556,31 @@ class AIVehicle():
         else:
             if random.randint(0,3)==3:
                 self.handle_component_damage('random_crew_fire',None)
+
+    #---------------------------------------------------------------------------
+    def handle_spalling_damage(self, compartment):
+        '''handle damage from armor spalling due to near-miss penetrations'''
+
+        num_fragments = random.randint(1, 3)
+
+        for i in range(num_fragments):
+            if compartment == 'passenger_compartment':
+                # higher chance of crew injury from spalling in crew compartment
+                if random.randint(0, 2) == 0:
+                    shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
+                    shrapnel.ai.projectile_type = 'shrapnel'
+                    shrapnel.name = 'shrapnel'
+                    shrapnel.ai.starting_coords = self.owner.world_coords
+                    self.handle_component_damage('random_crew_projectile', shrapnel)
+
+            else:  # vehicle_body
+                if random.randint(0, 2) == 0:
+                    shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
+                    shrapnel.ai.projectile_type = 'shrapnel'
+                    shrapnel.name = 'shrapnel'
+                    shrapnel.ai.starting_coords = self.owner.world_coords
+                    self.handle_component_damage('driver_projectile', shrapnel)
+                
 
     #---------------------------------------------------------------------------
     def handle_rudder_left(self):
@@ -742,6 +787,10 @@ class AIVehicle():
             self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
 
         else:
+            # check for partial penetration causing spalling
+            if pen_value >= armor_value * 0.9:
+                self.handle_spalling_damage('passenger_compartment')
+                result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
             self.projectile_bounce(projectile)
         
@@ -763,6 +812,10 @@ class AIVehicle():
             self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
 
         else:
+            # check for partial penetration causing spalling
+            if pen_value >= armor_value * 0.9:
+                self.handle_spalling_damage('vehicle_body')
+                result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
             self.projectile_bounce(projectile)
 
@@ -1140,10 +1193,3 @@ class AIVehicle():
 
                 # note this also puts out the existing fire
                 self.on_fire=False
-                
-
-
-
-
-
-

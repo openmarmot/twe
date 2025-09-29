@@ -99,7 +99,7 @@ class Graphics_2D_Pygame(object):
 
         # text stuff
         # Different text sizes for in menus
-        self.small_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 12)
+        self.small_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 14)
         self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
         self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
 
@@ -117,7 +117,7 @@ class Graphics_2D_Pygame(object):
 
         # scale min/max limit 
         #self.scale_limit=[0.2,1.1]
-        self.scale_limit=[0.1,1.5]
+        self.scale_limit=[0.1,2.5]
 
         # scale. normal is 1. this is set by the player with []
         self.scale=self.scale_limit[1]
@@ -413,7 +413,7 @@ class Graphics_2D_Pygame(object):
             h=0
             for b in self.world.debug_text_queue:
                 h+=15
-                self.small_font.render_to(self.screen, (900, h), b,self.menu_color )
+                self.small_font.render_to(self.screen, (self.screen_size[0]-350, h), b,self.menu_color )
 
         if self.world.display_vehicle_text :
             h=0
