@@ -833,30 +833,35 @@ class AIHumanVehicle():
         prefer_at=False
         prefer_ap=False
 
-        if len(for_both)>0:
-            new_magazine=for_both[0]
-        else:
-            if target is None:
-                # could check if vehicles are near
-                if len(self.owner.ai.near_vehicle_targets)>0 or len(self.owner.ai.mid_vehicle_targets)>0 or len(self.owner.ai.far_vehicle_targets)>0:
-                    prefer_at=True
-                elif len(self.owner.ai.near_human_targets)>0:
-                    prefer_ap=True
 
-            else:
-                if target.is_vehicle:
+        if target is None:
+            if len(self.owner.ai.near_vehicle_targets)>0 or len(self.owner.ai.mid_vehicle_targets)>0 or len(self.owner.ai.far_vehicle_targets)>0:
+                prefer_at=True
+            elif len(self.owner.ai.near_human_targets)>0:
+                prefer_ap=True
+
+        else:
+            if target.is_vehicle:
+                if target.ai.vehicle_armor['front'][0]>4:
                     prefer_at=True
                 else:
                     prefer_ap=True
+            else:
+                prefer_ap=True
 
-        if prefer_at and len(for_at)>0:
-            new_magazine=for_at[0]
+        if prefer_at:
+            if len(for_at)>0:
+                new_magazine=for_at[0]
+            elif len(for_both)>0:
+                new_magazine=for_both[0]
         
-        if prefer_ap and len(for_ap)>0:
-            new_magazine=for_ap[0]
+        elif prefer_ap:
+            if len(for_ap)>0:
+                new_magazine=for_ap[0]
+            elif len(for_both)>0:
+                new_magazine=for_both[0]
 
-        #print(f'{vehicle.name} {weapon.name} AT:{len(for_at)}, AP: {len(for_ap)}, BOTH: {len(for_both)}')
-
+        # if we don't specify a magazine the reload process picks one
         reload_success=self.owner.ai.reload_weapon(weapon,vehicle,new_magazine)
         if reload_success is False:
             engine.log.add_data('Error','think_vehicle_role_gunner reload failed',True)
