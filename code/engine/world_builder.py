@@ -331,14 +331,14 @@ def create_random_battlegroup(faction, funds):
     categories = [
         (squad_options_infantry, 3, 5),
         (squad_options_tanks, 1, 3),
-        (squad_options_support_infantry, 1, 2),
-        (squad_options_support_vehicle, 1, 2),
-        (squad_options_other, 1, 2)
+        (squad_options_support_infantry, 0, 2),
+        (squad_options_support_vehicle, 0, 2),
+        (squad_options_other, 0, 2)
     ]
     
     while cost < funds:
         added = False
-        random.shuffle(categories)  # Randomize order to avoid bias
+        #random.shuffle(categories)  # Randomize order to avoid bias
         
         for cat_dict, min_num, max_num in categories:
             if cat_dict:
@@ -484,22 +484,30 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     # -- initial troops --
     squads=[]
+    
+    
 
     if battle_option=='1':
         points=2500
+        soviet_advantage=points*0.3
+        print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points)
+        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
 
     elif battle_option=='2':
         points=5000
+        soviet_advantage=points*0.3
+        print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points)
+        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
 
     
     elif battle_option=='3':
         points=10000
+        soviet_advantage=points*0.3
+        print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points)
+        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
 
     # testing
     elif battle_option=='4':

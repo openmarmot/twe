@@ -1,6 +1,23 @@
 TWE Project : Change Log
 
 ----------------------------------
+September 30 2025
+- updated position for move closer to the target so tanks don't end up on top of each other 
+- gave soviets a 30% points advantage in quick battles to try and even things out
+- updated exit queue for vehicles to remove turrets and hit markers as well 
+
+i don't think the quick battles were even in recent memory. the german guns and armor are both better, with the 
+only exception being the su100 and it tends to get knocked out pretty quick. 
+
+this might change when i add the soviet is1 and is2 and maybe su122 but i doubt it. I haven't added any of the 
+powerful german tanks yet. 
+
+the campaign will naturally result in a soviet win as they will have a large man power advantage but in quick battles 
+you want things to be sort of even 
+
+todo 
+
+----------------------------------
 September 28 2025
 -updated check visibility from vehicle to increase vehicle engagement rangees 
 - made some modifications to the vehicle reload decision code to hopefully use more high explosive rounds 

@@ -552,6 +552,7 @@ class World():
 
     #---------------------------------------------------------------------------
     def kill_all_nonplayer_humans(self):
+        '''kill all nonplayer humans '''
         for b in self.grid_manager.get_objects_from_all_grid_squares(True,False):
             if b.is_player is False:
                 b.ai.blood_pressure=0
@@ -559,6 +560,7 @@ class World():
 
     #---------------------------------------------------------------------------
     def process_add_remove_queue(self):
+        '''processes the add and remove queues '''
         if len(self.add_queue)>0:
             for b in self.add_queue:
                 self.add_object(b)
@@ -581,6 +583,14 @@ class World():
                 # exit vehicle
             
             if b.is_vehicle:
+                for c in b.ai.turrets:
+                    self.remove_queue.append(c)
+
+                for c in self.grid_manager.get_all_objects():
+                    if c.is_hit_marker:
+                        if c.ai.hit_object==b:
+                            self.remove_queue.append(c)
+
                 # process all the passengers
                 pass
 
