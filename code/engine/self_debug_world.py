@@ -12,9 +12,6 @@ import engine.math_2d
 def run_object_counts_report(world):
     '''generates a list of objects in world with a count per type'''
 
-    print('------------------------------------')
-    print('world object count ')
-    print('------------------------------------')
     wo_list={}
     for b in world.grid_manager.get_all_objects():
         if b.world_builder_identity in wo_list:
@@ -22,7 +19,12 @@ def run_object_counts_report(world):
         else:
             wo_list[b.world_builder_identity]=1
 
-    for key,value in wo_list.items():
+    total_objects = sum(wo_list.values())
+    print('------------------------------------')
+    print(f'world object count. total : {total_objects}')
+    print('------------------------------------')
+
+    for key,value in sorted(wo_list.items(), key=lambda item: item[1], reverse=True):
         print(key,'count:',value)
     print('------------------------------------')
 
@@ -137,12 +139,13 @@ def check_vehicle_sanity(b, issues, world):
     # check engines
     for engine in b.ai.engines:
         if engine.ai.engine_on and b.ai.vehicle_disabled is False:
-            if len(b.ai.fuel_tanks) == 0:
-                issues.append(f'{b.name} engine on but no fuel tanks')
-            else:
-                current_fuel, max_fuel = b.ai.read_fuel_gauge()
-                if current_fuel == 0:
-                    issues.append(f'{b.name} engine on but no fuel')
+            if engine.ai.internal_combustion:
+                if len(b.ai.fuel_tanks) == 0:
+                    issues.append(f'{b.name} engine on but no fuel tanks')
+                else:
+                    current_fuel, max_fuel = b.ai.read_fuel_gauge()
+                    if current_fuel == 0:
+                        issues.append(f'{b.name} engine on but no fuel')
 
     # check ammo rack
     if len(b.ai.ammo_rack) > b.ai.ammo_rack_capacity:

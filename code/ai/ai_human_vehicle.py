@@ -391,7 +391,8 @@ class AIHumanVehicle():
                             if need_vehicle_order:
                                 vehicle_order=VehicleOrder()
                                 vehicle_order.order_close_with_enemy=True
-                                vehicle_order.world_coords=copy.copy(target.world_coords)
+                                # just so that we don't end up on top of the target
+                                vehicle_order.world_coords=engine.math_2d.calculate_relative_position(target.world_coords,60,[200,200])
                                 if vehicle.ai.is_transport:
                                     vehicle_order.exit_vehicle_when_finished=True
                                 self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order

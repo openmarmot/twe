@@ -234,6 +234,16 @@ class AIVehicle():
         self.last_fire_check=0
         self.fire_check_interval=15
 
+        # - leave tracks on the ground - 
+        # this is turned on when throttle>0 and current_speed==0 
+        self.tracks_enabled=True
+        self.tracks_last_time=0
+        self.tracks_interval=0.5
+        self.tracks_count=0
+        self.tracks_max=10
+        self.tracks_left_offset=[0,-15]
+        self.tracks_right_offset=[0,15]
+
     #---------------------------------------------------------------------------
     def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value):
         '''add hit data to the collision log'''
@@ -642,6 +652,12 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_throttle_up(self):
         '''adjust the throttle a bit over time'''
+
+        # ! note - nothing actually uses this apparently..
+
+        if self.current_speed==0:
+            self.tracks_enabled=True
+
         self.throttle+=1*self.owner.world.time_passed_seconds
         if self.throttle>1:
             self.throttle=1
@@ -652,6 +668,9 @@ class AIVehicle():
     #---------------------------------------------------------------------------
     def handle_throttle_down(self):
         '''adjust the throttle a bit over time'''
+
+        # note nothing actuall uses this apparently
+
         self.throttle-=1*self.owner.world.time_passed_seconds
         if self.throttle<0:
             self.throttle=0
@@ -902,6 +921,9 @@ class AIVehicle():
         if self.on_fire:
             self.update_vehicle_fire()
 
+        if self.tracks_enabled:
+            self.update_tracks()
+
         # update engines
         for b in self.engines:
             b.throttle_control=self.throttle
@@ -922,6 +944,10 @@ class AIVehicle():
             self.radio.update()
 
         if self.throttle>0:
+            if self.current_speed==0:
+                self.tracks_enabled=True
+                self.tracks_count=0
+
             self.update_acceleration_calculation()
         else:
             self.acceleration=0
@@ -1168,6 +1194,32 @@ class AIVehicle():
                 # if elevator is zero then rate of climb will be zero
                 # if elevator is up (-1) then rate of climb will be negative
                 self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
+
+    #---------------------------------------------------------------------------
+    def update_tracks(self):
+        if self.current_speed>0:
+            if self.tracks_last_time+self.tracks_interval<self.owner.world.world_seconds:
+                # reset time
+                self.tracks_last_time=self.owner.world.world_seconds
+
+                self.tracks_count+=1
+
+                coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
+                    self.owner.rotation_angle,self.tracks_left_offset)
+                track=engine.world_builder.spawn_object(self.owner.world,coords,'tank_tracks',True)
+                track.rotation_angle=self.owner.rotation_angle
+
+                coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
+                    self.owner.rotation_angle,self.tracks_right_offset)
+                track=engine.world_builder.spawn_object(self.owner.world,coords,'tank_tracks',True)
+                track.rotation_angle=self.owner.rotation_angle
+
+                if self.tracks_count>self.tracks_max:
+                    self.tracks_count=0
+                    self.tracks_enabled=False
+
+
+        
 
     #---------------------------------------------------------------------------
     def update_vehicle_fire(self):

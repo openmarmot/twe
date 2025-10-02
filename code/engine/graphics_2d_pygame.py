@@ -625,7 +625,7 @@ class Graphics_2D_Pygame(object):
             random_image=random.choice(['background_kubelwagen',
                 'background_panther','background_t34_column',
                 'background_t34_76','background_ju88','background_me163',
-                'background_su85'])
+                'background_su85','background_su100'])
             self.set_background_image(random_image)
 
         # tactical battle
