@@ -21,6 +21,8 @@ import engine.log
 from ai.ai_faction_tactical import AIFactionTactical
 import engine.world_radio
 from engine.world_grid_manager import WorldGridManager
+import engine.self_debug_world
+
 
 
 #global variables
@@ -680,6 +682,9 @@ class World():
 
         # spawn player
         self.spawn_player()
+
+        # run a immediate debug for useful info 
+        engine.self_debug_world.start(self)
 
     #---------------------------------------------------------------------------
     def toggle_hit_markers(self):

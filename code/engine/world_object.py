@@ -174,6 +174,7 @@ class WorldObject(object):
         # render level kind of a 'z' layer
         # see graphics_2d_pygame for the current list of levels
         self.render_level=None
+        self.static_render_level=False
         # doesn't do much here, should also be called after all variables are set by the spawner
         self.reset_render_level()
 
@@ -194,6 +195,9 @@ class WorldObject(object):
     #---------------------------------------------------------------------------
     def reset_render_level(self):
         '''reset render level to defaults based on object type '''
+
+        if self.static_render_level:
+            return
 
         if self.is_ground_texture:
             self.render_level=0

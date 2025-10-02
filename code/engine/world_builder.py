@@ -60,7 +60,6 @@ from ai.ai_radio import AIRadio
 from ai.ai_turret import AITurret
 from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
-from ai.ai_vehicle_wreck import AIVehicleWreck
 from ai.ai_dani import AIDani
 from ai.ai_wheel import AIWheel
 
@@ -621,21 +620,21 @@ def spawn_container_body(name,world_object,image_index):
     z.world_coords=world_object.world_coords
     z.rotation_angle=world_object.rotation_angle
     z.ai.inventory=world_object.ai.inventory
-    z.world_builder_identity='wreck'
+    z.world_builder_identity='body'
     z.volume=world_object.volume
     z.weight=world_object.weight
     z.collision_radius=world_object.collision_radius
     z.is_large_human_pickup=True
     z.is_body=True
+    # containers normally update to handle leaks - this is no update for performance considerations
+    z.no_update=True 
     z.wo_start()
-
 
 #------------------------------------------------------------------------------
 def spawn_drop_canister(world,world_coords,CRATE_TYPE):
     ''' generates different crate types with contents'''
 
     z=spawn_object(world,world_coords,'german_drop_canister',True)
-
 
     if CRATE_TYPE=='mixed_supply':
         z.ai.inventory.append(get_random_from_list(world,world_coords,list_german_guns,False))
@@ -929,6 +928,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='barrel'
         z.collision_radius=15
         z.rotation_angle=float(random.randint(0,359))
+        z.no_update=True
         if random.randint(0,1)==1:
             fill_container(world,z,'water')
 
@@ -956,6 +956,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=20
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
+        z.no_update=True
     
     elif object_type=='crate_mp40':
         z=spawn_object(world,world_coords,'crate',False)
@@ -992,6 +993,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=20
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
+        z.no_update=True
 
     elif object_type=='cupboard':
         z=WorldObject(world,['cupboard'],AIContainer)
@@ -1001,6 +1003,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=20
         z.rotation_angle=float(random.randint(0,359))
         z.volume=100
+        z.no_update=True
 
         if random.randint(0,1)==1:
             z.ai.inventory.append(get_random_from_list(world,world_coords,list_household_items,False))
@@ -4738,8 +4741,7 @@ def spawn_object(world,world_coords,object_type, spawn):
 
 
     elif object_type=='red_bicycle':
-        # note second image is used for the wreck..
-        z=WorldObject(world,['red_bicycle','red_bicycle'],AIVehicle)
+        z=WorldObject(world,['red_bicycle'],AIVehicle)
         z.name='red_bicycle'
         z.is_vehicle=True
         z.ai.is_transport=True
@@ -5321,6 +5323,23 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_particle_effect=True
         z.rotation_angle=float(random.randint(0,359))
+        z.ai.speed=0
+        z.ai.rotation_speed=0
+        z.ai.rotate_time_max=0
+        z.ai.move_time_max=0
+        z.ai.alive_time_max=75
+        z.ai.self_remove=True
+        z.ai.only_remove_when_not_visible=True
+        z.no_save=True
+
+    elif object_type=='tank_tracks':
+        z=WorldObject(world,['tank_tracks'],AIAnimatedSprite)
+        z.name='tank_tracks'
+        z.static_render_level=True
+        z.render_level=1
+        z.minimum_visible_scale=0.4
+        z.is_particle_effect=True
+        z.rotation_angle=0
         z.ai.speed=0
         z.ai.rotation_speed=0
         z.ai.rotate_time_max=0

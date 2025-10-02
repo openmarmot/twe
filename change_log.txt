@@ -1,6 +1,25 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 1 2025
+- added su100 background 
+- added vehicle track sprites 
+- made bodies no_update to help with performance 
+- made a couple other items no_update 
+
+spent some time going over big performance improvements that i could do. 
+looks like threading is still going to be hard to impossible. 
+pygame sprite groups is an option but its a rather large change and idk if it would 
+be a improvement or not. 
+
+the vehicle tracks is just something fun. the tracks can be positioned per vehicle type, but its 
+good enough for now. 
+
+todo 
+- some vehicles like bicycles should not make tracks 
+- pass zoom level into world so particle effects can delete when they aren't visible 
+
+----------------------------------
 September 30 2025
 - updated position for move closer to the target so tanks don't end up on top of each other 
 - gave soviets a 30% points advantage in quick battles to try and even things out
