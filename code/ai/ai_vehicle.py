@@ -235,8 +235,8 @@ class AIVehicle():
         self.fire_check_interval=15
 
         # - leave tracks on the ground - 
-        # this is turned on when throttle>0 and current_speed==0 
-        self.tracks_enabled=True
+        # this is turned on when throttle>0 and current_speed==0 and weight>500
+        self.tracks_enabled=False
         self.tracks_last_time=0
         self.tracks_interval=0.5
         self.tracks_count=0
@@ -945,8 +945,9 @@ class AIVehicle():
 
         if self.throttle>0:
             if self.current_speed==0:
-                self.tracks_enabled=True
-                self.tracks_count=0
+                if self.owner.weight>500:
+                    self.tracks_enabled=True
+                    self.tracks_count=0
 
             self.update_acceleration_calculation()
         else:

@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 2 2025
+- vehicles now only make tracks if they weigh >500
+- moved scale variable from graphics_2d_pygame to world 
+- ai_animated_sprite can now use scale to determine visibility for despawning 
+- minor updates 
+
+watching tigers get destroyed left and right in my play testing. they do not 
+survive the early merge engagement, but if any survive they tend to clean up. 
+
+todo 
+- vehicle engagement probably needs to get slightly less smart. 
+seeing very few bounces - i think because now the gunner calculates if they can 
+penetrate before they shoot. 
+
+----------------------------------
 Oct 1 2025
 - added su100 background 
 - added vehicle track sprites 

@@ -162,6 +162,12 @@ class World():
         # 
         self.grid_manager=WorldGridManager()
 
+        # scale min/max limit 
+        self.scale_limit=[0.1,2.5]
+
+        # scale this is set by the player with []
+        self.scale=self.scale_limit[1]
+
     #---------------------------------------------------------------------------
     def activate_context_menu(self):
         '''called when player hits tab, activates a menu based on the context'''
@@ -430,7 +436,7 @@ class World():
             elif key=='t':
                 self.player.ai.launch_antitank([],mouse_screen_coords)
 
-        # controls for vehicles and walking 
+        # general controls
         if key=='r':
             self.player.ai.handle_player_reload()
 
@@ -442,6 +448,12 @@ class World():
 
         if key=='m':
             self.toggle_map()
+
+        if key=='[':
+            self.zoom_out()
+        
+        if key==']':
+            self.zoom_in()
 
     #---------------------------------------------------------------------------
     def handle_key_press(self,key,mouse_screen_coords=None):
@@ -636,6 +648,12 @@ class World():
 
         # remove from grid square
         self.grid_manager.remove_object_from_world_grid(world_object)
+
+    #------------------------------------------------------------------------------
+    def reset_all(self):
+        ''' resize all world_objects'''
+        for b in self.grid_manager.get_all_objects():
+            b.reset_image=True
         
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
@@ -765,6 +783,7 @@ class World():
     #------------------------------------------------------------------------------
     def update_debug_info(self):
         self.debug_text_queue = []
+        self.debug_text_queue.append(f'World scale: {self.scale}')
         self.debug_text_queue.append(f"Grid Square Count: {len(self.grid_manager.index_map)}")
         self.debug_text_queue.append(f"World Objects: {len(self.grid_manager.get_all_objects())}")
         self.debug_text_queue.append(f"World Objects that Update: {len(self.grid_manager.get_all_wo_update())}")
@@ -862,3 +881,16 @@ class World():
                         self.vehicle_text_queue.append(' - damaged')
                     ammo_gun,ammo_inventory,magazine_count=self.player.ai.check_ammo(weapon,vehicle)
                     self.vehicle_text_queue.append(f' - ammo {ammo_gun}/{ammo_inventory}')
+
+    #------------------------------------------------------------------------------
+    def zoom_out(self):
+        '''zoom out'''
+        if self.scale>self.scale_limit[0]:
+            self.scale=round(self.scale-0.1,1)
+            self.reset_all()
+    #------------------------------------------------------------------------------
+    def zoom_in(self):
+        ''' zoom in'''
+        if self.scale<self.scale_limit[1]:
+            self.scale=round(self.scale+0.1,1)
+            self.reset_all()
