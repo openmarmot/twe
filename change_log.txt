@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 4 2025
+- rewrote evaluate_targets to be more efficent 
+- rewrote calculate_engagement to use new armor_knowledge stat 
+- rewrote target lists 
+- updated grid_square finding mechanism 
+- misc updates
+
+target lists no longer use the near/mid/far system which had too many magic numbers to track. 
+now they are simply a list of targets sorted closest first 
+
+the grid square fix resolved a lot of issues. targetting should be pretty good now. 
+
+----------------------------------
 Oct 2 2025
 - vehicles now only make tracks if they weigh >500
 - moved scale variable from graphics_2d_pygame to world 

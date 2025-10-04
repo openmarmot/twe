@@ -53,23 +53,24 @@ class WorldGridManager:
         return self.add_square(i, j)
     
     #---------------------------------------------------------------------------
-    def get_grid_squares_near_world_coords(self,coord,range):
-        '''return a array of grid squares within range of the supplied coordinates'''
-        squares=[]
-        squares.append(self.get_grid_square_for_world_coords(coord))
-        temp=self.get_grid_square_for_world_coords([coord[0]+range,coord[1]])
-        if temp not in squares:
-            squares.append(temp)
-        temp=self.get_grid_square_for_world_coords([coord[0]-range,coord[1]])
-        if temp not in squares:
-            squares.append(temp)
-        temp=self.get_grid_square_for_world_coords([coord[0],coord[1]+range])
-        if temp not in squares:
-            squares.append(temp)
-        temp=self.get_grid_square_for_world_coords([coord[0]+range,coord[1]-range])
-        if temp not in squares:
-            squares.append(temp)
-
+    def get_grid_squares_near_world_coords(self, coord, distance):
+        '''return an array of grid squares within range of the supplied coordinates'''
+        squares = []
+        min_x = coord[0] - distance
+        max_x = coord[0] + distance
+        min_y = coord[1] - distance
+        max_y = coord[1] + distance
+        
+        min_j = int((min_x - self.min_coord) // self.grid_size)
+        max_j = int((max_x - self.min_coord) // self.grid_size)
+        min_i = int((min_y - self.min_coord) // self.grid_size)
+        max_i = int((max_y - self.min_coord) // self.grid_size)
+        
+        for i in range(min_i, max_i + 1):
+            for j in range(min_j, max_j + 1):
+                square = self.add_square(i, j)
+                if square not in squares:  # Optional, but avoids duplicates
+                    squares.append(square)
         return squares
     
     #---------------------------------------------------------------------------

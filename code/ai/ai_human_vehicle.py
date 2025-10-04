@@ -378,7 +378,7 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
                             return
-                    if current_action=='Waiting for driver to close distance with target':
+                    if 'Waiting for driver to close distance' in current_action:
                         target=role.human.ai.memory['task_vehicle_crew']['target']
                         if target is not None:
                             need_vehicle_order=False
@@ -649,14 +649,10 @@ class AIHumanVehicle():
             target=None
             if turret.ai.primary_weapon.ai.use_antitank:
                 #prioritize vehicles
-                target=self.owner.ai.get_target_vehicle(turret.ai.primary_weapon.ai.range)
-                if target is None:
-                    target=self.owner.ai.get_target_human(turret.ai.primary_weapon.ai.range)
+                target=self.owner.ai.get_target(False,True)
             else:
-                # prioritize humans 
-                target=self.owner.ai.get_target_human(turret.ai.primary_weapon.ai.range)
-                if target is None:
-                    target=self.owner.ai.get_target_vehicle(turret.ai.primary_weapon.ai.range)
+                # prioritize soft targets 
+                target=self.owner.ai.get_target(True,False)
             if target is not None:
                 self.owner.ai.memory['task_vehicle_crew']['target']=target
 
@@ -721,7 +717,7 @@ class AIHumanVehicle():
                     if turret.ai.primary_turret:
                         # wait for a couple seconds before rechecking
                         self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,1)
-                        self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to close distance with target'
+                        self.owner.ai.memory['task_vehicle_crew']['current_action']=f'Waiting for driver to close distance with {target.name}'
                         return
             
             # if we can't pen occasionally send a round out anyways. 
@@ -836,9 +832,9 @@ class AIHumanVehicle():
 
 
         if target is None:
-            if len(self.owner.ai.near_vehicle_targets)>0 or len(self.owner.ai.mid_vehicle_targets)>0 or len(self.owner.ai.far_vehicle_targets)>0:
+            if self.owner.ai.vehicle_targets:
                 prefer_at=True
-            elif len(self.owner.ai.near_human_targets)>0:
+            elif self.owner.ai.human_targets:
                 prefer_ap=True
 
         else:
@@ -923,16 +919,12 @@ class AIHumanVehicle():
         '''think.. as a passenger'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-
-        if len(self.owner.ai.near_human_targets)>0:
-            # check if we should be worried about small arms fire
-            # near targets will absolutely chew up a unarmored vehicle
-
-            # kind of a hack. left and right are likely symetric so its a good
-            # general guess
-            # but only jump out if the vehicle is going slow. otherwise it might get away 
-            if vehicle.ai.current_speed<20 and vehicle.ai.passenger_compartment_armor['left'][0]<5:
+        if self.owner.ai.human_targets or self.owner.ai.vehicle_targets:
+            if vehicle.ai.current_speed<20:
                 self.owner.ai.switch_task_exit_vehicle()
+
+
+
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_radio_operator(self):
@@ -1036,7 +1028,7 @@ class AIHumanVehicle():
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
                 self.think_vehicle_role_gunner()
             if role.is_passenger:
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.5,0.9)
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1.5)
                 self.think_vehicle_role_passenger()
             if role.is_radio_operator:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)

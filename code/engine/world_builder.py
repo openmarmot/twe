@@ -4928,6 +4928,20 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,'bandage',False))
         add_standard_loadout(z,world,'mp40')
 
+    elif object_type=='german_afv_crew_expert':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']
+        z.ai.is_afv_trained=True
+        z.ai.armor_knowledge=0.1
+        z.ai.morale+=10
+        z.add_inventory(spawn_object(world,world_coords,'bandage',False))
+        if random.randint(0,1)==0:
+            z.add_inventory(spawn_object(world,world_coords,'schokakola',False))
+        if random.randint(0,1)==0:
+            add_standard_loadout(z,world,'stg44')
+        else:
+            add_standard_loadout(z,world,'mp40')
+        
     elif object_type=='german_afv_crew_pistol':
         z=spawn_object(world,world_coords,'german_soldier',False)
         z.image_list=['german_afv_crew','german_afv_crew_prone','german_afv_crew_dead']

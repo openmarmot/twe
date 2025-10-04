@@ -103,7 +103,8 @@ class AIHuman(object):
         self.is_medic=False
         self.is_mechanic=False
         self.is_small_arms_trained=False # this is true for soldiers. determines if they will pick up a gun with no enemy
-
+        # used by calculate_engagement. lower is better
+        self.armor_knowledge=0.3 
         # -- stats --
         self.confirmed_kills=0
         self.probable_kills=0
@@ -135,21 +136,10 @@ class AIHuman(object):
         self.squad=None
         self.squad_max_distance=300
 
-        # # target lists. these are refreshed periodically
-        self.near_human_range=800
-        self.mid_human_range=1500
-        self.far_human_range=2500
+        # # target lists. these are refreshed by evaluate_targets
+        self.human_targets=[]
+        self.vehicle_targets=[]
 
-        self.near_vehicle_range=1000
-        self.mid_vehicle_range=2500
-        self.far_vehicle_range=4100
-
-        self.near_human_targets=[]
-        self.mid_human_targets=[]
-        self.far_human_targets=[]
-        self.near_vehicle_targets=[]
-        self.mid_vehicle_targets=[]
-        self.far_vehicle_targets=[]
         self.last_target_eval_time=0
         self.target_eval_rate=random.uniform(0.1,0.9)
 
@@ -197,19 +187,27 @@ class AIHuman(object):
             projectile=weapon.ai.magazine.ai.projectiles[0]
             rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
             hit_side,relative_angle=engine.math_2d.calculate_hit_side(target.rotation_angle,rotation_angle)
+
             penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor[hit_side],hit_side,relative_angle)
             if penetration is True:
                 return penetration,''
-            else:
-                if distance>2000:
-                    distance=500
-                    penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
-                    if penetration:
-                        return False,'need to get closer to penetrate'
-                    else:
-                        return False,''
+            
+            # - penetration false --
+            # this basically simulates to what degree the ai would know the 
+            # exact answer that we get from penetration_calculator. 
+
+            if armor_value - pen_value < (armor_value * self.armor_knowledge):
+                return True,''
+            
+            if distance>2000:
+                distance=400
+                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
+                if penetration:
+                    return False,'need to get closer to penetrate'
                 else:
                     return False,''
+            else:
+                return False,''
         
         # default
         return True,''
@@ -492,82 +490,81 @@ class AIHuman(object):
         self.event_remove_inventory(CONSUMABLE)
 
     #---------------------------------------------------------------------------
-    def evaluate_targets(self):
+    def evaluate_targets(self, max_search_distance):
         '''find and categorize targets. react to close ones'''
+        # max_search_distance - determines how many grid squares out the search goes
 
-        self.near_human_targets=[]
-        self.mid_human_targets=[]
-        self.far_human_targets=[]
-        self.near_vehicle_targets=[]
-        self.mid_vehicle_targets=[]
-        self.far_vehicle_targets=[]
+        self.human_targets = []
+        self.vehicle_targets = []
 
-        closest_distance=1000
-        closest_object=None
+        # this should be set dynamically by the AI based on what they want to know
+        possible_humans = self.owner.world.grid_manager.get_objects_from_grid_squares_near_world_coords(
+            self.owner.world_coords, max_search_distance, True, False
+        )
 
-        # note we are using this list directly, this is ok because we aren't removing from it
-        for b in self.squad.faction_tactical.hostile_humans:
-            spotted=False
-            # quick check because this list isn't refreshed that often..
-            if b.ai.blood_pressure>0:
-                d=engine.math_2d.get_distance(self.owner.world_coords,b.world_coords)
-                # 3000 is the max engagement range for anything
-                if d<4000:
+        spotted = []  # List of (distance, target) tuples
+        seen_vehicles = set()  # For unique vehicle tracking
+        closest_distance = float('inf')  # Better than arbitrary 1000
+        closest_object = None
 
-                    target=b
-                    if 'task_vehicle_crew' in b.ai.memory:
-                        target=b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-                        # could do something further here to check armor pen
+        is_vehicle_crew = self.memory['current_task'] == 'task_vehicle_crew'
 
-                    # vehicle crew target analysis
-                    if self.memory['current_task']=='task_vehicle_crew':
-                        spotted=self.check_visibility_from_vehicle(target,d)
+        for b in possible_humans:
+            # Quick check if they are dead/dying
+            if b.ai.blood_pressure < 1:
+                continue
 
-                    # - human (not in vehicle) target analysis - 
-                    else:
-                        spotted=self.check_visibility(target,d)
+            if b.ai.squad.faction not in self.squad.faction_tactical.hostile_factions:
+                continue
 
+            if b.ai.memory['current_task'] == 'task_vehicle_crew':
+                vehicle = b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+                if vehicle in seen_vehicles:
+                    continue
+                seen_vehicles.add(vehicle)
+                target = vehicle
+            else:
+                target = b
 
-                    if spotted:
-                        if target.is_human:
-                            if d<self.near_human_range:
-                                self.near_human_targets.append(target)
-                            elif d<self.mid_human_range:
-                                self.mid_human_targets.append(target)
-                            elif d<self.far_human_range:
-                                self.far_human_targets.append(target)
-                        else:
-                            if d<self.near_vehicle_range:
-                                if target not in self.near_vehicle_targets:
-                                    self.near_vehicle_targets.append(target)
-                            elif d<self.mid_vehicle_range:
-                                if target not in self.mid_vehicle_targets:
-                                    self.mid_vehicle_targets.append(target)
-                            elif d<self.far_vehicle_range:
-                                if target not in self.far_vehicle_targets:
-                                    self.far_vehicle_targets.append(target)
+            d = engine.math_2d.get_distance(self.owner.world_coords, target.world_coords)
 
+            if is_vehicle_crew:
+                spotted_flag = self.check_visibility_from_vehicle(target, d)
+            else:
+                spotted_flag = self.check_visibility(target, d)
 
-                    if d<closest_distance:
-                        closest_distance=d
-                        closest_object=target
+            if spotted_flag:
+                spotted.append((d, target))
+                if d < closest_distance:
+                    closest_distance = d
+                    closest_object = target
 
-        # note that we should double check that we can actually see the closest target
+        if not spotted:
+            return  # Early exit if no targets
+
+        # Sort by distance (ascending)
+        spotted.sort(key=lambda x: x[0])
+
+        # Split into human and vehicle targets (preserves sorted order)
+        for d, target in spotted:
+            if target.is_human:
+                self.human_targets.append(target)
+            else:
+                self.vehicle_targets.append(target)
+
         if closest_object is not None:
-            if self.memory['current_task']=='task_vehicle_crew':
+            if is_vehicle_crew:
                 # i think its better to NOT do anything here.
                 # vehicle gunners have a lot of logic to pick new targets now
-                pass 
-
+                pass
             else:
-
                 # don't want to over ride exiting a vehicle 
-                if self.memory['current_task']!='task_exit_vehicle':
+                if self.memory['current_task'] != 'task_exit_vehicle':
                     if self.primary_weapon is not None:
-                        if self.check_ammo_bool(self.primary_weapon,self.owner):
+                        if self.check_ammo_bool(self.primary_weapon, self.owner):
                             self.switch_task_engage_enemy(closest_object)
                     else:
-                        engine.log.add_data('warn','close enemy and no primary weapon. not handled. faction:'+self.squad.faction,True)
+                        engine.log.add_data('warn', 'close enemy and no primary weapon. not handled. faction:' + self.squad.faction, True)
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
@@ -898,44 +895,26 @@ class AIHuman(object):
         return wounded_humans
 
     #---------------------------------------------------------------------------
-    def get_target_human(self,max_range):
-        '''returns a target or None if there are None'''
+    def get_target(self,prefer_soft_target,prefer_vehicle):
+        '''returns a target or none if there are none'''
         target=None
-        if len(self.near_human_targets)>0:
-            target=self.near_human_targets.pop()
-        elif len(self.mid_human_targets)>0:
-            target=self.mid_human_targets.pop()
-        elif len(self.far_human_targets)>0:
-            target=self.far_human_targets.pop()
 
-        if target is not None:
+        if prefer_soft_target:
+            if self.human_targets and self.vehicle_targets:
+                if self.vehicle_targets[0].ai.passenger_compartment_armor['right'][0]<2:
+                    return self.vehicle_targets.pop(0)
 
-            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-            if distance>max_range:
-                # alternatively we could drive closer.
-                target=None
-                
-        return target
-    
-    #---------------------------------------------------------------------------
-    def get_target_vehicle(self,max_range):
-        '''returns a target or None if there are None'''
-        target=None
-        if len(self.near_vehicle_targets)>0:
-            target=self.near_vehicle_targets.pop()
-        elif len(self.mid_vehicle_targets)>0:
-            target=self.mid_vehicle_targets.pop()
-        elif len(self.far_vehicle_targets)>0:
-            target=self.far_vehicle_targets.pop()
-
-        if target is not None:
-
-            distance=engine.math_2d.get_distance(self.owner.world_coords,target.world_coords)
-            if distance>max_range:
-                # alternatively we could drive closer.
-                target=None
-                
-        return target
+        if prefer_vehicle:
+            if self.vehicle_targets:
+                return self.vehicle_targets.pop(0)        
+               
+        if self.human_targets:
+            return self.human_targets.pop(0)
+        if self.vehicle_targets:
+            return self.vehicle_targets.pop(0)
+        
+        return None
+        
     
     #---------------------------------------------------------------------------
     def give_squad_transportation_orders(self,vehicle_order):
@@ -1266,7 +1245,10 @@ class AIHuman(object):
             if new_magazine is not None:
                 if old_magazine is not None:
                     # empty disintegrating magazines get de-referenced and dissapear 
-                    if old_magazine.ai.disintegrating==False or len(old_magazine.ai.projectiles)>0:
+                    if old_magazine.ai.disintegrating and len(old_magazine.ai.projectiles)==0:
+                        # discard magazine
+                        pass
+                    else:
                         obj_with_inventory.ai.event_add_inventory(old_magazine)
 
                 # remove the new magazine from inventory
@@ -1390,11 +1372,10 @@ class AIHuman(object):
         #close_world_area=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.world_areas,3000)
 
         # - are we currently in combat?
-        humans=self.near_human_targets+self.mid_human_targets+self.far_human_targets
-        vehicles=self.near_vehicle_targets+self.mid_vehicle_targets+self.far_vehicle_targets
-        if len(humans+vehicles)>0:
 
-            if len(vehicles)>len(self.squad.vehicles):
+        if len(self.human_targets+self.vehicle_targets)>0:
+
+            if len(self.vehicle_targets)>len(self.squad.vehicles):
                 # lets get out of here 
                 friendly_area=None
                 for area in self.owner.world.world_areas:
@@ -1819,11 +1800,25 @@ class AIHuman(object):
             # identify and categorize targets. should not be run for the player as it can result in new current_task
             if (self.owner.world.world_seconds-self.last_target_eval_time>self.target_eval_rate) and self.owner.is_player is False:
                 self.last_target_eval_time=self.owner.world.world_seconds
-                self.target_eval_rate=random.uniform(0.8,6.5)
-                self.evaluate_targets()
+                self.target_eval_rate=random.uniform(1,6.5)
 
-            
-                
+                # determine target search distance
+                # default value for objects that don't really need to run this
+                max_search_distance=500
+                if self.memory['current_task']=='task_vehicle_crew':
+                    vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
+                    if vehicle_role.is_gunner:
+                        # faster re-eval rate
+                        self.target_eval_rate=random.uniform(0.8,1)
+                        max_search_distance=vehicle_role.turret.ai.primary_weapon.ai.range+500
+                    if vehicle_role.is_commander:
+                        max_search_distance=4500
+                else:
+                    if self.primary_weapon or self.antitank:
+                        max_search_distance=3000
+
+                self.evaluate_targets(max_search_distance)
+
             # building awareness stuff. ai and human need this
             if self.owner.world.world_seconds-self.last_building_check_time>self.building_check_rate:
                 self.last_building_check_time=self.owner.world.world_seconds
@@ -1891,7 +1886,7 @@ class AIHuman(object):
                 # possibly have a random stop bleed even if you don't have medical
             else:
                 # regain morale if not bleeding
-                self.morale+=0.5*self.owner.world.time_passed_seconds
+                self.morale = max(0, min(100, self.morale + 0.5 * self.owner.world.time_passed_seconds))
 
 
             # -- body attribute stuff --
@@ -2053,9 +2048,8 @@ class AIHuman(object):
 
         else:
 
-            new_enemy=self.get_target_human(self.primary_weapon.ai.range)
-            if new_enemy is None:
-                new_enemy=self.get_target_vehicle(self.primary_weapon.ai.range)
+            new_enemy=self.get_target(True,False)
+
             if new_enemy is None:
 
                     # no closer targets. is the target really far out of range?
@@ -2586,7 +2580,7 @@ class AIHuman(object):
         # check for AT targets as a high priority
         if self.antitank is not None:
             if self.check_ammo_bool(self.antitank,self.owner):
-                vehicle_target=self.get_target_vehicle(self.antitank.ai.range)
+                vehicle_target=self.get_target(False,True)
                 if vehicle_target is not None:
                     self.switch_task_engage_enemy(vehicle_target)
                     return
@@ -2595,17 +2589,15 @@ class AIHuman(object):
         if self.primary_weapon is None:
             # need to get a gun
             distance=4000
-            if len(self.near_human_targets)>0:
-                distance=400
-            elif len(self.mid_human_targets)>0:
-                distance=600
-            elif len(self.far_human_targets)>0:
-                distance=900
+            if self.human_targets:
+                distance=800
+            elif self.vehicle_targets:
+                distance=2000
             else:
                 # no human targets
                 # ai that is small arms trained will pick up weapons
                 if self.is_small_arms_trained:
-                    distance=1200
+                    distance=1600
 
             # this also means that humans that are not small armed trained, and have no targets will not pickup guns
             if distance<4000:
@@ -2618,8 +2610,8 @@ class AIHuman(object):
             # -- we have a gun. is it usable? --
             if self.check_ammo_bool(self.primary_weapon,self.owner):
                 
-                # focus on humans, AT weapon specific check was done earlier (above)
-                human_target=self.get_target_human(self.primary_weapon.ai.range)
+                # focus on soft targets, AT weapon specific check was done earlier (above)
+                human_target=self.get_target(True,False)
                 if human_target is not None:
                     self.switch_task_engage_enemy(human_target)
                     return
