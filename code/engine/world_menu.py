@@ -1257,7 +1257,7 @@ class World_Menu(object):
                     text=f'{role.role_name}: '
                     if role.role_occupied:
                         text+=role.human.name
-                        text+=f': {role.human.ai.memory['task_vehicle_crew']['current_action']}'
+                        text+=f": {role.human.ai.memory['task_vehicle_crew']['current_action']}"
                     else:
                         text+='unoccupied'
                     self.text_queue.append(text)
