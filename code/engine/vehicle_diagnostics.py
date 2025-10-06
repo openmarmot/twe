@@ -77,7 +77,7 @@ class VehicleDiagnostics(object):
             text=f'{role.role_name}: '
             if role.role_occupied:
                 text+=f'{role.human.name} ({role.human.ai.blood_pressure})'
-                text+=f': {role.human.ai.memory['task_vehicle_crew']['current_action']}'
+                text+=f": {role.human.ai.memory['task_vehicle_crew']['current_action']}"
             else:
                 text+='unoccupied'
             self.text_queue.append([text,copy.copy(coord),self.text_black])
