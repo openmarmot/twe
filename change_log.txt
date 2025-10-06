@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 6 2025
+- minor fixes and updates 
+
+----------------------------------
 Oct 4 2025
 - rewrote evaluate_targets to be more efficent 
 - rewrote calculate_engagement to use new armor_knowledge stat 

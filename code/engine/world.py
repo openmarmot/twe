@@ -852,15 +852,15 @@ class World():
                 for role in vehicle.ai.vehicle_crew:
                     if role.role_occupied:
                         if role.is_gunner:
-                            self.vehicle_text_queue.append(f'Gunner {role.human.name} Vehicle Targets: {len(role.human.ai.vehicle_targets)} Action: {role.human.ai.memory['task_vehicle_crew']['current_action']}')
+                            self.vehicle_text_queue.append(f"Gunner {role.human.name} Vehicle Targets: {len(role.human.ai.vehicle_targets)} Action: {role.human.ai.memory['task_vehicle_crew']['current_action']}")
 
             if vehicle_role.is_commander:
                 for role in vehicle.ai.vehicle_crew:
                     if role.role_occupied:
                         if role.is_gunner:
-                            self.vehicle_text_queue.append(f'Gunner {role.human.name} Vehicle Targets: {len(role.human.ai.vehicle_targets)} Action: {role.human.ai.memory['task_vehicle_crew']['current_action']}')
+                            self.vehicle_text_queue.append(f"Gunner {role.human.name} Vehicle Targets: {len(role.human.ai.vehicle_targets)} Action: {role.human.ai.memory['task_vehicle_crew']['current_action']}")
                         if role.is_driver:
-                            self.vehicle_text_queue.append(f'Driver {role.human.name}: {role.human.ai.memory['task_vehicle_crew']['current_action']}')
+                            self.vehicle_text_queue.append(f"Driver {role.human.name}: {role.human.ai.memory['task_vehicle_crew']['current_action']}")
 
 
             if vehicle_role.is_gunner:
