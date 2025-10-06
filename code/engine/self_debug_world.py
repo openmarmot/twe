@@ -128,7 +128,7 @@ def check_vehicle_sanity(b, issues, world):
                 if role.human.in_world is False:
                     issues.append(f'{b.name} crew {role.human.name} not in world')
                 if role.human.ai.memory.get('current_task') != 'task_vehicle_crew':
-                    issues.append(f'{b.name} crew {role.human.name} memory[current_task] is {role.human.ai.memory['current_task']} not task_vehicle_crew')
+                    issues.append(f"{b.name} crew {role.human.name} memory[current_task] is {role.human.ai.memory['current_task']} not task_vehicle_crew")
                 # check if human's vehicle_role points back
                 if 'vehicle_role' not in role.human.ai.memory['task_vehicle_crew']:
                     issues.append(f'{b.name} crew {role.human.name} missing vehicle_role in memory')
