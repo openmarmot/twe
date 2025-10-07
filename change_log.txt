@@ -2,7 +2,21 @@ TWE Project : Change Log
 
 ----------------------------------
 Oct 6 2025
-- minor fixes and updates 
+- fixing some f strings that were failing on the mac 
+- added sd.kfz.234/2 'puma'
+
+testing on a mac for the first time in forever and apparently its less forgiving of overlapping '' usage than linux is. very interesting 
+
+the puma is kind of interesting. It has the 5cm L60 that did well on the Panzer III but its a mid-late war vehicle and the 5cm penetration falls 
+off hard at range. With the current high accuracy of tank shots in my game, and basically no advantage to being a armored car I expect this thing to 
+get smoked. The side armor is really bad - just 8mm. The 5cm can pen most soviet tanks in the side armor at mid ranges and opportunities for side 
+shots come up a lot in the game at the moment, but the puma is going to be a target for everything on the soviet side with a gun bigger than a mg. 
+
+Interestingly it apparently came with a MG42. I'm not sure if this is correct, but the turret is left over from a cancelled mid war light tank project, 
+so I guess its possible. 
+
+I was wondering the other day why I never see any 14.5mm AT rifle hits anymore, but I took a Puma out and got smoked by 14.5mm pens, so I guess they 
+were just waiting for the right moment.. 
 
 ----------------------------------
 Oct 4 2025

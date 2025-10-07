@@ -72,11 +72,12 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Panzer IV Ausf G | Tank | 75mm L43 |
 | German | Panzer IV Ausf H | Tank | 75mm L48 |
 | German | Panzer IV Ausf J | Tank | Minor differences from the H |
-| German | Panzer VI Ausf E | Tank | Tiger 1 |
+| German | Panzer VI Ausf E Tiger | Tank | Tiger 1 |
 | German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
 | German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
 | German | Sd.kfz.10 | Halftrack | unarmored prime mover |
 | German | Sd.kfz.234/1 | AFV | Heavy recon car with a 2cm turret |
+| German | Sd.kfz.234/2 Puma | AFV | 5cm turret |
 | German | Sd.kfz.251/1 | APC | The famous German half-track |
 | German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
 | German | Sd.kfz.251/9 'Stummel' | AFV | 75mm L24 |
@@ -101,11 +102,13 @@ I already have a large amount of infantry weapons in game, but currently infantr
 ### Main branch is stable. Dev branch is the latest and may be less stable. Check the change_log for details. Dev is merged to Main when I feel like it.
   
 ### Install Instructions
+Primarily developed on Fedora Linux
+Occasionally tested on Windows and Mac
+
 - install python3 and pygame
 - download code
 - change directory to the code directory
 - python3 twe.py (windows would be: py twe.py)
-- tested on Windows 10, Linux, Apple (M2)
 - if you need to change the screen resolution, it is currently set in code/twe.py
 - more notes in misc_notes/install_notes.txt
 
@@ -145,6 +148,7 @@ I already have a large amount of infantry weapons in game, but currently infantr
 | 'tab' | Vehicle context menu |
 
 #### Vehicle Gunner Controls
+Note - enabling the vehicle HUD from the context menu is very useful if you are a driver or commander
 | Key | Use |
 |---|---|
 | 'w' | Rotates the turret to aim where the mouse is (if possible) | 
