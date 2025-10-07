@@ -81,7 +81,7 @@ class WorldGridSquare:
                 self.wo_objects_furniture.append(wo_object)
         else:
             text='world_grid_square.add_wo_object - '
-            text+=f'{wo_object.name} is alreay in the wo_objects list'
+            text+=f'{wo_object.name} is already in the wo_objects list'
             engine.log.add_data('error',text,True)
 
 

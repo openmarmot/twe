@@ -48,7 +48,8 @@ class AIAnimatedSprite(object):
     #---------------------------------------------------------------------------
     def update(self):
         if self.self_delete_when_not_visible:
-            if self.owner.grid_square.visible==False:
+            if (self.owner.grid_square.visible==False or 
+                self.owner.world.scale<self.owner.minimum_visible_scale):
                 self.owner.wo_stop()
                 return
             return
@@ -75,10 +76,7 @@ class AIAnimatedSprite(object):
                     self.owner.rotation_angle+=self.rotation_speed*time_passed
 
                     # normalize angles 
-                    if self.owner.rotation_angle>360:
-                        self.owner.rotation_angle=0
-                    elif self.owner.rotation_angle<0:
-                        self.owner.rotation_angle=360
+                    self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
 
                     if self.heading_from_rotation:
                         self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)

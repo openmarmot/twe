@@ -1,6 +1,52 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 6 2025
+- fixing some f strings that were failing on the mac 
+- added sd.kfz.234/2 'puma'
+
+testing on a mac for the first time in forever and apparently its less forgiving of overlapping '' usage than linux is. very interesting 
+
+the puma is kind of interesting. It has the 5cm L60 that did well on the Panzer III but its a mid-late war vehicle and the 5cm penetration falls 
+off hard at range. With the current high accuracy of tank shots in my game, and basically no advantage to being a armored car I expect this thing to 
+get smoked. The side armor is really bad - just 8mm. The 5cm can pen most soviet tanks in the side armor at mid ranges and opportunities for side 
+shots come up a lot in the game at the moment, but the puma is going to be a target for everything on the soviet side with a gun bigger than a mg. 
+
+Interestingly it apparently came with a MG42. I'm not sure if this is correct, but the turret is left over from a cancelled mid war light tank project, 
+so I guess its possible. 
+
+I was wondering the other day why I never see any 14.5mm AT rifle hits anymore, but I took a Puma out and got smoked by 14.5mm pens, so I guess they 
+were just waiting for the right moment.. 
+
+----------------------------------
+Oct 4 2025
+- rewrote evaluate_targets to be more efficent 
+- rewrote calculate_engagement to use new armor_knowledge stat 
+- rewrote target lists 
+- updated grid_square finding mechanism 
+- misc updates
+
+target lists no longer use the near/mid/far system which had too many magic numbers to track. 
+now they are simply a list of targets sorted closest first 
+
+the grid square fix resolved a lot of issues. targetting should be pretty good now. 
+
+----------------------------------
+Oct 2 2025
+- vehicles now only make tracks if they weigh >500
+- moved scale variable from graphics_2d_pygame to world 
+- ai_animated_sprite can now use scale to determine visibility for despawning 
+- minor updates 
+
+watching tigers get destroyed left and right in my play testing. they do not 
+survive the early merge engagement, but if any survive they tend to clean up. 
+
+todo 
+- vehicle engagement probably needs to get slightly less smart. 
+seeing very few bounces - i think because now the gunner calculates if they can 
+penetrate before they shoot. 
+
+----------------------------------
 Oct 1 2025
 - added su100 background 
 - added vehicle track sprites 

@@ -115,12 +115,7 @@ class Graphics_2D_Pygame(object):
         # max_fps max frames for every second.
         self.max_fps=60
 
-        # scale min/max limit 
-        #self.scale_limit=[0.2,1.1]
-        self.scale_limit=[0.1,2.5]
-
-        # scale. normal is 1. this is set by the player with []
-        self.scale=self.scale_limit[1]
+        
 
         # buffer to make objects start rendering slightly off screen
         self.view_buffer=100
@@ -209,8 +204,8 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
-        player_x=self.world.player.world_coords[0]*self.scale
-        player_y=self.world.player.world_coords[1]*self.scale
+        player_x=self.world.player.world_coords[0]*self.world.scale
+        player_y=self.world.player.world_coords[1]*self.world.scale
         
         self.world.player.screen_coords=self.screen_center
 
@@ -234,11 +229,7 @@ class Graphics_2D_Pygame(object):
                 if self.mode==0:
                     self.game_menu.handle_input(translated_key)
                 elif self.mode==1:
-                    if translated_key=='[':
-                        self.zoom_out()
-                    elif translated_key==']':
-                        self.zoom_in()
-                    elif translated_key=='l_ctrl':
+                    if translated_key=='l_ctrl':
                         self.create_screenshot()
                     else:
                         self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
@@ -397,7 +388,7 @@ class Graphics_2D_Pygame(object):
                 self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
 
                 if self.draw_collision:
-                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.scale)
+                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.world.scale)
 
         h=0
         for b in islice(self.world.text_queue,self.world.text_queue_display_size):
@@ -427,15 +418,15 @@ class Graphics_2D_Pygame(object):
                 vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 for turret in vehicle.ai.turrets:
                     if turret.ai.primary_weapon is not None:
-                        radius=turret.ai.primary_weapon.ai.range*self.scale
+                        radius=turret.ai.primary_weapon.ai.range*self.world.scale
                         pygame.draw.circle(self.screen,(236,64,122),turret.screen_coords,radius,width=5)
             else:
                 if self.world.player.ai.primary_weapon is not None:
-                    radius=self.world.player.ai.primary_weapon.ai.range*self.scale
+                    radius=self.world.player.ai.primary_weapon.ai.range*self.world.scale
                     pygame.draw.circle(self.screen,(236,64,122),self.world.player.screen_coords,radius,width=5)
 
                 if self.world.player.ai.antitank is not None:
-                    radius=self.world.player.ai.antitank.ai.range*self.scale
+                    radius=self.world.player.ai.antitank.ai.range*self.world.scale
                     pygame.draw.circle(self.screen,(236,64,50),self.world.player.screen_coords,radius,width=5)
 
         if self.double_buffering:
@@ -498,7 +489,7 @@ class Graphics_2D_Pygame(object):
     def reset_pygame_image(self, wo):
         '''Reset the image for a world object with caching'''
         wo.reset_image = False
-        obj_scale = self.scale + wo.scale_modifier
+        obj_scale = self.world.scale + wo.scale_modifier
         wo.image_size = (
             int(self.images[wo.image_list[wo.image_index]].get_width() * obj_scale),
             int(self.images[wo.image_list[wo.image_index]].get_height() * obj_scale)
@@ -509,7 +500,7 @@ class Graphics_2D_Pygame(object):
         key = f"{wo.image_list[wo.image_index]}_{wo.image_size}_{round(wo.rotation_angle, 1)}"
         
         # Check if the image is already cached
-        scale_cache = self.image_cache.setdefault(self.scale, {})
+        scale_cache = self.image_cache.setdefault(self.world.scale, {})
         if key in scale_cache:
             wo.image = scale_cache[key]
             return
@@ -531,11 +522,7 @@ class Graphics_2D_Pygame(object):
                 True
             )
 
-    #------------------------------------------------------------------------------
-    def reset_all(self):
-        ''' resize all world_objects'''
-        for b in self.world.grid_manager.get_all_objects():
-            b.reset_image=True
+    
 
     #---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self,mouse_coords):
@@ -616,8 +603,8 @@ class Graphics_2D_Pygame(object):
         '''switch the graphic engine mode '''
 
         # reset scale to defaults
-        self.scale=self.scale_limit[1]
-        self.reset_all()
+        self.world.scale=self.world.scale_limit[1]
+        self.world.reset_all()
         
         # main menu
         if desired_mode==0:
@@ -674,7 +661,6 @@ class Graphics_2D_Pygame(object):
             # insert graphic engine specific debug text (after world.update populated it)
             if self.world.debug_mode and self.world.is_paused==False:
                 self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
-                self.world.debug_text_queue.insert(1,'World scale: '+str(self.scale))
                 self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
 
                 
@@ -714,11 +700,11 @@ class Graphics_2D_Pygame(object):
         self.render_count = 0
 
         # Calculate half the visible world distance (accounting for scale)
-        half_width_world = (self.screen_size[0] / 2.0) / self.scale
-        half_height_world = (self.screen_size[1] / 2.0) / self.scale
+        half_width_world = (self.screen_size[0] / 2.0) / self.world.scale
+        half_height_world = (self.screen_size[1] / 2.0) / self.world.scale
 
         # Buffer in world coordinates 
-        buffer_world = self.view_buffer / self.scale
+        buffer_world = self.view_buffer / self.world.scale
 
         # Visible ranges in world coordinates (min/max with buffer)
         max_x = self.world.player.world_coords[0] + half_width_world + buffer_world
@@ -740,7 +726,7 @@ class Graphics_2D_Pygame(object):
                 grid_square.visible = True
 
                 for obj in grid_square.wo_objects:
-                    if (obj.render and (self.scale + obj.scale_modifier) >= obj.minimum_visible_scale):
+                    if (obj.render and (self.world.scale + obj.scale_modifier) >= obj.minimum_visible_scale):
                         renderable_objects.append(obj)
             else:
                 grid_square.visible = False
@@ -748,22 +734,11 @@ class Graphics_2D_Pygame(object):
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
             if not obj.is_player:
-                obj.screen_coords[0] = obj.world_coords[0] * self.scale + translation[0]
-                obj.screen_coords[1] = obj.world_coords[1] * self.scale + translation[1]
+                obj.screen_coords[0] = obj.world_coords[0] * self.world.scale + translation[0]
+                obj.screen_coords[1] = obj.world_coords[1] * self.world.scale + translation[1]
         
         self.render_count = len(renderable_objects)      
 
-    #------------------------------------------------------------------------------
-    def zoom_out(self):
-        '''zoom out'''
-        if self.scale>self.scale_limit[0]:
-            self.scale=round(self.scale-0.1,1)
-            self.reset_all()
-    #------------------------------------------------------------------------------
-    def zoom_in(self):
-        ''' zoom in'''
-        if self.scale<self.scale_limit[1]:
-            self.scale=round(self.scale+0.1,1)
-            self.reset_all()
+
 
 
