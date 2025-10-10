@@ -1189,8 +1189,7 @@ class World_Menu(object):
             if self.selected_object.ai.vehicle_disabled:
                 self.text_queue.append('Vehicle Disabled')
 
-
-
+            
             if distance<self.max_menu_distance:
                 self.text_queue.append('')
                 self.text_queue.append('-- Actions --')

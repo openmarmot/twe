@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 9 2025
+- vehicle diagnostics hit read out now prioritizes penetrations
+
+i was reading about pygame performance today and i found out that pygame had been branched to pygame-ce years ago and that version is 
+more actively developed. i should probably switch to that..
+
+----------------------------------
 Oct 6 2025
 - fixing some f strings that were failing on the mac 
 - added sd.kfz.234/2 'puma'

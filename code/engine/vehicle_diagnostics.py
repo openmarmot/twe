@@ -26,6 +26,7 @@ class VehicleDiagnostics(object):
         self.text_red='#FF2121'
 
         self.menu_string='[Esc to Exit]  [1 Main]  [2 Turrets]  [3 Crew]  [4 Engine]  [5 Wheels]'
+        self.max_display_hits=10
 
     #---------------------------------------------------------------------------
     def handle_keydown(self,translated_key):
@@ -50,12 +51,13 @@ class VehicleDiagnostics(object):
         self.screen_center=screen_center
         self.load_main_screen()
 
+
     #---------------------------------------------------------------------------
     def load_crew_screen(self):
         '''load main screen text and image '''
 
         self.image_objects=[]
-        # add the main object 
+        # add the main object
         v=VehicleDiagnosticObject()
         v.image_list=self.vehicle.image_list
         v.screen_coords=self.screen_center
@@ -223,8 +225,6 @@ class VehicleDiagnostics(object):
             self.text_queue.append(['engine(s) damaged',copy.copy(coord),self.text_red])
             coord[1]+=spacing
         
-       
-
         # - fuel tank data -
         # this should move to its own page
         
@@ -248,14 +248,20 @@ class VehicleDiagnostics(object):
                 self.text_queue.append([f'-> contaminated',copy.copy(coord),self.text_red])
                 coord[1]+=spacing
 
-
         
-
         # - hit log data -
         coord=[40,700]
         self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
-        for b in self.vehicle.ai.collision_log[-10:]:
+        penetrated_hits = [hit for hit in self.vehicle.ai.collision_log if hit.penetrated]
+        non_penetrated_hits = [hit for hit in self.vehicle.ai.collision_log if not hit.penetrated]
+
+        if len(penetrated_hits) >= self.max_display_hits:
+            hits_to_show = penetrated_hits[:self.max_display_hits]
+        else:
+            hits_to_show = penetrated_hits + non_penetrated_hits[:(self.max_display_hits - len(penetrated_hits))]
+
+        for b in hits_to_show:
             pen_text=f'[penetrated: {b.penetrated}] [distance: {b.distance}] [projectile: {b.projectile_name}] [penetration value: {b.penetration_value}] [armor value: {b.armor_value}] [side: {b.hit_side}] [compartment: {b.hit_compartment}] [result: {b.result}]'
             if b.penetrated:
                 self.text_queue.append([pen_text,copy.copy(coord),self.text_red])
