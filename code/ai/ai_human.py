@@ -22,6 +22,7 @@ import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
 from engine.tactical_order import TacticalOrder
 from ai.ai_human_vehicle import AIHumanVehicle
+from ai.ai_human_radio_operator import AIHumanRadioOperator
 #import engine.global_exchange_rates
 
 #global variables
@@ -31,6 +32,7 @@ class AIHuman(object):
         self.owner=owner
 
         self.in_vehicle_ai=AIHumanVehicle(self.owner)
+        self.radio_operator_ai=AIHumanRadioOperator(self.owner)
 
         self.task_map={
             'task_player_control':self.update_task_player_control,
@@ -626,7 +628,7 @@ class AIHuman(object):
             if random.randint(1,5)==1:
                 event_data.ai.redirect(event_data.ai.equipper.world_coords)
             else:
-                if self.memory['current_task']=='task_vehicle_crew':
+                if self.in_vehicle():
                     engine.log.add_data('warn','hit by a grenade while in a vehicle',True)
                 else:
                     # - we are on foot - 
@@ -797,7 +799,7 @@ class AIHuman(object):
                     aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,target.world_coords,target.heading,time_passed)
 
             if target.is_human:
-                if target.ai.memory['current_task']=='task_vehicle_crew':
+                if target.ai.in_vehicle():
                     vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                     if vehicle.ai.current_speed>0:
                         aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,vehicle.world_coords,vehicle.heading,time_passed)
@@ -968,7 +970,7 @@ class AIHuman(object):
                         near_squad.pop(0)
                     else:
 
-                        if near_squad[0].ai.memory['current_task']=='task_vehicle_crew':
+                        if near_squad[0].ai.in_vehicle():
                             #already in a vehicle, so no further action needed
                             near_squad.pop(0)
                         else:
@@ -998,7 +1000,7 @@ class AIHuman(object):
             self.event_explosion(event_data)
         elif event=='vehicle_hit':
             # this is called by ai_vehicle.add_hit_data
-            if self.memory['current_task']=='task_vehicle_crew':
+            if self.in_vehicle():
                 self.memory['task_vehicle_crew']['vehicle_hits'].append(event_data)
             else:
                 engine.log.add_data('warn','ai_human.handle_event vehicle_hit but user is not in vehicle',True)
@@ -1019,7 +1021,7 @@ class AIHuman(object):
         # called by world.handle_key_press
 
         # check if we are in a vehicle
-        if self.memory['current_task']=='task_vehicle_crew':
+        if self.in_vehicle():
             turret=self.memory['task_vehicle_crew']['vehicle_role'].turret
             vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
             # make sure the player is actually in a turret
@@ -1109,7 +1111,14 @@ class AIHuman(object):
                 elif ammo_gun==0 and ammo_inventory>0:
                     self.switch_task_reload(self.antitank)
 
+    #---------------------------------------------------------------------------
+    def in_vehicle(self):
+        '''simple check if the ai is currently in a vehicle'''
+        # this was being checked a lot, so this reduces spelling mistakes
 
+        if self.memory['current_task']=='task_vehicle_crew':
+            return True
+        return False
     #---------------------------------------------------------------------------
     def morale_check(self):
         '''checks morale, returns results'''
@@ -1151,7 +1160,7 @@ class AIHuman(object):
     def player_vehicle_role_change(self,requested_role):
         'player changes vehicle roles'
         # this is called by world_menu
-        if self.memory['current_task']=='task_vehicle_crew':
+        if self.in_vehicle():
             vehicle=self.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
             # remove yourself from any existing roles 
@@ -1322,7 +1331,7 @@ class AIHuman(object):
             distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
             if distance>close_distance:
                 # in a vehicle
-                if self.memory['current_task']=='task_vehicle_crew':
+                if self.in_vehicle():
                     vehicle_order=VehicleOrder()
                     vehicle_order.order_drive_to_coords=True
                     vehicle_order.world_coords=copy.copy(order.world_coords)
@@ -1344,7 +1353,7 @@ class AIHuman(object):
             distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
             if distance>close_distance:
                 # in a vehicle
-                if self.memory['current_task']=='task_vehicle_crew':
+                if self.in_vehicle():
                     vehicle_order=VehicleOrder()
                     vehicle_order.order_drive_to_coords=True
                     vehicle_order.world_coords=copy.copy(order.world_coords)
@@ -1805,7 +1814,7 @@ class AIHuman(object):
                 # determine target search distance
                 # default value for objects that don't really need to run this
                 max_search_distance=500
-                if self.memory['current_task']=='task_vehicle_crew':
+                if self.in_vehicle():
                     vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
                     if vehicle_role.is_gunner:
                         # faster re-eval rate
@@ -1899,7 +1908,7 @@ class AIHuman(object):
             if self.blood_pressure<self.blood_pressure_min:
                 if self.prone is False:
                     self.prone_state_change()
-                if self.memory['current_task']=='task_vehicle_crew':
+                if self.in_vehicle():
                     # re-use this function to exit the vehicle cleanly
                     self.switch_task_exit_vehicle()
                     self.update_task_exit_vehicle()
@@ -1936,7 +1945,7 @@ class AIHuman(object):
             if self.large_pickup is not None:
                 self.drop_object(self.large_pickup)
 
-            if self.memory['current_task']=='task_vehicle_crew':
+            if self.in_vehicle():
                 # re-use this function to exit the vehicle cleanly
                 self.switch_task_exit_vehicle()
                 self.update_task_exit_vehicle()
@@ -2665,6 +2674,12 @@ class AIHuman(object):
             if len(damaged_vehicles)>0:
                 self.switch_task_mechanic(damaged_vehicles)
                 return
+            
+        # -- radio check --
+        # this may eventually become a task. unsure 
+        if self.large_pickup:
+            if self.large_pickup.is_radio:
+                self.radio_operator_ai.update()
 
         # -- squad stuff (lower importance)--
         # could maybe have some logic to this if i ever add ranks 

@@ -206,7 +206,7 @@ class AIHumanVehicle():
                 aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,aim_coords,target.heading,time_passed)
 
         if target.is_human:
-            if target.ai.memory['current_task']=='task_vehicle_crew':
+            if target.ai.in_vehicle():
                 vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 if vehicle.ai.current_speed>0:
                     aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,aim_coords,vehicle.heading,time_passed)
@@ -947,35 +947,9 @@ class AIHumanVehicle():
             # gunner also uses this, do not want to over write 
             if vehicle_role.is_gunner is False:
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
-            if radio.ai.power_on is False:
-                radio.ai.current_frequency=self.owner.ai.squad.faction_tactical.radio_frequency
-                radio.ai.turn_power_on()
+            
+            self.owner.ai.radio_operator_ai.update()
 
-                # should double check here that this worked.
-                # but what are the failure conditions?
-                # - bad battery 
-                # - no battery?
-            else:
-                # check the frequency
-                if radio.ai.current_frequency!=self.owner.ai.squad.faction_tactical.radio_frequency:
-                    radio.ai.current_frequency=self.owner.ai.squad.faction_tactical.radio_frequency
-                    # this is needed to reset frequency with world_radio
-                    radio.ai.turn_power_on()
-
-                # -- receive radio messages --
-                if len(radio.ai.receive_queue)>0:
-                    message=radio.ai.receive_queue.pop()
-                    
-                    # avoid duplicates from other radio operators
-                    if message not in self.owner.ai.squad.radio_receive_queue:
-                        # ideally do some processing here 
-                        self.owner.ai.squad.radio_receive_queue.append(message)
-
-                # -- send radio messages --
-                if len(self.owner.ai.squad.radio_send_queue)>0:
-                    message=self.owner.ai.squad.radio_send_queue.pop()
-                    vehicle.ai.radio.ai.send_message(message)
-                    # maybe self.owner.ai.speak something here?
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):

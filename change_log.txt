@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 11 2025
+- rewriting radio code
+- new ai_human_radio_operator 
+- minor updates and fixes 
+
+radio bits get removed from squad. the problem with squad is there is no guarantee that the squad is actually together. 
+
+decided to create a new ai_human class file specifically for radio operator like i did for human vehicle ai.
+I'm going to start following this pattern more because ai_human is too big. 
+
+my intention was to work on indirect fire but i got sucked into fixing radio 
+
+todo 
+- handle recieve queue 
+
+----------------------------------
 Oct 9 2025
 - vehicle diagnostics hit read out now prioritizes penetrations
 
