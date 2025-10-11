@@ -4,6 +4,7 @@ TWE Project : Change Log
 Oct 11 2025
 - rewriting radio code
 - new ai_human_radio_operator 
+- fixed su100 max ammo capacity (it was 60, should be 30 )
 - minor updates and fixes 
 
 radio bits get removed from squad. the problem with squad is there is no guarantee that the squad is actually together. 

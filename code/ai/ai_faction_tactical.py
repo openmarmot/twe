@@ -269,9 +269,6 @@ class AIFactionTactical():
         time_passed=self.world.time_passed_seconds
         self.time_since_update+=time_passed
 
-        # run the update for each squad
-        for b in self.squads:
-            b.update()
 
         self.process_radio_messages()
 

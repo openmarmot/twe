@@ -71,10 +71,7 @@ class AISquad(object):
             if b.is_human:
                 b.ai.squad=self
 
-    #---------------------------------------------------------------------------
-    def update(self):
-        if self.world.world_seconds-self.last_radio_eval_time>self.radio_eval_rate:
-            self.update_radio_contact()
+
 
 
 

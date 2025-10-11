@@ -4393,7 +4393,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
-        z.ai.ammo_rack_capacity=60
+        z.ai.ammo_rack_capacity=30
         for b in range(25):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"100mm_d_10_magazine",False))
         for b in range(5):

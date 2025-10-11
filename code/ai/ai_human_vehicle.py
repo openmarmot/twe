@@ -868,6 +868,7 @@ class AIHumanVehicle():
         '''think vehicle role indirect fire gunner'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        fire_missons=self.owner.ai.memory['task_vehicle_crew']['fire_missions']
 
         # handle the reloading action
         if self.owner.ai.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
@@ -912,6 +913,8 @@ class AIHumanVehicle():
         # if we got this far we have ammo, and the weapon is functional 
         
         # note this is unfinished
+        if fire_missons:
+            pass
 
 
     #---------------------------------------------------------------------------
@@ -922,8 +925,6 @@ class AIHumanVehicle():
         if self.owner.ai.human_targets or self.owner.ai.vehicle_targets:
             if vehicle.ai.current_speed<20:
                 self.owner.ai.switch_task_exit_vehicle()
-
-
 
 
     #---------------------------------------------------------------------------
@@ -939,16 +940,14 @@ class AIHumanVehicle():
         radio=vehicle.ai.radio
 
         if radio is None:
-
             # should we try to do something else?
             return
             
-        else:
-            # gunner also uses this, do not want to over write 
-            if vehicle_role.is_gunner is False:
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
-            
-            self.owner.ai.radio_operator_ai.update()
+        # gunner also uses this, do not want to over write 
+        if vehicle_role.is_gunner is False:
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
+        
+        self.owner.ai.radio_operator_ai.update()
 
 
     #---------------------------------------------------------------------------

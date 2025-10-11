@@ -16,9 +16,9 @@ class AIHumanRadioOperator():
     #---------------------------------------------------------------------------
     def get_radio(self):
         '''get the radio object that we are using'''
-        if self.in_vehicle():
+        if self.owner.ai.in_vehicle():
             vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-            return vehicle.ai.rado
+            return vehicle.ai.radio
         
         # we must be on foot
         if self.owner.ai.large_pickup:
@@ -39,7 +39,7 @@ class AIHumanRadioOperator():
             radio.ai.send_message(message)
     
     #---------------------------------------------------------------------------
-    def turn_on_and_tune_radio(radio,frequency):
+    def turn_on_and_tune_radio(self,radio,frequency):
         '''turn on and tune radio to the given frequency'''
 
         if radio.ai.power_on==False  or radio.ai.current_frequency!=frequency:
@@ -54,7 +54,7 @@ class AIHumanRadioOperator():
         if radio is None:
             return
         
-        self.turn_on_and_tune_radio(radio)
+        self.turn_on_and_tune_radio(radio,self.owner.ai.squad.faction_tactical.radio_frequency)
 
         # process recieve queue 
 
