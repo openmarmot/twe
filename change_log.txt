@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 12 2025
+- working on indirect fire code. 
+
+indirect fire is just going to be a gunner instead of a seperate role to reduce code duplication. 
+this will also allow indirect fire guns to fire direct_fire when applicable as well as have coax weapons 
+
+----------------------------------
 Oct 11 2025
 - rewriting radio code
 - new ai_human_radio_operator 

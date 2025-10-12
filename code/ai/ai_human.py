@@ -1715,6 +1715,7 @@ class AIHuman(object):
             'calculated_turret_angle': None, #used by the gunner role
             'engage_primary_weapon': False, # used by gunner
             'engage_coaxial_weapon': False, #used by gunner
+            'engage_indirect_fire': False, #used by gunner
             'calculated_vehicle_angle': None, # used by driver role
             'calculated_distance_to_target':None, # used by driver role
             'last_think_time': 0,

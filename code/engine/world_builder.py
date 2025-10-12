@@ -2668,7 +2668,7 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         # note special indirect fire gunner role
         role=VehicleRole('gunner',z)
-        role.is_indirect_fire_gunner=True
+        role.is_gunner=True
         role.turret=turret
         role.seat_visible=True
         role.seat_offset=[17,0]
