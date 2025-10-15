@@ -2732,6 +2732,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'GrW34_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.range=4000
+        z.ai.indirect_range=4500
         z.ai.type='cannon'
         z.ai.use_antitank=False
         z.ai.use_antipersonnel=True

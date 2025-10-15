@@ -9,5 +9,8 @@ class FireMisson():
         # coordinates of the strike
         self.world_coords=world_coords
 
+        self.rounds_requested=10
+        self.rounds_fired=0
+
         # world.world_seconds time when strike request expires
         self.expiration_time=expiration_time

@@ -122,7 +122,16 @@ class AIHumanVehicle():
 
     #---------------------------------------------------------------------------
     def action_vehicle_gunner_engage_indirect_fire(self):
-        pass
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        fire_mission=self.owner.ai.memory['task_vehicle_crew']['fire_missons'][0]
+
+        # rotate turret towards target. true if rotation matches
+        if self.rotate_turret(turret,self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']):
+
+            if turret.ai.handle_fire():
+                fire_mission.rounds_fired+=1
+
+        # thats pretty much it. think can stop the engagement when we've fired enough as indirect fire weapons are fairly slow firing
 
     #---------------------------------------------------------------------------
     def action_vehicle_gunner_engage_target(self):
@@ -183,7 +192,7 @@ class AIHumanVehicle():
         if self.owner.ai.blood_pressure<100:
             adjust_max+=1
         if self.owner.ai.blood_pressure<50:
-            adjust_max+=10
+            adjust_max+=20
 
         if distance>1000:
             adjust_max+=1
@@ -219,6 +228,48 @@ class AIHumanVehicle():
                     aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
 
         
+
+        self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
+
+    #---------------------------------------------------------------------------
+    def calculate_turret_aim_indirect(self,turret,target_position,weapon):
+        '''calculates the correct turret angle to hit a target'''
+
+        # this is where we should be applying the majority of the aim adjustments
+
+        # target : world_object
+        # turret : world_object with ai_turret
+
+        aim_coords=target_position
+        # guess how long it will take for the bullet to arrive
+        distance=engine.math_2d.get_distance(turret.world_coords,target_position)
+
+        # - determine adjustment - 
+        adjust_max=0
+        adjust_max+=weapon.ai.mechanical_accuracy
+
+        if self.owner.ai.blood_pressure<100:
+            adjust_max+=10
+        if self.owner.ai.blood_pressure<50:
+            adjust_max+=50
+
+        if distance>1000:
+            adjust_max+=10
+        if distance>2000:
+            adjust_max+=20
+        if distance>3000:
+            adjust_max+=30
+        if distance>3500:
+            adjust_max+=40
+
+        if adjust_max<0:
+            adjust_max=0
+
+        # final results
+        aim_coords=[aim_coords[0]+random.uniform(-adjust_max,adjust_max),aim_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
+         # we want the projectile to collide so aim point will be a bit past it
+        weapon.ai.calculated_range=distance+random.randint(-adjust_max,adjust_max)
 
         self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
 
@@ -798,7 +849,6 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
                             return
 
-
         # default
         self.owner.ai.memory['task_vehicle_crew']['target']=None
         self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
@@ -806,16 +856,40 @@ class AIHumanVehicle():
     #---------------------------------------------------------------------------
     def think_vehicle_role_fire_misson(self):
         '''indirect fire mission'''
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        fire_mission=self.owner.ai.memory['task_vehicle_crew']['fire_missons'][0]
 
         # getting this far means we have ammo for the primary weapon and a fire mission
 
-        # turret rotation ?
+        # check if the fire mission is complete
+        if fire_mission.rounds_fired>fire_mission.rounds_requested:
+            # remove the fire mission. maybe we should do a radio broadcast ?
+            self.owner.ai.memory['task_vehicle_crew']['fire_missons'].pop(0)
+            return
 
         # range ?
+        distance=engine.math_2d.get_distance(self.owner.world_coords,fire_mission.world_coords)
+        if distance > turret.ai.primary_weapon.ai.indirect_range:
+            # wait for a couple seconds before rechecking
+            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,2)
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to get in position for Fire Misson'
+            return
+            
+        # turret rotation ?
+        # check rotation
+        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
+        rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
 
-        
+        if rotation_check == False:
 
-        pass
+            # wait for a couple seconds before rechecking
+            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,2)
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
+            return
+
+        # if we got this far then we are set to fire i guess
+        self.calculate_turret_aim_indirect(turret,fire_mission.world_coords,turret.ai.primary_weapon)
+        self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] = True
             
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_reload(self,weapon):

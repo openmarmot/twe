@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 14 2025
+- more work on indirect fire 
+
+this is going slow.
+the mortars are going to have a hard time. their range is not a lot better than the cannon range. 
+
+remaining todo for indirect fire 
+- driver actions 
+- way for faction tactical to add initial fire misson once vehicles are crewed 
+- radio integration 
+- figure out proper dispersion 
+
+hmm do i need to add wind? do i already have wind? can't remember 
+
+----------------------------------
 Oct 12 2025
 - working on indirect fire code. 
 
