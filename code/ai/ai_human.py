@@ -1722,7 +1722,7 @@ class AIHuman(object):
             'think_interval': 0.5,
             'reload_start_time':0,
             'vehicle_order':vehicle_order,
-            'fire_missons':[], # array of fire_misson.py used by indirect gunner 
+            'fire_missions':[], # array of fire_mission.py used by indirect gunner 
             'vehicle_hits':[] # array of HitData. gets added to when the vehicle is hit
         }
 

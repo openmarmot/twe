@@ -1,6 +1,17 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 15 2025
+- added driver integration for 
+- added code for ai_faction_tactical to hand out random initial fire missons 
+
+i don't even want to test this, its so goofy. I'll leave that for the next day 
+
+if this actually works the next step is radios as indirect fire really needs radios to get 
+new orders. after that we will need more indirect fire units. plust the targeting system needs 
+to be reworked or it will be completely ineffective. also explosions need to be redone
+
+----------------------------------
 Oct 14 2025
 - more work on indirect fire 
 
