@@ -42,20 +42,6 @@ class AISquad(object):
         # a link back to the parent faction tactical
         self.faction_tactical=None
 
-        # whether the squad is connected to a radio or not
-        self.radio_contact=False
-        self.last_radio_eval_time=0
-        self.radio_eval_rate=0 # updates after first check
-
-        # incoming radio messages go here
-        # radio operators will add messages to this queue
-        # team leaders will pop them and think about them
-        self.radio_receive_queue=[]
-
-        # outgoing messages go here
-        # radio operators will pop them and send them through their radios
-        self.radio_send_queue=[]
-        # format [world.world_seconds,'message']
 
         self.name=''
 
@@ -85,50 +71,9 @@ class AISquad(object):
             if b.is_human:
                 b.ai.squad=self
 
-    #---------------------------------------------------------------------------
-    def update(self):
-        if self.world.world_seconds-self.last_radio_eval_time>self.radio_eval_rate:
-            self.update_radio_contact()
 
-    #---------------------------------------------------------------------------
-    def update_radio_contact(self):
-        '''checks if the squad is in range of a radio'''
-        self.last_radio_eval_time=self.world.world_seconds
-        self.radio_eval_rate=random.uniform(1,3.5)
 
-        # reset
-        self.radio_contact=False
 
-        # first check each member to see if they are in a vehicle with a radio
-        # or have a radio
-        for b in self.members:
-            if self.radio_contact:
-                break
-
-            # check if anyone is in a vehicle with a working radio
-            if b.ai.memory['current_task']=='task_vehicle_crew':
-                vehicle=b.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-                for c in vehicle.ai.inventory:
-                    if c.is_radio:
-                        if c.ai.power_on:
-                            self.radio_contact=True
-                            break
-
-            # check if the bot has a radio in inventory
-            for c in b.ai.inventory:
-                if c.is_radio:
-                    if c.ai.power_on:
-                        self.radio_contact=True
-                        break
-
-        # next check any radios that are in the world for proximity
-        # this is more expensive
-        if self.radio_contact==False:
-            for member in self.members:
-                for radio in member.grid_square.wo_objects_radio:
-                    if engine.math_2d.get_distance(member.world_coords,radio.world_coords)<300:
-                        self.radio_contact=True
-                        break
 
 
           

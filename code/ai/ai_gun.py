@@ -52,6 +52,7 @@ class AIGun(object):
         # used by the ai and used to calculate projectile flight time.
         # this is esentially the max range for the weapon
         self.range=0
+        self.indirect_range=0
 
         # minimum range - mostly used for indirect fire weapons
         self.minimum_range=0

@@ -174,7 +174,7 @@ class World():
 
         if self.world_menu.active_menu=='none':
 
-            if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.player.ai.in_vehicle():
                 vehicle=self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 self.world_menu.activate_menu(vehicle)
             else:
@@ -213,7 +213,7 @@ class World():
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
         if collided is not None:
             if collided.is_human:
-                if collided.ai.memory['current_task']=='task_vehicle_crew':
+                if collided.ai.in_vehicle():
                     collided=collided.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 else:
                     # check if object misses due to prone
@@ -329,7 +329,7 @@ class World():
             if obj.is_player:
                 pass
 
-            if obj.ai.memory['current_task']=='task_vehicle_crew':
+            if obj.ai.in_vehicle():
                 # add the vehicle otherwise it tends to get hit
                 ignore_list.append(obj.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
                 for b in obj.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle.ai.turrets:
@@ -421,7 +421,7 @@ class World():
         #print('key ',key)
         self.world_menu.handle_input(key)
 
-        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+        if self.player.ai.in_vehicle():
             if self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle.is_airplane:
                 if key=='p':
                     self.player.ai.switch_task_exit_vehicle(self.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle)
@@ -464,7 +464,7 @@ class World():
         if self.player.ai.blood_pressure>0:
             # key press is when a key is held down
             # key - string  example 'w'
-            if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.player.ai.in_vehicle():
                 role=self.player.ai.memory['task_vehicle_crew']['vehicle_role']
                 vehicle=role.vehicle
                 turret=role.turret
@@ -673,7 +673,7 @@ class World():
         if len(candidates)>0:
             self.player=random.choice(candidates)
             self.player.is_player=True
-            if self.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.player.ai.in_vehicle():
                 # not sure if we have to do anything if in a vehicle 
                 pass
             else:
@@ -820,7 +820,7 @@ class World():
         
         self.vehicle_text_queue=[]
 
-        if self.player.ai.memory['current_task']=='task_vehicle_crew':
+        if self.player.ai.in_vehicle():
             vehicle_role=self.player.ai.memory['task_vehicle_crew']['vehicle_role']
             vehicle=vehicle_role.vehicle
             self.vehicle_text_queue.append('Vehicle: '+vehicle.name)

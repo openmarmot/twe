@@ -13,11 +13,11 @@ import copy
 #import custom packages
 import engine.squad_builder
 import engine.math_2d
-import copy
 from ai.ai_squad import AISquad
 import engine.world_builder
 from engine.tactical_order import TacticalOrder
 from engine.vehicle_order import VehicleOrder
+from engine.fire_mission import FireMission
 
 #global variables
 
@@ -38,9 +38,8 @@ class AIFactionTactical():
         self.time_since_update=70
 
         # how often you the class thinks
-        # want this to be a highish number to give squads time to make independent decisions
         # before they get re-tasked by faction_tactical
-        self.think_rate=60
+        self.think_rate=3
 
         # faction - german/soviet/american/civilian
         self.faction=faction
@@ -60,11 +59,33 @@ class AIFactionTactical():
         self.radio.ai.turn_power_on()
         # no need to radio.update at the moment.
 
-
+        self.initial_fire_missions=0
+        self.indirect_fire_vehicles=[]
 
         self.allied_humans=[]
         self.hostile_humans=[]
         self.allied_crewed_vehicles=[]
+
+    #---------------------------------------------------------------------------
+    def assign_initial_fire_missions(self):
+        '''assign initial fire missons'''
+
+        # this is kind of awful but we don't really have a better way of assigning these 
+        # as we don't know who ends up being a indirect gunner
+
+        for v in self.indirect_fire_vehicles:
+            for role in v.ai.vehicle_crew:
+                if role.role_occupied and role.is_gunner:
+                    if role.turret.ai.primary_weapon.ai.indirect_fire:
+                        # random for now
+                        random_world_area=random.choice(self.world.world_areas)
+                        f=FireMission(random_world_area.get_location(),self.world.world_seconds+300)
+                        role.human.ai.memory['task_vehicle_crew']['fire_missions'].append(f)
+                        self.initial_fire_missions-=1
+
+        if self.initial_fire_missions<1:
+            # reset think rate to normal
+            self.think_rate=30
 
 
     #---------------------------------------------------------------------------
@@ -198,6 +219,20 @@ class AIFactionTactical():
                 order.world_area=random_world_area
                 order.world_coords=random_world_area.get_location()
                 squad.squad_leader.ai.switch_task_squad_leader(order)
+            
+            # compiles list of indirect fire vehicles
+            for v in squad.vehicles:
+                for t in v.ai.turrets:
+                    if t.ai.primary_weapon.ai.indirect_fire:
+                        self.indirect_fire_vehicles.append(v)
+                        self.initial_fire_missions+=1
+                        break
+
+            if self.initial_fire_missions>0:
+                self.think_rate=3
+            else:
+                self.think_rate=30
+
 
     #---------------------------------------------------------------------------
     def set_starting_positions(self):
@@ -269,18 +304,19 @@ class AIFactionTactical():
         time_passed=self.world.time_passed_seconds
         self.time_since_update+=time_passed
 
-        # run the update for each squad
-        for b in self.squads:
-            b.update()
 
         self.process_radio_messages()
 
         if self.time_since_update>self.think_rate:
+
             self.time_since_update=0
             # randomize think_rate a bit 
-            self.think_rate=random.randint(60,90)
+            #self.think_rate=random.randint(60,90)
 
             self.update_human_lists()
+
+            if self.initial_fire_missions>0:
+                self.assign_initial_fire_missions()
 
 
     #---------------------------------------------------------------------------

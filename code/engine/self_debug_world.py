@@ -175,7 +175,7 @@ def check_vehicle_sanity(b, issues, world):
                 issues.append(f'{b.name} insufficient healthy wheels but not disabled')
 
     # check electrical system
-    if len(b.ai.batteries) > 0 and not b.ai.electrical_system_functioning:
+    if len(b.ai.batteries) > 0 and not b.ai.electrical_system_functioning and b.ai.engines_on:
         issues.append(f'{b.name} has batteries but electrical system not functioning')
 
 #---------------------------------------------------------------------------

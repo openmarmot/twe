@@ -120,6 +120,20 @@ class AIHumanVehicle():
                 else:
                     vehicle.ai.handle_steer_right()
 
+    #---------------------------------------------------------------------------
+    def action_vehicle_gunner_engage_indirect_fire(self):
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        fire_mission=self.owner.ai.memory['task_vehicle_crew']['fire_missions'][0]
+
+        # rotate turret towards target. true if rotation matches
+        if self.rotate_turret(turret,self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']):
+
+            if turret.ai.handle_fire():
+                fire_mission.rounds_fired+=1
+                engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
+
+
+        # thats pretty much it. think can stop the engagement when we've fired enough as indirect fire weapons are fairly slow firing
 
     #---------------------------------------------------------------------------
     def action_vehicle_gunner_engage_target(self):
@@ -180,7 +194,7 @@ class AIHumanVehicle():
         if self.owner.ai.blood_pressure<100:
             adjust_max+=1
         if self.owner.ai.blood_pressure<50:
-            adjust_max+=10
+            adjust_max+=20
 
         if distance>1000:
             adjust_max+=1
@@ -206,7 +220,7 @@ class AIHumanVehicle():
                 aim_coords=engine.math_2d.moveAlongVector(target.ai.current_speed,aim_coords,target.heading,time_passed)
 
         if target.is_human:
-            if target.ai.memory['current_task']=='task_vehicle_crew':
+            if target.ai.in_vehicle():
                 vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 if vehicle.ai.current_speed>0:
                     aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,aim_coords,vehicle.heading,time_passed)
@@ -216,6 +230,48 @@ class AIHumanVehicle():
                     aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
 
         
+
+        self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
+
+    #---------------------------------------------------------------------------
+    def calculate_turret_aim_indirect(self,turret,target_position,weapon):
+        '''calculates the correct turret angle to hit a target'''
+
+        # this is where we should be applying the majority of the aim adjustments
+
+        # target : world_object
+        # turret : world_object with ai_turret
+
+        aim_coords=target_position
+        # guess how long it will take for the bullet to arrive
+        distance=engine.math_2d.get_distance(turret.world_coords,target_position)
+
+        # - determine adjustment - 
+        adjust_max=0
+        adjust_max+=weapon.ai.mechanical_accuracy
+
+        if self.owner.ai.blood_pressure<100:
+            adjust_max+=10
+        if self.owner.ai.blood_pressure<50:
+            adjust_max+=50
+
+        if distance>1000:
+            adjust_max+=10
+        if distance>2000:
+            adjust_max+=20
+        if distance>3000:
+            adjust_max+=30
+        if distance>3500:
+            adjust_max+=40
+
+        if adjust_max<0:
+            adjust_max=0
+
+        # final results
+        aim_coords=[aim_coords[0]+random.uniform(-adjust_max,adjust_max),aim_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
+         # we want the projectile to collide so aim point will be a bit past it
+        weapon.ai.calculated_range=distance+random.randint(-adjust_max,adjust_max)
 
         self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']=engine.math_2d.get_rotation(turret.world_coords,aim_coords)
 
@@ -378,7 +434,51 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
                             return
+                    if current_action=='Waiting for driver to rotate the vehicle for fire mission':
+                        if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
+                            fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
+                            
+                            # catch out of fuel 
+                            current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
+                            if current_fuel==0 and max_fuel>0:
+                                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
+                                vehicle.ai.vehicle_disabled=True
+                                return
+
+                            rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,fire_mission.world_coords)
+                            v=vehicle.rotation_angle
+                            if rotation_required>v-1 and rotation_required<v+1:
+                                # we are close enough
+                                self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
+                                vehicle.ai.brake_power=1
+                                vehicle.ai.throttle=0
+                                # wait to think for a bit so we don't end up doing something else immediately
+                                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                                return
+                            #default
+                            self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
+                            self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
+                            return
                     if 'Waiting for driver to close distance' in current_action:
+                        if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
+                            fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
+                            need_vehicle_order=False
+                            if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
+                                need_vehicle_order=True
+                            else:
+                                if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'].order_close_with_enemy is False:
+                                    need_vehicle_order=True
+                            # ensuring we only do this once
+                            if need_vehicle_order:
+                                vehicle_order=VehicleOrder()
+                                vehicle_order.order_close_with_enemy=True
+                                # just so that we don't end up on top of the target
+                                # note this doesn't really make sense. should get closer but not that close..
+                                vehicle_order.world_coords=engine.math_2d.calculate_relative_position(fire_mission.world_coords,60,[200,200])
+                                if vehicle.ai.is_transport:
+                                    vehicle_order.exit_vehicle_when_finished=True
+                                self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
+                    if current_action=='Waiting for driver to get in position for fire mission':
                         target=role.human.ai.memory['task_vehicle_crew']['target']
                         if target is not None:
                             need_vehicle_order=False
@@ -540,6 +640,11 @@ class AIHumanVehicle():
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
 
+        # reset engagement commands 
+        self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon'] = False
+        self.owner.ai.memory['task_vehicle_crew']['engage_coaxial_weapon'] = False
+        self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] = False
+
         # handle the reloading action
         if self.owner.ai.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
             if (self.owner.world.world_seconds-self.owner.ai.memory['task_vehicle_crew']['reload_start_time'] 
@@ -647,18 +752,26 @@ class AIHumanVehicle():
 
         if self.owner.ai.memory['task_vehicle_crew']['target'] is None:
             target=None
-            if turret.ai.primary_weapon.ai.use_antitank:
-                #prioritize vehicles
-                target=self.owner.ai.get_target(False,True)
-            else:
-                # prioritize soft targets 
-                target=self.owner.ai.get_target(True,False)
-            if target is not None:
-                self.owner.ai.memory['task_vehicle_crew']['target']=target
+            if turret.ai.primary_weapon.ai.direct_fire:
+                if turret.ai.primary_weapon.ai.use_antitank:
+                    #prioritize vehicles
+                    target=self.owner.ai.get_target(False,True)
+                else:
+                    # prioritize soft targets 
+                    target=self.owner.ai.get_target(True,False)
+                if target is not None:
+                    self.owner.ai.memory['task_vehicle_crew']['target']=target
+            elif turret.ai.coaxial_weapon:
+                if turret.ai.coaxial_weapon.ai.direct_fire:
+                    # prioritize soft targets 
+                    target=self.owner.ai.get_target(True,False)
 
         # we have a target, lets think about it in more detail
         if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:
             self.think_vehicle_role_gunner_examine_target(out_of_ammo_primary,out_of_ammo_coax)
+        else:
+            if self.owner.ai.memory['task_vehicle_crew']['fire_missions'] and out_of_ammo_primary == False:
+                self.think_vehicle_role_fire_mission()
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_examine_target(self,out_of_ammo_primary,out_of_ammo_coax):
@@ -749,6 +862,7 @@ class AIHumanVehicle():
                 # save the engagement commands for the gunner actions
                 self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon']=engage_primary
                 self.owner.ai.memory['task_vehicle_crew']['engage_coaxial_weapon']=engage_coaxial
+                turret.ai.primary_weapon.ai.indirect_fire_mode=False
 
                 if engage_primary:
                     self.calculate_turret_aim(turret,target,turret.ai.primary_weapon)
@@ -778,14 +892,54 @@ class AIHumanVehicle():
                         if target.is_vehicle or random.randint(0,1)==1:
 
                             # wait for a couple seconds before rechecking
-                            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,5)
+                            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,2)
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
                             return
-
 
         # default
         self.owner.ai.memory['task_vehicle_crew']['target']=None
         self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_fire_mission(self):
+        '''indirect fire mission'''
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        fire_mission=self.owner.ai.memory['task_vehicle_crew']['fire_missions'][0]
+
+        # getting this far means we have ammo for the primary weapon and a fire mission
+
+        # check if the fire mission is complete
+        if fire_mission.rounds_fired>fire_mission.rounds_requested:
+            # remove the fire mission. maybe we should do a radio broadcast ?
+            self.owner.ai.memory['task_vehicle_crew']['fire_missions'].pop(0)
+            return
+
+        # range ?
+        distance=engine.math_2d.get_distance(self.owner.world_coords,fire_mission.world_coords)
+        if distance > turret.ai.primary_weapon.ai.indirect_range:
+            # wait for a couple seconds before rechecking
+            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,2)
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to get in position for fire mission'
+            return
+            
+        # turret rotation ?
+        # check rotation
+        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,fire_mission.world_coords)
+        rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
+
+        if rotation_check == False:
+
+            # wait for a couple seconds before rechecking
+            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.5,2)
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle for fire mission'
+            return
+
+        # if we got this far then we are set to fire i guess
+        self.calculate_turret_aim_indirect(turret,fire_mission.world_coords,turret.ai.primary_weapon)
+        self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] = True
+        turret.ai.primary_weapon.ai.indirect_fire_mode=True
+        # gotta think of a better word, but 'Engaging' triggers the driver to wait
+        self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Fire Mission'
             
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_reload(self,weapon):
@@ -864,57 +1018,6 @@ class AIHumanVehicle():
             engine.log.add_data('Error','think_vehicle_role_gunner reload failed',True)
 
     #---------------------------------------------------------------------------
-    def think_vehicle_role_indirect_gunner(self):
-        '''think vehicle role indirect fire gunner'''
-        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
-
-        # handle the reloading action
-        if self.owner.ai.memory['task_vehicle_crew']['current_action']=='reloading primary weapon':
-            if (self.owner.world.world_seconds-self.owner.ai.memory['task_vehicle_crew']['reload_start_time'] 
-            > turret.ai.primary_weapon_reload_speed):
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='none'
-                self.think_vehicle_role_gunner_reload(turret.ai.primary_weapon)
-            else:
-                return
-
-        # check main gun ammo
-        ammo_gun,ammo_inventory,magazine_count=self.owner.ai.check_ammo(turret.ai.primary_weapon,vehicle)
-        if ammo_gun==0:
-            if ammo_inventory>0:
-                # start the reload process
-                self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-                self.owner.ai.memory['task_vehicle_crew']['target']=None
-                return
-            else:
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Out of ammo'
-                return
-        
-        if turret.ai.primary_weapon.ai.action_jammed:
-            # this we can fix ourselves
-            #if we are already in this state then consider it fixed 
-            if self.owner.ai.memory['task_vehicle_crew']['current_action']=='Clearing weapon jam':
-                if turret.ai.primary_weapon:
-                    if turret.ai.primary_weapon.ai.action_jammed:
-                        self.owner.ai.speak('fixing jammed gun')
-                        turret.ai.primary_weapon.ai.action_jammed=False
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for fire mission'
-                return
-            else:
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Clearing weapon jam'
-                self.owner.ai.memory['task_vehicle_crew']['target']=None
-                # wait for a bit to simulate fixing.
-                # on the next loop it will be fixed
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(25,45)
-                return
-            
-        # if we got this far we have ammo, and the weapon is functional 
-        
-        # note this is unfinished
-
-
-    #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
         '''think.. as a passenger'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
@@ -922,8 +1025,6 @@ class AIHumanVehicle():
         if self.owner.ai.human_targets or self.owner.ai.vehicle_targets:
             if vehicle.ai.current_speed<20:
                 self.owner.ai.switch_task_exit_vehicle()
-
-
 
 
     #---------------------------------------------------------------------------
@@ -939,43 +1040,15 @@ class AIHumanVehicle():
         radio=vehicle.ai.radio
 
         if radio is None:
-
             # should we try to do something else?
             return
             
-        else:
-            # gunner also uses this, do not want to over write 
-            if vehicle_role.is_gunner is False:
-                self.owner.ai.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
-            if radio.ai.power_on is False:
-                radio.ai.current_frequency=self.owner.ai.squad.faction_tactical.radio_frequency
-                radio.ai.turn_power_on()
+        # gunner also uses this, do not want to over write 
+        if vehicle_role.is_gunner is False:
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='Beep boop. operating the radio'
+        
+        self.owner.ai.radio_operator_ai.update()
 
-                # should double check here that this worked.
-                # but what are the failure conditions?
-                # - bad battery 
-                # - no battery?
-            else:
-                # check the frequency
-                if radio.ai.current_frequency!=self.owner.ai.squad.faction_tactical.radio_frequency:
-                    radio.ai.current_frequency=self.owner.ai.squad.faction_tactical.radio_frequency
-                    # this is needed to reset frequency with world_radio
-                    radio.ai.turn_power_on()
-
-                # -- receive radio messages --
-                if len(radio.ai.receive_queue)>0:
-                    message=radio.ai.receive_queue.pop()
-                    
-                    # avoid duplicates from other radio operators
-                    if message not in self.owner.ai.squad.radio_receive_queue:
-                        # ideally do some processing here 
-                        self.owner.ai.squad.radio_receive_queue.append(message)
-
-                # -- send radio messages --
-                if len(self.owner.ai.squad.radio_send_queue)>0:
-                    message=self.owner.ai.squad.radio_send_queue.pop()
-                    vehicle.ai.radio.ai.send_message(message)
-                    # maybe self.owner.ai.speak something here?
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew(self):
@@ -1033,9 +1106,6 @@ class AIHumanVehicle():
             if role.is_radio_operator:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                 self.think_vehicle_role_radio_operator()
-            if role.is_indirect_fire_gunner:
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
-                self.think_vehicle_role_indirect_gunner()
 
             # the squad lead has some stuff to do independent of their vehicle role
             if self.owner==self.owner.ai.squad.squad_leader:
@@ -1049,6 +1119,9 @@ class AIHumanVehicle():
             # some roles will want to do something every update cycle
 
             if role.is_gunner:
+                if self.owner.ai.memory['task_vehicle_crew']['target'] is None and self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire']:
+                    self.action_vehicle_gunner_engage_indirect_fire()
+
                 if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:
                     if self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
                         self.action_vehicle_gunner_engage_target()

@@ -372,7 +372,7 @@ class World_Menu(object):
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
             self.text_queue.append('1 - German Sd.kfz.234/2')
-            self.text_queue.append('2 - soviet_zis_5')
+            self.text_queue.append('2 - soviet_gaz_61')
             self.text_queue.append('3 - german_sd_kfz_251/23')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
             self.text_queue.append('5 - german_sd_kfz_234/1')
@@ -383,7 +383,7 @@ class World_Menu(object):
             if key=='1':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_234/2',True)
             elif key=='2':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_zis_5',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_gaz_61',True)
             elif key=='3':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_251/23',True)
             elif key=='4':
@@ -816,7 +816,7 @@ class World_Menu(object):
             if self.selected_object.ai.squad.squad_leader!=None:
                 d2=engine.math_2d.get_distance(self.selected_object.world_coords,self.selected_object.ai.squad.squad_leader.world_coords)
             self.text_queue.append('current task: '+self.selected_object.ai.memory['current_task'])
-            if self.selected_object.ai.memory['current_task']=='task_vehicle_crew':
+            if self.selected_object.ai.in_vehicle():
                 self.text_queue.append('Vehicle Role: '+self.selected_object.ai.memory['task_vehicle_crew']['role'])
             self.text_queue.append('Distance from player: '+str(d))
             self.text_queue.append('Distance from squad: '+str(d2))
@@ -850,7 +850,7 @@ class World_Menu(object):
             self.text_queue.append('1 - [Speak] What are you up to ?')
             self.text_queue.append('2 - Manage Inventory')
             self.text_queue.append('3 - [Speak] Can you upgrade your gear?')
-            if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+            if self.world.player.ai.in_vehicle():
                 self.text_queue.append('4 - [Speak] Climb aboard!')
             if key=='1':
                 self.selected_object.ai.speak('status')
@@ -859,7 +859,7 @@ class World_Menu(object):
                 self.change_menu('storage')
             if key=='3':
                 self.selected_object.ai.handle_event('speak',['ask to upgrade gear',None])
-            if key=='4' and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+            if key=='4' and self.world.player.ai.in_vehicle():
                 vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 self.selected_object.ai.handle_event('speak',['task_enter_vehicle',vehicle])
         elif self.menu_state == 'non_squad_member_menu':
@@ -1189,8 +1189,7 @@ class World_Menu(object):
             if self.selected_object.ai.vehicle_disabled:
                 self.text_queue.append('Vehicle Disabled')
 
-
-
+            
             if distance<self.max_menu_distance:
                 self.text_queue.append('')
                 self.text_queue.append('-- Actions --')
@@ -1199,7 +1198,7 @@ class World_Menu(object):
                 self.text_queue.append('3 - storage ')
                 if fuel_option:
                     self.text_queue.append('4 - fuel ')
-                if distance<300 and self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                if distance<300 and self.world.player.ai.in_vehicle():
                     vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                     self.text_queue.append('5 - Tow Vehicle')
                     if key=='5':
@@ -1225,7 +1224,7 @@ class World_Menu(object):
                     self.change_menu('fuel')
             else:
                 # we are clicking on a vehicle that is some distance away
-                if self.world.player.ai.memory['current_task']=='task_vehicle_crew':
+                if self.world.player.ai.in_vehicle():
                     pass
 
         if self.menu_state=='internal':
