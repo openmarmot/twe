@@ -4,6 +4,19 @@ TWE Project : Change Log
 ----------------------------------
 Oct 18 2025
 - added soviet GAZ-61 offroad staff car 
+- fixed 8cm sd.kfz.251 ammo 
+- misc updates 
+- changed ai_tactical update behavior to assign initial fire missons faster. 
+
+initial fire missons work now. sd.kfz.251/2 gunners will get indirect fire missons at the beginning of the scenario and will 
+fire a 10 round fire misson. they won't hit anything, but it works :D 
+
+saw a 251/2 that was getting hit by infantry fire turn around and hit the infantry with a close range shot from the 8cm mortar.
+this should not happen, but it was funny so i'll leave it in for now.
+
+todo 
+- indirect only weapon carriers need to know to stay out of combat. 
+- need radio indirect fire orders 
 
 ----------------------------------
 Oct 15 2025

@@ -38,9 +38,8 @@ class AIFactionTactical():
         self.time_since_update=70
 
         # how often you the class thinks
-        # want this to be a highish number to give squads time to make independent decisions
         # before they get re-tasked by faction_tactical
-        self.think_rate=60
+        self.think_rate=3
 
         # faction - german/soviet/american/civilian
         self.faction=faction
@@ -81,8 +80,13 @@ class AIFactionTactical():
                         # random for now
                         random_world_area=random.choice(self.world.world_areas)
                         f=FireMission(random_world_area.get_location(),self.world.world_seconds+300)
-                        role.human.ai.memory['task_vehicle_crew']['fire_missons'].append(f)
+                        role.human.ai.memory['task_vehicle_crew']['fire_missions'].append(f)
                         self.initial_fire_missions-=1
+
+        if self.initial_fire_missions<1:
+            # reset think rate to normal
+            self.think_rate=30
+
 
     #---------------------------------------------------------------------------
     def create_squads(self):
@@ -224,6 +228,11 @@ class AIFactionTactical():
                         self.initial_fire_missions+=1
                         break
 
+            if self.initial_fire_missions>0:
+                self.think_rate=3
+            else:
+                self.think_rate=30
+
 
     #---------------------------------------------------------------------------
     def set_starting_positions(self):
@@ -299,9 +308,10 @@ class AIFactionTactical():
         self.process_radio_messages()
 
         if self.time_since_update>self.think_rate:
+
             self.time_since_update=0
             # randomize think_rate a bit 
-            self.think_rate=random.randint(60,90)
+            #self.think_rate=random.randint(60,90)
 
             self.update_human_lists()
 

@@ -499,6 +499,9 @@ def load_quick_battle_map_objects(battle_option,result_container):
         print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads.append('German Sd.kfz.251/2')
+        squads.append('German Sd.kfz.251/2')
+        squads.append('German Sd.kfz.251/2')
 
     
     elif battle_option=='3':
@@ -2691,7 +2694,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.ammo_rack_capacity=66
         # HE
         for b in range(66):
-            z.ai.ammo_rack.append(spawn_object(world,world_coords,"8cmGrW34",False))
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"GrW34_magazine",False))
 
 
     elif object_type=='251_2_turret':

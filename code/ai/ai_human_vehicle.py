@@ -130,6 +130,8 @@ class AIHumanVehicle():
 
             if turret.ai.handle_fire():
                 fire_mission.rounds_fired+=1
+                engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
+
 
         # thats pretty much it. think can stop the engagement when we've fired enough as indirect fire weapons are fairly slow firing
 
@@ -860,6 +862,7 @@ class AIHumanVehicle():
                 # save the engagement commands for the gunner actions
                 self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon']=engage_primary
                 self.owner.ai.memory['task_vehicle_crew']['engage_coaxial_weapon']=engage_coaxial
+                turret.ai.primary_weapon.ai.indirect_fire_mode=False
 
                 if engage_primary:
                     self.calculate_turret_aim(turret,target,turret.ai.primary_weapon)
@@ -934,6 +937,7 @@ class AIHumanVehicle():
         # if we got this far then we are set to fire i guess
         self.calculate_turret_aim_indirect(turret,fire_mission.world_coords,turret.ai.primary_weapon)
         self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] = True
+        turret.ai.primary_weapon.ai.indirect_fire_mode=True
         # gotta think of a better word, but 'Engaging' triggers the driver to wait
         self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Fire Mission'
             
