@@ -13,7 +13,6 @@ import copy
 #import custom packages
 import engine.squad_builder
 import engine.math_2d
-import copy
 from ai.ai_squad import AISquad
 import engine.world_builder
 from engine.tactical_order import TacticalOrder

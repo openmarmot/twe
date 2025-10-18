@@ -85,6 +85,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Sd.kfz.251/22 | AFV | Pak 40 |
 | German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
 | Soviet | Lend Lease American Truck | Utility | |
+| Soviet | GAZ-61 | Utility | off-road staff car|
 | Soviet | Su-85 | Tank | Basically a turretless T34-85 |
 | Soviet | Su-100 | Tank | Better armor and gun than the Su-85 |
 | Soviet | T20 'Komsomolets' | Utility | Armored Tractor |

@@ -4784,6 +4784,56 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif object_type=='soviet_gaz_61':
+        z=WorldObject(world,['gaz_61'],AIVehicle)
+        z.name='GAZ 61'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.is_transport=True
+
+        z.ai.max_speed=592
+
+        driver=VehicleRole('driver',z)
+        driver.is_driver=True
+        z.ai.vehicle_crew.append(driver)
+
+        for x in range(3):
+            passenger=VehicleRole('passenger',z)
+            passenger.is_passenger=True
+            z.ai.vehicle_crew.append(passenger)
+
+        z.ai.max_offroad_speed=177.6
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.weight=800
+        z.drag_coefficient=0.8
+        z.frontal_area=3
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"volkswagen_type_82_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[65,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
+        z.ai.max_wheels=4
+        z.ai.max_spare_wheels=1
+        z.ai.front_left_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.front_right_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.spare_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
+        z.ai.max_spare_wheels=1
+        if random.randint(0,3)==1:
+            mg=spawn_object(world,world_coords,'mg34',False)
+            z.add_inventory(mg)
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
+            z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
+            z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_german_military_equipment,False))
+        z.rotation_angle=float(random.randint(0,359))
   
     elif object_type=='german_kubelwagen':
         z=WorldObject(world,['kubelwagen','kubelwagen_destroyed'],AIVehicle)
@@ -4817,23 +4867,20 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.min_wheels_per_side_front=1
         z.ai.min_wheels_per_side_rear=1
         z.ai.max_wheels=4
-        z.ai.max_spare_wheels=0
+        z.ai.max_spare_wheels=1
         z.ai.front_left_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
         z.ai.front_right_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
         z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
         z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
         z.ai.spare_wheels.append(spawn_object(world,world_coords,"volkswagen_wheel",False))
         z.ai.max_spare_wheels=1
-        if random.randint(0,3)==1:
-            mg=spawn_object(world,world_coords,'mg34',False)
-            z.add_inventory(mg)
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
-            z.add_inventory(spawn_object(world,world_coords,"mg34_drum_magazine",False))
-            z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
-            z.add_inventory(spawn_object(world,world_coords,"german_mg_ammo_can",False))
+        if random.randint(0,1)==1:
+
+            z.add_inventory(spawn_object(world,world_coords,"beer",False))
+            z.add_inventory(spawn_object(world,world_coords,"beer",False))
+            z.add_inventory(spawn_object(world,world_coords,"wine",False))
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
-        z.add_inventory(get_random_from_list(world,world_coords,list_german_military_equipment,False))
         z.rotation_angle=float(random.randint(0,359))
 
     elif object_type=='german_kubelwagen_camo':

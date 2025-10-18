@@ -1,5 +1,10 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Oct 18 2025
+- added soviet GAZ-61 offroad staff car 
+
 ----------------------------------
 Oct 15 2025
 - added driver integration for 
