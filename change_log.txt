@@ -1,5 +1,8 @@
 TWE Project : Change Log
 
+----------------------------------
+Oct 19 2025
+- added cross hairs and outline to image tool
 
 ----------------------------------
 Oct 18 2025
