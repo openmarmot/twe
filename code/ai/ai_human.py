@@ -1146,7 +1146,7 @@ class AIHuman(object):
         else:
             if world_object.is_gun:
                 if self.owner.is_player is False:
-                    near_magazines=self.get_compatible_magazines_within_range(self.primary_weapon,500)
+                    near_magazines=self.get_compatible_magazines_within_range(world_object,500)
                     if len(near_magazines)>0:
                         self.switch_task_pickup_objects(near_magazines)
 

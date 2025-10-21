@@ -304,6 +304,12 @@ class World():
         ''' generates a ignore list for collision checking'''
         # obj - the world object that needs the ignore list
         # this is for objects that use ai_human
+        
+        # rare error that I haven't figured out yet. not sure what circumstances can result in this
+        if obj is None:
+            engine.log.add_data('error','world.generate_ignore_list input obj is None',True)
+            return []
+
         ignore_list=[obj]
 
         if obj.is_turret:

@@ -14,6 +14,7 @@ import copy
 import engine.math_2d
 import engine.world_builder 
 import engine.penetration_calculator
+import engine.log
 
 
 #global variables
@@ -118,6 +119,11 @@ class AIGun(object):
     def fire(self):
         ''' fire the gun. run check_if_can_fire first if you have calculations to do'''
         if self.check_if_can_fire():
+
+            # a rare error that i don't understand yet
+            if self.equipper is None:
+                engine.log.add_data('error',f'ai_gun.fire {self.owner.name} equipper is none',True)
+
             self.last_fired_time=self.owner.world.world_seconds
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1

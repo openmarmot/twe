@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 20 2025
+- vehicle turret hits now bounce/deflect properly
+- when picking up a weapon a near magazine search is triggered for the weapon you are picking up, 
+used to be searching for your primary weapon 
+- added a catch for a new error where equipper is none for generate ignore list 
+
+non-penetrating turret hits were not terminating the projectile or updating the ignore list
+ so they ended up hitting the vehicle again (possibly multiple times)
+
+ ran into an error where a primary_weapon equipper was None but I was unable to figure out what 
+ would cause that or duplicate it. 
+
+----------------------------------
 Oct 19 2025
 - added cross hairs and outline to image tool
 
