@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 21 2025
+- minor bug fixes and updates 
+
+testing gpt-os-120b and had it do a review of ai_human and it found a couple small bugs. 
+
+----------------------------------
 Oct 20 2025
 - vehicle turret hits now bounce/deflect properly
 - when picking up a weapon a near magazine search is triggered for the weapon you are picking up, 
