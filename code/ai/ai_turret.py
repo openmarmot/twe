@@ -191,12 +191,13 @@ class AITurret(object):
                 else:
                     engine.log.add_data('error',f'ai_turret.event_collision unknown result: {result}',True)
 
-            else:
-                # bounced the projectile
-                pass
-
             if self.vehicle!=None:
                 self.vehicle.ai.add_hit_data(projectile,penetration,side,distance,f'Turret {self.owner.name}',result,pen_value,armor_value)
+                
+                if penetration==False:
+                    # this handles terminating the projectile or re-orientating it if it glances off
+                    self.vehicle.ai.projectile_bounce(projectile)
+
         elif EVENT_DATA.is_grenade:
             print('bonk')
         else:

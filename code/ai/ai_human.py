@@ -1146,7 +1146,7 @@ class AIHuman(object):
         else:
             if world_object.is_gun:
                 if self.owner.is_player is False:
-                    near_magazines=self.get_compatible_magazines_within_range(self.primary_weapon,500)
+                    near_magazines=self.get_compatible_magazines_within_range(world_object,500)
                     if len(near_magazines)>0:
                         self.switch_task_pickup_objects(near_magazines)
 
@@ -1243,6 +1243,7 @@ class AIHuman(object):
                                 biggest=len(b.ai.projectiles)
 
             if new_magazine is None and obj_with_inventory.is_vehicle:
+                biggest=0
                 for b in obj_with_inventory.ai.ammo_rack:
                     if b.is_gun_magazine:
                         if weapon.world_builder_identity in b.ai.compatible_guns:
@@ -2752,7 +2753,7 @@ class AIHuman(object):
 
         self.blood_pressure+=medical.ai.health_effect
         self.hunger+=medical.ai.hunger_effect
-        self.thirst_rate+=medical.ai.thirst_effect
+        self.thirst+=medical.ai.thirst_effect
         self.fatigue+=medical.ai.fatigue_effect
 
         # calling this by itself should remove all references to the object

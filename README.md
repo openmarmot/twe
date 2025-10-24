@@ -76,6 +76,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
 | German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
 | German | Sd.kfz.10 | Halftrack | unarmored prime mover |
+| German | Sd.kfz.222 | AFV | Light recon car with a 2cm turret |
 | German | Sd.kfz.234/1 | AFV | Heavy recon car with a 2cm turret |
 | German | Sd.kfz.234/2 Puma | AFV | 5cm turret |
 | German | Sd.kfz.251/1 | APC | The famous German half-track |

@@ -1,4 +1,3 @@
-
 '''
 repo : https://github.com/openmarmot/twe
 email : andrew@openmarmot.com
@@ -67,6 +66,12 @@ class ImageTool(object):
         # draw collision circles
         self.draw_collision=False
 
+        # draw alignment lines (new)
+        self.draw_alignment_lines=True
+
+        # colors for different images
+        self.colors = [(255,0,0), (0,255,0), (0,0,255), (255,165,0), (128,0,128), (0,255,255), (255,0,255), (255,255,0)]
+
         # will cause everything to exit
         self.quit=False
 
@@ -75,7 +80,7 @@ class ImageTool(object):
 
         # scale min/max limit 
         #self.scale_limit=[0.2,1.1]
-        self.scale_limit=[0.1,1.5]
+        self.scale_limit=[0.1,2.5]
 
         # scale. normal is 1. this is set by the player with []
         self.scale=self.scale_limit[1]
@@ -167,7 +172,11 @@ class ImageTool(object):
         for b in files:
             name=b.split('.')[0]
             image_path=folder_path+'/'+b
-            self.images[name]=pygame.image.load(image_path).convert_alpha()
+            image = pygame.image.load(image_path).convert_alpha()
+            w, h = image.get_size()
+            if w != h:
+                print(f"Alert: Image {name} is not square (width: {w}, height: {h})")
+            self.images[name]=image
         
         print('Image loading complete')
 
@@ -191,12 +200,27 @@ class ImageTool(object):
         self.update_render_info()
 
         self.screen.blit(self.background, (0, 0))
-        for b in self.image_objects:
+        for i, b in enumerate(self.image_objects):
             self.reset_pygame_image(b)
             self.screen.blit(b.image, (b.screen_coords[0]-b.image_center[0], b.screen_coords[1]-b.image_center[1]))
 
             if(self.draw_collision):
                 pygame.draw.circle(self.screen,(236,64,122),b.screen_coords,b.collision_radius)
+
+            if self.draw_alignment_lines:
+                color = self.colors[i % len(self.colors)]
+                center_x, center_y = b.screen_coords
+                # Vertical line through center, spanning image height
+                v_start = (center_x, center_y - b.image_center[1])
+                v_end = (center_x, center_y + b.image_center[1])
+                pygame.draw.line(self.screen, color, v_start, v_end, 1)
+                # Horizontal line through center, spanning image width
+                h_start = (center_x - b.image_center[0], center_y)
+                h_end = (center_x + b.image_center[0], center_y)
+                pygame.draw.line(self.screen, color, h_start, h_end, 1)
+                # Outline around the image
+                top_left = (center_x - b.image_center[0], center_y - b.image_center[1])
+                pygame.draw.rect(self.screen, color, (top_left[0], top_left[1], b.image_size[0], b.image_size[1]), 1)
 
 
         # text stuff
@@ -413,8 +437,8 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['crate'],0))
 
-image_tool.image_objects.append(ImageObject(['sd_kfz_234_chassis_green_camo'],0))
-image_tool.image_objects.append(ImageObject(['sd_kfz_234_2_turret'],0))
+image_tool.image_objects.append(ImageObject(['sd_kfz_222_chassis'],0))
+image_tool.image_objects.append(ImageObject(['sd_kfz_234_1_turret'],0))
 
 
 
@@ -422,5 +446,3 @@ while image_tool.quit==False:
 
     image_tool.update()
     image_tool.render()
-
-
