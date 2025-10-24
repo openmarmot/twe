@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 23 2025
+- added Sd.kfz.222 and camo version 
+
+the 222 is a lighter and smaller 234. having only 4 wheels does make a difference, it gets 
+mobility disabled pretty easily. 
+
+----------------------------------
 Oct 21 2025
 - minor bug fixes and updates 
 
