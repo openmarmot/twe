@@ -10,6 +10,7 @@ It should not have any specific graphic engine code (pygame, etc)
 #import built in modules
 import random
 import copy
+import threading
 
 
 #import custom packages
@@ -58,10 +59,10 @@ class World():
 
         # tactical AIs. This also adds radios !
         self.tactical_ai={}
-        self.tactical_ai['german']=AIFactionTactical(self,'german',[],['soviet'],self.spawn_west,3)
-        self.tactical_ai['soviet']=AIFactionTactical(self,'soviet',[],['german'],self.spawn_east,5)
-        self.tactical_ai['american']=AIFactionTactical(self,'american',[],[],self.spawn_north,10)
-        self.tactical_ai['civilian']=AIFactionTactical(self,'civilian',[],[],self.spawn_center,12)
+        self.tactical_ai['german']=AIFactionTactical(self,'german',[],['soviet'],3)
+        self.tactical_ai['soviet']=AIFactionTactical(self,'soviet',[],['german'],5)
+        self.tactical_ai['american']=AIFactionTactical(self,'american',[],[],10)
+        self.tactical_ai['civilian']=AIFactionTactical(self,'civilian',[],[],12)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -660,7 +661,36 @@ class World():
         ''' resize all world_objects'''
         for b in self.grid_manager.get_all_objects():
             b.reset_image=True
-        
+
+    #---------------------------------------------------------------------------
+    def set_spawn_positions(self):
+        '''sets initial tactical ai spawn positions'''
+        x_positive=0
+        x_negative=0
+        y_positive=0
+        y_negative=0
+
+        for w in self.world_areas:
+            if w.world_coords[0]>x_positive:
+                x_positive=w.world_coords[0]
+            if w.world_coords[0]<x_negative:
+                x_negative=w.world_coords[0]
+            if w.world_coords[1]>y_positive:
+                y_positive=w.world_coords[1]
+            if w.world_coords[1]<y_negative:
+                y_negative=w.world_coords[1]
+
+        standoff=8000
+
+        spawn_center=[0,0]
+        spawn_north=[0,-standoff+y_negative]
+        spawn_south=[0,standoff+y_positive]
+        spawn_west=[-standoff+x_negative,0]
+        spawn_east=[standoff+x_positive,0]
+
+        self.tactical_ai['german'].spawn_location=spawn_west
+        self.tactical_ai['soviet'].spawn_location=spawn_east
+
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
         for b in self.grid_manager.get_all_objects():
@@ -697,9 +727,17 @@ class World():
 
         # precompute world_area locations
         engine.log.add_data('note','Computing World Area locations..',True)
+        threads = []
         for area in self.world_areas:
-            area.compute_locations()
+            t = threading.Thread(target=area.compute_locations)
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
         
+        engine.log.add_data('note','Starting tactical AIs..',True)
+        # set initial spawn points for each faction
+        self.set_spawn_positions()
         # tactical_ai start. create squads, figure out initial coords, orders, etc 
         for ai in self.tactical_ai.values():
             ai.start()

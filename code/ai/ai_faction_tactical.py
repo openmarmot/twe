@@ -9,6 +9,7 @@ notes : AI that controls all a factions squads on the tactical map
 #import built in modules
 import random
 import copy 
+from itertools import cycle
 
 #import custom packages
 import engine.squad_builder
@@ -22,13 +23,13 @@ from engine.fire_mission import FireMission
 #global variables
 
 class AIFactionTactical():
-    def __init__(self,world,faction,allied_factions,hostile_factions,spawn_location,radio_frequency):
+    def __init__(self,world,faction,allied_factions,hostile_factions,radio_frequency):
 
 
         # squads in the faction who are present on this map
         self.squads=[] 
 
-        self.spawn_location=spawn_location
+        self.spawn_location=[0,0]
 
         # general map goal (attack/defend/scout ?)
 
@@ -65,6 +66,9 @@ class AIFactionTactical():
         self.allied_humans=[]
         self.hostile_humans=[]
         self.allied_crewed_vehicles=[]
+
+        # world areas under control at the start of the scenario
+        self.initial_controlled_world_areas=[]
 
     #---------------------------------------------------------------------------
     def assign_initial_fire_missions(self):
@@ -156,6 +160,28 @@ class AIFactionTactical():
             print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
 
     #---------------------------------------------------------------------------
+    def identify_indirect_fire_vehicles(self):
+        '''identify friendly vehicles with indirect fire weapons'''
+        self.indirect_fire_vehicles=[]
+        self.initial_fire_missions=0
+
+        for squad in self.squads:
+            # compiles list of indirect fire vehicles
+            for v in squad.vehicles:
+                for t in v.ai.turrets:
+                    if t.ai.primary_weapon.ai.indirect_fire:
+                        self.indirect_fire_vehicles.append(v)
+                        self.initial_fire_missions+=1
+                        break
+
+
+            # we want to think more often if we have fire missions that we can hand out
+            if self.initial_fire_missions>0:
+                self.think_rate=3
+            else:
+                self.think_rate=30
+
+    #---------------------------------------------------------------------------
     def process_radio_messages(self):
         for message in self.radio.ai.receive_queue:
             if message.startswith('HQ'):
@@ -168,6 +194,105 @@ class AIFactionTactical():
     #---------------------------------------------------------------------------
     def send_radio_comms_check(self):
         self.radio.ai.send_message('HQ,ALL,Sending a comms check, ')
+
+    #---------------------------------------------------------------------------
+    def set_initial_orders_and_positions(self):
+        '''hand out the initial tactical orders to the squad leads'''
+
+        remaining_squads=self.squads[:]
+        random.shuffle(remaining_squads)
+        min_squads_per_area=2
+        max_squads_per_area=5
+
+
+        if self.initial_controlled_world_areas:
+            areas = copy.copy(self.initial_controlled_world_areas)
+            random.shuffle(areas)
+
+            area_assignments = {area: [] for area in areas}
+            remaining_squads = self.squads[:]
+
+            # Assign minimum squads to each area
+            for area in areas:
+                for _ in range(min_squads_per_area):
+                    if remaining_squads:
+                        sq = remaining_squads.pop(0)
+                        area_assignments[area].append(sq)
+                    else:
+                        break
+
+            # Distribute remaining squads up to max per area
+            area_cycle = cycle(areas)
+            while remaining_squads:
+                area = next(area_cycle)
+                if len(area_assignments[area]) < max_squads_per_area:
+                    sq = remaining_squads.pop(0)
+                    area_assignments[area].append(sq)
+                else:
+                    # Check if all areas are at max
+                    if all(len(area_assignments[a]) >= max_squads_per_area for a in areas):
+                        break
+
+            for world_area,squads in area_assignments.items():
+                for squad in squads:
+                    location=world_area.get_location()
+                    self.set_squad_defend_order(squad,world_area,location)
+                    self.set_squad_starting_position(squad,location)
+
+
+        if remaining_squads:
+            squad_spacing=250
+            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,squad_spacing,len(remaining_squads))
+            for squad in remaining_squads:
+                location=squad_grid.pop()
+                world_area=random.choice(self.world.world_areas)
+                self.set_squad_defend_order(squad,world_area,location)
+                self.set_squad_starting_position(squad,location)
+
+    #---------------------------------------------------------------------------
+    def set_squad_defend_order(self,squad,world_area,world_area_location):
+        if squad.squad_leader:
+            order=TacticalOrder()
+            order.order_defend_area=True
+            order.world_area=world_area
+            order.world_coords=world_area_location
+            squad.squad_leader.ai.switch_task_squad_leader(order)
+
+    #---------------------------------------------------------------------------
+    def set_squad_starting_position(self,squad,position):
+        # set the member positions
+        member_grid=engine.math_2d.get_grid_coords(position,20,len(squad.members))
+        member_vehicle_assignments=[]
+        for c in squad.members:
+            c.world_coords=member_grid.pop()
+            member_vehicle_assignments.append(c)
+            # randomize position a bit
+            #engine.math_2d.randomize_position_and_rotation(c,170)
+
+        # - handle squad attached vehicles -
+            
+        # set an initial vehicle order. after this vehicle orders will be 
+        # created by ai_human dynamically based on what the ai is trying to do
+        vehicle_order=None
+        if squad.squad_leader:
+            if squad.squad_leader.ai.memory['task_squad_leader']['orders']:
+                vehicle_order=VehicleOrder()
+                vehicle_order.order_drive_to_coords=True
+                vehicle_order.world_coords=squad.squad_leader.ai.memory['task_squad_leader']['orders'][0].world_coords
+
+        for vehicle in squad.vehicles:
+            vehicle.world_coords=position
+            # set initial rotation
+            if self.faction=='german':
+                vehicle.rotation_angle=270
+            elif self.faction=='soviet':
+                vehicle.rotation_angle=90
+            
+            # assign vehicle crew
+            crew_count=len(vehicle.ai.vehicle_crew)
+            while len(member_vehicle_assignments)>0 and crew_count>0:
+                crew_count-=1
+                member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,vehicle_order)  
 
     #---------------------------------------------------------------------------
     def split_squad(self,members):
@@ -191,6 +316,7 @@ class AIFactionTactical():
     #---------------------------------------------------------------------------
     def start(self):
         '''do all ai_faction_tactical starting tasks needed after world creation'''
+        # controlled_world_areas : list of world_areas controlled by your team
         # create squads 
         self.create_squads()
 
@@ -198,91 +324,14 @@ class AIFactionTactical():
         self.tune_radios()
         
         # create initial tactical orders
-        self.set_initial_orders()
-        
-        # this should be done after initial orders so that any enter vehicle commands 
-        # aren't overridden for commanders 
-        # set squad and object starting positions
-        self.set_starting_positions()
+        # also sets squad spawn positions
+        self.set_initial_orders_and_positions()
+
+        # build indirect fire data
+        self.identify_indirect_fire_vehicles()
 
         # update human lists and give out tactical orders right away
-        self.update_human_lists()
-
-    #---------------------------------------------------------------------------
-    def set_initial_orders(self):
-        '''hand out the initial tactical orders to the squad leads'''
-        for squad in self.squads:
-            if squad.squad_leader:
-                order=TacticalOrder()
-                order.order_defend_area=True
-                random_world_area=random.choice(self.world.world_areas)
-                order.world_area=random_world_area
-                order.world_coords=random_world_area.get_location()
-                squad.squad_leader.ai.switch_task_squad_leader(order)
-            
-            # compiles list of indirect fire vehicles
-            for v in squad.vehicles:
-                for t in v.ai.turrets:
-                    if t.ai.primary_weapon.ai.indirect_fire:
-                        self.indirect_fire_vehicles.append(v)
-                        self.initial_fire_missions+=1
-                        break
-
-            if self.initial_fire_missions>0:
-                self.think_rate=3
-            else:
-                self.think_rate=30
-
-
-    #---------------------------------------------------------------------------
-    def set_starting_positions(self):
-        '''set the starting positions of the squads, squad members, and vehicles'''
-        # reset spawn locations.
-        # civilians have world_coords set when they are generated, but after that they should be reset
-        if self.faction=='civilian':
-            pass
-        else:
-            squad_spacing=250
-            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,squad_spacing,len(self.squads))
-
-            for b in self.squads:
-
-                # initially set the squad destination to be th espawn location
-                squad_coords=squad_grid.pop()
-
-                # set the member positions
-                member_grid=engine.math_2d.get_grid_coords(squad_coords,20,len(b.members))
-                member_vehicle_assignments=[]
-                for c in b.members:
-                    c.world_coords=member_grid.pop()
-                    member_vehicle_assignments.append(c)
-                    # randomize position a bit
-                    #engine.math_2d.randomize_position_and_rotation(c,170)
-
-                # - handle squad attached vehicles -
-                    
-                # set an initial vehicle order. after this vehicle orders will be 
-                # created by ai_human dynamically based on what the ai is trying to do
-                if b.squad_leader:
-                    vehicle_order=VehicleOrder()
-                    vehicle_order.order_drive_to_coords=True
-                    vehicle_order.world_coords=b.squad_leader.ai.memory['task_squad_leader']['orders'][0].world_coords
-                else:
-                    vehicle_order=None
-
-                for vehicle in b.vehicles:
-                    vehicle.world_coords=squad_coords
-                    # set initial rotation
-                    if self.faction=='german':
-                        vehicle.rotation_angle=270
-                    elif self.faction=='soviet':
-                        vehicle.rotation_angle=90
-                    
-                    # assign vehicle crew
-                    crew_count=len(vehicle.ai.vehicle_crew)
-                    while len(member_vehicle_assignments)>0 and crew_count>0:
-                        crew_count-=1
-                        member_vehicle_assignments.pop().ai.switch_task_enter_vehicle(vehicle,vehicle_order)
+        self.update_human_lists()       
 
     #---------------------------------------------------------------------------
     def tune_radios(self):

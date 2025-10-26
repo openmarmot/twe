@@ -476,7 +476,7 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     world_area_options=[]
     world_area_options.append(['town','town','town'])
-    world_area_options.append(['airport'])
+    world_area_options.append(['airport','town'])
     map_areas=random.choice(world_area_options)
 
     map_objects=engine.map_generator.generate_map(map_areas)
@@ -564,7 +564,7 @@ def load_sqlite_squad_data():
     conn.close()
 
 #------------------------------------------------------------------------------
-def load_world(world,map_objects):
+def load_world(world,map_objects,defending_faction):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
 
     # this is called in a thread by graphics_2d_pygame.load_world()
@@ -572,6 +572,16 @@ def load_world(world,map_objects):
     # convert map_objects to world_objects
     # note - this also spawns them and creates the world_area objects
     convert_map_objects_to_world_objects(world,map_objects)
+
+    # this should be done before we create the dynamic areas as they are not interesting
+    available_areas=world.world_areas[:]
+    print(f'available areas count {len(available_areas)}, defending faction: {defending_faction}')
+    if available_areas and defending_faction in ['german','soviet','american']:
+        engine.log.add_data('note',f'{defending_faction} is defending.',True)
+        world.tactical_ai[defending_faction].initial_controlled_world_areas=available_areas
+
+    if defending_faction=="mixed":
+        print('mixed defending faction not implemented')
 
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)

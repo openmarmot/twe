@@ -1,6 +1,19 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 26 2025
+- large rewrite of initial squad position system to allow for a tactical ai to start with 
+some world areas that they are defending 
+- spawn positions are now a fixed distance from the nearest world area 
+- airport map now also gets a town 
+- world_area spawn location computation is now threaded which should speed up loading a lot 
+
+amusingly the initial effect of the new positioning is minor.
+there is a 50% chance one of the sides is defending, otherwise 
+its a meeting engagement and spawn is much the same as it was.
+
+
+----------------------------------
 Oct 23 2025
 - added Sd.kfz.222 and camo version 
 
