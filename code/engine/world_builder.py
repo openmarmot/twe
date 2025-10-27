@@ -103,35 +103,14 @@ squad_data={}
 #------------------------------------------------------------------------------
 def add_random_pistol_to_inventory(wo,world):
     '''adds a random pistol to the inventory'''
-    pistol=random.randint(0,6)
-    if pistol==0:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk_magazine',False))
-    elif pistol==1:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-    elif pistol==2:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33_magazine',False))
-    elif pistol==3:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911_magazine',False))
-    elif pistol==4:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
-    elif pistol==5:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'walther_p38',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
-    elif pistol==6:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
+
+    pistol_type = random.choice(list_guns_pistols)
+    pistol=spawn_object(world, wo.world_coords, pistol_type, False)
+    wo.add_inventory(pistol)
+    magazine_type = pistol.ai.magazine.world_builder_identity
+    for _ in range(2):
+        wo.add_inventory(spawn_object(world, wo.world_coords, magazine_type, False))
+
 
 #------------------------------------------------------------------------------
 def add_standard_loadout(wo,world,loadout):
@@ -259,7 +238,7 @@ def convert_map_objects_to_world_objects(world,map_objects):
                     for a in map_object.inventory:
                         already_exists=False
                         for b in wo.ai.inventory:
-                            if b.name==a:
+                            if b.world_builder_identity==a:
                                 already_exists=True
                                 break
                         if already_exists is False:
@@ -502,6 +481,16 @@ def load_quick_battle_map_objects(battle_option,result_container):
         squads.append('German Sd.kfz.251/2')
         squads.append('German Sd.kfz.251/2')
         squads.append('German Sd.kfz.251/2')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
 
     
     elif battle_option=='3':
@@ -606,20 +595,18 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
     for x in range(count):
         current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
 
-        x=spawn_object(world,point_a,spawn_string,True)
+        x=spawn_object(world,current_coords,spawn_string,True)
         x.rotation_angle=rotation
         x.heading=heading
-        x.world_coords=current_coords
 
     if second_layer:
         current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
         for x in range(int(count/2)):
             current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
 
-            x=spawn_object(world,point_a,spawn_string,True)
+            x=spawn_object(world,current_coords,spawn_string,True)
             x.rotation_angle=rotation
             x.heading=heading
-            x.world_coords=current_coords
 
 #------------------------------------------------------------------------------
 def spawn_container_body(name,world_object,image_index):

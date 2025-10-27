@@ -220,7 +220,6 @@ class AIHuman(object):
 
         adjust_max=0
 
-
         # mechanical accuracy of the gun
         adjust_max+=weapon.ai.mechanical_accuracy
 
@@ -647,6 +646,7 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def event_add_inventory(self,event_data):
         ''' add object to inventory. does not remove obj from world'''
+
         self.recent_noise_or_move=True
         self.last_noise_or_move_time=self.owner.world.world_seconds
         if event_data not in self.inventory:
@@ -986,6 +986,10 @@ class AIHuman(object):
         # this is supposed to be the main interface that the outside world uses to interact with the ai
         # EVENT - text describing event
         # EVENT_DATA - most likely a world_object but could be anything
+
+        if event_data is None:
+            engine.log.add_data('error',f'ai_human.handle_event data for event {event} is None',True)
+            return
 
         # not sure what to do here yet. will have to think of some standard events
         if event=='add_inventory':

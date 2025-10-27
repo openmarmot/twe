@@ -218,7 +218,7 @@ class World():
                     collided=collided.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 else:
                     # check if object misses due to prone
-                    if consider_prone:
+                    if consider_prone and collided.ai.prone:
                         chance=random.randint(0,1)
                         if chance==1:
                             # missed due to prone

@@ -130,7 +130,7 @@ class AIHumanVehicle():
 
             if turret.ai.handle_fire():
                 fire_mission.rounds_fired+=1
-                engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
+                #engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
 
 
         # thats pretty much it. think can stop the engagement when we've fired enough as indirect fire weapons are fairly slow firing
@@ -459,7 +459,7 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
                             return
-                    if 'Waiting for driver to close distance' in current_action:
+                    if current_action=='Waiting for driver to get in position for fire mission':
                         if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
                             fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
                             need_vehicle_order=False
@@ -478,7 +478,8 @@ class AIHumanVehicle():
                                 if vehicle.ai.is_transport:
                                     vehicle_order.exit_vehicle_when_finished=True
                                 self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
-                    if current_action=='Waiting for driver to get in position for fire mission':
+                    # this is triggered by gunners that need to get closer to a tank to penetrate
+                    if 'Waiting for driver to close distance' in current_action:
                         target=role.human.ai.memory['task_vehicle_crew']['target']
                         if target is not None:
                             need_vehicle_order=False

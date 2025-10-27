@@ -7,11 +7,20 @@ some world areas that they are defending
 - spawn positions are now a fixed distance from the nearest world area 
 - airport map now also gets a town 
 - world_area spawn location computation is now threaded which should speed up loading a lot 
+- minor changes and cleanup
+- prone actually makes a difference now, this wasn't being checked correctly for collision before
+- driver action for fire missions and getting closer to targets was incorrectly flipped 
 
 amusingly the initial effect of the new positioning is minor.
 there is a 50% chance one of the sides is defending, otherwise 
 its a meeting engagement and spawn is much the same as it was.
 
+confirmed that the no equipper error is with the svt40-sniper 
+error : ai_gun.fire svt40-sniper equipper is none
+
+todo 
+- exempt civilians from new spawning setup 
+- investigate oddness with svt40-sniper error 
 
 ----------------------------------
 Oct 23 2025

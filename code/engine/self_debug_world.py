@@ -179,6 +179,28 @@ def check_vehicle_sanity(b, issues, world):
         issues.append(f'{b.name} has batteries but electrical system not functioning')
 
 #---------------------------------------------------------------------------
+def check_human_primary_weapon(b, issues, world):
+    '''sanity checks for human primary_weapon'''
+    if b.ai.primary_weapon is None:
+        # check if there are unequipped guns in inventory that could be equipped
+        for item in b.ai.inventory:
+            if item.is_gun and item.ai.equipper is None:
+                issues.append(f'{b.name} has unequipped gun {item.name} in inventory but primary_weapon is None')
+                break  # avoid multiple issues
+    else:
+        # primary_weapon is not None
+        if b.ai.primary_weapon not in b.ai.inventory:
+            issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} not in inventory')
+        elif b.ai.primary_weapon.ai.equipper != b:
+            issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} equipper mismatch')
+        else:
+            # check ammo - only if equipped correctly
+            ammo_gun, ammo_inventory, _ = b.ai.check_ammo(b.ai.primary_weapon, b)
+            if ammo_gun == 0 and ammo_inventory == 0 and not b.ai.primary_weapon.ai.damaged:
+                # allow for damaged weapons to have no ammo
+                issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} has no ammo and may need resupply')
+
+#---------------------------------------------------------------------------
 def run_wo_objects_check(world):
     '''sanity checks all world objects'''
 
@@ -206,6 +228,9 @@ def run_wo_objects_check(world):
                 check_task_move_to_location(b, issues, world)
             elif current_task == 'task_engage_enemy':
                 check_task_engage_enemy(b, issues, world)
+
+            # general human sanity checks
+            check_human_primary_weapon(b, issues, world)
 
         elif b.is_vehicle:
             check_vehicle_sanity(b, issues, world)
