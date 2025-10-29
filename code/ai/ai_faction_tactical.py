@@ -323,12 +323,14 @@ class AIFactionTactical():
         # tune radios to the correct channel
         self.tune_radios()
         
-        # create initial tactical orders
-        # also sets squad spawn positions
-        self.set_initial_orders_and_positions()
+        # civilians get positions set by map gen 
+        if self.faction != "civilian":
+            # create initial tactical orders
+            # also sets squad spawn positions
+            self.set_initial_orders_and_positions()
 
-        # build indirect fire data
-        self.identify_indirect_fire_vehicles()
+            # build indirect fire data
+            self.identify_indirect_fire_vehicles()
 
         # update human lists and give out tactical orders right away
         self.update_human_lists()       

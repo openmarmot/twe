@@ -1,6 +1,9 @@
 TWE Project : Change Log
 
 ----------------------------------
+Oct 28 2025
+- fixed civilian spawns 
+----------------------------------
 Oct 26 2025
 - large rewrite of initial squad position system to allow for a tactical ai to start with 
 some world areas that they are defending 
