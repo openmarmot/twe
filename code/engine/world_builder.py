@@ -31,7 +31,6 @@ import engine.log
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
-import engine.world_radio
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator

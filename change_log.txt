@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Oct 29 2025
+- updated algo for world area positions. seems faster 
+- minor cleanup and updates 
+
 ----------------------------------
 Oct 28 2025
 - fixed civilian spawns 
