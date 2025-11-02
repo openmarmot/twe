@@ -91,7 +91,6 @@ class AIFactionTactical():
             # reset think rate to normal
             self.think_rate=30
 
-
     #---------------------------------------------------------------------------
     def create_squads(self):
         '''sort a list of humans into squads and initialize them'''
@@ -121,14 +120,12 @@ class AIFactionTactical():
             if len(squad.members)>0:
                 squad.squad_leader=squad.members[0]
             else:
-                print(f'squad error. member count:{len(squad.members)}, vehicle count:{len(squad.vehicles)}')
-                for v in squad.vehicles:
-                    print(v.name)
+                # some squads end up vehicle only due to the current squad creation algo.
+                #print(f'squad error. member count:{len(squad.members)}, vehicle count:{len(squad.vehicles)}')
+                # lets just skip adding those squads to ai tactical
+                continue
                 
-
             self.squads.append(squad)
-
-
 
     #---------------------------------------------------------------------------
     def get_area_enemy_count(self,area):

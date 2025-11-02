@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 02 2025
+- minor changes and updates 
+- updated shrapnel generated for vehicle top hits to include weapon and shooter data
+- fixed soem ai_human_vehicle rotation calculations that were using human position instead of turret position as a base 
+
+still getting some shrapnel shooter is none, not sure why 
+
+----------------------------------
 Oct 29 2025
 - updated algo for world area positions. seems faster 
 - minor cleanup and updates 

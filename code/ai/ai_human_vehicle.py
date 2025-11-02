@@ -603,7 +603,7 @@ class AIHumanVehicle():
 
                 # out of fuel.
                 # disable the vehicle for now. in the future we will want to try and get fuel and refuel
-                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
+                #engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
                 vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):
@@ -794,7 +794,7 @@ class AIHumanVehicle():
                 return
 
         # check rotation
-        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
+        rotation_angle=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
         rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
         
         # check engagement for each weapon
@@ -925,7 +925,7 @@ class AIHumanVehicle():
             
         # turret rotation ?
         # check rotation
-        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,fire_mission.world_coords)
+        rotation_angle=engine.math_2d.get_rotation(turret.world_coords,fire_mission.world_coords)
         rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
 
         if rotation_check == False:
