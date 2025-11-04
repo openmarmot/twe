@@ -77,15 +77,27 @@ class AIFactionTactical():
         # this is kind of awful but we don't really have a better way of assigning these 
         # as we don't know who ends up being a indirect gunner
 
-        for v in self.indirect_fire_vehicles:
-            for role in v.ai.vehicle_crew:
-                if role.role_occupied and role.is_gunner:
-                    if role.turret.ai.primary_weapon.ai.indirect_fire:
-                        # random for now
-                        random_world_area=random.choice(self.world.world_areas)
-                        f=FireMission(random_world_area.get_location(),self.world.world_seconds+300)
-                        role.human.ai.memory['task_vehicle_crew']['fire_missions'].append(f)
-                        self.initial_fire_missions-=1
+        hostile_world_areas=[]
+        for b in self.world.world_areas:
+            if self.faction=='german':
+                if b.faction=='soviet':
+                    hostile_world_areas.append(b)
+            elif self.faction=='soviet':
+                if b.faction=='german':
+                    hostile_world_areas.append(b)
+
+        if hostile_world_areas:
+            for v in self.indirect_fire_vehicles:
+                for role in v.ai.vehicle_crew:
+                    if role.role_occupied and role.is_gunner:
+                        if role.turret.ai.primary_weapon.ai.indirect_fire:
+                            # random for now
+                            random_world_area=random.choice(hostile_world_areas)
+                            for _ in range(3):
+                                f=FireMission(random_world_area.get_location(),self.world.world_seconds+300)
+                                f.rounds_requested=5
+                                role.human.ai.memory['task_vehicle_crew']['fire_missions'].append(f)
+                            self.initial_fire_missions-=1
 
         if self.initial_fire_missions<1:
             # reset think rate to normal
@@ -112,7 +124,7 @@ class AIFactionTactical():
             squad.faction=self.faction
             squad.faction_tactical=self
             squad.name=f"squad{squad_number}"
-            squad_number+=0
+            squad_number+=1
             for c in b:
                 squad.add_to_squad(c)
             
@@ -154,7 +166,7 @@ class AIFactionTactical():
         elif self.faction=='civilian':
             return 0
         else:
-            print('debug: ai_faction_tactical.get_area_enemy_count - faction not handled: ',self.faction)
+            print('debug: ai_faction_tactical.get_area_friendly_count - faction not handled: ',self.faction)
 
     #---------------------------------------------------------------------------
     def identify_indirect_fire_vehicles(self):
@@ -300,6 +312,8 @@ class AIFactionTactical():
             squad=AISquad(self.world)
             squad.faction=self.faction
             squad.faction_tactical=self
+            squad_number = len(self.squads) 
+            squad.name = f"squad_split_{squad_number}" # for now just to keep track of these
             
             for b in members:
                 # note! this will remove the members from their old squad if they had one

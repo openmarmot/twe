@@ -1,5 +1,12 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 03 2025
+- ai_faction_tactical initial indirect fire targets world areas controlled by the enemy instead of just random ones 
+- initial indirect fire assignments are now multiple per world_area to hopefully get lucky and hit something 
+- minor fixes and updates 
+
+indirect fire is still basically useless. i need to add a way to do some manual fire or maybe for the commander to add new missions 
 
 ----------------------------------
 Nov 02 2025
