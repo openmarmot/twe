@@ -3270,6 +3270,57 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
 
+    # this is the late war german smoke/he mortar device
+    elif object_type=='nahverteidigungswaffe_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        z=WorldObject(world,['panzer_iv_hull_mg'],AITurret)
+        z.name='Nahverteidigungswaffe Turret'
+        z.render=False # this turret is small enough to be basically invisible from outside a tank. its just a circle with a hole in it.
+        z.is_turret=True
+        z.ai.small=True
+        z.ai.vehicle_mount_side='center' # this makes it un-hittable
+        z.ai.turret_accuracy=10
+        z.ai.turret_armor['top']=[16,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[5,0,0]
+        z.ai.turret_armor['right']=[5,0,0]
+        z.ai.turret_armor['front']=[5,0,0]
+        z.ai.turret_armor['rear']=[5,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'nahverteidigungswaffe',False)
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_weapon_reload_speed=5
+        z.no_save=True
+
+    elif object_type=='nahverteidigungswaffe':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='Nahverteidigungswaffe'
+        z.no_update=True
+        z.is_gun=True
+        z.ai.mechanical_accuracy=15
+        z.ai.magazine=spawn_object(world,world_coords,'nahverteidigungswaffe_magazine',False)
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=5
+        z.ai.range=50
+        z.ai.type='close defense weapon'
+        z.ai.use_antitank=False
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='nahverteidigungswaffe_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='nahverteidigungswaffe_magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['nahverteidigungswaffe']
+        z.ai.compatible_projectiles=['PzGr39_75_L43','Sprgr_34_75_L43']
+        z.ai.capacity=1
+        z.ai.disintegrating=True
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_g_turret','panzer_iv_g_turret'],AITurret)

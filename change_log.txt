@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 04 2025
+- did some work on adding nahverteidigungswaffe but got stuck on determining projectiles.
+
+for now i will probably give it the 28mm he shell from the german combat pistol - will probably model that 
+
+it seems there is very little details on the nahverteidigungswaffe weapon system, which is odd because it was fairly widespread 
+
+todo 
+- add kampfpistole and ammo 
+- finish nahv. work 
+- consider adding post penetration trajectory modeling to determine crew hits 
+
 ----------------------------------
 Nov 03 2025
 - ai_faction_tactical initial indirect fire targets world areas controlled by the enemy instead of just random ones 
