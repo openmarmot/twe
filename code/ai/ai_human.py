@@ -668,6 +668,8 @@ class AIHuman(object):
 
                 if event_data.is_gun :
                     if self.primary_weapon is not None:
+                        if self.primary_weapon==event_data:
+                            engine.log.add_data('error',f'error in event_add_inventory {event_data.name} is already primary_weapon')
                         # drop the current obj and pick up the new one
                         self.drop_object(self.primary_weapon)
                     if self.owner.is_player :
@@ -1557,7 +1559,9 @@ class AIHuman(object):
         # if this task already exists we just want to update it
         if task_name in self.memory:
             # just add the extra objects on
-            self.memory[task_name]['objects']+=objects
+            for obj in objects:
+                if obj not in self.memory[task_name]['objects']:
+                    self.memory[task_name]['objects'].append(obj)
         else:
             # otherwise create a new one
             
@@ -2472,6 +2476,8 @@ class AIHuman(object):
                     # remove as we will be picking it up
                     remove_queue.append(b)
                     self.pickup_object(b)
+                    # we want to break here because pickup_object can add more objects to our objects list
+                    break
 
                 elif distance>self.max_walk_distance:
                     # maybe should add a option to ignore this but for the most part you want to forget distant objects

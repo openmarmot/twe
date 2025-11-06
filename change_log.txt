@@ -1,5 +1,14 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 05 2025
+- added kampfpistole
+- panzer iv j and tiger 1 get the nahverteidigungswaffe_turret
+- found and fixed a pretty nasty ai_human_vehicle bug that was rewriting a local role variable 
+- improved checks in check_object_exists()
+
+spent a lot of time debugging the rare weapon equipper crash. did not find the cause but added some debug and 
+made check_object_exists() a lot better - which was probably the source of the issue
 
 ----------------------------------
 Nov 04 2025

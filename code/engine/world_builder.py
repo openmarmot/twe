@@ -1453,6 +1453,32 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
+    elif object_type=='kampfpistole':
+        z=WorldObject(world,['walther_p38'],AIGun)
+        z.name='Kampfpistole'
+        z.no_update=True
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=20
+        z.ai.magazine=spawn_object(world,world_coords,'kampfpistole_magazine',False)
+        z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
+        z.ai.range=1000
+        z.ai.type='pistol'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='kampfpistole_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='Kampfpistole Magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['kampfpistole','nahverteidigungswaffe']
+        z.ai.compatible_projectiles=['Sprgr_23']
+        z.ai.capacity=1
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
     elif object_type=='c96':
         z=WorldObject(world,['c96'],AIGun)
         z.name='C96 Mauser Pistol'
@@ -3279,7 +3305,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='center' # this makes it un-hittable
-        z.ai.turret_accuracy=10
+        z.ai.turret_accuracy=30
         z.ai.turret_armor['top']=[16,0,0]
         z.ai.turret_armor['bottom']=[8,0,0]
         z.ai.turret_armor['left']=[5,0,0]
@@ -3300,26 +3326,14 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.is_gun=True
         z.ai.mechanical_accuracy=15
-        z.ai.magazine=spawn_object(world,world_coords,'nahverteidigungswaffe_magazine',False)
+        z.ai.magazine=spawn_object(world,world_coords,'kampfpistole_magazine',False)
         z.ai.rate_of_fire=1
         z.ai.reload_speed=5
-        z.ai.range=50
+        z.ai.range=150
         z.ai.type='close defense weapon'
         z.ai.use_antitank=False
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
-
-    elif object_type=='nahverteidigungswaffe_magazine':
-        z=WorldObject(world,['stg44_magazine'],AIMagazine)
-        z.name='nahverteidigungswaffe_magazine'
-        z.minimum_visible_scale=0.4
-        z.is_gun_magazine=True
-        z.ai.compatible_guns=['nahverteidigungswaffe']
-        z.ai.compatible_projectiles=['PzGr39_75_L43','Sprgr_34_75_L43']
-        z.ai.capacity=1
-        z.ai.disintegrating=True
-        z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
 
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
@@ -3496,6 +3510,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
+        n_turret=spawn_object(world,world_coords,'nahverteidigungswaffe_turret',True)
+        n_turret.ai.vehicle=z
+        z.ai.turrets.append(n_turret)
 
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -3519,6 +3536,8 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
+        role.is_gunner=True
+        role.turret=n_turret
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -3539,8 +3558,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
+        z.add_inventory(spawn_object(world,world_coords,'kampfpistole',False))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"kampfpistole_magazine",False))
         z.ai.ammo_rack_capacity=87
         for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
@@ -3674,6 +3696,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
+        n_turret=spawn_object(world,world_coords,'nahverteidigungswaffe_turret',True)
+        n_turret.ai.vehicle=z
+        z.ai.turrets.append(n_turret)
 
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -3697,6 +3722,8 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
+        role.is_gunner=True
+        role.turret=n_turret
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -3716,9 +3743,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'kampfpistole',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"kampfpistole_magazine",False))
         # armor piercing belt
         if random.randint(0,1)==1:
             belt=spawn_object(world,world_coords,"mg34_belt",False)

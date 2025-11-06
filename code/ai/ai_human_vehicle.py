@@ -641,6 +641,11 @@ class AIHumanVehicle():
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
 
+        if turret is None:
+            print(f'turret none in {vehicle.name}, role {self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].role_name}')
+            for b in vehicle.ai.vehicle_crew:
+                print(f' role: {b.role_name} is_driver: {b.is_driver} is_gunner: {b.is_gunner} is_commander {b.is_commander}')
+
         # reset engagement commands 
         self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon'] = False
         self.owner.ai.memory['task_vehicle_crew']['engage_coaxial_weapon'] = False
@@ -1078,9 +1083,9 @@ class AIHumanVehicle():
             # universal check for empty priority spots
             if role.is_driver is False and role.is_gunner is False:
                 # check if there are any empty roles
-                for role in vehicle.ai.vehicle_crew:
-                    if role.role_occupied is False:
-                        if role.is_driver or role.is_gunner:
+                for available_role in vehicle.ai.vehicle_crew:
+                    if available_role.role_occupied is False:
+                        if available_role.is_driver or available_role.is_gunner:
                             self.owner.ai.switch_task_vehicle_crew(vehicle,None)
                             return
                         

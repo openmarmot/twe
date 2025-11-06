@@ -242,7 +242,17 @@ class World():
     def check_object_exists(self,wo_obj):
         '''returns a bool as to whether the object is in the world'''
 
-        # note this has been neutered a bit. no longer checks if the object is really in world
+        if wo_obj in self.add_queue:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in add_queue',True)
+            return False
+
+        if wo_obj.grid_square:
+            if wo_obj not in wo_obj.grid_square.wo_objects:
+                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} that is not in its grid square',True)
+                return False
+        else:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} that does not have a grid square',True)
+            return False
 
         if wo_obj in self.remove_queue:
             engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in remove_queue',True)
