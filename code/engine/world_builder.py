@@ -31,7 +31,6 @@ import engine.log
 from engine.world_object import WorldObject
 from engine.world_area import WorldArea
 from engine.map_object import MapObject
-import engine.world_radio
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator
@@ -103,35 +102,14 @@ squad_data={}
 #------------------------------------------------------------------------------
 def add_random_pistol_to_inventory(wo,world):
     '''adds a random pistol to the inventory'''
-    pistol=random.randint(0,6)
-    if pistol==0:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'ppk_magazine',False))
-    elif pistol==1:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_magazine',False))
-    elif pistol==2:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'tt33_magazine',False))
-    elif pistol==3:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'1911_magazine',False))
-    elif pistol==4:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'c96_red_9_magazine',False))
-    elif pistol==5:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'walther_p38',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'p38_magazine',False))
-    elif pistol==6:
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
-        wo.add_inventory(spawn_object(world,wo.world_coords,'luger_p08_magazine',False))
+
+    pistol_type = random.choice(list_guns_pistols)
+    pistol=spawn_object(world, wo.world_coords, pistol_type, False)
+    wo.add_inventory(pistol)
+    magazine_type = pistol.ai.magazine.world_builder_identity
+    for _ in range(2):
+        wo.add_inventory(spawn_object(world, wo.world_coords, magazine_type, False))
+
 
 #------------------------------------------------------------------------------
 def add_standard_loadout(wo,world,loadout):
@@ -259,7 +237,7 @@ def convert_map_objects_to_world_objects(world,map_objects):
                     for a in map_object.inventory:
                         already_exists=False
                         for b in wo.ai.inventory:
-                            if b.name==a:
+                            if b.world_builder_identity==a:
                                 already_exists=True
                                 break
                         if already_exists is False:
@@ -476,7 +454,7 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     world_area_options=[]
     world_area_options.append(['town','town','town'])
-    world_area_options.append(['airport'])
+    world_area_options.append(['airport','town'])
     map_areas=random.choice(world_area_options)
 
     map_objects=engine.map_generator.generate_map(map_areas)
@@ -502,6 +480,16 @@ def load_quick_battle_map_objects(battle_option,result_container):
         squads.append('German Sd.kfz.251/2')
         squads.append('German Sd.kfz.251/2')
         squads.append('German Sd.kfz.251/2')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
+        squads.append('Soviet Sniper Squad SVT-40')
 
     
     elif battle_option=='3':
@@ -564,7 +552,7 @@ def load_sqlite_squad_data():
     conn.close()
 
 #------------------------------------------------------------------------------
-def load_world(world,map_objects):
+def load_world(world,map_objects,defending_faction):
     '''coverts map_objects to world_objects and does everything necessary to load the world'''
 
     # this is called in a thread by graphics_2d_pygame.load_world()
@@ -572,6 +560,16 @@ def load_world(world,map_objects):
     # convert map_objects to world_objects
     # note - this also spawns them and creates the world_area objects
     convert_map_objects_to_world_objects(world,map_objects)
+
+    # this should be done before we create the dynamic areas as they are not interesting
+    available_areas=world.world_areas[:]
+    print(f'available areas count {len(available_areas)}, defending faction: {defending_faction}')
+    if available_areas and defending_faction in ['german','soviet','american']:
+        engine.log.add_data('note',f'{defending_faction} is defending.',True)
+        world.tactical_ai[defending_faction].initial_controlled_world_areas=available_areas
+
+    if defending_faction=="mixed":
+        print('mixed defending faction not implemented')
 
     # generate some minor world areas for battle flow
     generate_dynamic_world_areas(world)
@@ -596,20 +594,18 @@ def spawn_aligned_pile(world,point_a,point_b,spawn_string,separation_distance,co
     for x in range(count):
         current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
 
-        x=spawn_object(world,point_a,spawn_string,True)
+        x=spawn_object(world,current_coords,spawn_string,True)
         x.rotation_angle=rotation
         x.heading=heading
-        x.world_coords=current_coords
 
     if second_layer:
         current_coords=engine.math_2d.moveAlongVector(separation_distance/3,point_a,heading,1)
         for x in range(int(count/2)):
             current_coords=engine.math_2d.moveAlongVector(separation_distance,current_coords,heading,1)
 
-            x=spawn_object(world,point_a,spawn_string,True)
+            x=spawn_object(world,current_coords,spawn_string,True)
             x.rotation_angle=rotation
             x.heading=heading
-            x.world_coords=current_coords
 
 #------------------------------------------------------------------------------
 def spawn_container_body(name,world_object,image_index):
@@ -1454,6 +1450,32 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_guns=['luger_p08']
         z.ai.compatible_projectiles=['9mm_124','9mm_115','9mm_ME']
         z.ai.capacity=8
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
+    elif object_type=='kampfpistole':
+        z=WorldObject(world,['walther_p38'],AIGun)
+        z.name='Kampfpistole'
+        z.no_update=True
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=20
+        z.ai.magazine=spawn_object(world,world_coords,'kampfpistole_magazine',False)
+        z.ai.rate_of_fire=0.7
+        z.ai.reload_speed=5
+        z.ai.range=1000
+        z.ai.type='pistol'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
+    elif object_type=='kampfpistole_magazine':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='Kampfpistole Magazine'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['kampfpistole','nahverteidigungswaffe']
+        z.ai.compatible_projectiles=['Sprgr_23']
+        z.ai.capacity=1
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -3274,6 +3296,45 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
 
+    # this is the late war german smoke/he mortar device
+    elif object_type=='nahverteidigungswaffe_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        z=WorldObject(world,['panzer_iv_hull_mg'],AITurret)
+        z.name='Nahverteidigungswaffe Turret'
+        z.render=False # this turret is small enough to be basically invisible from outside a tank. its just a circle with a hole in it.
+        z.is_turret=True
+        z.ai.small=True
+        z.ai.vehicle_mount_side='center' # this makes it un-hittable
+        z.ai.turret_accuracy=30
+        z.ai.turret_armor['top']=[16,0,0]
+        z.ai.turret_armor['bottom']=[8,0,0]
+        z.ai.turret_armor['left']=[5,0,0]
+        z.ai.turret_armor['right']=[5,0,0]
+        z.ai.turret_armor['front']=[5,0,0]
+        z.ai.turret_armor['rear']=[5,0,0]
+        z.ai.position_offset=[0,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'nahverteidigungswaffe',False)
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon.ai.spawn_case=False
+        z.ai.primary_weapon_reload_speed=5
+        z.no_save=True
+
+    elif object_type=='nahverteidigungswaffe':
+        z=WorldObject(world,['mg34'],AIGun)
+        z.name='Nahverteidigungswaffe'
+        z.no_update=True
+        z.is_gun=True
+        z.ai.mechanical_accuracy=15
+        z.ai.magazine=spawn_object(world,world_coords,'kampfpistole_magazine',False)
+        z.ai.rate_of_fire=1
+        z.ai.reload_speed=5
+        z.ai.range=150
+        z.ai.type='close defense weapon'
+        z.ai.use_antitank=False
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_g_turret','panzer_iv_g_turret'],AITurret)
@@ -3449,6 +3510,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
+        n_turret=spawn_object(world,world_coords,'nahverteidigungswaffe_turret',True)
+        n_turret.ai.vehicle=z
+        z.ai.turrets.append(n_turret)
 
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -3472,6 +3536,8 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
+        role.is_gunner=True
+        role.turret=n_turret
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -3492,8 +3558,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
         z.rotation_angle=float(random.randint(0,359))
+        z.add_inventory(spawn_object(world,world_coords,'kampfpistole',False))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"kampfpistole_magazine",False))
         z.ai.ammo_rack_capacity=87
         for b in range(60):
             z.ai.ammo_rack.append(spawn_object(world,world_coords,"75mm_kwk40_l48_magazine",False))
@@ -3627,6 +3696,9 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
+        n_turret=spawn_object(world,world_coords,'nahverteidigungswaffe_turret',True)
+        n_turret.ai.vehicle=z
+        z.ai.turrets.append(n_turret)
 
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -3650,6 +3722,8 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
+        role.is_gunner=True
+        role.turret=n_turret
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed=367.04
@@ -3669,9 +3743,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
         z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
         z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.add_inventory(spawn_object(world,world_coords,'kampfpistole',False))
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
+        for b in range(10):
+            z.add_inventory(spawn_object(world,world_coords,"kampfpistole_magazine",False))
         # armor piercing belt
         if random.randint(0,1)==1:
             belt=spawn_object(world,world_coords,"mg34_belt",False)

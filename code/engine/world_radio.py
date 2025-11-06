@@ -21,7 +21,7 @@ def add_radio(frequency,radio):
         channels[frequency].append(radio)
     else:
         channels[frequency]=[radio]
-        engine.log.add_data('note','world_radio.add_radio frequency channel '+str(frequency)+' does not exist. creating..',True)
+        #engine.log.add_data('note','world_radio.add_radio frequency channel '+str(frequency)+' does not exist. creating..',True)
 
 #---------------------------------------------------------------------------
 def remove_radio(radio):

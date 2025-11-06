@@ -307,12 +307,14 @@ class Graphics_2D_Pygame(object):
             # Check if thread is done
             if not thread.is_alive():
                 loading=False
+        
+        defending_faction=random.choice(['german','soviet','none','contested'])
 
-        self.load_world(player_spawn_faction,"Quick battle",result_container[0])
+        self.load_world(player_spawn_faction,"Quick battle",result_container[0],defending_faction)
 
     
     #------------------------------------------------------------------------------
-    def load_world(self,player_spawn_faction,map_square_name,map_objects):
+    def load_world(self,player_spawn_faction,map_square_name,map_objects,defending_faction):
         ''' this is the central load_world function. calls other load_world functions'''
 
         # one of the main points of this function is to keep pygame responsive while 
@@ -325,7 +327,7 @@ class Graphics_2D_Pygame(object):
         self.world.map_square_name=map_square_name
 
         # Start computation in a separate thread
-        thread = threading.Thread(target=engine.world_builder.load_world, args=(self.world, map_objects))
+        thread = threading.Thread(target=engine.world_builder.load_world, args=(self.world, map_objects,defending_faction))
         thread.start()
 
         self.game_menu.text_queue=['Loading world ...']

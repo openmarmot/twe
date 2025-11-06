@@ -10,6 +10,7 @@ It should not have any specific graphic engine code (pygame, etc)
 #import built in modules
 import random
 import copy
+import threading
 
 
 #import custom packages
@@ -58,10 +59,10 @@ class World():
 
         # tactical AIs. This also adds radios !
         self.tactical_ai={}
-        self.tactical_ai['german']=AIFactionTactical(self,'german',[],['soviet'],self.spawn_west,3)
-        self.tactical_ai['soviet']=AIFactionTactical(self,'soviet',[],['german'],self.spawn_east,5)
-        self.tactical_ai['american']=AIFactionTactical(self,'american',[],[],self.spawn_north,10)
-        self.tactical_ai['civilian']=AIFactionTactical(self,'civilian',[],[],self.spawn_center,12)
+        self.tactical_ai['german']=AIFactionTactical(self,'german',[],['soviet'],3)
+        self.tactical_ai['soviet']=AIFactionTactical(self,'soviet',[],['german'],5)
+        self.tactical_ai['american']=AIFactionTactical(self,'american',[],[],10)
+        self.tactical_ai['civilian']=AIFactionTactical(self,'civilian',[],[],12)
 
         # off man reinforcements
         # array of  [time,faction,[spawn_point,squad]]
@@ -217,7 +218,7 @@ class World():
                     collided=collided.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
                 else:
                     # check if object misses due to prone
-                    if consider_prone:
+                    if consider_prone and collided.ai.prone:
                         chance=random.randint(0,1)
                         if chance==1:
                             # missed due to prone
@@ -241,7 +242,17 @@ class World():
     def check_object_exists(self,wo_obj):
         '''returns a bool as to whether the object is in the world'''
 
-        # note this has been neutered a bit. no longer checks if the object is really in world
+        if wo_obj in self.add_queue:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in add_queue',True)
+            return False
+
+        if wo_obj.grid_square:
+            if wo_obj not in wo_obj.grid_square.wo_objects:
+                engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} that is not in its grid square',True)
+                return False
+        else:
+            engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} that does not have a grid square',True)
+            return False
 
         if wo_obj in self.remove_queue:
             engine.log.add_data('debug',f'check_object_exists on object: {wo_obj.name} in remove_queue',True)
@@ -660,7 +671,36 @@ class World():
         ''' resize all world_objects'''
         for b in self.grid_manager.get_all_objects():
             b.reset_image=True
-        
+
+    #---------------------------------------------------------------------------
+    def set_spawn_positions(self):
+        '''sets initial tactical ai spawn positions'''
+        x_positive=0
+        x_negative=0
+        y_positive=0
+        y_negative=0
+
+        for w in self.world_areas:
+            if w.world_coords[0]>x_positive:
+                x_positive=w.world_coords[0]
+            if w.world_coords[0]<x_negative:
+                x_negative=w.world_coords[0]
+            if w.world_coords[1]>y_positive:
+                y_positive=w.world_coords[1]
+            if w.world_coords[1]<y_negative:
+                y_negative=w.world_coords[1]
+
+        standoff=8000
+
+        spawn_center=[0,0]
+        spawn_north=[0,-standoff+y_negative]
+        spawn_south=[0,standoff+y_positive]
+        spawn_west=[-standoff+x_negative,0]
+        spawn_east=[standoff+x_positive,0]
+
+        self.tactical_ai['german'].spawn_location=spawn_west
+        self.tactical_ai['soviet'].spawn_location=spawn_east
+
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
         for b in self.grid_manager.get_all_objects():
@@ -697,9 +737,17 @@ class World():
 
         # precompute world_area locations
         engine.log.add_data('note','Computing World Area locations..',True)
+        threads = []
         for area in self.world_areas:
-            area.compute_locations()
+            t = threading.Thread(target=area.compute_locations)
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
         
+        engine.log.add_data('note','Starting tactical AIs..',True)
+        # set initial spawn points for each faction
+        self.set_spawn_positions()
         # tactical_ai start. create squads, figure out initial coords, orders, etc 
         for ai in self.tactical_ai.values():
             ai.start()

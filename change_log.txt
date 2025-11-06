@@ -1,6 +1,75 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 05 2025
+- added kampfpistole
+- panzer iv j and tiger 1 get the nahverteidigungswaffe_turret
+- found and fixed a pretty nasty ai_human_vehicle bug that was rewriting a local role variable 
+- improved checks in check_object_exists()
+
+spent a lot of time debugging the rare weapon equipper crash. did not find the cause but added some debug and 
+made check_object_exists() a lot better - which was probably the source of the issue
+
+----------------------------------
+Nov 04 2025
+- did some work on adding nahverteidigungswaffe but got stuck on determining projectiles.
+
+for now i will probably give it the 28mm he shell from the german combat pistol - will probably model that 
+
+it seems there is very little details on the nahverteidigungswaffe weapon system, which is odd because it was fairly widespread 
+
+todo 
+- add kampfpistole and ammo 
+- finish nahv. work 
+- consider adding post penetration trajectory modeling to determine crew hits 
+
+----------------------------------
+Nov 03 2025
+- ai_faction_tactical initial indirect fire targets world areas controlled by the enemy instead of just random ones 
+- initial indirect fire assignments are now multiple per world_area to hopefully get lucky and hit something 
+- minor fixes and updates 
+
+indirect fire is still basically useless. i need to add a way to do some manual fire or maybe for the commander to add new missions 
+
+----------------------------------
+Nov 02 2025
+- minor changes and updates 
+- updated shrapnel generated for vehicle top hits to include weapon and shooter data
+- fixed soem ai_human_vehicle rotation calculations that were using human position instead of turret position as a base 
+
+still getting some shrapnel shooter is none, not sure why 
+
+----------------------------------
+Oct 29 2025
+- updated algo for world area positions. seems faster 
+- minor cleanup and updates 
+
+----------------------------------
+Oct 28 2025
+- fixed civilian spawns 
+----------------------------------
+Oct 26 2025
+- large rewrite of initial squad position system to allow for a tactical ai to start with 
+some world areas that they are defending 
+- spawn positions are now a fixed distance from the nearest world area 
+- airport map now also gets a town 
+- world_area spawn location computation is now threaded which should speed up loading a lot 
+- minor changes and cleanup
+- prone actually makes a difference now, this wasn't being checked correctly for collision before
+- driver action for fire missions and getting closer to targets was incorrectly flipped 
+
+amusingly the initial effect of the new positioning is minor.
+there is a 50% chance one of the sides is defending, otherwise 
+its a meeting engagement and spawn is much the same as it was.
+
+confirmed that the no equipper error is with the svt40-sniper 
+error : ai_gun.fire svt40-sniper equipper is none
+
+todo 
+- exempt civilians from new spawning setup 
+- investigate oddness with svt40-sniper error 
+
+----------------------------------
 Oct 23 2025
 - added Sd.kfz.222 and camo version 
 

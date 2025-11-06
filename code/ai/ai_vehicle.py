@@ -389,24 +389,19 @@ class AIVehicle():
         
         compartment=random.choice(['vehicle_body','passenger_compartment'])
 
-        if compartment=='vehicle_body':
-            for b in range(throwable.ai.shrapnel_count):
-                # special code to make sure the shrapnel hits the top armor
-                shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
-                shrapnel.ai.projectile_type='shrapnel'
-                shrapnel.name='shrapnel'
-                shrapnel.ai.starting_coords=self.owner.world_coords
+        for b in range(throwable.ai.shrapnel_count):
+            # special code to make sure the shrapnel hits the top armor
+            shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
+            shrapnel.ai.projectile_type='shrapnel'
+            shrapnel.name='shrapnel'
+            shrapnel.ai.starting_coords=self.owner.world_coords
+            shrapnel.ai.shooter=throwable.ai.equipper
+            shrapnel.ai.weapon=throwable
+            if compartment=='vehicle_body':
                 self.projectile_hit_vehicle_body(shrapnel,'top',0)
-        elif compartment=='passenger_compartment':
-            for b in range(throwable.ai.shrapnel_count):
-                # special code to make sure the shrapnel hits the top armor
-                shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
-                shrapnel.ai.projectile_type='shrapnel'
-                shrapnel.name='shrapnel'
-                shrapnel.ai.starting_coords=self.owner.world_coords
+            else:
                 self.projectile_hit_passenger_compartment(shrapnel,'top',0)
-        else:
-            engine.log.add_data('error',f'ai_vehicle.event_throwable_explosion_on_top_of_vehicle unknown compartment {compartment}',True)
+
                 
     #---------------------------------------------------------------------------
     def handle_component_damage(self,damaged_component,projectile):

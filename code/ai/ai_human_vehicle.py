@@ -130,7 +130,7 @@ class AIHumanVehicle():
 
             if turret.ai.handle_fire():
                 fire_mission.rounds_fired+=1
-                engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
+                #engine.log.add_data('note',f'{turret.name} fired a indirect fire round',True)
 
 
         # thats pretty much it. think can stop the engagement when we've fired enough as indirect fire weapons are fairly slow firing
@@ -459,7 +459,7 @@ class AIHumanVehicle():
                             self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                             self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
                             return
-                    if 'Waiting for driver to close distance' in current_action:
+                    if current_action=='Waiting for driver to get in position for fire mission':
                         if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
                             fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
                             need_vehicle_order=False
@@ -478,7 +478,8 @@ class AIHumanVehicle():
                                 if vehicle.ai.is_transport:
                                     vehicle_order.exit_vehicle_when_finished=True
                                 self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
-                    if current_action=='Waiting for driver to get in position for fire mission':
+                    # this is triggered by gunners that need to get closer to a tank to penetrate
+                    if 'Waiting for driver to close distance' in current_action:
                         target=role.human.ai.memory['task_vehicle_crew']['target']
                         if target is not None:
                             need_vehicle_order=False
@@ -602,7 +603,7 @@ class AIHumanVehicle():
 
                 # out of fuel.
                 # disable the vehicle for now. in the future we will want to try and get fuel and refuel
-                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
+                #engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver_drive_to_destination out of fuel. driver {self.owner.name} vehicle {vehicle.name} marking vehicle disabled',True)
                 vehicle.ai.vehicle_disabled=True
     #---------------------------------------------------------------------------
     def think_vehicle_role_driver_vehicle_order(self):
@@ -639,6 +640,11 @@ class AIHumanVehicle():
     def think_vehicle_role_gunner(self):
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+
+        if turret is None:
+            print(f'turret none in {vehicle.name}, role {self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].role_name}')
+            for b in vehicle.ai.vehicle_crew:
+                print(f' role: {b.role_name} is_driver: {b.is_driver} is_gunner: {b.is_gunner} is_commander {b.is_commander}')
 
         # reset engagement commands 
         self.owner.ai.memory['task_vehicle_crew']['engage_primary_weapon'] = False
@@ -793,7 +799,7 @@ class AIHumanVehicle():
                 return
 
         # check rotation
-        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
+        rotation_angle=engine.math_2d.get_rotation(turret.world_coords,target.world_coords)
         rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
         
         # check engagement for each weapon
@@ -924,7 +930,7 @@ class AIHumanVehicle():
             
         # turret rotation ?
         # check rotation
-        rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,fire_mission.world_coords)
+        rotation_angle=engine.math_2d.get_rotation(turret.world_coords,fire_mission.world_coords)
         rotation_check=self.check_vehicle_turret_rotation_real_angle(rotation_angle,turret)
 
         if rotation_check == False:
@@ -1077,9 +1083,9 @@ class AIHumanVehicle():
             # universal check for empty priority spots
             if role.is_driver is False and role.is_gunner is False:
                 # check if there are any empty roles
-                for role in vehicle.ai.vehicle_crew:
-                    if role.role_occupied is False:
-                        if role.is_driver or role.is_gunner:
+                for available_role in vehicle.ai.vehicle_crew:
+                    if available_role.role_occupied is False:
+                        if available_role.is_driver or available_role.is_gunner:
                             self.owner.ai.switch_task_vehicle_crew(vehicle,None)
                             return
                         

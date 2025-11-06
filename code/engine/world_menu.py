@@ -402,7 +402,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_weapons':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Weapons --')
-            self.text_queue.append('1 - ppsh41 ')
+            self.text_queue.append('1 - kampfpistole ')
             self.text_queue.append('2 - Panzerschreck')
             self.text_queue.append('3 - Panzerfaust 60 ')
             self.text_queue.append('4 - molotov')
@@ -410,7 +410,9 @@ class World_Menu(object):
             self.text_queue.append('6 - ptrs-41')
             self.text_queue.append('7 - rpg43')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'ppsh41',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kampfpistole',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kampfpistole_magazine',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'kampfpistole_magazine',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'panzerschreck_magazine',True)

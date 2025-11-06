@@ -370,7 +370,133 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
     # If all retries are exhausted, raise an error
     raise ValueError(f"Failed to generate {count} coordinates after {retries} retries with max_size up to {current_max_size}.")
 
-import random
+
+#------------------------------------------------------------------------------
+# grok4 came up with this after a good 5 minutes of thinking and web search. 
+# seems faster..
+def get_random_constrained_coords_v2(starting_coordinate, max_size, minimum_separation, count, avoid_coords, avoid_coords_separation):
+    """
+    Generates a list of map coordinates with specified constraints.
+    Coordinates are whole numbers (integers).
+    If max_attempts are exhausted, increases max_size by 1000 and retries.
+    Parameters:
+    - starting_coordinate (list or tuple): The starting coordinates [x, y]. should usually be [0,0]
+    - max_size (int): The initial maximum absolute value for x or y.
+    - minimum_separation (int): The minimum Euclidean distance between any two coordinates.
+    - count (int): The number of coordinates to generate.
+    - avoid_coords (array): list of coords to avoid
+    - avoid_coords_separation: minimum distance from a avoided coordinate
+    Returns:
+    - list of lists: A list containing coordinate pairs [x, y].
+    Raises:
+    - ValueError: If it's impossible to place the desired number of points after multiple retries.
+    """
+    
+    avoid_coords = list(avoid_coords)  # Ensure it's a list
+    
+    min_sep_sq = minimum_separation ** 2
+    min_avoid_sep_sq = avoid_coords_separation ** 2
+    
+    current_max_size = max_size
+    size_increment = 1000
+    retry_limit = 10
+    retries = 0
+    
+    # Fixed set of relative neighbor offsets (covers up to ~2 cells away in each direction)
+    dxdy = [(-1,-2), (0,-2), (1,-2), (-2,-1), (-1,-1), (0,-1), (1,-1), (2,-1),
+            (-2,0), (-1,0), (0,0), (1,0), (2,0), (-2,1), (-1,1), (0,1), (1,1), (2,1),
+            (-1,2), (0,2), (1,2)]
+    
+    while retries < retry_limit:
+        coordinates = []
+        
+        max_attempts = count * 1000  # Consider increasing this to 10000+ if still failing often
+        attempts = 0
+        
+        min_x = starting_coordinate[0] - current_max_size
+        min_y = starting_coordinate[1] - current_max_size
+        
+        # Grid setup for generated coordinates
+        a = minimum_separation / math.sqrt(2)
+        cells = {}  # dict of (cx, cy): index in coordinates
+        
+        # Grid setup for avoid_coords (separate in case separations differ)
+        a_avoid = avoid_coords_separation / math.sqrt(2)
+        avoid_cells = {}  # dict of (cx, cy): list of indices in avoid_coords
+        for i, coord in enumerate(avoid_coords):
+            cx = math.floor((coord[0] - min_x) / a_avoid)
+            cy = math.floor((coord[1] - min_y) / a_avoid)
+            cell = (cx, cy)
+            if cell not in avoid_cells:
+                avoid_cells[cell] = []
+            avoid_cells[cell].append(i)
+        
+        def get_cell(x, y):
+            return (math.floor((x - min_x) / a), math.floor((y - min_y) / a))
+        
+        def get_cell_avoid(x, y):
+            return (math.floor((x - min_x) / a_avoid), math.floor((y - min_y) / a_avoid))
+        
+        def get_neighbours(coords, is_avoid=False):
+            neighbours = []
+            for dx, dy in dxdy:
+                nc = (coords[0] + dx, coords[1] + dy)
+                if is_avoid:
+                    if nc in avoid_cells:
+                        neighbours.extend(avoid_cells[nc])
+                else:
+                    if nc in cells:
+                        neighbours.append(cells[nc])
+            return neighbours
+        
+        while len(coordinates) < count and attempts < max_attempts:
+            offset_x = random.randint(-current_max_size, current_max_size)
+            x = starting_coordinate[0] + offset_x
+            offset_y = random.randint(-current_max_size, current_max_size)
+            y = starting_coordinate[1] + offset_y
+            too_close = False
+            
+            # Check against generated coordinates (only nearby via grid)
+            cell = get_cell(x, y)
+            neigh_idxs = get_neighbours(cell, is_avoid=False)
+            for idx in neigh_idxs:
+                coord = coordinates[idx]
+                dx = coord[0] - x
+                dy = coord[1] - y
+                if dx * dx + dy * dy < min_sep_sq:
+                    too_close = True
+                    break
+            if too_close:
+                attempts += 1
+                continue
+            
+            # Check against avoid_coords (only nearby via grid)
+            cell_avoid = get_cell_avoid(x, y)
+            neigh_avoid_idxs = get_neighbours(cell_avoid, is_avoid=True)
+            for idx in neigh_avoid_idxs:
+                coord = avoid_coords[idx]
+                dx = coord[0] - x
+                dy = coord[1] - y
+                if dx * dx + dy * dy < min_avoid_sep_sq:
+                    too_close = True
+                    break
+            if too_close:
+                attempts += 1
+                continue
+            
+            # Valid: add it
+            coordinates.append([x, y])
+            cells[cell] = len(coordinates) - 1
+            attempts += 1  # Count all attempts, including successes
+        
+        if len(coordinates) == count:
+            return coordinates
+        else:
+            retries += 1
+            current_max_size += size_increment
+            print(f"Attempt {retries}: Could only generate {len(coordinates)} coordinates with max_size={current_max_size - size_increment}. Increasing max_size to {current_max_size} and retrying...")
+    
+    raise ValueError(f"Failed to generate {count} coordinates after {retries} retries with max_size up to {current_max_size}.")
 
 #------------------------------------------------------------------------------
 def get_random_constrained_coords_with_max_sep(starting_coordinate, max_size, minimum_separation, maximum_separation, count, avoid_coords, avoid_coords_separation):

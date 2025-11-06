@@ -613,7 +613,10 @@ class StrategicMap(object):
 
         # should look into just moving this into strategic menu
 
-        self.graphics_engine.load_world(spawn_faction,map_square.name,map_square.map_objects)
+        # eventually we need to work out who was already on this map and who is attacking
+        defending_faction=random.choice(['german','soviet','none','contested'])
+
+        self.graphics_engine.load_world(spawn_faction,map_square.name,map_square.map_objects,defending_faction)
 
     #------------------------------------------------------------------------------
     def save_all_maps(self):
