@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 06 2025
+- fix f-string for older version of python 
+
+----------------------------------
 Nov 05 2025
 - added kampfpistole
 - panzer iv j and tiger 1 get the nahverteidigungswaffe_turret

@@ -642,7 +642,7 @@ class AIHumanVehicle():
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
 
         if turret is None:
-            print(f'turret none in {vehicle.name}, role {self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].role_name}')
+            print(f'turret none in {vehicle.name}, role {self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].role_name}')
             for b in vehicle.ai.vehicle_crew:
                 print(f' role: {b.role_name} is_driver: {b.is_driver} is_gunner: {b.is_gunner} is_commander {b.is_commander}')
 
