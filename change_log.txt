@@ -1,5 +1,18 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Nov 09 2025
+started working on a road system but it needs a rethink 
+
+the road system can't work how i planned because it needs to be able to be loaded. 
+instead i'll probably have 
+- a generator that creates loads when maps are created 
+- a scanner that scans all the roads in a grid and figures out sequences for fast travel. 
+
+the idea is to not only have visual roads but to also tie into a larger terrain system that determines vehicle 
+speeds and vehicle pathing 
+
 ----------------------------------
 Nov 06 2025
 - fix f-string for older version of python 
