@@ -5959,6 +5959,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.weight=1000
         z.rotation_angle=float(random.randint(0,359))
         z.no_update=True
+    elif object_type=='road_300':
+        # a road segment
+        z=WorldObject(world,['road_300'],AINone)
+        z.name='road'
+        z.weight=1000
+        z.rotation_angle=0
+        z.no_update=True
 
     else:
         print('!! Spawn Error: '+object_type+' is not recognized.')  

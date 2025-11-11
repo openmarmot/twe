@@ -134,7 +134,12 @@ class AIFactionTactical():
             else:
                 # some squads end up vehicle only due to the current squad creation algo.
                 #print(f'squad error. member count:{len(squad.members)}, vehicle count:{len(squad.vehicles)}')
-                # lets just skip adding those squads to ai tactical
+
+                # set the spawn location so the vehicles end up in the right area
+                self.set_squad_starting_position(squad,self.spawn_location)
+
+                # lets just skip adding those squads to ai tactical so the squad isn't saved
+                # they will just be extra vehicles that the ai can use if it wants
                 continue
                 
             self.squads.append(squad)

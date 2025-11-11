@@ -381,7 +381,6 @@ class Graphics_2D_Pygame(object):
         '''render mode 1 : tactical mode'''
 
         self.update_render_info()
-
         self.screen.blit(self.background, (0, 0))
         for b in self.renderlists:
             for c in b:
@@ -391,7 +390,6 @@ class Graphics_2D_Pygame(object):
 
                 if self.draw_collision:
                     pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.world.scale)
-
         h=0
         for b in islice(self.world.text_queue,self.world.text_queue_display_size):
             h+=15
@@ -523,8 +521,6 @@ class Graphics_2D_Pygame(object):
                 f'graphics_2d_pygame.reset_pygame_image: image transform error with image {wo.image_list[wo.image_index]}',
                 True
             )
-
-    
 
     #---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self,mouse_coords):

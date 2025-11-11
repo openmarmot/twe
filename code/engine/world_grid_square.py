@@ -23,7 +23,7 @@ class WorldGridSquare:
             j: Column index in the grid.
             top_left: (x, y) coordinates of top-left corner.
             bottom_right: (x, y) coordinates of bottom-right corner.
-            grid_size: Size of the grid square in units.
+            grid_size: Size of the grid square in units. normally 1000
         """
         self.i = i
         self.j = j
