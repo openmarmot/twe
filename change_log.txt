@@ -2,6 +2,20 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 11 2025
+- added all the remaining code for the terrain grid and terrain checks 
+
+I now have a functioning terrain grid. the square are 10x10 which is smaller than 
+I had intended - but smaller is probably better? The lookup seems super fast and the 
+initialization is fast enough. 
+
+i'm not honestly sure what im going to do with it immediately. 
+probably some path finding stuff, maybe that should be pre-computed 
+
+todo 
+- add vehicle code to occasionally check terrain and use that to set max speed 
+
+----------------------------------
 Nov 10 2025
 - added a road for testing purposes 
 - fixed a bug recently with vehicle only squads not having the vehicles positioned in squad spawn 
