@@ -2,6 +2,12 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 13 2025
+- added vehicle max_dynamic_speed which is 
+
+ran out of time and didn't test this 
+
+----------------------------------
 Nov 11 2025
 - added all the remaining code for the terrain grid and terrain checks 
 

@@ -195,6 +195,11 @@ class AIVehicle():
         # whether we are offroad or not
         self.offroad=True
 
+        # this is calculated
+        self.max_dynamic_speed=0
+        self.last_dynamic_speed_update=0
+        self.dynamic_speed_update_interval=0.5
+
         # minimum speed needed to take off
 
         # stall speed. should be affected by angle of attack
@@ -938,6 +943,11 @@ class AIVehicle():
             self.radio.world_coords=copy.copy(self.owner.world_coords)
             self.radio.update()
 
+        if self.owner.world.world_seconds>self.last_dynamic_speed_update+self.dynamic_speed_update_interval:
+            self.last_dynamic_speed_update=self.owner.world.world_seconds
+            self.update_max_dynamic_speed()
+
+
         if self.throttle>0:
             if self.current_speed==0:
                 if self.owner.weight>500:
@@ -1107,6 +1117,23 @@ class AIVehicle():
         self.owner.reset_image=True
 
     #---------------------------------------------------------------------------
+    def update_max_dynamic_speed(self):
+        terrain=self.owner.grid_square.get_terrain_type(self.owner.world_coords)
+        # terrain types 
+        # 0 -(default) open ground
+        # 1 - vegetation
+        # 2 - tree
+        # 3 - road
+        self.max_dynamic_speed=self.max_offroad_speed
+        if terrain==1:
+            self.max_dynamic_speed*=0.5
+        if terrain==2:
+            self.max_dynamic_speed*=0.1
+        if terrain==3:
+            self.max_dynamic_speed=self.max_speed
+
+
+    #---------------------------------------------------------------------------
     def update_physics(self):
         '''update the physics of the vehicle'''
         time_passed=self.owner.world.time_passed_seconds
@@ -1132,12 +1159,8 @@ class AIVehicle():
                    
         # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
         if self.throttle>0:
-            if self.offroad:
-                if self.current_speed<self.max_offroad_speed:
-                    self.current_speed+=(self.acceleration*self.throttle)*time_passed
-            else:
-                if self.current_speed<self.max_speed:
-                    self.current_speed+=(self.acceleration*self.throttle)*time_passed
+            if self.current_speed<self.max_dynamic_speed:
+                self.current_speed+=(self.acceleration*self.throttle)*time_passed
         else:
             # just in case the throttle went negative
             self.throttle=0
