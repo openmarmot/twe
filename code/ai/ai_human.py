@@ -1009,7 +1009,9 @@ class AIHuman(object):
             if self.in_vehicle():
                 self.memory['task_vehicle_crew']['vehicle_hits'].append(event_data)
             else:
-                engine.log.add_data('warn','ai_human.handle_event vehicle_hit but user is not in vehicle',True)
+                pass
+                # this actually happens pretty frequently
+                #engine.log.add_data('warn','ai_human.handle_event vehicle_hit but user is not in vehicle',True)
 
         else:
             engine.log.add_data('error','ai_human.handle_event cannot handle event'+event,True)

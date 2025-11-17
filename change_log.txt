@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 14 2025
+- fixed another area where shrapnel was being spawned without a shooter 
+- silenced the vehicle_hit but human not in vehicle log as the system works as intended at the moment 
+
+terrain system works in that it limits the max speed, but it doesn't decrease it 
+when the current speed exceeds the max 
+
+----------------------------------
 Nov 13 2025
 - added vehicle max_dynamic_speed which is 
 

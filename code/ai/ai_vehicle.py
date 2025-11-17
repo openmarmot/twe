@@ -568,30 +568,26 @@ class AIVehicle():
                 self.handle_component_damage('random_crew_fire',None)
 
     #---------------------------------------------------------------------------
-    def handle_spalling_damage(self, compartment):
+    def handle_spalling_damage(self, compartment,projectile):
         '''handle damage from armor spalling due to near-miss penetrations'''
 
         num_fragments = random.randint(1, 3)
 
         for i in range(num_fragments):
-            if compartment == 'passenger_compartment':
-                # higher chance of crew injury from spalling in crew compartment
-                if random.randint(0, 2) == 0:
-                    shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
-                    shrapnel.ai.projectile_type = 'shrapnel'
-                    shrapnel.name = 'shrapnel'
-                    shrapnel.ai.starting_coords = self.owner.world_coords
+            if random.randint(0, 2) == 0:
+                shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
+                shrapnel.ai.projectile_type = 'shrapnel'
+                shrapnel.name = 'shrapnel'
+                shrapnel.ai.starting_coords = self.owner.world_coords
+                shrapnel.ai.shooter=projectile.ai.shooter
+                shrapnel.ai.weapon=projectile.ai.weapon
+
+                if compartment == 'passenger_compartment':
                     self.handle_component_damage('random_crew_projectile', shrapnel)
 
-            else:  # vehicle_body
-                if random.randint(0, 2) == 0:
-                    shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
-                    shrapnel.ai.projectile_type = 'shrapnel'
-                    shrapnel.name = 'shrapnel'
-                    shrapnel.ai.starting_coords = self.owner.world_coords
+                else:  # vehicle_body
                     self.handle_component_damage('driver_projectile', shrapnel)
                 
-
     #---------------------------------------------------------------------------
     def handle_rudder_left(self):
         '''handle left rudder input'''
@@ -808,7 +804,7 @@ class AIVehicle():
         else:
             # check for partial penetration causing spalling
             if pen_value >= armor_value * 0.9:
-                self.handle_spalling_damage('passenger_compartment')
+                self.handle_spalling_damage('passenger_compartment',projectile)
                 result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
             self.projectile_bounce(projectile)
@@ -833,7 +829,7 @@ class AIVehicle():
         else:
             # check for partial penetration causing spalling
             if pen_value >= armor_value * 0.9:
-                self.handle_spalling_damage('vehicle_body')
+                self.handle_spalling_damage('vehicle_body',projectile)
                 result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
             self.projectile_bounce(projectile)
