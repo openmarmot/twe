@@ -36,7 +36,8 @@ class WorldGridSquare:
         )
 
         # - terrain sub grid - 
-        self.terrain_grid_resolution = 100
+        # this was 100 originally. idk what a good number is
+        self.terrain_grid_resolution = 75
         # 0=default (grass), 1=road, etc. 
         self.terrain_types = bytearray(self.terrain_grid_resolution * self.terrain_grid_resolution)  
 

@@ -6,12 +6,15 @@ Nov 17 2025
 - vehicle physics rewrite 
 - reduced world_area position calculation to increase loading time 
 - handled occasional terrain get out of bounds 
+- reduced terrain grid resolution to try and improve loading times 
+- minor fixes and updates  
 
 idk if the physics is significantly better than it was before.. 
 all vehicles need weights and engine power normalized 
 
 todo 
 - check airplanes, they seem to be bugged now 
+- some hit markers are not angled correctly and can be fixed by toggling hit markers on and off 
 
 ----------------------------------
 Nov 14 2025
