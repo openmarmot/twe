@@ -742,8 +742,16 @@ class World():
             t = threading.Thread(target=area.compute_locations)
             threads.append(t)
             t.start()
+
+        # compute terrain values
+        t = threading.Thread(target=self.grid_manager.compute_terrain_values)
+        threads.append(t)
+        t.start()
+
+        # wait for threads to finish
         for t in threads:
             t.join()
+
         
         engine.log.add_data('note','Starting tactical AIs..',True)
         # set initial spawn points for each faction
@@ -857,6 +865,8 @@ class World():
         self.debug_text_queue.append(f"Player Fatigue: {round(self.player.ai.fatigue, 1)}")
         self.debug_text_queue.append(f"Player Speed: {self.player.ai.get_calculated_speed()}")
         self.debug_text_queue.append(f"Player building overlap count: {len(self.player.ai.building_list)}")
+        self.debug_text_queue.append(f"Terrain at player coords: {self.player.grid_square.get_terrain_type(self.player.world_coords)}")
+
         self.debug_text_queue.append('----- Faction Stats ------')
         for b in self.tactical_ai.values():
             self.debug_text_queue.append(f"{b.faction} humans: {len(b.allied_humans)}")
@@ -887,11 +897,11 @@ class World():
                 self.vehicle_text_queue.append(f'Fuel Gauge: {current_fuel}/{max_fuel}')
                 self.vehicle_text_queue.append(f'Speed: {round(vehicle.ai.current_speed, 1)}')
 
-                #self.vehicle_text_queue.append(f'max speed: {round(vehicle.ai.max_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
-                #self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
-                #self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
-                #self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
-                #self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
+                self.vehicle_text_queue.append(f'max dynamic speed: {round(vehicle.ai.max_dynamic_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
+                self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
+                self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
+                self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
+                self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
 
                 # airplane specific 
                 if vehicle.is_airplane:

@@ -5,9 +5,11 @@ notes :
 '''
 
 #import built in modules
+import threading
 
 #import custom packages
 from engine.world_grid_square import WorldGridSquare
+import engine.log
 
 #global variables
 
@@ -28,6 +30,18 @@ class WorldGridManager:
                 self.grid_size)
             self.index_map[(i, j)] = square
         return self.index_map[(i, j)]
+    
+    #---------------------------------------------------------------------------
+    def compute_terrain_values(self):
+        # precompute world_area locations
+        engine.log.add_data('note','Computing grid square terrain values..',True)
+        threads = []
+        for g in self.index_map.values():
+            t = threading.Thread(target=g.compute_terrain_values)
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
     
     #---------------------------------------------------------------------------
     def get_all_objects(self):

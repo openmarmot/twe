@@ -13,6 +13,7 @@ from engine.map_object import MapObject
 import engine.math_2d
 import engine.world_builder
 import engine.log
+import math
 
 #------------------------------------------------------------------------------
 def generate_civilians(map_objects):
@@ -159,7 +160,6 @@ def generate_map(map_areas):
     world_size=max(min_world_size,len(map_areas)*4000)
 
     coord_list=engine.math_2d.get_random_constrained_coords([0,0],8000,5000,len(map_areas),[],0) 
-
     for map_area in map_areas:
         if map_area=='airport':
             map_objects+=generate_map_area_airport(coord_list.pop(),'airport')
@@ -167,6 +167,9 @@ def generate_map(map_areas):
             map_objects+=generate_map_area_rail_yard(coord_list.pop(),'rail_yard')
         elif map_area=='town':
             map_objects+=generate_map_area_town(coord_list.pop(),'town')
+
+    # generate road
+    map_objects+=generate_road([-8000,0],[8000,0],'road_300',300)
 
     # generate clutter 
     map_objects+=generate_clutter(map_objects)
@@ -259,6 +262,32 @@ def generate_map_area_town(world_coords,name):
     map_objects.append(world_area)
 
     return map_objects
+
+#------------------------------------------------------------------------------
+def generate_road(start_coords,end_coords,road_type,segment_height):
+    #road_type string, the world_builder_identity of the road segment
+    # rotation is in degrees
+    actual_rotation=engine.math_2d.get_rotation(start_coords,end_coords)
+    actual_distance=engine.math_2d.get_distance(start_coords,end_coords)
+
+    # for now calculated_rotation is the closest angle of 0,90,180,270
+    #calculated_rotation = round(actual_rotation / 90) * 90 % 360
+
+    # determine the number of segments needed and the overlap
+    # overlap defaults to the segment type_height
+    # if there is a remainder we will go one over and slightly overlap them
+    number_of_segments = math.ceil(actual_distance / segment_height)
+
+    segments=[]
+
+    # fill out the segments array
+    dir = engine.math_2d.get_heading_vector(start_coords, end_coords)
+    for i in range(number_of_segments):
+        center_pos = [start_coords[0] + (i * segment_height + segment_height / 2) * dir[0], 
+                        start_coords[1] + (i * segment_height + segment_height / 2) * dir[1]]
+        segments.append(MapObject(road_type,road_type,center_pos,actual_rotation,[]))
+
+    return segments
 
 #------------------------------------------------------------------------------
 def generate_vegetation(map_objects,world_size):

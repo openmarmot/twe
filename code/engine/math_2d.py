@@ -39,7 +39,7 @@ GRAVITY=-9.8
 cache_check=[]
 
 #------------------------------------------------------------------------------
-def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
+def calculate_acceleration_old(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
     '''calculate acceleration'''
     # force - force in watts
     # rolling_resistance : maybe 0.015 for a jeep (1.5% of the vehicle weight)
@@ -63,6 +63,48 @@ def calculate_acceleration(force,rolling_resistance,drag_coefficient,air_density
     # round to 2 sd
     acceleration=round(acceleration,2)
 
+    return acceleration
+
+#------------------------------------------------------------------------------
+def calculate_acceleration(force, rolling_resistance, drag_coefficient, air_density, frontal_area, mass, velocity, g=9.81):
+    '''Calculate acceleration based on net force, including velocity-dependent drag.'''
+    # force: engine force in Newtons
+    # rolling_resistance: dimensionless coefficient (e.g., 0.015 for road)
+    # drag_coefficient: dimensionless (e.g., 0.8 for jeep)
+    # air_density: kg/m³ (e.g., 1.225)
+    # frontal_area: m²
+    # mass: kg (formerly misnamed 'weight')
+    # velocity: current speed in m/s (absolute value for drag)
+    # g: gravity in m/s², default 9.81
+
+    # Calculate rolling resistance force (assuming flat ground; normal force = m*g)
+    rolling_force = rolling_resistance * mass * g
+
+    # Calculate aerodynamic drag force (increases with v²)
+    drag_force = 0.5 * drag_coefficient * air_density * frontal_area * (velocity ** 2)
+
+    # Net force forward
+    net_force = force - rolling_force - drag_force
+
+    # Acceleration = net_force / mass (can be negative if drag + rolling > force)
+    acceleration = net_force / mass
+
+    # Adjustment to game units (tune this if speeds/accelerations feel off)
+    adjustment = 1  # e.g., if game uses larger units, increase
+    acceleration *= adjustment
+
+    results={
+        'force':force,
+        'rolling_resistance':rolling_resistance,
+        'drag_coefficient':drag_coefficient,
+        'air_density':air_density,
+        'frontal_area':frontal_area,
+        'mass':mass,
+        'velocity':velocity,
+        'gravity':g,
+        'acceleration':acceleration
+    }
+    #print(results)
     return acceleration
 
 #------------------------------------------------------------------------------

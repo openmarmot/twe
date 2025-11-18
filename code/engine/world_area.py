@@ -71,7 +71,7 @@ class WorldArea(object):
                 coords_to_avoid.append(wo_object.world_coords)
 
         seperation=100
-        count=200 # this should be plenty. locations are mostly used at a squad or vehicle level
+        count=100 # this should be plenty. locations are mostly used at a squad or vehicle level
         #self.locations=engine.math_2d.get_random_constrained_coords(self.world_coords,
         #    self.size,seperation,count,coords_to_avoid,600)
         
