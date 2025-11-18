@@ -136,6 +136,11 @@ class WorldGridSquare:
         local_x = world_coords[0] - self.top_left[0]
         local_y = world_coords[1] - self.top_left[1]
 
+        # If outside square bounds, return default terrain type
+        if (local_x < 0 or local_x >= self.grid_size or
+            local_y < 0 or local_y >= self.grid_size):
+            return 0
+
         ix = min(self.terrain_grid_resolution - 1, int(local_x * self.terrain_grid_resolution / self.grid_size))
         iy = min(self.terrain_grid_resolution - 1, int(local_y * self.terrain_grid_resolution / self.grid_size))
         idx = iy * self.terrain_grid_resolution + ix

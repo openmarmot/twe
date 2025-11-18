@@ -897,11 +897,11 @@ class World():
                 self.vehicle_text_queue.append(f'Fuel Gauge: {current_fuel}/{max_fuel}')
                 self.vehicle_text_queue.append(f'Speed: {round(vehicle.ai.current_speed, 1)}')
 
-                #self.vehicle_text_queue.append(f'max speed: {round(vehicle.ai.max_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
-                #self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
-                #self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
-                #self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
-                #self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
+                self.vehicle_text_queue.append(f'max dynamic speed: {round(vehicle.ai.max_dynamic_speed, 1)} current speed: {round(vehicle.ai.current_speed, 1)}')
+                self.vehicle_text_queue.append(f'acceleration: {vehicle.ai.acceleration}')
+                self.vehicle_text_queue.append(f'throttle: {vehicle.ai.throttle}')
+                self.vehicle_text_queue.append(f'brake: {vehicle.ai.brake_power}')
+                self.vehicle_text_queue.append(f'wheel steering: {vehicle.ai.wheel_steering}')
 
                 # airplane specific 
                 if vehicle.is_airplane:

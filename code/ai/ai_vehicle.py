@@ -10,6 +10,7 @@ any AI would be handled by ai_human
 #import built in modules
 import random
 import copy
+import math
 
 #import custom packages
 import engine.math_2d
@@ -199,6 +200,9 @@ class AIVehicle():
         self.max_dynamic_speed=0
         self.last_dynamic_speed_update=0
         self.dynamic_speed_update_interval=0.5
+
+        self.rolling_resistance_coeff = 0.03  # Base coeff; updated by terrain
+        self.gravity = 9.81
 
         # minimum speed needed to take off
 
@@ -950,7 +954,6 @@ class AIVehicle():
                     self.tracks_enabled=True
                     self.tracks_count=0
 
-            self.update_acceleration_calculation()
         else:
             self.acceleration=0
 
@@ -965,49 +968,6 @@ class AIVehicle():
         if self.recent_noise_or_move:
             if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
                 self.recent_noise_or_move=False
-
-    #---------------------------------------------------------------------------
-    def update_acceleration_calculation(self):
-        '''update the acceleration calculation'''
-
-        # this can probably doesn't need to be done every update
-
-        self.acceleration=0
-
-        # calculate total current engine force
-        total_engine_force=0
-        for b in self.engines:
-            if b.ai.engine_on and b.ai.damaged is False:
-                total_engine_force+=b.ai.max_engine_force*b.ai.throttle_control
-
-        # no idea what are good values for this at the moment
-        rolling_resistance=0.03
-
-        # this is costly to do every update. 
-        # also unsure what the full effect will be 
-        # turning this off for now..
-        wheel_damage=False
-        if wheel_damage:
-            for b in self.front_left_wheels:
-                if b.ai.damaged or b.ai.destroyed:
-                    rolling_resistance+=1
-            for b in self.front_right_wheels:
-                if b.ai.damaged or b.ai.destroyed:
-                    rolling_resistance+=1
-            for b in self.rear_left_wheels:
-                if b.ai.damaged or b.ai.destroyed:
-                    rolling_resistance+=1
-            for b in self.rear_right_wheels:
-                if b.ai.damaged or b.ai.destroyed:
-                    rolling_resistance+=1
-
-        # prevents this from going negative. but maybe we want that?
-        # 0 engine force could result in negative accelleration 
-        if total_engine_force>0:
-            self.acceleration=engine.math_2d.calculate_acceleration(
-                total_engine_force,rolling_resistance,
-                self.owner.drag_coefficient,self.owner.world.air_density,
-                self.owner.frontal_area,self.owner.weight)
             
     #---------------------------------------------------------------------------
     def update_child_position_rotation(self):
@@ -1114,91 +1074,131 @@ class AIVehicle():
 
     #---------------------------------------------------------------------------
     def update_max_dynamic_speed(self):
-        terrain=self.owner.grid_square.get_terrain_type(self.owner.world_coords)
-        # terrain types 
-        # 0 -(default) open ground
-        # 1 - vegetation
-        # 2 - tree
-        # 3 - road
-        self.max_dynamic_speed=self.max_offroad_speed
-        if terrain==1:
-            self.max_dynamic_speed*=0.5
-        if terrain==2:
-            self.max_dynamic_speed*=0.1
-        if terrain==3:
-            self.max_dynamic_speed=self.max_speed
-
+        terrain = self.owner.grid_square.get_terrain_type(self.owner.world_coords)
+        # Tune coeffs to achieve desired max speeds via physics
+        if terrain == 3:  # road - low resistance
+            self.rolling_resistance_coeff = 0.015
+            terrain_max = self.max_speed
+        elif terrain == 0:  # open ground
+            self.rolling_resistance_coeff = 0.05
+            terrain_max = self.max_offroad_speed
+        elif terrain == 1:  # vegetation
+            self.rolling_resistance_coeff = 0.1
+            terrain_max = self.max_offroad_speed * 0.5
+        elif terrain == 2:  # tree
+            self.rolling_resistance_coeff = 0.3
+            terrain_max = self.max_offroad_speed * 0.1
+        else:
+            self.rolling_resistance_coeff = 0.03
+            terrain_max = self.max_offroad_speed
+        
+        
+        self.max_dynamic_speed = terrain_max
 
     #---------------------------------------------------------------------------
     def update_physics(self):
         '''update the physics of the vehicle'''
-        time_passed=self.owner.world.time_passed_seconds
+        time_passed = self.owner.world.time_passed_seconds
 
         heading_changed = False
 
         if self.first_update:
-            self.first_update=False
-            heading_changed=True
-
-        # check control input
+            self.first_update = False
+            heading_changed = True
 
         # update rotation angle on the ground
-        if self.owner.altitude<1:
-            rotation_change=(self.rotation_speed*self.wheel_steering)*time_passed
+        if self.owner.altitude < 1:
+            rotation_change = (self.rotation_speed * self.wheel_steering) * time_passed
         # update rotation angle in the air
         else:
-            rotation_change=(self.rotation_speed*self.ailerons)*time_passed
+            rotation_change = (self.rotation_speed * self.ailerons) * time_passed
 
-        if rotation_change !=0 and self.current_speed>0:
-            self.owner.rotation_angle+=rotation_change
-            heading_changed=True
-                   
-        # note this should be rethought. deceleration should happen at zero throttle with negative acceleration
-        if self.throttle>0:
-            if self.current_speed<self.max_dynamic_speed:
-                self.current_speed+=(self.acceleration*self.throttle)*time_passed
+        if rotation_change != 0 and abs(self.current_speed) > 0:
+            self.owner.rotation_angle += rotation_change
+            heading_changed = True
+
+        # Calculate total engine force (assuming in Newtons; tune if needed)
+        total_engine_force = 0
+        for b in self.engines:
+            if b.ai.engine_on and not b.ai.damaged:
+                total_engine_force += b.ai.max_engine_force * b.ai.throttle_control
+
+        # Wheel damage effect: increase rolling coeff
+        # Example: add per damaged wheel
+        effective_rolling_coeff = self.rolling_resistance_coeff
+        # Uncomment and tune if desired
+        # for wheels in [self.front_left_wheels, self.front_right_wheels, self.rear_left_wheels, self.rear_right_wheels]:
+        #     for w in wheels:
+        #         if w.ai.damaged: effective_rolling_coeff += 0.01  # Small increase per damage
+        #         if w.ai.destroyed: effective_rolling_coeff += 0.05
+
+        # Compute current acceleration (forward if throttle >0, can be pos/neg)
+        current_velocity = abs(self.current_speed)  # Drag uses magnitude
+        if self.throttle > 0:
+            effective_force = total_engine_force * self.throttle  # Scale by throttle
+            self.acceleration = engine.math_2d.calculate_acceleration(
+                effective_force, effective_rolling_coeff,
+                self.owner.drag_coefficient, self.owner.world.air_density,
+                self.owner.frontal_area, self.owner.weight, current_velocity,
+                g=self.gravity
+            )
+            self.current_speed += self.acceleration * time_passed
         else:
-            # just in case the throttle went negative
-            self.throttle=0
-            
-            # deceleration 
-            # this may need tuning 
-            if self.current_speed>5:
-                self.current_speed-=5*time_passed
-            elif self.current_speed<-5:
-                self.current_speed+=5*time_passed
-            elif self.current_speed<9 and self.current_speed>-9:
-                self.current_speed=0
+            self.throttle = max(0, self.throttle)  # Prevent negative
+            # Deceleration: accel with engine_force=0 (negative value)
+            self.acceleration = engine.math_2d.calculate_acceleration(
+                0, effective_rolling_coeff,
+                self.owner.drag_coefficient, self.owner.world.air_density,
+                self.owner.frontal_area, self.owner.weight, current_velocity,
+                g=self.gravity
+            )  # This will be negative
+            if self.current_speed > 0:
+                self.current_speed += self.acceleration * time_passed  # Adds negative
+            elif self.current_speed < 0:
+                self.current_speed -= self.acceleration * time_passed  # Subtract negative to add positive decel
 
-            if self.brake_power>0:
-                self.current_speed-=self.brake_power*self.brake_strength*time_passed
-                if self.current_speed<5:
-                    self.current_speed=0
+            # Add braking (extra decel)
+            if self.brake_power > 0:
+                brake_decel = -self.brake_power * self.brake_strength  # Negative accel
+                if self.current_speed > 0:
+                    self.current_speed += brake_decel * time_passed
+                elif self.current_speed < 0:
+                    self.current_speed -= brake_decel * time_passed  # For reverse
 
-        # apply air drag
+            # Clamp small speeds to zero
+            if abs(self.current_speed) < 0.1:  # Smaller threshold for precision
+                self.current_speed = 0
+
+        # Clamp to max_dynamic_speed to prevent runaway speeds and overflow
+        if self.current_speed > self.max_dynamic_speed:
+            self.current_speed = self.max_dynamic_speed
+        elif self.current_speed < -self.max_dynamic_speed:
+            self.current_speed = -self.max_dynamic_speed
+
+        # Reverse gear handling: if current_gear=='reverse', current_speed can be negative, but drag uses abs
 
         # adjust altitude
-        self.owner.altitude+=self.rate_of_climb*time_passed
-        
-        #  reset image if heading has changed 
+        self.owner.altitude += self.rate_of_climb * time_passed
+
+        # reset image if heading has changed
         if heading_changed:
             self.update_heading()
 
-
         # move along vector
-        if self.current_speed>0:
+        if abs(self.current_speed) > 0:
+            self.recent_noise_or_move = True
+            self.last_noise_or_move_time = self.owner.world.world_seconds
 
-            self.recent_noise_or_move=True
-            self.last_noise_or_move_time=self.owner.world.world_seconds
+            # apply gearbox (multiplies velocity; e.g., -1 for reverse)
+            gear_velocity = self.current_speed * self.transmission[self.current_gear][0]
 
-            # apply gearbox
-            gear_velocity=self.current_speed*self.transmission[self.current_gear][0]
+            # Move; heading is forward, but if gear_velocity negative, moves backward
+            self.owner.world_coords = engine.math_2d.moveAlongVector(gear_velocity, self.owner.world_coords, self.owner.heading, time_passed)
 
-            self.owner.world_coords=engine.math_2d.moveAlongVector(gear_velocity,self.owner.world_coords,self.owner.heading,time_passed)
-            
-        # update the relative position and rotation of child objects
-        if self.current_speed>0 or heading_changed:
+        # update child positions
+        if abs(self.current_speed) > 0 or heading_changed:
             self.update_child_position_rotation()
+
     #---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):
         '''update the rate of climb calculation'''
@@ -1232,9 +1232,6 @@ class AIVehicle():
                 if self.tracks_count>self.tracks_max:
                     self.tracks_count=0
                     self.tracks_enabled=False
-
-
-        
 
     #---------------------------------------------------------------------------
     def update_vehicle_fire(self):

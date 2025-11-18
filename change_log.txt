@@ -2,6 +2,18 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Nov 17 2025
+- vehicle physics rewrite 
+- reduced world_area position calculation to increase loading time 
+- handled occasional terrain get out of bounds 
+
+idk if the physics is significantly better than it was before.. 
+all vehicles need weights and engine power normalized 
+
+todo 
+- check airplanes, they seem to be bugged now 
+
+----------------------------------
 Nov 14 2025
 - fixed another area where shrapnel was being spawned without a shooter 
 - silenced the vehicle_hit but human not in vehicle log as the system works as intended at the moment 
