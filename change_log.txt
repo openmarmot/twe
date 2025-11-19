@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 18 2025
+- reverted hit marker performance code that was resulting in misaligned markers 
+- all hit markers self remove now, but adjusted the time up to 60 seconds from 30
+- adjusted vehicle weights 
+
+todo 
+- probably need a bunch more vehicle engines + some tuning 
 
 ----------------------------------
 Nov 17 2025
