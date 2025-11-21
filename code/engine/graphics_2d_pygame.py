@@ -548,8 +548,12 @@ class Graphics_2D_Pygame(object):
         for b in possible_objects:
             distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
             if distance<object_distance:
-                object_distance=distance
-                closest_object=b
+                if b.is_vehicle:
+                    closest_object=b
+                    break
+                else:
+                    object_distance=distance
+                    closest_object=b
         
         if closest_object is not None:
             #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)

@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 20 2025
+- updated mouse select to prefer vehicle
+- added clear_bottle art 
+- added vodka  
+
+this greatly improved mouse select issues
+
+i should spend some time on food and maybe add some more misc stuff to find in the world 
+
+----------------------------------
 Nov 18 2025
 - reverted hit marker performance code that was resulting in misaligned markers 
 - all hit markers self remove now, but adjusted the time up to 60 seconds from 30
