@@ -28,7 +28,7 @@ class AIHitMarker(object):
         self.last_rotation=0
 
         self.spawn_time=0
-        self.max_alive_time=30
+        self.max_alive_time=60
         self.self_remove=False
 
     #---------------------------------------------------------------------------
@@ -40,13 +40,16 @@ class AIHitMarker(object):
         self.hit_data=hit_data
         if hit_data.penetrated:
             self.owner.image_index=1
+            self.self_remove=True
+            self.spawn_time=self.owner.world.world_seconds
         else:
             self.self_remove=True
             self.spawn_time=self.owner.world.world_seconds
 
-
-        # run this once to get the correct angles
-        self.update_physics()
+        # make sure the initial angle is correct 
+        self.owner.reset_image=True
+        self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.hit_object.rotation_angle+self.hit_data.rotation_offset)
+        self.owner.world_coords=engine.math_2d.calculate_relative_position(self.hit_object.world_coords,self.hit_object.rotation_angle,self.hit_data.position_offset)
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -67,12 +70,9 @@ class AIHitMarker(object):
             self.last_rotation=copy.copy(self.hit_object.rotation_angle)
 
         if moved:
-            if self.hit_object.grid_square.visible:
-                self.owner.reset_image=True
-                self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.hit_object.rotation_angle+self.hit_data.rotation_offset)
-                self.owner.world_coords=engine.math_2d.calculate_relative_position(self.hit_object.world_coords,self.hit_object.rotation_angle,self.hit_data.position_offset)
-            else:
-                # simple location update
-                self.owner.world_coords=copy.copy(self.hit_object.world_coords)
+            self.owner.reset_image=True
+            self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.hit_object.rotation_angle+self.hit_data.rotation_offset)
+            self.owner.world_coords=engine.math_2d.calculate_relative_position(self.hit_object.world_coords,self.hit_object.rotation_angle,self.hit_data.position_offset)
+
 
 

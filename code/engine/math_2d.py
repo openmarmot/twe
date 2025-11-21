@@ -39,33 +39,6 @@ GRAVITY=-9.8
 cache_check=[]
 
 #------------------------------------------------------------------------------
-def calculate_acceleration_old(force,rolling_resistance,drag_coefficient,air_density,frontal_area,weight):
-    '''calculate acceleration'''
-    # force - force in watts
-    # rolling_resistance : maybe 0.015 for a jeep (1.5% of the vehicle weight)
-    # drag_coefficient : maybe 0.8 for a jeep
-    # air_density is the air density in kg/m^3 (typically around 1.225 kg/m^3 at sea level)
-    # frontal_area is the objects frontal cross-sectional area in square meters
-    # weight : kilograms
-
-    # adjustment to game units
-    adjustment=1
-
-    # Calculate net force
-    net_force = force - (rolling_resistance * weight) - (0.5 * air_density * frontal_area * drag_coefficient)
-
-    # Calculate acceleration in m/s^2
-    acceleration = net_force / weight
-
-    # adjust to game units
-    acceleration*=adjustment
-
-    # round to 2 sd
-    acceleration=round(acceleration,2)
-
-    return acceleration
-
-#------------------------------------------------------------------------------
 def calculate_acceleration(force, rolling_resistance, drag_coefficient, air_density, frontal_area, mass, velocity, g=9.81):
     '''Calculate acceleration based on net force, including velocity-dependent drag.'''
     # force: engine force in Newtons

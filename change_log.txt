@@ -1,17 +1,38 @@
 TWE Project : Change Log
 
+----------------------------------
+Nov 20 2025
+- updated mouse select to prefer vehicle
+- added clear_bottle art 
+- added vodka  
+
+this greatly improved mouse select issues
+
+i should spend some time on food and maybe add some more misc stuff to find in the world 
+
+----------------------------------
+Nov 18 2025
+- reverted hit marker performance code that was resulting in misaligned markers 
+- all hit markers self remove now, but adjusted the time up to 60 seconds from 30
+- adjusted vehicle weights 
+
+todo 
+- probably need a bunch more vehicle engines + some tuning 
 
 ----------------------------------
 Nov 17 2025
 - vehicle physics rewrite 
 - reduced world_area position calculation to increase loading time 
 - handled occasional terrain get out of bounds 
+- reduced terrain grid resolution to try and improve loading times 
+- minor fixes and updates  
 
 idk if the physics is significantly better than it was before.. 
 all vehicles need weights and engine power normalized 
 
 todo 
 - check airplanes, they seem to be bugged now 
+- some hit markers are not angled correctly and can be fixed by toggling hit markers on and off 
 
 ----------------------------------
 Nov 14 2025

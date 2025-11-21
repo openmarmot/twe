@@ -68,7 +68,7 @@ from ai.ai_wheel import AIWheel
 list_consumables=['green_apple','potato','turnip','cucumber','pickle','adler-cheese','camembert-cheese'
 ,'champignon-cheese','karwendel-cheese','wine','schokakola']
 list_consumables_common=['green_apple','potato','turnip','cucumber','pickle']
-list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer']
+list_consumables_rare=['adler-cheese','camembert-cheese','champignon-cheese','karwendel-cheese','wine','beer','vodka']
 list_consumables_ultra_rare=['schokakola']
 
 list_household_items=['blue_coffee_cup','coffee_tin','coffee_grinder','pickle_jar']
@@ -852,6 +852,18 @@ def spawn_object(world,world_coords,object_type, spawn):
     elif object_type=='beer':
         z=WorldObject(world,['green_bottle'],AIConsumable)
         z.name='beer'
+        z.no_update=True
+        z.minimum_visible_scale=0.4
+        z.rotation_angle=float(random.randint(0,359)) 
+        z.is_consumable=True
+        z.ai.health_effect=5
+        z.ai.hunger_effect=-50
+        z.ai.thirst_effect=-500
+        z.ai.fatigue_effect=50
+
+    elif object_type=='vodka':
+        z=WorldObject(world,['clear_bottle'],AIConsumable)
+        z.name='vodka'
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.rotation_angle=float(random.randint(0,359)) 
@@ -2125,7 +2137,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=2500
+        z.weight=3500
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2260,7 +2272,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=4900
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2326,7 +2338,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=4800
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -2419,7 +2431,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=11700
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -3242,7 +3254,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=25000
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -3731,7 +3743,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=57000
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4001,7 +4013,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=7800
+        z.weight=3100
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4215,7 +4227,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=32000
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4319,7 +4331,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=9200
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4449,7 +4461,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=29600
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4550,7 +4562,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=31700
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4664,7 +4676,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=26500
+        z.weight=15800
         z.drag_coefficient=0.9
         z.frontal_area=5
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -4974,7 +4986,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=800
+        z.weight=1200
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -5025,7 +5037,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
-        z.weight=800
+        z.weight=725
         z.drag_coefficient=0.8
         z.frontal_area=3
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -5162,7 +5174,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_airplane=True
         z.is_vehicle=True 
         z.rotation_angle=float(random.randint(0,359))
-        z.weight=9800
+        z.weight=4300
         z.drag_coefficient=0.8
         z.frontal_area=6
         z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
@@ -5775,7 +5787,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.internal_combustion=False
         z.ai.fuel_type='none'
         z.ai.fuel_consumption_rate=0
-        z.ai.max_engine_force=131.44
+        z.ai.max_engine_force=13100
         z.ai.engine_on=True
         z.rotation_angle=float(random.randint(0,359))
     elif object_type=='projectile':
