@@ -542,18 +542,19 @@ class Graphics_2D_Pygame(object):
             # for strategic map we want everything
             possible_objects=self.strategic_map.map_squares
 
+        max_object_distance=75
         object_distance=50
         closest_object=None
 
         for b in possible_objects:
             distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
-            if distance<object_distance:
+            if distance<max_object_distance:
                 if b.is_vehicle:
                     closest_object=b
                     break
-                else:
-                    object_distance=distance
-                    closest_object=b
+            if distance<object_distance:
+                object_distance=distance
+                closest_object=b
         
         if closest_object is not None:
             #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)

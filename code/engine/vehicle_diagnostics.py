@@ -286,6 +286,12 @@ class VehicleDiagnostics(object):
             turret_coords.append([self.screen_center[0]+200,self.screen_center[1]])
             turret_coords.append([self.screen_center[0]-200,self.screen_center[1]])
 
+        if len(self.vehicle.ai.turrets)==3:
+            turret_coords=[]
+            turret_coords.append([self.screen_center[0]+200,self.screen_center[1]])
+            turret_coords.append([self.screen_center[0],self.screen_center[1]])
+            turret_coords.append([self.screen_center[0]-300,self.screen_center[1]])
+
         for turret in self.vehicle.ai.turrets:
             v=VehicleDiagnosticObject()
             v.image_list=turret.image_list

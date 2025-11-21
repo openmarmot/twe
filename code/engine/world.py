@@ -790,7 +790,7 @@ class World():
                     self.remove_queue.append(b)
         else:
             self.map_enabled=True
-            print('map enabled :','green= world area','blue= squad','green= squad destination')
+            print('map enabled :','green= world area')
 
             for b in self.world_areas:
                 engine.world_builder.spawn_map_pointer(self,b.world_coords,'normal')

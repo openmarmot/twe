@@ -613,17 +613,13 @@ class AIVehicle():
         if self.electrical_system_functioning is False and self.engines[0].ai.internal_combustion:
             return
 
+        # turn engines on
         for b in self.engines:
             if b.ai.engine_on==False:
                 if b.ai.damaged is False:
                     b.ai.engine_on=True
-                # smoke no matter what
-                if b.ai.internal_combustion:
-                    #smoke!
-                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
-                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
-                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
+
+        self.spawn_engine_exhaust()
 
     #---------------------------------------------------------------------------
     def handle_stop_engines(self):
@@ -657,6 +653,7 @@ class AIVehicle():
 
         if self.current_speed==0:
             self.tracks_enabled=True
+            self.spawn_engine_exhaust()
 
         self.throttle+=1*self.owner.world.time_passed_seconds
         if self.throttle>1:
@@ -912,7 +909,18 @@ class AIVehicle():
                     current_volume+=tank.ai.inventory[0].volume
 
         return current_volume,max_volume
-
+    
+    #---------------------------------------------------------------------------
+    def spawn_engine_exhaust(self):
+        '''spawn engine smoke'''
+        for b in self.engines:
+            if b.ai.engine_on:
+                if b.ai.internal_combustion:
+                    #smoke!
+                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
+                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
+                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
+                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
 
     #---------------------------------------------------------------------------
     def update(self):
@@ -953,6 +961,7 @@ class AIVehicle():
                 if self.owner.weight>500:
                     self.tracks_enabled=True
                     self.tracks_count=0
+                    self.spawn_engine_exhaust()
 
         else:
             self.acceleration=0

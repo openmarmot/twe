@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 21 2025
+- added engine smoke when throttling up from stop 
+- fixed vehicle diagnostics crash caused by some vehicle having three turrets now 
+- minor updates
+
+----------------------------------
 Nov 20 2025
 - updated mouse select to prefer vehicle
 - added clear_bottle art 
