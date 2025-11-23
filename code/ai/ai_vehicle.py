@@ -1106,107 +1106,151 @@ class AIVehicle():
 
     #---------------------------------------------------------------------------
     def update_physics(self):
-        '''update the physics of the vehicle'''
+        '''update the physics of the vehicle - FIXED & IMPROVED VERSION'''
         time_passed = self.owner.world.time_passed_seconds
-
         heading_changed = False
 
         if self.first_update:
             self.first_update = False
             heading_changed = True
 
-        # update rotation angle on the ground
+        # --------------------------------------------------------------
+        # 1. ROTATION (ground + air)
+        # --------------------------------------------------------------
         if self.owner.altitude < 1:
-            rotation_change = (self.rotation_speed * self.wheel_steering) * time_passed
-        # update rotation angle in the air
+            # Ground steering (wheels)
+            rotation_change = self.rotation_speed * self.wheel_steering * time_passed
         else:
-            rotation_change = (self.rotation_speed * self.ailerons) * time_passed
+            # Air roll (ailerons)
+            rotation_change = self.rotation_speed * self.ailerons * time_passed
 
-        if rotation_change != 0 and abs(self.current_speed) > 0:
+        if rotation_change != 0 and abs(self.current_speed) > 0.1:
             self.owner.rotation_angle += rotation_change
             heading_changed = True
 
-        # Calculate total engine force (assuming in Newtons; tune if needed)
-        total_engine_force = 0
-        for b in self.engines:
-            if b.ai.engine_on and not b.ai.damaged:
-                total_engine_force += b.ai.max_engine_force * b.ai.throttle_control
+        # --------------------------------------------------------------
+        # 2. CALCULATE TOTAL ENGINE FORCE
+        # --------------------------------------------------------------
+        total_engine_force = 0.0
+        for e in self.engines:
+            if e.ai.engine_on and not e.ai.damaged:
+                total_engine_force += e.ai.max_engine_force * e.ai.throttle_control
 
-        # Wheel damage effect: increase rolling coeff
-        # Example: add per damaged wheel
+        # --------------------------------------------------------------
+        # 3. DETERMINE EFFECTIVE ROLLING RESISTANCE (terrain + wheel damage)
+        # --------------------------------------------------------------
         effective_rolling_coeff = self.rolling_resistance_coeff
-        # Uncomment and tune if desired
-        # for wheels in [self.front_left_wheels, self.front_right_wheels, self.rear_left_wheels, self.rear_right_wheels]:
-        #     for w in wheels:
-        #         if w.ai.damaged: effective_rolling_coeff += 0.01  # Small increase per damage
-        #         if w.ai.destroyed: effective_rolling_coeff += 0.05
 
-        # Compute current acceleration (forward if throttle >0, can be pos/neg)
-        current_velocity = abs(self.current_speed)  # Drag uses magnitude
-        if self.throttle > 0:
-            effective_force = total_engine_force * self.throttle  # Scale by throttle
+        # Count damaged/destroyed wheels
+        damaged = destroyed = 0
+        for wheel_list in (self.front_left_wheels, self.front_right_wheels,
+                           self.rear_left_wheels, self.rear_right_wheels):
+            for w in wheel_list:
+                if w.ai.destroyed:
+                    destroyed += 1
+                elif w.ai.damaged:
+                    damaged += 1
+
+        # Penalty: destroyed wheels hurt a lot more than just damaged ones
+        effective_rolling_coeff += damaged * 0.02
+        effective_rolling_coeff += destroyed * 0.08
+
+        # Hard cap so a totally wrecked vehicle can still crawl a tiny bit
+        effective_rolling_coeff = min(effective_rolling_coeff, 0.6)
+
+        # --------------------------------------------------------------
+        # 4. ACCELERATION / DECELERATION LOGIC
+        # --------------------------------------------------------------
+        speed_magnitude = abs(self.current_speed)
+
+        if self.throttle > 0 and total_engine_force > 0:
+            # ---- POWERED ACCELERATION ----
+            effective_force = total_engine_force * self.throttle
             self.acceleration = engine.math_2d.calculate_acceleration(
-                effective_force, effective_rolling_coeff,
-                self.owner.drag_coefficient, self.owner.world.air_density,
-                self.owner.frontal_area, self.owner.weight, current_velocity,
-                g=self.gravity
+                force=effective_force,
+                rolling_resistance=effective_rolling_coeff,
+                drag_coefficient=self.owner.drag_coefficient,
+                air_density=self.owner.world.air_density,
+                frontal_area=self.owner.frontal_area,
+                mass=self.owner.weight,
+                velocity=speed_magnitude
             )
             self.current_speed += self.acceleration * time_passed
+
         else:
-            self.throttle = max(0, self.throttle)  # Prevent negative
-            # Deceleration: accel with engine_force=0 (negative value)
-            self.acceleration = engine.math_2d.calculate_acceleration(
-                0, effective_rolling_coeff,
-                self.owner.drag_coefficient, self.owner.world.air_density,
-                self.owner.frontal_area, self.owner.weight, current_velocity,
-                g=self.gravity
-            )  # This will be negative
-            if self.current_speed > 0:
-                self.current_speed += self.acceleration * time_passed  # Adds negative
-            elif self.current_speed < 0:
-                self.current_speed -= self.acceleration * time_passed  # Subtract negative to add positive decel
+            # ---- COASTING / STOPPED ----
+            # Only apply natural drag/rolling resistance if we're actually moving
+            if speed_magnitude > 0.3:  # hysteresis to prevent jitter at stop
+                self.acceleration = engine.math_2d.calculate_acceleration(
+                    force=0,
+                    rolling_resistance=effective_rolling_coeff,
+                    drag_coefficient=self.owner.drag_coefficient,
+                    air_density=self.owner.world.air_density,
+                    frontal_area=self.owner.frontal_area,
+                    mass=self.owner.weight,
+                    velocity=speed_magnitude
+                )
+                self.current_speed += self.acceleration * time_passed
+            else:
+                # Fully stopped, no engine → ZERO everything
+                self.acceleration = 0.0
+                self.current_speed = 0.0
 
-            # Add braking (extra decel)
+            # Brakes work even with dead engine
             if self.brake_power > 0:
-                brake_decel = -self.brake_power * self.brake_strength  # Negative accel
-                if self.current_speed > 0:
+                if abs(self.current_speed) > 0.01:
+                    # Apply braking force opposite to current velocity
+                    direction = 1 if self.current_speed > 0 else -1
+                    brake_decel = -direction * self.brake_power * self.brake_strength
                     self.current_speed += brake_decel * time_passed
-                elif self.current_speed < 0:
-                    self.current_speed -= brake_decel * time_passed  # For reverse
+                else:
+                    # Stopped + brake → make absolutely sure we stay at 0
+                    self.current_speed = 0.0
 
-            # Clamp small speeds to zero
-            if abs(self.current_speed) < 0.1:  # Smaller threshold for precision
-                self.current_speed = 0
-
-        # Clamp to max_dynamic_speed to prevent runaway speeds and overflow
+        # --------------------------------------------------------------
+        # 5. SPEED CLAMPING & DEAD-ZONE CLEANUP
+        # --------------------------------------------------------------
         if self.current_speed > self.max_dynamic_speed:
             self.current_speed = self.max_dynamic_speed
         elif self.current_speed < -self.max_dynamic_speed:
             self.current_speed = -self.max_dynamic_speed
 
-        # Reverse gear handling: if current_gear=='reverse', current_speed can be negative, but drag uses abs
+        # Kill tiny residual speeds (prevents eternal 0.0001 creep)
+        if abs(self.current_speed) < 0.05:
+            self.current_speed = 0.0
+            self.acceleration = 0.0
 
-        # adjust altitude
+        # --------------------------------------------------------------
+        # 6. ALTITUDE (aircraft climb)
+        # --------------------------------------------------------------
         self.owner.altitude += self.rate_of_climb * time_passed
 
-        # reset image if heading has changed
+        # --------------------------------------------------------------
+        # 7. HEADING UPDATE
+        # --------------------------------------------------------------
         if heading_changed:
             self.update_heading()
 
-        # move along vector
-        if abs(self.current_speed) > 0:
+        # --------------------------------------------------------------
+        # 8. MOVEMENT
+        # --------------------------------------------------------------
+        if abs(self.current_speed) > 0.01:
             self.recent_noise_or_move = True
             self.last_noise_or_move_time = self.owner.world.world_seconds
 
-            # apply gearbox (multiplies velocity; e.g., -1 for reverse)
+            # Apply gearbox (reverse = negative multiplier)
             gear_velocity = self.current_speed * self.transmission[self.current_gear][0]
 
-            # Move; heading is forward, but if gear_velocity negative, moves backward
-            self.owner.world_coords = engine.math_2d.moveAlongVector(gear_velocity, self.owner.world_coords, self.owner.heading, time_passed)
+            self.owner.world_coords = engine.math_2d.moveAlongVector(
+                gear_velocity, self.owner.world_coords, self.owner.heading, time_passed
+            )
 
-        # update child positions
-        if abs(self.current_speed) > 0 or heading_changed:
+        # --------------------------------------------------------------
+        # 9. UPDATE CHILDREN (crew, towed objects, etc.)
+        # --------------------------------------------------------------
+        if abs(self.current_speed) > 0.01 or heading_changed:
             self.update_child_position_rotation()
+
 
     #---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):

@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 22 2025
+- added a vehicle specific debug menu 
+- rewrite of vehicle physics to fix negative acceleration at idle 
+
+todo 
+- add vehicle specific debug commands to empty fuel and simulate other issues 
+- engine being out of fuel should add significant rolling resistance
+
+it would be nice to pre-generate quick battle maps to make loading faster, but 
+I don't have a mechanism for saving a lot of the stuff that takes a long time to generate 
+
+----------------------------------
 Nov 21 2025
 - added engine smoke when throttling up from stop 
 - fixed vehicle diagnostics crash caused by some vehicle having three turrets now 
