@@ -523,14 +523,13 @@ class Graphics_2D_Pygame(object):
             )
 
     #---------------------------------------------------------------------------
-    def select_closest_object_with_mouse(self,mouse_coords):
-        possible_objects=[]
+    def select_closest_object_with_mouse(self, mouse_coords):
+        possible_objects = []
 
-        if self.mode==1:
-            # sort through the objects that are rendered (visible)
+        if self.mode == 1:
+            # Collect valid clickable objects (same as before)
             for b in self.renderlists:
                 for c in b:
-                    # filter out a couple things we don't want to click on
                     if (c.is_player is False 
                         and c != self.world.player.ai.large_pickup 
                         and c.is_turret is False 
@@ -538,34 +537,44 @@ class Graphics_2D_Pygame(object):
                         and c.is_particle_effect is False
                         and c.no_save is False):
                         possible_objects.append(c)
-        elif self.mode==2:
-            # for strategic map we want everything
-            possible_objects=self.strategic_map.map_squares
+        elif self.mode == 2:
+            possible_objects = self.strategic_map.map_squares
 
-        max_object_distance=75
-        object_distance=50
-        closest_object=None
-
-        for b in possible_objects:
-            distance=engine.math_2d.get_distance(mouse_coords,b.screen_coords)
-            if distance<max_object_distance:
-                if b.is_vehicle:
-                    closest_object=b
-                    break
-            if distance<object_distance:
-                object_distance=distance
-                closest_object=b
+        max_distance=75
+        max_vehicle_range = 75  # Only consider vehicles within this distance
+        closest_vehicle = None
+        closest_vehicle_dist = float('inf')
         
-        if closest_object is not None:
-            #engine.log.add_data('debug','mouse distance: '+str(object_distance),True)
-            #engine.log.add_data('debug','mouse select: '+closest_object.name,True)
+        closest_non_vehicle = None
+        closest_non_vehicle_dist = float('inf')
 
-            if self.mode==0:
-                pass
-            elif self.mode==1:
-                self.world.world_menu.activate_menu(closest_object)
-            elif self.mode==2:
-                self.strategic_map.strategic_menu.activate_menu(closest_object)
+        # Single pass: evaluate all objects
+        for obj in possible_objects:
+            distance = engine.math_2d.get_distance(mouse_coords, obj.screen_coords)
+            if distance < max_distance:
+                if obj.is_vehicle:
+                    if distance < max_vehicle_range and distance < closest_vehicle_dist:
+                        closest_vehicle_dist = distance
+                        closest_vehicle = obj
+                else:
+                    if distance < closest_non_vehicle_dist:
+                        closest_non_vehicle_dist = distance
+                        closest_non_vehicle = obj
+
+        # Decision logic:
+        if closest_vehicle is not None:
+            selected_object = closest_vehicle
+        elif closest_non_vehicle is not None:
+            selected_object = closest_non_vehicle
+        else:
+            selected_object = None
+
+        # Activate menu if we selected something
+        if selected_object is not None:
+            if self.mode == 1:
+                self.world.world_menu.activate_menu(selected_object)
+            elif self.mode == 2:
+                self.strategic_map.strategic_menu.activate_menu(selected_object)
 
     #------------------------------------------------------------------------------
     def set_background_image(self,image_name):

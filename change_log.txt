@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 29 2025
+- added more weathering to the rso pak to make the pak40 more visible 
+- fixed gunner position for the rso pak 
+- switched t20 to the lighter soviet detail grey color 
+- fixed mouse select issue when there are multiple vehicles present
+
+----------------------------------
 Nov 22 2025
 - added a vehicle specific debug menu 
 - rewrite of vehicle physics to fix negative acceleration at idle 
