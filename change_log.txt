@@ -1,6 +1,38 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 30 2025
+- added vehicle commander code 
+
+vehicle commander can now prioritize targets. i think this will eventually be 
+expanded to order vehicle rotation to not expose side armor to threats 
+
+----------------------------------
+Nov 29 2025
+- added more weathering to the rso pak to make the pak40 more visible 
+- fixed gunner position for the rso pak 
+- switched t20 to the lighter soviet detail grey color 
+- fixed mouse select issue when there are multiple vehicles present
+
+----------------------------------
+Nov 22 2025
+- added a vehicle specific debug menu 
+- rewrite of vehicle physics to fix negative acceleration at idle 
+
+todo 
+- add vehicle specific debug commands to empty fuel and simulate other issues 
+- engine being out of fuel should add significant rolling resistance
+
+it would be nice to pre-generate quick battle maps to make loading faster, but 
+I don't have a mechanism for saving a lot of the stuff that takes a long time to generate 
+
+----------------------------------
+Nov 21 2025
+- added engine smoke when throttling up from stop 
+- fixed vehicle diagnostics crash caused by some vehicle having three turrets now 
+- minor updates
+
+----------------------------------
 Nov 20 2025
 - updated mouse select to prefer vehicle
 - added clear_bottle art 

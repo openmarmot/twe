@@ -301,7 +301,7 @@ class World_Menu(object):
             # eventually 'spawn' should get its own submenu
             self.text_queue=[]
             self.text_queue.append('--Debug Menu (~ to exit) --')
-            self.text_queue.append('1 -  ')
+            self.text_queue.append('1 - vehicle debug menu  ')
             self.text_queue.append('2 - toggle debug mode')
             self.text_queue.append('3 - spawn menu')
             self.text_queue.append('4 - send test radio messages')
@@ -312,8 +312,9 @@ class World_Menu(object):
             self.text_queue.append('9 - toggle after action report (AAR) mode (auto screenshots)')
 
             if key=='1':
-                #unused
-                return
+                if self.world.player.ai.in_vehicle():
+                    self.menu_state='vehicle_debug'
+                    key=None
             elif key=='2':
                 self.world.debug_mode=not self.world.debug_mode
                 return
@@ -347,6 +348,23 @@ class World_Menu(object):
             elif key=='9':
                 self.world.aar_mode_enabled = not self.world.aar_mode_enabled
                 engine.log.add_data('info',f'After Action Report mode : {self.world.aar_mode_enabled}',True)
+
+        if self.menu_state=='vehicle_debug':
+            if self.world.player.ai.in_vehicle()==False:
+                self.menu_state='none'
+                return
+            
+            vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+
+            self.text_queue=[]
+            self.text_queue.append('--Debug -> Vehicle Debug Menu --')
+            self.text_queue.append('1 - empty fuel tanks')
+
+            if key=='1':
+                for tank in vehicle.ai.fuel_tanks:
+                    if tank.ai.inventory:
+                        tank.ai.inventory=[]
+
         if self.menu_state=='spawn':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu --')
@@ -371,7 +389,7 @@ class World_Menu(object):
         if self.menu_state=='spawn_vehicles':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
-            self.text_queue.append('1 - German Sd.kfz.234/2')
+            self.text_queue.append('1 - german_rso_pak')
             self.text_queue.append('2 - sd.kfz.222')
             self.text_queue.append('3 - german_sd_kfz_251/23')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
@@ -381,7 +399,7 @@ class World_Menu(object):
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - t34-85')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_234/2',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_rso_pak',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0],self.world.player.world_coords[1]],'german_sd_kfz_222',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_222_camo',True)

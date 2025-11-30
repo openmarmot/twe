@@ -376,6 +376,40 @@ class AIHumanVehicle():
                     
             # maybe add some morale damage?
 
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_commander(self):
+        '''commander role'''
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+
+        # determine what the primary weapon is and primary gunner is
+        primary_gunner=None
+        for role in vehicle.ai.vehicle_crew:
+            if role.is_gunner and role.role_occupied:
+                if role.turret:
+                    if role.turret.ai.primary_turret:
+                        primary_gunner=role
+                        break
+
+        # for now we have no actions if we don't have a primary gunner
+        if primary_gunner is None:
+            return
+
+        max_armor=0
+        biggest_threat=None
+        for v in self.owner.ai.vehicle_targets:
+            if v.ai.vehicle_armor['front'][0]>max_armor:
+                biggest_threat=v
+        
+        if biggest_threat:
+            engage_primary,engage_primary_reason=self.owner.ai.calculate_engagement(primary_gunner.turret.ai.primary_weapon,biggest_threat)
+            if engage_primary and primary_gunner.human.ai.memory['task_vehicle_crew']['target']!=biggest_threat :
+                # tell the gunner to engage
+                primary_gunner.human.ai.memory['task_vehicle_crew']['target']=biggest_threat
+                self.owner.ai.speak(f'Gunner, prioritize the {biggest_threat.name} ')
+                print(f'commander re-prioritizing fire of {vehicle.name} to {biggest_threat.name} ')
+
+
+            # check if we should re-orientate the vehicle to face the biggest threat
 
 
     #---------------------------------------------------------------------------
@@ -1107,11 +1141,14 @@ class AIHumanVehicle():
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
                 self.think_vehicle_role_gunner()
             if role.is_passenger:
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.8,1.5)
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.3,3.5)
                 self.think_vehicle_role_passenger()
             if role.is_radio_operator:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                 self.think_vehicle_role_radio_operator()
+            if role.is_commander:
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.1,2.5)
+                self.think_vehicle_role_commander()
 
             # the squad lead has some stuff to do independent of their vehicle role
             if self.owner==self.owner.ai.squad.squad_leader:

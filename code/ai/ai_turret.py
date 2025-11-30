@@ -65,6 +65,7 @@ class AITurret(object):
         self.last_vehicle_position=[0,0]
         self.last_vehicle_rotation=0
 
+        # very important!
         # whether this is the main/most important turret or not.
         # used by ai_human to determine actions
         self.primary_turret=False
