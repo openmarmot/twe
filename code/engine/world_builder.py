@@ -2179,6 +2179,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         turret.ai.vehicle=z
         turret.ai.position_offset=[11,0]
         turret.ai.rotation_range=[-360,360]
+        turret.ai.primary_turret=True
 
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -2369,6 +2370,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(turret)
         turret.ai.vehicle=z
         z.ai.turrets[0].ai.position_offset=[0,0]
+
         role=VehicleRole('driver',z)
         role.is_driver=True
         z.ai.vehicle_crew.append(role)

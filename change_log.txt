@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Nov 30 2025
+- added vehicle commander code 
+
+vehicle commander can now prioritize targets. i think this will eventually be 
+expanded to order vehicle rotation to not expose side armor to threats 
+
+----------------------------------
 Nov 29 2025
 - added more weathering to the rso pak to make the pak40 more visible 
 - fixed gunner position for the rso pak 
