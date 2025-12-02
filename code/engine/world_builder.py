@@ -1316,7 +1316,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.magazine=spawn_object(world,world_coords,'stg44_magazine',False)
         z.ai.rate_of_fire=0.1
         z.ai.reload_speed=7
-        z.ai.range=1813
+        z.ai.range=1913
         z.ai.type='assault rifle'
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
@@ -3303,7 +3303,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['front']=[50,11,0]
         z.ai.turret_armor['rear']=[30,15,0]
         z.ai.position_offset=[-50,19]
-        z.ai.rotation_range=[-20,20]
+        z.ai.rotation_range=[-30,30]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
@@ -3800,7 +3800,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['front']=[100,0,0]
         z.ai.turret_armor['rear']=[82,0,0]
         z.ai.position_offset=[-63,17]
-        z.ai.rotation_range=[-20,20]
+        z.ai.rotation_range=[-30,30]
         z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.spawn_case=False
@@ -4137,7 +4137,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['front']=[53,20,0]
         z.ai.turret_armor['rear']=[53,20,0]
         z.ai.position_offset=[-65,13]
-        z.ai.rotation_range=[-20,20]
+        z.ai.rotation_range=[-12,12]
         z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.spawn_case=False
         z.ai.primary_weapon.ai.equipper=z

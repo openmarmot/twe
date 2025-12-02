@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 01 2025
+- increased stg44 range by 100 units 
+- distant shots by humans get double aim adjustments applied 
+- adjusted t34 bow gun rotation (decrease) to be more historical 
+- adjusted panzer iv and vi bow gun rotation (increase) to be more historical
+
+todo 
+- turret accuracy affected by sight quality 
+
+----------------------------------
 Nov 30 2025
 - added vehicle commander code 
 
