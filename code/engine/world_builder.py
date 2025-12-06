@@ -2799,21 +2799,21 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_gunner=True
         role.turret=turret
         role.seat_visible=True
-        role.seat_offset=[17,0]
+        role.seat_offset=[48,0]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('commander',z)
         role.is_commander=True
         role.seat_visible=True
         role.seat_rotation=90
-        role.seat_offset=[24,10]
+        role.seat_offset=[34,9]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
         role.seat_visible=True
-        role.seat_rotation=90
-        role.seat_offset=[12,10]
+        role.seat_rotation=270
+        role.seat_offset=[27,-9]
         z.ai.vehicle_crew.append(role)
 
         z.ai.ammo_rack_capacity=66
@@ -2838,7 +2838,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['right']=[0,0,0]
         z.ai.turret_armor['front']=[0,0,0]
         z.ai.turret_armor['rear']=[0,0,0]
-        z.ai.position_offset=[-31,0]
+        z.ai.position_offset=[31,0]
         z.ai.rotation_range=[-30,30]
         z.ai.primary_weapon=spawn_object(world,world_coords,'8cmGrW34',False)
         z.ai.primary_weapon.ai.smoke_on_fire=True
@@ -3090,21 +3090,21 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.is_gunner=True
         role.turret=turret
         role.seat_visible=True
-        role.seat_offset=[0,0]
+        role.seat_offset=[19,-6]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('commander',z)
         role.is_commander=True
         role.seat_visible=True
         role.seat_rotation=90
-        role.seat_offset=[4,10]
+        role.seat_offset=[30,9]
         z.ai.vehicle_crew.append(role)
 
         role=VehicleRole('assistant_gunner',z)
         role.is_assistant_gunner=True
         role.seat_visible=True
         role.seat_rotation=90
-        role.seat_offset=[12,10]
+        role.seat_offset=[49,-3]
         z.ai.vehicle_crew.append(role)
 
         z.ai.ammo_rack_capacity=24
