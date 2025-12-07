@@ -145,20 +145,22 @@ def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
 
     # returns the first result only
 
-    collided=None
     for b in collision_list:
         if b.is_vehicle:
             # no collision on disabled vehicles
             if b.ai.vehicle_disabled:
                 continue
+        if wo!=b and b not in ignore_list:
 
-        distance=get_distance(wo.world_coords,b.world_coords)
+            distance=get_distance(wo.world_coords,b.world_coords)
+            if distance < (wo.collision_radius+b.collision_radius):
+                if b.bounding_circles:
+                    if check_collision_bounding_circles(wo.world_coords,b):
+                        return b
+                else:
+                    return b
 
-        if distance < (wo.collision_radius+b.collision_radius):
-            if wo!=b and (b not in ignore_list):
-                collided=b
-                break
-    return collided
+    return None
 
 #------------------------------------------------------------------------------
 def checkCollisionCircleCoordsAllResults(world_coords,collision_range,collision_list, ignore_list):

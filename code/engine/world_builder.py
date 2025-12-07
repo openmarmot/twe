@@ -2081,10 +2081,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([-32.0, 0.0],25)
-        z.bounding_circles.append([-8.0, 0.0],25)
-        z.bounding_circles.append([10.0, 0.0],25)
-        z.bounding_circles.append([35.0, 0.0],25)
+        z.bounding_circles.append([[-32.0, 0.0],25])
+        z.bounding_circles.append([[-8.0, 0.0],25])
+        z.bounding_circles.append([[10.0, 0.0],25])
+        z.bounding_circles.append([[35.0, 0.0],25])
         z.weight=2380
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2137,10 +2137,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([-35.0, 0.0],25)
-        z.bounding_circles.append([-10.0, 0.0],25)
-        z.bounding_circles.append([18.0, 0.0],25)
-        z.bounding_circles.append([35.0, 0.0],25)
+        z.bounding_circles.append([[-35.0, 0.0],25])
+        z.bounding_circles.append([[-10.0, 0.0],25])
+        z.bounding_circles.append([[18.0, 0.0],25])
+        z.bounding_circles.append([[35.0, 0.0],25])
         z.weight=3500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2203,10 +2203,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([-35.0, 0.0],25)
-        z.bounding_circles.append([-10.0, 0.0],25)
-        z.bounding_circles.append([18.0, 0.0],25)
-        z.bounding_circles.append([35.0, 0.0],25)
+        z.bounding_circles.append([[-35.0, 0.0],25])
+        z.bounding_circles.append([[-10.0, 0.0],25])
+        z.bounding_circles.append([[18.0, 0.0],25])
+        z.bounding_circles.append([[35.0, 0.0],25])
         z.weight=2500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2281,11 +2281,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([-51.0, 0.0],25)
-        z.bounding_circles.append([-22.0, 0.0],25)
-        z.bounding_circles.append([0.0, 0.0],25)
-        z.bounding_circles.append([21.0, 0.0],25)
-        z.bounding_circles.append([48.0, 0.0],25)
+        z.bounding_circles.append([[-51.0, 0.0],25])
+        z.bounding_circles.append([[-22.0, 0.0],25])
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.bounding_circles.append([[21.0, 0.0],25])
+        z.bounding_circles.append([[48.0, 0.0],25])
         z.weight=4900
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2352,11 +2352,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([-43.0, 0.0],25)
-        z.bounding_circles.append([-20.0, 0.0],25)
-        z.bounding_circles.append([0.0, 0.0],25)
-        z.bounding_circles.append([21.0, 0.0],25)
-        z.bounding_circles.append([39.0, 0.0],25)
+        z.bounding_circles.append([[-43.0, 0.0],25])
+        z.bounding_circles.append([[-20.0, 0.0],25])
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.bounding_circles.append([[21.0, 0.0],25])
+        z.bounding_circles.append([[39.0, 0.0],25])
         z.weight=4800
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2450,7 +2450,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_speed=385.9
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-52.0, 0.0],30])
+        z.bounding_circles.append([[-22.0, 0.0],30])
+        z.bounding_circles.append([[8.0, 0.0],30])
+        z.bounding_circles.append([[54.0, 0.0],30])
+        z.bounding_circles.append([[24.0, 0.0],30])
         z.weight=11700
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3278,7 +3283,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-48.0, 0.0],40])
+        z.bounding_circles.append([[-20.0, 0.0],40])
+        z.bounding_circles.append([[7.0, 0.0],40])
+        z.bounding_circles.append([[34.0, 0.0],40])
+        z.bounding_circles.append([[48.0, 0.0],40])
         z.weight=25000
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3457,7 +3467,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-48.0, 0.0],40])
+        z.bounding_circles.append([[-20.0, 0.0],40])
+        z.bounding_circles.append([[7.0, 0.0],40])
+        z.bounding_circles.append([[34.0, 0.0],40])
+        z.bounding_circles.append([[48.0, 0.0],40])
         z.weight=26500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3581,7 +3596,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-48.0, 0.0],40])
+        z.bounding_circles.append([[-20.0, 0.0],40])
+        z.bounding_circles.append([[7.0, 0.0],40])
+        z.bounding_circles.append([[34.0, 0.0],40])
+        z.bounding_circles.append([[48.0, 0.0],40])
         z.weight=26500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3767,7 +3787,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-37.0, 0.0],50])
+        z.bounding_circles.append([[0.0, 0.0],50])
+        z.bounding_circles.append([[38.0, 0.0],50])
         z.weight=57000
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3940,7 +3963,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-22.0, 0.0],25])
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.bounding_circles.append([[25.0, 0.0],25])
         z.weight=3500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4037,7 +4063,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-61.0, 0.0],25])
+        z.bounding_circles.append([[-35.0, 0.0],25])
+        z.bounding_circles.append([[-12.0, 0.0],25])
+        z.bounding_circles.append([[18.0, 0.0],30])
+        z.bounding_circles.append([[54.0, 0.0],30])
+
         z.weight=3100
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4112,7 +4144,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-54.0, 0.0],40])
+        z.bounding_circles.append([[-23.0, 0.0],40])
+        z.bounding_circles.append([[13.0, 0.0],40])
+        z.bounding_circles.append([[52.0, 0.0],40])
         z.weight=26500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4251,7 +4287,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-54.0, 0.0],40])
+        z.bounding_circles.append([[-23.0, 0.0],40])
+        z.bounding_circles.append([[13.0, 0.0],40])
+        z.bounding_circles.append([[52.0, 0.0],40])
         z.weight=32000
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4355,7 +4395,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-35.0, 0.0],30])
+        z.bounding_circles.append([[-11.0, 0.0],30])
+        z.bounding_circles.append([[13.0, 0.0],30])
+        z.bounding_circles.append([[32.0, 0.0],30])
+
         z.weight=9200
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4485,7 +4530,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-54.0, 0.0],40])
+        z.bounding_circles.append([[-23.0, 0.0],40])
+        z.bounding_circles.append([[13.0, 0.0],40])
+        z.bounding_circles.append([[52.0, 0.0],40])
         z.weight=29600
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4586,7 +4635,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-54.0, 0.0],40])
+        z.bounding_circles.append([[-23.0, 0.0],40])
+        z.bounding_circles.append([[13.0, 0.0],40])
+        z.bounding_circles.append([[52.0, 0.0],40])
         z.weight=31700
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4700,7 +4753,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([[-36.0, 0.0],40])
+        z.bounding_circles.append([[0.0, 0.0],40])
+        z.bounding_circles.append([[33.0, 0.0],40])
         z.weight=15800
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4824,6 +4880,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
+        z.bounding_circles.append([[0.0, 0.0],40])
         z.weight=1400
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -4913,6 +4970,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=50
+        z.bounding_circles.append([[0.0, 0.0],25])
         z.weight=1400
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -5011,6 +5069,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
+        z.bounding_circles.append([[-29.0, 0.0],20])
+        z.bounding_circles.append([[-8.0, 0.0],20])
+        z.bounding_circles.append([[7.0, 0.0],20])
+        z.bounding_circles.append([[29.0, 0.0],20])
         z.weight=1200
         z.drag_coefficient=0.8
         z.frontal_area=3
@@ -5062,6 +5124,10 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
         z.collision_radius=50
+        z.bounding_circles.append([[-34.0, 0.0],20])
+        z.bounding_circles.append([[-13.0, 0.0],17])
+        z.bounding_circles.append([[10.0, 0.0],17])
+        z.bounding_circles.append([[33.0, 0.0],20])
         z.weight=725
         z.drag_coefficient=0.8
         z.frontal_area=3
@@ -5115,6 +5181,9 @@ def spawn_object(world,world_coords,object_type, spawn):
 
         z.ai.open_top=True
         z.collision_radius=50
+        z.bounding_circles.append([[-12.0, 0.0],10])
+        z.bounding_circles.append([[0.0, 0.0],10])
+        z.bounding_circles.append([[12.0, 0.0],10])
         z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
         z.weight=13
         z.drag_coefficient=0.8

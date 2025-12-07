@@ -64,7 +64,7 @@ class ImageTool(object):
         self.text_queue=[]
 
         # draw collision circles
-        self.draw_collision=True
+        self.draw_collision=False
         self.collision_radius=50
 
         # draw alignment lines (new)
@@ -452,7 +452,7 @@ image_tool.collision_radius=100
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
-image_tool.image_objects.append(ImageObject(['sd_kfz_234_chassis_green_camo'],0))
+image_tool.image_objects.append(ImageObject(['red_bicycle'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
@@ -468,13 +468,13 @@ image_tool.image_objects.append(ImageObject(['sd_kfz_234_chassis_green_camo'],0)
 
 # -----
 # bounding box markers
-image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r20'],0))
 #image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
 
 
 

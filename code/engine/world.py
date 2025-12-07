@@ -209,7 +209,8 @@ class World():
         # ignore_list - list of objects to ignore
         # objects - array of objects to check collision against
 
-        
+        # this logic should just fold into the math2d function
+
         # note - this function skips collision on disabled vehicles
         collided=engine.math_2d.checkCollisionCircleOneResult(collider,objects,ignore_list)
         if collided is not None:

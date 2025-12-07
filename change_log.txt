@@ -3,8 +3,15 @@ TWE Project : Change Log
 ----------------------------------
 Dec 06 2025
 - update to image_tool to show relative offset in the menu 
-- work on a more detailed bounding box 
+- added advanced collision with multiple bounding circles. currently only set for vehicles 
+- minor updates 
 
+each vehicle now has a custom set of bounding circles. this should make smaller vehicles harder to hit, 
+and especially make bicycles not such bullet magnets 
+
+todo 
+- add bounding circles for buildings 
+- there seems to be an issue with smoke accumulating. bug with fires?
 ----------------------------------
 Dec 05 2025
 - updated seating arrangements for the sd.kfz.251/2 and sd.kfs.251/22
