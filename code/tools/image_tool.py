@@ -65,6 +65,7 @@ class ImageTool(object):
 
         # draw collision circles
         self.draw_collision=False
+        self.collision_radius=50
 
         # draw alignment lines (new)
         self.draw_alignment_lines=True
@@ -192,6 +193,14 @@ class ImageTool(object):
                     offset=[b.world_coords[0]-self.selected_object.world_coords[0],b.world_coords[1]-self.selected_object.world_coords[1]]
                     adjusted_offset=self.get_vector_rotation(offset,self.selected_object.rotation_angle)
                     print(b.image_list[b.image_index],' rotation:',b.rotation_angle,'offset:',adjusted_offset)
+            
+            # print out the specific format for bounding circles
+            for b in self.image_objects:
+                if 'bound_circle' in b.image_list[b.image_index]:
+                    offset=[b.world_coords[0]-self.selected_object.world_coords[0],b.world_coords[1]-self.selected_object.world_coords[1]]
+                    adjusted_offset=self.get_vector_rotation(offset,self.selected_object.rotation_angle)
+                    size=b.image_list[b.image_index].split('r')[-1]
+                    print(f'z.bounding_circles.append({adjusted_offset},{size})')
 
             print('----------------------------------')
 
@@ -200,12 +209,17 @@ class ImageTool(object):
         self.update_render_info()
 
         self.screen.blit(self.background, (0, 0))
+
+        if self.draw_collision and self.image_objects :
+            self.reset_pygame_image(self.image_objects[0])
+            coords=[self.image_objects[0].screen_coords[0]-self.image_objects[0].image_center[0], self.image_objects[0].screen_coords[1]-self.image_objects[0].image_center[1]]
+            pygame.draw.circle(self.screen,(236,64,122),self.image_objects[0].screen_coords,self.collision_radius)
+
         for i, b in enumerate(self.image_objects):
             self.reset_pygame_image(b)
             self.screen.blit(b.image, (b.screen_coords[0]-b.image_center[0], b.screen_coords[1]-b.image_center[1]))
 
-            if(self.draw_collision):
-                pygame.draw.circle(self.screen,(236,64,122),b.screen_coords,b.collision_radius)
+            
 
             if self.draw_alignment_lines:
                 color = self.colors[i % len(self.colors)]
@@ -270,6 +284,11 @@ class ImageTool(object):
             self.text_queue.append('W/S/A/D to move')
             self.text_queue.append('R to rotate')
             self.text_queue.append('1: print offsets relative to this object (rotation should be 0)')
+
+            if self.selected_object!=self.image_objects[0]:
+                offset=[self.selected_object.world_coords[0]-self.image_objects[0].world_coords[0],self.selected_object.world_coords[1]-self.image_objects[0].world_coords[1]]
+                adjusted_offset=self.get_vector_rotation(offset,self.image_objects[0].rotation_angle)
+                self.text_queue.append(f'relative offset: {adjusted_offset}')
 
         # update time
         self.time_passed=self.clock.tick(self.max_fps)
@@ -379,7 +398,7 @@ class ImageTool(object):
         if self.scale>self.scale_limit[0]:
             self.scale=round(self.scale-0.1,1)
             self.view_adjust+=self.view_adjustment
-            #print('zoom out',self.scale)
+            print('zoom out',self.scale)
     #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
@@ -389,7 +408,7 @@ class ImageTool(object):
             # otherwise stuff starts getting clipped when its <0
             if self.view_adjust<self.view_adjust_minimum:
                 self.view_adjust=self.view_adjust_minimum
-            #print('zoom in',self.scale)
+            print('zoom in',self.scale)
 
 #------------------------------------------------------------------------------
             
@@ -412,6 +431,8 @@ class ImageObject(object):
 #------------------------------------------------------------------------------
 screen_size = (1200,900)
 image_tool=ImageTool(screen_size)
+image_tool.collision_radius=100
+
 
 #image_tool.image_objects.append(ImageObject(['t20'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],90))
@@ -431,16 +452,30 @@ image_tool=ImageTool(screen_size)
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
-#image_tool.image_objects.append(ImageObject(['sd_kfz_251'],0))
+image_tool.image_objects.append(ImageObject(['red_bicycle'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['crate'],0))
 
-image_tool.image_objects.append(ImageObject(['rso_pak'],0))
-image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],0))
-image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+#image_tool.image_objects.append(ImageObject(['rso_pak'],0))
+#image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
+
+#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+
+
+# -----
+# bounding box markers
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r20'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
+
 
 
 while image_tool.quit==False:

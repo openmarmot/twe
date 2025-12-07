@@ -1,6 +1,33 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 06 2025
+- update to image_tool to show relative offset in the menu 
+- added advanced collision with multiple bounding circles. currently only set for vehicles 
+- minor updates 
+
+each vehicle now has a custom set of bounding circles. this should make smaller vehicles harder to hit, 
+and especially make bicycles not such bullet magnets 
+
+todo 
+- add bounding circles for buildings 
+- there seems to be an issue with smoke accumulating. bug with fires?
+----------------------------------
+Dec 05 2025
+- updated seating arrangements for the sd.kfz.251/2 and sd.kfs.251/22
+- fixed sd.kfz.251/2 turret position 
+
+----------------------------------
+Dec 01 2025
+- increased stg44 range by 100 units 
+- distant shots by humans get double aim adjustments applied 
+- adjusted t34 bow gun rotation (decrease) to be more historical 
+- adjusted panzer iv and vi bow gun rotation (increase) to be more historical
+
+todo 
+- turret accuracy affected by sight quality 
+
+----------------------------------
 Nov 30 2025
 - added vehicle commander code 
 

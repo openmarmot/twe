@@ -266,6 +266,11 @@ class AIHuman(object):
 
         # final results
         target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
+        # compound effect for long range fire
+        if distance>1500:
+            target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+
         calculated_range=distance+random.uniform(-adjust_max,adjust_max+500)
 
         return target_coords,calculated_range

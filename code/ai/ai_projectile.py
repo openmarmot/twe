@@ -30,7 +30,8 @@ class AIProjectile(object):
 
         # variables for collision checks
         self.last_collision_check=0
-        self.collision_check_interval=0.01
+        #self.collision_check_interval=0.005
+        self.collision_check_interval=0.01 # this seems to be plenty
 
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
