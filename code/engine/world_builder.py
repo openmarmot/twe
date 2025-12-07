@@ -501,11 +501,7 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     # testing
     elif battle_option=='4':
-        for b in range(50):
-            squads.append('Soviet T-70')
-        squads.append('German Panzer VI Ausf E camo1')
-        squads.append('German Panzer VI Ausf E camo1')
-        squads.append('German Panzer VI Ausf E camo1')
+        pass
 
         
         #squads.append('Soviet T34-76 Model 1943')
@@ -2084,7 +2080,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([-32.0, 0.0],25)
+        z.bounding_circles.append([-8.0, 0.0],25)
+        z.bounding_circles.append([10.0, 0.0],25)
+        z.bounding_circles.append([35.0, 0.0],25)
         z.weight=2380
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2136,7 +2136,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([-35.0, 0.0],25)
+        z.bounding_circles.append([-10.0, 0.0],25)
+        z.bounding_circles.append([18.0, 0.0],25)
+        z.bounding_circles.append([35.0, 0.0],25)
         z.weight=3500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2198,7 +2202,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([-35.0, 0.0],25)
+        z.bounding_circles.append([-10.0, 0.0],25)
+        z.bounding_circles.append([18.0, 0.0],25)
+        z.bounding_circles.append([35.0, 0.0],25)
         z.weight=2500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2272,7 +2280,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([-51.0, 0.0],25)
+        z.bounding_circles.append([-22.0, 0.0],25)
+        z.bounding_circles.append([0.0, 0.0],25)
+        z.bounding_circles.append([21.0, 0.0],25)
+        z.bounding_circles.append([48.0, 0.0],25)
         z.weight=4900
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2338,7 +2351,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_speed=385.9
         z.ai.max_offroad_speed=177.6
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100
+        z.bounding_circles.append([-43.0, 0.0],25)
+        z.bounding_circles.append([-20.0, 0.0],25)
+        z.bounding_circles.append([0.0, 0.0],25)
+        z.bounding_circles.append([21.0, 0.0],25)
+        z.bounding_circles.append([39.0, 0.0],25)
         z.weight=4800
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -2694,7 +2712,12 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.max_offroad_speed=177.6
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
-        z.collision_radius=50
+        z.collision_radius=100 #50
+        z.bounding_circles.append([[-52,0],25])
+        z.bounding_circles.append([[-27,0],25])
+        z.bounding_circles.append([[-2,0],25])
+        z.bounding_circles.append([[22,0],25])
+        z.bounding_circles.append([[51,0],25])
         z.weight=7800
         z.drag_coefficient=0.9
         z.frontal_area=5

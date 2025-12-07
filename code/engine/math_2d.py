@@ -127,6 +127,17 @@ def calculate_relative_position(coords,rotation,offset):
     return relative_position
 
 #------------------------------------------------------------------------------
+def check_collision_bounding_circles(collision_coord,collision_object):
+    for circle in collision_object.bounding_circles:
+        adjusted_coords=calculate_relative_position(collision_object.world_coords,collision_object.rotation_angle,circle[0])
+        radius=circle[1]
+        distance=get_distance(collision_coord,adjusted_coords)
+        if distance<radius:
+            return True
+    return False
+
+
+#------------------------------------------------------------------------------
 def checkCollisionCircleOneResult(wo, collision_list, ignore_list):
     # wo - (worldobject)the object possibly doing the colliding
     # collision_list - (list[worldobject] a list of all possible objects that
@@ -263,10 +274,8 @@ def get_heading_vector(location,destination):
 #--------------------------------------------------------------------------------
 @lru_cache(maxsize=2000)
 def get_heading_from_rotation(rotation):
-    ''' get heading vector. input is rotation in degrees'''
-
-    r=math.radians(rotation)
-    b=[math.degrees(-math.sin(r)),-math.degrees(math.cos(r))]
+    r = math.radians(rotation)
+    b = [-math.sin(r), -math.cos(r)]
     return get_normalized(b)
 
 #------------------------------------------------------------------------------

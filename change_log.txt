@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 06 2025
+- update to image_tool to show relative offset in the menu 
+- work on a more detailed bounding box 
+
+----------------------------------
+Dec 05 2025
+- updated seating arrangements for the sd.kfz.251/2 and sd.kfs.251/22
+- fixed sd.kfz.251/2 turret position 
+
+----------------------------------
 Dec 01 2025
 - increased stg44 range by 100 units 
 - distant shots by humans get double aim adjustments applied 

@@ -169,6 +169,9 @@ class WorldObject(object):
         self.collision=True
         # radius of collision circle in world coords
         self.collision_radius=5
+
+        self.bounding_circles=[]
+        # each is [[offset_x,offset_y],radius]
         
 
         # render level kind of a 'z' layer

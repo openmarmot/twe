@@ -42,6 +42,8 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
     # for slope 0 is vertical, whereas 90 is full horizontal armor
     # normalize distance to nearest 500
 
+    print(f'penetration side: {side}')
+
     if distance<0:
         engine.log.add_data('error',f'penetration_calculator.calculate_penetration() error negative distance {distance}',True)
         distance=0

@@ -30,7 +30,7 @@ class AIProjectile(object):
 
         # variables for collision checks
         self.last_collision_check=0
-        self.collision_check_interval=0.01
+        self.collision_check_interval=0.005
 
         # matches up with the projectile_data dict in penetration_calculator.py
         self.projectile_type=None
@@ -96,6 +96,17 @@ class AIProjectile(object):
                 objects=self.owner.grid_square.wo_objects_projectile_collision
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
                 if collide_obj !=None:
+
+                    if collide_obj.bounding_circles:
+
+                        bounding_circles=engine.math_2d.check_collision_bounding_circles(self.owner.world_coords,collide_obj)
+
+                        if bounding_circles is False:
+                            print(f'collision not detected. projectile coords {self.owner.world_coords}, collision object coords {collide_obj.world_coords},collision object rotation {collide_obj.rotation_angle}')
+
+                            return
+
+
                     
                     # update hit counter
                     if self.weapon.is_gun:
