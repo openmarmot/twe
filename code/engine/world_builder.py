@@ -710,6 +710,22 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.collision_radius=200
         z.weight=10000
         z.is_building=True
+        z.bounding_circles.append([[-83.0, -269.0],100])
+        z.bounding_circles.append([[104.0, -269.0],100])
+        z.bounding_circles.append([[-83.84615384615384, 286.9230769230769],100])
+        z.bounding_circles.append([[-75.38461538461539, 96.92307692307692],100])
+        z.bounding_circles.append([[-83.84615384615384, -90.76923076923076],100])
+        z.bounding_circles.append([[108.46153846153845, -150.0],100])
+        z.bounding_circles.append([[-70.76923076923077, 2.3076923076923075],100])
+        z.bounding_circles.append([[-80.0, 178.46153846153845],100])
+        z.bounding_circles.append([[-163.07692307692307, -342.3076923076923],25])
+        z.bounding_circles.append([[7.692307692307692, -348.46153846153845],25])
+        z.bounding_circles.append([[174.6153846153846, -350.7692307692308],25])
+        z.bounding_circles.append([[174.6153846153846, -83.07692307692308],25])
+        z.bounding_circles.append([[24.615384615384613, -88.46153846153845],25])
+        z.bounding_circles.append([[-163.07692307692307, -174.6153846153846],25])
+        z.bounding_circles.append([[-18.46153846153846, 357.6923076923077],25])
+        z.bounding_circles.append([[-152.3076923076923, 358.46153846153845],25])
 
     elif object_type=='square_building':
         z=WorldObject(world,['square_building_outside','square_building_inside'],AIBuilding)

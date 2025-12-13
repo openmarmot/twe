@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Dec 13 2025
+- added complex bounding for warehouse object (too complex?)
+- image_tool now allows positioning with mouse clicks 
+- fixed mouse coords -> world coords 
+
+the circle bounding seems to work well for vehicles, but maybe less well for complex building shapes, however 
+i never got bounding boxes to work right. something in the math was always off 
+
+----------------------------------
+Dec 07 2025
+- fixed image_tool output
+
 ----------------------------------
 Dec 06 2025
 - update to image_tool to show relative offset in the menu 

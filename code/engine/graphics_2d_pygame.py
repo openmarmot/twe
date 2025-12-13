@@ -190,11 +190,11 @@ class Graphics_2D_Pygame(object):
     #------------------------------------------------------------------------------
     def get_mouse_world_coords(self):
         ''' return world coords of mouse'''
-        # pretty sure this math doesnt make any sense
-        x,y=pygame.mouse.get_pos()
-        player_x=self.world.player.world_coords[0]
-        player_y=self.world.player.world_coords[1]
-        return [player_x-x,player_y-y]
+        x, y = pygame.mouse.get_pos()
+        translation = self.get_translation()
+        world_x = (x - translation[0]) / self.scale
+        world_y = (y - translation[1]) / self.scale
+        return [world_x, world_y]
 
     #-----------------------------------------------------------------------------
     def get_player_screen_coords(self):
