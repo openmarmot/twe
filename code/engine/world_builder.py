@@ -477,19 +477,10 @@ def load_quick_battle_map_objects(battle_option,result_container):
         print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads.append('German T34 747r')
+        squads.append('German T34 747r camo')
         squads.append('German Sd.kfz.251/2')
-        squads.append('German Sd.kfz.251/2')
-        squads.append('German Sd.kfz.251/2')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
-        squads.append('Soviet Sniper Squad SVT-40')
+
 
     
     elif battle_option=='3':
@@ -4247,6 +4238,18 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=25
         z.ai.coaxial_weapon_reload_speed=10
         z.no_save=True
+
+    elif object_type=='german_t34_747r':
+        z=spawn_object(world,world_coords,'soviet_t34_76_model_1943',False)
+        z.name='T34 747r'
+        z.image_list=["t34_747r_chassis"]
+        z.ai.turrets[0].image_list=["t34_747r_turret"]
+
+    elif object_type=='german_t34_747r_camo':
+        z=spawn_object(world,world_coords,'soviet_t34_76_model_1943',False)
+        z.name='T34 747r'
+        z.image_list=["t34_747r_chassis_camo"]
+        z.ai.turrets[0].image_list=["t34_747r_turret_camo"]
 
     elif object_type=='soviet_t34_85':
         # ref : https://wiki.warthunder.com/T-34-85

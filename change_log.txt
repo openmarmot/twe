@@ -1,14 +1,28 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 15 2025
+- added the german captured t34 747r (a t34-76) in camo and no camo 
+
+for now there are no changes in the captured t34. I might give it less ammo in the future 
+
+I will probably add the t34-85 captured version as well as I just need to do the turret, but idk. the 76 was 
+probably more common 
 
 ----------------------------------
 Dec 13 2025
 - added complex bounding for warehouse object (too complex?)
 - image_tool now allows positioning with mouse clicks 
 - fixed mouse coords -> world coords 
+- added a fix for continuous smoke from disabled ju88
+- misc minor updates 
 
 the circle bounding seems to work well for vehicles, but maybe less well for complex building shapes, however 
 i never got bounding boxes to work right. something in the math was always off 
+
+playtest notes 
+- (fixed) saw a disabled ju88 with one of 4 fuel tanks empty. engines were both on and producing continous smoke clouds 
+    this is likely why i had seen a issue with small smoke accumulating 
 
 ----------------------------------
 Dec 07 2025

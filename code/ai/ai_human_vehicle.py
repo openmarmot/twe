@@ -406,8 +406,6 @@ class AIHumanVehicle():
                 # tell the gunner to engage
                 primary_gunner.human.ai.memory['task_vehicle_crew']['target']=biggest_threat
                 self.owner.ai.speak(f'Gunner, prioritize the {biggest_threat.name} ')
-                print(f'commander re-prioritizing fire of {vehicle.name} to {biggest_threat.name} ')
-
 
             # check if we should re-orientate the vehicle to face the biggest threat
 
@@ -864,7 +862,6 @@ class AIHumanVehicle():
                                             # start the reload process
                                                 self.owner.ai.memory['task_vehicle_crew']['reload_start_time']=self.owner.world.world_seconds
                                                 self.owner.ai.memory['task_vehicle_crew']['current_action']='reloading primary weapon'
-                                                print(f'reloading {turret.ai.primary_weapon.name} because engaging vehicle and HE loaded')
                                                 return
                 elif engage_primary_reason=='need to get closer to penetrate':
                     if turret.ai.primary_turret:
