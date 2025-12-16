@@ -64,7 +64,7 @@ class ImageTool(object):
         self.text_queue=[]
 
         # draw collision circles
-        self.draw_collision=False
+        self.draw_collision=True
         self.collision_radius=50
 
         # draw alignment lines (new)
@@ -84,7 +84,7 @@ class ImageTool(object):
         self.scale_limit=[0.1,2.5]
 
         # scale. normal is 1. this is set by the player with []
-        self.scale=self.scale_limit[1]
+        self.scale=1
 
         # adjustment to viewing area. > == more visible
         # 100 seems to be about the minimum where there is no popping in and out of objects
@@ -151,7 +151,8 @@ class ImageTool(object):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 # left click
                 if event.button==1:
-                    self.select_closest_object_with_mouse(self.get_mouse_screen_coords())
+                    if self.selected_object:
+                        self.selected_object.world_coords=self.get_mouse_world_coords()
                 # middle button click
                 if event.button==2:
                     pass
@@ -200,7 +201,7 @@ class ImageTool(object):
                     offset=[b.world_coords[0]-self.selected_object.world_coords[0],b.world_coords[1]-self.selected_object.world_coords[1]]
                     adjusted_offset=self.get_vector_rotation(offset,self.selected_object.rotation_angle)
                     size=b.image_list[b.image_index].split('r')[-1]
-                    print(f'z.bounding_circles.append({adjusted_offset},{size})')
+                    print(f'z.bounding_circles.append([{adjusted_offset},{size}])')
 
             print('----------------------------------')
 
@@ -281,7 +282,7 @@ class ImageTool(object):
         if self.selected_object!=None:
             self.text_queue.append('Object: '+self.selected_object.image_list[self.selected_object.image_index])
             self.text_queue.append('Rotation angle: '+str(round(self.selected_object.rotation_angle,2)))
-            self.text_queue.append('W/S/A/D to move')
+            self.text_queue.append('W/S/A/D or mouse click to move')
             self.text_queue.append('R to rotate')
             self.text_queue.append('1: print offsets relative to this object (rotation should be 0)')
 
@@ -335,11 +336,11 @@ class ImageTool(object):
     #------------------------------------------------------------------------------
     def get_mouse_world_coords(self):
         ''' return world coords of mouse'''
-        # pretty sure this math doesnt make any sense
-        x,y=pygame.mouse.get_pos()
-        player_x=0
-        player_y=0
-        return [player_x-x,player_y-y]
+        x, y = pygame.mouse.get_pos()
+        translation = self.get_translation()
+        world_x = (x - translation[0]) / self.scale
+        world_y = (y - translation[1]) / self.scale
+        return [world_x, world_y]
 
     #-----------------------------------------------------------------------------
     def get_player_screen_coords(self):
@@ -431,8 +432,7 @@ class ImageObject(object):
 #------------------------------------------------------------------------------
 screen_size = (1200,900)
 image_tool=ImageTool(screen_size)
-image_tool.collision_radius=100
-
+image_tool.collision_radius=440
 
 #image_tool.image_objects.append(ImageObject(['t20'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],90))
@@ -452,7 +452,7 @@ image_tool.collision_radius=100
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
-image_tool.image_objects.append(ImageObject(['red_bicycle'],0))
+image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
@@ -468,10 +468,22 @@ image_tool.image_objects.append(ImageObject(['red_bicycle'],0))
 
 # -----
 # bounding box markers
-image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
-#image_tool.image_objects.append(ImageObject(['bound_circle_r20'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
 #image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
 #image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
 #image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))

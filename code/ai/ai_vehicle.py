@@ -689,7 +689,9 @@ class AIVehicle():
         
         # is this wanted??
         # return throttle to neutral
-        if self.throttle_zero:
+        # we want this to happen no matter what if the vehicle is disabled
+        # otherwise there can be a continious smoke output from throttle>0 with no movement
+        if self.throttle_zero or self.vehicle_disabled:
             self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
 
         if self.brake_zero:
