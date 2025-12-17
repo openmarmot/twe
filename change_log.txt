@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 16 2025
+- minor changes 
+
+starting to think on some gunner idle actions like rotating the turret back to neutral 
+
+ai_human_vehicle is getting big enough already that i'm thinking about splitting off the gunner functions to its own file.
+perhaps all roles will end up in their own files 
+
+----------------------------------
 Dec 15 2025
 - added the german captured t34 747r (a t34-76) in camo and no camo 
 

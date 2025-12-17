@@ -809,7 +809,12 @@ class AIHumanVehicle():
             self.think_vehicle_role_gunner_examine_target(out_of_ammo_primary,out_of_ammo_coax)
         else:
             if self.owner.ai.memory['task_vehicle_crew']['fire_missions'] and out_of_ammo_primary == False:
-                self.think_vehicle_role_fire_mission()
+                self.think_vehicle_role_gunner_fire_mission()
+            else:
+                # we reach this when we have gone through the whole ai gunner decision tree and have found 
+                # nothing to do. perhaps we pop out to a gunner idle function here?
+                self.think_vehicle_role_gunner_idle()
+
                 
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_examine_target(self,out_of_ammo_primary,out_of_ammo_coax):
@@ -938,7 +943,7 @@ class AIHumanVehicle():
         self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
 
     #---------------------------------------------------------------------------
-    def think_vehicle_role_fire_mission(self):
+    def think_vehicle_role_gunner_fire_mission(self):
         '''indirect fire mission'''
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
         fire_mission=self.owner.ai.memory['task_vehicle_crew']['fire_missions'][0]
@@ -977,6 +982,11 @@ class AIHumanVehicle():
         turret.ai.primary_weapon.ai.indirect_fire_mode=True
         # gotta think of a better word, but 'Engaging' triggers the driver to wait
         self.owner.ai.memory['task_vehicle_crew']['current_action']='Engaging Fire Mission'
+
+    #---------------------------------------------------------------------------
+    def think_vehicle_role_gunner_idle(self):
+        '''think about what to do when we have no other tasks'''
+        pass
             
     #---------------------------------------------------------------------------
     def think_vehicle_role_gunner_reload(self,weapon):
