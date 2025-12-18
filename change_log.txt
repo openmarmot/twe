@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 18 2025
+- split the vehicle gunner code off into its own section
+
+will probably do this with all the roles eventually. even on its own the gunner code is .. expansive 
+----------------------------------
 Dec 16 2025
 - minor changes 
 
