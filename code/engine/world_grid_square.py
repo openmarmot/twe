@@ -57,6 +57,10 @@ class WorldGridSquare:
 
         # special selection for projectile collision. used by ai_projectile
         self.wo_objects_projectile_collision=[]
+
+        # set by ai_gun.fire. world.world_seconds when a fun was last fired
+        # starts negative so no one immediately prones
+        self.last_gun_fired=-100
     #---------------------------------------------------------------------------
     def add_wo_object(self,wo_object):
         ''' add a wo_object to the grid square'''

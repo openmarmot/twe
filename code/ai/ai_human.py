@@ -2606,6 +2606,16 @@ class AIHuman(object):
             self.switch_task_player_control()
             return
         
+
+        # check if we should prone / un-prone
+        # basically if a gun was fired in the last 30 seconds
+        if self.owner.grid_square.last_gun_fired+30>self.owner.world.world_seconds:
+            if self.prone is False:
+                self.prone_state_change()
+        else:
+            if self.prone:
+                self.prone_state_change()
+
         # check for AT targets as a high priority
         if self.antitank is not None:
             if self.check_ammo_bool(self.antitank,self.owner):

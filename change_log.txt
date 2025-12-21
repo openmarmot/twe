@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 21 2025
+- added last_gun_fired to world_grid_square that ai_human checks for prone decisions 
+
+----------------------------------
 Dec 18 2025
 - split the vehicle gunner code off into its own section
 
