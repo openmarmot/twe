@@ -477,9 +477,12 @@ def load_quick_battle_map_objects(battle_option,result_container):
         print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points+soviet_advantage)
-        squads.append('German T34 747r')
-        squads.append('German T34 747r camo')
-        squads.append('German Sd.kfz.251/2')
+        #squads.append('German Panzerjager Tiger P')
+        #squads.append('Soviet SU-85')
+        #squads.append('Soviet SU-85')
+        #squads.append('Soviet SU-85')
+        #squads.append('Soviet SU-85')
+
 
 
     
@@ -3734,7 +3737,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         load_magazine(world,z)
 
     elif object_type=='german_panzerjager_tiger_p_elefant':
-        # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
+        # a late model Ferdy/Elefant
+        # note that 2 of these fought in the battle of berlin !
         z=WorldObject(world,['elefant'],AIVehicle)
         z.name='Panzerjager Tiger P Elefant'
         z.is_vehicle=True
@@ -3748,7 +3752,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.vehicle_armor['bottom']=[20,0,0]
         z.ai.vehicle_armor['left']=[80,0,5]
         z.ai.vehicle_armor['right']=[80,0,5]
-        z.ai.vehicle_armor['front']=[80,45,0]
+        z.ai.vehicle_armor['front']=[110,45,0] # 80 on the early models, some sources say the late models were 80+30
         z.ai.vehicle_armor['rear']=[80,30,0]
         z.ai.passenger_compartment_armor['top']=[30,0,0]
         z.ai.passenger_compartment_armor['bottom']=[20,0,0]
@@ -3760,6 +3764,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
         mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
+        mg_turret.ai.position_offset=[-67.0, 17.0]
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
         z.ai.radio=spawn_object(world,world_coords,'radio_feldfu_b',False)
@@ -3813,11 +3818,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.rotation_angle=float(random.randint(0,359))
         for b in range(10):
             z.add_inventory(spawn_object(world,world_coords,"mg34_belt",False))
-        z.ai.ammo_rack_capacity=87
-        for b in range(60):
-            z.ai.ammo_rack.append(spawn_object(world,world_coords,"8cm_pak43_l71_magazine",False))
-        for b in range(27):
-            temp=spawn_object(world,world_coords,"8cm_pak43_l71_magazine",False)
+        z.ai.ammo_rack_capacity=75
+        for b in range(50):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"8.8cm_pak43_l71_magazine",False))
+        for b in range(25):
+            temp=spawn_object(world,world_coords,"8.8cm_pak43_l71_magazine",False)
             load_magazine(world,temp,'Sprgr_34_88_L71')
             z.ai.ammo_rack.append(temp)
         z.ai.min_wheels_per_side_front=3
@@ -3841,11 +3846,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['bottom']=[20,0,0]
         z.ai.turret_armor['left']=[200,0,0]
         z.ai.turret_armor['right']=[200,0,0]
-        z.ai.turret_armor['front']=[220,0,0]
-        z.ai.turret_armor['rear']=[220,0,0]
-        z.ai.position_offset=[-15,0]
+        z.ai.turret_armor['front']=[200,0,10] # has a odd spaced front plate
+        z.ai.turret_armor['rear']=[200,0,0]
+        z.ai.position_offset=[0,0]
         z.ai.rotation_range=[-36,36]
-        z.ai.primary_weapon=spawn_object(world,world_coords,'8cm_pak43_l71',False)
+        z.ai.primary_weapon=spawn_object(world,world_coords,'8.8cm_pak43_l71',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
         z.ai.primary_weapon.ai.smoke_type='cannon'

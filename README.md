@@ -73,6 +73,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Panzer IV Ausf H | Tank | 75mm L48 |
 | German | Panzer IV Ausf J | Tank | Minor differences from the H |
 | German | Panzer VI Ausf E Tiger | Tank | Tiger 1 |
+| German | PanzerJager Tiger (P) Elefant | Tank | Late model |
 | German | Raupenschlepper OST (RSO) | Utility | tracked utility vehicle |
 | German | RSO Pak | AT Vehicle | RSO with a Pak 40 |
 | German | Sd.kfz.10 | Halftrack | unarmored prime mover |
