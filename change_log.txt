@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 23 2025
+- added collision for elefant 
+- added elefant camo options 
+
+----------------------------------
 Dec 21 2025
 - added last_gun_fired to world_grid_square that ai_human checks for prone decisions 
 - started work on adding the elefant

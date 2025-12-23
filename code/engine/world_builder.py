@@ -3798,11 +3798,13 @@ def spawn_object(world,world_coords,object_type, spawn):
         #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed=40.
         z.collision_radius=100
-        z.bounding_circles.append([[-48.0, 0.0],40])
-        z.bounding_circles.append([[-20.0, 0.0],40])
-        z.bounding_circles.append([[7.0, 0.0],40])
-        z.bounding_circles.append([[34.0, 0.0],40])
-        z.bounding_circles.append([[48.0, 0.0],40])
+        z.bounding_circles.append([[0.0, 0.0],45])
+        z.bounding_circles.append([[-43.0, -0.47619047619047616],45])
+        z.bounding_circles.append([[51.80952380952381, -0.09523809523809534],45])
+        z.bounding_circles.append([[-80.47619047619047, -37.61904761904762],10])
+        z.bounding_circles.append([[-80.47619047619047, 35.238095238095234],10])
+        z.bounding_circles.append([[81.9047619047619, -37.14285714285714],10])
+        z.bounding_circles.append([[82.85714285714285, 33.33333333333333],10])
         z.weight=26500
         z.drag_coefficient=0.9
         z.frontal_area=5
@@ -3887,6 +3889,14 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
+
+    elif object_type=='german_panzerjager_tiger_p_elefant_camo1':
+        z=spawn_object(world,world_coords,'german_panzerjager_tiger_p_elefant',False)
+        z.image_list=["elefant_camo_1"]
+
+    elif object_type=='german_panzerjager_tiger_p_elefant_camo2':
+        z=spawn_object(world,world_coords,'german_panzerjager_tiger_p_elefant',False)
+        z.image_list=["elefant_camo_2"]
 
     elif object_type=='german_panzer_vi_ausf_e':
         # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
