@@ -1,6 +1,44 @@
 TWE Project : Change Log
 
 ----------------------------------
+Dec 23 2025
+- added collision for elefant 
+- added elefant camo options 
+
+----------------------------------
+Dec 21 2025
+- added last_gun_fired to world_grid_square that ai_human checks for prone decisions 
+- started work on adding the elefant
+
+I really need to re-work the penetration and distance system now that we have some ultra guns like the 8.8cm L71 
+
+I should also more clearly define vehicle vs passenger section and or completely redo the armor design 
+
+Initial play tests suggest the elefant does well. The lower glacias is only 80mm, which is a weak point frontally. 
+It is definitely not OP, It is penetrated fairly easily by a T34-85 from the side and as its a casemate it is often 
+presenting sides. It also seems to be in that armor range that often results in spalling from T34 hits 
+
+Spalling is probably op.. 
+
+todo 
+- add the camo versions of the elefant 
+- check stats on turret rotation, adjust weight, etc 
+
+----------------------------------
+Dec 18 2025
+- split the vehicle gunner code off into its own section
+
+will probably do this with all the roles eventually. even on its own the gunner code is .. expansive 
+----------------------------------
+Dec 16 2025
+- minor changes 
+
+starting to think on some gunner idle actions like rotating the turret back to neutral 
+
+ai_human_vehicle is getting big enough already that i'm thinking about splitting off the gunner functions to its own file.
+perhaps all roles will end up in their own files 
+
+----------------------------------
 Dec 15 2025
 - added the german captured t34 747r (a t34-76) in camo and no camo 
 

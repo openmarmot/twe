@@ -432,7 +432,7 @@ class ImageObject(object):
 #------------------------------------------------------------------------------
 screen_size = (1200,900)
 image_tool=ImageTool(screen_size)
-image_tool.collision_radius=440
+image_tool.collision_radius=100
 
 #image_tool.image_objects.append(ImageObject(['t20'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],90))
@@ -442,9 +442,9 @@ image_tool.collision_radius=440
 #image_tool.image_objects.append(ImageObject(['german_soldier'],270))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],270))
 
-#image_tool.image_objects.append(ImageObject(['panzer_iv_g_chassis'],0))
+image_tool.image_objects.append(ImageObject(['elefant'],0))
 #image_tool.image_objects.append(ImageObject(['panzer_iv_hull_mg'],0))
-#image_tool.image_objects.append(ImageObject(['panzer_iv_g_turret'],0))
+#image_tool.image_objects.append(ImageObject(['elefant_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['pak40_carriage_deployed'],0))
 #image_tool.image_objects.append(ImageObject(['pak40_turret'],0))
@@ -452,7 +452,7 @@ image_tool.collision_radius=440
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
-image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
+#image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
@@ -468,25 +468,30 @@ image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 
 # -----
 # bounding box markers
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r100'],0))
 #image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
-#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
-#image_tool.image_objects.append(ImageObject(['bound_circle_r30'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+#image_tool.image_objects.append(ImageObject(['bound_circle_r25'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r45'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r45'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r45'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
+image_tool.image_objects.append(ImageObject(['bound_circle_r10'],0))
 
 
 

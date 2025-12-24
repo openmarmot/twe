@@ -124,6 +124,9 @@ class AIGun(object):
             if self.equipper is None:
                 engine.log.add_data('error',f'ai_gun.fire {self.owner.name} equipper is none',True)
 
+            # update last fired tracker
+            self.equipper.grid_square.last_gun_fired=self.owner.world.world_seconds
+
             self.last_fired_time=self.owner.world.world_seconds
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
