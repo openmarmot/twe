@@ -4,6 +4,7 @@ TWE Project : Change Log
 ----------------------------------
 Dec 26 2025
 - minor changes 
+- some changes to prone decisions to fix excessive changes 
 
 messing around with opencode so I added a AGENTS.md file. 
 Not sure how much I will use it 
