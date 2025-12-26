@@ -15,7 +15,7 @@ import engine.math_2d
 
 #global variables
 
-class AIBuilding(object):
+class AIBuilding():
     def __init__(self, owner):
         self.owner=owner
         self.show_interior=False

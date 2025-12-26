@@ -14,7 +14,7 @@ import engine.math_2d
 
 #global variables
 
-class WorldArea(object):
+class WorldArea():
     def __init__(self,WORLD):
 
         # created by world_builder.generate_world_area

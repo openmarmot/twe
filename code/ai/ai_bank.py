@@ -13,7 +13,7 @@ import engine.global_finance
 
 #global variables
 
-class AIBank(object):
+class AIBank():
     def __init__(self):
 
         # unique bank name

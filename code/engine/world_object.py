@@ -14,7 +14,7 @@ import engine.math_2d
 #global variables
 
 
-class WorldObject(object):
+class WorldObject():
 
     def __init__(self, world,IMAGE_LIST,AI):
 

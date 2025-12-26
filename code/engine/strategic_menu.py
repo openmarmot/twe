@@ -19,7 +19,7 @@ import engine.math_2d
 #global variables
 
 
-class StrategicMenu(object):
+class StrategicMenu():
     ''' in game menu '''
 
     #---------------------------------------------------------------------------

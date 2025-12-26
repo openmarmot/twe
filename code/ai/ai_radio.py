@@ -13,7 +13,7 @@ import engine.math_2d
 
 
 
-class AIRadio(object):
+class AIRadio():
     def __init__(self, owner):
         self.owner=owner
 

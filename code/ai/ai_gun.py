@@ -19,7 +19,7 @@ import engine.log
 
 #global variables
 
-class AIGun(object):
+class AIGun():
     def __init__(self, owner):
         self.owner=owner
 

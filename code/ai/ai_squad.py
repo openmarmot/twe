@@ -17,7 +17,7 @@ import engine.log
 
 #global variables
 
-class AISquad(object):
+class AISquad():
     def __init__(self,world):
 
         # !! NOTE - this should have as little as possible in it. most stuff should be in ai_human

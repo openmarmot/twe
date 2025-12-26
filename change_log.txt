@@ -2,6 +2,13 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Dec 26 2025
+- minor changes 
+
+messing around with opencode so I added a AGENTS.md file. 
+Not sure how much I will use it 
+
+----------------------------------
 Dec 24 2025
 - added german and soviet field mortars
 - added a kar98k with rifle grenade attachment + HE and HEAT grenades

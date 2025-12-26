@@ -17,7 +17,7 @@ import engine.world_builder
 
 #global variables
 
-class AIThrowable(object):
+class AIThrowable():
     def __init__(self, owner):
         self.owner=owner
 

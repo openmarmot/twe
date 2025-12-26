@@ -27,7 +27,7 @@ from ai.ai_human_radio_operator import AIHumanRadioOperator
 
 #global variables
 
-class AIHuman(object):
+class AIHuman():
     def __init__(self, owner):
         self.owner=owner
 
@@ -1149,7 +1149,7 @@ class AIHuman(object):
             # need to make sure nobody else is already carrying it
             in_use=False
             for b in self.owner.world.grid_manager.get_objects_from_all_grid_squares(True,False):
-                if b.ai.large_pickup==b:
+                if b.ai.large_pickup==world_object:
                     in_use=True
 
             if in_use:
@@ -1223,14 +1223,15 @@ class AIHuman(object):
 
         if self.prone:
             self.owner.image_index=1
-        else: 
+        else:
             self.owner.image_index=0
 
         # good to do this as it changed
         self.owner.reset_image=True
 
-        # add some fatigue, not sure how much
-        self.fatigue+=15
+        # add fatigue only when standing up (from prone to standing)
+        if not self.prone:
+            self.fatigue+=15
     #-----------------------------------------------------------------------
     def reload_weapon(self,weapon,obj_with_inventory,new_magazine):
         '''reload weapon. return bool as to whether it was successful'''

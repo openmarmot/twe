@@ -9,7 +9,7 @@ notes : anything that is.. a wheel
 
 #import custom packages
 
-class AIWheel(object):
+class AIWheel():
     def __init__(self, owner):
         self.owner=owner
 

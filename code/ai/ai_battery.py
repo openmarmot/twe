@@ -9,7 +9,7 @@ notes : battery
 
 #import custom packages
 
-class AIBattery(object):
+class AIBattery():
     def __init__(self, owner):
         self.owner=owner
         # capacity in ampere-hours (Ah)

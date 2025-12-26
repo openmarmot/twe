@@ -35,7 +35,7 @@ from engine.strategic_map import StrategicMap
 from engine.vehicle_diagnostics import VehicleDiagnostics
 import engine.log
 
-class Graphics_2D_Pygame(object):
+class Graphics_2D_Pygame():
     ''' 2D Graphics Engine using PyGame '''
 
     def __init__(self,screen_size):

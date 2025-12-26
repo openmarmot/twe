@@ -9,7 +9,7 @@ notes : sprite that spins for awhile or moves or whatever
 #import custom packages
 import engine.math_2d
 
-class AIAnimatedSprite(object):
+class AIAnimatedSprite():
     def __init__(self, owner):
         self.owner=owner
         

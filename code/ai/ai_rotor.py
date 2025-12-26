@@ -17,7 +17,7 @@ import random
 
 #global variables
 
-class AIRotor(object):
+class AIRotor():
     def __init__(self, owner):
         self.owner=owner
 

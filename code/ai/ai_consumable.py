@@ -11,7 +11,7 @@ notes :
 
 #global variables
 
-class AIConsumable(object):
+class AIConsumable():
     def __init__(self, owner):
         self.owner=owner
 

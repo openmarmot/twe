@@ -12,7 +12,7 @@ notes : A (gun) magazine is a object that holds projectiles
 
 #global variables
 
-class AIMagazine(object):
+class AIMagazine():
     def __init__(self, owner):
         self.owner=owner
         # list of compatible gun names
