@@ -54,13 +54,14 @@ class AIProjectile():
         target_coords=engine.math_2d.moveAlongVector(self.speed,self.owner.world_coords,self.owner.heading,2)
         shrapnel_count=engine.penetration_calculator.projectile_data[self.projectile_type]['shrapnel_count']
         contact_effect=engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']
+        explosion_radius=engine.penetration_calculator.projectile_data[self.projectile_type]['explosion_radius']
         if 'HEAT' in contact_effect:
             engine.world_builder.spawn_flash(self.owner.world,self.owner.world_coords,engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle))
             engine.world_builder.spawn_heat_jet(self.owner.world,self.owner.world_coords,target_coords,shrapnel_count,contact_effect,self.shooter,self.weapon)
             engine.world_builder.spawn_sparks(self.owner.world,self.owner.world_coords,random.randint(1,5))
         elif contact_effect=='explosion':
             # note all this info should be added to the projectile data
-            self.owner.world.create_explosion(self.owner.world_coords,15,shrapnel_count,self.shooter,self.weapon,0.5,1)
+            self.owner.world.create_explosion(self.owner.world_coords,explosion_radius,shrapnel_count,self.shooter,self.weapon,0.5,1)
         else:
             print('ERROR - projectile ai contact_effect not recognized: ',contact_effect)
 

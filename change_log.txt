@@ -1,5 +1,22 @@
 TWE Project : Change Log
 
+----------------------------------
+Dec 30 2025
+- added explosion_radius to the projectile database 
+- ai_projectile now uses explosion_radius instead of 15
+- ai_throwable now uses the configured explosion_radius instead of 15
+
+the explosion radius for most projectiles is around 80 units now, which is about 10 feet.
+This is a large step up from the 15 units that it was previously.
+
+throwables should also get a bump as their configured explosion_radius was being ignored previously.
+
+I think explosions will still mostly damage via shrapnel, this is probably accurate 
+
+todo 
+- throwables need explosion_radius reworked. 
+- throwables could use the projectile database but they don't except for HEAT 
+- consider adding shrapnel_radius as well 
 
 ----------------------------------
 Dec 26 2025
