@@ -509,7 +509,10 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     # testing
     elif battle_option=='4':
-        pass
+        squads.append('German Panzerjager Tiger P camo1')
+
+        for s in range(100):
+            squads.append('Soviet T-70')
 
         
         #squads.append('Soviet T34-76 Model 1943')

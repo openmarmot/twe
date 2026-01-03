@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 02 2026
+- added full screen as an option although it ended up being annoying so its not the default 
+
+resolution can be adjusted in twe.py 
+
+----------------------------------
+Jan 01 2026
+- minor changes 
+
+added some logging to see if rifle grenades are being used. seems like no, so far. might just be rare. 
+there really aren't a ton of infantry engagements due to vehicles dominating so much 
+
 ----------------------------------
 Dec 30 2025
 - added explosion_radius to the projectile database 

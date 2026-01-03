@@ -19,6 +19,11 @@ import engine.log
 
 #global variables
 
+WATCHED_PROJECTILE_TYPES = set([
+    'Sprgr_30_grenade',
+    'PzGr_30_grenade',
+])
+
 class AIGun():
     def __init__(self, owner):
         self.owner=owner
@@ -130,7 +135,10 @@ class AIGun():
             self.last_fired_time=self.owner.world.world_seconds
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
-            
+
+            if projectile.ai.projectile_type in WATCHED_PROJECTILE_TYPES:
+                engine.log.add_data('info',f"Watched projectile '{projectile.ai.projectile_type}' fired by {self.owner.name} from {self.equipper.name if self.equipper else 'unknown'}",True)
+
             projectile.ai.weapon=self.owner
             projectile.ai.shooter=self.equipper
             projectile.ai.ignore_list=self.owner.world.generate_ignore_list(self.equipper)
