@@ -27,7 +27,7 @@ import engine.map_generator
 #global variables
 
 
-class StrategicMap(object):
+class StrategicMap():
 
     def __init__(self, graphics_engine):
 

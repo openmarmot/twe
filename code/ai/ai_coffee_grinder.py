@@ -14,7 +14,7 @@ import engine.world_builder
 
 #global variables
 
-class AICoffeeGrinder(object):
+class AICoffeeGrinder():
     def __init__(self, owner):
         self.owner=owner
 

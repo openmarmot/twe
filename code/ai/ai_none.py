@@ -9,7 +9,7 @@ notes : default ai class for objects that don't use AI
 
 #import custom packages
 
-class AINone(object):
+class AINone():
     def __init__(self, owner):
         self.owner=owner
     #---------------------------------------------------------------------------

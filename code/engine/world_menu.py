@@ -24,7 +24,7 @@ import engine.self_debug_world
 #global variables
 
 
-class World_Menu(object):
+class World_Menu():
     ''' in game menu '''
 
     #---------------------------------------------------------------------------

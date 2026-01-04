@@ -13,7 +13,7 @@ notes : a wearable is a piece of clothing armor, etc. something you can wear
 
 #global variables
 
-class AIWearable(object):
+class AIWearable():
     def __init__(self, owner):
         self.owner=owner
         # head / whatever

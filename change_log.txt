@@ -1,9 +1,76 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 04 2026
+- added tracers to MG belts
+
+It turns out that the germans and soviets mostly used green, although the germans also had 
+a variety of other colors. came out kind of neat. Nice to differentiate MG and automatic rifle fire 
+
+----------------------------------
+Jan 02 2026
+- added full screen as an option although it ended up being annoying so its not the default 
+
+resolution can be adjusted in twe.py 
+
+----------------------------------
+Jan 01 2026
+- minor changes 
+
+added some logging to see if rifle grenades are being used. seems like no, so far. might just be rare. 
+there really aren't a ton of infantry engagements due to vehicles dominating so much 
+
+----------------------------------
+Dec 30 2025
+- added explosion_radius to the projectile database 
+- ai_projectile now uses explosion_radius instead of 15
+- ai_throwable now uses the configured explosion_radius instead of 15
+
+the explosion radius for most projectiles is around 80 units now, which is about 10 feet.
+This is a large step up from the 15 units that it was previously.
+
+throwables should also get a bump as their configured explosion_radius was being ignored previously.
+
+I think explosions will still mostly damage via shrapnel, this is probably accurate 
+
+todo 
+- throwables need explosion_radius reworked. 
+- throwables could use the projectile database but they don't except for HEAT 
+- consider adding shrapnel_radius as well 
+
+----------------------------------
+Dec 26 2025
+- minor changes 
+- some changes to prone decisions to fix excessive changes 
+
+messing around with opencode so I added a AGENTS.md file. 
+Not sure how much I will use it 
+
+----------------------------------
+Dec 24 2025
+- added german and soviet field mortars
+- added a kar98k with rifle grenade attachment + HE and HEAT grenades
+- some german squads now get a rifle grenadier 
+
+just threw the mortars together quick to have some more life systems to start 
+working on artillery code. will update later. 
+
+I'm not super sure if the ai will use the rifle grenades or not. I think the 
+reload AI might pick them in some circumstances 
+
+
+todo 
+- weapon art + ammo for soviet 82mm 
+- possibly artillery troops? 
+- something other than bike pedals for manual movement 
+- work on differentiating explosions is desperately needed
+- give the sturmpistole to someone as primary? maybe a german unique character ?
+
+----------------------------------
 Dec 23 2025
 - added collision for elefant 
 - added elefant camo options 
+- adjusted elefant turret rotation range 
 
 ----------------------------------
 Dec 21 2025

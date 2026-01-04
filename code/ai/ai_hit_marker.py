@@ -16,7 +16,7 @@ import random
 
 #global variables
 
-class AIHitMarker(object):
+class AIHitMarker():
     def __init__(self, owner):
         self.owner=owner
 

@@ -18,7 +18,7 @@ from engine.map_object import MapObject
 
 #global variables
 
-class AIFactionStrategic(object):
+class AIFactionStrategic():
     def __init__(self,strategic_map,faction):
 
         # faction - german/soviet/american/civilian

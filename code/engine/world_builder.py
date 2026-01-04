@@ -133,6 +133,17 @@ def add_standard_loadout(wo,world,loadout):
         wo.add_inventory(spawn_object(world,[0,0],'kar98k',False))
         for _ in range(12):
             wo.add_inventory(spawn_object(world,[0,0],'kar98k_magazine',False))
+    elif loadout=='kar98k_schiessbecher':
+        wo.add_inventory(spawn_object(world,[0,0],'kar98k_schiessbecher',False))
+        for _ in range(12):
+            wo.add_inventory(spawn_object(world,[0,0],'kar98k_magazine',False))
+
+        # this is likely excessive but it represents squad mates carrying grenades
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world,[0,0],'schiessbecher_grenade',False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world,[0,0],'schiessbecher_grenade_heat',False))
+        
     elif loadout=='k43':
         wo.add_inventory(spawn_object(world,[0,0],'k43',False))
         for _ in range(6):
@@ -409,7 +420,7 @@ def get_squad_map_objects(squad_name):
     return map_objects
 
 #------------------------------------------------------------------------------
-def load_magazine(world,magazine,projectile_type=None):
+def load_magazine(world,magazine,projectile_type=None,tracers=False):
     '''loads a magazine with bullets'''
     # wipe whatever is in there
     magazine.ai.projectiles=[]
@@ -420,13 +431,19 @@ def load_magazine(world,magazine,projectile_type=None):
 
     if projectile_type in magazine.ai.compatible_projectiles:
         count=len(magazine.ai.projectiles)
+        tracer_interval=5
+        projectile_count=0
         while count<magazine.ai.capacity:
+            projectile_count+=1
             z=spawn_object(world,[0,0],'projectile',False)
             z.ai.projectile_type=projectile_type
 
             # change to a bigger projectile image. might make a couple more
             if engine.penetration_calculator.projectile_data[projectile_type]['diameter'] >14:
                 z.image_list=['projectile_mid']
+
+            if tracers and projectile_count % tracer_interval == 0:
+                z.image_list=['tracer_green']
             magazine.ai.projectiles.append(z)
 
             count+=1
@@ -477,11 +494,14 @@ def load_quick_battle_map_objects(battle_option,result_container):
         print(f'soviet advantage: {soviet_advantage}')
         squads+=create_random_battlegroup('german',points)
         squads+=create_random_battlegroup('soviet',points+soviet_advantage)
-        #squads.append('German Panzerjager Tiger P')
+        #squads.append('German Panzerjager Tiger P camo1')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
+        squads.append('German 8 cm Mortar Team')
+        squads.append('German 8 cm Mortar Team')
+        squads.append('Soviet 82 mm Mortar Team')
 
 
 
@@ -495,7 +515,10 @@ def load_quick_battle_map_objects(battle_option,result_container):
 
     # testing
     elif battle_option=='4':
-        pass
+        squads.append('German Panzerjager Tiger P camo1')
+
+        for s in range(100):
+            squads.append('Soviet T-70')
 
         
         #squads.append('Soviet T34-76 Model 1943')
@@ -1391,7 +1414,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=60
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,None,True)
 
     elif object_type=='ppk':
         z=WorldObject(world,['ppk'],AIGun)
@@ -1641,7 +1664,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=50
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z,'7.92x57_SME')
+        load_magazine(world,z,'7.92x57_SME',True)
 
     elif object_type=='mg34_belt':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
@@ -1653,7 +1676,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.capacity=250
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z,'7.92x57_SME')
+        load_magazine(world,z,'7.92x57_SME',True)
 
     elif object_type=='37mm_m1939_k61':
         z=WorldObject(world,['mg34'],AIGun)
@@ -1831,9 +1854,25 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=75
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,None,True)
 
     elif object_type=='kar98k':
+        z=WorldObject(world,['kar98k'],AIGun)
+        z.name='kar98k'
+        z.no_update=True
+        z.minimum_visible_scale=0.4
+        z.is_gun=True
+        z.ai.mechanical_accuracy=1
+        z.ai.magazine=spawn_object(world,world_coords,'kar98k_magazine',False)
+        z.ai.rate_of_fire=1.1
+        z.ai.reload_speed=10
+        z.ai.range=2418
+        z.ai.type='rifle'
+        z.ai.use_antipersonnel=True
+        z.rotation_angle=float(random.randint(0,359))
+    
+    elif object_type=='kar98k_schiessbecher':
+        # kar98k with a schiessbecher device for rifle grenades
         z=WorldObject(world,['kar98k'],AIGun)
         z.name='kar98k'
         z.no_update=True
@@ -1853,10 +1892,37 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.name='kar98k_magazine'
         z.minimum_visible_scale=0.4
         z.is_gun_magazine=True
-        z.ai.compatible_guns=['kar98k']
+        z.ai.compatible_guns=['kar98k','kar98k_schiessbecher']
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=5
         z.ai.removable=False
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
+    elif object_type=='schiessbecher_grenade':
+        # ref : https://grokipedia.com/page/Schiessbecher
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='Sprgr_30_grenade'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['kar98k_schiessbecher']
+        z.ai.compatible_projectiles=['Sprgr_30_grenade']
+        z.ai.capacity=5
+        z.ai.removable=True
+        z.ai.disintegrating=True
+        z.rotation_angle=float(random.randint(0,359))
+        load_magazine(world,z)
+
+    elif object_type=='schiessbecher_grenade_heat':
+        z=WorldObject(world,['stg44_magazine'],AIMagazine)
+        z.name='PzGr_30_grenade'
+        z.minimum_visible_scale=0.4
+        z.is_gun_magazine=True
+        z.ai.compatible_guns=['kar98k_schiessbecher']
+        z.ai.compatible_projectiles=['PzGr_30_grenade']
+        z.ai.capacity=5
+        z.ai.removable=True
+        z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
         load_magazine(world,z)
 
@@ -2888,6 +2954,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_turret=True
         z.no_save=True
 
+    # note this is the weapon, not the entire system
     elif object_type=='8cmGrW34':
         # ref : https://en.wikipedia.org/wiki/8_cm_Granatwerfer_34
         z=WorldObject(world,['mg34'],AIGun)
@@ -3851,7 +3918,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['front']=[200,0,10] # has a odd spaced front plate
         z.ai.turret_armor['rear']=[200,0,0]
         z.ai.position_offset=[0,0]
-        z.ai.rotation_range=[-36,36]
+        z.ai.rotation_range=[-14,14]
         z.ai.primary_weapon=spawn_object(world,world_coords,'8.8cm_pak43_l71',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon.ai.smoke_on_fire=True
@@ -5110,6 +5177,103 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
 
+    # this is vehicle+gun for a field type mortar
+    elif object_type=='german_8cm_mortar':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['mortar_base'],AIVehicle)
+        z.name='8cm Granatwerfer 34 Mortar System'
+        z.is_vehicle=True
+        z.is_towable=False
+        turret=spawn_object(world,world_coords,'251_2_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[13,20]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        role.seat_visible=True
+        role.seat_offset=[7,-9]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        role.seat_visible=True
+        role.seat_offset=[13,15]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
+        z.ai.max_speed=100
+        z.ai.max_offroad_speed=100
+        z.ai.open_top=True
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.weight=1400
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.ammo_rack_capacity=30
+        for b in range(30):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"GrW34_magazine",False))
+        z.ai.max_wheels=0
+        z.ai.max_spare_wheels=0
+
+    # this is vehicle+gun for a field type mortar
+    elif object_type=='soviet_82mm_mortar':
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z=WorldObject(world,['mortar_base'],AIVehicle)
+        z.name='Soviet 82mm Mortar System'
+        z.is_vehicle=True
+        z.is_towable=False
+        turret=spawn_object(world,world_coords,'251_2_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        role.seat_visible=True
+        role.seat_offset=[13,20]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        role.seat_visible=True
+        role.seat_offset=[7,-9]
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('assistant_gunner',z)
+        role.is_assistant_gunner=True
+        role.seat_visible=True
+        role.seat_offset=[13,15]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.engines.append(spawn_object(world,world_coords,"bicycle_pedals",False))
+        z.ai.max_speed=100
+        z.ai.max_offroad_speed=100
+        z.ai.open_top=True
+        #z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed=40.
+        z.collision_radius=50
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.weight=1400
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.rotation_angle=float(random.randint(0,359))
+        z.ai.ammo_rack_capacity=30
+        for b in range(30):
+            z.ai.ammo_rack.append(spawn_object(world,world_coords,"GrW34_magazine",False))
+        z.ai.max_wheels=0
+        z.ai.max_spare_wheels=0
+
+
     elif object_type=='german_pak40':
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['pak40_carriage_deployed','pak40_carriage_deployed'],AIVehicle)
@@ -5577,6 +5741,11 @@ def spawn_object(world,world_coords,object_type, spawn):
         z=spawn_object(world,world_coords,'german_soldier',False)
         add_standard_loadout(z,world,'standard_german_gear')
         add_standard_loadout(z,world,'kar98k')
+
+    elif object_type=='german_kar98k_schiessbecher':
+        z=spawn_object(world,world_coords,'german_soldier',False)
+        add_standard_loadout(z,world,'standard_german_gear')
+        add_standard_loadout(z,world,'kar98k_schiessbecher')
         
     elif object_type=='german_kar98k_panzerfaust':
         z=spawn_object(world,world_coords,'german_soldier',False)

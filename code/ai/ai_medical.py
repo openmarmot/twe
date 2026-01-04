@@ -11,7 +11,7 @@ notes :
 
 #global variables
 
-class AIMedical(object):
+class AIMedical():
     def __init__(self, owner):
         self.owner=owner
         

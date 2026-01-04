@@ -27,7 +27,7 @@ from ai.ai_human_radio_operator import AIHumanRadioOperator
 
 #global variables
 
-class AIHuman(object):
+class AIHuman():
     def __init__(self, owner):
         self.owner=owner
 
@@ -1149,7 +1149,7 @@ class AIHuman(object):
             # need to make sure nobody else is already carrying it
             in_use=False
             for b in self.owner.world.grid_manager.get_objects_from_all_grid_squares(True,False):
-                if b.ai.large_pickup==b:
+                if b.ai.large_pickup==world_object:
                     in_use=True
 
             if in_use:
@@ -1223,14 +1223,15 @@ class AIHuman(object):
 
         if self.prone:
             self.owner.image_index=1
-        else: 
+        else:
             self.owner.image_index=0
 
         # good to do this as it changed
         self.owner.reset_image=True
 
-        # add some fatigue, not sure how much
-        self.fatigue+=15
+        # add fatigue only when standing up (from prone to standing)
+        if not self.prone:
+            self.fatigue+=15
     #-----------------------------------------------------------------------
     def reload_weapon(self,weapon,obj_with_inventory,new_magazine):
         '''reload weapon. return bool as to whether it was successful'''
@@ -2402,6 +2403,8 @@ class AIHuman(object):
     #---------------------------------------------------------------------------
     def update_task_move_to_location(self):
         '''update task'''
+
+        # note - we should not make a prone state change decision here. leave that to update_task_think
         
         last_think_time=self.memory['task_move_to_location']['last_think_time']
         think_interval=self.memory['task_move_to_location']['think_interval']
@@ -2432,9 +2435,6 @@ class AIHuman(object):
 
             # -- think about walking --
             distance=engine.math_2d.get_distance(self.owner.world_coords,self.memory['task_move_to_location']['destination'])
-
-            if distance>200 and self.prone:
-                self.prone_state_change()
 
             # should we get a vehicle instead of hoofing it to wherever we are going?
             if distance>self.max_walk_distance:
@@ -2607,16 +2607,32 @@ class AIHuman(object):
             return
         
 
-        # check if we should prone / un-prone
-        # basically if a gun was fired in the last 30 seconds
-        if self.owner.grid_square.last_gun_fired+30>self.owner.world.world_seconds:
-            if self.prone is False:
-                self.prone_state_change()
-        else:
-            if self.prone:
-                self.prone_state_change()
+        # -- check if we should prone / un-prone --
 
-        # check for AT targets as a high priority
+        recent_danger = self.owner.grid_square.last_gun_fired + 30 > self.owner.world.world_seconds
+        has_target     = bool(self.human_targets)
+        in_range       = False
+
+        if self.primary_weapon and has_target:
+            closest = self.human_targets[0] 
+            if closest:
+                dist = engine.math_2d.get_distance(self.owner.world_coords, closest.world_coords)
+                in_range = dist < self.primary_weapon.ai.range * 1.1  
+
+        desired_prone = False
+
+        if recent_danger and in_range:
+            desired_prone = True
+        elif has_target and in_range:
+            desired_prone = True
+        elif recent_danger:
+            desired_prone = True  # still want to be low even if target out of range
+        # else: stay standing during safe long walks
+
+        if desired_prone != self.prone:
+            self.prone_state_change()
+
+        # -- check for AT targets as a high priority --
         if self.antitank is not None:
             if self.check_ammo_bool(self.antitank,self.owner):
                 vehicle_target=self.get_target(False,True)
@@ -2624,7 +2640,7 @@ class AIHuman(object):
                     self.switch_task_engage_enemy(vehicle_target)
                     return
 
-        # primary weapon
+        # -- primary weapon --
         if self.primary_weapon is None:
             # need to get a gun
             distance=4000

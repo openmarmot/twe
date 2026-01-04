@@ -7,7 +7,7 @@ import copy
 
 import engine.math_2d
 
-class VehicleDiagnostics(object):
+class VehicleDiagnostics():
 
     def __init__(self):
         self.vehicle=None
@@ -383,7 +383,7 @@ class VehicleDiagnostics(object):
         pass
 
 
-class VehicleDiagnosticObject(object):
+class VehicleDiagnosticObject():
     def __init__(self):
         self.screen_coords=[0,0]
         self.scale_modifier=0

@@ -13,7 +13,7 @@ import copy
 
 #global variables
 
-class AIContainer(object):
+class AIContainer():
     def __init__(self, owner):
         self.owner=owner
 

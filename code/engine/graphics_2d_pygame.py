@@ -35,7 +35,7 @@ from engine.strategic_map import StrategicMap
 from engine.vehicle_diagnostics import VehicleDiagnostics
 import engine.log
 
-class Graphics_2D_Pygame(object):
+class Graphics_2D_Pygame():
     ''' 2D Graphics Engine using PyGame '''
 
     def __init__(self,screen_size):
@@ -44,17 +44,23 @@ class Graphics_2D_Pygame(object):
         self.images={}
         self.image_cache={}
 
-        self.screen_size=screen_size
-        self.screen_center=[self.screen_size[0]/2,self.screen_size[1]/2]
         pygame.init()
         pygame.display.set_caption("https://github.com/openmarmot/twe")
 
-        # this seems to significantly improve visual quality when on
         self.double_buffering=True
-        if self.double_buffering:
-            self.screen = pygame.display.set_mode(self.screen_size, pygame.DOUBLEBUF, 32)
+
+        if screen_size is None:
+            # Detect display info for fullscreen
+            info = pygame.display.Info()
+            self.screen_size = (info.current_w, info.current_h)
+            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
         else:
-            self.screen=pygame.display.set_mode(self.screen_size,0,32)
+            # Use provided size for windowed mode
+            self.screen_size = screen_size
+            flags = pygame.DOUBLEBUF
+
+        self.screen = pygame.display.set_mode(self.screen_size, flags, 32)
+        self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))

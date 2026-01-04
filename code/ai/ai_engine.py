@@ -15,7 +15,7 @@ import engine.math_2d
 
 #global variables
 
-class AIEngine(object):
+class AIEngine():
     def __init__(self, owner):
         self.owner=owner
         

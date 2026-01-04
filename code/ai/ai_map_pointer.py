@@ -12,7 +12,7 @@ import engine.math_2d
 
 #global variables
 
-class AIMapPointer(object):
+class AIMapPointer():
     def __init__(self, owner):
         self.owner=owner
         self.target_coords=None

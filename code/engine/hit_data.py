@@ -12,7 +12,7 @@ import engine.math_2d
 
 #global variables
 
-class HitData(object):
+class HitData():
     '''Hit Data'''
     def __init__(self,hit_object,projectile,penetrated,hit_side,distance,hit_compartment,result,penetration_value,armor_value):
         # calculate offsets. this is used later to display a visual representation of the hit

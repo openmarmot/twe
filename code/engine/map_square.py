@@ -14,7 +14,7 @@ import engine.log
 #global variables
 
 
-class MapSquare(object):
+class MapSquare():
 
     def __init__(self,name,screen_coords):
         self.name=name

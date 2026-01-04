@@ -19,7 +19,7 @@ import pygame.freetype
 
 
 
-class ImageTool(object):
+class ImageTool():
     ''' 2D Graphics Engine using PyGame '''
 
     def __init__(self,screen_size):
@@ -413,7 +413,7 @@ class ImageTool(object):
 
 #------------------------------------------------------------------------------
             
-class ImageObject(object):
+class ImageObject():
 
     def __init__(self,image_list,rotation_angle):
         self.image_list=image_list

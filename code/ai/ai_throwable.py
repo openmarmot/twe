@@ -17,7 +17,7 @@ import engine.world_builder
 
 #global variables
 
-class AIThrowable(object):
+class AIThrowable():
     def __init__(self, owner):
         self.owner=owner
 
@@ -100,7 +100,7 @@ class AIThrowable(object):
 
     #---------------------------------------------------------------------------
     def explode(self):        
-        self.owner.world.create_explosion(self.owner.world_coords,15,self.shrapnel_count,self.equipper,self.owner,0.5,1)
+        self.owner.world.create_explosion(self.owner.world_coords,self.explosion_radious,self.shrapnel_count,self.equipper,self.owner,0.5,1)
 
     #---------------------------------------------------------------------------
     def explode_flame(self):

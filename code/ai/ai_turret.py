@@ -16,7 +16,7 @@ import engine.penetration_calculator
 
 #global variables
 
-class AITurret(object):
+class AITurret():
     def __init__(self, owner):
         self.owner=owner
 

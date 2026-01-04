@@ -116,6 +116,11 @@ Occasionally tested on Windows and Mac
 - if you need to change the screen resolution, it is currently set in code/twe.py
 - more notes in misc_notes/install_notes.txt
 
+### Resolution / Window Size
+The resolution can be changed by editing the screen_size variable in twe.py. 
+It can be set to 'full screen' by setting the variable to None.  
+Note that I mostly test in a windowed mode.  
+
 ### Controls
 
 #### General Controls  
