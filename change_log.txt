@@ -1,5 +1,11 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 04 2026
+- added tracers to MG belts
+
+It turns out that the germans and soviets mostly used green, although the germans also had 
+a variety of other colors. came out kind of neat. Nice to differentiate MG and automatic rifle fire 
 
 ----------------------------------
 Jan 02 2026

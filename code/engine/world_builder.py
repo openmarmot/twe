@@ -420,7 +420,7 @@ def get_squad_map_objects(squad_name):
     return map_objects
 
 #------------------------------------------------------------------------------
-def load_magazine(world,magazine,projectile_type=None):
+def load_magazine(world,magazine,projectile_type=None,tracers=False):
     '''loads a magazine with bullets'''
     # wipe whatever is in there
     magazine.ai.projectiles=[]
@@ -431,13 +431,19 @@ def load_magazine(world,magazine,projectile_type=None):
 
     if projectile_type in magazine.ai.compatible_projectiles:
         count=len(magazine.ai.projectiles)
+        tracer_interval=5
+        projectile_count=0
         while count<magazine.ai.capacity:
+            projectile_count+=1
             z=spawn_object(world,[0,0],'projectile',False)
             z.ai.projectile_type=projectile_type
 
             # change to a bigger projectile image. might make a couple more
             if engine.penetration_calculator.projectile_data[projectile_type]['diameter'] >14:
                 z.image_list=['projectile_mid']
+
+            if tracers and projectile_count % tracer_interval == 0:
+                z.image_list=['tracer_green']
             magazine.ai.projectiles.append(z)
 
             count+=1
@@ -1408,7 +1414,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.62x54_L','7.62x54_D']
         z.ai.capacity=60
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,None,True)
 
     elif object_type=='ppk':
         z=WorldObject(world,['ppk'],AIGun)
@@ -1658,7 +1664,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=50
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z,'7.92x57_SME')
+        load_magazine(world,z,'7.92x57_SME',True)
 
     elif object_type=='mg34_belt':
         z=WorldObject(world,['stg44_magazine'],AIMagazine)
@@ -1670,7 +1676,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.capacity=250
         z.ai.disintegrating=True
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z,'7.92x57_SME')
+        load_magazine(world,z,'7.92x57_SME',True)
 
     elif object_type=='37mm_m1939_k61':
         z=WorldObject(world,['mg34'],AIGun)
@@ -1848,7 +1854,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_projectiles=['7.92x57_SSP','7.92x57_SME','7.92x57_SMK','7.92x57_SMKH']
         z.ai.capacity=75
         z.rotation_angle=float(random.randint(0,359))
-        load_magazine(world,z)
+        load_magazine(world,z,None,True)
 
     elif object_type=='kar98k':
         z=WorldObject(world,['kar98k'],AIGun)
