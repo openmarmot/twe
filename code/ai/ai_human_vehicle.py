@@ -18,6 +18,7 @@ from engine.vehicle_order import VehicleOrder
 from engine.tactical_order import TacticalOrder
 from ai.ai_human_vehicle_gunner import AIHumanVehicleGunner
 from ai.ai_human_vehicle_driver import AIHumanVehicleDriver
+from ai.ai_human_vehicle_commander import AIHumanVehicleCommander
 #import engine.global_exchange_rates
 
 class AIHumanVehicle():
@@ -26,6 +27,7 @@ class AIHumanVehicle():
 
         self.role_driver=AIHumanVehicleDriver(self.owner)
         self.role_gunner=AIHumanVehicleGunner(self.owner)
+        self.role_commander=AIHumanVehicleCommander(self.owner)
 
         
 
@@ -88,38 +90,7 @@ class AIHumanVehicle():
                     
             # maybe add some morale damage?
 
-    #---------------------------------------------------------------------------
-    def think_vehicle_role_commander(self):
-        '''commander role'''
-        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-        # determine what the primary weapon is and primary gunner is
-        primary_gunner=None
-        for role in vehicle.ai.vehicle_crew:
-            if role.is_gunner and role.role_occupied:
-                if role.turret:
-                    if role.turret.ai.primary_turret:
-                        primary_gunner=role
-                        break
-
-        # for now we have no actions if we don't have a primary gunner
-        if primary_gunner is None:
-            return
-
-        max_armor=0
-        biggest_threat=None
-        for v in self.owner.ai.vehicle_targets:
-            if v.ai.vehicle_armor['front'][0]>max_armor:
-                biggest_threat=v
-        
-        if biggest_threat:
-            engage_primary,engage_primary_reason=self.owner.ai.calculate_engagement(primary_gunner.turret.ai.primary_weapon,biggest_threat)
-            if engage_primary and primary_gunner.human.ai.memory['task_vehicle_crew']['target']!=biggest_threat :
-                # tell the gunner to engage
-                primary_gunner.human.ai.memory['task_vehicle_crew']['target']=biggest_threat
-                self.owner.ai.speak(f'Gunner, prioritize the {biggest_threat.name} ')
-
-            # check if we should re-orientate the vehicle to face the biggest threat
 
     #---------------------------------------------------------------------------
     def think_vehicle_role_passenger(self):
@@ -211,7 +182,7 @@ class AIHumanVehicle():
                 self.think_vehicle_role_radio_operator()
             if role.is_commander:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.1,2.5)
-                self.think_vehicle_role_commander()
+                self.role_commander.think()
 
             # the squad lead has some stuff to do independent of their vehicle role
             if self.owner==self.owner.ai.squad.squad_leader:
