@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Jan 08 2026
+- moved vehicle role driver code to its own class 
+- moved vehicle commander code to its own class 
+
+I think next up for commander is authorizing new indirect fire missions. 
+
 ----------------------------------
 Jan 04 2026
 - added tracers to MG belts
