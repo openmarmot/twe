@@ -230,11 +230,11 @@ class AIHuman():
             adjust_max+=10
 
         if self.is_small_arms_trained is False:
-            adjust_max+=15
+            adjust_max+=20
 
         # fatigue
         if self.fatigue>3:
-            adjust_max+=3
+            adjust_max+=5
         if self.fatigue>5:
             adjust_max+=6
 
@@ -244,20 +244,25 @@ class AIHuman():
         if distance>1000:
             adjust_max+=7
         if distance>1500:
-            adjust_max+=7
+            adjust_max+=12
         if distance>2000:
-            adjust_max+=18
+            adjust_max+=29
+        
         # prone bonus 
         if self.prone:
-            adjust_max-=1
+            adjust_max-=10
+
+        # scope 
+        if weapon.ai.scope:
+            adjust_max-=5*weapon.ai.scope_magnification
 
         # skills 
         if self.is_expert_marksman:
-            adjust_max-=10
+            adjust_max-=15
 
         # recent experience
         if self.confirmed_kills>0:
-            adjust_max-=1
+            adjust_max-=5
 
         # reset lower bounds
         if adjust_max<0:
@@ -1189,8 +1194,6 @@ class AIHuman():
                             # turn on the brakes to prevent roll away
                             vehicle.ai.brake_power=1
 
-
-
             # --- add to the desired role --
             if requested_role in vehicle.ai.vehicle_crew:
                 # set the role in memory
@@ -1208,7 +1211,6 @@ class AIHuman():
 
             else:
                 engine.log.add_data('warn','ai_human.player_vehicle_role_change - role not available in vehicle',True)
-
 
 
         else:
@@ -2742,6 +2744,16 @@ class AIHuman():
         if distance>self.squad_max_distance:
             self.switch_task_move_to_location(self.squad.squad_leader.world_coords,None)
             return
+        else:
+            # we are close to the squad 
+            # enter squad lead vehicle if they are in one
+            if self.squad.squad_leader.ai.in_vehicle():
+                squad_leader_vehicle=self.squad.squad_leader.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+                if (squad_leader_vehicle.ai.requires_afv_training and self.is_afv_trained) or squad_leader_vehicle.ai.requires_afv_training is False:    
+                    if squad_leader_vehicle.ai.check_if_vehicle_is_full() is False:
+                        self.switch_task_enter_vehicle(squad_leader_vehicle,None)
+
+
 
         # -- ok now we've really run out of things to do. do things that don't matter
         # ! NOTE Squad Lead will never get this far

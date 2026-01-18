@@ -106,6 +106,10 @@ class AIGun():
         # indirect fire weapons can set this to true to fire projectiles that don't have collision checking
         self.indirect_fire_mode=False
 
+        self.scope=False
+        # this is in x powers. for example 3.5 for 3.5x magnification
+        self.scope_magnification=0
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''

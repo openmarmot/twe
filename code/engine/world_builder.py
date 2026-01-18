@@ -2123,6 +2123,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun=True
         z.ai.mechanical_accuracy=1
+        z.ai.scope=True
+        z.ai.scope_magnification=3.5
         z.ai.magazine=spawn_object(world,world_coords,'svt40_magazine',False)
         z.ai.mag_capacity=10
         z.ai.rate_of_fire=0.8
