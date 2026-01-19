@@ -225,6 +225,6 @@ class AIHumanVehicle():
             
             # this action is set by world. triggered by hitting 'w'
             if self.owner.ai.memory['task_vehicle_crew']['current_action']=='rotate turret':
-                if self.rotate_turret(turret,self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']):
+                if self.role_gunner.rotate_turret(turret,self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle']):
                     # rotation achieved. we can remove this action
                     self.owner.ai.memory['task_vehicle_crew']['current_action']=''

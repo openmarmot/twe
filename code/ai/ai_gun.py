@@ -54,6 +54,8 @@ class AIGun():
         # most rifles are 1
         self.mechanical_accuracy=0
 
+        self.mechanical_accuracy_deg=0.2 # used by turret calc 
+
         # range - how far the bullet will go before hitting the ground
         # used by the ai and used to calculate projectile flight time.
         # this is esentially the max range for the weapon
