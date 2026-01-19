@@ -94,9 +94,77 @@ class AIHumanVehicleGunner():
                 # less of an issue with vehicle targets
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
-
     #---------------------------------------------------------------------------
-    def calculate_turret_aim(self,turret,target,weapon):
+    def calculate_turret_aim(self, turret, target, weapon):
+        '''calculates the correct turret angle to hit a target - now with angular dispersion'''
+
+        base_coords = target.world_coords
+        distance = engine.math_2d.get_distance(turret.world_coords, base_coords)
+
+        # --- Lead calculation (move aim point forward based on target motion) ---
+        weapon.ai.calculated_range = distance + random.randint(0, 500)  # your existing over-aim
+        time_passed = distance / weapon.ai.muzzle_velocity
+
+        aim_coords = base_coords  # start with un-led position
+
+        if target.is_vehicle and target.ai.current_speed > 0:
+            aim_coords = engine.math_2d.moveAlongVector(
+                target.ai.current_speed, aim_coords, target.heading, time_passed
+            )
+
+        if target.is_human:
+            if target.ai.in_vehicle():
+                vehicle=target.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+                if vehicle.ai.current_speed>0:
+                    aim_coords=engine.math_2d.moveAlongVector(vehicle.ai.current_speed,aim_coords,vehicle.heading,time_passed)
+            else:
+                if target.ai.memory['current_task']=='task_move_to_location':
+                    destination=target.ai.memory['task_move_to_location']['destination']
+                    aim_coords=engine.math_2d.moveTowardsTarget(target.ai.get_calculated_speed(),aim_coords,destination,time_passed)
+
+        # --- Ideal angle to the led aim point ---
+        ideal_angle = engine.math_2d.get_rotation(turret.world_coords, aim_coords)
+
+        # --- Calculate total angular dispersion (in degrees) ---
+        angular_dispersion = weapon.ai.mechanical_accuracy_deg  # e.g. base 0.2-0.5 deg for good guns
+
+        # Crew stress (shaking hands, etc.)
+        if self.owner.ai.blood_pressure < 100:
+            angular_dispersion += 0.3
+        if self.owner.ai.blood_pressure < 50:
+            angular_dispersion += 1.5
+
+        # Distance-based aiming difficulty (harder to range/identify precisely)
+        distance_dispersion = 0.0
+        if distance > 1000:
+            distance_dispersion += 0.4
+        if distance > 2000:
+            distance_dispersion += 0.8
+        if distance > 3000:
+            distance_dispersion += 1.5
+        if distance > 3500:
+            distance_dispersion += 1.5
+
+        # --- Optic influence (only affects the distance/aiming component) ---
+        optic = getattr(turret, 'gun_sight', None)
+        if optic:
+            multiplier = optic.ai.get_dispersion_multiplier(distance)
+            distance_dispersion *= multiplier
+            # Optional close-range penalty already baked into multiplier
+
+        angular_dispersion += distance_dispersion
+
+        # Minimum dispersion to prevent perfect shots
+        angular_dispersion = max(0.05, angular_dispersion)
+
+        # --- Apply random angular error ---
+        angular_error = random.uniform(-angular_dispersion, angular_dispersion)
+        final_angle = ideal_angle + angular_error
+
+        # --- Store result ---
+        self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] = final_angle
+    #---------------------------------------------------------------------------
+    def calculate_turret_aim_old(self,turret,target,weapon):
         '''calculates the correct turret angle to hit a target'''
 
         # this is where we should be applying the majority of the aim adjustments

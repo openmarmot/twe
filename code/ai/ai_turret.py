@@ -81,11 +81,13 @@ class AITurret():
         # turrets with the small attribute are less likely to be hit
         self.small=False
 
+        self.gun_sight=None
+
     #---------------------------------------------------------------------------
     def calculate_accuracy(self,weapon):
         '''calculate mechanical accuracy. '''
 
-        # note most accuracy calculation should be done in ai_human_vehicle.calculate_turret_aim
+        # note most accuracy calculation should be done in ai_human_vehicle_gunner.calculate_turret_aim
         # this is smaller variations that get added when the bullet is fired
 
         temp_heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
@@ -96,9 +98,9 @@ class AITurret():
         adjust_max+=self.turret_accuracy
 
         if self.vehicle.ai.current_speed>0:
-            adjust_max+=10
-        if self.vehicle.ai.current_speed>100:
             adjust_max+=20
+        if self.vehicle.ai.current_speed>100:
+            adjust_max+=30
 
         # apply adjustment
         far_coords=[far_coords[0]+random.uniform(-adjust_max,adjust_max),far_coords[1]+random.uniform(-adjust_max,adjust_max)]

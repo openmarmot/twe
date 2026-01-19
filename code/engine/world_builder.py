@@ -61,6 +61,7 @@ from ai.ai_rotor import AIRotor
 from ai.ai_hit_marker import AIHitMarker
 from ai.ai_dani import AIDani
 from ai.ai_wheel import AIWheel
+from ai.ai_optic import AIOptic
 
 #global variables
 
@@ -2123,6 +2124,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.minimum_visible_scale=0.4
         z.is_gun=True
         z.ai.mechanical_accuracy=1
+        z.ai.scope=True
+        z.ai.scope_magnification=3.5
         z.ai.magazine=spawn_object(world,world_coords,'svt40_magazine',False)
         z.ai.mag_capacity=10
         z.ai.rate_of_fire=0.8
@@ -2606,12 +2609,21 @@ def spawn_object(world,world_coords,object_type, spawn):
             load_magazine(world,temp,'20x138_HE')
             z.ai.ammo_rack.append(temp)
 
+    elif object_type=='optic_iron_sights':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='Iron Sights'
+        z.ai.magnification=1
+        z.ai.field_of_view=40
+        z.ai.optical_quality=0.7
+        z.ai.close_range_penalty=0
+
     elif object_type=='234_1_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_234_1_turret'],AITurret)
         z.name='Sd.Kfz.234/1 Turret'
         z.is_turret=True
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_6',False)
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[1,0,0]
@@ -2711,12 +2723,22 @@ def spawn_object(world,world_coords,object_type, spawn):
             load_magazine(world,temp,'Sprgr_38_50_L60')
             z.ai.ammo_rack.append(temp)
 
+    elif object_type=='optic_tzf_6':
+        # https://www.landmarkscout.com/turmzielfernrohr-t-z-f-6-targeting-scope-for-2-cm-kwk-reconnaissance-vehicles/
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='TZF 6 Optic'
+        z.ai.magnification=2.5 # note this scope is actually variable to 5x
+        z.ai.field_of_view=25
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0
+
     elif object_type=='234_2_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_234_2_turret'],AITurret)
         z.name='Sd.Kfz.234/1 Turret'
         z.is_turret=True
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_6',False)
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[8,0,0]
@@ -2864,6 +2886,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['sd_kfz_251_mg34_turret','sd_kfz_251_mg34_turret'],AITurret)
         z.name='Sd.Kfz.251 MG34 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='top'
@@ -2931,6 +2954,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['251_2_turret'],AITurret)
         z.name='Sd.Kfz.251/2 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         # center should mean it is never hit by a projectile.
         # this is what we want because this turret is completely internal
@@ -3039,11 +3063,20 @@ def spawn_object(world,world_coords,object_type, spawn):
             load_magazine(world,temp,'HL_Gr_38A_L24')
             z.ai.ammo_rack.append(temp)
 
+    elif object_type=='optic_tzf_5b':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='TZF 5b Optic'
+        z.ai.magnification=2.5
+        z.ai.field_of_view=25
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0
+
     elif object_type=='251_9_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['251_9_turret','251_9_turret'],AITurret)
         z.name='Sd.Kfz.251/9 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5b',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -3151,6 +3184,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['251_9_late_turret','251_9_late_turret'],AITurret)
         z.name='Sd.Kfz.251/9 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5b',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -3220,12 +3254,21 @@ def spawn_object(world,world_coords,object_type, spawn):
             load_magazine(world,temp,'Sprgr_34_75_L48')
             z.ai.ammo_rack.append(temp)
 
+    elif object_type=='optic_zf_38':
+            z=WorldObject(world,['cucumber'],AIOptic)
+            z.name='ZF 3x8 Optic'
+            z.ai.magnification=3
+            z.ai.field_of_view=8
+            z.ai.optical_quality=1.5
+            z.ai.close_range_penalty=0
+
     elif object_type=='251_pak40_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['pak40_vehicle_turret','pak40_vehicle_turret'],AITurret)
         z.name='PAK 40 turret'
         z.is_turret=True
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_zf_38',False)
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
         z.ai.turret_armor['top']=[0,0,0]
@@ -3397,11 +3440,20 @@ def spawn_object(world,world_coords,object_type, spawn):
             z.ai.front_right_wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
             z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
             z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
+
+    elif object_type=='optic_kfz_2':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='KFZ 2 Optic'
+        z.ai.magnification=1.8
+        z.ai.field_of_view=18
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0
         
     elif object_type=='panzer_iv_hull_mg':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_hull_mg','panzer_iv_hull_mg'],AITurret)
         z.name='Panzer IV Hull MG'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_kfz_2',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='front'
@@ -3425,6 +3477,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_hull_mg'],AITurret)
         z.name='Nahverteidigungswaffe Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.render=False # this turret is small enough to be basically invisible from outside a tank. its just a circle with a hole in it.
         z.is_turret=True
         z.ai.small=True
@@ -3459,10 +3512,19 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.use_antipersonnel=True
         z.rotation_angle=float(random.randint(0,359))
 
+    elif object_type=='optic_tzf_5f':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='TZF 5f Optic'
+        z.ai.magnification=2.5
+        z.ai.field_of_view=25
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0
+
     elif object_type=='panzer_iv_g_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_g_turret','panzer_iv_g_turret'],AITurret)
         z.name='Panzer IV Ausf. G Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5f',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -3586,6 +3648,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_h_turret','panzer_iv_h_turret'],AITurret)
         z.name='Panzer IV Ausf. H Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5f',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -3724,6 +3787,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_j_turret','panzer_iv_j_turret'],AITurret)
         z.name='Panzer IV Ausf. J Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5f',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -3830,7 +3894,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         main_turret=spawn_object(world,world_coords,'elefant_turret',True)
         z.ai.turrets.append(main_turret)
         main_turret.ai.vehicle=z
-        mg_turret=spawn_object(world,world_coords,'panzer_iv_hull_mg',True)
+        mg_turret=spawn_object(world,world_coords,'panzer_vi_ausf_e_hull_mg',True)
         mg_turret.ai.position_offset=[-67.0, 17.0]
         z.ai.turrets.append(mg_turret)
         mg_turret.ai.vehicle=z
@@ -3904,10 +3968,19 @@ def spawn_object(world,world_coords,object_type, spawn):
             z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
             z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"panzeriv_wheel",False))
 
+    elif object_type=='optic_sfl_zf_1a':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='SFL ZF 1a Optic'
+        z.ai.magnification=5
+        z.ai.field_of_view=8
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0
+
     elif object_type=='elefant_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['elefant_turret'],AITurret)
         z.name='Elefant Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_sfl_zf_1a',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=1
@@ -4074,6 +4147,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_iv_hull_mg','panzer_iv_hull_mg'],AITurret)
         z.name='Panzer VI Ausf E Hull MG'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_kfz_2',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='front'
@@ -4096,6 +4170,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_vi_ausf_e_turret'],AITurret)
         z.name='Panzer VI Ausf. E Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1
@@ -4243,6 +4318,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['t20_turret','t20_turret'],AITurret)
         z.name='T20 Turret Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='front'
@@ -4424,6 +4500,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['t34_hull_mg_turret','t34_hull_mg_turret'],AITurret)
         z.name='T34 hull mg turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='front'
@@ -4442,10 +4519,19 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
 
+    elif object_type=='optic_tmfd_7':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='TMFD 7 Optic'
+        z.ai.magnification=2.5
+        z.ai.field_of_view=18
+        z.ai.optical_quality=0.8
+        z.ai.close_range_penalty=0
+
     elif object_type=='t34_76_model_1943_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['t34_76_model_1943_turret','t34_76_model_1943_turret'],AITurret)
         z.name='T34-76 Model 1943 turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tmfd_7',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=2
@@ -4581,10 +4667,19 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.compatible_vehicles=['soviet_t34_85','soviet_t34_76']
         z.ai.armor=[10,0,0]
 
+    elif object_type=='optic_tsh_16':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='TSH 16 Optic'
+        z.ai.magnification=4
+        z.ai.field_of_view=16
+        z.ai.optical_quality=0.9
+        z.ai.close_range_penalty=0.2
+
     elif object_type=='t34_85_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['t34_85_turret','t34_85_turret'],AITurret)
         z.name='T34-85 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tsh_16',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=2
@@ -4680,10 +4775,12 @@ def spawn_object(world,world_coords,object_type, spawn):
             z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
             z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"t34_wheel",False))
 
+
     elif object_type=='t70_turret':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['t70_turret'],AITurret)
         z.name='T70 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tmfd_7',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=2
@@ -4820,6 +4917,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['su_85_turret'],AITurret)
         z.name='SU-85 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tsh_16',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=2
@@ -4925,6 +5023,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['su_100_turret'],AITurret)
         z.name='SU-100 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tsh_16',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=2
@@ -5050,6 +5149,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['remote_mg34_turret','remote_mg34_turret'],AITurret)
         z.name='Remote MG34 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.small=True
         z.ai.vehicle_mount_side='top'
@@ -5069,10 +5169,19 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.primary_weapon_reload_speed=10
         z.no_save=True
 
+    elif object_type=='optic_sfl_zf_1':
+        z=WorldObject(world,['cucumber'],AIOptic)
+        z.name='SFL ZF 1 Optic'
+        z.ai.magnification=5
+        z.ai.field_of_view=8
+        z.ai.optical_quality=1.5
+        z.ai.close_range_penalty=0.2
+
     elif object_type=='jagdpanzer_38t_main_gun':
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['jagdpanzer_38t_main_gun','jagdpanzer_38t_main_gun'],AITurret)
         z.name='Jagdpanzer 38t Main Gun'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_sfl_zf_1',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='front'
         z.ai.turret_accuracy=1
@@ -5162,6 +5271,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['37mm_m1939_61k_turret','37mm_m1939_61k_turret'],AITurret)
         z.name='37mm_m1939_61k_turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=3
@@ -5347,6 +5457,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z=WorldObject(world,['pak40_turret','pak40_turret'],AITurret)
         z.name='PAK 40 turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_zf_38',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1

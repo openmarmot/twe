@@ -54,6 +54,8 @@ class AIGun():
         # most rifles are 1
         self.mechanical_accuracy=0
 
+        self.mechanical_accuracy_deg=0.2 # used by turret calc 
+
         # range - how far the bullet will go before hitting the ground
         # used by the ai and used to calculate projectile flight time.
         # this is esentially the max range for the weapon
@@ -105,6 +107,10 @@ class AIGun():
         
         # indirect fire weapons can set this to true to fire projectiles that don't have collision checking
         self.indirect_fire_mode=False
+
+        self.scope=False
+        # this is in x powers. for example 3.5 for 3.5x magnification
+        self.scope_magnification=0
 
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
