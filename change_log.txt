@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 21 2026
+- reduced distance effects of dispersion 
+
+----------------------------------
 Jan 19 2026
 - elefant now gets the tiger mg turret instead of the panzer iv mg turret 
 - turret gun sights are added with a new optics class 

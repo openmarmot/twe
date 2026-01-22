@@ -137,13 +137,13 @@ class AIHumanVehicleGunner():
         # Distance-based aiming difficulty (harder to range/identify precisely)
         distance_dispersion = 0.0
         if distance > 1000:
-            distance_dispersion += 0.4
+            distance_dispersion += 0.2
         if distance > 2000:
-            distance_dispersion += 0.8
+            distance_dispersion += 0.2
         if distance > 3000:
-            distance_dispersion += 1.5
+            distance_dispersion += 0.5
         if distance > 3500:
-            distance_dispersion += 1.5
+            distance_dispersion += 0.5
 
         # --- Optic influence (only affects the distance/aiming component) ---
         optic = getattr(turret, 'gun_sight', None)
