@@ -186,6 +186,27 @@ class AIHumanVehicleDriver():
 
         # precheck to make sure we aren't in combat 
         for role in vehicle.ai.vehicle_crew:
+            # commander orders take priority
+            if role.role_occupied and role.is_commander:
+                current_action=role.human.ai.memory['task_vehicle_crew']['current_action']
+
+                # this can be used for multiple things that require rotation
+                if current_action=='Waiting for driver to rotate the vehicle':
+                    rotation_required=role.human.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
+                    v=vehicle.rotation_angle
+                    if rotation_required>v-1 and rotation_required<v+1:
+                        # we are close enough
+                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
+                        vehicle.ai.brake_power=1
+                        vehicle.ai.throttle=0
+                        # wait to think for a bit so we don't end up doing something else immediately
+                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                        return
+                    #default
+                    self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
+                    self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
+                    return
+
             if role.role_occupied and role.is_gunner:
                 if role.turret.ai.primary_weapon:
                     current_action=role.human.ai.memory['task_vehicle_crew']['current_action']

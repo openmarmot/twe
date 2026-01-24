@@ -56,6 +56,7 @@ class AITurret():
         self.rotation_change=0
 
         # rotation range for the turret
+        # full rotation is [-360,360]
         self.rotation_range=[-20,20]
 
         # speed of rotation
