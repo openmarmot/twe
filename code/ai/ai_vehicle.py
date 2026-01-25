@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : the vehicle isn't really meant to have AI. 
 the only thing that should be here is physics and hardware stuff.
 any AI would be handled by ai_human
@@ -302,7 +302,52 @@ class AIVehicle():
             if role.role_occupied:
                 return True
         return False
-    
+
+    #---------------------------------------------------------------------------
+    def get_primary_gun_penetration(self, distance):
+        '''get the penetration value of the vehicle's primary gun at a given distance
+        returns penetration in mm, or 0 if vehicle has no functional gun
+        '''
+        primary_turret = None
+        for turret in self.turrets:
+            if turret.ai.primary_turret:
+                primary_turret = turret
+                break
+
+        if primary_turret is None:
+            return 0
+
+        primary_weapon = primary_turret.ai.primary_weapon
+        if primary_weapon is None:
+            return 0
+
+        magazine = primary_weapon.ai.magazine
+        if magazine is None:
+            return 0
+
+        # note - if magazine is empty we return 0, but the vehicle may still be
+        # a threat if it reloads. threat scoring handles this by also considering armor
+        if len(magazine.ai.projectiles) == 0:
+            return 0
+
+        projectile = magazine.ai.projectiles[-1]
+        projectile_type = projectile.ai.projectile_type
+
+        if projectile_type not in engine.penetration_calculator.projectile_data:
+            return 0
+
+        if distance >= engine.penetration_calculator.max_distance:
+            return engine.penetration_calculator.projectile_data[projectile_type][str(engine.penetration_calculator.max_distance)]
+
+        lower_distance = int((distance // 500) * 500)
+        upper_distance = int(lower_distance + 500)
+        lower_pen = engine.penetration_calculator.projectile_data[projectile_type][str(lower_distance)]
+        upper_pen = engine.penetration_calculator.projectile_data[projectile_type][str(upper_distance)]
+        t = (distance - lower_distance) / 500
+        penetration = lower_pen + t * (upper_pen - lower_pen)
+
+        return penetration
+
     #---------------------------------------------------------------------------
     def check_wheel_health(self):
         '''check the health of all the wheels against minimums'''

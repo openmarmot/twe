@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : sprite that spins for awhile or moves or whatever
 '''
 

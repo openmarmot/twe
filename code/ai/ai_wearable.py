@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : a wearable is a piece of clothing armor, etc. something you can wear
 '''
 

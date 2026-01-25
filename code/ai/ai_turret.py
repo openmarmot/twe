@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : the turret for a tank, or the mg mount on a vehicle
 '''
 
@@ -56,6 +56,7 @@ class AITurret():
         self.rotation_change=0
 
         # rotation range for the turret
+        # full rotation is [-360,360]
         self.rotation_range=[-20,20]
 
         # speed of rotation

@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : 
 
 static module with the following responsibilities
@@ -4170,7 +4170,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         # !! note - turrets should be spawned with spawn TRUE as they are always in world
         z=WorldObject(world,['panzer_vi_ausf_e_turret'],AITurret)
         z.name='Panzer VI Ausf. E Turret'
-        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_tzf_5f',False)
         z.is_turret=True
         z.ai.vehicle_mount_side='top'
         z.ai.turret_accuracy=1

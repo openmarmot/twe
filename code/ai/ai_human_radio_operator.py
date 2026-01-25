@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : the ai_human code for operating a radio
 '''
 

@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : sets the global exchange rates for various currencies and commodities
 '''
 

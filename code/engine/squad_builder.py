@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : 
 
 dynamically builds squads when the world is loaded

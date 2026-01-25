@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : AI that controls all a factions squads on the tactical map 
 '''
 

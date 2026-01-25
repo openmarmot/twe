@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : FireMission is a set of instructions for indirect fire on a area
 '''
 
