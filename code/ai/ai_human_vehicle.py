@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : the ai_human code for decisions when in vehicles
 '''
 
@@ -181,7 +181,8 @@ class AIHumanVehicle():
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
                 self.think_vehicle_role_radio_operator()
             if role.is_commander:
-                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.1,2.5)
+                # commander does a lot of heavy thinking. should not trigger very often
+                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
                 self.role_commander.think()
 
             # the squad lead has some stuff to do independent of their vehicle role

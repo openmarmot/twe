@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : VehicleOrder is a simplified task for a vehicle driver
 it is set on vehicle entry, and wiped on vehicle exit
 '''

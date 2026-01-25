@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes :
 This should hold as much of the pygame specifc code as possibe.
 The idea is to keep the graphics engine seperate from the rest of the code,

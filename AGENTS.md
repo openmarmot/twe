@@ -141,7 +141,7 @@ from ai.ai_faction_tactical import AIFactionTactical
 ```
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : ...
 '''
 ```

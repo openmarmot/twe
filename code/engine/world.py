@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes :
 The world class should handle all of the world logic and world objects.
 It should not have any specific graphic engine code (pygame, etc)

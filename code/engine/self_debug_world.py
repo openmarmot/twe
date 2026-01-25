@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes :
 all the code for self debug of the world state. this can be triggered through the debug menu (~)
 '''

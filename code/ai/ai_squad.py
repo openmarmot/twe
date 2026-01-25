@@ -1,7 +1,7 @@
 
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : holds some squad specific variables
 most of the logic should be in ai_human
 '''

@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : various penetration "calculations"
 
 see tools/armor_thickness.py for a simple tool to help visualize the effects of armor and armor slope

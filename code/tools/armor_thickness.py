@@ -1,6 +1,6 @@
 '''
 repo : https://github.com/openmarmot/twe
-email : andrew@openmarmot.com
+
 notes : calculate effective armor thickness
 follows the formula from engine/penetration_calculator
 

@@ -2,6 +2,11 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Jan 25 2026
+- rewrite commander threat categorization logic to include penetration values 
+- fix bug in commander rotation decision code 
+
+----------------------------------
 Jan 24 2026
 - vehicle commanders can now tell the driver to orient the vehicle towards a threat 
 - misc changes to how vehicle commanders assess threats 
