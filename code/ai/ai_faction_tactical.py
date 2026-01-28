@@ -213,75 +213,122 @@ class AIFactionTactical():
     def set_initial_orders_and_positions(self):
         '''hand out the initial tactical orders to the squad leads'''
 
-        remaining_squads=self.squads[:]
-        random.shuffle(remaining_squads)
+        # Configuration
         min_squads_per_area=2
         max_squads_per_area=5
 
+        # Sort all squads by type first
+        motorized_squads=[s for s in self.squads if len(s.vehicles)>0]
+        foot_squads=[s for s in self.squads if len(s.vehicles)==0]
+        random.shuffle(motorized_squads)
+        random.shuffle(foot_squads)
 
+        # --- Handle initial controlled world areas (defending in place) ---
         if self.initial_controlled_world_areas:
-            areas = copy.copy(self.initial_controlled_world_areas)
+            areas=copy.copy(self.initial_controlled_world_areas)
             random.shuffle(areas)
 
-            area_assignments = {area: [] for area in areas}
-            remaining_squads = self.squads[:]
-
-            # Assign minimum squads to each area
             for area in areas:
-                for _ in range(min_squads_per_area):
-                    if remaining_squads:
-                        sq = remaining_squads.pop(0)
-                        area_assignments[area].append(sq)
-                    else:
-                        break
+                # Assign 1 motorized squad if available
+                if motorized_squads:
+                    squad=motorized_squads.pop(0)
+                    location=area.get_location()
+                    threat_direction=self.get_threat_direction(location)
+                    self.set_squad_defend_order(squad,area,location,threat_direction)
+                    self.set_squad_starting_position(squad,location,threat_direction)
 
-            # Distribute remaining squads up to max per area
-            area_cycle = cycle(areas)
-            while remaining_squads:
-                area = next(area_cycle)
-                if len(area_assignments[area]) < max_squads_per_area:
-                    sq = remaining_squads.pop(0)
-                    area_assignments[area].append(sq)
-                else:
-                    # Check if all areas are at max
-                    if all(len(area_assignments[a]) >= max_squads_per_area for a in areas):
-                        break
+                # Assign 1 foot squad if available
+                if foot_squads:
+                    squad=foot_squads.pop(0)
+                    location=area.get_location()
+                    threat_direction=self.get_threat_direction(location)
+                    self.set_squad_defend_order(squad,area,location,threat_direction)
+                    self.set_squad_starting_position(squad,location,threat_direction)
 
+        # --- Handle remaining squads (spawn at spawn_location, travel to area) ---
+        remaining_squads=motorized_squads+foot_squads
+        if remaining_squads:
+            # Re-separate for grouped assignment
+            motorized_squads=[s for s in remaining_squads if len(s.vehicles)>0]
+            foot_squads=[s for s in remaining_squads if len(s.vehicles)==0]
+
+            # Setup spawn grid
+            squad_spacing=250
+            squad_grid=engine.math_2d.get_grid_coords(
+                self.spawn_location,squad_spacing,len(remaining_squads))
+
+            # Area setup
+            areas=self.world.world_areas[:]
+            random.shuffle(areas)
+            area_assignments={area:[] for area in areas}
+
+            # Phase 1: Assign same-type squads to each area (up to min_squads_per_area)
+            for area in areas:
+                for squad_list in [motorized_squads,foot_squads]:
+                    if len(area_assignments[area])>=min_squads_per_area:
+                        break
+                    while squad_list and len(area_assignments[area])<min_squads_per_area:
+                        area_assignments[area].append(squad_list.pop(0))
+
+            # Phase 2: Distribute overflow up to max_squads_per_area
+            overflow=motorized_squads+foot_squads
+            if overflow:
+                area_cycle=cycle(areas)
+                while overflow:
+                    area=next(area_cycle)
+                    if len(area_assignments[area])<max_squads_per_area:
+                        area_assignments[area].append(overflow.pop(0))
+                    elif all(len(area_assignments[a])>=max_squads_per_area for a in areas):
+                        # All areas at max - just assign to random (no hard limit)
+                        area_assignments[random.choice(areas)].append(overflow.pop(0))
+
+            # Issue orders and set positions
             for world_area,squads in area_assignments.items():
                 for squad in squads:
-                    location=world_area.get_location()
-                    self.set_squad_defend_order(squad,world_area,location)
-                    self.set_squad_starting_position(squad,location)
-
-
-        if remaining_squads:
-            squad_spacing=250
-            squad_grid=engine.math_2d.get_grid_coords(self.spawn_location,squad_spacing,len(remaining_squads))
-            for squad in remaining_squads:
-                location=squad_grid.pop()
-                world_area=random.choice(self.world.world_areas)
-                self.set_squad_defend_order(squad,world_area,location)
-                self.set_squad_starting_position(squad,location)
+                    spawn_location=squad_grid.pop()
+                    destination=world_area.get_location()
+                    threat_direction=self.get_threat_direction(destination)
+                    self.set_squad_defend_order(squad,world_area,destination,threat_direction)
+                    self.set_squad_starting_position(squad,spawn_location,threat_direction)
 
     #---------------------------------------------------------------------------
-    def set_squad_defend_order(self,squad,world_area,world_area_location):
+    def get_threat_direction(self,from_coords):
+        '''calculate the direction enemies are expected to come from'''
+        # returns rotation angle in degrees toward nearest hostile spawn
+        enemy_spawn=None
+        if self.faction=='german':
+            if 'soviet' in self.world.tactical_ai:
+                enemy_spawn=self.world.tactical_ai['soviet'].spawn_location
+        elif self.faction=='soviet':
+            if 'german' in self.world.tactical_ai:
+                enemy_spawn=self.world.tactical_ai['german'].spawn_location
+        
+        if enemy_spawn:
+            return engine.math_2d.get_rotation(from_coords,enemy_spawn)
+        return None
+
+    #---------------------------------------------------------------------------
+    def set_squad_defend_order(self,squad,world_area,world_area_location,threat_direction=None):
         if squad.squad_leader:
             order=TacticalOrder()
             order.order_defend_area=True
             order.world_area=world_area
             order.world_coords=world_area_location
+            order.threat_direction=threat_direction
             squad.squad_leader.ai.switch_task_squad_leader(order)
 
     #---------------------------------------------------------------------------
-    def set_squad_starting_position(self,squad,position):
+    def set_squad_starting_position(self,squad,position,threat_direction=None):
         # set the member positions
         member_grid=engine.math_2d.get_grid_coords(position,20,len(squad.members))
         member_vehicle_assignments=[]
         for c in squad.members:
             c.world_coords=member_grid.pop()
             member_vehicle_assignments.append(c)
-            # randomize position a bit
-            #engine.math_2d.randomize_position_and_rotation(c,170)
+            # set infantry facing toward threat if known
+            if threat_direction is not None:
+                c.rotation_angle=threat_direction
+                c.reset_image=True
 
         # - handle squad attached vehicles -
             
@@ -296,8 +343,11 @@ class AIFactionTactical():
 
         for vehicle in squad.vehicles:
             vehicle.world_coords=position
-            # set initial rotation
-            if self.faction=='german':
+            # set initial rotation toward threat direction if known
+            if threat_direction is not None:
+                vehicle.rotation_angle=threat_direction
+                vehicle.reset_image=True
+            elif self.faction=='german':
                 vehicle.rotation_angle=270
             elif self.faction=='soviet':
                 vehicle.rotation_angle=90

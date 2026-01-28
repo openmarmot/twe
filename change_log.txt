@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+----------------------------------
+Jan 27 2026
+- rewrote ai_faction_tactical initial order design 
+- rewrote penetration calculation to take into account tumbling effect of spaced armor 
 
 ----------------------------------
 Jan 25 2026

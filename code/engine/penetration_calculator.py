@@ -37,8 +37,43 @@ projectile_data={}
 max_distance=4000
 
 #---------------------------------------------------------------------------
+def evaluate_spaced_armor(projectile_type, max_penetration, spaced_armor_thickness):
+    '''Evaluate effect of spaced armor on a projectile
+    
+    Spaced armor (Schürzen) historically worked by destabilizing/tumbling incoming
+    projectiles before they hit the main armor. A tumbled bullet hits at a sub-optimal
+    angle with chaotic energy distribution, drastically reducing penetration.
+    
+    Returns: (adjusted_penetration, effect_string)
+    effect_string: '' (none), 'destabilized', 'defeated' (thickness added but no tumble)
+    '''
+    if spaced_armor_thickness <= 0:
+        return max_penetration, ''
+
+    diameter = projectile_data[projectile_type]['diameter']
+
+    if diameter < 20:
+        tumble_chance = min(95, 70 + (spaced_armor_thickness * 5))
+    elif diameter < 75:
+        tumble_chance = max(0, 50 - int(diameter * 1.5))
+    else:
+        tumble_chance = 0
+
+    if random.randint(1, 100) <= tumble_chance:
+        reduction = random.uniform(0.60, 0.70)
+        adjusted_penetration = max_penetration * (1 - reduction)
+        return adjusted_penetration, 'destabilized'
+    else:
+        if diameter >= 75 and spaced_armor_thickness < 10:
+            return max_penetration, ''
+        return max_penetration, 'defeated'
+
+#---------------------------------------------------------------------------
 def calculate_penetration(projectile, distance, armor_type, armor, side, relative_angle):
-    '''calculate penetration, return bool'''
+    '''calculate penetration
+    Returns: (penetrated: bool, pen_value: float, armor_value: float, spaced_effect: str)
+    spaced_effect: '' (none), 'destabilized', 'defeated'
+    '''
     # for slope 0 is vertical, whereas 90 is full horizontal armor
     # normalize distance to nearest 500
 
@@ -68,35 +103,37 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
         # Linearly interpolate between lower and upper penetration values
         max_penetration = round(lower_penetration + t * (upper_penetration - lower_penetration),2)
 
-    # fast check first (unchanged, but now uses full effective thickness later)
-    if max_penetration < (armor_thickness + spaced_armor):
-        return False, max_penetration, (armor_thickness + spaced_armor)
-    else:
-        # more complicated penetration check
+    # evaluate spaced armor effects (tumbling/destabilization)
+    effective_penetration, spaced_effect = evaluate_spaced_armor(
+        projectile.ai.projectile_type, max_penetration, spaced_armor)
 
-        # Compute horizontal obliquity
-        centers = {
-            "rear": 0,
-            "right": 90,
-            "front": 180,
-            "left": 270,
-            "top": 0,
-            "bottom": 0
-        }
-        # Handle wrap-around for rear
-        if side == "rear" and relative_angle > 180:
-            relative_angle -= 360
-        phi_h = abs(relative_angle - centers[side])
-        cos_phi_h = math.cos(math.radians(phi_h))
-        
-        # calculate effective thickness, including both the vertical angle of the armor and 
-        # the horizontal angle relative to the projectile
+    # Compute horizontal obliquity
+    centers = {
+        "rear": 0,
+        "right": 90,
+        "front": 180,
+        "left": 270,
+        "top": 0,
+        "bottom": 0
+    }
+    # Handle wrap-around for rear
+    if side == "rear" and relative_angle > 180:
+        relative_angle -= 360
+    phi_h = abs(relative_angle - centers[side])
+    cos_phi_h = math.cos(math.radians(phi_h))
+
+    # calculate effective thickness, including both the vertical angle of the armor and
+    # the horizontal angle relative to the projectile
+    # if destabilized, spaced armor already reduced penetration so don't add thickness
+    if spaced_effect == 'destabilized':
+        effective_thickness = armor_thickness / (math.cos(math.radians(armor_slope)) * cos_phi_h)
+    else:
         effective_thickness = (armor_thickness / (math.cos(math.radians(armor_slope)) * cos_phi_h)) + spaced_armor
-        
-        if max_penetration > effective_thickness:
-            return True, max_penetration, effective_thickness
-        else:
-            return False, max_penetration, effective_thickness
+
+    if effective_penetration > effective_thickness:
+        return True, effective_penetration, effective_thickness, spaced_effect
+    else:
+        return False, effective_penetration, effective_thickness, spaced_effect
 
 
 #---------------------------------------------------------------------------

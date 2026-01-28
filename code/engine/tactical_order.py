@@ -20,3 +20,12 @@ class TacticalOrder():
         self.world_area=None
         self.world_coords=None # [0,0]
         self.target_object=None # a world_object
+
+        # defend order state tracking
+        # True once the area has been contested at least once
+        # defend order only completes when was_contested=True AND is_contested=False
+        self.was_contested=False
+
+        # direction enemies are expected from (rotation angle in degrees)
+        # used so defenders can face the right direction
+        self.threat_direction=None
