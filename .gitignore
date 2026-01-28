@@ -3,6 +3,9 @@ code/saves/save*
 code/logs/*
 code/game_screenshots/*
 
+# ai stuff 
+.opencode
+
 .DS_Store
 **/.DS_Store
 

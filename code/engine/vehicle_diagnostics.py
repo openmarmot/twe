@@ -60,7 +60,7 @@ class VehicleDiagnostics():
         # add the main object
         v=VehicleDiagnosticObject()
         v.image_list=self.vehicle.image_list
-        v.screen_coords=self.screen_center
+        v.world_coords=self.vehicle.world_coords
         self.image_objects.append(v)
 
 
@@ -140,8 +140,7 @@ class VehicleDiagnostics():
             else:
                 v.image_list=['hit_green']
             v.rotation_angle=engine.math_2d.get_normalized_angle(hit.rotation_offset)
-            # note this is meant to calculate world coords, but it works well enough as screen coords
-            v.screen_coords=engine.math_2d.calculate_relative_position(self.screen_center,0,hit.position_offset)
+            v.world_coords=engine.math_2d.calculate_relative_position(self.vehicle.world_coords,0,hit.position_offset)
             self.image_objects.append(v)
 
 
@@ -386,6 +385,7 @@ class VehicleDiagnostics():
 class VehicleDiagnosticObject():
     def __init__(self):
         self.screen_coords=[0,0]
+        self.world_coords=[0,0]
         self.scale_modifier=0
         self.image=None
         self.image_index=0
