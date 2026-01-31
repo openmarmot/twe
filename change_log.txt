@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Jan 31 2026
+- rewrite of hit tracking in vehicle diagnostics to sort by penetration + show totals 
+
+----------------------------------
 Jan 27 2026
 - rewrote ai_faction_tactical initial order design 
 - rewrote penetration calculation to take into account tumbling effect of spaced armor 

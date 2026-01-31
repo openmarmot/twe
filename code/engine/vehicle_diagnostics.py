@@ -252,13 +252,23 @@ class VehicleDiagnostics():
         coord=[40,700]
         self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
         coord[1]+=spacing
-        penetrated_hits = [hit for hit in self.vehicle.ai.collision_log if hit.penetrated]
-        non_penetrated_hits = [hit for hit in self.vehicle.ai.collision_log if not hit.penetrated]
-
-        if len(penetrated_hits) >= self.max_display_hits:
-            hits_to_show = penetrated_hits[:self.max_display_hits]
-        else:
-            hits_to_show = penetrated_hits + non_penetrated_hits[:(self.max_display_hits - len(penetrated_hits))]
+        
+        total_penetrated = len([h for h in self.vehicle.ai.collision_log if h.penetrated])
+        total_non_penetrated = len([h for h in self.vehicle.ai.collision_log if not h.penetrated])
+        self.text_queue.append([f'Total hits - Penetrated: {total_penetrated}, Non-penetrated: {total_non_penetrated}', 
+                               copy.copy(coord), self.text_black])
+        coord[1]+=spacing
+        
+        penetrated_sorted = sorted([h for h in self.vehicle.ai.collision_log if h.penetrated], 
+                                  key=lambda x: x.penetration_value, reverse=True)
+        non_penetrated_sorted = sorted([h for h in self.vehicle.ai.collision_log if not h.penetrated],
+                                       key=lambda x: x.penetration_value, reverse=True)
+        
+        hits_to_show = []
+        hits_to_show.extend(penetrated_sorted[:self.max_display_hits])
+        remaining_slots = self.max_display_hits - len(hits_to_show)
+        if remaining_slots > 0 and non_penetrated_sorted:
+            hits_to_show.extend(non_penetrated_sorted[:remaining_slots])
 
         for b in hits_to_show:
             pen_text=f'[penetrated: {b.penetrated}] [distance: {b.distance}] [projectile: {b.projectile_name}] [penetration value: {b.penetration_value}] [armor value: {b.armor_value}] [side: {b.hit_side}] [compartment: {b.hit_compartment}] [result: {b.result}]'
