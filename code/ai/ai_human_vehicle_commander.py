@@ -49,72 +49,72 @@ class AIHumanVehicleCommander():
             self.think_indirect_gunner_role(vehicle,indirect_gunner_role)
 
     #---------------------------------------------------------------------------
-    def get_indirect_fire_targets(self,vehicle,scan_radius=2000):
-        '''get list of valid indirect fire targets sorted by density'''
-        valid_targets = []
-        nearby_targets = []
+    def get_indirect_fire_targets(self,vehicle):
+        '''get best indirect fire target - trusts evaluate_targets for filtering, vehicles first'''
+        vehicle_coords = vehicle.world_coords
 
-        # scan for valid targets within radius
-        for target in self.owner.ai.human_targets:
-            distance = engine.math_2d.get_distance(vehicle.world_coords, target.world_coords)
-            if distance <= scan_radius:
-                # prioritize humans that are far away
-                if distance > 1000:
-                    valid_targets.append(target)
-                else:
-                    nearby_targets.append(target)
+        # VEHICLE PRIORITY: process vehicles first to avoid redundant human distance checks
+        valid_targets = []
 
         for target in self.owner.ai.vehicle_targets:
-            # check if vehicle is valid (has crew and not disabled)
-            if target.ai.check_if_vehicle_is_occupied() and not target.ai.vehicle_disabled:
-                distance = engine.math_2d.get_distance(vehicle.world_coords, target.world_coords)
-                if distance <= scan_radius:
-                    # only target light vehicles with weak top armor
-                    top_armor = target.ai.passenger_compartment_armor['top'][0]
-                    if top_armor < 10:
-                        valid_targets.append(target)
-                    else:
-                        nearby_targets.append(target)
+            # evaluate_targets already filtered (alive, hostile, visible)
+            # commander adds own filter for vehicle status + armor
+            
+            if not target.ai.vehicle_disabled:
+                top_armor = target.ai.passenger_compartment_armor['top'][0]
+                if top_armor < 10:
+                    if target.ai.check_if_vehicle_is_occupied():
+                        distance = engine.math_2d.get_distance(vehicle_coords, target.world_coords)
+                        if distance> 1000:
+                            valid_targets.append({'obj': target, 'distance': distance})
 
-        # combine and sort by density (count in 500 unit clusters)
-        # first pass: count densities in 500 unit buckets
+
+        # VEHICLE CHECK: return if we have valid vehicles
+        if valid_targets:
+            if len(valid_targets) < 5:
+                valid_targets.sort(key=lambda t: t['distance'])
+                return [t['obj'] for t in valid_targets[:1]]
+            
+            # Find best vehicle (closest)
+            best_vehicle = min(valid_targets, key=lambda t: t['distance'])
+            return [best_vehicle['obj']]
+
+        # FALLBACK: HUMAN PRIORITY (only if no good vehicles)
+        for target in self.owner.ai.human_targets:
+            # evaluate_targets already filtered (alive, hostile, visible)
+            # commander only filters by distance > 1000 for priority
+            distance = engine.math_2d.get_distance(vehicle_coords, target.world_coords)
+            if distance > 1000:
+                valid_targets.append({'obj': target, 'distance': distance})
+
+        # HUMAN CLUSTERING: group by density
+        if not valid_targets:
+            return []
+
+        # DENSITY MAP (500-unit buckets) - only for humans
         density_map = {}
-        all_targets = valid_targets + nearby_targets
+        for human in valid_targets:
+            key = (int(human['obj'].world_coords[0] // 500), int(human['obj'].world_coords[1] // 500))
+            density_map[key] = density_map.get(key, 0) + 1
 
-        for target in all_targets:
-            key = (int(target.world_coords[0] // 500), int(target.world_coords[1] // 500))
-            if key not in density_map:
-                density_map[key] = 0
-            density_map[key] += 1
+        # find best cluster with most humans
+        best_cluster_key = max(density_map.items(), key=lambda kv: kv[1])[0]
 
-        # second pass: sort by density (highest first), then by distance (closest first)
-        targets_with_score = []
-        for target in all_targets:
-            key = (int(target.world_coords[0] // 500), int(target.world_coords[1] // 500))
-            distance = engine.math_2d.get_distance(vehicle.world_coords, target.world_coords)
-            density = density_map.get(key, 1)
-            score = density * 1000 - distance
-            targets_with_score.append((score, target))
+        # get humans in best cluster
+        best_cluster_humans = [h for h in valid_targets if (
+            int(h['obj'].world_coords[0] // 500),
+            int(h['obj'].world_coords[1] // 500)
+        ) == best_cluster_key]
 
-        # sort descending by score
-        targets_with_score.sort(reverse=True)
+        # sort cluster by distance
+        best_cluster_humans.sort(key=lambda t: t['distance'])
 
-        # extract sorted targets
-        return [target for score, target in targets_with_score]
+        return [best_cluster_humans[0]['obj']]
 
     #---------------------------------------------------------------------------
     def calculate_indirect_target_coords(self,target,scatter_radius=500):
         '''add random scatter to target coordinates for indirect fire'''
-        distance = engine.math_2d.get_distance(target.world_coords, [0,0])
-
-        # create random offset within scatter radius
-        angle = random.uniform(0, 2 * math.pi)
-        offset = random.uniform(0, scatter_radius)
-
-        offset_x = offset * math.cos(angle)
-        offset_y = offset * math.sin(angle)
-
-        # calculate center of mass of cluster to prioritize
+        # count humans in cluster (within 1000 units)
         cluster_count = 1
         for other_target in self.owner.ai.human_targets:
             if other_target.ai.blood_pressure >= 1 and other_target != target:
@@ -124,6 +124,7 @@ class AIHumanVehicleCommander():
 
         # more scatter for larger clusters (more realistic for area fire)
         adjusted_scatter = scatter_radius * (0.5 + cluster_count * 0.2)
+        angle = random.uniform(0, 2 * math.pi)
         offset = random.uniform(0, adjusted_scatter)
         offset_x = offset * math.cos(angle)
         offset_y = offset * math.sin(angle)
@@ -166,6 +167,8 @@ class AIHumanVehicleCommander():
     def think_indirect_gunner_role(self,vehicle,indirect_gunner_role):
         '''think of commander actions related to indirect gunner role'''
 
+        # this seems pretty computation heavy. need to consider how often this is running
+
         # check if fire_missions list exists in memory
         if 'fire_missions' not in indirect_gunner_role.human.ai.memory['task_vehicle_crew']:
             indirect_gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions'] = []
@@ -188,9 +191,10 @@ class AIHumanVehicleCommander():
 
             # check if target is still valid (alive)
             if fire_mission.target_obj is not None:
-                if fire_mission.target_obj.ai.blood_pressure < 1:
-                    fire_missions.pop(0)
-                    return
+                if fire_mission.target_obj.is_human:
+                    if fire_mission.target_obj.ai.blood_pressure < 1:
+                        fire_missions.pop(0)
+                        return
 
                 if fire_mission.target_obj.is_vehicle:
                     if not fire_mission.target_obj.ai.check_if_vehicle_is_occupied():
@@ -290,7 +294,10 @@ class AIHumanVehicleCommander():
                         # we will just save the angle and the driver will grab it
                         self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                         self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'
-                        #engine.log.add_data('debug',f'commander {self.owner.name} decision: - rotate {vehicle.name} due to {biggest_threat.name}',True)
+                        #engine.log.add_data(
+                        #    'debug',
+                        #    f'commander {self.owner.name} decision: - rotate {vehicle.name} due to {biggest_threat.name}',
+                        #    True)
 
             # lets push out a rethink a bit so we aren't immediately changing the order
             self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(15,25)
