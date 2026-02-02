@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+
+----------------------------------
+Feb 1 2026
+- work on commander indirect fire decisions 
+
+todo 
+- needs playtest + optimize 
+
 ----------------------------------
 Jan 31 2026
 - rewrite of hit tracking in vehicle diagnostics to sort by penetration + show totals 
