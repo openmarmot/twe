@@ -202,11 +202,12 @@ class AIHumanVehicleCommander():
                         return
 
                 # check if target moved beyond acceptable distance
-                old_dist = engine.math_2d.get_distance(fire_mission.world_coords,
-                                                       fire_mission.target_obj.world_coords)
-                if old_dist > 1500:
-                    fire_missions.pop(0)
-                    return
+                if fire_mission.target_obj is not None:
+                    old_dist = engine.math_2d.get_distance(fire_mission.world_coords,
+                                                           fire_mission.target_obj.world_coords)
+                    if old_dist > 1500:
+                        fire_missions.pop(0)
+                        return
 
         # mission is invalid or doesn't exist: find new targets
         valid_targets = self.get_indirect_fire_targets(vehicle)

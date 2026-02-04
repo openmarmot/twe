@@ -94,7 +94,7 @@ class AIFactionTactical():
                             # random for now
                             random_world_area=random.choice(hostile_world_areas)
                             for _ in range(3):
-                                f=FireMission(random_world_area.get_location(),self.world.world_seconds+300)
+                                f=FireMission(random_world_area.get_location(),self.world.world_seconds+300,None)
                                 f.rounds_requested=5
                                 role.human.ai.memory['task_vehicle_crew']['fire_missions'].append(f)
                             self.initial_fire_missions-=1

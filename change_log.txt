@@ -2,6 +2,14 @@ TWE Project : Change Log
 
 
 ----------------------------------
+Feb 03 2026
+- fix new bug in ai_tactical indirect fire pre-planning 
+- some work on fixing vehicles getting stuck trying to rotate in bad terrain 
+
+ideally if a vehicle is trying to move and not moving they will back out or something.
+however teaching the ai about gears is something im not enthusiastic about at the moment. 
+
+----------------------------------
 Feb 1 2026
 - work on commander indirect fire decisions 
 
