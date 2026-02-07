@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 07 2026
+- updated vehicle driver commander prioritization to fix a logic error that was resulting in excessive gunner prioritization 
+- reduced driver wait times in some conditions 
+- misc minor bug fix and cleanup
+
+----------------------------------
 Feb 06 2026
 - work on vegetation generation speedup 
 - fixed trees on roads issue 

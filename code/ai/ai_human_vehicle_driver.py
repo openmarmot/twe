@@ -10,11 +10,8 @@ import copy
 
 #import custom packages
 import engine.math_2d
-import engine.world_builder
 import engine.log
-import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
-from engine.tactical_order import TacticalOrder
 
 #import engine.global_exchange_rates
 
@@ -85,12 +82,11 @@ class AIHumanVehicleDriver():
 
             calculated_vehicle_angle = self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
 
-
             if vehicle.ai.current_speed==0:
                 # this throttle boost helps vehicle overcome bad terrain like trees 
                 # otherwise a 0.2 isn't enough to move against a tree tile and they will get stuck not moving or rotating
                 vehicle.ai.throttle = 0.5
-                vehicle.ai.brake_poer = 1
+                vehicle.ai.brake_power = 1
             elif vehicle.ai.current_speed > 10:
                 vehicle.ai.throttle = 0
                 vehicle.ai.brake_power = 1
@@ -157,10 +153,6 @@ class AIHumanVehicleDriver():
         '''perform actions necessary to start driving somewhere'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-        # temp for testing
-        if vehicle.ai.vehicle_disabled:
-            print(f'debug !! vehicle {vehicle.name} is already disabled!!')
-
         rotation=engine.math_2d.get_rotation(vehicle.world_coords,destination)
         self.owner.ai.memory['task_vehicle_crew']['current_action']='driving'
         self.owner.ai.memory['task_vehicle_crew']['calculated_distance_to_target']=distance
@@ -187,16 +179,7 @@ class AIHumanVehicleDriver():
                 vehicle.ai.vehicle_disabled=True
 
     #---------------------------------------------------------------------------
-    def _handle_gunner_busy_action(self, current_action, message):
-        '''handle common waiting for gunner action'''
-        self.owner.ai.memory['task_vehicle_crew']['current_action']=message
-        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        vehicle.ai.brake_power=1
-        vehicle.ai.throttle=0
-        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,10)
-        return
-
-    def _check_rotation_required(self, rotation_required):
+    def check_rotation_required(self, rotation_required):
         '''handle common rotation logic'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
@@ -217,7 +200,8 @@ class AIHumanVehicleDriver():
         self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
         return
 
-    def _create_vehicle_order_for_target(self, target_or_coords, offset_distance=60):
+    #---------------------------------------------------------------------------
+    def create_vehicle_order_for_target(self, target_or_coords, offset_distance=60):
         '''create vehicle order to get close to target with fire mission'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
         need_vehicle_order=False
@@ -234,6 +218,16 @@ class AIHumanVehicleDriver():
             if vehicle.ai.is_transport:
                 vehicle_order.exit_vehicle_when_finished=True
             self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
+
+    #---------------------------------------------------------------------------
+    def handle_gunner_busy_action(self, current_action, message):
+        '''handle common waiting for gunner action'''
+        self.owner.ai.memory['task_vehicle_crew']['current_action']=message
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        vehicle.ai.brake_power=1
+        vehicle.ai.throttle=0
+        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,10)
+        return
 
     #---------------------------------------------------------------------------
     def think(self):
@@ -281,35 +275,35 @@ class AIHumanVehicleDriver():
                 
                 # handle common busy states
                 if 'reloading' in current_action:
-                    return self._handle_gunner_busy_action(current_action,'waiting on crew to finish reloading')
+                    return self.handle_gunner_busy_action(current_action,'waiting on crew to finish reloading')
                 if 'Engaging' in current_action:
-                    return self._handle_gunner_busy_action(current_action,'waiting on crew to finish engagement')
+                    return self.handle_gunner_busy_action(current_action,'waiting on crew to finish engagement')
                 if 'jam' in current_action:
-                    return self._handle_gunner_busy_action(current_action,'waiting on gunner to finish clearing weapon jam')
+                    return self.handle_gunner_busy_action(current_action,'waiting on gunner to finish clearing weapon jam')
                 
                 # handle rotation requests
                 if current_action=='Waiting for driver to rotate the vehicle':
                     target=gunner_role.human.ai.memory['task_vehicle_crew']['target']
                     if target is not None:
                         rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
-                        return self._check_rotation_required(rotation_required)
+                        return self.check_rotation_required(rotation_required)
                 
                 if current_action=='Waiting for driver to rotate the vehicle for fire mission':
                     if gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions']:
                         fire_mission=gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
                         rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,fire_mission.world_coords)
-                        return self._check_rotation_required(rotation_required)
+                        return self.check_rotation_required(rotation_required)
                 
                 if current_action=='Waiting for driver to get in position for fire mission':
                     if gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions']:
                         fire_mission=gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
-                        return self._create_vehicle_order_for_target(fire_mission.world_coords)
+                        return self.create_vehicle_order_for_target(fire_mission.world_coords)
                 
                 # handle close distance requests
                 if 'Waiting for driver to close distance' in current_action:
                     target=gunner_role.human.ai.memory['task_vehicle_crew']['target']
                     if target is not None:
-                        return self._create_vehicle_order_for_target(target.world_coords)
+                        return self.create_vehicle_order_for_target(target.world_coords)
         
         # next lets check if anyone is trying to get in 
         if vehicle.ai.check_if_vehicle_is_full() is False:
