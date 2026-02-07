@@ -301,9 +301,8 @@ def generate_vegetation(map_objects,world_size):
 
     # generate a list of coordinates to avoid
     coordinates_to_avoid=[]
-    names_to_avoid=['warehouse','square_building','hangar','concrete_square']
     for obj in map_objects:
-        if obj.world_builder_identity in names_to_avoid:
+        if obj.world_builder_identity in ('warehouse','square_building','hangar','concrete_square','road_300'):
             coordinates_to_avoid.append(obj.world_coords)
 
 
@@ -313,7 +312,7 @@ def generate_vegetation(map_objects,world_size):
     max_size=world_size
     min_seperation=1000
     coord_count=random.randint(50,200)
-    forest_areas=engine.math_2d.get_random_constrained_coords([0,0],max_size,
+    forest_areas=engine.math_2d.get_random_constrained_coords_v2([0,0],max_size,
         min_seperation,coord_count,coordinates_to_avoid,600)
 
     # generate each forest clump 
@@ -322,15 +321,18 @@ def generate_vegetation(map_objects,world_size):
         max_size=1000
         min_seperation=100
         coord_count=random.randint(1,20)
-        tree_coords=engine.math_2d.get_random_constrained_coords(area,max_size,
+        tree_coords=engine.math_2d.get_random_constrained_coords_v2(area,max_size,
             min_seperation,coord_count,coordinates_to_avoid,100)
-        
+
+        # Batch create vegetation objects
+        tree_vegetation=[]
         for coords in tree_coords:
             rotation=random.randint(0,359)
-            vegetation.append(MapObject('pinus_sylvestris','pinus_sylvestris',coords,rotation,[]))
+            tree_vegetation.append(MapObject('pinus_sylvestris','pinus_sylvestris',coords,rotation,[]))
             if random.randint(0,1)==1:
                 rotation=random.randint(0,359)
-                vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+                tree_vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+        vegetation.extend(tree_vegetation)
 
 
         # - add green areas 
@@ -340,10 +342,13 @@ def generate_vegetation(map_objects,world_size):
         coord_count=random.randint(20,60)
         terrain_coords=engine.math_2d.get_random_constrained_coords_with_max_sep(area,max_size,
             min_seperation,max_seperation,coord_count,coordinates_to_avoid,100)
-        
+
+        # Batch create terrain green objects
+        terrain_vegetation=[]
         for coords in terrain_coords:
             rotation=random.randint(0,359)
-            vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+            terrain_vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
+        vegetation.extend(terrain_vegetation)
             
 
 

@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+----------------------------------
+Feb 06 2026
+- work on vegetation generation speedup 
+- fixed trees on roads issue 
 
 ----------------------------------
 Feb 03 2026
