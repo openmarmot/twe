@@ -821,9 +821,12 @@ class AIVehicle():
     def projectile_hit_passenger_compartment(self,projectile,side,relative_angle):
         '''handle a projectile hit to the passenger compartment'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side],side,relative_angle)
+        penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side],side,relative_angle)
         
         result=''
+        if spaced_effect == 'destabilized':
+            result = 'destabilized by spaced armor'
+        
         if penetration:
             damage_options=['random_crew_projectile']
 
@@ -851,7 +854,8 @@ class AIVehicle():
 
         else:
             # check for partial penetration causing spalling
-            if pen_value >= armor_value * 0.9:
+            # destabilized rounds lack coherent energy for spalling
+            if pen_value >= armor_value * 0.9 and spaced_effect != 'destabilized':
                 self.handle_spalling_damage('passenger_compartment',projectile)
                 result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
@@ -861,9 +865,12 @@ class AIVehicle():
     def projectile_hit_vehicle_body(self,projectile,side,relative_angle):
         '''handle a projectile hit to the vehicle body'''
         distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side],side,relative_angle)
+        penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side],side,relative_angle)
         
         result=''
+        if spaced_effect == 'destabilized':
+            result = 'destabilized by spaced armor'
+        
         if penetration:
             projectile.wo_stop()
             damage_options=['driver_projectile','engine','ammo_rack']
@@ -876,7 +883,8 @@ class AIVehicle():
 
         else:
             # check for partial penetration causing spalling
-            if pen_value >= armor_value * 0.9:
+            # destabilized rounds lack coherent energy for spalling
+            if pen_value >= armor_value * 0.9 and spaced_effect != 'destabilized':
                 self.handle_spalling_damage('vehicle_body',projectile)
                 result = 'spalling'
             self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
@@ -906,9 +914,12 @@ class AIVehicle():
                     wheel=random.choice(self.rear_right_wheels)
         if wheel:
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor,side,relative_angle)
+            penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor,side,relative_angle)
             
             result=''
+            if spaced_effect == 'destabilized':
+                result = 'destabilized by spaced armor'
+            
             if penetration:
                 if wheel.ai.destroyed:
                     # pass hit through to vehicle body

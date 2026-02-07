@@ -94,6 +94,7 @@ class AIHumanVehicleGunner():
                 # less of an issue with vehicle targets
                 self.owner.ai.memory['task_vehicle_crew']['target']=None
                 self.owner.ai.memory['task_vehicle_crew']['current_action']='Scanning for targets'
+                
     #---------------------------------------------------------------------------
     def calculate_turret_aim(self, turret, target, weapon):
         '''calculates the correct turret angle to hit a target - now with angular dispersion'''

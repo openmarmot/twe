@@ -85,7 +85,13 @@ class AIHumanVehicleDriver():
 
             calculated_vehicle_angle = self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
 
-            if vehicle.ai.current_speed > 10:
+
+            if vehicle.ai.current_speed==0:
+                # this throttle boost helps vehicle overcome bad terrain like trees 
+                # otherwise a 0.2 isn't enough to move against a tree tile and they will get stuck not moving or rotating
+                vehicle.ai.throttle = 0.5
+                vehicle.ai.brake_poer = 1
+            elif vehicle.ai.current_speed > 10:
                 vehicle.ai.throttle = 0
                 vehicle.ai.brake_power = 1
             else:

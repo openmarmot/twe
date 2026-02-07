@@ -190,7 +190,7 @@ class AIHuman():
             rotation_angle=engine.math_2d.get_rotation(self.owner.world_coords,target.world_coords)
             hit_side,relative_angle=engine.math_2d.calculate_hit_side(target.rotation_angle,rotation_angle)
 
-            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor[hit_side],hit_side,relative_angle)
+            penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor[hit_side],hit_side,relative_angle)
             if penetration is True:
                 return penetration,''
             
@@ -203,7 +203,7 @@ class AIHuman():
             
             if distance>2000:
                 distance=400
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
+                penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
                 if penetration:
                     return False,'need to get closer to penetrate'
                 else:
@@ -294,7 +294,7 @@ class AIHuman():
                 bleeding_hit=True
             else:
                 hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor[hit_side],hit_side,relative_angle)
+                penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_head.ai.armor[hit_side],hit_side,relative_angle)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -311,7 +311,7 @@ class AIHuman():
                 bleeding_hit=True
             else:
                 hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-                penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor[hit_side],hit_side,relative_angle)
+                penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.wearable_upper_body.ai.armor[hit_side],hit_side,relative_angle)
                 if penetration:
                     self.blood_pressure-=random.randint(30,75)
                     bleeding_hit=True
@@ -1362,9 +1362,14 @@ class AIHuman():
                 self.switch_task_move_to_location(order.world_coords,None)
                 return True
             else:
-                # close enough. should we cancel this order at some point?
-                if order.world_area.is_contested is False:
+                # we are in position - check if we should complete the defend order
+                if order.world_area.is_contested:
+                    # area is being contested - mark that it has been contested
+                    order.was_contested=True
+                elif order.was_contested:
+                    # area WAS contested but no longer is - we won, order complete
                     orders.remove(order)
+                # else: area has never been contested, keep defending
                 return False
         if order.order_move_to_location:
             distance=engine.math_2d.get_distance(self.owner.world_coords,order.world_coords)
@@ -1406,8 +1411,8 @@ class AIHuman():
                 friendly_area=None
                 for area in self.owner.world.world_areas:
                     if area.faction==self.squad.faction:
-                       friendly_area=area
-                       break
+                        friendly_area=area
+                        break
                 if friendly_area is not None:
                     tactical_order=TacticalOrder()
                     tactical_order.order_move_to_location=True
@@ -2548,12 +2553,15 @@ class AIHuman():
                 
         else:
             # -- do the shorter thing --
-            # this would be better as a task_do_random_thing
-            # go for a walk
-            decision=random.randint(1,100)
-            if decision==1:
-                coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
-                self.switch_task_move_to_location(coords,None)
+            # only do random walks if we don't have active defend orders
+            orders=self.memory['task_squad_leader']['orders']
+            has_defend_order=any(o.order_defend_area for o in orders)
+            
+            if not has_defend_order:
+                decision=random.randint(1,100)
+                if decision==1:
+                    coords=[self.owner.world_coords[0]+random.randint(-25,25),self.owner.world_coords[1]+random.randint(-25,25)]
+                    self.switch_task_move_to_location(coords,None)
 
             self.switch_task_think()
 

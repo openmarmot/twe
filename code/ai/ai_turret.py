@@ -119,8 +119,10 @@ class AITurret():
             distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
 
             side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-            penetration,pen_value,armor_value=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side],side,relative_angle)
+            penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.turret_armor[side],side,relative_angle)
             result=''
+            if spaced_effect == 'destabilized':
+                result = 'destabilized by spaced armor'
             if penetration:
                 EVENT_DATA.wo_stop()
                 # component damage

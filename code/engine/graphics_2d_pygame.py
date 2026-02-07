@@ -492,6 +492,28 @@ class Graphics_2D_Pygame():
             pygame.display.update()
 
     #------------------------------------------------------------------------------
+    def update_vehicle_diagnostics_render(self):
+        '''convert world coordinates to screen coordinates for vehicle diagnostics'''
+        if self.mode != 3:
+            return
+
+        vehicle = self.world.vehicle_diagnostics_vehicle
+        if vehicle and hasattr(vehicle, 'world_coords'):
+            player_x = vehicle.world_coords[0] * self.world.scale
+            player_y = vehicle.world_coords[1] * self.world.scale
+            translation = [self.screen_center[0] - player_x, self.screen_center[1] - player_y]
+        else:
+            translation = [0, 0]
+
+        for c in self.vehicle_diagnostics.image_objects:
+            if hasattr(c, 'world_coords') and vehicle and hasattr(vehicle, 'world_coords'):
+                if c == self.vehicle_diagnostics.image_objects[0]:
+                    c.screen_coords = self.screen_center
+                else:
+                    c.screen_coords[0] = c.world_coords[0] * self.world.scale + translation[0]
+                    c.screen_coords[1] = c.world_coords[1] * self.world.scale + translation[1]
+
+    #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
         '''Reset the image for a world object with caching'''
         wo.reset_image = False
@@ -698,6 +720,7 @@ class Graphics_2D_Pygame():
         elif self.mode==2:
             self.strategic_map.update()
         elif self.mode==3:
+            self.update_vehicle_diagnostics_render()
             self.vehicle_diagnostics.update()
 
             if self.vehicle_diagnostics.exit:

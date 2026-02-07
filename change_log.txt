@@ -1,5 +1,37 @@
 TWE Project : Change Log
 
+----------------------------------
+Feb 06 2026
+- work on vegetation generation speedup 
+- fixed trees on roads issue 
+
+----------------------------------
+Feb 03 2026
+- fix new bug in ai_tactical indirect fire pre-planning 
+- some work on fixing vehicles getting stuck trying to rotate in bad terrain 
+
+ideally if a vehicle is trying to move and not moving they will back out or something.
+however teaching the ai about gears is something im not enthusiastic about at the moment. 
+
+----------------------------------
+Feb 1 2026
+- work on commander indirect fire decisions 
+
+todo 
+- needs playtest + optimize 
+
+----------------------------------
+Jan 31 2026
+- rewrite of hit tracking in vehicle diagnostics to sort by penetration + show totals 
+
+----------------------------------
+Jan 27 2026
+- rewrote ai_faction_tactical initial order design 
+- rewrote penetration calculation to take into account tumbling effect of spaced armor 
+- rewrote vehicle_diagnostics rendering. hit markers are now translated correctly 
+
+todo 
+- rewrite vehicle_diagnostics interface for recent hit to show a total and sort by caliber 
 
 ----------------------------------
 Jan 25 2026
