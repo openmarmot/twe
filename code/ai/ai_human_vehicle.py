@@ -183,7 +183,15 @@ class AIHumanVehicle():
             if role.is_commander:
                 # commander does a lot of heavy thinking. should not trigger very often
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                self.role_commander.think()
+
+                # on some vehicles commanders are also gunners
+                if role.is_gunner:
+                # prevent commander thinking so as not to block/overwrite reloading current_action
+                    current_action=self.owner.ai.memory['task_vehicle_crew']['current_action']
+                    if 'reloading' not in current_action:
+                        self.role_commander.think()
+                else:
+                    self.role_commander.think()
 
             # the squad lead has some stuff to do independent of their vehicle role
             if self.owner==self.owner.ai.squad.squad_leader:

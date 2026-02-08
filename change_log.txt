@@ -6,6 +6,10 @@ Feb 07 2026
 - reduced driver wait times in some conditions 
 - misc minor bug fix and cleanup
 
+todo 
+- consider issues with commanders who are also gunners and need to reload.
+- also commander waiting to rotate is not clearing always 
+
 ----------------------------------
 Feb 06 2026
 - work on vegetation generation speedup 
