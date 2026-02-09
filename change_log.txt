@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 08 2026
+- vehicle commanders that are also gunners no longer overwrite their gunner actions 
+
+----------------------------------
 Feb 07 2026
 - updated vehicle driver commander prioritization to fix a logic error that was resulting in excessive gunner prioritization 
 - reduced driver wait times in some conditions 
