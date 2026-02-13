@@ -83,7 +83,7 @@ class AIContainer():
                     existing_liquid=b
                     break
             
-            if existing_liquid==None:
+            if existing_liquid is None:
                 # no existing liquid so just add the new liquid
                 self.inventory.append(event_data)
             else:

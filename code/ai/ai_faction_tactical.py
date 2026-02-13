@@ -197,6 +197,8 @@ class AIFactionTactical():
 
     #---------------------------------------------------------------------------
     def process_radio_messages(self):
+        '''Process incoming radio messages from HQ'''
+
         for message in self.radio.ai.receive_queue:
             if message.startswith('HQ'):
                 message=message.split(',')
@@ -207,6 +209,8 @@ class AIFactionTactical():
 
     #---------------------------------------------------------------------------
     def send_radio_comms_check(self):
+        '''Send comms check message to HQ'''
+
         self.radio.ai.send_message('HQ,ALL,Sending a comms check, ')
 
     #---------------------------------------------------------------------------
@@ -309,6 +313,8 @@ class AIFactionTactical():
 
     #---------------------------------------------------------------------------
     def set_squad_defend_order(self,squad,world_area,world_area_location,threat_direction=None):
+        '''Set squad defend order to specified location'''
+
         if squad.squad_leader:
             order=TacticalOrder()
             order.order_defend_area=True
@@ -319,6 +325,8 @@ class AIFactionTactical():
 
     #---------------------------------------------------------------------------
     def set_squad_starting_position(self,squad,position,threat_direction=None):
+        '''Set squad starting positions on the battlefield'''
+
         # set the member positions
         member_grid=engine.math_2d.get_grid_coords(position,20,len(squad.members))
         member_vehicle_assignments=[]
@@ -418,6 +426,8 @@ class AIFactionTactical():
 
     #---------------------------------------------------------------------------
     def update(self):
+        '''Update tactical AI faction processing'''
+
         time_passed=self.world.time_passed_seconds
         self.time_since_update+=time_passed
 

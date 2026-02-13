@@ -641,6 +641,8 @@ class World():
 
     #---------------------------------------------------------------------------
     def process_reinforcements(self):
+        '''Process queued reinforcements ready to spawn'''
+
         # array of  [time,faction,spawn_point,squad]
         process_queue=[]
         for b in self.reinforcements:
@@ -652,6 +654,8 @@ class World():
 
     #---------------------------------------------------------------------------
     def remove_hit_markers(self):
+        '''Remove hit marker objects from grid'''
+
         # if this is slow we could create our own wo_ category for hit markers
         for b in self.grid_manager.get_all_objects():
             if b.is_hit_marker:
@@ -704,6 +708,8 @@ class World():
 
     #---------------------------------------------------------------------------
     def spawn_hit_markers(self):
+        '''Spawn hit markers on damaged or wrecked vehicles'''
+
         for b in self.grid_manager.get_all_objects():
             if b.is_vehicle or b.is_vehicle_wreck:
                 for hit in b.ai.collision_log:
@@ -799,6 +805,8 @@ class World():
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):
+        '''Update world simulation state'''
+
         self.time_passed_seconds=time_passed_seconds
 
         if self.is_paused is False:
@@ -845,6 +853,8 @@ class World():
 
     #------------------------------------------------------------------------------
     def update_debug_info(self):
+        '''Update debug information display'''
+
         self.debug_text_queue = []
         self.debug_text_queue.append(f'World scale: {self.scale}')
         self.debug_text_queue.append(f"Grid Square Count: {len(self.grid_manager.index_map)}")
