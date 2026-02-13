@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 12 2026
+- minor cleanup 
+----------------------------------
+Feb 08 2026
+- vehicle commanders that are also gunners no longer overwrite their gunner actions 
+- fixed duplicate item warning bug with magazines
+ 
+----------------------------------
+Feb 07 2026
+- updated vehicle driver commander prioritization to fix a logic error that was resulting in excessive gunner prioritization 
+- reduced driver wait times in some conditions 
+- misc minor bug fix and cleanup
+
+todo 
+- consider issues with commanders who are also gunners and need to reload.
+- also commander waiting to rotate is not clearing always 
+
+----------------------------------
 Feb 06 2026
 - work on vegetation generation speedup 
 - fixed trees on roads issue 

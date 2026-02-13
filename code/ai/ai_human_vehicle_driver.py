@@ -10,11 +10,8 @@ import copy
 
 #import custom packages
 import engine.math_2d
-import engine.world_builder
 import engine.log
-import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
-from engine.tactical_order import TacticalOrder
 
 #import engine.global_exchange_rates
 
@@ -85,12 +82,11 @@ class AIHumanVehicleDriver():
 
             calculated_vehicle_angle = self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
 
-
             if vehicle.ai.current_speed==0:
                 # this throttle boost helps vehicle overcome bad terrain like trees 
                 # otherwise a 0.2 isn't enough to move against a tree tile and they will get stuck not moving or rotating
                 vehicle.ai.throttle = 0.5
-                vehicle.ai.brake_poer = 1
+                vehicle.ai.brake_power = 1
             elif vehicle.ai.current_speed > 10:
                 vehicle.ai.throttle = 0
                 vehicle.ai.brake_power = 1
@@ -157,10 +153,6 @@ class AIHumanVehicleDriver():
         '''perform actions necessary to start driving somewhere'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
-        # temp for testing
-        if vehicle.ai.vehicle_disabled:
-            print(f'debug !! vehicle {vehicle.name} is already disabled!!')
-
         rotation=engine.math_2d.get_rotation(vehicle.world_coords,destination)
         self.owner.ai.memory['task_vehicle_crew']['current_action']='driving'
         self.owner.ai.memory['task_vehicle_crew']['calculated_distance_to_target']=distance
@@ -187,145 +179,131 @@ class AIHumanVehicleDriver():
                 vehicle.ai.vehicle_disabled=True
 
     #---------------------------------------------------------------------------
+    def check_rotation_required(self, rotation_required):
+        '''handle common rotation logic'''
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
+        if current_fuel==0 and max_fuel>0:
+            engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
+            vehicle.ai.vehicle_disabled=True
+            return
+
+        v=vehicle.rotation_angle
+        if rotation_required>v-1 and rotation_required<v+1:
+            self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
+            vehicle.ai.brake_power=1
+            vehicle.ai.throttle=0
+            self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+            return
+        #default
+        self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
+        self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
+        return
+
+    #---------------------------------------------------------------------------
+    def create_vehicle_order_for_target(self, target_or_coords, offset_distance=60):
+        '''create vehicle order to get close to target with fire mission'''
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        need_vehicle_order=False
+        if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
+            need_vehicle_order=True
+        else:
+            if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'].order_close_with_enemy is False:
+                need_vehicle_order=True
+        # ensuring we only do this once
+        if need_vehicle_order:
+            vehicle_order=VehicleOrder()
+            vehicle_order.order_close_with_enemy=True
+            vehicle_order.world_coords=engine.math_2d.calculate_relative_position(target_or_coords,offset_distance,[200,200])
+            if vehicle.ai.is_transport:
+                vehicle_order.exit_vehicle_when_finished=True
+            self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
+
+    #---------------------------------------------------------------------------
+    def handle_gunner_busy_action(self, current_action, message):
+        '''handle common waiting for gunner action'''
+        self.owner.ai.memory['task_vehicle_crew']['current_action']=message
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        vehicle.ai.brake_power=1
+        vehicle.ai.throttle=0
+        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,10)
+        return
+
+    #---------------------------------------------------------------------------
     def think(self):
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
         # precheck to make sure we aren't in combat 
+        # first identify commander and primary gunner, then handle them with priority
+        commander_role=None
+        gunner_role=None
+        
         for role in vehicle.ai.vehicle_crew:
-            # commander orders take priority
             if role.role_occupied and role.is_commander:
-                current_action=role.human.ai.memory['task_vehicle_crew']['current_action']
-
-                # this can be used for multiple things that require rotation
-                if current_action=='Waiting for driver to rotate the vehicle':
-                    rotation_required=role.human.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
-                    v=vehicle.rotation_angle
-                    if rotation_required>v-1 and rotation_required<v+1:
-                        # we are close enough
-                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-                        # wait to think for a bit so we don't end up doing something else immediately
-                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                        return
-                    #default
-                    self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
-                    self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
-                    return
-
+                commander_role=role
+                break
             if role.role_occupied and role.is_gunner:
-                if role.turret.ai.primary_weapon:
-                    current_action=role.human.ai.memory['task_vehicle_crew']['current_action']
-                    if 'reloading' in current_action:
-                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting on crew to finish reloading'
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-                        # wait to think for a bit so we don't end up doing something else immediately
-                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                        return
-                    if 'Engaging' in current_action:
-                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting on crew to finish engagement'
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-                        # wait to think for a bit so we don't end up doing something else immediately
-                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                        return
-                    if 'jam' in current_action:
-                        self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting on gunner to finish clearing weapon jam'
-                        vehicle.ai.brake_power=1
-                        vehicle.ai.throttle=0
-                        # wait to think for a bit so we don't end up doing something else immediately
-                        self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                        return
-                    if current_action=='Waiting for driver to rotate the vehicle':
-                        target=role.human.ai.memory['task_vehicle_crew']['target']
-                        if target is not None:
-                            
-                            # catch out of fuel 
-                            current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
-                            if current_fuel==0 and max_fuel>0:
-                                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
-                                vehicle.ai.vehicle_disabled=True
-                                return
+                if role.turret and role.turret.ai and role.turret.ai.primary_weapon:
+                    gunner_role=role
+                    break
 
+        # commander orders take priority - handle them first
+        if commander_role:
+            current_action=commander_role.human.ai.memory['task_vehicle_crew']['current_action']
 
-                            rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
-                            v=vehicle.rotation_angle
-                            if rotation_required>v-1 and rotation_required<v+1:
-                                # we are close enough
-                                self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
-                                vehicle.ai.brake_power=1
-                                vehicle.ai.throttle=0
-                                # wait to think for a bit so we don't end up doing something else immediately
-                                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                                return
-                            #default
-                            self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
-                            self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
-                            return
-                    if current_action=='Waiting for driver to rotate the vehicle for fire mission':
-                        if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
-                            fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
-                            
-                            # catch out of fuel 
-                            current_fuel,max_fuel=vehicle.ai.read_fuel_gauge()
-                            if current_fuel==0 and max_fuel>0:
-                                engine.log.add_data('warn',f'ai_human_vehicle.think_vehicle_role_driver waiting for driver {self.owner.name}  to rotate {vehicle.name} and out of fuel, marking vehicle disabled',True)
-                                vehicle.ai.vehicle_disabled=True
-                                return
-
-                            rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,fire_mission.world_coords)
-                            v=vehicle.rotation_angle
-                            if rotation_required>v-1 and rotation_required<v+1:
-                                # we are close enough
-                                self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
-                                vehicle.ai.brake_power=1
-                                vehicle.ai.throttle=0
-                                # wait to think for a bit so we don't end up doing something else immediately
-                                self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-                                return
-                            #default
-                            self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
-                            self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
-                            return
-                    if current_action=='Waiting for driver to get in position for fire mission':
-                        if role.human.ai.memory['task_vehicle_crew']['fire_missions']:
-                            fire_mission=role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
-                            need_vehicle_order=False
-                            if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
-                                need_vehicle_order=True
-                            else:
-                                if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'].order_close_with_enemy is False:
-                                    need_vehicle_order=True
-                            # ensuring we only do this once
-                            if need_vehicle_order:
-                                vehicle_order=VehicleOrder()
-                                vehicle_order.order_close_with_enemy=True
-                                # just so that we don't end up on top of the target
-                                # note this doesn't really make sense. should get closer but not that close..
-                                vehicle_order.world_coords=engine.math_2d.calculate_relative_position(fire_mission.world_coords,60,[200,200])
-                                if vehicle.ai.is_transport:
-                                    vehicle_order.exit_vehicle_when_finished=True
-                                self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
-                    # this is triggered by gunners that need to get closer to a tank to penetrate
-                    if 'Waiting for driver to close distance' in current_action:
-                        target=role.human.ai.memory['task_vehicle_crew']['target']
-                        if target is not None:
-                            need_vehicle_order=False
-                            if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
-                                need_vehicle_order=True
-                            else:
-                                if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'].order_close_with_enemy is False:
-                                    need_vehicle_order=True
-                            # ensuring we only do this once
-                            if need_vehicle_order:
-                                vehicle_order=VehicleOrder()
-                                vehicle_order.order_close_with_enemy=True
-                                # just so that we don't end up on top of the target
-                                vehicle_order.world_coords=engine.math_2d.calculate_relative_position(target.world_coords,60,[200,200])
-                                if vehicle.ai.is_transport:
-                                    vehicle_order.exit_vehicle_when_finished=True
-                                self.owner.ai.memory['task_vehicle_crew']['vehicle_order']=vehicle_order
+            # this can be used for multiple things that require rotation
+            if current_action=='Waiting for driver to rotate the vehicle':
+                rotation_required=commander_role.human.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
+                v=vehicle.rotation_angle
+                if rotation_required>v-1 and rotation_required<v+1:
+                    # we are close enough
+                    self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
+                    vehicle.ai.brake_power=1
+                    vehicle.ai.throttle=0
+                    # wait to think for a bit so we don't end up doing something else immediately
+                    self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
+                    return
+                #default
+                self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
+                self.owner.ai.memory['task_vehicle_crew']['current_action']='rotating'
+                return
+        
+        # only check gunner actions if commander doesn't need rotation
+        if gunner_role:
+            if gunner_role.turret.ai.primary_weapon:
+                current_action=gunner_role.human.ai.memory['task_vehicle_crew']['current_action']
+                
+                # handle common busy states
+                if 'reloading' in current_action:
+                    return self.handle_gunner_busy_action(current_action,'waiting on crew to finish reloading')
+                if 'Engaging' in current_action:
+                    return self.handle_gunner_busy_action(current_action,'waiting on crew to finish engagement')
+                if 'jam' in current_action:
+                    return self.handle_gunner_busy_action(current_action,'waiting on gunner to finish clearing weapon jam')
+                
+                # handle rotation requests
+                if current_action=='Waiting for driver to rotate the vehicle':
+                    target=gunner_role.human.ai.memory['task_vehicle_crew']['target']
+                    if target is not None:
+                        rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,target.world_coords)
+                        return self.check_rotation_required(rotation_required)
+                
+                if current_action=='Waiting for driver to rotate the vehicle for fire mission':
+                    if gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions']:
+                        fire_mission=gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
+                        rotation_required=engine.math_2d.get_rotation(vehicle.world_coords,fire_mission.world_coords)
+                        return self.check_rotation_required(rotation_required)
+                
+                if current_action=='Waiting for driver to get in position for fire mission':
+                    if gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions']:
+                        fire_mission=gunner_role.human.ai.memory['task_vehicle_crew']['fire_missions'][0]
+                        return self.create_vehicle_order_for_target(fire_mission.world_coords)
+                
+                # handle close distance requests
+                if 'Waiting for driver to close distance' in current_action:
+                    target=gunner_role.human.ai.memory['task_vehicle_crew']['target']
+                    if target is not None:
+                        return self.create_vehicle_order_for_target(target.world_coords)
         
         # next lets check if anyone is trying to get in 
         if vehicle.ai.check_if_vehicle_is_full() is False:

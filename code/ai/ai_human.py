@@ -150,6 +150,7 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def building_check(self):
+        '''Check building proximity and in-building status'''
 
         # randomize time before we hit this method again
         self.building_check_rate=random.uniform(1.5,2.5)
@@ -172,7 +173,7 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def calculate_engagement(self,weapon,target):
-        '''calculate bool as to whether a target can be successfully engaged with a weapon'''
+        '''Calculate bool for successful weapon engagement with target'''
         # only consider the round currently loaded in the gun 
         if weapon.ai.damaged or weapon.ai.action_jammed:
             return False,'weapon damaged'
@@ -216,7 +217,7 @@ class AIHuman():
                 
     #---------------------------------------------------------------------------
     def calculate_human_accuracy(self,target_coords,distance,weapon):
-        '''returns target_coords adjusted for human weapon accuracy'''
+        '''Return target_coords adjusted for human weapon accuracy'''
 
         adjust_max=0
 
@@ -491,6 +492,8 @@ class AIHuman():
         
     #---------------------------------------------------------------------------
     def eat(self,CONSUMABLE):
+        '''Consume consumable and apply effects to human stats'''
+
         # eat the consumable object. or part of it anyway
         self.blood_pressure+=CONSUMABLE.ai.health_effect
         self.hunger+=CONSUMABLE.ai.hunger_effect
@@ -579,6 +582,8 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):
+        '''Handle collision event processing for projectiles'''
+
         if event_data.is_projectile:
             
             distance=engine.math_2d.get_distance(self.owner.world_coords,event_data.ai.starting_coords)
@@ -838,6 +843,8 @@ class AIHuman():
     
     #---------------------------------------------------------------------------
     def fire_player(self,weapon,mouse_coords):
+        '''Fire weapon at mouse coordinates'''
+
         # mouse_coords - mouse screen coords
         if weapon.ai.check_if_can_fire():
             # do computations based off of where the mouse is. 
@@ -856,6 +863,8 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def get_calculated_speed(self):
+        '''Calculate current speed based on fatigue factors'''
+
         calc_speed=self.speed
         if self.fatigue<3:
             calc_speed*=1.5
@@ -878,6 +887,8 @@ class AIHuman():
     
     #---------------------------------------------------------------------------
     def get_compatible_magazines_within_range(self,gun,max_distance):
+        '''Find compatible magazines within max distance'''
+
         compatible_magazines=[]
         for b in self.owner.grid_square.wo_objects_gun_magazine:
             if gun.name in b.ai.compatible_guns:
@@ -2016,9 +2027,9 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def update_task_engage_enemy(self):
+        '''Engage enemy targets with weapons or tactics'''
 
         # - getting this far assumes that you have a primary weapon
-
         enemy=self.memory['task_engage_enemy']['enemy']
         if enemy.is_human:
             if enemy.ai.blood_pressure<1:
@@ -2055,6 +2066,9 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def update_task_engage_enemy_human(self):
+        '''Engage human enemy targets with primary weapon or tactics'''
+
+        # - getting this far assumes that you have a primary weapon
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
         if distance<self.primary_weapon.ai.range:
@@ -2099,9 +2113,10 @@ class AIHuman():
     
     #---------------------------------------------------------------------------
     def update_task_engage_enemy_vehicle(self):
+        '''Engage vehicle targets with anti-tank or grenades'''
+
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
-        penetration=False
 
         if self.antitank is not None:
             if distance<self.antitank.ai.range:
@@ -2204,6 +2219,7 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def update_task_exit_vehicle(self):
+        '''Exit current vehicle and return to regular AI behavior'''
 
         vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
         vehicle_role.human=None
@@ -2296,12 +2312,6 @@ class AIHuman():
                     elif b.is_gun_magazine:
                         gun_magazines.append(b)
 
-                if len(take)==0:
-                    # nothing we wanted. lets grab something random
-                    chance=random.randint(1,5)
-                    if chance==1 and len(container.ai.inventory)>0:
-                        take.append(container.ai.inventory[0])
-                
                 # handle gun magazine decisions
                 if len(gun_magazines)>0:
                     gun=None
@@ -2321,10 +2331,17 @@ class AIHuman():
                     grabbed=0
                     if gun is not None:
                         for b in gun_magazines:
-                            if gun.name in b.ai.compatible_guns:
+                            if gun.world_builder_identity in b.ai.compatible_guns:
                                 if grabbed<2:
                                     take.append(b)
                                     grabbed+=1
+
+                # do this only after we've figured out what we want to grab
+                if len(take)==0:
+                    # nothing we wanted. lets grab something random
+                    chance=random.randint(1,5)
+                    if chance==1 and len(container.ai.inventory)>0:
+                        take.append(container.ai.inventory[0])
 
                 # take items!
                 for c in take:
@@ -2476,6 +2493,8 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def update_task_pickup_objects(self):
+        '''Pick up and process nearby objects from task memory'''
+
         objects=self.memory['task_pickup_objects']['objects']
         remove_queue=[]
         nearest_distance=2000
@@ -2516,14 +2535,16 @@ class AIHuman():
 
     #---------------------------------------------------------------------------
     def update_task_player_control(self):
-        '''update player control task'''
+        '''Handle player control for AI human'''
+
         # controls got moved to world. nothing left over here for now
         pass
 
     #---------------------------------------------------------------------------
     def update_task_reload(self):
-        ''' update task reload'''
-        # this is used to reload a hand held gun or at weapon 
+        '''Reload weapon from task memory'''
+
+        # this is used to reload a hand held gun or at weapon
         if (self.owner.world.world_seconds-self.memory['task_reload']['reload_start_time'] > 
             self.memory['task_reload']['weapon'].ai.reload_speed):
             self.reload_weapon(self.memory['task_reload']['weapon'],self.owner,None)
@@ -2532,9 +2553,10 @@ class AIHuman():
             
     #---------------------------------------------------------------------------
     def update_task_squad_leader(self):
+        '''Squad leader AI task for temporary tactical oversight'''
 
         # this is a task that is checked temporarily if there is nothing better to do.
-        # as such it should always switch_task_think() after doing what it planned on doing, 
+        # as such it should always switch_task_think() after doing what it planned on doing,
         # unless if it switched to something else
 
         last_think_time=self.memory['task_squad_leader']['last_think_time']
@@ -2803,6 +2825,8 @@ class AIHuman():
             self.switch_task_think()
     #-----------------------------------------------------------------------
     def use_medical_object(self,medical):
+        '''Apply medical object effects to heal or treat damage'''
+
         # MEDICAL - a medical object
 
         # should eventually handle bandages, morphine, etc etc

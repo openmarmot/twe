@@ -632,7 +632,7 @@ def spawn_container_body(name,world_object,image_index):
     z.name=name
     z.world_coords=world_object.world_coords
     z.rotation_angle=world_object.rotation_angle
-    z.ai.inventory=world_object.ai.inventory
+    z.ai.inventory=world_object.ai.inventory.copy()
     z.world_builder_identity='body'
     z.volume=world_object.volume
     z.weight=world_object.weight
