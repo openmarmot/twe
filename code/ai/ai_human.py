@@ -2068,6 +2068,8 @@ class AIHuman():
     def update_task_engage_enemy_human(self):
         '''Engage human enemy targets with primary weapon or tactics'''
 
+        # note - this is a think method
+
         # - getting this far assumes that you have a primary weapon
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
@@ -2115,9 +2117,13 @@ class AIHuman():
     def update_task_engage_enemy_vehicle(self):
         '''Engage vehicle targets with anti-tank or grenades'''
 
+        # note this is a think method
+
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
 
+        # note this means that pazerfaust + shrek units will not engage vehicles with their guns
+        # panzershrek should probably be dropped when empty
         if self.antitank is not None:
             if distance<self.antitank.ai.range:
                 self.launch_antitank(enemy.world_coords)
@@ -2133,10 +2139,20 @@ class AIHuman():
                         if enemy.ai.passenger_compartment_armor['top'][0]<6 or self.throwable.ai.use_antitank:
                             self.speak(f'Throwing {self.throwable.name} !!!!')
                             self.throw(enemy.world_coords)
+
+            # out of ammo ?
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
+            if ammo_gun==0:
+                if ammo_inventory>0:
+                    self.switch_task_reload(self.primary_weapon)
+                    return
+                else:
+                    # need ammo or new gun. hand it over to think to deal with this
+                    self.memory.pop('task_engage_enemy',None)
+                    self.switch_task_think()
+                    return
                             
-
             engage,engage_reason=self.calculate_engagement(self.primary_weapon,enemy)
-
 
             if engage is False:
                 # could speak the reason possibly

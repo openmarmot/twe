@@ -3,9 +3,22 @@ TWE Project : Change Log
 ----------------------------------
 Feb 14 2026
 - update mortar crew to change assistant gunner for commander 
+- added a ammo check to the human ai engage_vehicle think 
+    - this possibly fixes the no reload bug. hard to say 
 
 All indirect fire weapons benefit from a commander as a  commander 
 can create new fire missions 
+
+observed bugs 
+- stummel late that started in a town 
+    - some crew appeared outside of vehicle
+    - crew outside the vehicle rotated their bodies and proned suggesting they were not in the vehicle 
+    - vehicle was fully crewed 
+- german solder with kar98k 
+    - current_task=="task_engage_enemy"
+    - 15 rounds fired from kar98k. 
+    - kar98k remains empty, no further reloading 
+    - no enemy fire, enemy perhaps too far away? 
 
 ----------------------------------
 Feb 12 2026
