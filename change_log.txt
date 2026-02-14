@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 14 2026
+- update mortar crew to change assistant gunner for commander 
+
+All indirect fire weapons benefit from a commander as a  commander 
+can create new fire missions 
+
+----------------------------------
 Feb 12 2026
 - minor cleanup 
 ----------------------------------

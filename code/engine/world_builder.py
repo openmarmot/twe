@@ -5311,8 +5311,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[7,-9]
         z.ai.vehicle_crew.append(role)
 
-        role=VehicleRole('assistant_gunner',z)
-        role.is_assistant_gunner=True
+        role=VehicleRole('commander',z)
+        role.is_commander=True
         role.seat_visible=True
         role.seat_offset=[13,15]
         z.ai.vehicle_crew.append(role)
@@ -5359,8 +5359,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[7,-9]
         z.ai.vehicle_crew.append(role)
 
-        role=VehicleRole('assistant_gunner',z)
-        role.is_assistant_gunner=True
+        role=VehicleRole('commander',z)
+        role.is_commander=True
         role.seat_visible=True
         role.seat_offset=[13,15]
         z.ai.vehicle_crew.append(role)
