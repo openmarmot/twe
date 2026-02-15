@@ -33,7 +33,7 @@ class AIHumanVehicleGunner():
         role=self.owner.ai.memory['task_vehicle_crew']['vehicle_role']
 
         # figure out what action we are taking 
-        if self.owner.ai.memory['task_vehicle_crew']['target'] is None and self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire']:
+        if self.owner.ai.memory['task_vehicle_crew']['target'] is None and self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] and self.owner.ai.memory['task_vehicle_crew']['fire_missions']:
                     self.action_engage_indirect_fire()
 
         if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:

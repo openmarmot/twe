@@ -334,7 +334,9 @@ def get_random_constrained_coords(starting_coordinate, max_size, minimum_separat
     Raises:
     - ValueError: If it's impossible to place the desired number of points after multiple retries.
     """
-       
+    
+    print('warn - original get_random_constrained_coords used')
+
     # Initialize variables
     current_max_size = max_size
     size_increment = 1000 # Increment to add to max_size upon failure
@@ -446,22 +448,26 @@ def get_random_constrained_coords_v2(starting_coordinate, max_size, minimum_sepa
         a = minimum_separation / math.sqrt(2)
         cells = {}  # dict of (cx, cy): index in coordinates
         
-        # Grid setup for avoid_coords (separate in case separations differ)
-        a_avoid = avoid_coords_separation / math.sqrt(2)
-        avoid_cells = {}  # dict of (cx, cy): list of indices in avoid_coords
-        for i, coord in enumerate(avoid_coords):
-            cx = math.floor((coord[0] - min_x) / a_avoid)
-            cy = math.floor((coord[1] - min_y) / a_avoid)
-            cell = (cx, cy)
-            if cell not in avoid_cells:
-                avoid_cells[cell] = []
-            avoid_cells[cell].append(i)
+        # Grid setup for avoid_coords (only if separation is positive)
+        if avoid_coords_separation > 0:
+            a_avoid = avoid_coords_separation / math.sqrt(2)
+            avoid_cells = {}  # dict of (cx, cy): list of indices in avoid_coords
+            for i, coord in enumerate(avoid_coords):
+                cx = math.floor((coord[0] - min_x) / a_avoid)
+                cy = math.floor((coord[1] - min_y) / a_avoid)
+                cell = (cx, cy)
+                if cell not in avoid_cells:
+                    avoid_cells[cell] = []
+                avoid_cells[cell].append(i)
+            
+            def get_cell_avoid(x, y):
+                return (math.floor((x - min_x) / a_avoid), math.floor((y - min_y) / a_avoid))
+        else:
+            def get_cell_avoid(x, y):
+                return get_cell(x, y)
         
         def get_cell(x, y):
             return (math.floor((x - min_x) / a), math.floor((y - min_y) / a))
-        
-        def get_cell_avoid(x, y):
-            return (math.floor((x - min_x) / a_avoid), math.floor((y - min_y) / a_avoid))
         
         def get_neighbours(coords, is_avoid=False):
             neighbours = []
@@ -497,18 +503,19 @@ def get_random_constrained_coords_v2(starting_coordinate, max_size, minimum_sepa
                 continue
             
             # Check against avoid_coords (only nearby via grid)
-            cell_avoid = get_cell_avoid(x, y)
-            neigh_avoid_idxs = get_neighbours(cell_avoid, is_avoid=True)
-            for idx in neigh_avoid_idxs:
-                coord = avoid_coords[idx]
-                dx = coord[0] - x
-                dy = coord[1] - y
-                if dx * dx + dy * dy < min_avoid_sep_sq:
-                    too_close = True
-                    break
-            if too_close:
-                attempts += 1
-                continue
+            if avoid_coords_separation > 0:
+                cell_avoid = get_cell_avoid(x, y)
+                neigh_avoid_idxs = get_neighbours(cell_avoid, is_avoid=True)
+                for idx in neigh_avoid_idxs:
+                    coord = avoid_coords[idx]
+                    dx = coord[0] - x
+                    dy = coord[1] - y
+                    if dx * dx + dy * dy < min_avoid_sep_sq:
+                        too_close = True
+                        break
+                if too_close:
+                    attempts += 1
+                    continue
             
             # Valid: add it
             coordinates.append([x, y])

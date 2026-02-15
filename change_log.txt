@@ -1,6 +1,21 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 15 2026
+- some adjustments to battlegroup generation, added more categories
+- updated several random coord calculations to the v2 version 
+- misc minor updates and fixes 
+
+consider queueing penetration calculation instead of doing it real time 
+
+observed bugs 
+- from self debug : 
+    -Zis 5 Truck crew Nikolai Novikov memory[current_task] is task_squad_leader not task_vehicle_crew
+    -Zis 5 Truck crew Dmitri Vasiliev not in world objects
+     Zis 5 Truck crew Dmitri Vasiliev not in world
+     Zis 5 Truck crew Dmitri Vasiliev memory[current_task] is task_move_to_location not task_vehicle_crew
+
+----------------------------------
 Feb 14 2026
 - update mortar crew to change assistant gunner for commander 
 - added a ammo check to the human ai engage_vehicle think 

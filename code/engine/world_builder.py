@@ -34,6 +34,7 @@ from engine.map_object import MapObject
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator
+import engine.battlegroup_generator
 
 
 # load AI
@@ -288,63 +289,7 @@ def convert_world_objects_to_map_objects(world,map_square):
 
     # TBD - handle objects that exited the map
 
-#------------------------------------------------------------------------------
 
-def create_random_battlegroup(faction, funds):
-    '''Create random battlegroup for a faction'''
-    
-    battlegroup = []
-    cost = 0
-
-    # Sort faction-specific data into categories
-    squad_options_tanks = {}
-    squad_options_infantry = {}
-    squad_options_support_infantry = {}
-    squad_options_support_vehicle = {}
-    squad_options_other = {}
-    
-    for key, value in squad_data.items():
-        if value['faction'] == faction:
-            if value['type'] == 'tank':
-                squad_options_tanks[key] = value
-            elif value['type'] in ['infantry', 'motorized_infantry', 'mechanized_infantry']:
-                squad_options_infantry[key] = value
-            elif value['type'] in ['medic', 'mechanic', 'sniper', 'infantry radio', 'mg', 'antitank_infantry']:
-                squad_options_support_infantry[key] = value
-            elif value['type'] in ['antitank_vehicle', 'fire_support_vehicle', 'towed_antiair', 'scout car']:
-                squad_options_support_vehicle[key] = value
-            else:
-                squad_options_other[key] = value
-    
-    # Define categories with their batch ranges (min, max)
-    categories = [
-        (squad_options_infantry, 3, 5),
-        (squad_options_tanks, 1, 3),
-        (squad_options_support_infantry, 0, 2),
-        (squad_options_support_vehicle, 0, 2),
-        (squad_options_other, 0, 2)
-    ]
-    
-    while cost < funds:
-        added = False
-        #random.shuffle(categories)  # Randomize order to avoid bias
-        
-        for cat_dict, min_num, max_num in categories:
-            if cat_dict:
-                random_key = random.choice(list(cat_dict.keys()))
-                unit_cost = cat_dict[random_key]['cost']
-                for i in range(random.randint(min_num, max_num)):
-                    if cost + unit_cost <= funds:
-                        cost += unit_cost
-                        battlegroup.append(random_key)
-                        added = True
-                    else:
-                        break  # No need to try more in this batch
-        
-        if not added:
-            break  # Prevent infinite loop if can't afford anything
-    
-    return battlegroup
 
 #------------------------------------------------------------------------------
 def fill_container(world,container,fill_name):
@@ -486,33 +431,27 @@ def load_quick_battle_map_objects(battle_option,result_container):
         points=2500
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
 
     elif battle_option=='2':
         points=5000
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
         #squads.append('German Panzerjager Tiger P camo1')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
-        squads.append('German 8 cm Mortar Team')
-        squads.append('German 8 cm Mortar Team')
-        squads.append('Soviet 82 mm Mortar Team')
-
-
-
     
     elif battle_option=='3':
         points=10000
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
 
     # testing
     elif battle_option=='4':
