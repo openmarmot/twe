@@ -123,6 +123,8 @@ def check_vehicle_sanity(b, issues, world):
             if role.human is None:
                 issues.append(f'{b.name} role {role.role_name} occupied but human is None')
             else:
+                if role.human.ai.blood_pressure<30:
+                    issues.append(f'{b.name} crew {role.human.name} blood pressure ({role.human.ai.blood_pressure}) low')
                 if role.human not in world.grid_manager.get_all_objects():
                     issues.append(f'{b.name} crew {role.human.name} not in world objects')
                 if role.human.in_world is False:

@@ -1841,6 +1841,8 @@ class AIHuman():
                     engine.log.add_data('error','current task '+self.memory['current_task']+' not in task map',True)
 
             else:
+                #if self.memory['current_task'] not in ['None','task_sit_down','']:
+                #    engine.log.add_data('debug',f"ai_human.update() task {self.memory['current_task']} not in memory",True)
                 self.switch_task_think()
 
             # identify and categorize targets. should not be run for the player as it can result in new current_task
@@ -2238,8 +2240,14 @@ class AIHuman():
         '''Exit current vehicle and return to regular AI behavior'''
 
         vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
-        vehicle_role.human=None
-        vehicle_role.role_occupied=False
+        if vehicle_role.human==self.owner:
+            vehicle_role.human=None
+            vehicle_role.role_occupied=False
+        else:
+            # before this was put in we might have been wiping the wrong role
+            # this should never trip, if it does we have a bug
+            engine.log.add_data('error',f'update_task_exit_vehicle vehicle_role.human does not match',True)
+        
         if vehicle_role.role_name=='driver':
 
             # this may not do anything. i think it regresses to zero
