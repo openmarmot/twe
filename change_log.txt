@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 23 2026
+- fixed storage_menu missing distance check 
+- made human aiming errors more cumulative with range 
+
+notes
+watched a engagement at ~3800 distance between a tiger and a t70. the t70 was mostly hitting and the 
+tiger was mostly missing. i think something is off with the optics calculation. also probably need 
+to decrease base accuracy for shorter barrel guns. 
+
+----------------------------------
 Feb 15 2026
 - some adjustments to battlegroup generation, added more categories
 - updated several random coord calculations to the v2 version 

@@ -241,7 +241,7 @@ class AIHuman():
 
         # distance based
         if distance>500:
-            adjust_max+=3
+            adjust_max+=5
         if distance>1000:
             adjust_max+=7
         if distance>1500:
@@ -269,14 +269,18 @@ class AIHuman():
         if adjust_max<0:
             adjust_max=0
 
+        adjust0=random.uniform(-adjust_max,adjust_max)
+        adjust1=random.uniform(-adjust_max,adjust_max)
 
         # final results
-        target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+        target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
 
         # compound effect for long range fire
-        if distance>1500:
-            target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
-
+        if distance>1000:
+            target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
+        if distance>2000:
+            target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
+            
         calculated_range=distance+random.uniform(-adjust_max,adjust_max+500)
 
         return target_coords,calculated_range

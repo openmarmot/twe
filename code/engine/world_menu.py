@@ -1005,6 +1005,12 @@ class World_Menu():
     def storage_menu(self, key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
 
+        if distance>self.max_menu_distance:
+            self.text_queue=[]
+            self.text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
+            return
+
+
         # base storage menu
         if self.menu_state=='none':
             # print out the basic menu
