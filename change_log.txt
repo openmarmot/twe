@@ -1,6 +1,65 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 28 2026
+- add soviet ba-64 
+- added open_top flag to some vehicles 
+
+todo 
+- better recognition of when there is no driver. especially for commander 
+- turret damage needs to be updated to be more similar to vehicle damage 
+
+----------------------------------
+Feb 23 2026
+- fixed storage_menu missing distance check 
+- made human aiming errors more cumulative with range 
+
+notes
+watched a engagement at ~3800 distance between a tiger and a t70. the t70 was mostly hitting and the 
+tiger was mostly missing. i think something is off with the optics calculation. also probably need 
+to decrease base accuracy for shorter barrel guns. 
+
+----------------------------------
+Feb 15 2026
+- some adjustments to battlegroup generation, added more categories
+- updated several random coord calculations to the v2 version 
+- misc minor updates and fixes 
+- debug code to figure out vehicle crew issues 
+- some attempts to fix possible overwriting of 'task_exit_vehicle()'
+
+consider queueing penetration calculation instead of doing it real time 
+
+observed bugs 
+- getting some hard stutters at semi random intervals making me think that one of the think processes is ultra 
+slow. likely one of the new commander ones 
+- from self debug : 
+    -Zis 5 Truck crew Nikolai Novikov memory[current_task] is task_squad_leader not task_vehicle_crew
+    -Zis 5 Truck crew Dmitri Vasiliev not in world objects
+     Zis 5 Truck crew Dmitri Vasiliev not in world
+     Zis 5 Truck crew Dmitri Vasiliev memory[current_task] is task_move_to_location not task_vehicle_crew
+- engage_indirect_fire can be true with no fire missions. need to review 
+
+----------------------------------
+Feb 14 2026
+- update mortar crew to change assistant gunner for commander 
+- added a ammo check to the human ai engage_vehicle think 
+    - this possibly fixes the no reload bug. hard to say 
+
+All indirect fire weapons benefit from a commander as a  commander 
+can create new fire missions 
+
+observed bugs 
+- stummel late that started in a town 
+    - some crew appeared outside of vehicle
+    - crew outside the vehicle rotated their bodies and proned suggesting they were not in the vehicle 
+    - vehicle was fully crewed 
+- german solder with kar98k 
+    - current_task=="task_engage_enemy"
+    - 15 rounds fired from kar98k. 
+    - kar98k remains empty, no further reloading 
+    - no enemy fire, enemy perhaps too far away? 
+
+----------------------------------
 Feb 12 2026
 - minor cleanup 
 ----------------------------------

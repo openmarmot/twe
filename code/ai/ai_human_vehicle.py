@@ -162,39 +162,43 @@ class AIHumanVehicle():
             if len(self.owner.ai.memory['task_vehicle_crew']['vehicle_hits'])>0:
                 self.think_vehicle_hit()
             
-            # double check that we haven't decided to do something else like exit the vehicle
-            if self.owner.ai.memory['current_task']!='task_vehicle_crew':
-                return
+            # self.owner.ai.in_vehicle() has to be checked for every role as we need to catch 
+            # when we've decided to exit the vehicle, otherwise we could overwrite the 'task_exit_vehicle'
+            # current_task
 
             # note that roles can have multiple functions now
             if role.is_driver:
                 # driver needs a fast refresh for smooth vehicle controls
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.2)
-                self.role_driver.think()
+                if self.owner.ai.in_vehicle():
+                    self.role_driver.think()
             if role.is_gunner:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.1,0.3)
-                self.role_gunner.think()
+                if self.owner.ai.in_vehicle():
+                    self.role_gunner.think()
             if role.is_passenger:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(1.3,3.5)
-                self.think_vehicle_role_passenger()
+                if self.owner.ai.in_vehicle():
+                    self.think_vehicle_role_passenger()
             if role.is_radio_operator:
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(0.3,0.7)
-                self.think_vehicle_role_radio_operator()
+                if self.owner.ai.in_vehicle():
+                    self.think_vehicle_role_radio_operator()
             if role.is_commander:
                 # commander does a lot of heavy thinking. should not trigger very often
                 self.owner.ai.memory['task_vehicle_crew']['think_interval']=random.uniform(5,15)
-
-                # on some vehicles commanders are also gunners
-                if role.is_gunner:
-                # prevent commander thinking so as not to block/overwrite reloading current_action
-                    current_action=self.owner.ai.memory['task_vehicle_crew']['current_action']
-                    if 'reloading' not in current_action:
+                if self.owner.ai.in_vehicle():
+                    # on some vehicles commanders are also gunners
+                    if role.is_gunner:
+                    # prevent commander thinking so as not to block/overwrite reloading current_action
+                        current_action=self.owner.ai.memory['task_vehicle_crew']['current_action']
+                        if 'reloading' not in current_action:
+                            self.role_commander.think()
+                    else:
                         self.role_commander.think()
-                else:
-                    self.role_commander.think()
 
             # the squad lead has some stuff to do independent of their vehicle role
-            if self.owner==self.owner.ai.squad.squad_leader:
+            if self.owner==self.owner.ai.squad.squad_leader and self.owner.ai.in_vehicle():
                 # if we don't have a vehicle order, check to see if we can create 
                 # one from tactical orders
                 if self.owner.ai.memory['task_vehicle_crew']['vehicle_order'] is None:
@@ -203,12 +207,12 @@ class AIHumanVehicle():
 
         else:
             # some roles will want to do something every update cycle
-
-            if role.is_gunner:
-                self.role_gunner.action()
-                
-            if role.is_driver:
-                self.role_driver.action()
+            if self.owner.ai.in_vehicle():
+                if role.is_gunner:
+                    self.role_gunner.action()
+                    
+                if role.is_driver:
+                    self.role_driver.action()
 
     #---------------------------------------------------------------------------
     def update_task_vehicle_crew_player(self):

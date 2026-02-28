@@ -241,7 +241,7 @@ class AIHuman():
 
         # distance based
         if distance>500:
-            adjust_max+=3
+            adjust_max+=5
         if distance>1000:
             adjust_max+=7
         if distance>1500:
@@ -269,14 +269,18 @@ class AIHuman():
         if adjust_max<0:
             adjust_max=0
 
+        adjust0=random.uniform(-adjust_max,adjust_max)
+        adjust1=random.uniform(-adjust_max,adjust_max)
 
         # final results
-        target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
+        target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
 
         # compound effect for long range fire
-        if distance>1500:
-            target_coords=[target_coords[0]+random.uniform(-adjust_max,adjust_max),target_coords[1]+random.uniform(-adjust_max,adjust_max)]
-
+        if distance>1000:
+            target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
+        if distance>2000:
+            target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
+            
         calculated_range=distance+random.uniform(-adjust_max,adjust_max+500)
 
         return target_coords,calculated_range
@@ -1841,6 +1845,8 @@ class AIHuman():
                     engine.log.add_data('error','current task '+self.memory['current_task']+' not in task map',True)
 
             else:
+                #if self.memory['current_task'] not in ['None','task_sit_down','']:
+                #    engine.log.add_data('debug',f"ai_human.update() task {self.memory['current_task']} not in memory",True)
                 self.switch_task_think()
 
             # identify and categorize targets. should not be run for the player as it can result in new current_task
@@ -2068,6 +2074,8 @@ class AIHuman():
     def update_task_engage_enemy_human(self):
         '''Engage human enemy targets with primary weapon or tactics'''
 
+        # note - this is a think method
+
         # - getting this far assumes that you have a primary weapon
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
@@ -2115,9 +2123,13 @@ class AIHuman():
     def update_task_engage_enemy_vehicle(self):
         '''Engage vehicle targets with anti-tank or grenades'''
 
+        # note this is a think method
+
         enemy=self.memory['task_engage_enemy']['enemy']
         distance=engine.math_2d.get_distance(self.owner.world_coords,enemy.world_coords)
 
+        # note this means that pazerfaust + shrek units will not engage vehicles with their guns
+        # panzershrek should probably be dropped when empty
         if self.antitank is not None:
             if distance<self.antitank.ai.range:
                 self.launch_antitank(enemy.world_coords)
@@ -2133,10 +2145,20 @@ class AIHuman():
                         if enemy.ai.passenger_compartment_armor['top'][0]<6 or self.throwable.ai.use_antitank:
                             self.speak(f'Throwing {self.throwable.name} !!!!')
                             self.throw(enemy.world_coords)
+
+            # out of ammo ?
+            ammo_gun,ammo_inventory,magazine_count=self.check_ammo(self.primary_weapon,self.owner)
+            if ammo_gun==0:
+                if ammo_inventory>0:
+                    self.switch_task_reload(self.primary_weapon)
+                    return
+                else:
+                    # need ammo or new gun. hand it over to think to deal with this
+                    self.memory.pop('task_engage_enemy',None)
+                    self.switch_task_think()
+                    return
                             
-
             engage,engage_reason=self.calculate_engagement(self.primary_weapon,enemy)
-
 
             if engage is False:
                 # could speak the reason possibly
@@ -2222,8 +2244,14 @@ class AIHuman():
         '''Exit current vehicle and return to regular AI behavior'''
 
         vehicle_role=self.memory['task_vehicle_crew']['vehicle_role']
-        vehicle_role.human=None
-        vehicle_role.role_occupied=False
+        if vehicle_role.human==self.owner:
+            vehicle_role.human=None
+            vehicle_role.role_occupied=False
+        else:
+            # before this was put in we might have been wiping the wrong role
+            # this should never trip, if it does we have a bug
+            engine.log.add_data('error',f'update_task_exit_vehicle vehicle_role.human does not match',True)
+        
         if vehicle_role.role_name=='driver':
 
             # this may not do anything. i think it regresses to zero

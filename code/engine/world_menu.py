@@ -389,7 +389,7 @@ class World_Menu():
         if self.menu_state=='spawn_vehicles':
             self.text_queue=[]
             self.text_queue.append('--Debug -> Spawn Menu -> Vehicles --')
-            self.text_queue.append('1 - german_rso_pak')
+            self.text_queue.append('1 - ba_64')
             self.text_queue.append('2 - sd.kfz.222')
             self.text_queue.append('3 - german_sd_kfz_251/23')
             self.text_queue.append('4 - german_panzer_iv_ausf_j')
@@ -399,7 +399,7 @@ class World_Menu():
             self.text_queue.append('8 - t34-76 model 1943')
             self.text_queue.append('9 - t34-85')
             if key=='1':
-                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_rso_pak',True)
+                engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'soviet_ba_64',True)
             elif key=='2':
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0],self.world.player.world_coords[1]],'german_sd_kfz_222',True)
                 engine.world_builder.spawn_object(self.world, [self.world.player.world_coords[0]+50,self.world.player.world_coords[1]],'german_sd_kfz_222_camo',True)
@@ -1004,6 +1004,12 @@ class World_Menu():
     #---------------------------------------------------------------------------            
     def storage_menu(self, key):
         distance = engine.math_2d.get_distance(self.world.player.world_coords,self.selected_object.world_coords)
+
+        if distance>self.max_menu_distance:
+            self.text_queue=[]
+            self.text_queue.append('-- Storage Menu: ' + self.selected_object.name + ' --')
+            return
+
 
         # base storage menu
         if self.menu_state=='none':

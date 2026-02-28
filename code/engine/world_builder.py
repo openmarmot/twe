@@ -34,6 +34,7 @@ from engine.map_object import MapObject
 import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator
+import engine.battlegroup_generator
 
 
 # load AI
@@ -288,63 +289,7 @@ def convert_world_objects_to_map_objects(world,map_square):
 
     # TBD - handle objects that exited the map
 
-#------------------------------------------------------------------------------
 
-def create_random_battlegroup(faction, funds):
-    '''Create random battlegroup for a faction'''
-    
-    battlegroup = []
-    cost = 0
-
-    # Sort faction-specific data into categories
-    squad_options_tanks = {}
-    squad_options_infantry = {}
-    squad_options_support_infantry = {}
-    squad_options_support_vehicle = {}
-    squad_options_other = {}
-    
-    for key, value in squad_data.items():
-        if value['faction'] == faction:
-            if value['type'] == 'tank':
-                squad_options_tanks[key] = value
-            elif value['type'] in ['infantry', 'motorized_infantry', 'mechanized_infantry']:
-                squad_options_infantry[key] = value
-            elif value['type'] in ['medic', 'mechanic', 'sniper', 'infantry radio', 'mg', 'antitank_infantry']:
-                squad_options_support_infantry[key] = value
-            elif value['type'] in ['antitank_vehicle', 'fire_support_vehicle', 'towed_antiair', 'scout car']:
-                squad_options_support_vehicle[key] = value
-            else:
-                squad_options_other[key] = value
-    
-    # Define categories with their batch ranges (min, max)
-    categories = [
-        (squad_options_infantry, 3, 5),
-        (squad_options_tanks, 1, 3),
-        (squad_options_support_infantry, 0, 2),
-        (squad_options_support_vehicle, 0, 2),
-        (squad_options_other, 0, 2)
-    ]
-    
-    while cost < funds:
-        added = False
-        #random.shuffle(categories)  # Randomize order to avoid bias
-        
-        for cat_dict, min_num, max_num in categories:
-            if cat_dict:
-                random_key = random.choice(list(cat_dict.keys()))
-                unit_cost = cat_dict[random_key]['cost']
-                for i in range(random.randint(min_num, max_num)):
-                    if cost + unit_cost <= funds:
-                        cost += unit_cost
-                        battlegroup.append(random_key)
-                        added = True
-                    else:
-                        break  # No need to try more in this batch
-        
-        if not added:
-            break  # Prevent infinite loop if can't afford anything
-    
-    return battlegroup
 
 #------------------------------------------------------------------------------
 def fill_container(world,container,fill_name):
@@ -486,33 +431,30 @@ def load_quick_battle_map_objects(battle_option,result_container):
         points=2500
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
 
     elif battle_option=='2':
         points=5000
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
         #squads.append('German Panzerjager Tiger P camo1')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
-        #squads.append('Soviet SU-85')
-        squads.append('German 8 cm Mortar Team')
-        squads.append('German 8 cm Mortar Team')
-        squads.append('Soviet 82 mm Mortar Team')
-
-
-
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
     
     elif battle_option=='3':
         points=10000
         soviet_advantage=points*0.3
         print(f'soviet advantage: {soviet_advantage}')
-        squads+=create_random_battlegroup('german',points)
-        squads+=create_random_battlegroup('soviet',points+soviet_advantage)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('german',points,squad_data)
+        squads+=engine.battlegroup_generator.create_random_battlegroup('soviet',points+soviet_advantage,squad_data)
 
     # testing
     elif battle_option=='4':
@@ -2330,7 +2272,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.is_transport=True
-
+        z.ai.open_top=True
         # driver and assistant driver positions are the same for all variants
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -2798,7 +2740,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.is_transport=True
-
+        z.ai.open_top=True
         z.ai.vehicle_armor['top']=[8,8,0]
         z.ai.vehicle_armor['bottom']=[8,0,0]
         z.ai.vehicle_armor['left']=[8,19,0]
@@ -4346,7 +4288,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.is_vehicle=True
         z.is_towable=True
         z.ai.is_transport=True
-
+        z.ai.open_top=True
         # driver and assistant driver positions are the same for all variants
         role=VehicleRole('driver',z)
         role.is_driver=True
@@ -4408,6 +4350,104 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.front_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
         z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
         z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+
+    elif object_type=='soviet_ba_64':
+        z=WorldObject(world,['ba_64_chassis'],AIVehicle)
+        z.name='BA-64'
+        z.is_vehicle=True
+        z.is_towable=True
+        z.ai.open_top=True
+        z.ai.vehicle_armor['top']=[4,0,0]
+        z.ai.vehicle_armor['bottom']=[4,0,0]
+        z.ai.vehicle_armor['left']=[6,30,0]
+        z.ai.vehicle_armor['right']=[6,30,0]
+        z.ai.vehicle_armor['front']=[9,30,0]
+        z.ai.vehicle_armor['rear']=[6,30,0]
+        z.ai.passenger_compartment_armor['top']=[4,0,0]
+        z.ai.passenger_compartment_armor['bottom']=[4,0,0]
+        z.ai.passenger_compartment_armor['left']=[9,30,0]
+        z.ai.passenger_compartment_armor['right']=[9,30,0]
+        z.ai.passenger_compartment_armor['front']=[12,30,0]
+        z.ai.passenger_compartment_armor['rear']=[9,34,0]
+        z.ai.max_speed=385.9
+        z.ai.max_offroad_speed=177.6
+        z.ai.rotation_speed=40.
+        z.collision_radius=100
+        z.bounding_circles.append([[-43.0, 0.0],25])
+        z.bounding_circles.append([[-20.0, 0.0],25])
+        z.bounding_circles.append([[0.0, 0.0],25])
+        z.bounding_circles.append([[21.0, 0.0],25])
+        z.bounding_circles.append([[39.0, 0.0],25])
+        z.weight=4800
+        z.drag_coefficient=0.9
+        z.frontal_area=5
+        z.ai.fuel_tanks.append(spawn_object(world,world_coords,"vehicle_fuel_tank",False))
+        z.ai.fuel_tanks[0].volume=114
+        fill_container(world,z.ai.fuel_tanks[0],'gas_80_octane')
+        z.ai.engines.append(spawn_object(world,world_coords,"maybach_hl42_engine",False))
+        z.ai.engines[0].ai.exhaust_position_offset=[75,10]
+        z.ai.batteries.append(spawn_object(world,world_coords,"battery_vehicle_6v",False))
+        z.add_inventory(spawn_object(world,world_coords,"german_fuel_can",False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_medical,False))
+        z.add_inventory(get_random_from_list(world,world_coords,list_consumables,False))
+        z.rotation_angle=float(random.randint(0,359))
+        if random.randint(0,1)==1:
+            z.add_inventory(spawn_object(world,world_coords,"ppsh41",False))
+        z.ai.min_wheels_per_side_front=1
+        z.ai.min_wheels_per_side_rear=1
+        z.ai.max_wheels=4
+        z.ai.max_spare_wheels=1
+        z.ai.front_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.front_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.rear_left_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.rear_right_wheels.append(spawn_object(world,world_coords,"251_wheel",False))
+        z.ai.passenger_compartment_ammo_racks=True
+        z.ai.requires_afv_training=True
+        z.ai.is_transport=False
+        turret=spawn_object(world,world_coords,'ba_64_turret',True)
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle=z
+        z.ai.turrets[0].ai.position_offset=[19,0]
+
+        role=VehicleRole('driver',z)
+        role.is_driver=True
+        z.ai.vehicle_crew.append(role)
+
+        role=VehicleRole('gunner',z)
+        role.is_gunner=True
+        role.turret=turret
+        role.seat_offset=[13.6,-2.4]
+        role.seat_visible=True
+
+        z.ai.vehicle_crew.append(role)
+
+        # mg ammo
+        for b in range(20):
+            z.add_inventory(spawn_object(world,world_coords,"dtm_magazine",False))
+
+    elif object_type=='ba_64_turret':
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        z=WorldObject(world,['ba_64_turret'],AITurret)
+        z.name='BA-64 Turret'
+        z.ai.gun_sight=spawn_object(world,world_coords,'optic_iron_sights',False)
+        z.is_turret=True
+        z.ai.small=True
+        z.ai.vehicle_mount_side='top'
+        z.ai.turret_accuracy=10
+        z.ai.turret_armor['top']=[0,0,0]
+        z.ai.turret_armor['bottom']=[0,0,0]
+        z.ai.turret_armor['left']=[9,30,0]
+        z.ai.turret_armor['right']=[9,30,0]
+        z.ai.turret_armor['front']=[9,30,0]
+        z.ai.turret_armor['rear']=[9,30,0]
+        z.ai.position_offset=[-10,0]
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
+        z.ai.primary_weapon.ai.equipper=z
+        z.ai.primary_weapon_reload_speed=10
+        z.ai.primary_turret=True
+        z.no_save=True
+
 
     elif object_type=='soviet_t34_76_model_1943':
         # ref : https://wiki.warthunder.com/T-34_(1942)
@@ -5311,8 +5351,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[7,-9]
         z.ai.vehicle_crew.append(role)
 
-        role=VehicleRole('assistant_gunner',z)
-        role.is_assistant_gunner=True
+        role=VehicleRole('commander',z)
+        role.is_commander=True
         role.seat_visible=True
         role.seat_offset=[13,15]
         z.ai.vehicle_crew.append(role)
@@ -5359,8 +5399,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         role.seat_offset=[7,-9]
         z.ai.vehicle_crew.append(role)
 
-        role=VehicleRole('assistant_gunner',z)
-        role.is_assistant_gunner=True
+        role=VehicleRole('commander',z)
+        role.is_commander=True
         role.seat_visible=True
         role.seat_offset=[13,15]
         z.ai.vehicle_crew.append(role)

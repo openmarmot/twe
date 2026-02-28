@@ -159,7 +159,7 @@ def generate_map(map_areas):
 
     world_size=max(min_world_size,len(map_areas)*4000)
 
-    coord_list=engine.math_2d.get_random_constrained_coords([0,0],8000,5000,len(map_areas),[],0) 
+    coord_list=engine.math_2d.get_random_constrained_coords_v2([0,0],8000,5000,len(map_areas),[],0) 
     for map_area in map_areas:
         if map_area=='airport':
             map_objects+=generate_map_area_airport(coord_list.pop(),'airport')
@@ -252,7 +252,7 @@ def generate_map_area_town(world_coords,name):
     # add smaller square buildings in a more random pattern, avoiding the warehouses 
     building_max_area=2000
     building_seperation=200
-    building_coords=engine.math_2d.get_random_constrained_coords(world_coords,building_max_area,
+    building_coords=engine.math_2d.get_random_constrained_coords_v2(world_coords,building_max_area,
         building_seperation,count_building,coords_to_avoid,warehouse_seperation)
     for _ in range(count_building):
         map_objects.append(MapObject('square_building','some sort of building',building_coords.pop(),rotation,[]))
