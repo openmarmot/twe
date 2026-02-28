@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Feb 28 2026
+- add soviet ba-64 
+- added open_top flag to some vehicles 
+----------------------------------
 Feb 23 2026
 - fixed storage_menu missing distance check 
 - made human aiming errors more cumulative with range 
