@@ -4,6 +4,11 @@ TWE Project : Change Log
 Feb 28 2026
 - add soviet ba-64 
 - added open_top flag to some vehicles 
+
+todo 
+- better recognition of when there is no driver. especially for commander 
+- turret damage needs to be updated to be more similar to vehicle damage 
+
 ----------------------------------
 Feb 23 2026
 - fixed storage_menu missing distance check 

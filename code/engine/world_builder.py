@@ -444,7 +444,10 @@ def load_quick_battle_map_objects(battle_option,result_container):
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
         #squads.append('Soviet SU-85')
-        #squads.append('Soviet SU-85')
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
+        squads.append('Soviet BA-64')
     
     elif battle_option=='3':
         points=10000
@@ -4438,8 +4441,8 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.ai.turret_armor['front']=[9,30,0]
         z.ai.turret_armor['rear']=[9,30,0]
         z.ai.position_offset=[-10,0]
-        z.ai.rotation_range=[-20,20]
-        z.ai.primary_weapon=spawn_object(world,world_coords,'mg34',False)
+        z.ai.rotation_range=[-360,360]
+        z.ai.primary_weapon=spawn_object(world,world_coords,'dtm',False)
         z.ai.primary_weapon.ai.equipper=z
         z.ai.primary_weapon_reload_speed=10
         z.ai.primary_turret=True
