@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 1 2026
+- fixed dual-role (commander/gunner) AI conflicts in vehicle crew
+    - commander no longer overwrites gunner's current_action with 'Pondering'
+    - added busy-state checks to prevent commander from interfering during reload/jam/engagement
+    - fixed think_interval so gunner's fast rate (0.1-0.3s) takes precedence over commander (5-15s)
+    - removed redundant checks from ai_human_vehicle_commander.py, centralized in ai_human_vehicle.py
+
+----------------------------------
 Feb 28 2026
 - add soviet ba-64 
 - added open_top flag to some vehicles 
