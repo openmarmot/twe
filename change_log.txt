@@ -1,4 +1,16 @@
 TWE Project : Change Log
+----------------------------------
+Mar 8 2026
+- fixed turret damage logs (broken recently)
+
+----------------------------------
+Mar 5 2026
+- turret penetration/damage updates to bring it up to the vehicle standard 
+- some updates to human medic task
+- minor updates 
+
+todo 
+- improve medic patient selection 
 
 ----------------------------------
 Mar 1 2026
@@ -7,6 +19,10 @@ Mar 1 2026
     - added busy-state checks to prevent commander from interfering during reload/jam/engagement
     - fixed think_interval so gunner's fast rate (0.1-0.3s) takes precedence over commander (5-15s)
     - removed redundant checks from ai_human_vehicle_commander.py, centralized in ai_human_vehicle.py
+
+todo 
+- add bipods to weapons and bipod support to ai_human 
+    - bipod would increase accuracy when prone 
 
 ----------------------------------
 Feb 28 2026

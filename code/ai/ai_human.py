@@ -307,7 +307,7 @@ class AIHuman():
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.helmet_bounces+=1
-                    self.morale-=2
+                    self.morale-=8
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
@@ -324,7 +324,7 @@ class AIHuman():
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.body_armor_bounces+=1
-                    self.morale-=2
+                    self.morale-=8
                     self.speak('A projectile just bounced off my body armor!!')
 
         elif hit==3:
@@ -359,8 +359,6 @@ class AIHuman():
                 self.owner.world.text_queue.insert(0,'You are hit and begin to bleed')
 
         self.speak('react to being shot')
-
-
 
     #---------------------------------------------------------------------------
     def check_ammo(self,gun,object_with_inventory):
@@ -918,7 +916,7 @@ class AIHuman():
         '''return a list of nearby wounded humans'''
         wounded_humans=[]
         for human in human_list:
-            if human.ai.blood_pressure<80:
+            if human.ai.blood_pressure<80 and human.ai.blood_pressure>0:
                 if engine.math_2d.get_distance(self.owner.world_coords,human.world_coords)<max_range:
                     wounded_humans.append(human)
         return wounded_humans
@@ -2435,6 +2433,15 @@ class AIHuman():
                 return
             self.memory['task_medic']['current_patient']=self.memory['task_medic']['wounded_humans'].pop()
         patient=self.memory['task_medic']['current_patient']
+        
+        # is the patient alive?
+        if patient.ai.blood_pressure<1:
+            # dead patient
+            self.speak('whoops, there goes another patient')
+            self.memory['task_medic']['current_patient']=None
+            return
+        
+        # patient distance checks 
         distance=engine.math_2d.get_distance(self.owner.world_coords,patient.world_coords)
         if distance>1000:
             self.memory['task_medic']['current_patient']=None
