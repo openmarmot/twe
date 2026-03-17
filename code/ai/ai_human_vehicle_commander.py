@@ -28,7 +28,6 @@ class AIHumanVehicleCommander():
     def think(self):
         '''commander role'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
-        self.owner.ai.memory['task_vehicle_crew']['current_action']='Pondering'
 
         # determine what the primary weapon is and primary gunner is
         primary_gunner_role=None

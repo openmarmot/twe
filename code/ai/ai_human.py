@@ -203,8 +203,9 @@ class AIHuman():
                 return True,''
             
             if distance>2000:
-                distance=400
-                penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
+                # check if we would penetrate at a much closer distance
+                fake_distance=400
+                penetration,pen_value,armor_value,_=engine.penetration_calculator.calculate_penetration(projectile,fake_distance,'steel',target.ai.passenger_compartment_armor['left'],'front',180)
                 if penetration:
                     return False,'need to get closer to penetrate'
                 else:
@@ -253,6 +254,10 @@ class AIHuman():
         if self.prone:
             adjust_max-=10
 
+            # extra bipod bonus
+            if weapon.ai.bipod:
+                adjust_max-=5
+
         # scope 
         if weapon.ai.scope:
             adjust_max-=5*weapon.ai.scope_magnification
@@ -275,9 +280,11 @@ class AIHuman():
         # final results
         target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
 
-        # compound effect for long range fire
-        if distance>1000:
+        # - compound effect for long range fire -
+        if distance>1000 and not weapon.ai.bipod:
             target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
+
+        # for now i'm thinking no other conditions at this range
         if distance>2000:
             target_coords=[target_coords[0]+adjust0,target_coords[1]+adjust1]
             
@@ -307,7 +314,7 @@ class AIHuman():
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.helmet_bounces+=1
-                    self.morale-=2
+                    self.morale-=8
                     self.speak('A projectile just bounced off my helmet!!')
         elif hit==2:
             #upper body
@@ -324,7 +331,7 @@ class AIHuman():
                     # armor stopped the hit
                     engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'spark',True)
                     self.owner.world.body_armor_bounces+=1
-                    self.morale-=2
+                    self.morale-=8
                     self.speak('A projectile just bounced off my body armor!!')
 
         elif hit==3:
@@ -359,8 +366,6 @@ class AIHuman():
                 self.owner.world.text_queue.insert(0,'You are hit and begin to bleed')
 
         self.speak('react to being shot')
-
-
 
     #---------------------------------------------------------------------------
     def check_ammo(self,gun,object_with_inventory):
@@ -918,7 +923,7 @@ class AIHuman():
         '''return a list of nearby wounded humans'''
         wounded_humans=[]
         for human in human_list:
-            if human.ai.blood_pressure<80:
+            if human.ai.blood_pressure<80 and human.ai.blood_pressure>0:
                 if engine.math_2d.get_distance(self.owner.world_coords,human.world_coords)<max_range:
                     wounded_humans.append(human)
         return wounded_humans
@@ -1728,20 +1733,42 @@ class AIHuman():
                     # turn on the brakes to prevent roll away
                     vehicle.ai.brake_power=1
 
-        vehicle_role=None
-        for role in vehicle.ai.vehicle_crew:
-            if role.role_occupied is False:
-                vehicle_role=role
-                role.role_occupied=True
-                role.human=self.owner
-                self.owner.render=role.seat_visible
-                break
+        # AI vehicle role assignment logic
+        vehicle_role = next(
+            (role for role in vehicle.ai.vehicle_crew 
+             if not role.role_occupied),
+            None
+        )
+
+        if self.owner.is_player is False and vehicle_role is not None:
+            # Check if both driver and gunner roles are available
+            driver_available = any(
+                not role.role_occupied and role.is_driver 
+                for role in vehicle.ai.vehicle_crew
+            )
+            gunner_available = any(
+                not role.role_occupied and role.is_gunner 
+                for role in vehicle.ai.vehicle_crew
+            )
+            
+            # Prefer gunner if both roles available and close enemies exist
+            if driver_available and gunner_available:
+                if self.human_targets or self.vehicle_targets:
+                    vehicle_role = next(
+                        (role for role in vehicle.ai.vehicle_crew 
+                         if not role.role_occupied and role.is_gunner),
+                        vehicle_role
+                    )
+
+        # Mark role as occupied
+        if vehicle_role is not None:
+            vehicle_role.role_occupied = True
+            vehicle_role.human = self.owner
+            self.owner.render = vehicle_role.seat_visible
 
 
         if vehicle_role is None:
             engine.log.add_data('error','ai_human.switch_task_vehicle_crew No role found!! Vehicle is full='+str(vehicle.ai.check_if_vehicle_is_full()),True)
-
-
 
         # update the position to reflect the new seat
         vehicle.ai.update_child_position_rotation()
@@ -2435,6 +2462,15 @@ class AIHuman():
                 return
             self.memory['task_medic']['current_patient']=self.memory['task_medic']['wounded_humans'].pop()
         patient=self.memory['task_medic']['current_patient']
+        
+        # is the patient alive?
+        if patient.ai.blood_pressure<1:
+            # dead patient
+            self.speak('whoops, there goes another patient')
+            self.memory['task_medic']['current_patient']=None
+            return
+        
+        # patient distance checks 
         distance=engine.math_2d.get_distance(self.owner.world_coords,patient.world_coords)
         if distance>1000:
             self.memory['task_medic']['current_patient']=None
