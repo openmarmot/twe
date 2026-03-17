@@ -1,4 +1,19 @@
 TWE Project : Change Log
+
+----------------------------------
+Mar 16 2026
+- added support for bipods (effects human aim)
+- added bipod to mg34, mg42, mg15, dp28, fg42 type 1 and type 2
+- when entering a vehicle the ai will prioritize a gunner role if there are close enemies 
+
+bipods are mostly a flavor thing, but they should have a pretty decent accuracy increase when the soldier is prone
+
+hmm maybe the ai should only take a gunner role if its a 360 turret. otherwise its likely facing the wrong way. 
+
+----------------------------------
+Mar 9 2026
+- minor cleanup 
+
 ----------------------------------
 Mar 8 2026
 - fixed turret damage logs (broken recently)

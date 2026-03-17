@@ -112,6 +112,9 @@ class AIGun():
         # this is in x powers. for example 3.5 for 3.5x magnification
         self.scope_magnification=0
 
+        # bipod. used for human accuracy checks
+        self.bipod=False
+
     #---------------------------------------------------------------------------
     def check_if_can_fire(self):
         '''bool as to whether the gun can fire'''

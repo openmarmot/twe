@@ -1310,6 +1310,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'dp28_magazine',False)
         z.ai.rate_of_fire=0.12
@@ -1574,6 +1575,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'mg34_drum_magazine',False)
         z.ai.rate_of_fire=0.05
@@ -1589,6 +1591,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'mg34_drum_magazine',False)
         z.ai.rate_of_fire=0.04
@@ -1779,6 +1782,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=2
         z.ai.magazine=spawn_object(world,world_coords,'mg15_drum_magazine',False)
         z.ai.rate_of_fire=0.06
@@ -1929,6 +1933,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'fg42_type1_magazine',False)
         z.ai.rate_of_fire=0.06
@@ -1956,6 +1961,7 @@ def spawn_object(world,world_coords,object_type, spawn):
         z.no_update=True
         z.minimum_visible_scale=0.4
         z.is_gun=True
+        z.ai.bipod=True
         z.ai.mechanical_accuracy=1
         z.ai.magazine=spawn_object(world,world_coords,'fg42_type2_magazine',False)
         z.ai.rate_of_fire=0.08
