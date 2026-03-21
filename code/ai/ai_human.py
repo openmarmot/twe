@@ -55,7 +55,8 @@ class AIHuman():
 
         # memory a dictionary with a ton of stuff in it. 
         self.memory={}
-        self.memory['current_task']='task_think'
+        # start with something that doesn't match, forcing a think
+        self.memory['current_task']='none'
 
         # money !
         # amount can be a float to account for coinage

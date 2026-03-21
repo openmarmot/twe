@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 20 2026
+- minor fixes and code cleanup 
+
+----------------------------------
 Mar 16 2026
 - added support for bipods (effects human aim)
 - added bipod to mg34, mg42, mg15, dp28, fg42 type 1 and type 2
