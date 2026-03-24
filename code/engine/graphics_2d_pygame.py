@@ -49,17 +49,25 @@ class Graphics_2D_Pygame():
 
         self.double_buffering=True
 
-        if screen_size is None:
-            # Detect display info for fullscreen
-            info = pygame.display.Info()
-            self.screen_size = (info.current_w, info.current_h)
-            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
-        else:
-            # Use provided size for windowed mode
-            self.screen_size = screen_size
-            flags = pygame.DOUBLEBUF
+        info = pygame.display.Info()
 
-        self.screen = pygame.display.set_mode(self.screen_size, flags, 32)
+        if screen_size is None:                    # Fullscreen
+            self.screen_size = (info.current_w, info.current_h)
+            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED
+        elif screen_size == "auto":
+            # === SMART WINDOWED SIZE ===
+            w = min(int(info.current_w * 0.82), 1920)
+            h = min(int(info.current_h * 0.82), 1080)
+            # Keep a nice 16:9-ish ratio
+            if w / h > 1.78:
+                w = int(h * 1.7778)
+            self.screen_size = (w, h)
+            flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
+        else:
+            self.screen_size = screen_size
+            flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
+
+        self.screen = pygame.display.set_mode(self.screen_size, flags)
         self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
         
         self.background = pygame.surface.Surface(self.screen_size).convert()
@@ -515,40 +523,32 @@ class Graphics_2D_Pygame():
 
     #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
-        '''Reset the image for a world object with caching'''
+        '''Reset the image with optional smoothing + improved caching'''
         wo.reset_image = False
         obj_scale = self.world.scale + wo.scale_modifier
-        wo.image_size = (
-            int(self.images[wo.image_list[wo.image_index]].get_width() * obj_scale),
-            int(self.images[wo.image_list[wo.image_index]].get_height() * obj_scale)
-        )
-        wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
 
-        # Create a unique key based on image name, size, and rotation
-        key = f"{wo.image_list[wo.image_index]}_{wo.image_size}_{round(wo.rotation_angle, 1)}"
+        # Better cache key (scale factor + angle)
+        key = f"{wo.image_list[wo.image_index]}_{round(obj_scale, 3)}_{round(wo.rotation_angle, 1)}"
         
-        # Check if the image is already cached
         scale_cache = self.image_cache.setdefault(self.world.scale, {})
         if key in scale_cache:
             wo.image = scale_cache[key]
+            wo.image_size = wo.image.get_size()
+            wo.image_center = [round(wo.image_size[0]*0.5, 1), round(wo.image_size[1]*0.5, 1)]
             return
 
         try:
-            image=self.images[wo.image_list[wo.image_index]]
-            orig_rect = image.get_rect()
-            rot_image = pygame.transform.rotate(image, wo.rotation_angle)
-            rot_rect = orig_rect.copy()
-            rot_rect.center = rot_image.get_rect().center
-            rot_image = rot_image.subsurface(rot_rect).copy()
-            resize_image=pygame.transform.scale(rot_image,wo.image_size)
-            wo.image=resize_image
-            scale_cache[key] = resize_image
-        except KeyError:
-            engine.log.add_data(
-                'error',
-                f'graphics_2d_pygame.reset_pygame_image: image transform error with image {wo.image_list[wo.image_index]}',
-                True
-            )
+            base_image = self.images[wo.image_list[wo.image_index]]
+            
+            # antialiasing and efficient zoom/rotation
+            wo.image = pygame.transform.rotozoom(base_image, wo.rotation_angle, obj_scale)
+
+            wo.image_size = wo.image.get_size()
+            wo.image_center = [round(wo.image_size[0]*0.5, 1), round(wo.image_size[1]*0.5, 1)]
+            scale_cache[key] = wo.image
+            
+        except Exception as e:
+            engine.log.add_data('error', f'reset_pygame_image failed: {e}', True)
 
     #---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self, mouse_coords):

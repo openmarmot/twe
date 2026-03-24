@@ -63,11 +63,11 @@ class AIHumanVehicle():
                 return
             
             if role.is_gunner:
-                if hit.projectile_shooter:
-                    if hit.projectile_shooter.is_turret:
-                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter.ai.vehicle
+                if important_hit.projectile_shooter:
+                    if important_hit.projectile_shooter.is_turret:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=important_hit.projectile_shooter.ai.vehicle
                     else:
-                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter
+                        self.owner.ai.memory['task_vehicle_crew']['target']=important_hit.projectile_shooter
                     return
             if role.is_passenger:
                 # i feel that passengers should probably bail if there is a penetration 
@@ -79,13 +79,13 @@ class AIHumanVehicle():
             # not a penetration, so less of a reaction 
 
             if role.is_gunner:
-                if hit.projectile_shooter:
-                    if hit.projectile_shooter.is_turret:
-                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter.ai.vehicle
+                if important_hit.projectile_shooter:
+                    if important_hit.projectile_shooter.is_turret:
+                        self.owner.ai.memory['task_vehicle_crew']['target']=important_hit.projectile_shooter.ai.vehicle
                         return
                     # only engage humans if we aren't doing anything else
                     if self.owner.ai.memory['task_vehicle_crew']['target'] is None:
-                        self.owner.ai.memory['task_vehicle_crew']['target']=hit.projectile_shooter
+                        self.owner.ai.memory['task_vehicle_crew']['target']=important_hit.projectile_shooter
                         return
                     
             # maybe add some morale damage?
