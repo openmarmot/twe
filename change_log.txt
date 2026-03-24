@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 23 2026
+- switched to a new display scaling setup 
+
+----------------------------------
 Mar 20 2026
 - minor fixes and code cleanup 
 
