@@ -3,6 +3,9 @@ TWE Project : Change Log
 ----------------------------------
 Mar 23 2026
 - switched to a new display scaling setup 
+- switched to a new rotozoom rotation function that is faster and adds antialiasing 
+
+rotozoom is a very large improvement !
 
 ----------------------------------
 Mar 20 2026
