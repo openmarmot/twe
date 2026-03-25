@@ -208,4 +208,20 @@ class WorldGridSquare:
                     idx = iy * res + ix
                     self.terrain_types[idx] = new_type
 
+    #---------------------------------------------------------------------------
+    def switch_to_visible(self):
+        '''switch to visible and handle any one off visual updates'''
+
+        if not self.visible:
+            self.visible=True
+
+            # vehicles that don't move need one manual child position update
+            # otherwise if crew joined when the grid square was not visible they will
+            # have incorrect rotation and relative position
+            for v in self.wo_objects_vehicle:
+                if v.ai.current_speed==0:
+                    v.ai.update_child_position_rotation()
+
+
+
 

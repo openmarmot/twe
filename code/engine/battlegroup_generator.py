@@ -38,7 +38,7 @@ def create_random_battlegroup(faction, funds,squad_data):
                 squad_options_infantry[key] = value
             elif value['type'] in ['medic', 'mechanic', 'sniper', 'infantry radio', 'mg']:
                 squad_options_support_infantry[key] = value
-            elif value['type'] in ['fire_support_vehicle', 'towed_antiair', 'scout car','afv']:
+            elif value['type'] in ['fire_support_vehicle', 'towed_antiair', 'recon','afv']:
                 squad_options_support_vehicle[key] = value
             elif value['type'] in ['artillery']:
                 squad_options_artillery[key] = value

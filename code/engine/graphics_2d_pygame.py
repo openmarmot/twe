@@ -764,7 +764,7 @@ class Graphics_2D_Pygame():
             if (grid_square.top_left[0] < viewrange_x[0] and grid_square.bottom_right[0] > viewrange_x[1] and
                 grid_square.top_left[1] < viewrange_y[0] and grid_square.bottom_right[1] > viewrange_y[1]):
 
-                grid_square.visible = True
+                grid_square.switch_to_visible()
 
                 for obj in grid_square.wo_objects:
                     if (obj.render and (self.world.scale + obj.scale_modifier) >= obj.minimum_visible_scale):
