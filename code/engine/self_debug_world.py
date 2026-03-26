@@ -55,6 +55,8 @@ def check_task_vehicle_crew(b, issues, world):
                 distance = engine.math_2d.get_distance(b.world_coords, vehicle_role.vehicle.world_coords)
                 if distance > 50:  # arbitrary threshold for being "in" the vehicle
                     issues.append(f'{b.name} too far from vehicle {vehicle_role.vehicle.name} ({distance:.1f} units)')
+                    issues.append(f'{b.name} blood pressure {b.ai.blood_pressure} memory {b.ai.memory}')
+
 
 #---------------------------------------------------------------------------
 def check_task_enter_vehicle(b, issues, world):
@@ -118,25 +120,38 @@ def check_task_engage_enemy(b, issues, world):
 def check_vehicle_sanity(b, issues, world):
     '''sanity checks for vehicles'''
     # check crew
-    for role in b.ai.vehicle_crew:
-        if role.role_occupied:
-            if role.human is None:
-                issues.append(f'{b.name} role {role.role_name} occupied but human is None')
+    for i, role in enumerate(b.ai.vehicle_crew):
+        # CRITICAL: Check for role/human mismatch - these are the actual data integrity problems
+        if role.role_occupied and role.human is None:
+            issues.append(f'CRITICAL DATA ERROR: {b.name} role {role.role_name} is OCCUPIED but human is None!')
+        
+        if not role.role_occupied and role.human is not None:
+            issues.append(f'CRITICAL DATA ERROR: {b.name} role {role.role_name} is EMPTY but human {role.human.name} is assigned!')
+            # Add detailed diagnostics for this case
+            issues.append(f' Human memory dump {role.human.ai.memory}')
+            if 'task_vehicle_crew' in role.human.ai.memory:
+                vc = role.human.ai.memory['task_vehicle_crew']
+                if vc.get('vehicle_role'):
+                    issues.append(f'  Human points to role: {vc["vehicle_role"].role_name}')
+                    issues.append(f'  This role is NOT in this vehicle\'s crew list!')
+        
+        # Then do the normal checks for properly assigned crew
+        if role.role_occupied and role.human:
+            if role.human.ai.blood_pressure<30:
+                issues.append(f'{b.name} crew {role.human.name} blood pressure ({role.human.ai.blood_pressure}) low')
+            if role.human not in world.grid_manager.get_all_objects():
+                issues.append(f'{b.name} crew {role.human.name} not in world objects')
+            if role.human.in_world is False:
+                issues.append(f'{b.name} crew {role.human.name} not in world')
+            if role.human.ai.memory.get('current_task') != 'task_vehicle_crew':
+                issues.append(f"{b.name} crew {role.human.name} memory[current_task] is {role.human.ai.memory['current_task']} not task_vehicle_crew")
+            # check if human's vehicle_role points back
+            if 'vehicle_role' not in role.human.ai.memory['task_vehicle_crew']:
+                issues.append(f'{b.name} crew {role.human.name} missing vehicle_role in memory')
             else:
-                if role.human.ai.blood_pressure<30:
-                    issues.append(f'{b.name} crew {role.human.name} blood pressure ({role.human.ai.blood_pressure}) low')
-                if role.human not in world.grid_manager.get_all_objects():
-                    issues.append(f'{b.name} crew {role.human.name} not in world objects')
-                if role.human.in_world is False:
-                    issues.append(f'{b.name} crew {role.human.name} not in world')
-                if role.human.ai.memory.get('current_task') != 'task_vehicle_crew':
-                    issues.append(f"{b.name} crew {role.human.name} memory[current_task] is {role.human.ai.memory['current_task']} not task_vehicle_crew")
-                # check if human's vehicle_role points back
-                if 'vehicle_role' not in role.human.ai.memory['task_vehicle_crew']:
-                    issues.append(f'{b.name} crew {role.human.name} missing vehicle_role in memory')
-                else:
-                    if role.human.ai.memory['task_vehicle_crew']['vehicle_role'] != role:
-                        issues.append(f'{b.name} crew {role.human.name} vehicle_role mismatch')
+                if role.human.ai.memory['task_vehicle_crew']['vehicle_role'] != role:
+                    issues.append(f'{b.name} crew {role.human.name} vehicle_role mismatch')
+
 
     # check engines
     for engine in b.ai.engines:
@@ -180,7 +195,7 @@ def check_vehicle_sanity(b, issues, world):
     if len(b.ai.batteries) > 0 and not b.ai.electrical_system_functioning and b.ai.engines_on:
         issues.append(f'{b.name} has batteries but electrical system not functioning')
 
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def check_human_primary_weapon(b, issues, world):
     '''sanity checks for human primary_weapon'''
     if b.ai.primary_weapon is None:
@@ -190,19 +205,83 @@ def check_human_primary_weapon(b, issues, world):
                 issues.append(f'{b.name} has unequipped gun {item.name} in inventory but primary_weapon is None')
                 break  # avoid multiple issues
     else:
+        # primary_weapon is not None, but check if it has a name attribute
+        try:
+            weapon_name = b.ai.primary_weapon.name
+        except AttributeError:
+            weapon_name = b.ai.primary_weapon
+            
         # primary_weapon is not None
         if b.ai.primary_weapon not in b.ai.inventory:
-            issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} not in inventory')
+            issues.append(f'{b.name} primary_weapon {weapon_name} not in inventory')
         elif b.ai.primary_weapon.ai.equipper != b:
-            issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} equipper mismatch')
+            issues.append(f'{b.name} primary_weapon {weapon_name} equipper mismatch')
         else:
             # check ammo - only if equipped correctly
-            ammo_gun, ammo_inventory, _ = b.ai.check_ammo(b.ai.primary_weapon, b)
-            if ammo_gun == 0 and ammo_inventory == 0 and not b.ai.primary_weapon.ai.damaged:
-                # allow for damaged weapons to have no ammo
-                issues.append(f'{b.name} primary_weapon {b.ai.primary_weapon.name} has no ammo and may need resupply')
+            try:
+                ammo_gun, ammo_inventory, _ = b.ai.check_ammo(b.ai.primary_weapon, b)
+                if ammo_gun == 0 and ammo_inventory == 0 and not b.ai.primary_weapon.ai.damaged:
+                    # allow for damaged weapons to have no ammo
+                    issues.append(f'{b.name} primary_weapon {weapon_name} has no ammo and may need resupply')
+            except Exception as e:
+                issues.append(f'{b.name} primary_weapon check failed: {e}')
 
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+def check_crew_rotation_states(role, issues, world, index):
+    '''deep diagnostic for crew with rotation-related actions'''
+    if not role.role_occupied:
+        issues.append(f'  WARNING: {role.role_name} role is EMPTY (role_occupied=False)')
+        if role.is_commander or role.is_gunner:
+            issues.append(f'    CRITICAL: {role.role_name} role empty - driver may not find rotation requests!')
+        return
+    
+    if role.human is None:
+        issues.append(f'  WARNING: {role.role_name} has human=None')
+        return
+    
+    human = role.human
+    vc = human.ai.memory.get('task_vehicle_crew', {})
+    action = vc.get('current_action', 'NO_MEMORY')
+    
+    if 'Waiting' in action or 'rotating' in action or 'driving' in action:
+        issues.append(f'  >>> {human.name} ({role.role_name}): {action}')
+        issues.append(f'      calculated_vehicle_angle: {vc.get("calculated_vehicle_angle", "N/A")}')
+        issues.append(f'      think_interval: {vc.get("think_interval", "N/A")}')
+        issues.append(f'      vehicle_order: {vc.get("vehicle_order", "N/A")}')
+        
+        # Check if this is a commander role
+        if role.is_commander:
+            issues.append(f'      [COMMANDER] Checking if commander is correctly identified by driver...')
+            
+            # Verify vehicle matches
+            if vc.get('vehicle_role'):
+                actual_vehicle = vc['vehicle_role'].vehicle
+                if actual_vehicle != role.vehicle:
+                    issues.append(f'      [COMMANDER] VEHICLE MISMATCH! human points to {actual_vehicle.name}, role points to {role.vehicle.name}')
+            
+            # Check all crew roles to see if driver would find this commander
+            driver_would_find = False
+            for check_role in role.vehicle.ai.vehicle_crew:
+                if check_role.role_occupied and check_role.is_commander:
+                    if check_role == role:
+                        driver_would_find = True
+                    break
+            
+            if not driver_would_find:
+                issues.append(f'      [WARNING] Driver would NOT find this commander! Checking all roles...')
+                for i, check_role in enumerate(role.vehicle.ai.vehicle_crew):
+                    issues.append(f'        Role {i}: {check_role.role_name}')
+                    issues.append(f'          role_occupied={check_role.role_occupied}, is_commander={check_role.is_commander}')
+    
+    elif 'Waiting for driver to rotate' in action:
+        # This is the problematic action - should only exist on driver's perspective
+        if role.role_name != 'driver':
+            issues.append(f'  >>> CRITICAL STATE: {human.name} ({role.role_name}) has action "{action}"')
+            issues.append(f'      This human should be waiting for the driver, but driver may not be responding!')
+
+
+
+# ---------------------------------------------------------------------------
 def run_wo_objects_check(world):
     '''sanity checks all world objects'''
 

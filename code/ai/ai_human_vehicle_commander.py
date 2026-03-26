@@ -290,7 +290,10 @@ class AIHumanVehicleCommander():
                     v=vehicle.rotation_angle
                     rotation_fuzzyness=5
                     # rotate if we are NOT currently roughly facing the target
-                    if rotation_required > v - rotation_fuzzyness or rotation_required < v + rotation_fuzzyness:
+                    current_angle = engine.math_2d.get_normalized_angle(v)
+                    desired_angle = engine.math_2d.get_normalized_angle(rotation_required)
+                    diff = (desired_angle - current_angle + 180) % 360 - 180
+                    if abs(diff) > rotation_fuzzyness:
                         # we will just save the angle and the driver will grab it
                         self.owner.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']=rotation_required
                         self.owner.ai.memory['task_vehicle_crew']['current_action']='Waiting for driver to rotate the vehicle'

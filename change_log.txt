@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 25 2026
+- multiple fixes for driver logic for responses to crew actions 
+- cleanup of rotation decisions 
+
+----------------------------------
+Mar 24 2026
+- some vehicle category changes
+- fixed occasional vehicle crew position bug 
+
+----------------------------------
 Mar 23 2026
 - switched to a new display scaling setup 
 - switched to a new rotozoom rotation function that is faster and adds antialiasing 

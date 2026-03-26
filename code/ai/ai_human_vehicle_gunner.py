@@ -271,16 +271,10 @@ class AIHumanVehicleGunner():
         # this checks whether a turret can rotate to match a angle given the turrets restraints
         # this is here because it is a human dead reckoning thing, not a function of the turret itself
         # returns true if the turret can rotate to this angle
-        # reeturns false if it cannot
-        angle_ok=False
-        if rotation_angle>turret.ai.vehicle.rotation_angle+turret.ai.rotation_range[0]:
-            if rotation_angle<turret.ai.vehicle.rotation_angle+turret.ai.rotation_range[1]:
-                angle_ok=True
-
-        # this also needs to check the turrets starting rotation.
-        # for example, some turrets may face forward, some may face backward 
-
-        return angle_ok
+        vehicle_angle = engine.math_2d.get_normalized_angle(turret.ai.vehicle.rotation_angle)
+        target_angle = engine.math_2d.get_normalized_angle(rotation_angle)
+        required_delta = (target_angle - vehicle_angle + 180) % 360 - 180
+        return turret.ai.rotation_range[0] <= required_delta <= turret.ai.rotation_range[1]
     
     #---------------------------------------------------------------------------
     def rotate_turret(self, turret, desired_angle):
