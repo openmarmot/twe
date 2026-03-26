@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 25 2026
+- multiple fixes for driver logic for responses to crew actions 
+- cleanup of rotation decisions 
+
+----------------------------------
 Mar 24 2026
 - some vehicle category changes
 - fixed occasional vehicle crew position bug 

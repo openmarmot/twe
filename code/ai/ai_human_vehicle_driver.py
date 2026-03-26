@@ -189,7 +189,10 @@ class AIHumanVehicleDriver():
             return
 
         v=vehicle.rotation_angle
-        if rotation_required>v-1 and rotation_required<v+1:
+        current_angle = engine.math_2d.get_normalized_angle(v)
+        desired_angle = engine.math_2d.get_normalized_angle(rotation_required)
+        diff = (desired_angle - current_angle + 180) % 360 - 180
+        if abs(diff) <= 6:
             self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
             vehicle.ai.brake_power=1
             vehicle.ai.throttle=0
@@ -239,13 +242,12 @@ class AIHumanVehicleDriver():
         gunner_role=None
         
         for role in vehicle.ai.vehicle_crew:
-            if role.role_occupied and role.is_commander:
-                commander_role=role
-                break
-            if role.role_occupied and role.is_gunner:
-                if role.turret and role.turret.ai and role.turret.ai.primary_weapon:
-                    gunner_role=role
-                    break
+            if role.role_occupied:
+                if role.is_commander:
+                    commander_role=role
+                if role.is_gunner:
+                    if role.turret and role.turret.ai and getattr(role.turret.ai, 'primary_turret', False):
+                        gunner_role=role
 
         # commander orders take priority - handle them first
         if commander_role:
@@ -255,7 +257,10 @@ class AIHumanVehicleDriver():
             if current_action=='Waiting for driver to rotate the vehicle':
                 rotation_required=commander_role.human.ai.memory['task_vehicle_crew']['calculated_vehicle_angle']
                 v=vehicle.rotation_angle
-                if rotation_required>v-1 and rotation_required<v+1:
+                current_angle = engine.math_2d.get_normalized_angle(v)
+                desired_angle = engine.math_2d.get_normalized_angle(rotation_required)
+                diff = (desired_angle - current_angle + 180) % 360 - 180
+                if abs(diff) <= 6:
                     # we are close enough
                     self.owner.ai.memory['task_vehicle_crew']['current_action']='waiting'
                     vehicle.ai.brake_power=1
