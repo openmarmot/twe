@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 26 2026
+- updated font system to clear warning 
+- gunners now center turrets when the vehicle is moving and there are no enemies present 
+
+----------------------------------
 Mar 25 2026
 - multiple fixes for driver logic for responses to crew actions 
 - cleanup of rotation decisions 

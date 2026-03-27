@@ -31,6 +31,8 @@ class AIHumanVehicleGunner():
     def action(self):
         '''action - called by ai_human_vehicle.update_task_vehicle_crew()'''
         role=self.owner.ai.memory['task_vehicle_crew']['vehicle_role']
+        vehicle=role.vehicle
+        turret=role.turret
 
         # figure out what action we are taking 
         if self.owner.ai.memory['task_vehicle_crew']['target'] is None and self.owner.ai.memory['task_vehicle_crew']['engage_indirect_fire'] and self.owner.ai.memory['task_vehicle_crew']['fire_missions']:
@@ -39,8 +41,24 @@ class AIHumanVehicleGunner():
         if self.owner.ai.memory['task_vehicle_crew']['target'] is not None:
             if self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] is not None:
                 self.action_engage_target()
+        elif vehicle.ai.current_speed > 5:
+            self.action_align_turret_forward()
 
 
+    #---------------------------------------------------------------------------
+    def action_align_turret_forward(self):
+        turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
+        vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+        
+        vehicle_angle = engine.math_2d.get_normalized_angle(vehicle.rotation_angle)
+        current_turret_angle = engine.math_2d.get_normalized_angle(turret.rotation_angle)
+        angle_diff = abs((vehicle_angle - current_turret_angle + 180) % 360 - 180)
+        
+        if angle_diff > 5:
+            self.owner.ai.memory['task_vehicle_crew']['calculated_turret_angle'] = vehicle.rotation_angle
+            self.rotate_turret(turret, vehicle.rotation_angle)
+
+    
     #---------------------------------------------------------------------------
     def action_engage_indirect_fire(self):
         turret=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].turret
@@ -447,8 +465,6 @@ class AIHumanVehicleGunner():
             if self.owner.ai.memory['task_vehicle_crew']['fire_missions'] and out_of_ammo_primary == False:
                 self.think_fire_mission()
             else:
-                # we reach this when we have gone through the whole ai gunner decision tree and have found 
-                # nothing to do. perhaps we pop out to a gunner idle function here?
                 self.think_idle()
 
     #---------------------------------------------------------------------------

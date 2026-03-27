@@ -113,9 +113,10 @@ class Graphics_2D_Pygame():
 
         # text stuff
         # Different text sizes for in menus
-        self.small_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 14)
-        self.medium_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 18)
-        self.large_font = pygame.freetype.SysFont(pygame.font.get_default_font(), 30)
+        font_path = os.path.join(os.path.dirname(pygame.__file__), 'freesansbold.ttf')
+        self.small_font = pygame.freetype.Font(font_path, 14)
+        self.medium_font = pygame.freetype.Font(font_path, 18)
+        self.large_font = pygame.freetype.Font(font_path, 30)
 
         self.menu_color='#ffffff'
         self.color_black='#000000'
