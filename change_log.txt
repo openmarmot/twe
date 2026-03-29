@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+Mar 28 2026
+- added a quick launch option to make testing easier 
+
+python3 twe.py --quick-battle civilian 2
+
+----------------------------------
 Mar 26 2026
 - updated font system to clear warning 
 - gunners now center turrets when the vehicle is moving and there are no enemies present 

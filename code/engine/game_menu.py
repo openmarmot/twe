@@ -172,7 +172,7 @@ class GameMenu():
             # note 1 is missing as americans are not implemented
             if key in ['2','3','4']:
                 if key=='1':
-                    self.gplayer_spawn_faction='american'
+                    self.player_spawn_faction='american'
                 elif key=='2':
                     self.player_spawn_faction='german'
                 elif key=='3':
