@@ -4,6 +4,8 @@ TWE Project : Change Log
 April 01 2026
 - adjusted some cannon accuracy values 
 - towed guns will now be positioned in initial controlled areas 
+- adjusted vehicle commander think to clear old states 
+- minor changes 
 
 ----------------------------------
 Mar 28 2026

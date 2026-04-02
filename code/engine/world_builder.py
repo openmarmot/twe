@@ -4475,13 +4475,13 @@ def spawn_object(world, world_coords, object_type, spawn):
 
     elif object_type == "8.8cm_pak43_l71":
         z = WorldObject(world, ["mg34"], AIGun)
-        z.name = "8.8 cm KWK 36 L56"
+        z.name = "8.8 cm pak43 L71"
         z.no_update = True
         z.is_gun = True
         z.ai.mechanical_accuracy = 1
         z.ai.mechanical_accuracy_deg = 0.10
         z.ai.magazine = spawn_object(
-            world, world_coords, "8.8cm_kwk36_l56_magazine", False
+            world, world_coords, "8.8cm_pak43_l71_magazine", False
         )
         z.ai.rate_of_fire = 1
         z.ai.reload_speed = 20

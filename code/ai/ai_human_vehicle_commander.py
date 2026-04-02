@@ -29,6 +29,9 @@ class AIHumanVehicleCommander():
         '''commander role'''
         vehicle=self.owner.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
 
+        # reset to a default to clear any old states
+        self.owner.ai.memory['task_vehicle_crew']['current_action']='Monitoring the situation'
+
         # determine what the primary weapon is and primary gunner is
         primary_gunner_role=None
         indirect_gunner_role=None
