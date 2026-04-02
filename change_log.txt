@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 01 2026
+- adjusted some cannon accuracy values 
+- towed guns will now be positioned in initial controlled areas 
+
+----------------------------------
 Mar 28 2026
 - added a quick launch option to make testing easier 
 
