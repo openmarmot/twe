@@ -250,7 +250,7 @@ def generate_map_area_town(world_coords,name):
         map_objects.append(MapObject('warehouse','a old warehouse',warehouse_coord,rotation,[]))
     
     # add smaller square buildings in a more random pattern, avoiding the warehouses 
-    building_max_area=2000
+    building_max_area=3000
     building_seperation=200
     building_coords=engine.math_2d.get_random_constrained_coords_v2(world_coords,building_max_area,
         building_seperation,count_building,coords_to_avoid,warehouse_seperation)

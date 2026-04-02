@@ -1,6 +1,24 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 01 2026
+- adjusted some cannon accuracy values 
+- towed guns will now be positioned in initial controlled areas 
+- adjusted vehicle commander think to clear old states 
+- minor changes 
+
+----------------------------------
+Mar 28 2026
+- added a quick launch option to make testing easier 
+
+python3 twe.py --quick-battle civilian 2
+
+----------------------------------
+Mar 26 2026
+- updated font system to clear warning 
+- gunners now center turrets when the vehicle is moving and there are no enemies present 
+
+----------------------------------
 Mar 25 2026
 - multiple fixes for driver logic for responses to crew actions 
 - cleanup of rotation decisions 

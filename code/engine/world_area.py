@@ -28,7 +28,7 @@ class WorldArea():
 
         # radius? circumference?
         # this is used to determine the sphere of coverage for what is considered 'in' the area
-        self.size=2000
+        self.size=3000
 
         # center of the area
         self.world_coords=[0,0]
