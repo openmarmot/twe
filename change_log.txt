@@ -8,7 +8,7 @@ April 02 2026
 - switched vehicle crew current_action system to a enum (rather large change)
 - misc changes 
 - gave the 222 and ba-64 the new cramped_crew_compartment trait which has a increased damage chance 
-
+- turret hits do more damage now based on projectile diameter 
 
 ----------------------------------
 April 01 2026
