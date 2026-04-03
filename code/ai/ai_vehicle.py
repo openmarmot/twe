@@ -236,6 +236,9 @@ class AIVehicle():
         # this causes the ai humans to bail out, but the vehicle still updates.
         self.vehicle_disabled=False
 
+        # set by a gunner. lets soldiers know to not enter the vehicle
+        self.vehicle_out_of_ammo=False
+
         # tracks whether there is a fuel leak. true means increased risk of explosion
         self.fuel_leak=False
 
