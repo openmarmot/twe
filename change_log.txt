@@ -5,9 +5,10 @@ April 02 2026
 - gunner now sets vehicle.ai.vehicle_out_of_ammo for primary turrent primary weapons 
 - driver now attempts to return to spawn when vehicle out of ammo 
 - bots avoid entering out of ammo vehicles, unless if they are transports 
+- switched vehicle crew current_action system to a enum (rather large change)
+- misc changes 
+- gave the 222 and ba-64 the new cramped_crew_compartment trait which has a increased damage chance 
 
-this was mostly added for the indirect fire vehicles - which have a habit of charging into gun 
-fire when they have no ammo 
 
 ----------------------------------
 April 01 2026

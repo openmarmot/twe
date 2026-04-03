@@ -1,18 +1,17 @@
-
-'''
+"""
 repo : https://github.com/openmarmot/twe
 
-notes : the vehicle isn't really meant to have AI. 
+notes : the vehicle isn't really meant to have AI.
 the only thing that should be here is physics and hardware stuff.
 any AI would be handled by ai_human
-'''
+"""
 
-#import built in modules
+# import built in modules
 import random
 import copy
 import math
 
-#import custom packages
+# import custom packages
 import engine.math_2d
 import engine.world_builder
 import engine.penetration_calculator
@@ -20,186 +19,186 @@ import engine.log
 from engine.hit_data import HitData
 
 
+# global variables
 
-#global variables
 
-class AIVehicle():
+class AIVehicle:
     def __init__(self, owner):
-        self.owner=owner
+        self.owner = owner
 
         # -- vehicle sub categories --
         # this signals to the ai that they should tow this
-        self.is_towed_gun=False
-        self.is_transport=False # ai generally will exit these when reaching a destination
+        self.is_towed_gun = False
+        self.is_transport = (
+            False  # ai generally will exit these when reaching a destination
+        )
 
         # --- armor ---
-        #[side][armor thickness,armor slope,spaced_armor_thickness]
+        # [side][armor thickness,armor slope,spaced_armor_thickness]
         # slope 0 degrees is vertical, 90 degrees is horizontal
         # armor grade steel thickness in mm. standard soft aluminum/steel is a 0-1
         # this is the main vehicle
-        self.vehicle_armor={}
-        self.vehicle_armor['top']=[0,0,0]
-        self.vehicle_armor['bottom']=[0,0,0]
-        self.vehicle_armor['left']=[0,0,0]
-        self.vehicle_armor['right']=[0,0,0]
-        self.vehicle_armor['front']=[0,0,0]
-        self.vehicle_armor['rear']=[0,0,0]
+        self.vehicle_armor = {}
+        self.vehicle_armor["top"] = [0, 0, 0]
+        self.vehicle_armor["bottom"] = [0, 0, 0]
+        self.vehicle_armor["left"] = [0, 0, 0]
+        self.vehicle_armor["right"] = [0, 0, 0]
+        self.vehicle_armor["front"] = [0, 0, 0]
+        self.vehicle_armor["rear"] = [0, 0, 0]
 
         # specific armor for the passenger compartment
-        self.passenger_compartment_armor={}
-        self.passenger_compartment_armor['top']=[0,0,0]
-        self.passenger_compartment_armor['bottom']=[0,0,0]
-        self.passenger_compartment_armor['left']=[0,0,0]
-        self.passenger_compartment_armor['right']=[0,0,0]
-        self.passenger_compartment_armor['front']=[0,0,0]
-        self.passenger_compartment_armor['rear']=[0,0,0]
+        self.passenger_compartment_armor = {}
+        self.passenger_compartment_armor["top"] = [0, 0, 0]
+        self.passenger_compartment_armor["bottom"] = [0, 0, 0]
+        self.passenger_compartment_armor["left"] = [0, 0, 0]
+        self.passenger_compartment_armor["right"] = [0, 0, 0]
+        self.passenger_compartment_armor["front"] = [0, 0, 0]
+        self.passenger_compartment_armor["rear"] = [0, 0, 0]
 
         # results in a chance for high damage from a passenger compartment hit
         # this is meant to be large caliber ammo - like tank shells
-        self.passenger_compartment_ammo_racks=False
+        self.passenger_compartment_ammo_racks = False
+
+        # when True and the passenger compartment is hit there is a greatly increased
+        # chance of crew being damaged due to tight spacing
+        self.cramped_crew_compartment = False
 
         # ---
 
         # gears
-        self.transmission={}
-        self.current_gear='drive'
-        self.transmission['drive']=[1]
-        self.transmission['neutral']=[0]
-        self.transmission['reverse']=[-1]
+        self.transmission = {}
+        self.current_gear = "drive"
+        self.transmission["drive"] = [1]
+        self.transmission["neutral"] = [0]
+        self.transmission["reverse"] = [-1]
 
         # --- components ---
 
-        # turrets - these are spawned and are in world 
+        # turrets - these are spawned and are in world
         # !! Note these should be added in order of importance due to know the driver handles requests
-        self.turrets=[]
+        self.turrets = []
 
         # for rotary wing .. vehicles
-        self.rotors=[]
+        self.rotors = []
 
         # array of engine objects
-        self.engines=[]
+        self.engines = []
 
         # array of fuel tank objects
-        self.fuel_tanks=[]
+        self.fuel_tanks = []
 
         # array of battery objects
-        self.batteries=[]
+        self.batteries = []
 
         # radio - only one for now
-        self.radio=None
+        self.radio = None
 
         # amp output for the alternator(s)
         # if i lose more of my sanity it would be nice to model individual alternators
-        self.alternator_amps=15
-        
+        self.alternator_amps = 15
+
         # open top. mostly refers to the passenger section. results in some extra damage options
-        self.open_top=False
+        self.open_top = False
 
         # only stores main gun ammo
-        self.ammo_rack=[]
-        self.ammo_rack_capacity=0 # max capacity
+        self.ammo_rack = []
+        self.ammo_rack_capacity = 0  # max capacity
 
-        # wheels 
-        self.max_wheels=0 # maximum wheels that can be fitted to the vehicle
-        self.min_wheels_per_side_front=0 # minimum number of healthy wheels to move
-        self.min_wheels_per_side_rear=0 # minimum number of healthy wheels to move
+        # wheels
+        self.max_wheels = 0  # maximum wheels that can be fitted to the vehicle
+        self.min_wheels_per_side_front = 0  # minimum number of healthy wheels to move
+        self.min_wheels_per_side_rear = 0  # minimum number of healthy wheels to move
 
-        self.front_left_wheels=[]
-        self.front_right_wheels=[]
-        
-        self.rear_left_wheels=[]
-        self.rear_right_wheels=[]
+        self.front_left_wheels = []
+        self.front_right_wheels = []
 
-        self.spare_wheels=[]
-        self.max_spare_wheels=0
+        self.rear_left_wheels = []
+        self.rear_right_wheels = []
+
+        self.spare_wheels = []
+        self.max_spare_wheels = 0
 
         # tracks
-        self.left_tracks=[]
-        self.right_tracks=[]
-        self.spare_track_segments=[]
-
+        self.left_tracks = []
+        self.right_tracks = []
+        self.spare_track_segments = []
 
         # ----- controls ------
 
         # engine power. 0 is idle 1 is max
         # note - this needs to be propagated to the engines throttle_control variable
-        self.throttle=0
+        self.throttle = 0
 
         # if true throttle returns to zero slowly
         # should generally be true for cars and false for planes
-        self.throttle_zero=True
+        self.throttle_zero = True
 
         # if true brake returns to zero quickly
         # should be true for everything (?)
-        self.brake_zero=True
+        self.brake_zero = True
 
         # brake_power 0 is none 1 is max
-        self.brake_power=0
+        self.brake_power = 0
 
-        self.brake_strength=100
+        self.brake_strength = 100
 
         # planes that have wheel steering, cars, etc
         # 1 all the way left -1 all the way right. 0 neutral
-        self.wheel_steering=0
-
+        self.wheel_steering = 0
 
         # - airplane controls -
 
         # generally negative is left or down. zero is neutral
         # except for flaps. flaps up is zero
 
-        self.ailerons=0
-        self.elevator=0
-        self.flaps=0
-        self.rudder=0
+        self.ailerons = 0
+        self.elevator = 0
+        self.flaps = 0
+        self.rudder = 0
 
         # -- crew --
- 
 
-        self.vehicle_crew=[]
+        self.vehicle_crew = []
 
         # --
         # this gives the AI clues as to how they should use the vehicle
-        self.vehicle_role=''
+        self.vehicle_role = ""
         # whether the crew needs is_afv_trained
-        self.requires_afv_training=False
+        self.requires_afv_training = False
 
         #
-        self.towed_object=None
-        self.tow_offset=[150,0]
-        self.in_tow=False # whether this vehicle is being towed currently
+        self.towed_object = None
+        self.tow_offset = [150, 0]
+        self.in_tow = False  # whether this vehicle is being towed currently
 
-
-        # 
-        self.inventory=[]
-
+        #
+        self.inventory = []
 
         # this is computed. should not be set by anything else
-        self.acceleration=0
-
+        self.acceleration = 0
 
         # rate of climb in meters/second this is computed and can be positive or negative
-        self.rate_of_climb=0
+        self.rate_of_climb = 0
 
-        # max rate of climb in meters/second. vehicle specific 
-        self.max_rate_of_climb=0
+        # max rate of climb in meters/second. vehicle specific
+        self.max_rate_of_climb = 0
 
         # the current speed
-        self.current_speed=0.
+        self.current_speed = 0.0
 
         # max speed - this is in game units
-        self.max_speed=0 
+        self.max_speed = 0
 
-        # max offroad speed 
-        self.max_offroad_speed=0
+        # max offroad speed
+        self.max_offroad_speed = 0
 
         # whether we are offroad or not
-        self.offroad=True
+        self.offroad = True
 
         # this is calculated
-        self.max_dynamic_speed=0
-        self.last_dynamic_speed_update=0
-        self.dynamic_speed_update_interval=0.5
+        self.max_dynamic_speed = 0
+        self.last_dynamic_speed_update = 0
+        self.dynamic_speed_update_interval = 0.5
 
         self.rolling_resistance_coeff = 0.03  # Base coeff; updated by terrain
         self.gravity = 9.81
@@ -207,110 +206,132 @@ class AIVehicle():
         # minimum speed needed to take off
 
         # stall speed. should be affected by angle of attack
-        self.stall_speed=0
-        
-        self.rotation_speed=0 # max rotation speed around axis (wheel steering)
+        self.stall_speed = 0
+
+        self.rotation_speed = 0  # max rotation speed around axis (wheel steering)
 
         # update physics needs to know if its never been run before
-        self.first_update=True
+        self.first_update = True
 
-        # used for death message 
-        self.collision_log=[]
+        # used for death message
+        self.collision_log = []
 
         # used for targeting
-        self.recent_noise_or_move=False
+        self.recent_noise_or_move = False
         # reset in update
-        self.last_noise_or_move_time=0 # in world.world_seconds
-        self.recent_noise_or_move_reset_seconds=30
-
+        self.last_noise_or_move_time = 0  # in world.world_seconds
+        self.recent_noise_or_move_reset_seconds = 30
 
         # --- system checks ---
         # these are useful for the ai to understand system status without having to query a bunch of things
 
         # this means one or more engine is on
-        self.engines_on=False
+        self.engines_on = False
 
-        self.electrical_system_functioning=False
+        self.electrical_system_functioning = False
 
         # vehicle is damaged to the point that it is out of action
         # this causes the ai humans to bail out, but the vehicle still updates.
-        self.vehicle_disabled=False
+        self.vehicle_disabled = False
 
         # set by a gunner. lets soldiers know to not enter the vehicle
-        self.vehicle_out_of_ammo=False
+        self.vehicle_out_of_ammo = False
 
         # tracks whether there is a fuel leak. true means increased risk of explosion
-        self.fuel_leak=False
+        self.fuel_leak = False
 
-        self.on_fire=False
-        self.last_fire_check=0
-        self.fire_check_interval=15
+        self.on_fire = False
+        self.last_fire_check = 0
+        self.fire_check_interval = 15
 
-        # - leave tracks on the ground - 
+        # - leave tracks on the ground -
         # this is turned on when throttle>0 and current_speed==0 and weight>500
-        self.tracks_enabled=False
-        self.tracks_last_time=0
-        self.tracks_interval=0.5
-        self.tracks_count=0
-        self.tracks_max=10
-        self.tracks_left_offset=[0,-15]
-        self.tracks_right_offset=[0,15]
+        self.tracks_enabled = False
+        self.tracks_last_time = 0
+        self.tracks_interval = 0.5
+        self.tracks_count = 0
+        self.tracks_max = 10
+        self.tracks_left_offset = [0, -15]
+        self.tracks_right_offset = [0, 15]
 
-    #---------------------------------------------------------------------------
-    def add_hit_data(self,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value):
-        '''add hit data to the collision log'''
-        hit=HitData(self.owner,projectile,penetration,side,distance,compartment_hit,result,pen_value,armor_value)
+    # ---------------------------------------------------------------------------
+    def add_hit_data(
+        self,
+        projectile,
+        penetration,
+        side,
+        distance,
+        compartment_hit,
+        result,
+        pen_value,
+        armor_value,
+    ):
+        """add hit data to the collision log"""
+        hit = HitData(
+            self.owner,
+            projectile,
+            penetration,
+            side,
+            distance,
+            compartment_hit,
+            result,
+            pen_value,
+            armor_value,
+        )
         self.collision_log.append(hit)
         if self.owner.world.hit_markers:
-            marker=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'hit_marker',True)
-            marker.ai.setup(self.owner,hit)
+            marker = engine.world_builder.spawn_object(
+                self.owner.world, self.owner.world_coords, "hit_marker", True
+            )
+            marker.ai.setup(self.owner, hit)
 
         # allow human to respond to hit
         for b in self.vehicle_crew:
             if b.role_occupied:
-                b.human.ai.handle_event('vehicle_hit',hit)
-    #---------------------------------------------------------------------------
-    def attach_tow_object(self,tow_object):
-        '''attach an object for towing'''
+                b.human.ai.handle_event("vehicle_hit", hit)
+
+    # ---------------------------------------------------------------------------
+    def attach_tow_object(self, tow_object):
+        """attach an object for towing"""
 
         if self.towed_object is not None:
             self.detach_tow_object()
-        
-        self.towed_object=tow_object
-        if self.towed_object.is_vehicle:
-            self.towed_object.ai.in_tow=True
 
-    #---------------------------------------------------------------------------
-    def check_if_human_in_vehicle(self,human):
-        '''returns a bool as to whether a specific human is in the vehicle'''
+        self.towed_object = tow_object
+        if self.towed_object.is_vehicle:
+            self.towed_object.ai.in_tow = True
+
+    # ---------------------------------------------------------------------------
+    def check_if_human_in_vehicle(self, human):
+        """returns a bool as to whether a specific human is in the vehicle"""
         for role in self.vehicle_crew:
             if role.role_occupied:
-                if role.human==human:
+                if role.human == human:
                     return True
         return False
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def check_if_vehicle_is_full(self):
-        '''returns a bool as to whether the vehicle is full'''
+        """returns a bool as to whether the vehicle is full"""
 
         for role in self.vehicle_crew:
             if role.role_occupied is False:
                 return False
         return True
-    
-    #---------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------
     def check_if_vehicle_is_occupied(self):
-        '''returns bool as to whether any humans are crewing the vehicle'''
+        """returns bool as to whether any humans are crewing the vehicle"""
         for role in self.vehicle_crew:
             if role.role_occupied:
                 return True
         return False
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def get_primary_gun_penetration(self, distance):
-        '''get the penetration value of the vehicle's primary gun at a given distance
+        """get the penetration value of the vehicle's primary gun at a given distance
         returns penetration in mm, or 0 if vehicle has no functional gun
-        '''
+        """
         primary_turret = None
         for turret in self.turrets:
             if turret.ai.primary_turret:
@@ -340,606 +361,730 @@ class AIVehicle():
             return 0
 
         if distance >= engine.penetration_calculator.max_distance:
-            return engine.penetration_calculator.projectile_data[projectile_type][str(engine.penetration_calculator.max_distance)]
+            return engine.penetration_calculator.projectile_data[projectile_type][
+                str(engine.penetration_calculator.max_distance)
+            ]
 
         lower_distance = int((distance // 500) * 500)
         upper_distance = int(lower_distance + 500)
-        lower_pen = engine.penetration_calculator.projectile_data[projectile_type][str(lower_distance)]
-        upper_pen = engine.penetration_calculator.projectile_data[projectile_type][str(upper_distance)]
+        lower_pen = engine.penetration_calculator.projectile_data[projectile_type][
+            str(lower_distance)
+        ]
+        upper_pen = engine.penetration_calculator.projectile_data[projectile_type][
+            str(upper_distance)
+        ]
         t = (distance - lower_distance) / 500
         penetration = lower_pen + t * (upper_pen - lower_pen)
 
         return penetration
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def check_wheel_health(self):
-        '''check the health of all the wheels against minimums'''
+        """check the health of all the wheels against minimums"""
 
         # front left
-        wheel_count=len(self.front_left_wheels)
+        wheel_count = len(self.front_left_wheels)
         for b in self.front_left_wheels:
             if b.ai.destroyed:
-                wheel_count-=1
-        if wheel_count<self.min_wheels_per_side_front:
-            self.vehicle_disabled=True
+                wheel_count -= 1
+        if wheel_count < self.min_wheels_per_side_front:
+            self.vehicle_disabled = True
             return
-        
+
         # front right
-        wheel_count=len(self.front_right_wheels)
+        wheel_count = len(self.front_right_wheels)
         for b in self.front_right_wheels:
             if b.ai.destroyed:
-                wheel_count-=1
-        if wheel_count<self.min_wheels_per_side_front:
-            self.vehicle_disabled=True
+                wheel_count -= 1
+        if wheel_count < self.min_wheels_per_side_front:
+            self.vehicle_disabled = True
             return
-        
+
         # rear left
-        wheel_count=len(self.rear_left_wheels)
+        wheel_count = len(self.rear_left_wheels)
         for b in self.rear_left_wheels:
             if b.ai.destroyed:
-                wheel_count-=1
-        if wheel_count<self.min_wheels_per_side_rear:
-            self.vehicle_disabled=True
+                wheel_count -= 1
+        if wheel_count < self.min_wheels_per_side_rear:
+            self.vehicle_disabled = True
             return
-        
+
         # rear right
-        wheel_count=len(self.rear_right_wheels)
+        wheel_count = len(self.rear_right_wheels)
         for b in self.rear_right_wheels:
             if b.ai.destroyed:
-                wheel_count-=1
-        if wheel_count<self.min_wheels_per_side_rear:
-            self.vehicle_disabled=True
+                wheel_count -= 1
+        if wheel_count < self.min_wheels_per_side_rear:
+            self.vehicle_disabled = True
             return
-    #---------------------------------------------------------------------------
-    def detach_tow_object(self):
-        '''detach an object that we are towing'''
-        if self.towed_object!=None:
-            if self.towed_object.is_vehicle:
-                self.towed_object.ai.in_tow=False
-            self.towed_object=None
 
-    #---------------------------------------------------------------------------
-    def event_collision(self,event_data):
-        '''handle a collision event'''
+    # ---------------------------------------------------------------------------
+    def detach_tow_object(self):
+        """detach an object that we are towing"""
+        if self.towed_object != None:
+            if self.towed_object.is_vehicle:
+                self.towed_object.ai.in_tow = False
+            self.towed_object = None
+
+    # ---------------------------------------------------------------------------
+    def event_collision(self, event_data):
+        """handle a collision event"""
 
         if event_data.is_projectile:
             self.projectile_collision(event_data)
 
         elif event_data.is_grenade:
-            print('bonk')
+            print("bonk")
         else:
-            engine.log.add_data('error','ai_vehicle event_collision - unhandled collision type'+event_data.name,True)
+            engine.log.add_data(
+                "error",
+                "ai_vehicle event_collision - unhandled collision type"
+                + event_data.name,
+                True,
+            )
 
-    #---------------------------------------------------------------------------
-    def event_add_inventory(self,event_data):
-        '''add an object to the inventory'''
+    # ---------------------------------------------------------------------------
+    def event_add_inventory(self, event_data):
+        """add an object to the inventory"""
 
         if event_data.is_human:
             # we don't want humans in here
-            print('! Error - human added to vehicle inventory')
+            print("! Error - human added to vehicle inventory")
         else:
-
             # put whatever it is in the inventory
-            self.inventory.append(event_data) 
+            self.inventory.append(event_data)
 
-
-    #---------------------------------------------------------------------------
-    def event_remove_inventory(self,event_data):
-        '''remove an object from the inventory'''
+    # ---------------------------------------------------------------------------
+    def event_remove_inventory(self, event_data):
+        """remove an object from the inventory"""
         if event_data in self.inventory:
             self.inventory.remove(event_data)
 
             if event_data.is_radio:
-                if self.radio==event_data:
-                    self.radio=None
+                if self.radio == event_data:
+                    self.radio = None
 
             # make sure the obj world_coords reflect the obj that had it in inventory
-            event_data.world_coords=copy.copy(self.owner.world_coords)
+            event_data.world_coords = copy.copy(self.owner.world_coords)
 
-    #---------------------------------------------------------------------------
-    def event_throwable_explosion_on_top_of_vehicle(self,throwable):
-        '''handle a throwable exploding on the top of the vehicle'''
+    # ---------------------------------------------------------------------------
+    def event_throwable_explosion_on_top_of_vehicle(self, throwable):
+        """handle a throwable exploding on the top of the vehicle"""
 
         if self.open_top:
             # extra damage as it likely fell inside before exploding
-            self.handle_component_damage('random_crew_explosion',None)
-        
-        compartment=random.choice(['vehicle_body','passenger_compartment'])
+            self.handle_component_damage("random_crew_explosion", None)
+
+        compartment = random.choice(["vehicle_body", "passenger_compartment"])
 
         for b in range(throwable.ai.shrapnel_count):
             # special code to make sure the shrapnel hits the top armor
-            shrapnel=engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'projectile',False)
-            shrapnel.ai.projectile_type='shrapnel'
-            shrapnel.name='shrapnel'
-            shrapnel.ai.starting_coords=self.owner.world_coords
-            shrapnel.ai.shooter=throwable.ai.equipper
-            shrapnel.ai.weapon=throwable
-            if compartment=='vehicle_body':
-                self.projectile_hit_vehicle_body(shrapnel,'top',0)
+            shrapnel = engine.world_builder.spawn_object(
+                self.owner.world, self.owner.world_coords, "projectile", False
+            )
+            shrapnel.ai.projectile_type = "shrapnel"
+            shrapnel.name = "shrapnel"
+            shrapnel.ai.starting_coords = self.owner.world_coords
+            shrapnel.ai.shooter = throwable.ai.equipper
+            shrapnel.ai.weapon = throwable
+            if compartment == "vehicle_body":
+                self.projectile_hit_vehicle_body(shrapnel, "top", 0)
             else:
-                self.projectile_hit_passenger_compartment(shrapnel,'top',0)
+                self.projectile_hit_passenger_compartment(shrapnel, "top", 0)
 
-                
-    #---------------------------------------------------------------------------
-    def handle_component_damage(self,damaged_component,projectile):
-        '''handle damage to a component'''
-        if damaged_component=='driver_projectile':
+    # ---------------------------------------------------------------------------
+    def handle_component_damage(self, damaged_component, projectile):
+        """handle damage to a component"""
+        if damaged_component == "driver_projectile":
             for role in self.vehicle_crew:
-                if role.role_name=='driver' and role.role_occupied:
-                    role.human.ai.handle_event('collision',projectile)
+                if role.role_name == "driver" and role.role_occupied:
+                    role.human.ai.handle_event("collision", projectile)
                     return
-            if random.randint(0,1)==0:
-                self.on_fire=True
-        elif damaged_component=='engine':
+            if random.randint(0, 1) == 0:
+                self.on_fire = True
+        elif damaged_component == "engine":
             for b in self.engines:
-                b.ai.damaged=True
+                b.ai.damaged = True
                 if b.ai.internal_combustion:
-                    #smoke!
-                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
-                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
-                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
-            self.vehicle_disabled=True
-        elif damaged_component=='all_crew':
+                    # smoke!
+                    heading = engine.math_2d.get_heading_from_rotation(
+                        self.owner.rotation_angle + 180
+                    )
+                    smoke_coords = engine.math_2d.calculate_relative_position(
+                        self.owner.world_coords,
+                        self.owner.rotation_angle,
+                        b.ai.exhaust_position_offset,
+                    )
+                    engine.world_builder.spawn_smoke_cloud(
+                        self.owner.world, smoke_coords, heading
+                    )
+            self.vehicle_disabled = True
+        elif damaged_component == "all_crew":
             for role in self.vehicle_crew:
                 if role.role_occupied:
-                    role.human.ai.handle_event('collision',projectile)
-        elif damaged_component=='random_crew_projectile':
+                    role.human.ai.handle_event("collision", projectile)
+        elif damaged_component == "random_crew_projectile":
             for role in self.vehicle_crew:
                 if role.role_occupied:
-                    if random.randint(0,1)==1:
-                        role.human.ai.handle_event('collision',projectile)
-        elif damaged_component=='random_crew_explosion':
+                    if random.randint(0, 1) == 1:
+                        role.human.ai.handle_event("collision", projectile)
+        elif damaged_component == "random_crew_explosion":
             if self.fuel_leak and self.on_fire is False:
-                if random.randint(0,1)==0:
-                    self.on_fire=True
+                if random.randint(0, 1) == 0:
+                    self.on_fire = True
             for role in self.vehicle_crew:
                 if role.role_occupied:
-                    if random.randint(0,1)==1:
-                        role.human.ai.handle_event('explosion',100)
-        elif damaged_component=='random_crew_fire':
+                    if random.randint(0, 1) == 1:
+                        role.human.ai.handle_event("explosion", 100)
+        elif damaged_component == "random_crew_fire":
             if self.fuel_leak and self.on_fire is False:
-                if random.randint(0,1)==0:
-                    self.on_fire=True
+                if random.randint(0, 1) == 0:
+                    self.on_fire = True
             for role in self.vehicle_crew:
                 if role.role_occupied:
-                    if random.randint(0,1)==1:
+                    if random.randint(0, 1) == 1:
                         role.human.ai.handle_hit_with_flame()
-        elif damaged_component=='ammo_rack':
-            temp=random.randint(0,self.ammo_rack_capacity)
-            if temp<len(self.ammo_rack):
-                self.handle_component_damage('random_crew_explosion',projectile)
-                self.handle_component_damage('random_crew_explosion',projectile)
-                self.handle_component_damage('engine',projectile)
-                self.vehicle_disabled=True
+        elif damaged_component == "ammo_rack":
+            temp = random.randint(0, self.ammo_rack_capacity)
+            if temp < len(self.ammo_rack):
+                self.handle_component_damage("random_crew_explosion", projectile)
+                self.handle_component_damage("random_crew_explosion", projectile)
+                self.handle_component_damage("engine", projectile)
+                self.vehicle_disabled = True
                 for b in self.turrets:
-                    b.ai.turret_jammed=True
+                    b.ai.turret_jammed = True
                     if b.ai.primary_weapon:
-                        b.ai.primary_weapon.ai.damaged=True
+                        b.ai.primary_weapon.ai.damaged = True
                     if b.ai.coaxial_weapon:
-                        b.ai.coaxial_weapon.ai.damaged=True
-                engine.world_builder.spawn_explosion_and_fire(self.owner.world,self.owner.world_coords,10,30)
-        elif damaged_component=='miraculously unharmed':
+                        b.ai.coaxial_weapon.ai.damaged = True
+                engine.world_builder.spawn_explosion_and_fire(
+                    self.owner.world, self.owner.world_coords, 10, 30
+                )
+        elif damaged_component == "miraculously unharmed":
             pass
-        elif damaged_component=='fuel_tank':
-            
-            tank=random.choice(self.fuel_tanks)
-            self.fuel_leak=True
+        elif damaged_component == "fuel_tank":
+            tank = random.choice(self.fuel_tanks)
+            self.fuel_leak = True
             # fuel tank should be a ai_container
-            tank.ai.punctured=True
-            # the more hits the more leaks. 
-            tank.ai.container_integrity-= random.uniform(0.1, 0.3)
+            tank.ai.punctured = True
+            # the more hits the more leaks.
+            tank.ai.container_integrity -= random.uniform(0.1, 0.3)
 
+            if random.randint(0, 1) == 0:
+                self.on_fire = True
 
-            if random.randint(0,1)==0:
-                self.on_fire=True
-
-            if random.randint(0,1)==0:
-                self.handle_component_damage('random_crew_fire',projectile)
+            if random.randint(0, 1) == 0:
+                self.handle_component_damage("random_crew_fire", projectile)
         else:
-            engine.log.add_data('error',f'ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}',True)
+            engine.log.add_data(
+                "error",
+                f"ai_vehicle.handle_component_damage unrecognized damage:{damaged_component}",
+                True,
+            )
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_aileron_left(self):
-        '''handle left aileron input'''
-        self.ailerons=1
+        """handle left aileron input"""
+        self.ailerons = 1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_aileron_right(self):
-        '''handle right aileron input'''
-        self.ailerons=-1
+        """handle right aileron input"""
+        self.ailerons = -1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_elevator_up(self):
-        '''handle elevator up event'''
-        self.elevator=-1
+        """handle elevator up event"""
+        self.elevator = -1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_elevator_down(self):
-        '''handle elevator down event'''
-        self.elevator=1
+        """handle elevator down event"""
+        self.elevator = 1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_event(self, event, event_data):
-        ''' overrides base handle_event'''
+        """overrides base handle_event"""
         # EVENT - text describing event
         # event_data - most likely a world_object but could be anything
 
         # not sure what to do here yet. will have to think of some standard events
-        if event=='add_inventory':
+        if event == "add_inventory":
             self.event_add_inventory(event_data)
-        elif event=='collision':
+        elif event == "collision":
             self.event_collision(event_data)
-        elif event=='explosion':
+        elif event == "explosion":
             self.handle_explosion(event_data)
-        elif event=='remove_inventory':
+        elif event == "remove_inventory":
             self.event_remove_inventory(event_data)
-        elif event=='throwable_explosion_on_top_of_vehicle':
+        elif event == "throwable_explosion_on_top_of_vehicle":
             self.event_throwable_explosion_on_top_of_vehicle(event_data)
         else:
-            print('Error: '+self.owner.name+' cannot handle event '+event)
+            print("Error: " + self.owner.name + " cannot handle event " + event)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_flaps_down(self):
-        '''handle flaps down event'''
-        self.flaps=1
+        """handle flaps down event"""
+        self.flaps = 1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_flaps_up(self):
-        '''handle flaps up event'''
-        self.flaps=0
+        """handle flaps up event"""
+        self.flaps = 0
 
-    #---------------------------------------------------------------------------
-    def handle_explosion(self,event_data):
-        '''handle the vehicle being hit by an explosion'''
-        power = event_data['power']
-        explosion_coords = event_data['coords']
+    # ---------------------------------------------------------------------------
+    def handle_explosion(self, event_data):
+        """handle the vehicle being hit by an explosion"""
+        power = event_data["power"]
+        explosion_coords = event_data["coords"]
 
         # Calculate which side of the vehicle was hit
-        hit_side, relative_angle = engine.math_2d.calculate_hit_side(self.owner.rotation_angle,
-            engine.math_2d.get_rotation(self.owner.world_coords, explosion_coords))
+        hit_side, relative_angle = engine.math_2d.calculate_hit_side(
+            self.owner.rotation_angle,
+            engine.math_2d.get_rotation(self.owner.world_coords, explosion_coords),
+        )
 
         # Get armor thickness for the hit side (including spaced armor)
-        armor_thickness = self.vehicle_armor[hit_side][0] + self.vehicle_armor[hit_side][2]
+        armor_thickness = (
+            self.vehicle_armor[hit_side][0] + self.vehicle_armor[hit_side][2]
+        )
 
         # honestly not sure how to handle explosions yet, this is mostly a placeholder function
 
-        if armor_thickness<5:
-            self.handle_component_damage('random_crew_explosion', None)
+        if armor_thickness < 5:
+            self.handle_component_damage("random_crew_explosion", None)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_hit_with_flame(self):
-        '''handle the vehicle being hit with flame'''
+        """handle the vehicle being hit with flame"""
 
         if self.open_top:
-            self.handle_component_damage('random_crew_fire',None)
-            self.on_fire=True
+            self.handle_component_damage("random_crew_fire", None)
+            self.on_fire = True
         else:
-            if random.randint(0,3)==3:
-                self.handle_component_damage('random_crew_fire',None)
+            if random.randint(0, 3) == 3:
+                self.handle_component_damage("random_crew_fire", None)
 
-    #---------------------------------------------------------------------------
-    def handle_spalling_damage(self, compartment,projectile):
-        '''handle damage from armor spalling due to near-miss penetrations'''
+    # ---------------------------------------------------------------------------
+    def handle_spalling_damage(self, compartment, projectile):
+        """handle damage from armor spalling due to near-miss penetrations"""
 
         num_fragments = random.randint(1, 3)
 
         for i in range(num_fragments):
             if random.randint(0, 2) == 0:
-                shrapnel = engine.world_builder.spawn_object(self.owner.world, self.owner.world_coords, 'projectile', False)
-                shrapnel.ai.projectile_type = 'shrapnel'
-                shrapnel.name = 'shrapnel'
+                shrapnel = engine.world_builder.spawn_object(
+                    self.owner.world, self.owner.world_coords, "projectile", False
+                )
+                shrapnel.ai.projectile_type = "shrapnel"
+                shrapnel.name = "shrapnel"
                 shrapnel.ai.starting_coords = self.owner.world_coords
-                shrapnel.ai.shooter=projectile.ai.shooter
-                shrapnel.ai.weapon=projectile.ai.weapon
+                shrapnel.ai.shooter = projectile.ai.shooter
+                shrapnel.ai.weapon = projectile.ai.weapon
 
-                if compartment == 'passenger_compartment':
-                    self.handle_component_damage('random_crew_projectile', shrapnel)
+                if compartment == "passenger_compartment":
+                    self.handle_component_damage("random_crew_projectile", shrapnel)
 
                 else:  # vehicle_body
-                    self.handle_component_damage('driver_projectile', shrapnel)
-                
-    #---------------------------------------------------------------------------
+                    self.handle_component_damage("driver_projectile", shrapnel)
+
+    # ---------------------------------------------------------------------------
     def handle_rudder_left(self):
-        '''handle left rudder input'''
-        self.rudder=-1
+        """handle left rudder input"""
+        self.rudder = -1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_rudder_right(self):
-        '''handle right rudder input'''
-        self.rudder=1
+        """handle right rudder input"""
+        self.rudder = 1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_start_engines(self):
-        '''handle starting the engines'''
+        """handle starting the engines"""
 
         # check batteries
         # for now we are just checking if any of the batteries have any juice
-        # note - once the engines use magnetos or compression and dont need 
+        # note - once the engines use magnetos or compression and dont need
         # a functioning battery to keep going once started.
-        if self.electrical_system_functioning is False and self.engines[0].ai.internal_combustion:
+        if (
+            self.electrical_system_functioning is False
+            and self.engines[0].ai.internal_combustion
+        ):
             return
 
         # turn engines on
         for b in self.engines:
-            if b.ai.engine_on==False:
+            if b.ai.engine_on == False:
                 if b.ai.damaged is False:
-                    b.ai.engine_on=True
+                    b.ai.engine_on = True
 
         self.spawn_engine_exhaust()
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_stop_engines(self):
-        '''handle stopping the engines'''
+        """handle stopping the engines"""
         for b in self.engines:
-            if b.ai.engine_on==True:
-                b.ai.engine_on=False
+            if b.ai.engine_on == True:
+                b.ai.engine_on = False
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_steer_left(self):
-        ''' recieve left steering input '''
-        if self.owner.altitude<1:
-            self.wheel_steering=1
-    
-    #---------------------------------------------------------------------------
+        """recieve left steering input"""
+        if self.owner.altitude < 1:
+            self.wheel_steering = 1
+
+    # ---------------------------------------------------------------------------
     def handle_steer_right(self):
-        ''' recieve left steering input '''
-        if self.owner.altitude<1:
-            self.wheel_steering=-1
+        """recieve left steering input"""
+        if self.owner.altitude < 1:
+            self.wheel_steering = -1
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_steer_neutral(self):
-        '''reset steerign to zero'''
-        self.wheel_steering=0
+        """reset steerign to zero"""
+        self.wheel_steering = 0
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_throttle_up(self):
-        '''adjust the throttle a bit over time'''
+        """adjust the throttle a bit over time"""
 
         # ! note - nothing actually uses this apparently..
 
-        if self.current_speed==0:
-            self.tracks_enabled=True
+        if self.current_speed == 0:
+            self.tracks_enabled = True
             self.spawn_engine_exhaust()
 
-        self.throttle+=1*self.owner.world.time_passed_seconds
-        if self.throttle>1:
-            self.throttle=1
+        self.throttle += 1 * self.owner.world.time_passed_seconds
+        if self.throttle > 1:
+            self.throttle = 1
 
         if self.throttle_zero:
-            print('Warning - throttle_zero interferes with throttle up')
+            print("Warning - throttle_zero interferes with throttle up")
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def handle_throttle_down(self):
-        '''adjust the throttle a bit over time'''
+        """adjust the throttle a bit over time"""
 
         # note nothing actuall uses this apparently
 
-        self.throttle-=1*self.owner.world.time_passed_seconds
-        if self.throttle<0:
-            self.throttle=0
+        self.throttle -= 1 * self.owner.world.time_passed_seconds
+        if self.throttle < 0:
+            self.throttle = 0
 
         if self.throttle_zero:
-            print('Warning - throttle_zero interferes with throttle down')
+            print("Warning - throttle_zero interferes with throttle down")
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def neutral_controls(self):
-        ''' return controls to neutral over time'''
+        """return controls to neutral over time"""
 
-        # controls should return to neutral over time 
-        time_passed=self.owner.world.time_passed_seconds
+        # controls should return to neutral over time
+        time_passed = self.owner.world.time_passed_seconds
 
-        #return wheel to neutral
-        self.wheel_steering=engine.math_2d.regress_to_zero(self.wheel_steering,time_passed)
+        # return wheel to neutral
+        self.wheel_steering = engine.math_2d.regress_to_zero(
+            self.wheel_steering, time_passed
+        )
 
-        
         # is this wanted??
         # return throttle to neutral
         # we want this to happen no matter what if the vehicle is disabled
         # otherwise there can be a continious smoke output from throttle>0 with no movement
         if self.throttle_zero or self.vehicle_disabled:
-            self.throttle=engine.math_2d.regress_to_zero(self.throttle,time_passed)
+            self.throttle = engine.math_2d.regress_to_zero(self.throttle, time_passed)
 
         if self.brake_zero:
-            self.brake_power=engine.math_2d.regress_to_zero(self.brake_power,time_passed)
+            self.brake_power = engine.math_2d.regress_to_zero(
+                self.brake_power, time_passed
+            )
 
-         # aierlons 
-        self.ailerons=engine.math_2d.regress_to_zero(self.ailerons,time_passed)
+        # aierlons
+        self.ailerons = engine.math_2d.regress_to_zero(self.ailerons, time_passed)
 
         # elevator
-        self.elevator=engine.math_2d.regress_to_zero(self.elevator,time_passed)
+        self.elevator = engine.math_2d.regress_to_zero(self.elevator, time_passed)
 
-        # rudder       
-        self.rudder=engine.math_2d.regress_to_zero(self.rudder,time_passed)
+        # rudder
+        self.rudder = engine.math_2d.regress_to_zero(self.rudder, time_passed)
 
-    #---------------------------------------------------------------------------
-    def projectile_bounce(self,projectile):
-        '''bounce/deflect a projectile'''
-        if random.randint(0,3)==3:
-            projectile.ai.flightTime=projectile.ai.maxTime-random.uniform(0.2,0.5)
-            projectile.rotation_angle=(projectile.rotation_angle+180) % 360
-            projectile.rotation_angle+=random.randint(-30,30)
-            projectile.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle)
-            projectile.ai.ignore_list=[self.owner]
-            projectile.reset_image=True
+    # ---------------------------------------------------------------------------
+    def projectile_bounce(self, projectile):
+        """bounce/deflect a projectile"""
+        if random.randint(0, 3) == 3:
+            projectile.ai.flightTime = projectile.ai.maxTime - random.uniform(0.2, 0.5)
+            projectile.rotation_angle = (projectile.rotation_angle + 180) % 360
+            projectile.rotation_angle += random.randint(-30, 30)
+            projectile.heading = engine.math_2d.get_heading_from_rotation(
+                projectile.rotation_angle
+            )
+            projectile.ai.ignore_list = [self.owner]
+            projectile.reset_image = True
         else:
             projectile.wo_stop()
 
-    #---------------------------------------------------------------------------
-    def projectile_collision(self,projectile):
-        
+    # ---------------------------------------------------------------------------
+    def projectile_collision(self, projectile):
+
         # -- determine what area the projectile hit --
-        hit_side,relative_angle=engine.math_2d.calculate_hit_side(self.owner.rotation_angle,projectile.rotation_angle)
-        hit_height=random.choice(['high','low'])
+        hit_side, relative_angle = engine.math_2d.calculate_hit_side(
+            self.owner.rotation_angle, projectile.rotation_angle
+        )
+        hit_height = random.choice(["high", "low"])
 
-        area_hit_options=[]
-        possible_turrets=[]
-        if hit_height=='high':
+        area_hit_options = []
+        possible_turrets = []
+        if hit_height == "high":
             for b in self.turrets:
-                if b.ai.vehicle_mount_side=='top':
+                if b.ai.vehicle_mount_side == "top":
                     possible_turrets.append(b)
-            area_hit_options.append('passenger_compartment')
-        if hit_height=='low':
+            area_hit_options.append("passenger_compartment")
+        if hit_height == "low":
             for b in self.turrets:
-                if b.ai.vehicle_mount_side==hit_side:
+                if b.ai.vehicle_mount_side == hit_side:
                     possible_turrets.append(b)
-            area_hit_options.append('vehicle_body')
+            area_hit_options.append("vehicle_body")
 
-            if hit_side in ['left','right']:
-                area_hit_options.append('wheels')
+            if hit_side in ["left", "right"]:
+                area_hit_options.append("wheels")
 
-        if len(possible_turrets)>0:
-            area_hit_options.append('turret')
+        if len(possible_turrets) > 0:
+            area_hit_options.append("turret")
 
-        area_hit=random.choice(area_hit_options)
-
+        area_hit = random.choice(area_hit_options)
 
         # ! Note : it is important that these subfunctions remove projectile from world if it doesn't bounce
-        if area_hit=='vehicle_body':
-            self.projectile_hit_vehicle_body(projectile,hit_side,relative_angle)
-        elif area_hit=='passenger_compartment':
-            self.projectile_hit_passenger_compartment(projectile,hit_side,relative_angle)
-        elif area_hit=='wheels':
-            self.projectile_hit_wheel(projectile,hit_side,relative_angle)
-        elif area_hit=='turret':
-            turret=random.choice(possible_turrets)
+        if area_hit == "vehicle_body":
+            self.projectile_hit_vehicle_body(projectile, hit_side, relative_angle)
+        elif area_hit == "passenger_compartment":
+            self.projectile_hit_passenger_compartment(
+                projectile, hit_side, relative_angle
+            )
+        elif area_hit == "wheels":
+            self.projectile_hit_wheel(projectile, hit_side, relative_angle)
+        elif area_hit == "turret":
+            turret = random.choice(possible_turrets)
             # small gives a 50% chance to miss and hit the vehicle body instead
             if turret.ai.small:
-                if random.randint(0,1)==1:
-                    turret.ai.handle_event('collision',projectile)
+                if random.randint(0, 1) == 1:
+                    turret.ai.handle_event("collision", projectile)
                 else:
-                    self.projectile_hit_vehicle_body(projectile,hit_side,relative_angle)
+                    self.projectile_hit_vehicle_body(
+                        projectile, hit_side, relative_angle
+                    )
             else:
-                turret.ai.handle_event('collision',projectile)
+                turret.ai.handle_event("collision", projectile)
         else:
-            engine.log.add_data('error',f'ai_vehicle.projectile_collision unknown area_hit:{area_hit}',True)
-        
+            engine.log.add_data(
+                "error",
+                f"ai_vehicle.projectile_collision unknown area_hit:{area_hit}",
+                True,
+            )
 
-        #engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
-        engine.world_builder.spawn_sparks(self.owner.world,projectile.world_coords,random.randint(1,2))
+        # engine.world_builder.spawn_object(self.owner.world,event_data.world_coords,'dirt',True)
+        engine.world_builder.spawn_sparks(
+            self.owner.world, projectile.world_coords, random.randint(1, 2)
+        )
 
-    #---------------------------------------------------------------------------
-    def projectile_hit_passenger_compartment(self,projectile,side,relative_angle):
-        '''handle a projectile hit to the passenger compartment'''
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.passenger_compartment_armor[side],side,relative_angle)
-        
-        result=''
-        if spaced_effect == 'destabilized':
-            result = 'destabilized by spaced armor'
-        
+    # ---------------------------------------------------------------------------
+    def projectile_hit_passenger_compartment(self, projectile, side, relative_angle):
+        """handle a projectile hit to the passenger compartment"""
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, projectile.ai.starting_coords
+        )
+        penetration, pen_value, armor_value, spaced_effect = (
+            engine.penetration_calculator.calculate_penetration(
+                projectile,
+                distance,
+                "steel",
+                self.passenger_compartment_armor[side],
+                side,
+                relative_angle,
+            )
+        )
+
+        result = ""
+        if spaced_effect == "destabilized":
+            result = "destabilized by spaced armor"
+
         if penetration:
-            damage_options=['random_crew_projectile']
+            damage_options = ["random_crew_projectile"]
 
             if self.fuel_leak:
-                damage_options.append('random_crew_fire')
+                damage_options.append("random_crew_fire")
 
             # no armor also means no spalling
-            # chance for bullets to just sail through without hitting 
-            if self.passenger_compartment_armor['left'][0]<1:
-                damage_options.append('miraculously unharmed')
+            # chance for bullets to just sail through without hitting
+            if self.passenger_compartment_armor["left"][0] < 1:
+                damage_options.append("miraculously unharmed")
 
             if self.passenger_compartment_ammo_racks:
-                damage_options.append('ammo_rack')
+                damage_options.append("ammo_rack")
 
-            result=random.choice(damage_options)
-            self.handle_component_damage(result,projectile)
+            # cramped crew compartment greatly increases chance of crew damage
+            if self.cramped_crew_compartment:
+                # double the weight for crew damage options
+                damage_options.append("random_crew_projectile")
+                if self.fuel_leak:
+                    damage_options.append("random_crew_fire")
+                    damage_options.append("random_crew_fire")
+                if random.randint(0, 1) == 0:
+                    damage_options.append("all_crew")
 
-            # chance to richochet into the body 
-            if random.randint(0,3)==3:
-                self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+                # extra damage 
+                if random.randint(0,2)==2:
+                    self.handle_component_damage(random.choice(damage_options),projectile)
+
+            result = random.choice(damage_options)
+            self.handle_component_damage(result, projectile)
+
+            # chance to richochet into the body
+            if random.randint(0, 3) == 3:
+                self.projectile_hit_vehicle_body(projectile, side, relative_angle)
             else:
                 projectile.wo_stop()
 
-            self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
+            self.add_hit_data(
+                projectile,
+                penetration,
+                side,
+                distance,
+                "Passenger Compartment",
+                result,
+                pen_value,
+                armor_value,
+            )
 
         else:
             # check for partial penetration causing spalling
             # destabilized rounds lack coherent energy for spalling
-            if pen_value >= armor_value * 0.9 and spaced_effect != 'destabilized':
-                self.handle_spalling_damage('passenger_compartment',projectile)
-                result = 'spalling'
-            self.add_hit_data(projectile,penetration,side,distance,'Passenger Compartment',result,pen_value,armor_value)
+            if pen_value >= armor_value * 0.9 and spaced_effect != "destabilized":
+                self.handle_spalling_damage("passenger_compartment", projectile)
+                result = "spalling"
+            self.add_hit_data(
+                projectile,
+                penetration,
+                side,
+                distance,
+                "Passenger Compartment",
+                result,
+                pen_value,
+                armor_value,
+            )
             self.projectile_bounce(projectile)
-        
-    #---------------------------------------------------------------------------
-    def projectile_hit_vehicle_body(self,projectile,side,relative_angle):
-        '''handle a projectile hit to the vehicle body'''
-        distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-        penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',self.vehicle_armor[side],side,relative_angle)
-        
-        result=''
-        if spaced_effect == 'destabilized':
-            result = 'destabilized by spaced armor'
-        
+
+    # ---------------------------------------------------------------------------
+    def projectile_hit_vehicle_body(self, projectile, side, relative_angle):
+        """handle a projectile hit to the vehicle body"""
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, projectile.ai.starting_coords
+        )
+        penetration, pen_value, armor_value, spaced_effect = (
+            engine.penetration_calculator.calculate_penetration(
+                projectile,
+                distance,
+                "steel",
+                self.vehicle_armor[side],
+                side,
+                relative_angle,
+            )
+        )
+
+        result = ""
+        if spaced_effect == "destabilized":
+            result = "destabilized by spaced armor"
+
         if penetration:
             projectile.wo_stop()
-            damage_options=['driver_projectile','engine','ammo_rack']
-            if len(self.fuel_tanks)>0:
-                damage_options.append('fuel_tank')
-            result=random.choice(damage_options)
-            self.handle_component_damage(result,projectile)
+            damage_options = ["driver_projectile", "engine", "ammo_rack"]
+            if len(self.fuel_tanks) > 0:
+                damage_options.append("fuel_tank")
+            result = random.choice(damage_options)
+            self.handle_component_damage(result, projectile)
 
-            self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
+            self.add_hit_data(
+                projectile,
+                penetration,
+                side,
+                distance,
+                "Vehicle Body",
+                result,
+                pen_value,
+                armor_value,
+            )
 
         else:
             # check for partial penetration causing spalling
             # destabilized rounds lack coherent energy for spalling
-            if pen_value >= armor_value * 0.9 and spaced_effect != 'destabilized':
-                self.handle_spalling_damage('vehicle_body',projectile)
-                result = 'spalling'
-            self.add_hit_data(projectile,penetration,side,distance,'Vehicle Body',result,pen_value,armor_value)
+            if pen_value >= armor_value * 0.9 and spaced_effect != "destabilized":
+                self.handle_spalling_damage("vehicle_body", projectile)
+                result = "spalling"
+            self.add_hit_data(
+                projectile,
+                penetration,
+                side,
+                distance,
+                "Vehicle Body",
+                result,
+                pen_value,
+                armor_value,
+            )
             self.projectile_bounce(projectile)
 
-    #---------------------------------------------------------------------------
-    def projectile_hit_wheel(self,projectile,side,relative_angle):
-        '''handle a projectile hit to the vehicle body'''
+    # ---------------------------------------------------------------------------
+    def projectile_hit_wheel(self, projectile, side, relative_angle):
+        """handle a projectile hit to the vehicle body"""
 
-        # note - vehicles that only have wheels in some of the groups will fair 
+        # note - vehicles that only have wheels in some of the groups will fair
         # better here. the flow should probably be updated to fix this.
 
-        wheel=None
-        if side=='left':
-            if random.randint(0,1)==0:
+        wheel = None
+        if side == "left":
+            if random.randint(0, 1) == 0:
                 if self.front_left_wheels:
-                    wheel=random.choice(self.front_left_wheels)
+                    wheel = random.choice(self.front_left_wheels)
             else:
                 if self.rear_left_wheels:
-                    wheel=random.choice(self.rear_left_wheels)
-        elif side=='right':
-            if random.randint(0,1)==0:
+                    wheel = random.choice(self.rear_left_wheels)
+        elif side == "right":
+            if random.randint(0, 1) == 0:
                 if self.front_right_wheels:
-                    wheel=random.choice(self.front_right_wheels)
+                    wheel = random.choice(self.front_right_wheels)
             else:
                 if self.rear_right_wheels:
-                    wheel=random.choice(self.rear_right_wheels)
+                    wheel = random.choice(self.rear_right_wheels)
         if wheel:
-            distance=engine.math_2d.get_distance(self.owner.world_coords,projectile.ai.starting_coords)
-            penetration,pen_value,armor_value,spaced_effect=engine.penetration_calculator.calculate_penetration(projectile,distance,'steel',wheel.ai.armor,side,relative_angle)
-            
-            result=''
-            if spaced_effect == 'destabilized':
-                result = 'destabilized by spaced armor'
-            
+            distance = engine.math_2d.get_distance(
+                self.owner.world_coords, projectile.ai.starting_coords
+            )
+            penetration, pen_value, armor_value, spaced_effect = (
+                engine.penetration_calculator.calculate_penetration(
+                    projectile, distance, "steel", wheel.ai.armor, side, relative_angle
+                )
+            )
+
+            result = ""
+            if spaced_effect == "destabilized":
+                result = "destabilized by spaced armor"
+
             if penetration:
                 if wheel.ai.destroyed:
                     # pass hit through to vehicle body
-                    self.projectile_hit_vehicle_body(projectile,side,relative_angle)
-                    result='projectile passes through destroyed wheel'
+                    self.projectile_hit_vehicle_body(projectile, side, relative_angle)
+                    result = "projectile passes through destroyed wheel"
 
                 else:
                     if wheel.ai.damaged:
-                        wheel.ai.destroyed=True
-                        result='wheel destroyed'
+                        wheel.ai.destroyed = True
+                        result = "wheel destroyed"
                     else:
-                        wheel.ai.damaged=True
-                        result='wheel damaged'
+                        wheel.ai.damaged = True
+                        result = "wheel damaged"
 
                     # chance to continue into the body
-                    if random.randint(0,2)==2:
-                        self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+                    if random.randint(0, 2) == 2:
+                        self.projectile_hit_vehicle_body(
+                            projectile, side, relative_angle
+                        )
                     else:
                         projectile.wo_stop()
 
@@ -949,43 +1094,60 @@ class AIVehicle():
             else:
                 self.projectile_bounce(projectile)
 
-            
-            self.add_hit_data(projectile,penetration,side,distance,'Wheel',result,pen_value,armor_value)
+            self.add_hit_data(
+                projectile,
+                penetration,
+                side,
+                distance,
+                "Wheel",
+                result,
+                pen_value,
+                armor_value,
+            )
         else:
-            # no wheels hit 
+            # no wheels hit
             # pass it to the vehicle body
-            self.projectile_hit_vehicle_body(projectile,side,relative_angle)
+            self.projectile_hit_vehicle_body(projectile, side, relative_angle)
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def read_fuel_gauge(self):
-        '''returns current fuel volume and maximum fuel volume combined across all tanks'''
-        max_volume=0
-        current_volume=0
+        """returns current fuel volume and maximum fuel volume combined across all tanks"""
+        max_volume = 0
+        current_volume = 0
 
         for tank in self.fuel_tanks:
-            max_volume+=tank.volume
-            if len(tank.ai.inventory)>0:
-                if 'gas' in tank.ai.inventory[0].name or 'diesel' in tank.ai.inventory[0].name:
-                    current_volume+=tank.ai.inventory[0].volume
+            max_volume += tank.volume
+            if len(tank.ai.inventory) > 0:
+                if (
+                    "gas" in tank.ai.inventory[0].name
+                    or "diesel" in tank.ai.inventory[0].name
+                ):
+                    current_volume += tank.ai.inventory[0].volume
 
-        return current_volume,max_volume
-    
-    #---------------------------------------------------------------------------
+        return current_volume, max_volume
+
+    # ---------------------------------------------------------------------------
     def spawn_engine_exhaust(self):
-        '''spawn engine smoke'''
+        """spawn engine smoke"""
         for b in self.engines:
             if b.ai.engine_on:
                 if b.ai.internal_combustion:
-                    #smoke!
-                    heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle+180)
-                    smoke_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
-                                            self.owner.rotation_angle,b.ai.exhaust_position_offset)
-                    engine.world_builder.spawn_smoke_cloud(self.owner.world,smoke_coords,heading)
+                    # smoke!
+                    heading = engine.math_2d.get_heading_from_rotation(
+                        self.owner.rotation_angle + 180
+                    )
+                    smoke_coords = engine.math_2d.calculate_relative_position(
+                        self.owner.world_coords,
+                        self.owner.rotation_angle,
+                        b.ai.exhaust_position_offset,
+                    )
+                    engine.world_builder.spawn_smoke_cloud(
+                        self.owner.world, smoke_coords, heading
+                    )
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update(self):
-        ''' overrides base update '''
+        """overrides base update"""
 
         if self.on_fire:
             self.update_vehicle_fire()
@@ -995,11 +1157,11 @@ class AIVehicle():
 
         # update engines
         for b in self.engines:
-            b.throttle_control=self.throttle
+            b.throttle_control = self.throttle
             b.update()
             # simple check for now
             if b.ai.engine_on:
-                self.engines_on=True
+                self.engines_on = True
 
         # updates fuel tanks and handles fuel flow to engines
         self.update_fuel_system()
@@ -1008,24 +1170,26 @@ class AIVehicle():
         self.update_electrical_system()
 
         # update radio
-        if self.radio!=None:
-            self.radio.world_coords=copy.copy(self.owner.world_coords)
+        if self.radio != None:
+            self.radio.world_coords = copy.copy(self.owner.world_coords)
             self.radio.update()
 
-        if self.owner.world.world_seconds>self.last_dynamic_speed_update+self.dynamic_speed_update_interval:
-            self.last_dynamic_speed_update=self.owner.world.world_seconds
+        if (
+            self.owner.world.world_seconds
+            > self.last_dynamic_speed_update + self.dynamic_speed_update_interval
+        ):
+            self.last_dynamic_speed_update = self.owner.world.world_seconds
             self.update_max_dynamic_speed()
 
-
-        if self.throttle>0:
-            if self.current_speed==0:
-                if self.owner.weight>500:
-                    self.tracks_enabled=True
-                    self.tracks_count=0
+        if self.throttle > 0:
+            if self.current_speed == 0:
+                if self.owner.weight > 500:
+                    self.tracks_enabled = True
+                    self.tracks_count = 0
                     self.spawn_engine_exhaust()
 
         else:
-            self.acceleration=0
+            self.acceleration = 0
 
         # update rate of climb
         self.update_rate_of_climb_calculation()
@@ -1034,14 +1198,17 @@ class AIVehicle():
 
         # bring controls back to neutral slowly over time
         self.neutral_controls()
-        
+
         if self.recent_noise_or_move:
-            if self.owner.world.world_seconds-self.last_noise_or_move_time>self.recent_noise_or_move_reset_seconds:
-                self.recent_noise_or_move=False
-            
-    #---------------------------------------------------------------------------
+            if (
+                self.owner.world.world_seconds - self.last_noise_or_move_time
+                > self.recent_noise_or_move_reset_seconds
+            ):
+                self.recent_noise_or_move = False
+
+    # ---------------------------------------------------------------------------
     def update_child_position_rotation(self):
-        '''update the position and rotation of child objects'''
+        """update the position and rotation of child objects"""
         # this is only called when the vehicle position or rotation changes
         # it is also called by human_ai when it enters the vehicle
 
@@ -1049,60 +1216,68 @@ class AIVehicle():
         for role in self.vehicle_crew:
             # if position is occupied
             if role.role_occupied:
-
                 # stuff to change no matter what
-                role.human.altitude=self.owner.altitude
+                role.human.altitude = self.owner.altitude
                 # if position is visible and grid square we are in is visible
                 if role.seat_visible and self.owner.grid_square.visible:
                     # set the world coords with the offset
-                    role.human.world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,role.seat_offset)
-                    role.human.rotation_angle=self.owner.rotation_angle+role.seat_rotation
-                    role.human.reset_image=True
+                    role.human.world_coords = (
+                        engine.math_2d.calculate_relative_position(
+                            self.owner.world_coords,
+                            self.owner.rotation_angle,
+                            role.seat_offset,
+                        )
+                    )
+                    role.human.rotation_angle = (
+                        self.owner.rotation_angle + role.seat_rotation
+                    )
+                    role.human.reset_image = True
                 else:
                     # just a simple position
-                    role.human.world_coords=copy.copy(self.owner.world_coords)
-
-
+                    role.human.world_coords = copy.copy(self.owner.world_coords)
 
         # update towed object
-        if self.towed_object!=None:
-            self.towed_object.world_coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,self.owner.rotation_angle,self.tow_offset)
-            if self.towed_object.rotation_angle!=self.owner.rotation_angle:
-                self.towed_object.rotation_angle=self.owner.rotation_angle
-                self.towed_object.reset_image=True
+        if self.towed_object != None:
+            self.towed_object.world_coords = engine.math_2d.calculate_relative_position(
+                self.owner.world_coords, self.owner.rotation_angle, self.tow_offset
+            )
+            if self.towed_object.rotation_angle != self.owner.rotation_angle:
+                self.towed_object.rotation_angle = self.owner.rotation_angle
+                self.towed_object.reset_image = True
 
             if self.towed_object.is_vehicle:
                 # need to specifically call this as it will not trigger on the towed object itself as its engine is not used
                 self.towed_object.ai.update_child_position_rotation()
-        
-    #---------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------
     def update_electrical_system(self):
-        '''update the electrical system'''
+        """update the electrical system"""
         # update batteries
-        self.electrical_system_functioning=False
+        self.electrical_system_functioning = False
         for b in self.batteries:
             b.update()
             # quick and dirty check that at least one battery is functioning
-            if b.ai.state_of_charge>0:
-                self.electrical_system_functioning=True
-        
-        #electrical units are in hours for whatever reason. gotta get the conversion
-        time_passed_hours=self.owner.world.time_passed_seconds/3600
+            if b.ai.state_of_charge > 0:
+                self.electrical_system_functioning = True
 
-        charge=self.alternator_amps*time_passed_hours # I think the result of this is amp hours ?
-        
-        # charge batteries with the alternator 
+        # electrical units are in hours for whatever reason. gotta get the conversion
+        time_passed_hours = self.owner.world.time_passed_seconds / 3600
+
+        charge = (
+            self.alternator_amps * time_passed_hours
+        )  # I think the result of this is amp hours ?
+
+        # charge batteries with the alternator
         # theoretically the charge should be divided up amongst all the batteries?
-        # but then we should be modelling multiple alternators 
+        # but then we should be modelling multiple alternators
 
         if self.engines_on:
             for b in self.batteries:
                 b.ai.recharge(charge)
-        
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_fuel_system(self):
-        ''' distributes fuel from the tanks to the engines'''
+        """distributes fuel from the tanks to the engines"""
 
         # update fuel tanks
         for b in self.fuel_tanks:
@@ -1111,38 +1286,49 @@ class AIVehicle():
         # well this is not great
 
         for b in self.engines:
-            if b.ai.fuel_consumed>0:
-                fuel=0
+            if b.ai.fuel_consumed > 0:
+                fuel = 0
                 for c in self.fuel_tanks:
-                    if fuel<b.ai.fuel_consumed:
-                        if len(c.ai.inventory)==1: # fuel tank should have one object - the fuel liquid
+                    if fuel < b.ai.fuel_consumed:
+                        if (
+                            len(c.ai.inventory) == 1
+                        ):  # fuel tank should have one object - the fuel liquid
                             if c.ai.inventory[0].is_liquid:
                                 if c.ai.inventory[0].name in b.ai.fuel_type:
-                                    c.ai.inventory[0].volume,fuel=engine.math_2d.get_transfer_results(c.ai.inventory[0].volume,fuel,b.ai.fuel_consumed)
+                                    c.ai.inventory[0].volume, fuel = (
+                                        engine.math_2d.get_transfer_results(
+                                            c.ai.inventory[0].volume,
+                                            fuel,
+                                            b.ai.fuel_consumed,
+                                        )
+                                    )
                                 else:
-                                    print('warn - fuel type mismatch')
+                                    print("warn - fuel type mismatch")
                                     # note - this should hard kill the engine
                             else:
-                                print('Error: object in fuel tank is not liquid')
+                                print("Error: object in fuel tank is not liquid")
                         else:
-                            pass 
+                            pass
                             # should deal with contamination - but could also be empty
 
                 # give the fuel we got from the tanks to the engine
                 # if the engine doesn't get enough fuel it will eventuall shut off
-                b.ai.fuel_consumed-=fuel
+                b.ai.fuel_consumed -= fuel
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_heading(self):
-        '''normalize rotation and update heading'''
+        """normalize rotation and update heading"""
         # mostly called by update_physics when rotation changes, but also
         # needed when the the rotation angle of the vehicle has to be fixed externally
-        self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
-        self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-        self.owner.reset_image=True
+        self.owner.rotation_angle = engine.math_2d.get_normalized_angle(
+            self.owner.rotation_angle
+        )
+        self.owner.heading = engine.math_2d.get_heading_from_rotation(
+            self.owner.rotation_angle
+        )
+        self.owner.reset_image = True
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_max_dynamic_speed(self):
         terrain = self.owner.grid_square.get_terrain_type(self.owner.world_coords)
         # Tune coeffs to achieve desired max speeds via physics
@@ -1161,13 +1347,12 @@ class AIVehicle():
         else:
             self.rolling_resistance_coeff = 0.03
             terrain_max = self.max_offroad_speed
-        
-        
+
         self.max_dynamic_speed = terrain_max
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_physics(self):
-        '''update the physics of the vehicle - FIXED & IMPROVED VERSION'''
+        """update the physics of the vehicle - FIXED & IMPROVED VERSION"""
         time_passed = self.owner.world.time_passed_seconds
         heading_changed = False
 
@@ -1204,8 +1389,12 @@ class AIVehicle():
 
         # Count damaged/destroyed wheels
         damaged = destroyed = 0
-        for wheel_list in (self.front_left_wheels, self.front_right_wheels,
-                           self.rear_left_wheels, self.rear_right_wheels):
+        for wheel_list in (
+            self.front_left_wheels,
+            self.front_right_wheels,
+            self.rear_left_wheels,
+            self.rear_right_wheels,
+        ):
             for w in wheel_list:
                 if w.ai.destroyed:
                     destroyed += 1
@@ -1234,7 +1423,7 @@ class AIVehicle():
                 air_density=self.owner.world.air_density,
                 frontal_area=self.owner.frontal_area,
                 mass=self.owner.weight,
-                velocity=speed_magnitude
+                velocity=speed_magnitude,
             )
             self.current_speed += self.acceleration * time_passed
 
@@ -1249,7 +1438,7 @@ class AIVehicle():
                     air_density=self.owner.world.air_density,
                     frontal_area=self.owner.frontal_area,
                     mass=self.owner.weight,
-                    velocity=speed_magnitude
+                    velocity=speed_magnitude,
                 )
                 self.current_speed += self.acceleration * time_passed
             else:
@@ -1312,62 +1501,79 @@ class AIVehicle():
         if abs(self.current_speed) > 0.01 or heading_changed:
             self.update_child_position_rotation()
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_rate_of_climb_calculation(self):
-        '''update the rate of climb calculation'''
-        if self.max_rate_of_climb!=0:
+        """update the rate of climb calculation"""
+        if self.max_rate_of_climb != 0:
             # need some sort of actual algo here
-            lift=9.8 # counter act gravity for now
-            if self.current_speed>self.stall_speed:
+            lift = 9.8  # counter act gravity for now
+            if self.current_speed > self.stall_speed:
                 # if elevator is zero then rate of climb will be zero
                 # if elevator is up (-1) then rate of climb will be negative
-                self.rate_of_climb=(self.max_rate_of_climb*self.throttle*self.elevator)+lift
+                self.rate_of_climb = (
+                    self.max_rate_of_climb * self.throttle * self.elevator
+                ) + lift
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_tracks(self):
-        if self.current_speed>0:
-            if self.tracks_last_time+self.tracks_interval<self.owner.world.world_seconds:
+        if self.current_speed > 0:
+            if (
+                self.tracks_last_time + self.tracks_interval
+                < self.owner.world.world_seconds
+            ):
                 # reset time
-                self.tracks_last_time=self.owner.world.world_seconds
+                self.tracks_last_time = self.owner.world.world_seconds
 
-                self.tracks_count+=1
+                self.tracks_count += 1
 
-                coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
-                    self.owner.rotation_angle,self.tracks_left_offset)
-                track=engine.world_builder.spawn_object(self.owner.world,coords,'tank_tracks',True)
-                track.rotation_angle=self.owner.rotation_angle
+                coords = engine.math_2d.calculate_relative_position(
+                    self.owner.world_coords,
+                    self.owner.rotation_angle,
+                    self.tracks_left_offset,
+                )
+                track = engine.world_builder.spawn_object(
+                    self.owner.world, coords, "tank_tracks", True
+                )
+                track.rotation_angle = self.owner.rotation_angle
 
-                coords=engine.math_2d.calculate_relative_position(self.owner.world_coords,
-                    self.owner.rotation_angle,self.tracks_right_offset)
-                track=engine.world_builder.spawn_object(self.owner.world,coords,'tank_tracks',True)
-                track.rotation_angle=self.owner.rotation_angle
+                coords = engine.math_2d.calculate_relative_position(
+                    self.owner.world_coords,
+                    self.owner.rotation_angle,
+                    self.tracks_right_offset,
+                )
+                track = engine.world_builder.spawn_object(
+                    self.owner.world, coords, "tank_tracks", True
+                )
+                track.rotation_angle = self.owner.rotation_angle
 
-                if self.tracks_count>self.tracks_max:
-                    self.tracks_count=0
-                    self.tracks_enabled=False
+                if self.tracks_count > self.tracks_max:
+                    self.tracks_count = 0
+                    self.tracks_enabled = False
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update_vehicle_fire(self):
-        if self.last_fire_check+self.fire_check_interval<self.owner.world.world_seconds:
+        if (
+            self.last_fire_check + self.fire_check_interval
+            < self.owner.world.world_seconds
+        ):
             # reset time
-            self.last_fire_check=self.owner.world.world_seconds
+            self.last_fire_check = self.owner.world.world_seconds
 
-            chance=0
+            chance = 0
 
             if self.fuel_leak:
-                chance+=1
+                chance += 1
 
-            if random.randint(0,2)<=chance:
-
+            if random.randint(0, 2) <= chance:
                 # new fire!
-                flame_radius=20
-                flame_amount=5
-                coords=engine.math_2d.randomize_coordinates(self.owner.world_coords,random.randint(5,10))
-                self.owner.world.create_fire(coords,flame_amount,flame_radius,10,5)
+                flame_radius = 20
+                flame_amount = 5
+                coords = engine.math_2d.randomize_coordinates(
+                    self.owner.world_coords, random.randint(5, 10)
+                )
+                self.owner.world.create_fire(coords, flame_amount, flame_radius, 10, 5)
                 # not sure at what point the vehicle just becomes disabled
-                self.vehicle_disabled=True
+                self.vehicle_disabled = True
             else:
-
                 # note this also puts out the existing fire
-                self.on_fire=False
+                self.on_fire = False
