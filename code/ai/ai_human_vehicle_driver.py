@@ -309,7 +309,7 @@ class AIHumanVehicleDriver:
                 if abs(diff) <= 6:
                     # we are close enough
                     self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                        "waiting"
+                        VehicleCrewAction.WAITING
                     )
                     vehicle.ai.brake_power = 1
                     vehicle.ai.throttle = 0
@@ -329,26 +329,31 @@ class AIHumanVehicleDriver:
 
         # only check gunner actions if commander doesn't need rotation
         if gunner_role:
-            if gunner_role.turret.ai.primary_weapon:
-                current_action = gunner_role.human.ai.memory["task_vehicle_crew"][
-                    "current_action"
-                ]
+            current_action = gunner_role.human.ai.memory["task_vehicle_crew"][
+                "current_action"
+            ]
 
-                if current_action in [
+            if gunner_role.turret.ai.primary_weapon:
+                if current_action in (
                     VehicleCrewAction.RELOADING_PRIMARY,
                     VehicleCrewAction.RELOADING_COAX,
                     VehicleCrewAction.ENGAGING,
-                    VehicleCrewAction.CLEARING_JAM
-                ]:
+                    VehicleCrewAction.CLEARING_JAM,
+                ):
                     # wait for a bit
-                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = VehicleCrewAction.WAITING
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.WAITING
+                    )
                     vehicle.ai.brake_power = 1
                     vehicle.ai.throttle = 0
-                    self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = random.uniform(
-                        1, 5.0
+                    self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                        random.uniform(1, 5.0)
                     )
                     return
-
+            else:
+                # this should never happen. i think
+                engine.log.add_data('error',f'turret {gunner_role.turret.name} does not have a primary weapon',True)
+                return
 
             if current_action == VehicleCrewAction.WAITING_FOR_ROTATE:
                 target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]

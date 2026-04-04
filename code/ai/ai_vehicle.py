@@ -516,7 +516,10 @@ class AIVehicle:
                         b.ai.exhaust_position_offset,
                     )
                     engine.world_builder.spawn_smoke_cloud(
-                        self.owner.world, smoke_coords, heading
+                        self.owner.world, smoke_coords, heading, 40
+                    )
+                    engine.world_builder.spawn_smoke_cloud(
+                        self.owner.world, smoke_coords, heading, 40
                     )
             self.vehicle_disabled = True
         elif damaged_component == "all_crew":
@@ -569,6 +572,20 @@ class AIVehicle:
             tank.ai.punctured = True
             # the more hits the more leaks.
             tank.ai.container_integrity -= random.uniform(0.1, 0.3)
+
+            # spawn heavy smoke from fuel leak - multiple positions for volume
+            heading = engine.math_2d.get_heading_from_rotation(
+                self.owner.rotation_angle + 180
+            )
+            for offset in [[50, 0], [40, 15], [40, -15]]:
+                smoke_coords = engine.math_2d.calculate_relative_position(
+                    self.owner.world_coords,
+                    self.owner.rotation_angle,
+                    offset,
+                )
+                engine.world_builder.spawn_smoke_cloud(
+                    self.owner.world, smoke_coords, heading, 30
+                )
 
             if random.randint(0, 1) == 0:
                 self.on_fire = True
@@ -930,9 +947,11 @@ class AIVehicle:
                 if random.randint(0, 1) == 0:
                     damage_options.append("all_crew")
 
-                # extra damage 
-                if random.randint(0,2)==2:
-                    self.handle_component_damage(random.choice(damage_options),projectile)
+                # extra damage
+                if random.randint(0, 2) == 2:
+                    self.handle_component_damage(
+                        random.choice(damage_options), projectile
+                    )
 
             result = random.choice(damage_options)
             self.handle_component_damage(result, projectile)
@@ -1558,6 +1577,20 @@ class AIVehicle:
         ):
             # reset time
             self.last_fire_check = self.owner.world.world_seconds
+
+            # spawn heavy smoke when vehicle is on fire - multiple positions for volume
+            heading = engine.math_2d.get_heading_from_rotation(
+                self.owner.rotation_angle + 180
+            )
+            for offset in [[0, 0], [30, 20], [-30, -20], [20, 30], [-20, -30]]:
+                smoke_coords = engine.math_2d.calculate_relative_position(
+                    self.owner.world_coords,
+                    self.owner.rotation_angle,
+                    offset,
+                )
+                engine.world_builder.spawn_smoke_cloud(
+                    self.owner.world, smoke_coords, heading, 25
+                )
 
             chance = 0
 

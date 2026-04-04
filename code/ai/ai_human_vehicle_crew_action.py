@@ -11,6 +11,7 @@ class VehicleCrewAction(Enum):
     NONE = "none"
     DRIVING = "driving"
     ROTATING = "rotating"
+    ROTATING_TURRET = "rotating turret"
     IDLE = "idle"
     WAITING = "waiting"
     WAITING_FOR_ROTATE = "Waiting for driver to rotate the vehicle"

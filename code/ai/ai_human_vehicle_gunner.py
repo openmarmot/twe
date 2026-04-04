@@ -11,7 +11,6 @@ from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 
 # import custom packages
 import engine.math_2d
-import engine.world_builder
 import engine.log
 import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
@@ -767,7 +766,7 @@ class AIHumanVehicleGunner:
         # default
         self.owner.ai.memory["task_vehicle_crew"]["target"] = None
         self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-            "Scanning for targets"
+            VehicleCrewAction.SCANNING
         )
 
     # ---------------------------------------------------------------------------

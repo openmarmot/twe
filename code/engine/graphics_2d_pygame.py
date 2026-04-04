@@ -1,5 +1,4 @@
-
-'''
+"""
 repo : https://github.com/openmarmot/twe
 
 notes :
@@ -10,10 +9,9 @@ The idea is to keep the graphics engine seperate from the rest of the code,
  ref:
  # pygame.key.get_pressed() and general input theory
  https://stackoverflow.com/questions/17372314/is-it-me-or-is-pygame-key-get-pressed-not-working
-'''
+"""
 
-
-#import built in modules
+# import built in modules
 from itertools import islice
 import os
 from datetime import datetime
@@ -27,7 +25,7 @@ import pygame
 from pygame.locals import *
 import pygame.freetype
 
-#import custom packages
+# import custom packages
 import engine.math_2d
 from engine.game_menu import GameMenu
 from engine.world import World
@@ -35,23 +33,24 @@ from engine.strategic_map import StrategicMap
 from engine.vehicle_diagnostics import VehicleDiagnostics
 import engine.log
 
-class Graphics_2D_Pygame():
-    ''' 2D Graphics Engine using PyGame '''
 
-    def __init__(self,screen_size):
+class Graphics_2D_Pygame:
+    """2D Graphics Engine using PyGame"""
+
+    def __init__(self, screen_size):
         # called by World.__init__
 
-        self.images={}
-        self.image_cache={}
+        self.images = {}
+        self.image_cache = {}
 
         pygame.init()
         pygame.display.set_caption("https://github.com/openmarmot/twe")
 
-        self.double_buffering=True
+        self.double_buffering = True
 
         info = pygame.display.Info()
 
-        if screen_size is None:                    # Fullscreen
+        if screen_size is None:  # Fullscreen
             self.screen_size = (info.current_w, info.current_h)
             flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED
         elif screen_size == "auto":
@@ -69,26 +68,28 @@ class Graphics_2D_Pygame():
 
         self.screen = pygame.display.set_mode(self.screen_size, flags)
         self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
-        
+
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
 
-        self.screenshot_folder=f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+        self.screenshot_folder = (
+            f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+        )
         os.makedirs(self.screenshot_folder, exist_ok=True)
 
-        self.aar_screenshot_interval=10
-        self.last_aar_screenshot_time=0
+        self.aar_screenshot_interval = 10
+        self.last_aar_screenshot_time = 0
 
-        self.mode=0
+        self.mode = 0
         # 0 - game menu
-        # 1 - world 
+        # 1 - world
         # 2 - strategic_map
 
-        self.game_menu=GameMenu(self)
-        self.world=World()
-        self.strategic_map=StrategicMap(self)
-        self.vehicle_diagnostics=VehicleDiagnostics()
-
+        self.game_menu = GameMenu(self)
+        self.world = World()
+        self.strategic_map = StrategicMap(self)
+        self.vehicle_diagnostics = VehicleDiagnostics()
+        self.saved_scale = None
 
         # render level kind of a 'z' layer
         # 0 - ground cover
@@ -99,59 +100,65 @@ class Graphics_2D_Pygame():
         # 5 - humans
         # 6 - roofs (custom building ai)
         # 7 - objects above ground (birds, planes, clouds, etc)
-        
-        self.render_level_count=10
-        self.renderlists=[[] for _ in range(self.render_level_count)]
+
+        self.render_level_count = 10
+        self.renderlists = [[] for _ in range(self.render_level_count)]
 
         # count of rendered objects
-        self.render_count=0
+        self.render_count = 0
 
         # time stuff
-        self.clock=pygame.time.Clock()
-        self.time_passed=None
-        self.time_passed_seconds=None
+        self.clock = pygame.time.Clock()
+        self.time_passed = None
+        self.time_passed_seconds = None
 
         # text stuff
         # Different text sizes for in menus
-        font_path = os.path.join(os.path.dirname(pygame.__file__), 'freesansbold.ttf')
+        font_path = os.path.join(os.path.dirname(pygame.__file__), "freesansbold.ttf")
         self.small_font = pygame.freetype.Font(font_path, 14)
         self.medium_font = pygame.freetype.Font(font_path, 18)
         self.large_font = pygame.freetype.Font(font_path, 30)
 
-        self.menu_color='#ffffff'
-        self.color_black='#000000'
+        self.menu_color = "#ffffff"
+        self.color_black = "#000000"
 
         # draw collision circles
-        self.draw_collision=False
+        self.draw_collision = False
 
         # will cause everything to exit
-        self.quit=False
+        self.quit = False
 
         # max_fps max frames for every second.
-        self.max_fps=60
-
-        
+        self.max_fps = 60
 
         # buffer to make objects start rendering slightly off screen
-        self.view_buffer=100
+        self.view_buffer = 100
 
         # -- key stuff --
         # https://www.pygame.org/docs/ref/key.html
         # continuous
         self.key_press_actions = {
-            pygame.K_w: lambda: self.world.handle_key_press('w',self.get_mouse_screen_coords()),
-            pygame.K_s: lambda: self.world.handle_key_press('s'),
-            pygame.K_a: lambda: self.world.handle_key_press('a'),
-            pygame.K_d: lambda: self.world.handle_key_press('d'),
-            pygame.K_f: lambda: self.world.handle_key_press('f', self.get_mouse_screen_coords()),
-            pygame.K_g: lambda: self.world.handle_key_press('g', self.get_mouse_screen_coords()),
-            pygame.K_t: lambda: self.world.handle_key_press('t', self.get_mouse_screen_coords()),
-            pygame.K_b: lambda: self.world.handle_key_press('b'),
-            pygame.K_p: lambda: self.world.handle_key_press('p'),
-            pygame.K_UP: lambda: self.world.handle_key_press('up'),
-            pygame.K_DOWN: lambda: self.world.handle_key_press('down'),
-            pygame.K_LEFT: lambda: self.world.handle_key_press('left'),
-            pygame.K_RIGHT: lambda: self.world.handle_key_press('right'),
+            pygame.K_w: lambda: self.world.handle_key_press(
+                "w", self.get_mouse_screen_coords()
+            ),
+            pygame.K_s: lambda: self.world.handle_key_press("s"),
+            pygame.K_a: lambda: self.world.handle_key_press("a"),
+            pygame.K_d: lambda: self.world.handle_key_press("d"),
+            pygame.K_f: lambda: self.world.handle_key_press(
+                "f", self.get_mouse_screen_coords()
+            ),
+            pygame.K_g: lambda: self.world.handle_key_press(
+                "g", self.get_mouse_screen_coords()
+            ),
+            pygame.K_t: lambda: self.world.handle_key_press(
+                "t", self.get_mouse_screen_coords()
+            ),
+            pygame.K_b: lambda: self.world.handle_key_press("b"),
+            pygame.K_p: lambda: self.world.handle_key_press("p"),
+            pygame.K_UP: lambda: self.world.handle_key_press("up"),
+            pygame.K_DOWN: lambda: self.world.handle_key_press("down"),
+            pygame.K_LEFT: lambda: self.world.handle_key_press("left"),
+            pygame.K_RIGHT: lambda: self.world.handle_key_press("right"),
         }
 
         # one time
@@ -168,232 +175,251 @@ class Graphics_2D_Pygame():
             pygame.K_8: "8",
             pygame.K_9: "9",
             pygame.K_ESCAPE: "esc",
-            pygame.K_TAB: 'tab',
-            pygame.K_p: 'p',
-            pygame.K_t: 't',
-            pygame.K_g: 'g',
-            pygame.K_r: 'r',
-            pygame.K_MINUS: '-',
-            pygame.K_EQUALS: '+',
-            pygame.K_z: 'z',
-            pygame.K_x: 'x',
-            pygame.K_LEFTBRACKET: '[',
-            pygame.K_RIGHTBRACKET: ']',
-            pygame.K_SPACE: 'space',
-            pygame.K_LCTRL: 'l_ctrl',
-            pygame.K_m: 'm'
+            pygame.K_TAB: "tab",
+            pygame.K_p: "p",
+            pygame.K_t: "t",
+            pygame.K_g: "g",
+            pygame.K_r: "r",
+            pygame.K_MINUS: "-",
+            pygame.K_EQUALS: "+",
+            pygame.K_z: "z",
+            pygame.K_x: "x",
+            pygame.K_LEFTBRACKET: "[",
+            pygame.K_RIGHTBRACKET: "]",
+            pygame.K_SPACE: "space",
+            pygame.K_LCTRL: "l_ctrl",
+            pygame.K_m: "m",
         }
 
-
         # load all images
-        self.load_all_images('images')
+        self.load_all_images("images")
 
         # setup and scale the background images
-        self.menu_background_image=None
-        self.menu_background_rect=None
+        self.menu_background_image = None
+        self.menu_background_rect = None
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def create_screenshot(self):
-        pygame.image.save(self.screen, f"{self.screenshot_folder}/twe-{round(self.world.world_seconds,2)}.png")
+        pygame.image.save(
+            self.screen,
+            f"{self.screenshot_folder}/twe-{round(self.world.world_seconds, 2)}.png",
+        )
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def get_mouse_screen_coords(self):
-        '''return mouse screen coordinates'''
-        x,y=pygame.mouse.get_pos()
-        return [x,y]
+        """return mouse screen coordinates"""
+        x, y = pygame.mouse.get_pos()
+        return [x, y]
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def get_mouse_world_coords(self):
-        ''' return world coords of mouse'''
+        """return world coords of mouse"""
         x, y = pygame.mouse.get_pos()
         translation = self.get_translation()
         world_x = (x - translation[0]) / self.scale
         world_y = (y - translation[1]) / self.scale
         return [world_x, world_y]
 
-    #-----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     def get_player_screen_coords(self):
-        ''' return player screen coordinates'''
+        """return player screen coordinates"""
         return self.screen_center
-    
-    #------------------------------------------------------------------------------
-    def get_translation(self):
-        ''' returns the translation for world to screen coords '''
-        player_x=self.world.player.world_coords[0]*self.world.scale
-        player_y=self.world.player.world_coords[1]*self.world.scale
-        
-        self.world.player.screen_coords=self.screen_center
 
-        translate=[self.screen_center[0]-player_x,self.screen_center[1]-player_y]
+    # ------------------------------------------------------------------------------
+    def get_translation(self):
+        """returns the translation for world to screen coords"""
+        player_x = self.world.player.world_coords[0] * self.world.scale
+        player_y = self.world.player.world_coords[1] * self.world.scale
+
+        self.world.player.screen_coords = self.screen_center
+
+        translate = [self.screen_center[0] - player_x, self.screen_center[1] - player_y]
         return translate
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def handle_input(self):
-        ''' handle input from user'''
+        """handle input from user"""
 
-        # usefull for single button presses where you don't 
+        # usefull for single button presses where you don't
         # need to know if the button is still pressed
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                #pygame.quit()
-                self.quit=True
-            if event.type==pygame.KEYDOWN:
-                #print(event.key)
-                translated_key=self.key_down_translations.get(event.key,'none')
+            if event.type == pygame.QUIT:
+                # pygame.quit()
+                self.quit = True
+            if event.type == pygame.KEYDOWN:
+                # print(event.key)
+                translated_key = self.key_down_translations.get(event.key, "none")
 
-                if self.mode==0:
+                if self.mode == 0:
                     self.game_menu.handle_input(translated_key)
-                elif self.mode==1:
-                    if translated_key=='l_ctrl':
+                elif self.mode == 1:
+                    if translated_key == "l_ctrl":
                         self.create_screenshot()
                     else:
-                        self.world.handle_keydown(translated_key,self.get_mouse_screen_coords())
-                elif self.mode==2:
+                        self.world.handle_keydown(
+                            translated_key, self.get_mouse_screen_coords()
+                        )
+                elif self.mode == 2:
                     self.strategic_map.handle_keydown(translated_key)
-                elif self.mode==3:
+                elif self.mode == 3:
                     self.vehicle_diagnostics.handle_keydown(translated_key)
                 else:
-                    engine.log.add_data('error','graphics_2d_pygame.handle_input graphic_engine.mode unknown '+str(self.mode),True)
+                    engine.log.add_data(
+                        "error",
+                        "graphics_2d_pygame.handle_input graphic_engine.mode unknown "
+                        + str(self.mode),
+                        True,
+                    )
 
-            if event.type==pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 # left click
-                if event.button==1:
-                    self.select_closest_object_with_mouse(self.get_mouse_screen_coords())
+                if event.button == 1:
+                    self.select_closest_object_with_mouse(
+                        self.get_mouse_screen_coords()
+                    )
                 # middle button click
-                if event.button==2:
+                if event.button == 2:
                     pass
                 # right click
-                if event.button==3:
+                if event.button == 3:
                     pass
-            if event.type==pygame.MOUSEMOTION:
-                #print(str(event.pos))
+            if event.type == pygame.MOUSEMOTION:
+                # print(str(event.pos))
                 pass
-        
+
         # handle key press (continuous input)
         # i think more than one can be down at once, that is why we don't do if/elif
-        if self.mode==1:
+        if self.mode == 1:
             keys = pygame.key.get_pressed()
-            
+
             for key, action in self.key_press_actions.items():
                 if keys[key]:
                     action()
 
-    #------------------------------------------------------------------------------
-    def load_all_images(self,folder_path):
-        '''load all the images into pygame'''
+    # ------------------------------------------------------------------------------
+    def load_all_images(self, folder_path):
+        """load all the images into pygame"""
         try:
             for filename in os.listdir(folder_path):
                 filepath = os.path.join(folder_path, filename)
                 if os.path.isfile(filepath):
                     name, ext = os.path.splitext(filename)
                     # just loading png for now, but could add other formats later
-                    if ext.lower() in ['.png']:
+                    if ext.lower() in [".png"]:
                         self.images[name] = pygame.image.load(filepath).convert_alpha()
-            print('Image loading complete')
+            print("Image loading complete")
         except Exception as e:
-            engine.log.add_data('error', f'Failed to load images: {e}', True)
+            engine.log.add_data("error", f"Failed to load images: {e}", True)
 
-    #------------------------------------------------------------------------------
-    def load_quick_battle(self,player_spawn_faction,battle_option):
-        '''load a quick battle'''
+    # ------------------------------------------------------------------------------
+    def load_quick_battle(self, player_spawn_faction, battle_option):
+        """load a quick battle"""
 
         # called by game_menu.start_menu
 
-        # this uses a thread to prevent the game from going unresponsive while 
+        # this uses a thread to prevent the game from going unresponsive while
         # all the data is being generated
 
         # Start computation in a separate thread
         # Container to store result from thread
         result_container = [None]
-        thread = threading.Thread(target=engine.world_builder.load_quick_battle_map_objects, args=(battle_option,result_container))
+        thread = threading.Thread(
+            target=engine.world_builder.load_quick_battle_map_objects,
+            args=(battle_option, result_container),
+        )
         thread.start()
 
-        self.game_menu.text_queue=['Creating quick battle map objects...']
+        self.game_menu.text_queue = ["Creating quick battle map objects..."]
         # render
         self.render_mode_0()
 
-        loading=True
+        loading = True
         while loading:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loading = False
-                    self.quit=True
+                    self.quit = True
 
             # Check if thread is done
             if not thread.is_alive():
-                loading=False
-        
-        defending_faction=random.choice(['german','soviet','none','contested'])
+                loading = False
 
-        self.load_world(player_spawn_faction,"Quick battle",result_container[0],defending_faction)
+        defending_faction = random.choice(["german", "soviet", "none", "contested"])
 
-    
-    #------------------------------------------------------------------------------
-    def load_world(self,player_spawn_faction,map_square_name,map_objects,defending_faction):
-        ''' this is the central load_world function. calls other load_world functions'''
+        self.load_world(
+            player_spawn_faction, "Quick battle", result_container[0], defending_faction
+        )
 
-        # one of the main points of this function is to keep pygame responsive while 
-        # all the heavy world gen computation is done so the os doesn't think its not 
+    # ------------------------------------------------------------------------------
+    def load_world(
+        self, player_spawn_faction, map_square_name, map_objects, defending_faction
+    ):
+        """this is the central load_world function. calls other load_world functions"""
+
+        # one of the main points of this function is to keep pygame responsive while
+        # all the heavy world gen computation is done so the os doesn't think its not
         # responding
 
         # create a new world
-        self.world=World()
-        self.world.player_spawn_faction=player_spawn_faction
-        self.world.map_square_name=map_square_name
+        self.world = World()
+        self.world.player_spawn_faction = player_spawn_faction
+        self.world.map_square_name = map_square_name
 
         # Start computation in a separate thread
-        thread = threading.Thread(target=engine.world_builder.load_world, args=(self.world, map_objects,defending_faction))
+        thread = threading.Thread(
+            target=engine.world_builder.load_world,
+            args=(self.world, map_objects, defending_faction),
+        )
         thread.start()
 
-        self.game_menu.text_queue=['Loading world ...']
+        self.game_menu.text_queue = ["Loading world ..."]
         # render
         self.render_mode_0()
 
-        loading=True
+        loading = True
         while loading:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loading = False
-                    self.quit=True
+                    self.quit = True
 
             # Check if thread is done
             if not thread.is_alive():
-                loading=False
+                loading = False
 
         # switch to world mode
         self.switch_mode(1)
 
-
-
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def render(self):
 
-        if self.mode==0:
+        if self.mode == 0:
             self.render_mode_0()
-        elif self.mode==1:
+        elif self.mode == 1:
             self.render_mode_1()
-        elif self.mode==2:
+        elif self.mode == 2:
             self.render_mode_2()
-        elif self.mode==3:
+        elif self.mode == 3:
             self.render_mode_3()
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def render_mode_0(self):
-        '''render mode 0 : main game menu'''
+        """render mode 0 : main game menu"""
         self.screen.fill((255, 255, 255))
         self.screen.blit(self.menu_background_image, self.menu_background_rect)
-        h=0
+        h = 0
         for b in self.game_menu.text_queue:
-            h+=15
+            h += 15
             self.small_font.render_to(self.screen, (40, h), b, self.color_black)
 
         if self.double_buffering:
             pygame.display.flip()
         else:
             pygame.display.update()
-    #------------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
     def render_mode_1(self):
-        '''render mode 1 : tactical mode'''
+        """render mode 1 : tactical mode"""
 
         self.update_render_info()
         self.screen.blit(self.background, (0, 0))
@@ -401,81 +427,146 @@ class Graphics_2D_Pygame():
             for c in b:
                 if c.reset_image:
                     self.reset_pygame_image(c)
-                self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
+                self.screen.blit(
+                    c.image,
+                    (
+                        c.screen_coords[0] - c.image_center[0],
+                        c.screen_coords[1] - c.image_center[1],
+                    ),
+                )
 
                 if self.draw_collision:
-                    pygame.draw.circle(self.screen,(236,64,122),c.screen_coords,c.collision_radius*self.world.scale)
-        h=0
-        for b in islice(self.world.text_queue,self.world.text_queue_display_size):
-            h+=15
+                    pygame.draw.circle(
+                        self.screen,
+                        (236, 64, 122),
+                        c.screen_coords,
+                        c.collision_radius * self.world.scale,
+                    )
+        h = 0
+        for b in islice(self.world.text_queue, self.world.text_queue_display_size):
+            h += 15
             self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-        h+=20
+        h += 20
         for b in self.world.world_menu.text_queue:
-            h+=15
+            h += 15
             self.small_font.render_to(self.screen, (40, h), b, self.menu_color)
 
-        if self.world.debug_mode :
-            h=0
+        if self.world.debug_mode:
+            h = 0
             for b in self.world.debug_text_queue:
-                h+=15
-                self.small_font.render_to(self.screen, (self.screen_size[0]-350, h), b,self.menu_color )
+                h += 15
+                self.small_font.render_to(
+                    self.screen, (self.screen_size[0] - 350, h), b, self.menu_color
+                )
 
-        if self.world.display_vehicle_text :
-            h=0
+        if self.world.display_vehicle_text:
+            h = 0
             for b in self.world.vehicle_text_queue:
-                h+=15
+                h += 15
                 self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
 
         # might consider moving this to world and just returning a array of circles to draw
         if self.world.display_weapon_range:
             if self.world.player.ai.in_vehicle():
-                vehicle=self.world.player.ai.memory['task_vehicle_crew']['vehicle_role'].vehicle
+                vehicle = self.world.player.ai.memory["task_vehicle_crew"][
+                    "vehicle_role"
+                ].vehicle
                 for turret in vehicle.ai.turrets:
                     if turret.ai.primary_weapon is not None:
-                        radius=turret.ai.primary_weapon.ai.range*self.world.scale
-                        pygame.draw.circle(self.screen,(236,64,122),turret.screen_coords,radius,width=5)
+                        radius = turret.ai.primary_weapon.ai.range * self.world.scale
+                        pygame.draw.circle(
+                            self.screen,
+                            (236, 64, 122),
+                            turret.screen_coords,
+                            radius,
+                            width=5,
+                        )
             else:
                 if self.world.player.ai.primary_weapon is not None:
-                    radius=self.world.player.ai.primary_weapon.ai.range*self.world.scale
-                    pygame.draw.circle(self.screen,(236,64,122),self.world.player.screen_coords,radius,width=5)
+                    radius = (
+                        self.world.player.ai.primary_weapon.ai.range * self.world.scale
+                    )
+                    pygame.draw.circle(
+                        self.screen,
+                        (236, 64, 122),
+                        self.world.player.screen_coords,
+                        radius,
+                        width=5,
+                    )
 
                 if self.world.player.ai.antitank is not None:
-                    radius=self.world.player.ai.antitank.ai.range*self.world.scale
-                    pygame.draw.circle(self.screen,(236,64,50),self.world.player.screen_coords,radius,width=5)
+                    radius = self.world.player.ai.antitank.ai.range * self.world.scale
+                    pygame.draw.circle(
+                        self.screen,
+                        (236, 64, 50),
+                        self.world.player.screen_coords,
+                        radius,
+                        width=5,
+                    )
 
         if self.double_buffering:
             pygame.display.flip()
         else:
             pygame.display.update()
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def render_mode_2(self):
-        '''render mode 3 : strategic mode'''
-
+        """render mode 3 : strategic mode"""
 
         self.screen.blit(self.background, (0, 0))
         for c in self.strategic_map.map_squares:
             if c.reset_image:
                 self.reset_pygame_image(c)
-            self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
+            self.screen.blit(
+                c.image,
+                (
+                    c.screen_coords[0] - c.image_center[0],
+                    c.screen_coords[1] - c.image_center[1],
+                ),
+            )
 
             if c.airport:
-                self.small_font.render_to(self.screen, (c.screen_coords[0],c.screen_coords[1]), 'A', self.color_black)
+                self.small_font.render_to(
+                    self.screen,
+                    (c.screen_coords[0], c.screen_coords[1]),
+                    "A",
+                    self.color_black,
+                )
             if c.rail_yard:
-                self.small_font.render_to(self.screen, (c.screen_coords[0]+10,c.screen_coords[1]), 'R', self.color_black)
+                self.small_font.render_to(
+                    self.screen,
+                    (c.screen_coords[0] + 10, c.screen_coords[1]),
+                    "R",
+                    self.color_black,
+                )
             if c.town:
-                self.small_font.render_to(self.screen, (c.screen_coords[0]-10,c.screen_coords[1]), 'T', self.color_black)
+                self.small_font.render_to(
+                    self.screen,
+                    (c.screen_coords[0] - 10, c.screen_coords[1]),
+                    "T",
+                    self.color_black,
+                )
 
-            # german count 
-            if c.german_count>0:
-                self.small_font.render_to(self.screen, (c.screen_coords[0]-25,c.screen_coords[1]+20), str(c.german_count), self.color_black)
-            if c.soviet_count>0:
-                self.small_font.render_to(self.screen, (c.screen_coords[0]+15,c.screen_coords[1]+20), str(c.soviet_count), self.color_black)
+            # german count
+            if c.german_count > 0:
+                self.small_font.render_to(
+                    self.screen,
+                    (c.screen_coords[0] - 25, c.screen_coords[1] + 20),
+                    str(c.german_count),
+                    self.color_black,
+                )
+            if c.soviet_count > 0:
+                self.small_font.render_to(
+                    self.screen,
+                    (c.screen_coords[0] + 15, c.screen_coords[1] + 20),
+                    str(c.soviet_count),
+                    self.color_black,
+                )
 
-        h=0
+        h = 0
         for b in self.strategic_map.strategic_menu.text_queue:
-            h+=15
+            h += 15
             self.small_font.render_to(self.screen, (40, h), b, self.color_black)
 
         if self.double_buffering:
@@ -483,75 +574,100 @@ class Graphics_2D_Pygame():
         else:
             pygame.display.update()
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def render_mode_3(self):
-        '''render mode 4 : vehicle diagnostic overlay'''
+        """render mode 4 : vehicle diagnostic overlay"""
         self.screen.blit(self.background, (0, 0))
         for c in self.vehicle_diagnostics.image_objects:
             if c.reset_image:
                 self.reset_pygame_image(c)
-            self.screen.blit(c.image, (c.screen_coords[0]-c.image_center[0], c.screen_coords[1]-c.image_center[1]))
+            self.screen.blit(
+                c.image,
+                (
+                    c.screen_coords[0] - c.image_center[0],
+                    c.screen_coords[1] - c.image_center[1],
+                ),
+            )
 
         for text in self.vehicle_diagnostics.text_queue:
-            self.small_font.render_to(self.screen, text[1], text[0],text[2] )
+            self.small_font.render_to(self.screen, text[1], text[0], text[2])
 
         if self.double_buffering:
             pygame.display.flip()
         else:
             pygame.display.update()
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def update_vehicle_diagnostics_render(self):
-        '''convert world coordinates to screen coordinates for vehicle diagnostics'''
+        """convert world coordinates to screen coordinates for vehicle diagnostics"""
         if self.mode != 3:
             return
 
         vehicle = self.world.vehicle_diagnostics_vehicle
-        if vehicle and hasattr(vehicle, 'world_coords'):
+        if vehicle and hasattr(vehicle, "world_coords"):
             player_x = vehicle.world_coords[0] * self.world.scale
             player_y = vehicle.world_coords[1] * self.world.scale
-            translation = [self.screen_center[0] - player_x, self.screen_center[1] - player_y]
+            translation = [
+                self.screen_center[0] - player_x,
+                self.screen_center[1] - player_y,
+            ]
         else:
             translation = [0, 0]
 
         for c in self.vehicle_diagnostics.image_objects:
-            if hasattr(c, 'world_coords') and vehicle and hasattr(vehicle, 'world_coords'):
+            if (
+                hasattr(c, "world_coords")
+                and vehicle
+                and hasattr(vehicle, "world_coords")
+            ):
                 if c == self.vehicle_diagnostics.image_objects[0]:
                     c.screen_coords = self.screen_center
                 else:
-                    c.screen_coords[0] = c.world_coords[0] * self.world.scale + translation[0]
-                    c.screen_coords[1] = c.world_coords[1] * self.world.scale + translation[1]
+                    c.screen_coords[0] = (
+                        c.world_coords[0] * self.world.scale + translation[0]
+                    )
+                    c.screen_coords[1] = (
+                        c.world_coords[1] * self.world.scale + translation[1]
+                    )
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
-        '''Reset the image with optional smoothing + improved caching'''
+        """Reset the image with optional smoothing + improved caching"""
         wo.reset_image = False
         obj_scale = self.world.scale + wo.scale_modifier
 
         # Better cache key (scale factor + angle)
         key = f"{wo.image_list[wo.image_index]}_{round(obj_scale, 3)}_{round(wo.rotation_angle, 1)}"
-        
+
         scale_cache = self.image_cache.setdefault(self.world.scale, {})
         if key in scale_cache:
             wo.image = scale_cache[key]
             wo.image_size = wo.image.get_size()
-            wo.image_center = [round(wo.image_size[0]*0.5, 1), round(wo.image_size[1]*0.5, 1)]
+            wo.image_center = [
+                round(wo.image_size[0] * 0.5, 1),
+                round(wo.image_size[1] * 0.5, 1),
+            ]
             return
 
         try:
             base_image = self.images[wo.image_list[wo.image_index]]
-            
+
             # antialiasing and efficient zoom/rotation
-            wo.image = pygame.transform.rotozoom(base_image, wo.rotation_angle, obj_scale)
+            wo.image = pygame.transform.rotozoom(
+                base_image, wo.rotation_angle, obj_scale
+            )
 
             wo.image_size = wo.image.get_size()
-            wo.image_center = [round(wo.image_size[0]*0.5, 1), round(wo.image_size[1]*0.5, 1)]
+            wo.image_center = [
+                round(wo.image_size[0] * 0.5, 1),
+                round(wo.image_size[1] * 0.5, 1),
+            ]
             scale_cache[key] = wo.image
-            
-        except Exception as e:
-            engine.log.add_data('error', f'reset_pygame_image failed: {e}', True)
 
-    #---------------------------------------------------------------------------
+        except Exception as e:
+            engine.log.add_data("error", f"reset_pygame_image failed: {e}", True)
+
+    # ---------------------------------------------------------------------------
     def select_closest_object_with_mouse(self, mouse_coords):
         possible_objects = []
 
@@ -559,23 +675,25 @@ class Graphics_2D_Pygame():
             # Collect valid clickable objects (same as before)
             for b in self.renderlists:
                 for c in b:
-                    if (c.is_player is False 
-                        and c != self.world.player.ai.large_pickup 
-                        and c.is_turret is False 
+                    if (
+                        c.is_player is False
+                        and c != self.world.player.ai.large_pickup
+                        and c.is_turret is False
                         and c.is_ground_texture is False
                         and c.is_particle_effect is False
-                        and c.no_save is False):
+                        and c.no_save is False
+                    ):
                         possible_objects.append(c)
         elif self.mode == 2:
             possible_objects = self.strategic_map.map_squares
 
-        max_distance=75
+        max_distance = 75
         max_vehicle_range = 75  # Only consider vehicles within this distance
         closest_vehicle = None
-        closest_vehicle_dist = float('inf')
-        
+        closest_vehicle_dist = float("inf")
+
         closest_non_vehicle = None
-        closest_non_vehicle_dist = float('inf')
+        closest_non_vehicle_dist = float("inf")
 
         # Single pass: evaluate all objects
         for obj in possible_objects:
@@ -605,9 +723,9 @@ class Graphics_2D_Pygame():
             elif self.mode == 2:
                 self.strategic_map.strategic_menu.activate_menu(selected_object)
 
-    #------------------------------------------------------------------------------
-    def set_background_image(self,image_name):
-        '''sets and scales the background image'''
+    # ------------------------------------------------------------------------------
+    def set_background_image(self, image_name):
+        """sets and scales the background image"""
         # Load and scale the menu background image, preserving aspect ratio
         try:
             background_image = self.images.get(image_name, self.background)
@@ -627,7 +745,9 @@ class Graphics_2D_Pygame():
                 new_height = int(target_height)
                 new_width = int(new_height * aspect_ratio)
 
-            self.menu_background_image = pygame.transform.scale(background_image, (new_width, new_height))
+            self.menu_background_image = pygame.transform.scale(
+                background_image, (new_width, new_height)
+            )
             # Position the image in the right 3/4 of the screen
             # Left edge starts at 1/4 screen width, centered vertically
             left_edge = self.screen_size[0] / 4
@@ -635,106 +755,132 @@ class Graphics_2D_Pygame():
                 center=(left_edge + target_width / 2, self.screen_size[1] / 2)
             )
         except Exception as e:
-            engine.log.add_data('error', f'Failed to load or scale menu background image: {e}', True)
+            engine.log.add_data(
+                "error", f"Failed to load or scale menu background image: {e}", True
+            )
             self.menu_background_image = self.background
             self.menu_background_rect = self.menu_background_image.get_rect()
 
-    #------------------------------------------------------------------------------
-    def switch_mode(self,desired_mode):
-        '''switch the graphic engine mode '''
+    # ------------------------------------------------------------------------------
+    def switch_mode(self, desired_mode):
+        """switch the graphic engine mode"""
 
         # reset scale to defaults
-        self.world.scale=self.world.scale_limit[1]
+        self.world.scale = self.world.scale_limit[1]
         self.world.reset_all()
-        
+
         # main menu
-        if desired_mode==0:
-            self.mode=0
-            random_image=random.choice(['background_kubelwagen',
-                'background_panther','background_t34_column',
-                'background_t34_76','background_ju88','background_me163',
-                'background_su85','background_su100'])
+        if desired_mode == 0:
+            self.mode = 0
+            random_image = random.choice(
+                [
+                    "background_kubelwagen",
+                    "background_panther",
+                    "background_t34_column",
+                    "background_t34_76",
+                    "background_ju88",
+                    "background_me163",
+                    "background_su85",
+                    "background_su100",
+                ]
+            )
             self.set_background_image(random_image)
 
         # tactical battle
-        elif desired_mode==1:
-            self.mode=1
+        elif desired_mode == 1:
+            self.mode = 1
             # this one has great constrast with the sprites
             # bullets are very visible
             self.background.fill((128, 102, 77))
 
-            #self.background.fill((201,184,171))
-            #self.background.fill((171,149,131))
+            # self.background.fill((201,184,171))
+            # self.background.fill((171,149,131))
         # strategic screen
-        elif desired_mode==2:
-            self.mode=2
+        elif desired_mode == 2:
+            self.mode = 2
             self.background.fill((255, 255, 255))
         # vehicle info
-        elif desired_mode==3:
-            self.mode=3
+        elif desired_mode == 3:
+            self.mode = 3
             self.background.fill((255, 255, 255))
         else:
-            engine.log.add_data('Error','graphic_engine.switch_mode mode not recognized: '+str(desired_mode),True)
+            engine.log.add_data(
+                "Error",
+                "graphic_engine.switch_mode mode not recognized: " + str(desired_mode),
+                True,
+            )
 
-
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def update(self):
-        '''
-            any misc updating that needs to be done
-        '''
+        """
+        any misc updating that needs to be done
+        """
         self.handle_input()
 
         # update time
-        self.time_passed=self.clock.tick(self.max_fps)
-        self.time_passed_seconds=self.time_passed / 1000.0
+        self.time_passed = self.clock.tick(self.max_fps)
+        self.time_passed_seconds = self.time_passed / 1000.0
 
-        if self.mode==0:
+        if self.mode == 0:
             pass
-            #self.game_menu.update(self.time_passed_seconds)
-        elif self.mode==1:
+            # self.game_menu.update(self.time_passed_seconds)
+        elif self.mode == 1:
             self.world.update(self.time_passed_seconds)
 
             if self.world.aar_mode_enabled:
-                if self.world.world_seconds-self.last_aar_screenshot_time>self.aar_screenshot_interval:
-                    self.last_aar_screenshot_time=self.world.world_seconds
+                if (
+                    self.world.world_seconds - self.last_aar_screenshot_time
+                    > self.aar_screenshot_interval
+                ):
+                    self.last_aar_screenshot_time = self.world.world_seconds
                     self.create_screenshot()
 
             # insert graphic engine specific debug text (after world.update populated it)
-            if self.world.debug_mode and self.world.is_paused==False:
-                self.world.debug_text_queue.insert(0,'FPS: '+str(int(self.clock.get_fps())))
-                self.world.debug_text_queue.insert(3,'Rendered Objects: '+ str(self.render_count))
+            if self.world.debug_mode and self.world.is_paused == False:
+                self.world.debug_text_queue.insert(
+                    0, "FPS: " + str(int(self.clock.get_fps()))
+                )
+                self.world.debug_text_queue.insert(
+                    3, "Rendered Objects: " + str(self.render_count)
+                )
 
-                
-                # image cache debug info 
-                #for key, value in self.image_cache.items():
+                # image cache debug info
+                # for key, value in self.image_cache.items():
                 #    self.world.debug_text_queue.insert(4,f"Image cache {key} - size: {len(value)}")
-            
+
             if self.world.exit_world:
                 self.strategic_map.unload_world()
                 self.switch_mode(2)
 
             if self.world.vehicle_diagnostics:
-                self.world.vehicle_diagnostics=False
-                self.vehicle_diagnostics.load(self.world.vehicle_diagnostics_vehicle,self.screen_center)
+                self.world.vehicle_diagnostics = False
+                self.saved_scale = self.world.scale
+                self.vehicle_diagnostics.load(
+                    self.world.vehicle_diagnostics_vehicle, self.screen_center
+                )
                 self.switch_mode(3)
 
-        elif self.mode==2:
+        elif self.mode == 2:
             self.strategic_map.update()
-        elif self.mode==3:
+        elif self.mode == 3:
             self.update_vehicle_diagnostics_render()
             self.vehicle_diagnostics.update()
 
             if self.vehicle_diagnostics.exit:
-                self.vehicle_diagnostics.exit=False
+                self.vehicle_diagnostics.exit = False
                 self.switch_mode(1)
+                if self.saved_scale is not None:
+                    self.world.scale = self.saved_scale
+                    self.world.reset_all()
+                    self.saved_scale = None
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     def update_render_info(self):
-        '''
-            checks if world objects are within the viewable screen area,
-            and if so, translates their world coordinates to screen coordinates
-            only used by tactical mode
-        '''
+        """
+        checks if world objects are within the viewable screen area,
+        and if so, translates their world coordinates to screen coordinates
+        only used by tactical mode
+        """
 
         # clear out the render levels
         self.renderlists = [[] for _ in range(self.render_level_count)]
@@ -745,7 +891,7 @@ class Graphics_2D_Pygame():
         half_width_world = (self.screen_size[0] / 2.0) / self.world.scale
         half_height_world = (self.screen_size[1] / 2.0) / self.world.scale
 
-        # Buffer in world coordinates 
+        # Buffer in world coordinates
         buffer_world = self.view_buffer / self.world.scale
 
         # Visible ranges in world coordinates (min/max with buffer)
@@ -762,13 +908,20 @@ class Graphics_2D_Pygame():
 
         # make a visibility determination per grid square. this worked well with grid square size set to 1000
         for grid_square in self.world.grid_manager.index_map.values():
-            if (grid_square.top_left[0] < viewrange_x[0] and grid_square.bottom_right[0] > viewrange_x[1] and
-                grid_square.top_left[1] < viewrange_y[0] and grid_square.bottom_right[1] > viewrange_y[1]):
-
+            if (
+                grid_square.top_left[0] < viewrange_x[0]
+                and grid_square.bottom_right[0] > viewrange_x[1]
+                and grid_square.top_left[1] < viewrange_y[0]
+                and grid_square.bottom_right[1] > viewrange_y[1]
+            ):
                 grid_square.switch_to_visible()
 
                 for obj in grid_square.wo_objects:
-                    if (obj.render and (self.world.scale + obj.scale_modifier) >= obj.minimum_visible_scale):
+                    if (
+                        obj.render
+                        and (self.world.scale + obj.scale_modifier)
+                        >= obj.minimum_visible_scale
+                    ):
                         renderable_objects.append(obj)
             else:
                 grid_square.visible = False
@@ -776,11 +929,11 @@ class Graphics_2D_Pygame():
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
             if not obj.is_player:
-                obj.screen_coords[0] = obj.world_coords[0] * self.world.scale + translation[0]
-                obj.screen_coords[1] = obj.world_coords[1] * self.world.scale + translation[1]
-        
-        self.render_count = len(renderable_objects)      
+                obj.screen_coords[0] = (
+                    obj.world_coords[0] * self.world.scale + translation[0]
+                )
+                obj.screen_coords[1] = (
+                    obj.world_coords[1] * self.world.scale + translation[1]
+                )
 
-
-
-
+        self.render_count = len(renderable_objects)

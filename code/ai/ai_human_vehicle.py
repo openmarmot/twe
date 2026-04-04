@@ -11,7 +11,6 @@ from enum import Enum
 
 # import custom packages
 import engine.math_2d
-import engine.world_builder
 import engine.log
 import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
@@ -249,7 +248,7 @@ class AIHumanVehicle:
             turret = role.turret
             if (
                 self.owner.ai.memory["task_vehicle_crew"]["current_action"]
-                == "reloading primary weapon"
+                == VehicleCrewAction.RELOADING_PRIMARY
             ):
                 if (
                     self.owner.world.world_seconds
@@ -281,7 +280,7 @@ class AIHumanVehicle:
             # this action is set by world. triggered by hitting 'w'
             if (
                 self.owner.ai.memory["task_vehicle_crew"]["current_action"]
-                == "rotate turret"
+                == VehicleCrewAction.ROTATING_TURRET
             ):
                 if self.role_gunner.rotate_turret(
                     turret,
@@ -290,4 +289,6 @@ class AIHumanVehicle:
                     ],
                 ):
                     # rotation achieved. we can remove this action
-                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = ""
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.NONE
+                    )

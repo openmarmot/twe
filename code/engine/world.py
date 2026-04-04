@@ -608,8 +608,10 @@ class World:
 
                 elif role.is_gunner:
                     if key == "w":
+                        from ai.ai_human_vehicle_crew_action import VehicleCrewAction
+
                         self.player.ai.memory["task_vehicle_crew"]["current_action"] = (
-                            "rotate turret"
+                            VehicleCrewAction.ROTATING_TURRET
                         )
                         angle = engine.math_2d.get_rotation(
                             turret.screen_coords, mouse_screen_coords

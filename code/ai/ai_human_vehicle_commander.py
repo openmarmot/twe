@@ -12,7 +12,6 @@ import math
 
 # import custom packages
 import engine.math_2d
-import engine.world_builder
 import engine.log
 from engine.vehicle_order import VehicleOrder
 from engine.tactical_order import TacticalOrder
