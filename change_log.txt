@@ -4,7 +4,8 @@ TWE Project : Change Log
 April 03 2026
 - more current_action fixes for human vehicle ai 
 - zoom level resets properly when exiting vehicle_diagnostics 
-- some changes to smoke on vehicle hits 
+- some changes to smoke on vehicle hits
+- crew attempts to retreat some distance when exiting a disabled vehicle 
 - misc updates 
 
 ----------------------------------

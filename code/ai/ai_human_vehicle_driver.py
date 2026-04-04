@@ -352,7 +352,11 @@ class AIHumanVehicleDriver:
                     return
             else:
                 # this should never happen. i think
-                engine.log.add_data('error',f'turret {gunner_role.turret.name} does not have a primary weapon',True)
+                engine.log.add_data(
+                    "error",
+                    f"turret {gunner_role.turret.name} does not have a primary weapon",
+                    True,
+                )
                 return
 
             if current_action == VehicleCrewAction.WAITING_FOR_ROTATE:
@@ -378,14 +382,21 @@ class AIHumanVehicleDriver:
                     fire_mission = gunner_role.human.ai.memory["task_vehicle_crew"][
                         "fire_missions"
                     ][0]
-                    return self.create_vehicle_order_for_target(
-                        fire_mission.world_coords
-                    )
+                    self.create_vehicle_order_for_target(fire_mission.world_coords)
+                    # fall through to process the order we just created
 
             if current_action == VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE:
                 target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
                 if target is not None:
-                    return self.create_vehicle_order_for_target(target.world_coords)
+                    self.create_vehicle_order_for_target(target.world_coords)
+                    # fall through to process the order we just created
+                else:
+                    # target was cleared, fall through to other logic
+                    engine.log.add_data(
+                        "debug",
+                        f"driver: gunner waiting for close distance but target is None",
+                        False,
+                    )
 
         # next lets check if anyone is trying to get in
         if vehicle.ai.check_if_vehicle_is_full() is False:
@@ -454,6 +465,7 @@ class AIHumanVehicleDriver:
                 self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = (
                     vehicle_order
                 )
+                # will act on the vehicle order in the next think
                 return
 
         # how far are we from the squad leader?
@@ -472,7 +484,7 @@ class AIHumanVehicleDriver:
                 self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = (
                     vehicle_order
                 )
-                return
+                # fall through to process the order we just created
 
         # default behavior after everything else
         # no orders

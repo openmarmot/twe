@@ -2623,6 +2623,41 @@ class AIHuman:
             self.speak("Jumping out")
 
             if self.owner.is_player is False:
+                # check if any enemies are in target lists (implies they are in range)
+
+                # different reaction if the vehicle is disabled
+                if vehicle_role.vehicle.ai.vehicle_disabled:
+                    spawn_coords = self.squad.faction_tactical.spawn_location
+                    distance_to_spawn = engine.math_2d.get_distance(
+                        self.owner.world_coords, spawn_coords
+                    )
+
+                    # only want to move away slightly before re-engaging
+                    if len(self.human_targets) > 0:
+                        retreat_distance = random.randint(100,200)
+                    else:
+                        retreat_distance = random.randint(1400,1500)
+
+                    # calculate target point towards spawn
+                        vec_to_spawn = [
+                            spawn_coords[0] - self.owner.world_coords[0],
+                            spawn_coords[1] - self.owner.world_coords[1],
+                        ]
+                        vec_normalized = engine.math_2d.get_normalized(vec_to_spawn)
+                        target_coords = [
+                            self.owner.world_coords[0]
+                            + vec_normalized[0] * retreat_distance,
+                            self.owner.world_coords[1]
+                            + vec_normalized[1] * retreat_distance,
+                        ]
+                        # randomize target coords by 100
+                        target_coords = engine.math_2d.randomize_coordinates(
+                            target_coords, 100
+                        )
+                        self.switch_task_move_to_location(target_coords, None)
+                        return
+
+
                 # move slightly
                 # this seems to be needed to prevent the ai from immediately jumping back in
                 coords = [
