@@ -1,405 +1,609 @@
-'''
+"""
 repo : https://github.com/openmarmot/twe
 
 notes :
-'''
+"""
+
 import copy
 
 import engine.math_2d
 
-class VehicleDiagnostics():
 
+class VehicleDiagnostics:
     def __init__(self):
-        self.vehicle=None
-        self.screen_center=None
+        self.vehicle = None
+        self.screen_center = None
 
         # array of VehicleDiagnosticObject
-        self.image_objects=[]
+        self.image_objects = []
 
         # tells graphic_engine to switch mode back to tactical
-        self.exit=False
+        self.exit = False
 
         # [['test,[0,0]],]
-        self.text_queue=[]
+        self.text_queue = []
 
-        self.text_black='#000000'
-        self.text_red='#FF2121'
+        self.text_black = "#000000"
+        self.text_red = "#FF2121"
 
-        self.menu_string='[Esc to Exit]  [1 Main]  [2 Turrets]  [3 Crew]  [4 Engine]  [5 Wheels]'
-        self.max_display_hits=10
+        self.menu_string = (
+            "[Esc to Exit]  [1 Main]  [2 Turrets]  [3 Crew]  [4 Engine]  [5 Wheels]"
+        )
+        self.max_display_hits = 10
 
-    #---------------------------------------------------------------------------
-    def handle_keydown(self,translated_key):
+    # ---------------------------------------------------------------------------
+    def handle_keydown(self, translated_key):
 
-        if translated_key=='esc':
-            self.exit=True
+        if translated_key == "esc":
+            self.exit = True
             return
-        if translated_key=='1':
+        if translated_key == "1":
             self.load_main_screen()
-        if translated_key=='2':
+        if translated_key == "2":
             self.load_turret_screen()
-        if translated_key=='3':
+        if translated_key == "3":
             self.load_crew_screen()
-        if translated_key=='4':
+        if translated_key == "4":
             self.load_engine_screen()
-        if translated_key=='5':
+        if translated_key == "5":
             self.load_wheels_screen()
 
-    #---------------------------------------------------------------------------
-    def load(self,vehicle,screen_center):
-        self.vehicle=vehicle
-        self.screen_center=screen_center
+    # ---------------------------------------------------------------------------
+    def load(self, vehicle, screen_center):
+        self.vehicle = vehicle
+        self.screen_center = screen_center
         self.load_main_screen()
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def load_crew_screen(self):
-        '''load main screen text and image '''
+        """load main screen text and image"""
 
-        self.image_objects=[]
+        self.image_objects = []
         # add the main object
-        v=VehicleDiagnosticObject()
-        v.image_list=self.vehicle.image_list
-        v.world_coords=self.vehicle.world_coords
+        v = VehicleDiagnosticObject()
+        v.image_list = self.vehicle.image_list
+        v.world_coords = self.vehicle.world_coords
         self.image_objects.append(v)
 
+        self.text_queue = []
+        spacing = 15
+        coord = [40, 15]
 
-        self.text_queue=[]
-        spacing=15
-        coord=[40,15]
+        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        coord[1] += spacing
 
-        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        coord[1]+=spacing
-
-        coord=[40,100]
-        self.text_queue.append(['crew role | crew member (blood pressure) | current task',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
+        coord = [40, 100]
+        self.text_queue.append(
+            [
+                "crew role | crew member (blood pressure) | current task",
+                copy.copy(coord),
+                self.text_black,
+            ]
+        )
+        coord[1] += spacing
         for role in self.vehicle.ai.vehicle_crew:
-            text=f'{role.role_name}: '
+            text = f"{role.role_name}: "
             if role.role_occupied:
-                text+=f'{role.human.name} ({role.human.ai.blood_pressure})'
-                text+=f": {role.human.ai.memory['task_vehicle_crew']['current_action']}"
+                text += f"{role.human.name} ({role.human.ai.blood_pressure})"
+                text += (
+                    f": {role.human.ai.memory['task_vehicle_crew']['current_action']}"
+                )
             else:
-                text+='unoccupied'
-            self.text_queue.append([text,copy.copy(coord),self.text_black])
-            coord[1]+=spacing
+                text += "unoccupied"
+            self.text_queue.append([text, copy.copy(coord), self.text_black])
+            coord[1] += spacing
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def load_engine_screen(self):
-        '''load main screen text and image '''
+        """load main screen text and image"""
 
-        self.image_objects=[]
-        # add the main object 
-        v=VehicleDiagnosticObject()
-        v.image_list=self.vehicle.image_list
-        v.screen_coords=self.screen_center
+        self.image_objects = []
+        # add the main object
+        v = VehicleDiagnosticObject()
+        v.image_list = self.vehicle.image_list
+        v.screen_coords = self.screen_center
         self.image_objects.append(v)
 
+        self.text_queue = []
+        spacing = 15
+        coord = [40, 15]
 
-        self.text_queue=[]
-        spacing=15
-        coord=[40,15]
+        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        coord[1] += spacing
 
-        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        coord[1]+=spacing
-
-         # - engine data -
+        # - engine data -
         # this should move to its own page
-        
-        coord=[40,200]
-        self.text_queue.append(['-- engine data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
+
+        coord = [40, 200]
+        self.text_queue.append(["-- engine data --", copy.copy(coord), self.text_black])
+        coord[1] += spacing
         for b in self.vehicle.ai.engines:
-            self.text_queue.append([f'Engine: {b.name}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-            self.text_queue.append([f'-> engine on: {b.ai.engine_on}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
+            self.text_queue.append(
+                [f"Engine: {b.name}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
+            self.text_queue.append(
+                [f"-> engine on: {b.ai.engine_on}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
             if b.ai.damaged:
-                self.text_queue.append([f'-> damaged',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
-        
+                self.text_queue.append([f"-> damaged", copy.copy(coord), self.text_red])
+                coord[1] += spacing
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def load_main_screen(self):
-        '''load main screen text and image '''
+        """load main screen text and image"""
 
-        self.image_objects=[]
-        # add the main object 
-        v=VehicleDiagnosticObject()
-        v.image_list=self.vehicle.image_list
-        v.screen_coords=self.screen_center
+        self.image_objects = []
+        # add the main object
+        v = VehicleDiagnosticObject()
+        v.image_list = self.vehicle.image_list
+        v.screen_coords = self.screen_center
         self.image_objects.append(v)
 
         # load collision markers
         for hit in self.vehicle.ai.collision_log:
-            v=VehicleDiagnosticObject()
+            v = VehicleDiagnosticObject()
             if hit.penetrated:
-                v.image_list=['hit_orange']
+                v.image_list = ["hit_orange"]
             else:
-                v.image_list=['hit_green']
-            v.rotation_angle=engine.math_2d.get_normalized_angle(hit.rotation_offset)
-            v.world_coords=engine.math_2d.calculate_relative_position(self.vehicle.world_coords,0,hit.position_offset)
+                v.image_list = ["hit_green"]
+            v.rotation_angle = engine.math_2d.get_normalized_angle(hit.rotation_offset)
+            v.world_coords = engine.math_2d.calculate_relative_position(
+                self.vehicle.world_coords, 0, hit.position_offset
+            )
             self.image_objects.append(v)
 
+        self.text_queue = []
+        spacing = 15
+        coord = [40, 15]
 
-        self.text_queue=[]
-        spacing=15
-        coord=[40,15]
+        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        coord[1] += spacing
 
-        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        coord[1]+=spacing
-
-        self.text_queue.append([f'vehicle: {self.vehicle.name}',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
+        self.text_queue.append(
+            [f"vehicle: {self.vehicle.name}", copy.copy(coord), self.text_black]
+        )
+        coord[1] += spacing
         if self.vehicle.ai.vehicle_disabled:
-            self.text_queue.append(['disabled',copy.copy(coord),self.text_red])
-            coord[1]+=spacing
+            self.text_queue.append(["disabled", copy.copy(coord), self.text_red])
+            coord[1] += spacing
 
+        # armor
+        coord = [40, 150]
+        self.text_queue.append(["-- armor --", copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        self.text_queue.append(
+            ["[armor, slope, spaced armor]", copy.copy(coord), self.text_black]
+        )
+        coord[1] += spacing
+        self.text_queue.append(
+            ["vehicle body armor", copy.copy(coord), self.text_black]
+        )
+        coord[1] += spacing
+        for key, value in self.vehicle.ai.vehicle_armor.items():
+            self.text_queue.append(
+                [f"{key} : {value}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
+        self.text_queue.append(
+            ["passenger compartment armor", copy.copy(coord), self.text_black]
+        )
+        coord[1] += spacing
+        for key, value in self.vehicle.ai.passenger_compartment_armor.items():
+            self.text_queue.append(
+                [f"{key} : {value}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
 
-        # armor 
-        coord=[40,150]
-        self.text_queue.append(['-- armor --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        self.text_queue.append(['[armor, slope, spaced armor]',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        self.text_queue.append(['vehicle body armor',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        for key,value in self.vehicle.ai.vehicle_armor.items():
-            self.text_queue.append([f'{key} : {value}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-        self.text_queue.append(['passenger compartment armor',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        for key,value in self.vehicle.ai.passenger_compartment_armor.items():
-            self.text_queue.append([f'{key} : {value}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-
-        # diagnostics 
-        coord=[40,450]
-        self.text_queue.append(['-- diagnostics --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
+        # diagnostics
+        coord = [40, 450]
+        self.text_queue.append(["-- diagnostics --", copy.copy(coord), self.text_black])
+        coord[1] += spacing
         for b in self.vehicle.ai.turrets:
             if b.ai.turret_jammed:
-                self.text_queue.append([f'{b.name} jammed',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
+                self.text_queue.append(
+                    [f"{b.name} jammed", copy.copy(coord), self.text_red]
+                )
+                coord[1] += spacing
             if b.ai.primary_weapon.ai.damaged:
-                self.text_queue.append([f'{b.ai.primary_weapon.name} damaged',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
+                self.text_queue.append(
+                    [
+                        f"{b.ai.primary_weapon.name} damaged",
+                        copy.copy(coord),
+                        self.text_red,
+                    ]
+                )
+                coord[1] += spacing
 
-        wheel_damage=False
-        wheel_destroyed=False
+        wheel_damage = False
+        wheel_destroyed = False
         for b in self.vehicle.ai.front_left_wheels:
             if b.ai.damaged:
-                wheel_damage=True
+                wheel_damage = True
             if b.ai.destroyed:
-                wheel_destroyed=True
+                wheel_destroyed = True
         for b in self.vehicle.ai.front_right_wheels:
             if b.ai.damaged:
-                wheel_damage=True
+                wheel_damage = True
             if b.ai.destroyed:
-                wheel_destroyed=True
+                wheel_destroyed = True
         for b in self.vehicle.ai.rear_left_wheels:
             if b.ai.damaged:
-                wheel_damage=True
+                wheel_damage = True
             if b.ai.destroyed:
-                wheel_destroyed=True
+                wheel_destroyed = True
         for b in self.vehicle.ai.rear_right_wheels:
             if b.ai.damaged:
-                wheel_damage=True
+                wheel_damage = True
             if b.ai.destroyed:
-                wheel_destroyed=True
+                wheel_destroyed = True
         if wheel_damage:
-            self.text_queue.append(['wheel(s) damaged',copy.copy(coord),self.text_red])
-            coord[1]+=spacing
+            self.text_queue.append(
+                ["wheel(s) damaged", copy.copy(coord), self.text_red]
+            )
+            coord[1] += spacing
         if wheel_destroyed:
-            self.text_queue.append(['wheel(s) destroyed',copy.copy(coord),self.text_red])
-            coord[1]+=spacing
-        engine_damaged=False
+            self.text_queue.append(
+                ["wheel(s) destroyed", copy.copy(coord), self.text_red]
+            )
+            coord[1] += spacing
+        engine_damaged = False
         for b in self.vehicle.ai.engines:
             if b.ai.damaged:
-                engine_damaged=True
+                engine_damaged = True
         if engine_damaged:
-            self.text_queue.append(['engine(s) damaged',copy.copy(coord),self.text_red])
-            coord[1]+=spacing
-        
+            self.text_queue.append(
+                ["engine(s) damaged", copy.copy(coord), self.text_red]
+            )
+            coord[1] += spacing
+
         # - fuel tank data -
         # this should move to its own page
-        
-        coord=[40,600]
-        self.text_queue.append(['-- fuel data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        for b in self.vehicle.ai.fuel_tanks:
-            self.text_queue.append([f'Fuel Tank: {b.name}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
-            if len(b.ai.inventory)>0:
-                if 'gas' in b.ai.inventory[0].name:
-                    self.text_queue.append([f'-> gas: {b.ai.inventory[0].volume} liters',copy.copy(coord),self.text_black])
-                    coord[1]+=spacing
-                if 'diesel' in b.ai.inventory[0].name:
-                    self.text_queue.append([f'-> diesel: {b.ai.inventory[0].volume} liters',copy.copy(coord),self.text_black])
-                    coord[1]+=spacing
-            if b.ai.punctured:
-                self.text_queue.append([f'-> punctured',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
-            if b.ai.contaminated:
-                self.text_queue.append([f'-> contaminated',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
 
-        
+        coord = [40, 600]
+        self.text_queue.append(["-- fuel data --", copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        for b in self.vehicle.ai.fuel_tanks:
+            self.text_queue.append(
+                [f"Fuel Tank: {b.name}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
+            if len(b.ai.inventory) > 0:
+                if "gas" in b.ai.inventory[0].name:
+                    self.text_queue.append(
+                        [
+                            f"-> gas: {b.ai.inventory[0].volume} liters",
+                            copy.copy(coord),
+                            self.text_black,
+                        ]
+                    )
+                    coord[1] += spacing
+                if "diesel" in b.ai.inventory[0].name:
+                    self.text_queue.append(
+                        [
+                            f"-> diesel: {b.ai.inventory[0].volume} liters",
+                            copy.copy(coord),
+                            self.text_black,
+                        ]
+                    )
+                    coord[1] += spacing
+            if b.ai.punctured:
+                self.text_queue.append(
+                    [f"-> punctured", copy.copy(coord), self.text_red]
+                )
+                coord[1] += spacing
+            if b.ai.contaminated:
+                self.text_queue.append(
+                    [f"-> contaminated", copy.copy(coord), self.text_red]
+                )
+                coord[1] += spacing
+
         # - hit log data -
-        coord=[40,700]
-        self.text_queue.append(['-- recent hit data --',copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        
-        total_penetrated = len([h for h in self.vehicle.ai.collision_log if h.penetrated])
-        total_non_penetrated = len([h for h in self.vehicle.ai.collision_log if not h.penetrated])
-        self.text_queue.append([f'Total hits - Penetrated: {total_penetrated}, Non-penetrated: {total_non_penetrated}', 
-                               copy.copy(coord), self.text_black])
-        coord[1]+=spacing
-        
-        penetrated_sorted = sorted([h for h in self.vehicle.ai.collision_log if h.penetrated], 
-                                  key=lambda x: x.penetration_value, reverse=True)
-        non_penetrated_sorted = sorted([h for h in self.vehicle.ai.collision_log if not h.penetrated],
-                                       key=lambda x: x.penetration_value, reverse=True)
-        
+        coord = [40, 700]
+        self.text_queue.append(
+            ["-- recent hit data --", copy.copy(coord), self.text_black]
+        )
+        coord[1] += spacing
+
+        total_penetrated = len(
+            [h for h in self.vehicle.ai.collision_log if h.penetrated]
+        )
+        total_non_penetrated = len(
+            [h for h in self.vehicle.ai.collision_log if not h.penetrated]
+        )
+        self.text_queue.append(
+            [
+                f"Total hits - Penetrated: {total_penetrated}, Non-penetrated: {total_non_penetrated}",
+                copy.copy(coord),
+                self.text_black,
+            ]
+        )
+        coord[1] += spacing
+
+        penetrated_sorted = sorted(
+            [h for h in self.vehicle.ai.collision_log if h.penetrated],
+            key=lambda x: x.penetration_value,
+            reverse=True,
+        )
+        non_penetrated_sorted = sorted(
+            [h for h in self.vehicle.ai.collision_log if not h.penetrated],
+            key=lambda x: x.penetration_value,
+            reverse=True,
+        )
+
         hits_to_show = []
-        hits_to_show.extend(penetrated_sorted[:self.max_display_hits])
+        hits_to_show.extend(penetrated_sorted[: self.max_display_hits])
         remaining_slots = self.max_display_hits - len(hits_to_show)
         if remaining_slots > 0 and non_penetrated_sorted:
             hits_to_show.extend(non_penetrated_sorted[:remaining_slots])
 
         for b in hits_to_show:
-            pen_text=f'[penetrated: {b.penetrated}] [distance: {b.distance}] [projectile: {b.projectile_name}] [penetration value: {b.penetration_value}] [armor value: {b.armor_value}] [side: {b.hit_side}] [compartment: {b.hit_compartment}] [result: {b.result}]'
+            pen_text = f"[penetrated: {b.penetrated}] [distance: {b.distance}] [projectile: {b.projectile_name}] [penetration value: {b.penetration_value}] [armor value: {b.armor_value}] [side: {b.hit_side}] [compartment: {b.hit_compartment}] [result: {b.result}]"
             if b.penetrated:
-                self.text_queue.append([pen_text,copy.copy(coord),self.text_red])
-                coord[1]+=spacing
+                self.text_queue.append([pen_text, copy.copy(coord), self.text_red])
+                coord[1] += spacing
             else:
-                self.text_queue.append([pen_text,copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+                self.text_queue.append([pen_text, copy.copy(coord), self.text_black])
+                coord[1] += spacing
 
+    # ---------------------------------------------------------------------------
+    def get_turret_ammo_types(self, weapon, vehicle):
+        """get a dict of projectile types and counts for all compatible magazines"""
+        ammo_types = {}
 
-    #---------------------------------------------------------------------------
+        # check magazines in inventory
+        for b in vehicle.ai.inventory:
+            if b.is_gun_magazine:
+                if weapon.world_builder_identity in b.ai.compatible_guns:
+                    for projectile in b.ai.projectiles:
+                        p_type = projectile.ai.projectile_type
+                        if p_type in ammo_types:
+                            ammo_types[p_type] += 1
+                        else:
+                            ammo_types[p_type] = 1
+
+        # check ammo_rack for vehicles
+        if vehicle.is_vehicle:
+            for b in vehicle.ai.ammo_rack:
+                if b.is_gun_magazine:
+                    if weapon.world_builder_identity in b.ai.compatible_guns:
+                        for projectile in b.ai.projectiles:
+                            p_type = projectile.ai.projectile_type
+                            if p_type in ammo_types:
+                                ammo_types[p_type] += 1
+                            else:
+                                ammo_types[p_type] = 1
+
+        return ammo_types
+
+    # ---------------------------------------------------------------------------
     def load_turret_screen(self):
-        '''load main screen text and image '''
+        """load main screen text and image"""
 
-        self.image_objects=[]
-        turret_coords=[]
-        if len(self.vehicle.ai.turrets)==0:
+        self.image_objects = []
+        turret_coords = []
+        if len(self.vehicle.ai.turrets) == 0:
             pass
-        elif len(self.vehicle.ai.turrets)==1:
-            turret_coords=[self.screen_center]
-        if len(self.vehicle.ai.turrets)==2:
-            turret_coords=[]
-            turret_coords.append([self.screen_center[0]+200,self.screen_center[1]])
-            turret_coords.append([self.screen_center[0]-200,self.screen_center[1]])
+        elif len(self.vehicle.ai.turrets) == 1:
+            turret_coords = [self.screen_center]
+        if len(self.vehicle.ai.turrets) == 2:
+            turret_coords = []
+            turret_coords.append([self.screen_center[0] + 200, self.screen_center[1]])
+            turret_coords.append([self.screen_center[0] - 200, self.screen_center[1]])
 
-        if len(self.vehicle.ai.turrets)==3:
-            turret_coords=[]
-            turret_coords.append([self.screen_center[0]+200,self.screen_center[1]])
-            turret_coords.append([self.screen_center[0],self.screen_center[1]])
-            turret_coords.append([self.screen_center[0]-300,self.screen_center[1]])
+        if len(self.vehicle.ai.turrets) == 3:
+            turret_coords = []
+            turret_coords.append([self.screen_center[0] + 200, self.screen_center[1]])
+            turret_coords.append([self.screen_center[0], self.screen_center[1]])
+            turret_coords.append([self.screen_center[0] - 300, self.screen_center[1]])
 
         for turret in self.vehicle.ai.turrets:
-            v=VehicleDiagnosticObject()
-            v.image_list=turret.image_list
-            v.screen_coords=turret_coords.pop()
+            v = VehicleDiagnosticObject()
+            v.image_list = turret.image_list
+            v.screen_coords = turret_coords.pop()
             self.image_objects.append(v)
 
+        self.text_queue = []
+        spacing = 15
+        coord = [40, 15]
 
-        self.text_queue=[]
-        spacing=15
-        coord=[40,15]
+        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        coord[1] += spacing
 
-        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        coord[1]+=spacing
+        # - turret data -
+        # this should eventually move to its own page
+        coord = [40, 150]
 
-        # - turret data - 
-        # this should eventually move to its own page 
-        coord=[40,150]
-       
         for b in self.vehicle.ai.turrets:
-            self.text_queue.append([f'Turret: {b.name}',copy.copy(coord),self.text_black])
-            coord[1]+=spacing
+            self.text_queue.append(
+                [f"Turret: {b.name}", copy.copy(coord), self.text_black]
+            )
+            coord[1] += spacing
 
             if b.ai.turret_jammed:
-                self.text_queue.append([' -> Turret ring is jammed',copy.copy(coord),self.text_red])
-                coord[1]+=spacing
-            
-            if b.ai.primary_weapon!=None:
-                self.text_queue.append([f' -> {b.ai.primary_weapon.name}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+                self.text_queue.append(
+                    [" -> Turret ring is jammed", copy.copy(coord), self.text_red]
+                )
+                coord[1] += spacing
+
+            if b.ai.primary_weapon != None:
+                self.text_queue.append(
+                    [
+                        f" -> {b.ai.primary_weapon.name}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
                 if b.ai.primary_weapon.ai.action_jammed:
-                    self.text_queue.append([' --> action is jammed',copy.copy(coord),self.text_red])
-                    coord[1]+=spacing
+                    self.text_queue.append(
+                        [" --> action is jammed", copy.copy(coord), self.text_red]
+                    )
+                    coord[1] += spacing
                 if b.ai.primary_weapon.ai.damaged:
-                    self.text_queue.append([' --> weapon is damaged',copy.copy(coord),self.text_red])
-                    coord[1]+=spacing
-                ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.primary_weapon,self.vehicle)
-                self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
-                self.text_queue.append([f' --> rounds fired: {b.ai.primary_weapon.ai.rounds_fired}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
-                self.text_queue.append([f' --> accuracy: {b.ai.primary_weapon.ai.get_accuracy()}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+                    self.text_queue.append(
+                        [" --> weapon is damaged", copy.copy(coord), self.text_red]
+                    )
+                    coord[1] += spacing
+                ammo_gun, ammo_inventory, magazine_count = (
+                    self.vehicle.world.player.ai.check_ammo(
+                        b.ai.primary_weapon, self.vehicle
+                    )
+                )
+                self.text_queue.append(
+                    [
+                        f" --> ammo {ammo_gun}/{ammo_inventory}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
+                self.text_queue.append(
+                    [
+                        f" --> rounds fired: {b.ai.primary_weapon.ai.rounds_fired}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
+                self.text_queue.append(
+                    [
+                        f" --> accuracy: {b.ai.primary_weapon.ai.get_accuracy()}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
 
-            if b.ai.coaxial_weapon!=None:
-                self.text_queue.append([f' -> {b.ai.coaxial_weapon.name}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+                # display ammo types breakdown
+                ammo_types = self.get_turret_ammo_types(
+                    b.ai.primary_weapon, self.vehicle
+                )
+                if ammo_types:
+                    self.text_queue.append(
+                        [" --> ammo types:", copy.copy(coord), self.text_black]
+                    )
+                    coord[1] += spacing
+                    for p_type, count in ammo_types.items():
+                        self.text_queue.append(
+                            [
+                                f"     {p_type}: {count}",
+                                copy.copy(coord),
+                                self.text_black,
+                            ]
+                        )
+                        coord[1] += spacing
+
+            if b.ai.coaxial_weapon != None:
+                self.text_queue.append(
+                    [
+                        f" -> {b.ai.coaxial_weapon.name}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
                 if b.ai.coaxial_weapon.ai.action_jammed:
-                    self.text_queue.append([' --> action is jammed',copy.copy(coord),self.text_red])
-                    coord[1]+=spacing
+                    self.text_queue.append(
+                        [" --> action is jammed", copy.copy(coord), self.text_red]
+                    )
+                    coord[1] += spacing
                 if b.ai.coaxial_weapon.ai.damaged:
-                    self.text_queue.append([' --> weapon is damaged',copy.copy(coord),self.text_red])
-                    coord[1]+=spacing
-                ammo_gun,ammo_inventory,magazine_count=self.vehicle.world.player.ai.check_ammo(b.ai.coaxial_weapon,self.vehicle)
-                self.text_queue.append([f' --> ammo {ammo_gun}/{ammo_inventory}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
-                self.text_queue.append([f' --> rounds fired: {b.ai.coaxial_weapon.ai.rounds_fired}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
-                self.text_queue.append([f' --> accuracy: {b.ai.coaxial_weapon.ai.get_accuracy()}',copy.copy(coord),self.text_black])
-                coord[1]+=spacing
+                    self.text_queue.append(
+                        [" --> weapon is damaged", copy.copy(coord), self.text_red]
+                    )
+                    coord[1] += spacing
+                ammo_gun, ammo_inventory, magazine_count = (
+                    self.vehicle.world.player.ai.check_ammo(
+                        b.ai.coaxial_weapon, self.vehicle
+                    )
+                )
+                self.text_queue.append(
+                    [
+                        f" --> ammo {ammo_gun}/{ammo_inventory}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
+                self.text_queue.append(
+                    [
+                        f" --> rounds fired: {b.ai.coaxial_weapon.ai.rounds_fired}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
+                self.text_queue.append(
+                    [
+                        f" --> accuracy: {b.ai.coaxial_weapon.ai.get_accuracy()}",
+                        copy.copy(coord),
+                        self.text_black,
+                    ]
+                )
+                coord[1] += spacing
 
-            coord[1]+=spacing
-            coord[1]+=spacing
+                # display ammo types breakdown
+                ammo_types = self.get_turret_ammo_types(
+                    b.ai.coaxial_weapon, self.vehicle
+                )
+                if ammo_types:
+                    self.text_queue.append(
+                        [" --> ammo types:", copy.copy(coord), self.text_black]
+                    )
+                    coord[1] += spacing
+                    for p_type, count in ammo_types.items():
+                        self.text_queue.append(
+                            [
+                                f"     {p_type}: {count}",
+                                copy.copy(coord),
+                                self.text_black,
+                            ]
+                        )
+                        coord[1] += spacing
 
-    #---------------------------------------------------------------------------
+            coord[1] += spacing
+            coord[1] += spacing
+
+    # ---------------------------------------------------------------------------
     def load_wheels_screen(self):
-        '''load main screen text and image '''
+        """load main screen text and image"""
 
-        self.image_objects=[]
-        # add the main object 
-        v=VehicleDiagnosticObject()
-        v.image_list=self.vehicle.image_list
-        v.screen_coords=self.screen_center
+        self.image_objects = []
+        # add the main object
+        v = VehicleDiagnosticObject()
+        v.image_list = self.vehicle.image_list
+        v.screen_coords = self.screen_center
         self.image_objects.append(v)
 
+        self.text_queue = []
+        spacing = 15
+        coord = [40, 15]
 
-        self.text_queue=[]
-        spacing=15
-        coord=[40,15]
+        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
+        coord[1] += spacing
+        coord[1] += spacing
 
-        self.text_queue.append([self.menu_string,copy.copy(coord),self.text_black])
-        coord[1]+=spacing
-        coord[1]+=spacing
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def update(self):
-        '''update. called by graphics_2d_pygame'''
+        """update. called by graphics_2d_pygame"""
 
         pass
 
 
-class VehicleDiagnosticObject():
+class VehicleDiagnosticObject:
     def __init__(self):
-        self.screen_coords=[0,0]
-        self.world_coords=[0,0]
-        self.scale_modifier=0
-        self.image=None
-        self.image_index=0
-        self.image_list=[]
-        self.image_size=None
-        self.rotation_angle=0
-        self.reset_image=True
+        self.screen_coords = [0, 0]
+        self.world_coords = [0, 0]
+        self.scale_modifier = 0
+        self.image = None
+        self.image_index = 0
+        self.image_list = []
+        self.image_size = None
+        self.rotation_angle = 0
+        self.reset_image = True
