@@ -2692,7 +2692,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.name = "Sd.Kfz.222"
         z.is_vehicle = True
         z.is_towable = True
-
+        z.ai.cramped_crew_compartment=True
         z.ai.vehicle_armor["top"] = [5, 0, 0]
         z.ai.vehicle_armor["bottom"] = [5, 0, 0]
         z.ai.vehicle_armor["left"] = [8, 35, 0]
@@ -4971,6 +4971,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_vehicle = True
         z.is_towable = True
         z.ai.open_top = True
+        z.ai.cramped_crew_compartment=True
         z.ai.vehicle_armor["top"] = [4, 0, 0]
         z.ai.vehicle_armor["bottom"] = [4, 0, 0]
         z.ai.vehicle_armor["left"] = [6, 30, 0]

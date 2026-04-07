@@ -1,170 +1,133 @@
 # AGENTS.md
-## For agentic coding assistants operating in this TWE (To Whatever End) repository
+## For AI assistants working on TWE (To Whatever End)
 
-This document provides essential commands, code style guidelines, and conventions for
-this Python/Pygame-based WW2 tactical simulation game. TWE simulates individual
-soldiers and vehicles with realistic physics, AI, and penetration mechanics.
+Python/Pygame WW2 tactical simulation. Simulates individual soldiers and vehicles with realistic physics, AI, and penetration mechanics.
 
-No formal build system (no pyproject.toml, setup.py, or Makefile). Run directly with Python3.
-No unit/integration tests (manual playtesting via `twe.py`). No CI/CD.
+**Run directly**: `cd code && python3 twe.py` (no build system, no tests, no CI/CD)
 
 ---
 
-## Commands
+## Quick Commands
 
-### Running the Game
-```
-cd code/
-python3 twe.py  # Launches main game loop (Graphics_2D_Pygame)
-# Screen size hardcoded: (1920,1080) in code/twe.py:26
-```
-- Controls: WASD move, F fire, TAB context menu, ~ debug menu (README.md).
-- Quick start: Main menu > Quick Battle > Civilian > 5k points.
+```bash
+# Run game
+cd code && python3 twe.py
 
-### Installation/Dependencies
-```
-pip install pygame --user  # Only external dep (misc_notes/install_notes.txt)
-# Platform notes:
-# - Fedora: sudo dnf install python3-pip; pip install pygame --user
-# - Windows: py -m pip install pygame --user
-# - macOS: brew install python; pip3 install pygame --user
-```
-Data: `code/data/ingest.py` populates `data/data.sqlite` (names/projectiles).
+# test run that skips menus with manual actions :
+python3 twe.py --quick-battle civilian 2
 
-### Linting & Static Analysis
-No built-in linters. Use:
-```
-pip install pylint  # Recommended (used in tools/code_review.sh)
-pylint code/engine/world.py  # Lint single file
-pylint code/  # Lint all (slow on large files like ai_human.py ~2700 lines)
-```
-Code review script:
-```
-cd code/tools/
-bash code_review.sh  # Runs external tool (~/localdev/review/code/review.py) on key files:
-                     # world_builder.py, world.py, ai_human.py, ai_human_vehicle.py
-alias r='python3 ~/localdev/review/code/review.py'  # From code_review.sh
-r ../engine/world.py  # Review single file
-```
+# Lint (pylint)
+pip install pylint
+pylint code/engine/world.py
 
-### Type Checking
-No mypy.ini or typing usage. Suggest:
-```
-pip install mypy
-mypy code/  # Will fail (no annotations); use --ignore-missing-imports
-```
-
-### Testing
-**No formal tests** (no pytest.ini, tests/, or test_*.py).
-- Manual: Run `twe.py`, use debug menu (~), playtest battles.
-- Data checks: `code/data/query_check.py` (dumps projectile_data).
-- Profiling:
-```
+# Profile
 python3 -m cProfile -o profile.prof twe.py
-pip install snakeviz --user
-snakeviz profile.prof  # Visualize hotspots (e.g., grid_manager.update_world_objects)
+snakeviz profile.prof
+
+# Tools
+cd code/tools
+python3 armor_thickness.py 20 60  # Calc effective armor
+python3 image_tool.py  # Sprite alignment GUI
 ```
 
-### Asset/Tools
-```
-cd code/tools/
-python3 image_tool.py  # Interactive sprite alignment (Pygame GUI for bounds/offsets)
-python3 armor_thickness.py 20 60  # Calc effective thickness: 20mm @ 60° slope
-```
-
-### Git & Repo State
-```
-git status  # Untracked: art/ XC files, saves/
-git log --oneline -10  # Recent: dev branch active (main stable)
-git diff  # Staged/unstaged changes
-# NEVER commit/push without user request. No hooks.
-```
-
-### Useful Searches (via tools)
-```
-glob \"**/ai/*.py\"  # AI modules (60+)
-grep -r \"update_task\" code/ai/ai_human.py  # Task dispatch patterns
-read code/engine/world.py  # Core sim loop (~970 lines)
-```
-
-**Post-Edit Workflow**:
-1. Lint changed files: `pylint <file.py>`
-2. Run game: `python3 twe.py` (check crashes/visuals).
-3. No auto-typecheck/lint; manual verify.
+**Controls**: WASD move, F fire, TAB menu, ~ debug, [ ] zoom
 
 ---
 
-## Code Style Guidelines
+## Code Structure
 
-### Imports (Strict Grouping)
 ```
-#import built in modules
+code/
+  twe.py              # Entry point (screen size: 1920x1080)
+  engine/             # Core game: world.py (~970 lines), graphics_2d_pygame.py
+  ai/                 # 35+ AI modules: ai_human.py (~2700 lines), ai_faction_tactical.py
+  data/               # holds the main database
+  tools/              # armor_thickness.py, image_tool.py
+```
+
+**Key Files**:
+- `engine/world.py` - Main simulation loop
+- `engine/graphics_2d_pygame.py` - Rendering
+- `ai/ai_human.py` - Human AI (task dispatch via `self.task_map`)
+- `engine/vehicle_diagnostics.py` - Vehicle debug screens
+
+---
+
+## Code Style
+
+### Imports
+```python
+# Builtins
 import random
 import copy
-import threading
 
-#import custom packages  # engine/, ai/
+# Local (absolute paths)
 from engine.graphics_2d_pygame import Graphics_2D_Pygame
 import engine.math_2d
-from ai.ai_faction_tactical import AIFactionTactical
 ```
-- **Order**: Builtins > locals (engine/ai). Absolute paths (90%+). No relative except intra-dir.
-- **No typing/from __future__**. Avoid unused imports.
+- Order: Builtins > locals. No relative imports (except intra-dir). No `typing` or `from __future__`.
 
-### Formatting (PEP8-ish, 4-space indent)
-- **Indent**: 4 spaces (no tabs).
-- **Lines**: <100 chars preferred; ~120 OK for conditionals.
-- **Spacing**: 1 blank line funcs/classes; 2 post-imports/docstrings. No trailing WS.
-- **Quotes**: Double for strings (`"error"`); single for keys (`'task_think'`).
+### Naming
+- `snake_case`: vars/functions (`world_coords`, `update_task_engage_enemy`)
+- `PascalCase`: classes (`AIHuman`, `World`)
+- `lower` abbreviations: `ai`, `wo` (WorldObject)
 
-### Naming Conventions
-- **snake_case**: Vars/fns (`world_coords`, `update_task_engage_enemy`).
-- **PascalCase**: Classes (`AIHuman`, `World`).
-- **UPPER_SNAKE**: Globals/constants (`GRAVITY` inconsistent).
-- **Abbreviations**: Lower (`ai`, `wo` for WorldObject).
-- Old-style classes: `class AIHuman(object):` (migrate to `class AIHuman():`).
-
-### Typing/Annotations
-- **None**: No `typing.List`, `-> None`. Dynamic only (`self.memory = {}`).
-- Add gradually: `from typing import Dict, Optional`; annotate new code.
-
-### Error Handling
-- **Minimal try/except**: Bare `except Exception:` for I/O/math. Prefer:
-  ```
-  engine.log.add_data('error', 'msg', True)  # Centralized logging
-  print('Error: ...')  # Fallback
-  ```
-- No `raise`. Validate inputs early (`if obj is None: return`).
-
-### Comments & Docstrings
-- **Module Header**: Triple-quote top (repo, email, notes).
-```
-'''
-repo : https://github.com/openmarmot/twe
-
-notes : ...
-'''
-```
-- **Inline**: `# note - ...` for TODOs/warnings.
-- **Docstrings**: Sparse triple-quotes for classes (`'''world class...'''`); add for public methods.
-
-### Class/Method Structure
-- **AI/State**: `self.memory = {}` dict for tasks/state. Dispatch: `self.task_map['task_foo']()`.
-- **Long Methods**: `update()` 100-500+ lines OK (AI dispatchers). Split if >300.
-- **Inheritance**: Flat (`class AIHuman(object):`); composition (`self.in_vehicle_ai = AIHumanVehicle(self.owner)`).
-- `__init__`: Sets 20-50 attrs. No `__slots__`/dataclasses.
+### Formatting
+- 4-space indent, 40-char line for long conditionals OK
+- 1 blank line between funcs/classes
+- Double quotes for strings, single for dict keys
 
 ### Patterns
-- **Queues**: `add_queue`, `remove_queue` for world ops (thread-safe).
-- **Events**: `handle_event(event, data)` dispatcher.
-- **Coords**: `world_coords` lists `[x,y]`; `screen_coords`.
-- **Globals**: Minimal; avoid.
+- **AI State**: `self.memory = {}` dict, dispatch via `self.task_map['task_name']()`
+- **Queues**: `add_queue`, `remove_queue` for thread-safe world ops
+- **Coords**: `world_coords` = `[x, y]` list; `screen_coords` for display
+- **Long methods OK**: `update()` can be 100-500+ lines (AI dispatchers)
 
-### Security/Best Practices
-- No secrets/keys. Pure sim (no net/DB beyond local SQLite).
-- Physics: `engine.math_2d` utils (dist, rotation).
-- NEVER add comments unless requested.
+### Error Handling
+- Minimal try/except. Prefer centralized logging:
+  ```python
+  engine.log.add_data('error', 'msg', True)
+  ```
+- No `raise`. Validate early: `if obj is None: return`
 
-**Mimic Existing**: Check neighbors (`code/ai/ai_human.py` for AI tasks). Run `pylint` post-edit.
+### Comments
+- **NEVER add comments unless requested**
+- Module header: triple-quote with repo URL
+- Inline: `# note - ...` for TODOs only
 
-(152 lines total)
+---
+
+## Key Conventions
+
+### AI Task Dispatch
+```python
+self.memory['task'] = {'state': 'foo', 'target': target}
+self.task_map[self.memory['task']['current_task']]()
+```
+
+### Vehicle/Magazine Access
+```python
+# Check ammo (in ai_human.py)
+ammo_gun, ammo_inventory, magazine_count = self.check_ammo(weapon, vehicle)
+
+# Compatible magazines: vehicle.ai.inventory + vehicle.ai.ammo_rack
+# Filter by: magazine.is_gun_magazine and weapon.world_builder_identity in magazine.ai.compatible_guns
+```
+
+### World Object Properties
+- `is_vehicle`, `is_human`, `is_gun_magazine`
+- `ai.inventory`, `ai.ammo_rack` (vehicles)
+- `ai.projectiles` (magazine contents)
+- `ai.projectile_type` (projectile categorization)
+
+---
+
+## Post-Edit Workflow
+1. Lint: `pylint <file.py>`
+2. Run: `python3 twe.py` (check for crashes/visual issues)
+
+---
+
+## Git
+- `main`: stable, `dev`: active development
+- **NEVER commit/push without explicit request**
