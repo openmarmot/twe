@@ -531,23 +531,27 @@ def load_quick_battle_map_objects(battle_option, result_container):
     if battle_option == "1":
         points = 2500
         soviet_advantage = points * 0.3
+        year = random.choice([1944, 1945])
+        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data
+            "german", points, squad_data, year
         )
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data
+            "soviet", points + soviet_advantage, squad_data, year
         )
 
     elif battle_option == "2":
         points = 5000
         soviet_advantage = points * 0.3
+        year = random.choice([1944, 1945])
+        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data
+            "german", points, squad_data, year
         )
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data
+            "soviet", points + soviet_advantage, squad_data, year
         )
         # squads.append('German Panzerjager Tiger P camo1')
         # squads.append('Soviet SU-85')
@@ -561,12 +565,14 @@ def load_quick_battle_map_objects(battle_option, result_container):
     elif battle_option == "3":
         points = 10000
         soviet_advantage = points * 0.3
+        year = random.choice([1944, 1945])
+        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data
+            "german", points, squad_data, year
         )
         squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data
+            "soviet", points + soviet_advantage, squad_data, year
         )
 
     # testing
@@ -2692,7 +2698,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.name = "Sd.Kfz.222"
         z.is_vehicle = True
         z.is_towable = True
-        z.ai.cramped_crew_compartment=True
+        z.ai.cramped_crew_compartment = True
         z.ai.vehicle_armor["top"] = [5, 0, 0]
         z.ai.vehicle_armor["bottom"] = [5, 0, 0]
         z.ai.vehicle_armor["left"] = [8, 35, 0]
@@ -4971,7 +4977,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_vehicle = True
         z.is_towable = True
         z.ai.open_top = True
-        z.ai.cramped_crew_compartment=True
+        z.ai.cramped_crew_compartment = True
         z.ai.vehicle_armor["top"] = [4, 0, 0]
         z.ai.vehicle_armor["bottom"] = [4, 0, 0]
         z.ai.vehicle_armor["left"] = [6, 30, 0]
