@@ -87,6 +87,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Sd.kfz.251/22 | AFV | Pak 40 |
 | German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
 | German | T34 747r | Tank | A captured T34-76 |
+| Soviet | BA-64 | AFV | Light armored car |
 | Soviet | Lend Lease American Truck | Utility | |
 | Soviet | GAZ-61 | Utility | off-road staff car|
 | Soviet | Su-85 | Tank | Basically a turretless T34-85 |
@@ -197,4 +198,4 @@ From the main menu
 
 
 ![screenshot](/screenshots/twe_forest_battle.png "TWE screenshot")
-This screenshot shows the end of a large battle in a forested area. 
+This screenshot shows the end of a large battle in a forested area.
