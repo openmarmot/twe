@@ -445,7 +445,7 @@ class AIHumanVehicleDriver:
         for role in vehicle.ai.vehicle_crew:
             if role.role_occupied is False:
                 if role.is_gunner and role.turret:
-                    self.owner.ai.switch_task_vehicle_crew(vehicle, role)
+                    self.owner.ai.switch_task_vehicle_crew(vehicle, None)
                     return True
 
         target = None

@@ -557,10 +557,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
         # squads.append('Soviet SU-85')
         # squads.append('Soviet SU-85')
         # squads.append('Soviet SU-85')
-        squads.append("Soviet BA-64")
-        squads.append("Soviet BA-64")
-        squads.append("Soviet BA-64")
-        squads.append("Soviet BA-64")
+
 
     elif battle_option == "3":
         points = 10000
