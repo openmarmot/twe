@@ -2152,14 +2152,20 @@ class AIHuman:
                 max_search_distance = 500
                 if self.in_vehicle():
                     vehicle_role = self.memory["task_vehicle_crew"]["vehicle_role"]
-                    if vehicle_role.is_gunner:
+                    if vehicle_role.is_commander:
+                        max_search_distance = 5000
+                    elif vehicle_role.is_gunner:
                         # faster re-eval rate
                         self.target_eval_rate = random.uniform(0.8, 1)
                         max_search_distance = (
                             vehicle_role.turret.ai.primary_weapon.ai.range + 500
                         )
-                    if vehicle_role.is_commander:
-                        max_search_distance = 4500
+                    elif vehicle_role.is_passenger:
+                        # passengers need some search for knowing when to bail out, etc
+                        max_search_distance = 1500
+                    elif vehicle_role.is_driver:
+                        # needs some search to make decisions
+                        max_search_distance = 1500
                 else:
                     if self.primary_weapon or self.antitank:
                         max_search_distance = 3000

@@ -1,0 +1,4 @@
+# squad_data table
+
+chance_1944 and chance_1945 are the relative chance that a unit will be available that year out of 100.
+basically how rare it is, with 100 being common, and 0 being completely unavailable.
