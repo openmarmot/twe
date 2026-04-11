@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 08 2026
+- made some changes to driver decision making
+
+driver will now switch role or exit vehicle, or drive away from enemies under some circumstances
+
+----------------------------------
 April 07 2026
 - added new columns 'chance_44,chance_45' to squad list
 - quick battle now picks either 44 or 45 and the chances determine the options for the randomized battle group
