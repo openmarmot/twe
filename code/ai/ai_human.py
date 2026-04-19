@@ -60,6 +60,11 @@ class AIHuman:
         # start with something that doesn't match, forcing a think
         self.memory["current_task"] = "none"
 
+        # journal - array of strings for logging events
+        self.journal = []
+        self.last_journal_message = None
+        self.last_journal_time = 0
+
         # money !
         # amount can be a float to account for coinage
         # 'currency name',amount
@@ -560,7 +565,9 @@ class AIHuman:
         """drop object into the world"""
         if OBJECT_TO_DROP.is_large_human_pickup:
             self.large_pickup = None
+            self.add_journal_entry(f"Dropped large item: {OBJECT_TO_DROP.name}")
         else:
+            self.add_journal_entry(f"Dropped: {OBJECT_TO_DROP.name}")
             self.event_remove_inventory(OBJECT_TO_DROP)
             # make sure the obj world_coords reflect the obj that had it in inventory
             OBJECT_TO_DROP.world_coords = copy.copy(self.owner.world_coords)
@@ -575,6 +582,7 @@ class AIHuman:
         """Consume consumable and apply effects to human stats"""
 
         # eat the consumable object. or part of it anyway
+        self.add_journal_entry(f"Ate: {CONSUMABLE.name}")
         self.blood_pressure += CONSUMABLE.ai.health_effect
         self.hunger += CONSUMABLE.ai.hunger_effect
         self.thirst += CONSUMABLE.ai.thirst_effect
@@ -1401,6 +1409,7 @@ class AIHuman:
                 )
             else:
                 self.large_pickup = world_object
+                self.add_journal_entry(f"Picked up large item: {world_object.name}")
         else:
             if world_object.is_gun:
                 if self.owner.is_player is False:
@@ -1411,6 +1420,7 @@ class AIHuman:
                         self.switch_task_pickup_objects(near_magazines)
 
             self.speak("Picking up a " + world_object.name)
+            self.add_journal_entry(f"Picked up: {world_object.name}")
 
             self.event_add_inventory(world_object)
             # remove from world
@@ -1491,6 +1501,7 @@ class AIHuman:
 
         # new_magazine - magazine obj that you want to reload with. if None the function finds a compatible one
 
+        self.add_journal_entry(f"Reloaded: {weapon.name}")
         self.speak("reloading!")
         if weapon.is_gun or weapon.is_handheld_antitank:
             # first get the current magazine
@@ -1574,7 +1585,11 @@ class AIHuman:
                 s = "[" + self.owner.name + "] "
 
                 if what == "status":
-                    s += " what?"
+                    recent_entry = self.get_recent_journal_entry(300)
+                    if recent_entry:
+                        s += recent_entry
+                    else:
+                        s += "just hanging out"
                 elif what == "bandage":
                     s += " applying bandage"
                 elif what == "joined squad":
@@ -1587,6 +1602,20 @@ class AIHuman:
                     s += what
 
                 self.owner.world.text_queue.insert(0, s)
+
+    # ---------------------------------------------------------------------------
+    def get_recent_journal_entry(self, max_age_seconds):
+        """Get the most recent journal entry within max_age_seconds. Returns None if none found."""
+        current_time = self.owner.world.world_seconds
+        for entry in reversed(self.journal):
+            timestamp_str = entry.split(":")[0]
+            try:
+                timestamp = float(timestamp_str)
+                if current_time - timestamp <= max_age_seconds:
+                    return entry
+            except ValueError:
+                continue
+        return None
 
     # ---------------------------------------------------------------------------
     def squad_leader_review_orders(self):
@@ -2059,6 +2088,7 @@ class AIHuman:
         if self.prone:
             self.prone_state_change()
         if self.throwable is not None:
+            self.add_journal_entry(f"Threw: {self.throwable.name}")
             # this does all the needed internal ai stuff for the throwable
             self.throwable.ai.throw()
 
@@ -2573,6 +2603,7 @@ class AIHuman:
                 # make sure we aren't prone
                 if self.prone:
                     self.prone_state_change()
+                self.add_journal_entry(f"Entered vehicle: {vehicle.name}")
                 self.switch_task_vehicle_crew(vehicle, vehicle_order)
             else:
                 # something went wrong, cancel the task
@@ -2624,6 +2655,8 @@ class AIHuman:
         self.memory.pop("task_exit_vehicle", None)
         self.memory["current_task"] = ""
 
+        self.add_journal_entry(f"Exited vehicle: {vehicle_role.vehicle.name}")
+
         # maybe grab your large pick up if you put it in the trunk
         if self.blood_pressure > 0:
             self.speak("Jumping out")
@@ -2640,11 +2673,11 @@ class AIHuman:
 
                     # only want to move away slightly before re-engaging
                     if len(self.human_targets) > 0:
-                        retreat_distance = random.randint(100,200)
+                        retreat_distance = random.randint(100, 200)
                     else:
-                        retreat_distance = random.randint(1400,1500)
+                        retreat_distance = random.randint(1400, 1500)
 
-                    # calculate target point towards spawn
+                        # calculate target point towards spawn
                         vec_to_spawn = [
                             spawn_coords[0] - self.owner.world_coords[0],
                             spawn_coords[1] - self.owner.world_coords[1],
@@ -2662,7 +2695,6 @@ class AIHuman:
                         )
                         self.switch_task_move_to_location(target_coords, None)
                         return
-
 
                 # move slightly
                 # this seems to be needed to prevent the ai from immediately jumping back in
@@ -2773,6 +2805,7 @@ class AIHuman:
                     container.remove_inventory(c)
                     self.event_add_inventory(c)
                     self.speak("Grabbed a " + c.name)
+                    self.add_journal_entry(f"Looted from {container.name}: {c.name}")
 
             elif distance > self.max_walk_distance:
                 # maybe should add a option to ignore this but for the most part you want to forget distant objects
@@ -3340,6 +3373,19 @@ class AIHuman:
             self.switch_task_think()
 
     # -----------------------------------------------------------------------
+    def add_journal_entry(self, message):
+        """Add an entry to the journal with world_seconds timestamp.
+        Skips duplicate messages within 60 seconds to prevent spam."""
+        if message == self.last_journal_message:
+            time_since_last = self.owner.world.world_seconds - self.last_journal_time
+            if time_since_last < 60:
+                return
+        self.last_journal_message = message
+        self.last_journal_time = self.owner.world.world_seconds
+        timestamp = self.owner.world.world_seconds
+        self.journal.append(f"{timestamp}: {message}")
+
+    # -----------------------------------------------------------------------
     def use_medical_object(self, medical):
         """Apply medical object effects to heal or treat damage"""
 
@@ -3350,13 +3396,14 @@ class AIHuman:
 
         # should select the correct medical item to fix whatever the issue is
 
+        self.add_journal_entry(f"Used medical: {medical.name}")
         self.speak("Using medical " + medical.name)
 
         self.bleeding = False
 
         self.blood_pressure += medical.ai.health_effect
         self.hunger += medical.ai.hunger_effect
-        self.thirst += medical.ai.thirst_effect
+        self.thirst += medical.ai.hunger_effect
         self.fatigue += medical.ai.fatigue_effect
 
         # calling this by itself should remove all references to the object

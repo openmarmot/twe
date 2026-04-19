@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 18 2026
+- started working on a journal system to record ai decisions.
+
+didn't finish or get a chance to test. may be broken
+
+----------------------------------
 April 08 2026
 - made some changes to driver decision making
 

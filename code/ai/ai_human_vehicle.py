@@ -52,8 +52,10 @@ class AIHumanVehicle:
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"] = []
 
         role = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"]
+        vehicle = role.vehicle
 
         if important_hit.penetrated:
+            self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
             self.owner.ai.morale -= 10
             if self.owner.ai.morale_check() is False:
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
@@ -79,6 +81,9 @@ class AIHumanVehicle:
                 return
         else:
             # not a penetration, so less of a reaction
+            self.owner.ai.add_journal_entry(
+                f"Vehicle {vehicle.name} hit (no penetration)"
+            )
 
             if role.is_gunner:
                 if important_hit.projectile_shooter:

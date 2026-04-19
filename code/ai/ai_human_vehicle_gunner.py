@@ -451,6 +451,9 @@ class AIHumanVehicleGunner:
         if ammo_gun == 0:
             if ammo_inventory > 0:
                 # start the reload process
+                self.owner.ai.add_journal_entry(
+                    f"Reloading {turret.ai.primary_weapon.name}"
+                )
                 self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
                     self.owner.world.world_seconds
                 )
@@ -470,6 +473,7 @@ class AIHumanVehicleGunner:
             if ammo_gun == 0:
                 if ammo_inventory > 0:
                     # start the reload process
+                    self.owner.ai.add_journal_entry(f"Reloading coax")
                     self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
                         self.owner.world.world_seconds
                     )
@@ -721,6 +725,9 @@ class AIHumanVehicleGunner:
                 target_name = target.name
                 if target.is_human:
                     target_name = "soldiers"
+                self.owner.ai.add_journal_entry(
+                    f"Firing {turret.ai.primary_weapon.name} at {target_name}"
+                )
                 self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                     VehicleCrewAction.ENGAGING
                 )
@@ -733,6 +740,7 @@ class AIHumanVehicleGunner:
                 target_name = target.name
                 if target.is_human:
                     target_name = "soldiers"
+                self.owner.ai.add_journal_entry(f"Firing coax at {target_name}")
                 self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                     VehicleCrewAction.ENGAGING
                 )
