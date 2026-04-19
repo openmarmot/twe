@@ -156,6 +156,18 @@ class AIHuman:
         self.last_speak = ""
 
     # ---------------------------------------------------------------------------
+    def add_journal_entry(self, message):
+        """Add an entry to the journal with world_seconds timestamp.
+        Skips duplicate messages within 60 seconds to prevent spam."""
+        if message == self.last_journal_message:
+            time_since_last = self.owner.world.world_seconds - self.last_journal_time
+            if time_since_last < 60:
+                return
+        self.last_journal_message = message
+        self.last_journal_time = self.owner.world.world_seconds
+        self.journal.append(f"{self.last_journal_time}: {message}")
+
+    # ---------------------------------------------------------------------------
     def building_check(self):
         """Check building proximity and in-building status"""
 
@@ -1354,8 +1366,10 @@ class AIHuman:
                     self.owner.world_coords, adjusted_coords
                 )
                 self.antitank.ai.calculated_range = calculated_range
+
             self.antitank.ai.fire()
             self.owner.world.panzerfaust_launches += 1
+            self.add_journal_entry(f"Fired {self.antitank.name}")
 
             # drop panzerfausts always
             if "panzerfaust" in self.antitank.name:
@@ -1763,11 +1777,6 @@ class AIHuman:
         self.memory[task_name] = task_details
         self.memory["current_task"] = task_name
 
-        if self.squad.squad_leader == self.owner:
-            # for now the afv stuff just confuses stuff. we don't want them joining up as passengers
-            if self.is_afv_trained is False:
-                self.give_squad_transportation_orders(vehicle_order)
-
     # ---------------------------------------------------------------------------
     def switch_task_engage_enemy(self, enemy):
         """switch task"""
@@ -1777,6 +1786,12 @@ class AIHuman:
 
         self.memory[task_name] = task_details
         self.memory["current_task"] = task_name
+
+        target_type = "soldiers" if enemy.is_human else enemy.name
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, enemy.world_coords
+        )
+        self.add_journal_entry(f"Engaging {target_type} at {int(distance)}m")
 
         self.owner.rotation_angle = engine.math_2d.get_rotation(
             self.owner.world_coords, enemy.world_coords
@@ -2324,6 +2339,24 @@ class AIHuman:
                 death_log["last collision"] = self.collision_log[-1]
 
             engine.log.human_death_log.append(death_log)
+
+            print(f"\n=== DEATH: {self.owner.name} ===")
+            print(f"Faction: {self.squad.faction}")
+            print(f"Primary weapon: {death_log['primary weapon']}")
+            if self.primary_weapon is not None:
+                print(f"Rounds fired: {self.primary_weapon.ai.rounds_fired}")
+                print(f"Rounds hit: {self.primary_weapon.ai.rounds_hit}")
+            print(f"Confirmed kills: {self.confirmed_kills}")
+            print(f"Probable kills: {self.probable_kills}")
+            print(f"Last collision: {death_log['last collision']}")
+            if self.journal:
+                print("Journal:")
+                for entry in self.journal:
+                    print(f"  {entry}")
+            else:
+                print("Journal: (empty)")
+            print("=" * 40 + "\n")
+
             # --
 
             # drop primary weapon
@@ -3191,6 +3224,9 @@ class AIHuman:
             if self.check_ammo_bool(self.antitank, self.owner):
                 vehicle_target = self.get_target(False, True)
                 if vehicle_target is not None:
+                    self.add_journal_entry(
+                        f"AT weapon acquired, engaging {vehicle_target.name}"
+                    )
                     self.switch_task_engage_enemy(vehicle_target)
                     return
 
@@ -3371,19 +3407,6 @@ class AIHuman:
         """update task wait"""
         if self.owner.world.world_seconds > self.memory["task_wait"]["end_time"]:
             self.switch_task_think()
-
-    # -----------------------------------------------------------------------
-    def add_journal_entry(self, message):
-        """Add an entry to the journal with world_seconds timestamp.
-        Skips duplicate messages within 60 seconds to prevent spam."""
-        if message == self.last_journal_message:
-            time_since_last = self.owner.world.world_seconds - self.last_journal_time
-            if time_since_last < 60:
-                return
-        self.last_journal_message = message
-        self.last_journal_time = self.owner.world.world_seconds
-        timestamp = self.owner.world.world_seconds
-        self.journal.append(f"{timestamp}: {message}")
 
     # -----------------------------------------------------------------------
     def use_medical_object(self, medical):

@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 19 2026
+- minor adjustments to the journal system
+- added back in death logs for soldiers, now with journal entries
+----------------------------------
 April 18 2026
 - started working on a journal system to record ai decisions.
 

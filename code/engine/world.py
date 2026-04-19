@@ -909,7 +909,7 @@ class World:
         self.time_passed_seconds = time_passed_seconds
 
         if self.is_paused is False:
-            self.world_seconds += self.time_passed_seconds
+            self.world_seconds = round(self.world_seconds + self.time_passed_seconds, 2)
             self.process_reinforcements()
 
             # cycle the text queue
