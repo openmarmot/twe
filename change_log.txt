@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 21 2026
+- added german military bike as a vehicle option
+- added two german military bike squad options
+----------------------------------
 April 19 2026
 - minor adjustments to the journal system
 - added back in death logs for soldiers, now with journal entries

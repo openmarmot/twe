@@ -558,7 +558,6 @@ def load_quick_battle_map_objects(battle_option, result_container):
         # squads.append('Soviet SU-85')
         # squads.append('Soviet SU-85')
 
-
     elif battle_option == "3":
         points = 10000
         soviet_advantage = points * 0.3
@@ -6524,7 +6523,48 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "bicycle_wheel":
         z = WorldObject(world, ["volkswagen_wheel"], AIWheel)
         z.name = "Bicycle Wheel"
-        z.ai.compatible_vehicles = ["red_bicycle"]
+        z.ai.compatible_vehicles = ["red_bicycle", "german_military_bicycle"]
+
+    elif object_type == "german_military_bicycle":
+        z = WorldObject(world, ["german_military_bicycle"], AIVehicle)
+        z.name = "german_military_bicycle"
+        z.is_vehicle = True
+        z.ai.is_transport = True
+        z.ai.max_speed = 177.6
+        z.ai.max_offroad_speed = 142.08
+        z.ai.rotation_speed = 50.0
+
+        driver = VehicleRole("driver", z)
+        driver.is_driver = True
+        driver.seat_visible = True
+        z.ai.vehicle_crew.append(driver)
+
+        z.ai.open_top = True
+        z.collision_radius = 50
+        z.bounding_circles.append([[-12.0, 0.0], 10])
+        z.bounding_circles.append([[0.0, 0.0], 10])
+        z.bounding_circles.append([[12.0, 0.0], 10])
+        z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
+        z.weight = 13
+        z.drag_coefficient = 0.8
+        z.frontal_area = 3
+        z.ai.min_wheels_per_side_front = 1
+        z.ai.min_wheels_per_side_rear = 0
+        z.ai.max_wheels = 4
+        z.ai.max_spare_wheels = 0
+        z.ai.front_left_wheels.append(
+            spawn_object(world, world_coords, "bicycle_wheel", False)
+        )
+        z.ai.front_right_wheels.append(
+            spawn_object(world, world_coords, "bicycle_wheel", False)
+        )
+        z.rotation_angle = float(random.randint(0, 359))
+
+        if random.randint(0, 1) == 1:
+            z.add_inventory(spawn_object(world, world_coords, "panzerfaust_60", False))
+        if random.randint(0, 1) == 1:
+            z.add_inventory(spawn_object(world, world_coords, "mg34_belt", False))
+            z.add_inventory(spawn_object(world, world_coords, "mg34_belt", False))
 
     elif object_type == "german_ju88":
         z = WorldObject(
