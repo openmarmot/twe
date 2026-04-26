@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 25 2026
+- fixed a logic error that was causing humans in vehicles to be damaged by explosions
+
+need a way for explosions to hit top armor when they are direct hits
+
+----------------------------------
 April 21 2026
 - added german military bike as a vehicle option
 - added two german military bike squad options

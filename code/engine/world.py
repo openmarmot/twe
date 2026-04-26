@@ -319,8 +319,9 @@ class World:
             if distance < explosion_radius:
                 # power reverse scales with distance
                 power = 100 * (1 - (distance / explosion_radius))
-                if b.is_human:
+                if b.is_human and not b.ai.in_vehicle():
                     b.ai.handle_event("explosion", power)
+                # vehicle will also handle any passengers
                 if b.is_vehicle:
                     b.ai.handle_event(
                         "explosion", {"power": power, "coords": world_coords}

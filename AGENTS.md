@@ -3,18 +3,13 @@
 
 Python/Pygame WW2 tactical simulation. Simulates individual soldiers and vehicles with realistic physics, AI, and penetration mechanics.
 
-**Run directly**: `cd code && python3 twe.py` (no build system, no tests, no CI/CD)
-
 ---
 
 ## Quick Commands
 
 ```bash
-# Run game
-cd code && python3 twe.py
-
 # test run that skips menus with manual actions :
-python3 twe.py --quick-battle civilian 2
+cd code && python3 twe.py --quick-battle civilian 2
 
 # Lint (pylint)
 pip install pylint
