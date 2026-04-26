@@ -52,11 +52,16 @@ class AIHumanVehicle:
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"] = []
 
         role = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"]
+        vehicle = role.vehicle
 
         if important_hit.penetrated:
+            self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
             self.owner.ai.morale -= 10
             if self.owner.ai.morale_check() is False:
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
+                self.owner.ai.add_journal_entry(
+                    f"Bailing out of {vehicle.name} due to morale failure"
+                )
                 self.owner.ai.switch_task_exit_vehicle()
                 return
 
@@ -75,10 +80,16 @@ class AIHumanVehicle:
                 # i feel that passengers should probably bail if there is a penetration
                 # really no reason for them to do anything else
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
+                self.owner.ai.add_journal_entry(
+                    f"Bailing out of penetrated {vehicle.name}"
+                )
                 self.owner.ai.switch_task_exit_vehicle()
                 return
         else:
             # not a penetration, so less of a reaction
+            self.owner.ai.add_journal_entry(
+                f"Vehicle {vehicle.name} hit (no penetration)"
+            )
 
             if role.is_gunner:
                 if important_hit.projectile_shooter:

@@ -1,6 +1,30 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 26 2026
+- removed redundant 'reloading' journal entry
+- sprites now remove when not visible when fps is low
+----------------------------------
+April 25 2026
+- fixed a logic error that was causing humans in vehicles to be damaged by explosions
+
+need a way for explosions to hit top armor when they are direct hits
+
+----------------------------------
+April 21 2026
+- added german military bike as a vehicle option
+- added two german military bike squad options
+----------------------------------
+April 19 2026
+- minor adjustments to the journal system
+- added back in death logs for soldiers, now with journal entries
+----------------------------------
+April 18 2026
+- started working on a journal system to record ai decisions.
+
+didn't finish or get a chance to test. may be broken
+
+----------------------------------
 April 08 2026
 - made some changes to driver decision making
 
