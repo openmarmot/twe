@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ----------------------------------
+April 26 2026
+- removed redundant 'reloading' journal entry
+- sprites now remove when not visible when fps is low
+----------------------------------
 April 25 2026
 - fixed a logic error that was causing humans in vehicles to be damaged by explosions
 

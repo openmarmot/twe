@@ -144,6 +144,13 @@ class World:
         # seconds between the last update. updated by self.update()
         self.time_passed_seconds = 0
 
+        # the current fps. updated by self.update()
+        self.fps=0
+
+        # below this there are negative effects
+        # mg42 needs a min of 30
+        self.minimum_fps=38
+
         # -- some stat counters for the debug info screen --
         self.panzerfaust_launches = 0
         # incremented when a medic heals someone
@@ -904,10 +911,11 @@ class World:
                 engine.world_builder.spawn_map_pointer(self, b.world_coords, "normal")
 
     # ---------------------------------------------------------------------------
-    def update(self, time_passed_seconds):
+    def update(self, time_passed_seconds,fps):
         """Update world simulation state"""
 
         self.time_passed_seconds = time_passed_seconds
+        self.fps=fps
 
         if self.is_paused is False:
             self.world_seconds = round(self.world_seconds + self.time_passed_seconds, 2)

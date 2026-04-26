@@ -12,7 +12,7 @@ import engine.math_2d
 class AIAnimatedSprite():
     def __init__(self, owner):
         self.owner=owner
-        
+
         # determines if the update code is active
         self.alive=True
 
@@ -28,7 +28,7 @@ class AIAnimatedSprite():
         # rotation speed per second
         self.rotation_speed=400
 
-        # how long it moves along its heading 
+        # how long it moves along its heading
         self.move_time_max=2
 
         # if true the heading is updated when rotation is updated
@@ -47,13 +47,20 @@ class AIAnimatedSprite():
 
     #---------------------------------------------------------------------------
     def update(self):
+
+        # performance optimization
+        if self.owner.world.fps<self.owner.world.minimum_fps:
+            if not self.owner.grid_square.visible:
+                self.owner.wo_stop()
+                return
+
         if self.self_delete_when_not_visible:
-            if (self.owner.grid_square.visible==False or 
+            if (self.owner.grid_square.visible==False or
                 self.owner.world.scale<self.owner.minimum_visible_scale):
                 self.owner.wo_stop()
                 return
             return
-        
+
         if self.alive:
             time_passed=self.owner.world.time_passed_seconds
 
@@ -61,7 +68,7 @@ class AIAnimatedSprite():
 
             if self.alive_time>self.alive_time_max:
                 self.alive=False
-                
+
                 # self terminate
                 if self.self_remove:
                     if self.only_remove_when_not_visible:
@@ -75,12 +82,12 @@ class AIAnimatedSprite():
                     #rotate
                     self.owner.rotation_angle+=self.rotation_speed*time_passed
 
-                    # normalize angles 
+                    # normalize angles
                     self.owner.rotation_angle=engine.math_2d.get_normalized_angle(self.owner.rotation_angle)
 
                     if self.heading_from_rotation:
                         self.owner.heading=engine.math_2d.get_heading_from_rotation(self.owner.rotation_angle)
-                    
+
                     # reset immage as rotation has changed
                     self.owner.reset_image=True
 
