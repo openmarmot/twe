@@ -1,5 +1,9 @@
 TWE Project : Change Log
 
+---------------------------------
+April 28 2026
+- adding a start.sh with venv
+
 ----------------------------------
 April 26 2026
 - removed redundant 'reloading' journal entry
