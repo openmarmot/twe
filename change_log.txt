@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+April 30 2026
+- added zoom scrolling with the mouse scroll wheel. its really nice!
+
+---------------------------------
 April 28 2026
 - adding a start.sh with venv
 

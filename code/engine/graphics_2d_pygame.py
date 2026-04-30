@@ -283,6 +283,12 @@ class Graphics_2D_Pygame:
                 # right click
                 if event.button == 3:
                     pass
+                # scroll up
+                if event.button == 4:
+                    self.world.zoom_in()
+                # scroll down
+                if event.button == 5:
+                    self.world.zoom_out()
             if event.type == pygame.MOUSEMOTION:
                 # print(str(event.pos))
                 pass
