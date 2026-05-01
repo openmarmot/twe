@@ -2,6 +2,10 @@ TWE Project : Change Log
 
 ---------------------------------
 April 30 2026
+- added print logs for screen size debugging
+
+---------------------------------
+April 29 2026
 - added zoom scrolling with the mouse scroll wheel. its really nice!
 
 ---------------------------------

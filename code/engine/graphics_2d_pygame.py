@@ -66,6 +66,9 @@ class Graphics_2D_Pygame:
             self.screen_size = screen_size
             flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
 
+        print("Display detected:", info.current_w, "x", info.current_h)
+        print("Using screen size:", self.screen_size[0], "x", self.screen_size[1])
+
         self.screen = pygame.display.set_mode(self.screen_size, flags)
         self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
 
