@@ -73,7 +73,7 @@ class Graphics_2D_Pygame:
         print("Using screen size:", self.screen_size[0], "x", self.screen_size[1])
 
         self.screen = pygame.display.set_mode(self.screen_size, flags)
-        self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
+        self.screen_center = [self.screen_size[0] // 2, self.screen_size[1] // 2]
 
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
@@ -635,10 +635,10 @@ class Graphics_2D_Pygame:
                 if c == self.vehicle_diagnostics.image_objects[0]:
                     c.screen_coords = self.screen_center
                 else:
-                    c.screen_coords[0] = (
+                    c.screen_coords[0] = round(
                         c.world_coords[0] * self.world.scale + translation[0]
                     )
-                    c.screen_coords[1] = (
+                    c.screen_coords[1] = round(
                         c.world_coords[1] * self.world.scale + translation[1]
                     )
 
@@ -942,10 +942,10 @@ class Graphics_2D_Pygame:
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
             if not obj.is_player:
-                obj.screen_coords[0] = (
+                obj.screen_coords[0] = round(
                     obj.world_coords[0] * self.world.scale + translation[0]
                 )
-                obj.screen_coords[1] = (
+                obj.screen_coords[1] = round(
                     obj.world_coords[1] * self.world.scale + translation[1]
                 )
 
