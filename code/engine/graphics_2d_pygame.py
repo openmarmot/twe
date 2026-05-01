@@ -49,15 +49,18 @@ class Graphics_2D_Pygame:
         self.double_buffering = True
 
         info = pygame.display.Info()
+        desktops = pygame.display.get_desktop_sizes()
+        if desktops:
+            display_w, display_h = max(desktops, key=lambda s: s[0]*s[1])
+        else:
+            display_w, display_h = info.current_w, info.current_h
 
-        if screen_size is None:  # Fullscreen
-            self.screen_size = (info.current_w, info.current_h)
+        if screen_size is None:
+            self.screen_size = (display_w, display_h)
             flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED
         elif screen_size == "auto":
-            # === SMART WINDOWED SIZE ===
-            w = min(int(info.current_w * 0.82), 1920)
-            h = min(int(info.current_h * 0.82), 1080)
-            # Keep a nice 16:9-ish ratio
+            w = min(int(display_w * 0.82), 1920)
+            h = min(int(display_h * 0.82), 1080)
             if w / h > 1.78:
                 w = int(h * 1.7778)
             self.screen_size = (w, h)
@@ -66,7 +69,7 @@ class Graphics_2D_Pygame:
             self.screen_size = screen_size
             flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
 
-        print("Display detected:", info.current_w, "x", info.current_h)
+        print("Display detected:", display_w, "x", display_h)
         print("Using screen size:", self.screen_size[0], "x", self.screen_size[1])
 
         self.screen = pygame.display.set_mode(self.screen_size, flags)
