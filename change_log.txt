@@ -1,5 +1,19 @@
 TWE Project : Change Log
 
+---------------------------------
+April 30 2026
+- added print logs for screen size debugging
+- graphics_engine now gets all display sizes and picks the largest to display appropriately on multi-monitor systems
+- some updates to screen coord calculations to reduce jitter
+
+---------------------------------
+April 29 2026
+- added zoom scrolling with the mouse scroll wheel. its really nice!
+
+---------------------------------
+April 28 2026
+- adding a start.sh with venv
+
 ----------------------------------
 April 26 2026
 - removed redundant 'reloading' journal entry

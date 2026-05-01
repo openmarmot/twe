@@ -49,15 +49,18 @@ class Graphics_2D_Pygame:
         self.double_buffering = True
 
         info = pygame.display.Info()
+        desktops = pygame.display.get_desktop_sizes()
+        if desktops:
+            display_w, display_h = max(desktops, key=lambda s: s[0]*s[1])
+        else:
+            display_w, display_h = info.current_w, info.current_h
 
-        if screen_size is None:  # Fullscreen
-            self.screen_size = (info.current_w, info.current_h)
+        if screen_size is None:
+            self.screen_size = (display_w, display_h)
             flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED
         elif screen_size == "auto":
-            # === SMART WINDOWED SIZE ===
-            w = min(int(info.current_w * 0.82), 1920)
-            h = min(int(info.current_h * 0.82), 1080)
-            # Keep a nice 16:9-ish ratio
+            w = min(int(display_w * 0.82), 1920)
+            h = min(int(display_h * 0.82), 1080)
             if w / h > 1.78:
                 w = int(h * 1.7778)
             self.screen_size = (w, h)
@@ -66,8 +69,11 @@ class Graphics_2D_Pygame:
             self.screen_size = screen_size
             flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
 
+        print("Display detected:", display_w, "x", display_h)
+        print("Using screen size:", self.screen_size[0], "x", self.screen_size[1])
+
         self.screen = pygame.display.set_mode(self.screen_size, flags)
-        self.screen_center = [self.screen_size[0] / 2, self.screen_size[1] / 2]
+        self.screen_center = [self.screen_size[0] // 2, self.screen_size[1] // 2]
 
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
@@ -283,6 +289,12 @@ class Graphics_2D_Pygame:
                 # right click
                 if event.button == 3:
                     pass
+                # scroll up
+                if event.button == 4:
+                    self.world.zoom_in()
+                # scroll down
+                if event.button == 5:
+                    self.world.zoom_out()
             if event.type == pygame.MOUSEMOTION:
                 # print(str(event.pos))
                 pass
@@ -623,10 +635,10 @@ class Graphics_2D_Pygame:
                 if c == self.vehicle_diagnostics.image_objects[0]:
                     c.screen_coords = self.screen_center
                 else:
-                    c.screen_coords[0] = (
+                    c.screen_coords[0] = round(
                         c.world_coords[0] * self.world.scale + translation[0]
                     )
-                    c.screen_coords[1] = (
+                    c.screen_coords[1] = round(
                         c.world_coords[1] * self.world.scale + translation[1]
                     )
 
@@ -930,10 +942,10 @@ class Graphics_2D_Pygame:
         for obj in renderable_objects:
             self.renderlists[obj.render_level].append(obj)
             if not obj.is_player:
-                obj.screen_coords[0] = (
+                obj.screen_coords[0] = round(
                     obj.world_coords[0] * self.world.scale + translation[0]
                 )
-                obj.screen_coords[1] = (
+                obj.screen_coords[1] = round(
                     obj.world_coords[1] * self.world.scale + translation[1]
                 )
 
