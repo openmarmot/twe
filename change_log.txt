@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 02 2026
+- gunner no longer waits to get closer if there is no driver
+
+---------------------------------
 April 30 2026
 - added print logs for screen size debugging
 - graphics_engine now gets all display sizes and picks the largest to display appropriately on multi-monitor systems
