@@ -666,17 +666,21 @@ class AIHumanVehicleGunner:
                                                 return
                 elif engage_primary_reason == "need to get closer to penetrate":
                     if turret.ai.primary_turret:
-                        # wait for a couple seconds before rechecking
-                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
-                            random.uniform(0.5, 1)
-                        )
-                        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE
-                        )
-                        self.owner.ai.memory["task_vehicle_crew"][
-                            "current_action_details"
-                        ] = f"Waiting for driver to close distance with {target.name}"
-                        return
+                        if (
+                            vehicle.ai.vehicle_crew[0].is_driver
+                            and vehicle.ai.vehicle_crew[0].role_occupied
+                        ):
+                            # wait for a couple seconds before rechecking
+                            self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                                random.uniform(0.5, 1)
+                            )
+                            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                                VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE
+                            )
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "current_action_details"
+                            ] = f"Waiting for driver to close distance with {target.name}"
+                            return
 
             # if we can't pen occasionally send a round out anyways.
             if engage_primary is False and engage_primary_reason == "":
