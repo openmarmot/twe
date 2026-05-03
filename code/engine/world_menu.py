@@ -256,6 +256,8 @@ class World_Menu:
         if self.menu_state == "none":
             # print out the basic menu
             self.text_queue.append("-- " + self.selected_object.name + " --")
+            if self.selected_object.description:
+                self.text_queue.append(self.selected_object.description)
             if self.world.debug_mode == True:
                 d = engine.math_2d.get_distance(
                     self.world.player.world_coords, self.selected_object.world_coords
@@ -1007,6 +1009,8 @@ class World_Menu:
         # print out the basic menu
         self.text_queue = []
         self.text_queue.append("-- " + self.selected_object.name + " --")
+        if self.selected_object.description:
+            self.text_queue.append(self.selected_object.description)
         if self.world.debug_mode == True:
             self.text_queue.append("Distance: " + str(distance))
 
@@ -1030,6 +1034,8 @@ class World_Menu:
             # print out the basic menu
             self.text_queue = []
             self.text_queue.append("-- " + self.selected_object.name + " --")
+            if self.selected_object.description:
+                self.text_queue.append(self.selected_object.description)
             if self.world.debug_mode == True:
                 self.text_queue.append("Distance: " + str(distance))
 

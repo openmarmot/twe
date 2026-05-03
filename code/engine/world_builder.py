@@ -882,6 +882,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     if object_type == "warehouse":
         z = WorldObject(world, ["warehouse-outside", "warehouse-inside"], AIBuilding)
         z.name = "warehouse"
+        z.description = "A large industrial warehouse"
         z.collision_radius = 200
         z.weight = 10000
         z.is_building = True
@@ -907,6 +908,7 @@ def spawn_object(world, world_coords, object_type, spawn):
             world, ["square_building_outside", "square_building_inside"], AIBuilding
         )
         z.name = "square building"
+        z.description = "A simple square building"
         z.collision_radius = 60
         z.weight = 10000
         z.is_building = True
@@ -914,6 +916,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "hangar":
         z = WorldObject(world, ["hangar_outside", "hangar_inside"], AIBuilding)
         z.name = "hangar"
+        z.description = "A large aircraft hangar"
         z.collision_radius = 600
         z.weight = 10000
         z.is_building = True
@@ -921,6 +924,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "green_apple":
         z = WorldObject(world, ["green_apple"], AIConsumable)
         z.name = "Green Apple"
+        z.description = "A fresh green apple"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
@@ -933,6 +937,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "potato":
         z = WorldObject(world, ["potato"], AIConsumable)
         z.name = "potato"
+        z.description = "A raw potato"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
@@ -945,6 +950,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "turnip":
         z = WorldObject(world, ["turnip"], AIConsumable)
         z.name = "turnip"
+        z.description = "A fresh turnip"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
@@ -957,6 +963,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "cucumber":
         z = WorldObject(world, ["cucumber"], AIConsumable)
         z.name = "cucumber"
+        z.description = "A green cucumber"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
@@ -969,6 +976,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "pickle":
         z = WorldObject(world, ["cucumber"], AIConsumable)
         z.name = "pickle"
+        z.description = "A pickled cucumber"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
@@ -1432,6 +1440,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "bandage":
         z = WorldObject(world, ["bandage"], AIMedical)
         z.name = "bandage"
+        z.description = "A roll of medical bandage"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_medical = True
@@ -1442,6 +1451,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "german_officer_first_aid_kit":
         z = WorldObject(world, ["german_officer_first_aid_kit"], AIMedical)
         z.name = "German Officer First Aid Kit"
+        z.description = "A German officer's first aid kit"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_medical = True
@@ -1456,6 +1466,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_large_human_pickup = True
         z.volume = 20
         z.name = "german_fuel_can"
+        z.description = "A German military fuel canister"
         z.rotation_angle = float(random.randint(0, 359))
         fill_container(world, z, "gas_80_octane")
 
@@ -1464,6 +1475,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 0.3
         z.name = "blue_coffee_cup"
+        z.description = "A blue coffee cup"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1472,6 +1484,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 208
         z.name = "55_gallon_drum"
+        z.description = "A standard 55 gallon fuel drum"
         z.collision_radius = 15
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 208.2
@@ -1482,6 +1495,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 208
         z.name = "barrel"
+        z.description = "A wooden barrel"
         z.collision_radius = 15
         z.rotation_angle = float(random.randint(0, 359))
         z.no_update = True
@@ -1493,6 +1507,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_ammo_container = True
         z.is_large_human_pickup = True
         z.name = "german_mg_ammo_can"
+        z.description = "A German machine gun ammo can"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1501,6 +1516,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "german drop canister"
+        z.description = "A German airdrop canister"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1509,6 +1525,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "crate"
+        z.description = "A wooden supply crate"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1561,6 +1578,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "small_crate"
+        z.description = "A small wooden crate"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1571,6 +1589,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "cupboard"
+        z.description = "A wooden cupboard"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1593,6 +1612,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 1
         z.name = "coffee_tin"
+        z.description = "A tin of coffee"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         contents = "coffee_beans"
@@ -1605,12 +1625,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 1
         z.name = "jar"
+        z.description = "A glass jar"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
     elif object_type == "pickle_jar":
         z = spawn_object(world, world_coords, "jar", False)
         z.name = "pickle jar"
+        z.description = "A jar filled with pickles"
         z.minimum_visible_scale = 0.4
         z.add_inventory(spawn_object(world, world_coords, "pickle", False))
         z.add_inventory(spawn_object(world, world_coords, "pickle", False))
@@ -1622,6 +1644,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_60":
         z = WorldObject(world, ["panzerfaust", "panzerfaust_empty"], AIGun)
         z.name = "panzerfaust 60"
+        z.description = "A Panzerfaust 60 anti-tank launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 15
@@ -1642,6 +1665,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_60_magazine":
         z = WorldObject(world, ["panzerfaust_empty"], AIMagazine)
         z.name = "panzerfaust internal magazine"
+        z.description = "Internal magazine for Panzerfaust 60"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerfaust_60"]
@@ -1655,6 +1679,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_100":
         z = WorldObject(world, ["panzerfaust", "panzerfaust_empty"], AIGun)
         z.name = "panzerfaust 100"
+        z.description = "A Panzerfaust 100 anti-tank launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 15
@@ -1675,6 +1700,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_100_magazine":
         z = WorldObject(world, ["panzerfaust_empty"], AIMagazine)
         z.name = "panzerfaust internal magazine"
+        z.description = "Internal magazine for Panzerfaust 100"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerfaust_100"]
@@ -1688,6 +1714,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerschreck":
         z = WorldObject(world, ["panzerschreck", "panzerschreck"], AIGun)
         z.name = "panzerschreck"
+        z.description = "A Panzerschreck anti-tank rocket launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 10
@@ -1708,6 +1735,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerschreck_magazine":
         z = WorldObject(world, ["panzerfaust_warhead"], AIMagazine)
         z.name = "panzerschreck magazine"
+        z.description = "Rocket magazine for Panzerschreck"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerschreck"]
@@ -1721,6 +1749,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "model24":
         z = WorldObject(world, ["model24"], AIThrowable)
         z.name = "model24"
+        z.description = "A German Model 24 stick grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1738,6 +1767,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "rpg43":
         z = WorldObject(world, ["model24"], AIThrowable)
         z.name = "rpg43"
+        z.description = "A Soviet RPG-43 anti-tank grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1748,7 +1778,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.max_speed = 150
         z.ai.max_flight_time = 2.0
         z.ai.range = 310
-        z.ai.has_fuse = False  # no time fuse
+        z.ai.has_fuse = False
         z.ai.fuse_max_time = 4
         z.ai.use_antitank = True
         z.rotation_angle = float(random.randint(0, 359))
@@ -1756,6 +1786,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "molotov_cocktail":
         z = WorldObject(world, ["green_bottle"], AIThrowable)
         z.name = "Molotov Cocktail"
+        z.description = "A Molotov cocktail incendiary"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1774,6 +1805,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "rg_42_grenade":
         z = WorldObject(world, ["rg_42_grenade"], AIThrowable)
         z.name = "RG-42 Grenade"
+        z.description = "A Soviet RG-42 fragmentation grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1791,6 +1823,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "mp40":
         z = WorldObject(world, ["mp40"], AIGun)
         z.name = "mp40"
+        z.description = "A standard German submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1806,6 +1839,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "mp40_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "mp40_magazine"
+        z.description = "A magazine for the MP40 submachine gun"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["mp40"]
@@ -1817,6 +1851,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41":
         z = WorldObject(world, ["ppsh41"], AIGun)
         z.name = "ppsh41"
+        z.description = "A Soviet PPSh-41 submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1832,6 +1867,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41_drum_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh41_drum_magazine"
+        z.description = "A drum magazine for the PPSh-41"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh41"]
@@ -1843,6 +1879,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41_box_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh41_drum_magazine"
+        z.description = "A box magazine for the PPSh-41"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh41"]
@@ -1854,6 +1891,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh43":
         z = WorldObject(world, ["ppsh43"], AIGun)
         z.name = "ppsh43"
+        z.description = "A Soviet PPSh-43 submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1869,6 +1907,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh43_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh43_magazine"
+        z.description = "A magazine for the PPSh-43"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh43"]
@@ -1880,6 +1919,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "stg44":
         z = WorldObject(world, ["stg44"], AIGun)
         z.name = "stg44"
+        z.description = "A German StG 44 assault rifle"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1895,6 +1935,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "stg44_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "stg44_magazine"
+        z.description = "A magazine for the StG 44"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["stg44"]
@@ -1906,6 +1947,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "dp28":
         z = WorldObject(world, ["dp28"], AIGun)
         z.name = "dp28"
+        z.description = "A Soviet DP-28 light machine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1922,6 +1964,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "dp28_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "dp28_magazine"
+        z.description = "A pan magazine for the DP-28"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["dp28"]
@@ -1931,10 +1974,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         load_magazine(world, z)
 
     elif object_type == "dtm":
-        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
-        # basically a dp28 adapted for tank use
         z = WorldObject(world, ["dp28"], AIGun)
         z.name = "DTM Machine Gun"
+        z.description = "A Soviet DTM tank machine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1948,9 +1990,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
 
     elif object_type == "dtm_magazine":
-        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "DTM Pan Magazine"
+        z.description = "A pan magazine for the DTM"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["dtm"]
@@ -1962,6 +2004,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppk":
         z = WorldObject(world, ["ppk"], AIGun)
         z.name = "ppk"
+        z.description = "A Walther PPK pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1977,6 +2020,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppk_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppk_magazine"
+        z.description = "A magazine for the PPK pistol"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppk"]
@@ -1988,6 +2032,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "walther_p38":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Walther P38"
+        z.description = "A Walther P38 pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -2003,6 +2048,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "p38_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "p38_magazine"
+        z.description = "A magazine for the P38 pistol"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["walther_p38"]
@@ -2014,6 +2060,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "luger_p08":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Luger P08"
+        z.description = "A Luger P08 pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -2029,6 +2076,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "luger_p08_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "Luger P08 Magazine"
+        z.description = "A magazine for the Luger P08"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["luger_p08"]
@@ -2040,6 +2088,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "kampfpistole":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Kampfpistole"
+        z.description = "A Kampfpistole flare pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -2057,6 +2106,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "kampfpistole_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "Kampfpistole Magazine"
+        z.description = "A magazine for the Kampfpistole"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["kampfpistole", "nahverteidigungswaffe"]
@@ -2068,6 +2118,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96":
         z = WorldObject(world, ["c96"], AIGun)
         z.name = "C96 Mauser Pistol"
+        z.description = "A C96 Mauser pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -2083,6 +2134,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "c96_magazine"
+        z.description = "A magazine for the C96 Mauser"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["c96"]
@@ -2094,6 +2146,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96_red_9":
         z = WorldObject(world, ["c96"], AIGun)
         z.name = "C96 Red 9 Mauser Pistol"
+        z.description = "A C96 Red 9 Mauser pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
