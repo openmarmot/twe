@@ -6558,6 +6558,8 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_vehicle = True
         z.is_towable = False
         turret = spawn_object(world, world_coords, "251_2_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
         z.ai.turrets.append(turret)
         turret.ai.vehicle = z
 
@@ -6608,6 +6610,8 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_vehicle = True
         z.is_towable = False
         turret = spawn_object(world, world_coords, "251_2_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
         z.ai.turrets.append(turret)
         turret.ai.vehicle = z
 

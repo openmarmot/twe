@@ -5,6 +5,7 @@ May 03 2026
 - food updates
 - added new food items
 - item descriptions
+- fixed mortar position for german and soviet mortars
 
 ---------------------------------
 May 02 2026
