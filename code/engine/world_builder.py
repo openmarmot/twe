@@ -72,23 +72,70 @@ list_consumables = [
     "cucumber",
     "pickle",
     "adler-cheese",
+    "spam",
+    "german_field_rations",
+    "soviet_field_rations",
+    "german_white_beans",
+    "soviet_white_beans",
+    "german_herrings",
+    "soviet_herrings",
+    "german_schmalzfleisch",
+    "german_rinderbraten",
+    "german_chicken",
+    "german_sardinen",
+    "german_linsen",
+    "german_erbsensuppe",
+    "german_gulaschsuppe",
+    "german_tomatencremesuppe",
+    "soviet_corned_beef",
+    "soviet_beef_stew",
+    "soviet_chicken",
+    "soviet_sardines",
+    "soviet_solyanka",
+    "soviet_borscht",
     "camembert-cheese",
     "champignon-cheese",
     "karwendel-cheese",
     "wine",
     "schokakola",
+    "coffee",
+    "schnaps",
+    "kvass",
+    "canned_peas",
+    "canned_carrots",
+    "sauerkraut",
 ]
-list_consumables_common = ["green_apple", "potato", "turnip", "cucumber", "pickle"]
+list_consumables_common = ["green_apple", "potato", "turnip", "cucumber", "pickle", "german_field_rations", "soviet_field_rations", "german_white_beans", "soviet_white_beans", "german_herrings", "soviet_herrings", "kvass", "canned_peas", "canned_carrots", "sauerkraut"]
 list_consumables_rare = [
     "adler-cheese",
+    "german_schmalzfleisch",
+    "german_rinderbraten",
+    "german_chicken",
+    "german_sardinen",
+    "german_linsen",
+    "german_erbsensuppe",
+    "german_gulaschsuppe",
+    "german_tomatencremesuppe",
+    "soviet_corned_beef",
+    "soviet_beef_stew",
+    "soviet_chicken",
+    "soviet_sardines",
+    "soviet_solyanka",
+    "soviet_borscht",
     "camembert-cheese",
     "champignon-cheese",
     "karwendel-cheese",
     "wine",
     "beer",
     "vodka",
+    "coffee",
+    "schnaps",
+    "kvass",
+    "canned_peas",
+    "canned_carrots",
+    "sauerkraut",
 ]
-list_consumables_ultra_rare = ["schokakola"]
+list_consumables_ultra_rare = ["schokakola", "spam"]
 
 list_household_items = ["blue_coffee_cup", "coffee_tin", "coffee_grinder", "pickle_jar"]
 
@@ -878,10 +925,10 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -10
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -40
+        z.ai.thirst_effect = -25
+        z.ai.fatigue_effect = -5
 
     elif object_type == "potato":
         z = WorldObject(world, ["potato"], AIConsumable)
@@ -890,10 +937,10 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -70
-        z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -20
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -85
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -15
 
     elif object_type == "turnip":
         z = WorldObject(world, ["turnip"], AIConsumable)
@@ -902,10 +949,10 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
-        z.ai.fatigue_effect = -10
+        z.ai.health_effect = 6
+        z.ai.hunger_effect = -65
+        z.ai.thirst_effect = -15
+        z.ai.fatigue_effect = -12
 
     elif object_type == "cucumber":
         z = WorldObject(world, ["cucumber"], AIConsumable)
@@ -915,9 +962,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
-        z.ai.fatigue_effect = -10
+        z.ai.hunger_effect = -45
+        z.ai.thirst_effect = -35
+        z.ai.fatigue_effect = -8
 
     elif object_type == "pickle":
         z = WorldObject(world, ["cucumber"], AIConsumable)
@@ -926,58 +973,374 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -55
+        z.ai.thirst_effect = -5
         z.ai.fatigue_effect = -10
 
     elif object_type == "adler-cheese":
         z = WorldObject(world, ["adler-cheese"], AIConsumable)
         z.name = "Adler cheese"
+        z.description = "Fancy German Cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -200
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -180
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -40
 
     elif object_type == "camembert-cheese":
         z = WorldObject(world, ["camembert-cheese"], AIConsumable)
         z.name = "Camembert cheese"
+        z.description = "Soft French cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -250
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -220
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -45
 
     elif object_type == "champignon-cheese":
         z = WorldObject(world, ["champignon-cheese"], AIConsumable)
         z.name = "Champignon cheese"
+        z.description = "German cream cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -300
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -200
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -40
 
     elif object_type == "karwendel-cheese":
         z = WorldObject(world, ["karwendel-cheese"], AIConsumable)
         z.name = "Karwendel cheese"
+        z.description = "Hard German mountain cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -500
+        z.ai.health_effect = 15
+        z.ai.hunger_effect = -280
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -55
+
+    elif object_type == "spam":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Spam"
+        z.description = "Canned Spam"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -200
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "german_field_rations":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Field Rations"
+        z.description = "German canned field rations"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -220
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -45
+
+    elif object_type == "soviet_field_rations":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Field Rations"
+        z.description = "Soviet canned field rations"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -220
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -45
+
+    elif object_type == "german_white_beans":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German White Beans"
+        z.description = "Canned white beans in tomato sauce"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -180
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -32
+
+    elif object_type == "soviet_white_beans":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet White Beans"
+        z.description = "Canned white beans"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -180
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -32
+
+    elif object_type == "german_herrings":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Herrings"
+        z.description = "Canned herrings in oil"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -135
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -28
+
+    elif object_type == "soviet_herrings":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Herrings"
+        z.description = "Canned herrings"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -135
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -28
+
+    elif object_type == "german_schmalzfleisch":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Schmalzfleisch"
+        z.description = "Pork preserved in lard"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -310
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -60
+
+    elif object_type == "german_rinderbraten":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Rinderbraten"
+        z.description = "Canned roast beef"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 18
+        z.ai.hunger_effect = -340
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -65
+
+    elif object_type == "german_chicken":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Chicken"
+        z.description = "Canned chicken"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -270
         z.ai.thirst_effect = -5
         z.ai.fatigue_effect = -50
+
+    elif object_type == "german_sardinen":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Sardinen"
+        z.description = "Canned sardines in oil"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -38
+
+    elif object_type == "soviet_corned_beef":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Corned Beef"
+        z.description = "Canned corned beef"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 18
+        z.ai.hunger_effect = -350
+        z.ai.thirst_effect = -8
+        z.ai.fatigue_effect = -60
+
+    elif object_type == "soviet_beef_stew":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Beef Stew"
+        z.description = "Canned beef stew"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 16
+        z.ai.hunger_effect = -310
+        z.ai.thirst_effect = -8
+        z.ai.fatigue_effect = -55
+
+    elif object_type == "soviet_chicken":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Chicken"
+        z.description = "Canned chicken"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -270
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -50
+
+    elif object_type == "soviet_sardines":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Sardines"
+        z.description = "Canned sardines"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -38
+
+    elif object_type == "german_linsen":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Linsen"
+        z.description = "Canned lentils"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 9
+        z.ai.hunger_effect = -185
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "canned_peas":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Canned Peas"
+        z.description = "Canned green peas"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -140
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -25
+
+    elif object_type == "canned_carrots":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Canned Carrots"
+        z.description = "Canned carrots"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -130
+        z.ai.thirst_effect = -15
+        z.ai.fatigue_effect = -22
+
+    elif object_type == "sauerkraut":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Sauerkraut"
+        z.description = "Canned fermented cabbage"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -120
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -20
+
+    elif object_type == "german_erbsensuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Erbsensuppe"
+        z.description = "Canned pea soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -155
+        z.ai.thirst_effect = -95
+        z.ai.fatigue_effect = -30
+
+    elif object_type == "german_gulaschsuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Gulaschsuppe"
+        z.description = "Canned goulash soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 11
+        z.ai.hunger_effect = -215
+        z.ai.thirst_effect = -75
+        z.ai.fatigue_effect = -40
+
+    elif object_type == "german_tomatencremesuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Tomatencremesuppe"
+        z.description = "Canned tomato cream soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -115
+        z.ai.thirst_effect = -140
+        z.ai.fatigue_effect = -25
+
+    elif object_type == "soviet_solyanka":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Solyanka"
+        z.description = "Canned meat and vegetable soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -85
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "soviet_borscht":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Borscht"
+        z.description = "Canned beet soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -145
+        z.ai.thirst_effect = -105
+        z.ai.fatigue_effect = -28
 
     elif object_type == "wine":
         z = WorldObject(world, ["wine_bottle"], AIConsumable)
@@ -987,9 +1350,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -30
+        z.ai.thirst_effect = -450
+        z.ai.fatigue_effect = 55
 
     elif object_type == "beer":
         z = WorldObject(world, ["green_bottle"], AIConsumable)
@@ -999,9 +1362,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -30
+        z.ai.thirst_effect = -450
+        z.ai.fatigue_effect = 55
 
     elif object_type == "vodka":
         z = WorldObject(world, ["clear_bottle"], AIConsumable)
@@ -1011,21 +1374,61 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -20
+        z.ai.thirst_effect = -600
+        z.ai.fatigue_effect = 95
 
     elif object_type == "schokakola":
         z = WorldObject(world, ["schokakola"], AIConsumable)
         z.name = "scho-ka-kola"
+        z.description = "Caffeinated chocolate for troops"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 15
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = 10
-        z.ai.fatigue_effect = -250
+        z.ai.health_effect = 20
+        z.ai.hunger_effect = -60
+        z.ai.thirst_effect = 5
+        z.ai.fatigue_effect = -300
+
+    elif object_type == "coffee":
+        z = WorldObject(world, ["blue_coffee_cup"], AIConsumable)
+        z.name = "Coffee"
+        z.description = "Hot ersatz coffee"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 5
+        z.ai.hunger_effect = -15
+        z.ai.thirst_effect = -120
+        z.ai.fatigue_effect = -85
+
+    elif object_type == "schnaps":
+        z = WorldObject(world, ["clear_bottle"], AIConsumable)
+        z.name = "Schnaps"
+        z.description = "German fruit brandy"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 5
+        z.ai.hunger_effect = -10
+        z.ai.thirst_effect = -300
+        z.ai.fatigue_effect = 130
+
+    elif object_type == "kvass":
+        z = WorldObject(world, ["green_bottle"], AIConsumable)
+        z.name = "Kvass"
+        z.description = "Soviet fermented bread drink"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -40
+        z.ai.thirst_effect = -180
+        z.ai.fatigue_effect = -15
     elif object_type == "bandage":
         z = WorldObject(world, ["bandage"], AIMedical)
         z.name = "bandage"
@@ -6386,19 +6789,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         )
         z.ai.max_spare_wheels = 1
         if random.randint(0, 3) == 1:
-            mg = spawn_object(world, world_coords, "mg34", False)
-            z.add_inventory(mg)
             z.add_inventory(
-                spawn_object(world, world_coords, "mg34_drum_magazine", False)
+                spawn_object(world, world_coords, "vodka", False)
             )
             z.add_inventory(
-                spawn_object(world, world_coords, "mg34_drum_magazine", False)
+                spawn_object(world, world_coords, "vodka", False)
             )
             z.add_inventory(
-                spawn_object(world, world_coords, "german_mg_ammo_can", False)
-            )
-            z.add_inventory(
-                spawn_object(world, world_coords, "german_mg_ammo_can", False)
+                spawn_object(world, world_coords, "pickle_jar", False)
             )
         z.add_inventory(spawn_object(world, world_coords, "german_fuel_can", False))
         z.add_inventory(get_random_from_list(world, world_coords, list_medical, False))

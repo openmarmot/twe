@@ -1,8 +1,13 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 03 2026
+- food updates
+
+---------------------------------
 May 02 2026
 - gunner no longer waits to get closer if there is no driver
+- gaz61 no longer has a mg34 chance, gets pickles and vodka instead
 
 ---------------------------------
 April 30 2026
