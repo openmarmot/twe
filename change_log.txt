@@ -1,6 +1,9 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 05 2026
+- add sMG42 on the Lafette mount
+---------------------------------
 May 03 2026
 - food updates
 - added new food items

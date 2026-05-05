@@ -412,7 +412,7 @@ class World_Menu:
             self.text_queue = []
             self.text_queue.append("--Debug -> Spawn Menu -> Vehicles --")
             self.text_queue.append("1 - german_8cm_mortar")
-            self.text_queue.append("2 - sd.kfz.222")
+            self.text_queue.append("2 - german_smg42")
             self.text_queue.append("3 - german_sd_kfz_251/23")
             self.text_queue.append("4 - german_panzer_iv_ausf_j")
             self.text_queue.append("5 - german_sd_kfz_234/1")
@@ -437,7 +437,7 @@ class World_Menu:
                         self.world.player.world_coords[0],
                         self.world.player.world_coords[1],
                     ],
-                    "german_sd_kfz_222",
+                    "german_smg42",
                     True,
                 )
                 engine.world_builder.spawn_object(

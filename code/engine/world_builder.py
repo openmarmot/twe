@@ -6550,6 +6550,87 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.primary_weapon_reload_speed = 10
         z.no_save = True
 
+    elif object_type == "german_smg42":
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z = WorldObject(world, ["smg42_base"], AIVehicle)
+        z.name = "Schweres MG42 on Lafette mount"
+        z.is_vehicle = True
+        z.is_towable = False
+        turret = spawn_object(world, world_coords, "smg42_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle = z
+
+        role = VehicleRole("driver", z)
+        role.is_driver = True
+        role.seat_visible = True
+        role.seat_offset = [28.8, 20.0]
+        z.ai.vehicle_crew.append(role)
+
+        role = VehicleRole("gunner", z)
+        role.is_gunner = True
+        role.turret = turret
+        role.seat_visible = True
+        role.seat_offset = [19.6, -0.4]
+        z.ai.vehicle_crew.append(role)
+
+        role = VehicleRole("commander", z)
+        role.is_commander = True
+        role.seat_visible = True
+        role.seat_offset = [27.6, -28.0]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
+        z.ai.max_speed = 100
+        z.ai.max_offroad_speed = 100
+        z.ai.open_top = True
+        # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed = 40.0
+        z.collision_radius = 50
+        z.bounding_circles.append([[0.0, 0.0], 25])
+        z.weight = 1400
+        z.drag_coefficient = 0.9
+        z.frontal_area = 5
+        z.rotation_angle = float(random.randint(0, 359))
+        z.ai.ammo_rack_capacity = 30
+        # mg ammo
+        for b in range(10):
+            z.add_inventory(spawn_object(world, world_coords, "mg34_belt", False))
+        # armor piercing belt
+        if random.randint(0, 1) == 1:
+            belt = spawn_object(world, world_coords, "mg34_belt", False)
+            load_magazine(world, belt, "7.92x57_SMK")
+            z.add_inventory(belt)
+        z.ai.max_wheels = 0
+        z.ai.max_spare_wheels = 0
+
+    elif object_type == "smg42_turret":
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
+        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z = WorldObject(
+            world, ["smg42_gun"], AITurret
+        )
+        z.name = "sMG42 Turret"
+        z.ai.gun_sight = spawn_object(world, world_coords, "optic_iron_sights", False)
+        z.is_turret = True
+        z.ai.small = True
+        z.ai.vehicle_mount_side = "top"
+        z.ai.turret_accuracy = 10
+        z.ai.turret_armor["top"] = [0, 0, 0]
+        z.ai.turret_armor["bottom"] = [0, 0, 0]
+        z.ai.turret_armor["left"] = [0, 0, 0]
+        z.ai.turret_armor["right"] = [0, 0, 0]
+        z.ai.turret_armor["front"] = [0, 0, 0]
+        z.ai.turret_armor["rear"] = [0, 0, 0]
+        z.ai.position_offset = [0, 0]
+        z.ai.rotation_range = [-18.3, 18.3]
+        z.ai.primary_weapon = spawn_object(world, world_coords, "mg42", False)
+        z.ai.primary_weapon.ai.equipper = z
+        z.ai.primary_weapon_reload_speed = 10
+        z.ai.primary_turret = True
+        z.no_save = True
+
     # this is vehicle+gun for a field type mortar
     elif object_type == "german_8cm_mortar":
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
