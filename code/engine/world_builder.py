@@ -326,6 +326,14 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "tt33", False))
         for _ in range(2):
             wo.add_inventory(spawn_object(world, [0, 0], "tt33_magazine", False))
+    elif loadout == "walther_p38":
+        wo.add_inventory(spawn_object(world, [0, 0], "walther_p38", False))
+        for _ in range(2):
+            wo.add_inventory(spawn_object(world, [0, 0], "p38_magazine", False))
+    elif loadout == "luger_p08":
+        wo.add_inventory(spawn_object(world, [0, 0], "luger_p08", False))
+        for _ in range(2):
+            wo.add_inventory(spawn_object(world, [0, 0], "luger_p08_magazine", False))
 
 
 # ------------------------------------------------------------------------------
@@ -7395,6 +7403,12 @@ def spawn_object(world, world_coords, object_type, spawn):
         add_standard_loadout(z, world, "mp40")
         z.add_inventory(spawn_object(world, world_coords, "panzerfaust_60", False))
 
+    elif object_type == "german_pilot":
+        z = spawn_object(world, world_coords, "german_soldier", False)
+        add_standard_loadout(z, world, "standard_german_gear")
+        add_standard_loadout(z, world, "walther_p38")
+        z.ai.is_pilot = True
+
     elif object_type == "german_mg34":
         z = spawn_object(world, world_coords, "german_soldier", False)
         add_standard_loadout(z, world, "standard_german_gear")
@@ -7451,6 +7465,12 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.is_afv_trained = True
         z.add_inventory(spawn_object(world, world_coords, "bandage", False))
         add_standard_loadout(z, world, "tt33")
+
+    elif object_type == "soviet_pilot":
+        z = spawn_object(world, world_coords, "soviet_soldier", False)
+        add_standard_loadout(z, world, "standard_soviet_gear")
+        add_standard_loadout(z, world, "tt33")
+        z.ai.is_pilot = True
 
     elif object_type == "soviet_mosin_nagant":
         z = spawn_object(world, world_coords, "soviet_soldier", False)

@@ -199,10 +199,6 @@ def generate_map_area_airport(world_coords,name):
     map_objects.append(MapObject('hangar','hangar',[world_coords[0]+2500,world_coords[1]+600],0,[]))
     map_objects.append(MapObject('hangar','hangar',[world_coords[0]+3500,world_coords[1]+600],0,[]))
 
-    # add some planes
-    map_objects.append(MapObject('german_fa_223_drache','Drache',[world_coords[0]+1500,world_coords[1]+600],0,[]))
-    map_objects.append(MapObject('german_ju88','JU-88',[world_coords[0]+2500,world_coords[1]+600],0,[]))
-
     # add a world_area map object so the tactical ai can recognize it, and so it shows up on maps
     world_area=MapObject('world_area_'+'airport',name,world_coords,0,[])
     map_objects.append(world_area)

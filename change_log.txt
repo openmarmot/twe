@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 07 2026
+- removed planes from map_generator as they were getting added to squads that didn't make sense
+- added german and soviet pilots
+- added squads for Ju88 and FA223
+
+---------------------------------
 May 05 2026
 - add sMG42 on the Lafette mount
 ---------------------------------
