@@ -295,14 +295,77 @@ class World_Menu:
             for b in self.world.player.ai.collision_log:
                 self.text_queue.append(b)
 
-            self.text_queue.append("1 - respawn as a random bot on your team")
-            if key == "1":
-                if self.world.spawn_player():
+            faction = self.world.player.ai.squad.faction
+            in_vehicle_candidates = []
+            not_in_vehicle_candidates = []
+
+            for squad in self.world.tactical_ai[faction].squads:
+                for member in squad.members:
+                    if member.is_player:
+                        continue
+                    if member.ai.in_vehicle():
+                        in_vehicle_candidates.append(member)
+                    else:
+                        not_in_vehicle_candidates.append(member)
+
+            random.shuffle(in_vehicle_candidates)
+            random.shuffle(not_in_vehicle_candidates)
+
+            max_choices = 8
+            half_choices = max_choices // 2
+
+            vehicle_count = min(half_choices, len(in_vehicle_candidates))
+            foot_count = min(half_choices, len(not_in_vehicle_candidates))
+
+            total_available = vehicle_count + foot_count
+            if total_available == 0:
+                self.text_queue.append("! No more humans left on your team")
+                self.menu_state = "no_respawns"
+                return
+
+            self.menu_state = "select_respawn"
+            self.death_respawn_choices = []
+
+            selection_key = 1
+            for i in range(vehicle_count):
+                if selection_key > max_choices:
+                    break
+                bot = in_vehicle_candidates[i]
+                vehicle_role = bot.ai.memory["task_vehicle_crew"]["vehicle_role"]
+                display_text = f"{selection_key} - {bot.name} | {vehicle_role.vehicle.name} | {vehicle_role.role_name}"
+                self.text_queue.append(display_text)
+                self.death_respawn_choices.append(bot)
+                selection_key += 1
+
+            for i in range(foot_count):
+                if selection_key > max_choices:
+                    break
+                bot = not_in_vehicle_candidates[i]
+                display_text = f"{selection_key} - {bot.name} | on foot"
+                self.text_queue.append(display_text)
+                self.death_respawn_choices.append(bot)
+                selection_key += 1
+
+        if self.menu_state == "select_respawn":
+            if key is not None and key.isdigit():
+                index = int(key) - 1
+                if 0 <= index < len(self.death_respawn_choices):
+                    selected_bot = self.death_respawn_choices[index]
+                    old_player = self.world.player
+                    old_player.is_player = False
+
+                    self.world.player = selected_bot
+                    self.world.player.is_player = True
+
+                    if self.world.player.ai.in_vehicle():
+                        self.world.player.ai.memory["current_task"] = "task_vehicle_crew"
+                    else:
+                        self.world.player.ai.memory["current_task"] = "task_player_control"
+
+                    print(f"You are now {self.world.player.name}")
                     self.world.is_paused = False
                     self.deactivate_menu()
                     return
-                else:
-                    self.text_queue.append("! No more humans left on your team")
 
     # ---------------------------------------------------------------------------
     def debug_menu(self, key):

@@ -482,28 +482,32 @@ class Graphics_2D_Pygame:
                 h += 15
                 self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
 
-        # might consider moving this to world and just returning a array of circles to draw
         if self.world.display_weapon_range:
             if self.world.player.ai.in_vehicle():
                 vehicle = self.world.player.ai.memory["task_vehicle_crew"][
                     "vehicle_role"
                 ].vehicle
+                primary_turret = None
                 for turret in vehicle.ai.turrets:
-                    if turret.ai.primary_weapon is not None:
-                        radius = turret.ai.primary_weapon.ai.range * self.world.scale
+                    if turret.ai.primary_turret:
+                        primary_turret = turret
+                        break
+                if primary_turret is not None:
+                    if primary_turret.ai.primary_weapon is not None:
+                        radius = primary_turret.ai.primary_weapon.ai.range * self.world.scale
                         pygame.draw.circle(
                             self.screen,
                             (236, 64, 122),
-                            turret.screen_coords,
+                            primary_turret.screen_coords,
                             radius,
                             width=5,
                         )
-                    if turret.ai.coaxial_weapon is not None:
-                        radius = turret.ai.coaxial_weapon.ai.range * self.world.scale
+                    if primary_turret.ai.coaxial_weapon is not None:
+                        radius = primary_turret.ai.coaxial_weapon.ai.range * self.world.scale
                         pygame.draw.circle(
                             self.screen,
                             (236, 64, 122),
-                            turret.screen_coords,
+                            primary_turret.screen_coords,
                             radius,
                             width=5,
                         )
