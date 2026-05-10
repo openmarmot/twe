@@ -62,6 +62,16 @@ class AIHumanVehicle:
                 self.owner.ai.add_journal_entry(
                     f"Bailing out of {vehicle.name} due to morale failure"
                 )
+                if role.is_driver or role.is_gunner or role.is_commander:
+                    for crew_role in vehicle.ai.vehicle_crew:
+                        if crew_role.role_occupied and crew_role.human != self.owner:
+                            crew_role.human.ai.speak(
+                                "Crew member bailed due to morale failure!"
+                            )
+                            crew_role.human.ai.add_journal_entry(
+                                f"Bailing out of {vehicle.name} due to crew morale failure"
+                            )
+                            crew_role.human.ai.switch_task_exit_vehicle()
                 self.owner.ai.switch_task_exit_vehicle()
                 return
 

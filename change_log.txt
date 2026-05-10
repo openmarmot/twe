@@ -6,6 +6,9 @@ May 10 2026
 - pinned pygame version
 - now tracking all gun use. data will show in debug mode
 - vehicle penetration now causes increased morale damage
+- driver/gunner/commander bail out will cause the rest of the crew to bail as well
+
+
 
 ---------------------------------
 May 07 2026
