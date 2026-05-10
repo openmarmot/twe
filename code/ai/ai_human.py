@@ -1368,7 +1368,6 @@ class AIHuman:
                 self.antitank.ai.calculated_range = calculated_range
 
             self.antitank.ai.fire()
-            self.owner.world.panzerfaust_launches += 1
             self.add_journal_entry(f"Fired {self.antitank.name}")
 
             # drop panzerfausts always
