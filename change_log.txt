@@ -7,8 +7,10 @@ May 10 2026
 - now tracking all gun use. data will show in debug mode
 - vehicle penetration now causes increased morale damage
 - driver/gunner/commander bail out will cause the rest of the crew to bail as well
+- misc updates
 
-
+todo
+- penentrations of the hetzer remote turret can trigger a bail out. they shouldn't. need to rethink
 
 ---------------------------------
 May 07 2026

@@ -498,6 +498,15 @@ class Graphics_2D_Pygame:
                             radius,
                             width=5,
                         )
+                    if turret.ai.coaxial_weapon is not None:
+                        radius = turret.ai.coaxial_weapon.ai.range * self.world.scale
+                        pygame.draw.circle(
+                            self.screen,
+                            (236, 64, 122),
+                            turret.screen_coords,
+                            radius,
+                            width=5,
+                        )
             else:
                 if self.world.player.ai.primary_weapon is not None:
                     radius = (

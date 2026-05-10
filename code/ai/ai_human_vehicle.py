@@ -33,20 +33,21 @@ class AIHumanVehicle:
     # ---------------------------------------------------------------------------
     def think_vehicle_hit(self):
         """vehicle occupant reacts to the vehicle being hit"""
-        # for this to be called the vehicle_hits list is not empty
 
-        # set it to whatever the first one is
-        important_hit = self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"][0]
+        hits = self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"]
+        if not hits:
+            return
 
-        # check if anything is more important
-        for hit in self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"]:
+        def hit_priority(hit):
+            if hit.hit_compartment == "Wheel":
+                return 0
             if hit.penetrated:
-                important_hit = hit
-                break
+                return 3
+            if hit.projectile_shooter and hit.projectile_shooter.is_turret:
+                return 2
+            return 1
 
-            if hit.projectile_shooter:
-                if hit.projectile_shooter.is_turret:
-                    important_hit = hit
+        important_hit = max(hits, key=hit_priority)
 
         # we can now clear the list
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"] = []
@@ -57,7 +58,8 @@ class AIHumanVehicle:
         if important_hit.penetrated:
             self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
             self.owner.ai.morale -= random.randint(30, 50)
-            if self.owner.ai.morale_check() is False:
+            # basically we don't want wheel hits causing bail outs as they aren't penetrating the structure of the vehicle
+            if self.owner.ai.morale_check() is False and important_hit.hit_compartment != "Wheel":
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
                 self.owner.ai.add_journal_entry(
                     f"Bailing out of {vehicle.name} due to morale failure"
