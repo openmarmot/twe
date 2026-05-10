@@ -2,6 +2,7 @@
 code/saves/save*
 code/logs/*
 code/game_screenshots/*
+profile.prof
 
 # ai stuff 
 .opencode
