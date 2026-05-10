@@ -5,6 +5,7 @@ May 10 2026
 - added a way for ai to test the program and documented in AGENTS.md
 - pinned pygame version
 - now tracking all gun use. data will show in debug mode
+- vehicle penetration now causes increased morale damage
 
 ---------------------------------
 May 07 2026

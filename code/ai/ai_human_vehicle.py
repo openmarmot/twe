@@ -56,7 +56,7 @@ class AIHumanVehicle:
 
         if important_hit.penetrated:
             self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
-            self.owner.ai.morale -= 10
+            self.owner.ai.morale -= random.randint(30, 50)
             if self.owner.ai.morale_check() is False:
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
                 self.owner.ai.add_journal_entry(

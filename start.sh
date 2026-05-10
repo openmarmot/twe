@@ -1,4 +1,8 @@
 #!/bin/bash
+#for a timed test do the following
+#runs quick battle as civilian faction and exits after N seconds:
+#bash start.sh --ai-test civilian 10
+
 cd "$(dirname "$0")"
 python3 -m venv venv
 source venv/bin/activate

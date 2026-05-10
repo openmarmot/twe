@@ -4,14 +4,20 @@ repo : https://github.com/openmarmot/twe
 
 notes :
 
-the main python file for the project. 
+the main python file for the project.
 contains the main loop.
 
 python twe.py will run the project
 
 test run with : python3 twe.py --quick-battle civilian 2
 
-Project Github : https://github.com/openmarmot/twe 
+Project Github : https://github.com/openmarmot/twe
+
+This is not meant to be run directly. instead use start.sh
+
+for a timed test do the following
+runs quick battle as civilian faction and exits after N seconds:
+bash start.sh --ai-test civilian 10
 
 '''
 
