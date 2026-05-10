@@ -371,7 +371,7 @@ class AIHuman:
                         self.owner.world, self.owner.world_coords, "spark", True
                     )
                     self.owner.world.helmet_bounces += 1
-                    self.morale -= 8
+                    self.morale = max(0, self.morale - 8)
                     self.speak("A projectile just bounced off my helmet!!")
         elif hit == 2:
             # upper body
@@ -401,7 +401,7 @@ class AIHuman:
                         self.owner.world, self.owner.world_coords, "spark", True
                     )
                     self.owner.world.body_armor_bounces += 1
-                    self.morale -= 8
+                    self.morale = max(0, self.morale - 8)
                     self.speak("A projectile just bounced off my body armor!!")
 
         elif hit == 3:
@@ -439,7 +439,7 @@ class AIHuman:
 
         if bleeding_hit:
             # morale damage
-            self.morale -= random.randint(10, 20)
+            self.morale = max(0, self.morale - random.randint(10, 20))
             self.bleeding = True
             engine.world_builder.spawn_object(
                 self.owner.world, self.owner.world_coords, "blood_splatter", True
@@ -868,7 +868,7 @@ class AIHuman:
 
         # this will likely just kill the human
 
-        self.morale -= random.randint(20, 40)
+        self.morale = max(0, self.morale - random.randint(20, 40))
 
         self.blood_pressure -= event_data
         engine.world_builder.spawn_object(

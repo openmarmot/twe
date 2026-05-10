@@ -57,9 +57,9 @@ class AIHumanVehicle:
 
         if important_hit.penetrated:
             self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
-            self.owner.ai.morale -= random.randint(30, 50)
+            self.owner.ai.morale = max(0, self.owner.ai.morale - random.randint(30, 50))
             # basically we don't want wheel hits causing bail outs as they aren't penetrating the structure of the vehicle
-            if self.owner.ai.morale_check() is False and important_hit.hit_compartment != "Wheel":
+            if self.owner.ai.morale_check() is False and important_hit.hit_compartment != "Wheel" and not important_hit.hit_compartment.startswith("Turret"):
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
                 self.owner.ai.add_journal_entry(
                     f"Bailing out of {vehicle.name} due to morale failure"
