@@ -2,6 +2,9 @@ TWE Project : Change Log
 
 ---------------------------------
 May 10 2026
+- low morale now worsens human accuracy (morale < 30: +10 adjustment, < 60: +5)
+- soldiers with low morale run further when under fire (morale < 30: ±120, < 60: ±70, else ±30)
+- soldiers with morale < 70 who fail morale check will flee towards spawn instead of going prone when gunfire is nearby
 - added a way for ai to test the program and documented in AGENTS.md
 - pinned pygame version
 - now tracking all gun use. data will show in debug mode

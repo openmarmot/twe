@@ -285,6 +285,12 @@ class AIHuman:
         if self.fatigue > 5:
             adjust_max += 6
 
+        # morale based
+        if self.morale < 30:
+            adjust_max += 10
+        elif self.morale < 60:
+            adjust_max += 5
+
         # distance based
         if distance > 500:
             adjust_max += 5
@@ -751,10 +757,18 @@ class AIHuman:
                             + float(random.randint(-560, 560)),
                         ]
                     else:
-                        # soldier just repositions to get away from the fire
+                        # soldier repositions to get away from the fire
+                        # low morale soldiers run further
+                        run_distance = 30
+                        if self.morale < 30:
+                            run_distance = 120
+                        elif self.morale < 60:
+                            run_distance = 70
                         destination = [
-                            self.owner.world_coords[0] + float(random.randint(-30, 30)),
-                            self.owner.world_coords[1] + float(random.randint(-30, 30)),
+                            self.owner.world_coords[0]
+                            + float(random.randint(-run_distance, run_distance)),
+                            self.owner.world_coords[1]
+                            + float(random.randint(-run_distance, run_distance)),
                         ]
                     if self.prone is False:
                         self.prone_state_change()
@@ -3212,7 +3226,27 @@ class AIHuman:
         elif has_target and in_range:
             desired_prone = True
         elif recent_danger:
-            desired_prone = True  # still want to be low even if target out of range
+            if self.morale < 70 and self.morale_check() is False:
+                if self.owner.is_player is False:
+                    spawn_coords = self.squad.faction_tactical.spawn_location
+                    retreat_distance = random.randint(200, 400)
+                    vec_to_spawn = [
+                        spawn_coords[0] - self.owner.world_coords[0],
+                        spawn_coords[1] - self.owner.world_coords[1],
+                    ]
+                    vec_normalized = engine.math_2d.get_normalized(vec_to_spawn)
+                    destination = [
+                        self.owner.world_coords[0]
+                        + vec_normalized[0] * retreat_distance,
+                        self.owner.world_coords[1]
+                        + vec_normalized[1] * retreat_distance,
+                    ]
+                    if self.prone is False:
+                        self.prone_state_change()
+                    self.switch_task_move_to_location(destination, None)
+                    return
+            else:
+                desired_prone = True  # still want to be low even if target out of range
         # else: stay standing during safe long walks
 
         if desired_prone != self.prone:
