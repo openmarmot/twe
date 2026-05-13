@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 12 2026
+- adjusted SU-100 squad availability: 1944 5%, 1945 30% (was 40%/80%)
+
+---------------------------------
 May 10 2026
 - low morale now worsens human accuracy (morale < 30: +10 adjustment, < 60: +5)
 - soldiers with low morale run further when under fire (morale < 30: ±120, < 60: ±70, else ±30)
