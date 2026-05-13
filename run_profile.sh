@@ -1,6 +1,6 @@
 #!/bin/bash
 # Profiles the game and opens snakeviz
-# Usage: bash start_profile.sh --ai-test civilian 5
+# Usage: bash run_profile.sh --ai-test civilian 5
 
 cd "$(dirname "$0")"
 python3 -m venv venv
