@@ -1,6 +1,54 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 14 2026
+- experimenting with roads a bit.
+- optimized startup so its faster. theoretically (i forgot to benchmark)
+
+biggest issue is probably just that the current road texture is awful.
+perhaps i should have a town type, and a village type, with the village not having roads and being less industrial
+
+---------------------------------
+May 12 2026
+- adjusted SU-100 squad availability: 1944 5%, 1945 30% (was 40%/80%)
+
+---------------------------------
+May 10 2026
+- low morale now worsens human accuracy (morale < 30: +10 adjustment, < 60: +5)
+- soldiers with low morale run further when under fire (morale < 30: ±120, < 60: ±70, else ±30)
+- soldiers with morale < 70 who fail morale check will flee towards spawn instead of going prone when gunfire is nearby
+- added a way for ai to test the program and documented in AGENTS.md
+- pinned pygame version
+- now tracking all gun use. data will show in debug mode
+- vehicle penetration now causes increased morale damage
+- driver/gunner/commander bail out will cause the rest of the crew to bail as well
+- misc updates
+
+todo
+- penentrations of the hetzer remote turret can trigger a bail out. they shouldn't. need to rethink
+
+---------------------------------
+May 07 2026
+- removed planes from map_generator as they were getting added to squads that didn't make sense
+- added german and soviet pilots
+- added squads for Ju88 and FA223
+
+---------------------------------
+May 05 2026
+- add sMG42 on the Lafette mount
+---------------------------------
+May 03 2026
+- food updates
+- added new food items
+- item descriptions
+- fixed mortar position for german and soviet mortars
+
+---------------------------------
+May 02 2026
+- gunner no longer waits to get closer if there is no driver
+- gaz61 no longer has a mg34 chance, gets pickles and vodka instead
+
+---------------------------------
 April 30 2026
 - added print logs for screen size debugging
 - graphics_engine now gets all display sizes and picks the largest to display appropriately on multi-monitor systems

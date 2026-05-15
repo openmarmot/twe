@@ -20,7 +20,7 @@ class WorldObject():
 
         self.world = world
         self.name = None
-
+        self.description='' # extra flavor text
         # this gets set every time a object is added to the world
         # in world.world_seconds
         self.spawn_time=None
@@ -28,7 +28,7 @@ class WorldObject():
         # string that tells world_builder how to spawn this object
         # used for saving/loading objects
         self.world_builder_identity=''
-        
+
         # list of images, the AI will set image_index to the current one
         #   that should be used
         # human [default(standing?),walking,fighting,dead]
@@ -37,8 +37,8 @@ class WorldObject():
         # the index of the image in the list that should be rendered
         self.image_index=0
 
-        # the actual rotated image object. set by graphics_engine 
-        self.image=None 
+        # the actual rotated image object. set by graphics_engine
+        self.image=None
 
         # image width, height. set by graphics_engine
         self.image_size=None
@@ -53,14 +53,14 @@ class WorldObject():
         self.scale_modifier=0
 
 
-        # if the object scale (world scale + scale_modifier) is under 
+        # if the object scale (world scale + scale_modifier) is under
         # this it won't be rendered
         self.minimum_visible_scale=0.1
 
         # updated by the object AI
         self.world_coords=[0,0]
         self.last_world_coords=[0,0] # used to check for movement
-        
+
         # altitude above ground in meters
         self.altitude=0
 
@@ -72,8 +72,8 @@ class WorldObject():
         self.drag_coefficient=0.8
         self.frontal_area=0 # square meters
 
-        # updated automatically by the graphic engine when 
-        #   the object is renderable 
+        # updated automatically by the graphic engine when
+        #   the object is renderable
         self.screen_coords=[0.,0.]
 
         # rotation_angle - mainly used to rotate the object sprite. in degrees
@@ -83,14 +83,14 @@ class WorldObject():
         # can be set with math_2d.get_heading_vector
         self.heading=[0,0]
 
-        
-        # checked by graphics_2d_pygame.update_render_info 
+
+        # checked by graphics_2d_pygame.update_render_info
         # to determine whether to render the object or not
         # this is used RARELY for special effects like passengers of vehicles
         self.render=True
 
         # ---- descriptor bools ----------------------------
-        
+
         # for objects with no logic. update() will not be called
         self.no_update=False
 
@@ -106,18 +106,18 @@ class WorldObject():
 
 
         # these are used by other objects to determine how this object can be interacted with
-        # might just make this a string or something but bools are fast and easy to use 
+        # might just make this a string or something but bools are fast and easy to use
         self.is_player=False
         self.is_human=False # something that has ai_human
-        
+
         # note - more specific vehicle categories done in the ai_vehicle class
         self.is_vehicle=False
         self.is_airplane=False
         self.is_gun=False
-        self.is_gun_magazine=False # something that has ai_magazine 
+        self.is_gun_magazine=False # something that has ai_magazine
         self.is_grenade=False
         self.is_handheld_antitank=False
-        self.is_throwable=False #something that can be thrown 
+        self.is_throwable=False #something that can be thrown
         self.is_radio=False
         self.is_large_human_pickup=False # fills a large pickup slot
         self.is_container=False # object that stores other objects
@@ -129,7 +129,7 @@ class WorldObject():
         self.is_turret=False
         self.is_rotor=False
         self.is_towable=False # indicates whether a object can be towed by a vehicle
-        
+
         self.is_building=False
         self.is_map_pointer=False
         self.is_furniture=False
@@ -146,14 +146,14 @@ class WorldObject():
         self.is_gas=False
 
         # stuff that i don't think is used at the moment
-        self.is_melee=False # melee close combat weapon like a dagger 
+        self.is_melee=False # melee close combat weapon like a dagger
         self.is_gun_mag_carrier=False
 
 
 
-        # wearables are clothing, helmets, etc 
+        # wearables are clothing, helmets, etc
         self.is_wearable=False
-        
+
         # ---- \ descriptor bools ----------------------------
 
         # how this object should be offset if it is carried by a human
@@ -172,7 +172,7 @@ class WorldObject():
 
         self.bounding_circles=[]
         # each is [[offset_x,offset_y],radius]
-        
+
 
         # render level kind of a 'z' layer
         # see graphics_2d_pygame for the current list of levels
@@ -181,7 +181,7 @@ class WorldObject():
         # doesn't do much here, should also be called after all variables are set by the spawner
         self.reset_render_level()
 
-        # is this used? pretty sure its not 
+        # is this used? pretty sure its not
         self.id = 0
 
         # the world_grid_square the object is in
@@ -194,7 +194,7 @@ class WorldObject():
     #---------------------------------------------------------------------------
     def remove_inventory(self, ITEM):
         self.ai.handle_event('remove_inventory',ITEM)
-    
+
     #---------------------------------------------------------------------------
     def reset_render_level(self):
         '''reset render level to defaults based on object type '''
@@ -224,7 +224,7 @@ class WorldObject():
             self.render_level=6
         else:
             self.render_level=2
-            
+
     #---------------------------------------------------------------------------
     def update(self):
         self.ai.update()
@@ -235,7 +235,7 @@ class WorldObject():
     #---------------------------------------------------------------------------
     def update_grid_square(self):
         '''updates the grid square if movement is detected'''
-        # grid square controls rendering and collision, we do not want to be there if 
+        # grid square controls rendering and collision, we do not want to be there if
         # we are technically not in the world
         if self.in_world:
             if self.last_world_coords!=self.world_coords:
@@ -245,7 +245,7 @@ class WorldObject():
     #---------------------------------------------------------------------------
     def update_physics(self):
 
-        # gravity 
+        # gravity
         if self.altitude>0:
             self.render_level=6
             self.altitude+=(engine.math_2d.GRAVITY*self.world.time_passed_seconds)
@@ -267,8 +267,8 @@ class WorldObject():
 
                 # if player or vehicle with player in it ..
                 # theoretically also change the global scale by the amount that it changed
-                # and reset every obj. otherwise the player relative scale will change   
-                             
+                # and reset every obj. otherwise the player relative scale will change
+
     #---------------------------------------------------------------------------
     def wo_start(self):
         '''add object to world'''

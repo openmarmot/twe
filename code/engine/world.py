@@ -152,7 +152,7 @@ class World:
         self.minimum_fps=38
 
         # -- some stat counters for the debug info screen --
-        self.panzerfaust_launches = 0
+        self.weapon_use = {}
         # incremented when a medic heals someone
         self.medic_heals = 0
         # incremented when a mechanic fixes a vehicle
@@ -977,9 +977,10 @@ class World:
         self.debug_text_queue.append(
             f"Exited objects count: {self.exited_object_count}"
         )
-        self.debug_text_queue.append(
-            f"Panzerfaust launches: {self.panzerfaust_launches}"
-        )
+        for weapon_name, count in self.weapon_use.items():
+            self.debug_text_queue.append(
+                f"{weapon_name} use: {count}"
+            )
         self.debug_text_queue.append(f"Helmet bounces: {self.helmet_bounces}")
         self.debug_text_queue.append(f"Body armor bounces: {self.body_armor_bounces}")
         self.debug_text_queue.append(f"Medic Heals: {self.medic_heals}")

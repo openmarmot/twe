@@ -66,9 +66,14 @@ class WorldArea():
         # build a list of coordinates to avoid. avoid all objects roughly near the world area
         coords_to_avoid=[]
         grids=self.world.grid_manager.get_grid_squares_near_world_coords(self.world_coords,self.size)
+        r2=self.size*self.size
+        cx,cy=self.world_coords
         for grid in grids:
-            for wo_object in grid.wo_objects:
-                coords_to_avoid.append(wo_object.world_coords)
+            for wo in grid.wo_objects:
+                dx=wo.world_coords[0]-cx
+                dy=wo.world_coords[1]-cy
+                if dx*dx+dy*dy<=r2:
+                    coords_to_avoid.append(wo.world_coords)
 
         seperation=100
         count=100

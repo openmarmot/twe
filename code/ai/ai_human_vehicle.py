@@ -33,20 +33,21 @@ class AIHumanVehicle:
     # ---------------------------------------------------------------------------
     def think_vehicle_hit(self):
         """vehicle occupant reacts to the vehicle being hit"""
-        # for this to be called the vehicle_hits list is not empty
 
-        # set it to whatever the first one is
-        important_hit = self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"][0]
+        hits = self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"]
+        if not hits:
+            return
 
-        # check if anything is more important
-        for hit in self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"]:
+        def hit_priority(hit):
+            if hit.hit_compartment == "Wheel":
+                return 0
             if hit.penetrated:
-                important_hit = hit
-                break
+                return 3
+            if hit.projectile_shooter and hit.projectile_shooter.is_turret:
+                return 2
+            return 1
 
-            if hit.projectile_shooter:
-                if hit.projectile_shooter.is_turret:
-                    important_hit = hit
+        important_hit = max(hits, key=hit_priority)
 
         # we can now clear the list
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_hits"] = []
@@ -56,12 +57,23 @@ class AIHumanVehicle:
 
         if important_hit.penetrated:
             self.owner.ai.add_journal_entry(f"Vehicle {vehicle.name} penetrated!")
-            self.owner.ai.morale -= 10
-            if self.owner.ai.morale_check() is False:
+            self.owner.ai.morale = max(0, self.owner.ai.morale - random.randint(30, 50))
+            # basically we don't want wheel hits causing bail outs as they aren't penetrating the structure of the vehicle
+            if self.owner.ai.morale_check() is False and important_hit.hit_compartment != "Wheel" and not important_hit.hit_compartment.startswith("Turret"):
                 self.owner.ai.speak("The vehicle is hit! Bail out!!")
                 self.owner.ai.add_journal_entry(
                     f"Bailing out of {vehicle.name} due to morale failure"
                 )
+                if role.is_driver or role.is_gunner or role.is_commander:
+                    for crew_role in vehicle.ai.vehicle_crew:
+                        if crew_role.role_occupied and crew_role.human != self.owner:
+                            crew_role.human.ai.speak(
+                                "Crew member bailed due to morale failure!"
+                            )
+                            crew_role.human.ai.add_journal_entry(
+                                f"Bailing out of {vehicle.name} due to crew morale failure"
+                            )
+                            crew_role.human.ai.switch_task_exit_vehicle()
                 self.owner.ai.switch_task_exit_vehicle()
                 return
 

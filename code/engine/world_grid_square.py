@@ -185,26 +185,22 @@ class WorldGridSquare:
 
     #---------------------------------------------------------------------------
     def set_terrain_in_radius(self, world_coords, radius, new_type):
-        """
-        Set the terrain type for all terrain grid cells whose centers are within
-        the given radius of the specified world coordinates.
-        
-        Args:
-            world_coords: (x, y) world coordinates of the center point.
-            radius: Radius in world units.
-            new_type: The new terrain type value (integer, e.g., 0-255).
-        """
         local_x = world_coords[0] - self.top_left[0]
         local_y = world_coords[1] - self.top_left[1]
         res = self.terrain_grid_resolution
         cell_size = self.grid_size / res
-        
-        for iy in range(res):
-            for ix in range(res):
+        min_ix = max(0, int((local_x - radius) / cell_size))
+        max_ix = min(res - 1, int((local_x + radius) / cell_size))
+        min_iy = max(0, int((local_y - radius) / cell_size))
+        max_iy = min(res - 1, int((local_y + radius) / cell_size))
+        r2 = radius * radius
+        for iy in range(min_iy, max_iy + 1):
+            for ix in range(min_ix, max_ix + 1):
                 center_x = (ix + 0.5) * cell_size
                 center_y = (iy + 0.5) * cell_size
-                dist = engine.math_2d.get_distance([local_x, local_y], [center_x, center_y])
-                if dist <= radius:
+                dx = center_x - local_x
+                dy = center_y - local_y
+                if dx * dx + dy * dy <= r2:
                     idx = iy * res + ix
                     self.terrain_types[idx] = new_type
 

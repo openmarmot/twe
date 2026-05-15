@@ -64,6 +64,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Faction | Name | Type | Notes |
 |---|---|---|---|
 | Civilian | Red Bicycle | Bike | |
+| German | Bicycle | Bike | A military bicycle |
 | German | Fa223 Drache | Helicopter | |
 | German | Jagdpanzer 38t 'Hetzer' | Tank | |
 | German | Ju 88 | Airplane | |
@@ -86,7 +87,9 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Sd.kfz.251/9 Late | AFV | gains a MG |
 | German | Sd.kfz.251/22 | AFV | Pak 40 |
 | German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
+| German | sMG42 | mg | mg42 on Lafette mount |
 | German | T34 747r | Tank | A captured T34-76 |
+| German | 8 cm Mortar | Mortar | Standard German mortar|
 | Soviet | BA-64 | AFV | Light armored car |
 | Soviet | Lend Lease American Truck | Utility | |
 | Soviet | GAZ-61 | Utility | off-road staff car|
@@ -98,6 +101,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | T70 | Tank | light tank with a 45mm gun |
 | Soviet | Zis 5 Trunk | Utility | |
 | Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
+| Soviet | 82mm Mortar | Mortar | Mortar |
 
 
 ### A note on Infantry Weapons 

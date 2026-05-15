@@ -1203,7 +1203,8 @@ class AIVehicle:
         if self.throttle > 0:
             if self.current_speed == 0:
                 if self.owner.weight > 500:
-                    self.tracks_enabled = True
+                    if self.max_wheels > 0:
+                        self.tracks_enabled = True
                     self.tracks_count = 0
                     self.spawn_engine_exhaust()
 

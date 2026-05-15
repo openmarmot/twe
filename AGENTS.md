@@ -8,8 +8,8 @@ Python/Pygame WW2 tactical simulation. Simulates individual soldiers and vehicle
 ## Quick Commands
 
 ```bash
-# test run that skips menus with manual actions :
-cd code && python3 twe.py --quick-battle civilian 2
+# AI testing - runs quick battle and exits after N seconds:
+bash start.sh --ai-test civilian 3
 
 # Lint (pylint)
 pip install pylint

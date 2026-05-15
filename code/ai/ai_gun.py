@@ -193,6 +193,12 @@ class AIGun():
                     z=engine.world_builder.spawn_object(self.owner.world,self.equipper.world_coords,'brass',True)
                     z.heading=engine.math_2d.get_heading_from_rotation(projectile.rotation_angle-90)
 
+            # track weapon use
+            weapon_name = self.owner.name
+            if weapon_name not in self.owner.world.weapon_use:
+                self.owner.world.weapon_use[weapon_name] = 0
+            self.owner.world.weapon_use[weapon_name] += 1
+
             # handle special case for weapons that change appearance when empty
             if len(self.magazine.ai.projectiles)==0:
                 if 'panzerfaust' in self.owner.name:

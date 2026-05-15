@@ -72,23 +72,70 @@ list_consumables = [
     "cucumber",
     "pickle",
     "adler-cheese",
+    "spam",
+    "german_field_rations",
+    "soviet_field_rations",
+    "german_white_beans",
+    "soviet_white_beans",
+    "german_herrings",
+    "soviet_herrings",
+    "german_schmalzfleisch",
+    "german_rinderbraten",
+    "german_chicken",
+    "german_sardinen",
+    "german_linsen",
+    "german_erbsensuppe",
+    "german_gulaschsuppe",
+    "german_tomatencremesuppe",
+    "soviet_corned_beef",
+    "soviet_beef_stew",
+    "soviet_chicken",
+    "soviet_sardines",
+    "soviet_solyanka",
+    "soviet_borscht",
     "camembert-cheese",
     "champignon-cheese",
     "karwendel-cheese",
     "wine",
     "schokakola",
+    "coffee",
+    "schnaps",
+    "kvass",
+    "canned_peas",
+    "canned_carrots",
+    "sauerkraut",
 ]
-list_consumables_common = ["green_apple", "potato", "turnip", "cucumber", "pickle"]
+list_consumables_common = ["green_apple", "potato", "turnip", "cucumber", "pickle", "german_field_rations", "soviet_field_rations", "german_white_beans", "soviet_white_beans", "german_herrings", "soviet_herrings", "kvass", "canned_peas", "canned_carrots", "sauerkraut"]
 list_consumables_rare = [
     "adler-cheese",
+    "german_schmalzfleisch",
+    "german_rinderbraten",
+    "german_chicken",
+    "german_sardinen",
+    "german_linsen",
+    "german_erbsensuppe",
+    "german_gulaschsuppe",
+    "german_tomatencremesuppe",
+    "soviet_corned_beef",
+    "soviet_beef_stew",
+    "soviet_chicken",
+    "soviet_sardines",
+    "soviet_solyanka",
+    "soviet_borscht",
     "camembert-cheese",
     "champignon-cheese",
     "karwendel-cheese",
     "wine",
     "beer",
     "vodka",
+    "coffee",
+    "schnaps",
+    "kvass",
+    "canned_peas",
+    "canned_carrots",
+    "sauerkraut",
 ]
-list_consumables_ultra_rare = ["schokakola"]
+list_consumables_ultra_rare = ["schokakola", "spam"]
 
 list_household_items = ["blue_coffee_cup", "coffee_tin", "coffee_grinder", "pickle_jar"]
 
@@ -279,6 +326,14 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "tt33", False))
         for _ in range(2):
             wo.add_inventory(spawn_object(world, [0, 0], "tt33_magazine", False))
+    elif loadout == "walther_p38":
+        wo.add_inventory(spawn_object(world, [0, 0], "walther_p38", False))
+        for _ in range(2):
+            wo.add_inventory(spawn_object(world, [0, 0], "p38_magazine", False))
+    elif loadout == "luger_p08":
+        wo.add_inventory(spawn_object(world, [0, 0], "luger_p08", False))
+        for _ in range(2):
+            wo.add_inventory(spawn_object(world, [0, 0], "luger_p08_magazine", False))
 
 
 # ------------------------------------------------------------------------------
@@ -835,6 +890,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     if object_type == "warehouse":
         z = WorldObject(world, ["warehouse-outside", "warehouse-inside"], AIBuilding)
         z.name = "warehouse"
+        z.description = "A large industrial warehouse"
         z.collision_radius = 200
         z.weight = 10000
         z.is_building = True
@@ -860,6 +916,7 @@ def spawn_object(world, world_coords, object_type, spawn):
             world, ["square_building_outside", "square_building_inside"], AIBuilding
         )
         z.name = "square building"
+        z.description = "A simple square building"
         z.collision_radius = 60
         z.weight = 10000
         z.is_building = True
@@ -867,6 +924,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "hangar":
         z = WorldObject(world, ["hangar_outside", "hangar_inside"], AIBuilding)
         z.name = "hangar"
+        z.description = "A large aircraft hangar"
         z.collision_radius = 600
         z.weight = 10000
         z.is_building = True
@@ -874,110 +932,431 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "green_apple":
         z = WorldObject(world, ["green_apple"], AIConsumable)
         z.name = "Green Apple"
+        z.description = "A fresh green apple"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -10
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -40
+        z.ai.thirst_effect = -25
+        z.ai.fatigue_effect = -5
 
     elif object_type == "potato":
         z = WorldObject(world, ["potato"], AIConsumable)
         z.name = "potato"
+        z.description = "A raw potato"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -70
-        z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -20
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -85
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -15
 
     elif object_type == "turnip":
         z = WorldObject(world, ["turnip"], AIConsumable)
         z.name = "turnip"
+        z.description = "A fresh turnip"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
-        z.ai.fatigue_effect = -10
+        z.ai.health_effect = 6
+        z.ai.hunger_effect = -65
+        z.ai.thirst_effect = -15
+        z.ai.fatigue_effect = -12
 
     elif object_type == "cucumber":
         z = WorldObject(world, ["cucumber"], AIConsumable)
         z.name = "cucumber"
+        z.description = "A green cucumber"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
-        z.ai.fatigue_effect = -10
+        z.ai.hunger_effect = -45
+        z.ai.thirst_effect = -35
+        z.ai.fatigue_effect = -8
 
     elif object_type == "pickle":
         z = WorldObject(world, ["cucumber"], AIConsumable)
         z.name = "pickle"
+        z.description = "A pickled cucumber"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -60
-        z.ai.thirst_effect = -8
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -55
+        z.ai.thirst_effect = -5
         z.ai.fatigue_effect = -10
 
     elif object_type == "adler-cheese":
         z = WorldObject(world, ["adler-cheese"], AIConsumable)
         z.name = "Adler cheese"
+        z.description = "Fancy German Cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -200
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -180
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -40
 
     elif object_type == "camembert-cheese":
         z = WorldObject(world, ["camembert-cheese"], AIConsumable)
         z.name = "Camembert cheese"
+        z.description = "Soft French cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -250
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -220
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -45
 
     elif object_type == "champignon-cheese":
         z = WorldObject(world, ["champignon-cheese"], AIConsumable)
         z.name = "Champignon cheese"
+        z.description = "German cream cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -300
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -200
         z.ai.thirst_effect = -5
-        z.ai.fatigue_effect = -50
+        z.ai.fatigue_effect = -40
 
     elif object_type == "karwendel-cheese":
         z = WorldObject(world, ["karwendel-cheese"], AIConsumable)
         z.name = "Karwendel cheese"
+        z.description = "Hard German mountain cheese"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 5
-        z.ai.hunger_effect = -500
+        z.ai.health_effect = 15
+        z.ai.hunger_effect = -280
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -55
+
+    elif object_type == "spam":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Spam"
+        z.description = "Canned Spam"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -200
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "german_field_rations":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Field Rations"
+        z.description = "German canned field rations"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -220
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -45
+
+    elif object_type == "soviet_field_rations":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Field Rations"
+        z.description = "Soviet canned field rations"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -220
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -45
+
+    elif object_type == "german_white_beans":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German White Beans"
+        z.description = "Canned white beans in tomato sauce"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -180
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -32
+
+    elif object_type == "soviet_white_beans":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet White Beans"
+        z.description = "Canned white beans"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -180
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -32
+
+    elif object_type == "german_herrings":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Herrings"
+        z.description = "Canned herrings in oil"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -135
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -28
+
+    elif object_type == "soviet_herrings":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Herrings"
+        z.description = "Canned herrings"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -135
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -28
+
+    elif object_type == "german_schmalzfleisch":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Schmalzfleisch"
+        z.description = "Pork preserved in lard"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -310
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -60
+
+    elif object_type == "german_rinderbraten":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Rinderbraten"
+        z.description = "Canned roast beef"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 18
+        z.ai.hunger_effect = -340
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -65
+
+    elif object_type == "german_chicken":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Chicken"
+        z.description = "Canned chicken"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -270
         z.ai.thirst_effect = -5
         z.ai.fatigue_effect = -50
+
+    elif object_type == "german_sardinen":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Sardinen"
+        z.description = "Canned sardines in oil"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -38
+
+    elif object_type == "soviet_corned_beef":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Corned Beef"
+        z.description = "Canned corned beef"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 18
+        z.ai.hunger_effect = -350
+        z.ai.thirst_effect = -8
+        z.ai.fatigue_effect = -60
+
+    elif object_type == "soviet_beef_stew":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Beef Stew"
+        z.description = "Canned beef stew"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 16
+        z.ai.hunger_effect = -310
+        z.ai.thirst_effect = -8
+        z.ai.fatigue_effect = -55
+
+    elif object_type == "soviet_chicken":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Chicken"
+        z.description = "Canned chicken"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 14
+        z.ai.hunger_effect = -270
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -50
+
+    elif object_type == "soviet_sardines":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Sardines"
+        z.description = "Canned sardines"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -38
+
+    elif object_type == "german_linsen":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Linsen"
+        z.description = "Canned lentils"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 9
+        z.ai.hunger_effect = -185
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "canned_peas":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Canned Peas"
+        z.description = "Canned green peas"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -140
+        z.ai.thirst_effect = -10
+        z.ai.fatigue_effect = -25
+
+    elif object_type == "canned_carrots":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Canned Carrots"
+        z.description = "Canned carrots"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -130
+        z.ai.thirst_effect = -15
+        z.ai.fatigue_effect = -22
+
+    elif object_type == "sauerkraut":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Sauerkraut"
+        z.description = "Canned fermented cabbage"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 12
+        z.ai.hunger_effect = -120
+        z.ai.thirst_effect = -5
+        z.ai.fatigue_effect = -20
+
+    elif object_type == "german_erbsensuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Erbsensuppe"
+        z.description = "Canned pea soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -155
+        z.ai.thirst_effect = -95
+        z.ai.fatigue_effect = -30
+
+    elif object_type == "german_gulaschsuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Gulaschsuppe"
+        z.description = "Canned goulash soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 11
+        z.ai.hunger_effect = -215
+        z.ai.thirst_effect = -75
+        z.ai.fatigue_effect = -40
+
+    elif object_type == "german_tomatencremesuppe":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "German Tomatencremesuppe"
+        z.description = "Canned tomato cream soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 7
+        z.ai.hunger_effect = -115
+        z.ai.thirst_effect = -140
+        z.ai.fatigue_effect = -25
+
+    elif object_type == "soviet_solyanka":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Solyanka"
+        z.description = "Canned meat and vegetable soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -195
+        z.ai.thirst_effect = -85
+        z.ai.fatigue_effect = -35
+
+    elif object_type == "soviet_borscht":
+        z = WorldObject(world, ["can"], AIConsumable)
+        z.name = "Soviet Borscht"
+        z.description = "Canned beet soup"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 8
+        z.ai.hunger_effect = -145
+        z.ai.thirst_effect = -105
+        z.ai.fatigue_effect = -28
 
     elif object_type == "wine":
         z = WorldObject(world, ["wine_bottle"], AIConsumable)
@@ -987,9 +1366,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -30
+        z.ai.thirst_effect = -450
+        z.ai.fatigue_effect = 55
 
     elif object_type == "beer":
         z = WorldObject(world, ["green_bottle"], AIConsumable)
@@ -999,9 +1378,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -30
+        z.ai.thirst_effect = -450
+        z.ai.fatigue_effect = 55
 
     elif object_type == "vodka":
         z = WorldObject(world, ["clear_bottle"], AIConsumable)
@@ -1011,24 +1390,65 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
         z.ai.health_effect = 5
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = -500
-        z.ai.fatigue_effect = 50
+        z.ai.hunger_effect = -20
+        z.ai.thirst_effect = -600
+        z.ai.fatigue_effect = 95
 
     elif object_type == "schokakola":
         z = WorldObject(world, ["schokakola"], AIConsumable)
         z.name = "scho-ka-kola"
+        z.description = "Caffeinated chocolate for troops"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_consumable = True
-        z.ai.health_effect = 15
-        z.ai.hunger_effect = -50
-        z.ai.thirst_effect = 10
-        z.ai.fatigue_effect = -250
+        z.ai.health_effect = 20
+        z.ai.hunger_effect = -60
+        z.ai.thirst_effect = 5
+        z.ai.fatigue_effect = -300
+
+    elif object_type == "coffee":
+        z = WorldObject(world, ["blue_coffee_cup"], AIConsumable)
+        z.name = "Coffee"
+        z.description = "Hot ersatz coffee"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 5
+        z.ai.hunger_effect = -15
+        z.ai.thirst_effect = -120
+        z.ai.fatigue_effect = -85
+
+    elif object_type == "schnaps":
+        z = WorldObject(world, ["clear_bottle"], AIConsumable)
+        z.name = "Schnaps"
+        z.description = "German fruit brandy"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 5
+        z.ai.hunger_effect = -10
+        z.ai.thirst_effect = -300
+        z.ai.fatigue_effect = 130
+
+    elif object_type == "kvass":
+        z = WorldObject(world, ["green_bottle"], AIConsumable)
+        z.name = "Kvass"
+        z.description = "Soviet fermented bread drink"
+        z.no_update = True
+        z.minimum_visible_scale = 0.4
+        z.rotation_angle = float(random.randint(0, 359))
+        z.is_consumable = True
+        z.ai.health_effect = 10
+        z.ai.hunger_effect = -40
+        z.ai.thirst_effect = -180
+        z.ai.fatigue_effect = -15
     elif object_type == "bandage":
         z = WorldObject(world, ["bandage"], AIMedical)
         z.name = "bandage"
+        z.description = "A roll of medical bandage"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_medical = True
@@ -1039,6 +1459,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "german_officer_first_aid_kit":
         z = WorldObject(world, ["german_officer_first_aid_kit"], AIMedical)
         z.name = "German Officer First Aid Kit"
+        z.description = "A German officer's first aid kit"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         z.is_medical = True
@@ -1053,6 +1474,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_large_human_pickup = True
         z.volume = 20
         z.name = "german_fuel_can"
+        z.description = "A German military fuel canister"
         z.rotation_angle = float(random.randint(0, 359))
         fill_container(world, z, "gas_80_octane")
 
@@ -1061,6 +1483,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 0.3
         z.name = "blue_coffee_cup"
+        z.description = "A blue coffee cup"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1069,6 +1492,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 208
         z.name = "55_gallon_drum"
+        z.description = "A standard 55 gallon fuel drum"
         z.collision_radius = 15
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 208.2
@@ -1079,6 +1503,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 208
         z.name = "barrel"
+        z.description = "A wooden barrel"
         z.collision_radius = 15
         z.rotation_angle = float(random.randint(0, 359))
         z.no_update = True
@@ -1090,6 +1515,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_ammo_container = True
         z.is_large_human_pickup = True
         z.name = "german_mg_ammo_can"
+        z.description = "A German machine gun ammo can"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1098,6 +1524,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "german drop canister"
+        z.description = "A German airdrop canister"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
 
@@ -1106,6 +1533,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "crate"
+        z.description = "A wooden supply crate"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1158,6 +1586,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "small_crate"
+        z.description = "A small wooden crate"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1168,6 +1597,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.is_large_human_pickup = True
         z.name = "cupboard"
+        z.description = "A wooden cupboard"
         z.collision_radius = 20
         z.rotation_angle = float(random.randint(0, 359))
         z.volume = 100
@@ -1190,6 +1620,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 1
         z.name = "coffee_tin"
+        z.description = "A tin of coffee"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
         contents = "coffee_beans"
@@ -1202,12 +1633,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.is_container = True
         z.volume = 1
         z.name = "jar"
+        z.description = "A glass jar"
         z.minimum_visible_scale = 0.4
         z.rotation_angle = float(random.randint(0, 359))
 
     elif object_type == "pickle_jar":
         z = spawn_object(world, world_coords, "jar", False)
         z.name = "pickle jar"
+        z.description = "A jar filled with pickles"
         z.minimum_visible_scale = 0.4
         z.add_inventory(spawn_object(world, world_coords, "pickle", False))
         z.add_inventory(spawn_object(world, world_coords, "pickle", False))
@@ -1219,6 +1652,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_60":
         z = WorldObject(world, ["panzerfaust", "panzerfaust_empty"], AIGun)
         z.name = "panzerfaust 60"
+        z.description = "A Panzerfaust 60 anti-tank launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 15
@@ -1239,6 +1673,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_60_magazine":
         z = WorldObject(world, ["panzerfaust_empty"], AIMagazine)
         z.name = "panzerfaust internal magazine"
+        z.description = "Internal magazine for Panzerfaust 60"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerfaust_60"]
@@ -1252,6 +1687,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_100":
         z = WorldObject(world, ["panzerfaust", "panzerfaust_empty"], AIGun)
         z.name = "panzerfaust 100"
+        z.description = "A Panzerfaust 100 anti-tank launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 15
@@ -1272,6 +1708,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerfaust_100_magazine":
         z = WorldObject(world, ["panzerfaust_empty"], AIMagazine)
         z.name = "panzerfaust internal magazine"
+        z.description = "Internal magazine for Panzerfaust 100"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerfaust_100"]
@@ -1285,6 +1722,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerschreck":
         z = WorldObject(world, ["panzerschreck", "panzerschreck"], AIGun)
         z.name = "panzerschreck"
+        z.description = "A Panzerschreck anti-tank rocket launcher"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.ai.mechanical_accuracy = 10
@@ -1305,6 +1743,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "panzerschreck_magazine":
         z = WorldObject(world, ["panzerfaust_warhead"], AIMagazine)
         z.name = "panzerschreck magazine"
+        z.description = "Rocket magazine for Panzerschreck"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["panzerschreck"]
@@ -1318,6 +1757,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "model24":
         z = WorldObject(world, ["model24"], AIThrowable)
         z.name = "model24"
+        z.description = "A German Model 24 stick grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1335,6 +1775,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "rpg43":
         z = WorldObject(world, ["model24"], AIThrowable)
         z.name = "rpg43"
+        z.description = "A Soviet RPG-43 anti-tank grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1345,7 +1786,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.max_speed = 150
         z.ai.max_flight_time = 2.0
         z.ai.range = 310
-        z.ai.has_fuse = False  # no time fuse
+        z.ai.has_fuse = False
         z.ai.fuse_max_time = 4
         z.ai.use_antitank = True
         z.rotation_angle = float(random.randint(0, 359))
@@ -1353,6 +1794,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "molotov_cocktail":
         z = WorldObject(world, ["green_bottle"], AIThrowable)
         z.name = "Molotov Cocktail"
+        z.description = "A Molotov cocktail incendiary"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1371,6 +1813,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "rg_42_grenade":
         z = WorldObject(world, ["rg_42_grenade"], AIThrowable)
         z.name = "RG-42 Grenade"
+        z.description = "A Soviet RG-42 fragmentation grenade"
         z.minimum_visible_scale = 0.4
         z.is_grenade = True
         z.is_throwable = True
@@ -1388,6 +1831,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "mp40":
         z = WorldObject(world, ["mp40"], AIGun)
         z.name = "mp40"
+        z.description = "A standard German submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1403,6 +1847,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "mp40_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "mp40_magazine"
+        z.description = "A magazine for the MP40 submachine gun"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["mp40"]
@@ -1414,6 +1859,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41":
         z = WorldObject(world, ["ppsh41"], AIGun)
         z.name = "ppsh41"
+        z.description = "A Soviet PPSh-41 submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1429,6 +1875,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41_drum_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh41_drum_magazine"
+        z.description = "A drum magazine for the PPSh-41"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh41"]
@@ -1440,6 +1887,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh41_box_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh41_drum_magazine"
+        z.description = "A box magazine for the PPSh-41"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh41"]
@@ -1451,6 +1899,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh43":
         z = WorldObject(world, ["ppsh43"], AIGun)
         z.name = "ppsh43"
+        z.description = "A Soviet PPSh-43 submachine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1466,6 +1915,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppsh43_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppsh43_magazine"
+        z.description = "A magazine for the PPSh-43"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppsh43"]
@@ -1477,6 +1927,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "stg44":
         z = WorldObject(world, ["stg44"], AIGun)
         z.name = "stg44"
+        z.description = "A German StG 44 assault rifle"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1492,6 +1943,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "stg44_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "stg44_magazine"
+        z.description = "A magazine for the StG 44"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["stg44"]
@@ -1503,6 +1955,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "dp28":
         z = WorldObject(world, ["dp28"], AIGun)
         z.name = "dp28"
+        z.description = "A Soviet DP-28 light machine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1519,6 +1972,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "dp28_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "dp28_magazine"
+        z.description = "A pan magazine for the DP-28"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["dp28"]
@@ -1528,10 +1982,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         load_magazine(world, z)
 
     elif object_type == "dtm":
-        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
-        # basically a dp28 adapted for tank use
         z = WorldObject(world, ["dp28"], AIGun)
         z.name = "DTM Machine Gun"
+        z.description = "A Soviet DTM tank machine gun"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1545,9 +1998,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.rotation_angle = float(random.randint(0, 359))
 
     elif object_type == "dtm_magazine":
-        # ref : https://www.youtube.com/watch?v=goLAR1KdqRw
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "DTM Pan Magazine"
+        z.description = "A pan magazine for the DTM"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["dtm"]
@@ -1559,6 +2012,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppk":
         z = WorldObject(world, ["ppk"], AIGun)
         z.name = "ppk"
+        z.description = "A Walther PPK pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1574,6 +2028,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "ppk_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "ppk_magazine"
+        z.description = "A magazine for the PPK pistol"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["ppk"]
@@ -1585,6 +2040,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "walther_p38":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Walther P38"
+        z.description = "A Walther P38 pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1600,6 +2056,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "p38_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "p38_magazine"
+        z.description = "A magazine for the P38 pistol"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["walther_p38"]
@@ -1611,6 +2068,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "luger_p08":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Luger P08"
+        z.description = "A Luger P08 pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1626,6 +2084,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "luger_p08_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "Luger P08 Magazine"
+        z.description = "A magazine for the Luger P08"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["luger_p08"]
@@ -1637,6 +2096,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "kampfpistole":
         z = WorldObject(world, ["walther_p38"], AIGun)
         z.name = "Kampfpistole"
+        z.description = "A Kampfpistole flare pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1654,6 +2114,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "kampfpistole_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "Kampfpistole Magazine"
+        z.description = "A magazine for the Kampfpistole"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["kampfpistole", "nahverteidigungswaffe"]
@@ -1665,6 +2126,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96":
         z = WorldObject(world, ["c96"], AIGun)
         z.name = "C96 Mauser Pistol"
+        z.description = "A C96 Mauser pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -1680,6 +2142,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96_magazine":
         z = WorldObject(world, ["stg44_magazine"], AIMagazine)
         z.name = "c96_magazine"
+        z.description = "A magazine for the C96 Mauser"
         z.minimum_visible_scale = 0.4
         z.is_gun_magazine = True
         z.ai.compatible_guns = ["c96"]
@@ -1691,6 +2154,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "c96_red_9":
         z = WorldObject(world, ["c96"], AIGun)
         z.name = "C96 Red 9 Mauser Pistol"
+        z.description = "A C96 Red 9 Mauser pistol"
         z.no_update = True
         z.minimum_visible_scale = 0.4
         z.is_gun = True
@@ -6094,34 +6558,35 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.primary_weapon_reload_speed = 10
         z.no_save = True
 
-    # this is vehicle+gun for a field type mortar
-    elif object_type == "german_8cm_mortar":
+    elif object_type == "german_smg42":
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
-        z = WorldObject(world, ["mortar_base"], AIVehicle)
-        z.name = "8cm Granatwerfer 34 Mortar System"
+        z = WorldObject(world, ["smg42_base"], AIVehicle)
+        z.name = "Schweres MG42 on Lafette mount"
         z.is_vehicle = True
         z.is_towable = False
-        turret = spawn_object(world, world_coords, "251_2_turret", True)
+        turret = spawn_object(world, world_coords, "smg42_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
         z.ai.turrets.append(turret)
         turret.ai.vehicle = z
 
         role = VehicleRole("driver", z)
         role.is_driver = True
         role.seat_visible = True
-        role.seat_offset = [13, 20]
+        role.seat_offset = [28.8, 20.0]
         z.ai.vehicle_crew.append(role)
 
         role = VehicleRole("gunner", z)
         role.is_gunner = True
         role.turret = turret
         role.seat_visible = True
-        role.seat_offset = [7, -9]
+        role.seat_offset = [19.6, -0.4]
         z.ai.vehicle_crew.append(role)
 
         role = VehicleRole("commander", z)
         role.is_commander = True
         role.seat_visible = True
-        role.seat_offset = [13, 15]
+        role.seat_offset = [27.6, -28.0]
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
@@ -6137,21 +6602,52 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.frontal_area = 5
         z.rotation_angle = float(random.randint(0, 359))
         z.ai.ammo_rack_capacity = 30
-        for b in range(30):
-            z.ai.ammo_rack.append(
-                spawn_object(world, world_coords, "GrW34_magazine", False)
-            )
+        # mg ammo
+        for b in range(10):
+            z.add_inventory(spawn_object(world, world_coords, "mg34_belt", False))
+        # armor piercing belt
+        if random.randint(0, 1) == 1:
+            belt = spawn_object(world, world_coords, "mg34_belt", False)
+            load_magazine(world, belt, "7.92x57_SMK")
+            z.add_inventory(belt)
         z.ai.max_wheels = 0
         z.ai.max_spare_wheels = 0
 
-    # this is vehicle+gun for a field type mortar
-    elif object_type == "soviet_82mm_mortar":
+    elif object_type == "smg42_turret":
+        # !! note - turrets should be spawned with spawn TRUE as they are always in world
         # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
+        z = WorldObject(
+            world, ["smg42_gun"], AITurret
+        )
+        z.name = "sMG42 Turret"
+        z.ai.gun_sight = spawn_object(world, world_coords, "optic_iron_sights", False)
+        z.is_turret = True
+        z.ai.small = True
+        z.ai.vehicle_mount_side = "top"
+        z.ai.turret_accuracy = 10
+        z.ai.turret_armor["top"] = [0, 0, 0]
+        z.ai.turret_armor["bottom"] = [0, 0, 0]
+        z.ai.turret_armor["left"] = [0, 0, 0]
+        z.ai.turret_armor["right"] = [0, 0, 0]
+        z.ai.turret_armor["front"] = [0, 0, 0]
+        z.ai.turret_armor["rear"] = [0, 0, 0]
+        z.ai.position_offset = [0, 0]
+        z.ai.rotation_range = [-18.3, 18.3]
+        z.ai.primary_weapon = spawn_object(world, world_coords, "mg42", False)
+        z.ai.primary_weapon.ai.equipper = z
+        z.ai.primary_weapon_reload_speed = 10
+        z.ai.primary_turret = True
+        z.no_save = True
+
+    # this is vehicle+gun for a field type mortar
+    elif object_type == "german_8cm_mortar":
         z = WorldObject(world, ["mortar_base"], AIVehicle)
-        z.name = "Soviet 82mm Mortar System"
+        z.name = "8cm Granatwerfer 34 Mortar System"
         z.is_vehicle = True
         z.is_towable = False
         turret = spawn_object(world, world_coords, "251_2_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
         z.ai.turrets.append(turret)
         turret.ai.vehicle = z
 
@@ -6175,14 +6671,65 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
-        z.ai.max_speed = 100
-        z.ai.max_offroad_speed = 100
+        z.ai.max_speed = 20
+        z.ai.max_offroad_speed = 20
         z.ai.open_top = True
         # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed = 40.0
         z.collision_radius = 50
         z.bounding_circles.append([[0.0, 0.0], 25])
-        z.weight = 1400
+        z.weight = 150
+        z.drag_coefficient = 0.9
+        z.frontal_area = 5
+        z.rotation_angle = float(random.randint(0, 359))
+        z.ai.ammo_rack_capacity = 30
+        for b in range(30):
+            z.ai.ammo_rack.append(
+                spawn_object(world, world_coords, "GrW34_magazine", False)
+            )
+        z.ai.max_wheels = 0
+        z.ai.max_spare_wheels = 0
+
+    # this is vehicle+gun for a field type mortar
+    elif object_type == "soviet_82mm_mortar":
+        z = WorldObject(world, ["mortar_base"], AIVehicle)
+        z.name = "Soviet 82mm Mortar System"
+        z.is_vehicle = True
+        z.is_towable = False
+        turret = spawn_object(world, world_coords, "251_2_turret", True)
+        turret.ai.position_offset = [0, 0]
+        turret.ai.rotation_range = [-30, 30]
+        z.ai.turrets.append(turret)
+        turret.ai.vehicle = z
+
+        role = VehicleRole("driver", z)
+        role.is_driver = True
+        role.seat_visible = True
+        role.seat_offset = [13, 20]
+        z.ai.vehicle_crew.append(role)
+
+        role = VehicleRole("gunner", z)
+        role.is_gunner = True
+        role.turret = turret
+        role.seat_visible = True
+        role.seat_offset = [7, -9]
+        z.ai.vehicle_crew.append(role)
+
+        role = VehicleRole("commander", z)
+        role.is_commander = True
+        role.seat_visible = True
+        role.seat_offset = [13, 15]
+        z.ai.vehicle_crew.append(role)
+
+        z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
+        z.ai.max_speed = 20
+        z.ai.max_offroad_speed = 20
+        z.ai.open_top = True
+        # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
+        z.ai.rotation_speed = 40.0
+        z.collision_radius = 50
+        z.bounding_circles.append([[0.0, 0.0], 25])
+        z.weight = 130
         z.drag_coefficient = 0.9
         z.frontal_area = 5
         z.rotation_angle = float(random.randint(0, 359))
@@ -6386,19 +6933,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         )
         z.ai.max_spare_wheels = 1
         if random.randint(0, 3) == 1:
-            mg = spawn_object(world, world_coords, "mg34", False)
-            z.add_inventory(mg)
             z.add_inventory(
-                spawn_object(world, world_coords, "mg34_drum_magazine", False)
+                spawn_object(world, world_coords, "vodka", False)
             )
             z.add_inventory(
-                spawn_object(world, world_coords, "mg34_drum_magazine", False)
+                spawn_object(world, world_coords, "vodka", False)
             )
             z.add_inventory(
-                spawn_object(world, world_coords, "german_mg_ammo_can", False)
-            )
-            z.add_inventory(
-                spawn_object(world, world_coords, "german_mg_ammo_can", False)
+                spawn_object(world, world_coords, "pickle_jar", False)
             )
         z.add_inventory(spawn_object(world, world_coords, "german_fuel_can", False))
         z.add_inventory(get_random_from_list(world, world_coords, list_medical, False))
@@ -6859,6 +7401,12 @@ def spawn_object(world, world_coords, object_type, spawn):
         add_standard_loadout(z, world, "mp40")
         z.add_inventory(spawn_object(world, world_coords, "panzerfaust_60", False))
 
+    elif object_type == "german_pilot":
+        z = spawn_object(world, world_coords, "german_soldier", False)
+        add_standard_loadout(z, world, "standard_german_gear")
+        add_standard_loadout(z, world, "walther_p38")
+        z.ai.is_pilot = True
+
     elif object_type == "german_mg34":
         z = spawn_object(world, world_coords, "german_soldier", False)
         add_standard_loadout(z, world, "standard_german_gear")
@@ -6915,6 +7463,12 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.is_afv_trained = True
         z.add_inventory(spawn_object(world, world_coords, "bandage", False))
         add_standard_loadout(z, world, "tt33")
+
+    elif object_type == "soviet_pilot":
+        z = spawn_object(world, world_coords, "soviet_soldier", False)
+        add_standard_loadout(z, world, "standard_soviet_gear")
+        add_standard_loadout(z, world, "tt33")
+        z.ai.is_pilot = True
 
     elif object_type == "soviet_mosin_nagant":
         z = spawn_object(world, world_coords, "soviet_soldier", False)

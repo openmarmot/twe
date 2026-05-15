@@ -140,6 +140,10 @@ class Graphics_2D_Pygame:
         # buffer to make objects start rendering slightly off screen
         self.view_buffer = 100
 
+        # debug text update throttling
+        self.debug_text_frame_counter = 0
+        self.debug_text_update_interval = 30
+
         # -- key stuff --
         # https://www.pygame.org/docs/ref/key.html
         # continuous
@@ -478,19 +482,32 @@ class Graphics_2D_Pygame:
                 h += 15
                 self.small_font.render_to(self.screen, (500, h), b, self.menu_color)
 
-        # might consider moving this to world and just returning a array of circles to draw
         if self.world.display_weapon_range:
             if self.world.player.ai.in_vehicle():
                 vehicle = self.world.player.ai.memory["task_vehicle_crew"][
                     "vehicle_role"
                 ].vehicle
+                primary_turret = None
                 for turret in vehicle.ai.turrets:
-                    if turret.ai.primary_weapon is not None:
-                        radius = turret.ai.primary_weapon.ai.range * self.world.scale
+                    if turret.ai.primary_turret:
+                        primary_turret = turret
+                        break
+                if primary_turret is not None:
+                    if primary_turret.ai.primary_weapon is not None:
+                        radius = primary_turret.ai.primary_weapon.ai.range * self.world.scale
                         pygame.draw.circle(
                             self.screen,
                             (236, 64, 122),
-                            turret.screen_coords,
+                            primary_turret.screen_coords,
+                            radius,
+                            width=5,
+                        )
+                    if primary_turret.ai.coaxial_weapon is not None:
+                        radius = primary_turret.ai.coaxial_weapon.ai.range * self.world.scale
+                        pygame.draw.circle(
+                            self.screen,
+                            (236, 64, 122),
+                            primary_turret.screen_coords,
                             radius,
                             width=5,
                         )
@@ -832,13 +849,12 @@ class Graphics_2D_Pygame:
         # update time
         self.time_passed = self.clock.tick(self.max_fps)
         self.time_passed_seconds = self.time_passed / 1000.0
-        fps=int(self.clock.get_fps())
+        fps = int(self.clock.get_fps())
 
         if self.mode == 0:
             pass
-            # self.game_menu.update(self.time_passed_seconds)
         elif self.mode == 1:
-            self.world.update(self.time_passed_seconds,fps)
+            self.world.update(self.time_passed_seconds, fps)
 
             if self.world.aar_mode_enabled:
                 if (
@@ -848,18 +864,15 @@ class Graphics_2D_Pygame:
                     self.last_aar_screenshot_time = self.world.world_seconds
                     self.create_screenshot()
 
-            # insert graphic engine specific debug text (after world.update populated it)
-            if self.world.debug_mode and self.world.is_paused == False:
-                self.world.debug_text_queue.insert(
-                    0, f"FPS: {fps}"
-                )
-                self.world.debug_text_queue.insert(
-                    3, "Rendered Objects: " + str(self.render_count)
-                )
+            if self.world.debug_mode and self.world.is_paused is False:
+                self.debug_text_frame_counter += 1
 
-                # image cache debug info
-                # for key, value in self.image_cache.items():
-                #    self.world.debug_text_queue.insert(4,f"Image cache {key} - size: {len(value)}")
+                if self.debug_text_frame_counter % self.debug_text_update_interval == 0:
+                    self.world.update_debug_info()  # always starts with "World scale:"
+
+                # insert stable top lines without overwriting
+                self.world.debug_text_queue.insert(0, f"FPS: {fps}")
+                self.world.debug_text_queue.insert(1, "Rendered Objects: " + str(self.render_count))
 
             if self.world.exit_world:
                 self.strategic_map.unload_world()

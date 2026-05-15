@@ -8,7 +8,7 @@ A special tool for working with images
 
 #import built in modules
 from itertools import islice
-import os 
+import os
 import math
 
 # import pip packages
@@ -25,7 +25,7 @@ class ImageTool():
     def __init__(self,screen_size):
         # called by World.__init__
 
-        
+
         self.image_objects=[]
         self.selected_object=None
         self.selection_index=0
@@ -35,18 +35,18 @@ class ImageTool():
         self.screen_size=screen_size
         pygame.init()
 
-        # this seems to significantly improve visual quality when on 
+        # this seems to significantly improve visual quality when on
         self.double_buffering=True
         if self.double_buffering:
             self.screen = pygame.display.set_mode(self.screen_size, pygame.DOUBLEBUF, 32)
         else:
             self.screen=pygame.display.set_mode(self.screen_size,0,32)
-        
+
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
 
 
-        
+
         # time stuff
         self.clock=pygame.time.Clock()
         self.time_passed=None
@@ -79,7 +79,7 @@ class ImageTool():
         # max_fps max frames for every second.
         self.max_fps=60
 
-        # scale min/max limit 
+        # scale min/max limit
         #self.scale_limit=[0.2,1.1]
         self.scale_limit=[0.1,2.5]
 
@@ -99,7 +99,7 @@ class ImageTool():
     #------------------------------------------------------------------------------
     def handleInput(self):
 
-        # usefull for single button presses where you don't 
+        # usefull for single button presses where you don't
         # need to know if the button is still pressed
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -136,8 +136,8 @@ class ImageTool():
                     if self.selection_index>len(self.image_objects)-1:
                         self.selection_index=0
                     self.selected_object=self.image_objects[self.selection_index]
-                    
-                
+
+
                 if event.key==49: #1
                     self.print_offsets()
 
@@ -162,8 +162,8 @@ class ImageTool():
             if event.type==pygame.MOUSEMOTION:
                 #print(str(event.pos))
                 pass
-        
- 
+
+
     #------------------------------------------------------------------------------
     def load_all_images(self,folder_path):
         '''load all the images into pygame'''
@@ -179,7 +179,7 @@ class ImageTool():
             if w != h:
                 print(f"Alert: Image {name} is not square (width: {w}, height: {h})")
             self.images[name]=image
-        
+
         print('Image loading complete')
 
     #------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ class ImageTool():
                     offset=[b.world_coords[0]-self.selected_object.world_coords[0],b.world_coords[1]-self.selected_object.world_coords[1]]
                     adjusted_offset=self.get_vector_rotation(offset,self.selected_object.rotation_angle)
                     print(b.image_list[b.image_index],' rotation:',b.rotation_angle,'offset:',adjusted_offset)
-            
+
             # print out the specific format for bounding circles
             for b in self.image_objects:
                 if 'bound_circle' in b.image_list[b.image_index]:
@@ -220,7 +220,7 @@ class ImageTool():
             self.reset_pygame_image(b)
             self.screen.blit(b.image, (b.screen_coords[0]-b.image_center[0], b.screen_coords[1]-b.image_center[1]))
 
-            
+
 
             if self.draw_alignment_lines:
                 color = self.colors[i % len(self.colors)]
@@ -263,7 +263,7 @@ class ImageTool():
             if distance<object_distance:
                 object_distance=distance
                 closest_object=b
-        
+
         if closest_object != None:
             self.selected_object=closest_object
 
@@ -295,7 +295,7 @@ class ImageTool():
         self.time_passed=self.clock.tick(self.max_fps)
         self.time_passed_seconds=self.time_passed / 1000.0
 
-            
+
     #------------------------------------------------------------------------------
     def update_render_info(self):
         '''
@@ -310,7 +310,7 @@ class ImageTool():
         viewrange_y=((0+
             self.screen_size[1]+self.view_adjust), (0-
             self.screen_size[1])-self.view_adjust)
-        
+
         translation=self.get_translation()
 
         for b in self.image_objects:
@@ -346,7 +346,7 @@ class ImageTool():
     def get_player_screen_coords(self):
         ''' return player screen coordinates'''
         return [self.screen_size[0]/2,self.screen_size[1]/2]
-    
+
     #------------------------------------------------------------------------------
     def get_translation(self):
         ''' returns the translation for world to screen coords '''
@@ -354,24 +354,24 @@ class ImageTool():
         center_y=self.screen_size[1]/2
         player_x=0*self.scale
         player_y=0*self.scale
-        
+
 
         translate=[center_x-player_x,center_y-player_y]
         return translate
-    
+
     #------------------------------------------------------------------------------
     def get_vector_rotation(self,vector,angle_degrees):
         # note this is adjusted to match how in game coordinates work
         # in the original code x and y were flipped
         # Convert angle to radians
         angle_rad = math.radians(angle_degrees)
-        
+
         # Rotation matrix applied to vector
         y = vector[0] * math.cos(angle_rad) - vector[1] * math.sin(angle_rad)
         x = vector[0] * math.sin(angle_rad) + vector[1] * math.cos(angle_rad)
-        
-        return [x, y] 
-    
+
+        return [x, y]
+
     #------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
         '''reset the image for a world object'''
@@ -379,7 +379,7 @@ class ImageTool():
         wo.image_size=self.images[wo.image_list[wo.image_index]].get_size()
         wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
         wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
- 
+
         try:
             image=self.images[wo.image_list[wo.image_index]]
             orig_rect = image.get_rect()
@@ -391,7 +391,7 @@ class ImageTool():
             wo.image=resize_image
         except:
             print('error','graphics_2d_pygame.reset_pygame_image: image transform error with image '+wo.image_list[wo.image_index])
-        
+
 
     #------------------------------------------------------------------------------
     def zoom_out(self):
@@ -412,7 +412,7 @@ class ImageTool():
             print('zoom in',self.scale)
 
 #------------------------------------------------------------------------------
-            
+
 class ImageObject():
 
     def __init__(self,image_list,rotation_angle):
@@ -451,8 +451,8 @@ image_tool.collision_radius=100
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
-image_tool.image_objects.append(ImageObject(['ba_64_chassis'],0))
-image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
+#image_tool.image_objects.append(ImageObject(['ba_64_chassis'],0))
+#image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
@@ -463,8 +463,11 @@ image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
 #image_tool.image_objects.append(ImageObject(['rso_pak'],0))
 #image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
 
-#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
-#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['smg42_base'],0))
+image_tool.image_objects.append(ImageObject(['smg42_gun'],0))
+
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
