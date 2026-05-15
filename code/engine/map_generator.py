@@ -168,14 +168,25 @@ def generate_map(map_areas):
         elif map_area=='town':
             map_objects+=generate_map_area_town(coord_list.pop(),'town')
 
-    # generate road
-    map_objects+=generate_road([-8000,0],[8000,0],'road_300',300)
+    # generate dynamic roads between towns
+    map_objects+=generate_dynamic_roads(map_objects)
+    roads=[o for o in map_objects if o.world_builder_identity=='road_300']
+    for b in map_objects:
+        if b.world_builder_identity in ('warehouse','square_building'):
+            for r in roads:
+                if engine.math_2d.get_distance(b.world_coords,r.world_coords)<180:
+                    dx=b.world_coords[0]-r.world_coords[0]
+                    dy=b.world_coords[1]-r.world_coords[1]
+                    b.world_coords=[b.world_coords[0]+dx*0.3,b.world_coords[1]+dy*0.3]
+                    break
 
     # generate clutter 
     map_objects+=generate_clutter(map_objects)
 
     # generate vegetation
-    map_objects+=generate_vegetation(map_objects,world_size)  
+    veg=generate_vegetation(map_objects,world_size)
+    roads=[o for o in map_objects if o.world_builder_identity=='road_300']
+    map_objects+= [v for v in veg if all(engine.math_2d.get_distance(v.world_coords,r.world_coords)>150 for r in roads)]
 
     # generate civilians
     map_objects+=generate_civilians(map_objects)
@@ -284,6 +295,23 @@ def generate_road(start_coords,end_coords,road_type,segment_height):
         segments.append(MapObject(road_type,road_type,center_pos,actual_rotation,[]))
 
     return segments
+
+
+#------------------------------------------------------------------------------
+def generate_dynamic_roads(map_objects):
+    towns=[obj for obj in map_objects if obj.world_builder_identity=='world_area_town']
+    if len(towns)<=1: return []
+    xs=[t.world_coords[0] for t in towns]
+    ys=[t.world_coords[1] for t in towns]
+    y_mean=sum(ys)/len(ys)
+    x_min=min(xs)-2000
+    x_max=max(xs)+2000
+    roads=generate_road([x_min,y_mean],[x_max,y_mean],'road_300',300)
+    for t in towns:
+        offset=150 if t.world_coords[1]>y_mean else -150
+        target=[t.world_coords[0],y_mean+offset]
+        roads+=generate_road(t.world_coords,target,'road_300',300)
+    return roads
 
 #------------------------------------------------------------------------------
 def generate_vegetation(map_objects,world_size):
