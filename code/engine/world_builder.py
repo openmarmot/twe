@@ -6641,7 +6641,6 @@ def spawn_object(world, world_coords, object_type, spawn):
 
     # this is vehicle+gun for a field type mortar
     elif object_type == "german_8cm_mortar":
-        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z = WorldObject(world, ["mortar_base"], AIVehicle)
         z.name = "8cm Granatwerfer 34 Mortar System"
         z.is_vehicle = True
@@ -6672,14 +6671,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
-        z.ai.max_speed = 100
-        z.ai.max_offroad_speed = 100
+        z.ai.max_speed = 20
+        z.ai.max_offroad_speed = 20
         z.ai.open_top = True
         # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed = 40.0
         z.collision_radius = 50
         z.bounding_circles.append([[0.0, 0.0], 25])
-        z.weight = 1400
+        z.weight = 150
         z.drag_coefficient = 0.9
         z.frontal_area = 5
         z.rotation_angle = float(random.randint(0, 359))
@@ -6693,7 +6692,6 @@ def spawn_object(world, world_coords, object_type, spawn):
 
     # this is vehicle+gun for a field type mortar
     elif object_type == "soviet_82mm_mortar":
-        # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
         z = WorldObject(world, ["mortar_base"], AIVehicle)
         z.name = "Soviet 82mm Mortar System"
         z.is_vehicle = True
@@ -6724,14 +6722,14 @@ def spawn_object(world, world_coords, object_type, spawn):
         z.ai.vehicle_crew.append(role)
 
         z.ai.engines.append(spawn_object(world, world_coords, "bicycle_pedals", False))
-        z.ai.max_speed = 100
-        z.ai.max_offroad_speed = 100
+        z.ai.max_speed = 20
+        z.ai.max_offroad_speed = 20
         z.ai.open_top = True
         # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
         z.ai.rotation_speed = 40.0
         z.collision_radius = 50
         z.bounding_circles.append([[0.0, 0.0], 25])
-        z.weight = 1400
+        z.weight = 130
         z.drag_coefficient = 0.9
         z.frontal_area = 5
         z.rotation_angle = float(random.randint(0, 359))

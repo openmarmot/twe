@@ -3,6 +3,7 @@ TWE Project : Change Log
 ---------------------------------
 May 14 2026
 - experimenting with roads a bit.
+- optimized startup so its faster. theoretically (i forgot to benchmark)
 
 biggest issue is probably just that the current road texture is awful.
 perhaps i should have a town type, and a village type, with the village not having roads and being less industrial
