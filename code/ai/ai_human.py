@@ -2019,6 +2019,18 @@ class AIHuman:
         # this can also be used by a ai in a vehicle already that wants to change role
         # role should be NONE in most cases.
 
+        if (
+            self.memory.get("current_task") == "task_vehicle_crew"
+            and "task_vehicle_crew" in self.memory
+        ):
+            prev_role = self.memory["task_vehicle_crew"]["vehicle_role"]
+            if prev_role is not None and prev_role.human == self.owner:
+                prev_role.human = None
+                prev_role.role_occupied = False
+                if prev_role.role_name == "driver":
+                    prev_role.vehicle.ai.brake_power = 1
+                self.memory.pop("task_vehicle_crew", None)
+
         # first remove yourself from any existing crew spots
         for role in vehicle.ai.vehicle_crew:
             if role.human == self.owner:

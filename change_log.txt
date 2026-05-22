@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 21 2026
+- bug fixes and logging
+
+
+---------------------------------
 May 14 2026
 - experimenting with roads a bit.
 - optimized startup so its faster. theoretically (i forgot to benchmark)

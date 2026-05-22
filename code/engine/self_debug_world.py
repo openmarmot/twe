@@ -53,9 +53,11 @@ def check_task_vehicle_crew(b, issues, world):
                     issues.append(f'{b.name} vehicle_role not in vehicle crew')
                 # check distance
                 distance = engine.math_2d.get_distance(b.world_coords, vehicle_role.vehicle.world_coords)
-                if distance > 50:  # arbitrary threshold for being "in" the vehicle
+                if distance > 50:
                     issues.append(f'{b.name} too far from vehicle {vehicle_role.vehicle.name} ({distance:.1f} units)')
                     issues.append(f'{b.name} blood pressure {b.ai.blood_pressure} memory {b.ai.memory}')
+                    vehicle_role.vehicle.ai.update_child_position_rotation()
+
 
 
 #---------------------------------------------------------------------------
@@ -124,18 +126,16 @@ def check_vehicle_sanity(b, issues, world):
         # CRITICAL: Check for role/human mismatch - these are the actual data integrity problems
         if role.role_occupied and role.human is None:
             issues.append(f'CRITICAL DATA ERROR: {b.name} role {role.role_name} is OCCUPIED but human is None!')
-        
+            role.role_occupied = False
         if not role.role_occupied and role.human is not None:
             issues.append(f'CRITICAL DATA ERROR: {b.name} role {role.role_name} is EMPTY but human {role.human.name} is assigned!')
-            # Add detailed diagnostics for this case
             issues.append(f' Human memory dump {role.human.ai.memory}')
             if 'task_vehicle_crew' in role.human.ai.memory:
                 vc = role.human.ai.memory['task_vehicle_crew']
                 if vc.get('vehicle_role'):
                     issues.append(f'  Human points to role: {vc["vehicle_role"].role_name}')
                     issues.append(f'  This role is NOT in this vehicle\'s crew list!')
-        
-        # Then do the normal checks for properly assigned crew
+            role.human = None
         if role.role_occupied and role.human:
             if role.human.ai.blood_pressure<30:
                 issues.append(f'{b.name} crew {role.human.name} blood pressure ({role.human.ai.blood_pressure}) low')
@@ -145,12 +145,14 @@ def check_vehicle_sanity(b, issues, world):
                 issues.append(f'{b.name} crew {role.human.name} not in world')
             if role.human.ai.memory.get('current_task') != 'task_vehicle_crew':
                 issues.append(f"{b.name} crew {role.human.name} memory[current_task] is {role.human.ai.memory['current_task']} not task_vehicle_crew")
-            # check if human's vehicle_role points back
-            if 'vehicle_role' not in role.human.ai.memory['task_vehicle_crew']:
+            if 'vehicle_role' not in role.human.ai.memory.get('task_vehicle_crew', {}):
                 issues.append(f'{b.name} crew {role.human.name} missing vehicle_role in memory')
             else:
                 if role.human.ai.memory['task_vehicle_crew']['vehicle_role'] != role:
                     issues.append(f'{b.name} crew {role.human.name} vehicle_role mismatch')
+                    role.human = None
+                    role.role_occupied = False
+
 
 
     # check engines
