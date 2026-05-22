@@ -973,6 +973,9 @@ class AIHuman:
         """fires a weapon"""
 
         if weapon.ai.check_if_can_fire():
+            target_type = "soldiers" if target.is_human else target.name
+            self.add_journal_entry(f"Engaging {target_type}")
+
             self.recent_noise_or_move = True
             self.last_noise_or_move_time = self.owner.world.world_seconds
 
@@ -1799,12 +1802,6 @@ class AIHuman:
 
         self.memory[task_name] = task_details
         self.memory["current_task"] = task_name
-
-        target_type = "soldiers" if enemy.is_human else enemy.name
-        distance = engine.math_2d.get_distance(
-            self.owner.world_coords, enemy.world_coords
-        )
-        self.add_journal_entry(f"Engaging {target_type} at {int(distance)}m")
 
         self.owner.rotation_angle = engine.math_2d.get_rotation(
             self.owner.world_coords, enemy.world_coords
