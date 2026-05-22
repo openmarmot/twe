@@ -31,92 +31,242 @@ def run_object_counts_report(world):
 #---------------------------------------------------------------------------
 def check_task_vehicle_crew(b, issues, world):
     '''sanity checks for task_vehicle_crew'''
-    if 'vehicle_role' not in b.ai.memory['task_vehicle_crew']:
-        issues.append(f'{b.name} missing vehicle_role in task_vehicle_crew memory')
+    vcrew = b.ai.memory.get('task_vehicle_crew', {})
+    expected_keys = [
+        'vehicle_role', 'current_action', 'current_action_details', 'target',
+        'calculated_turret_angle', 'engage_primary_weapon', 'engage_coaxial_weapon',
+        'engage_indirect_fire', 'calculated_vehicle_angle', 'calculated_distance_to_target',
+        'last_think_time', 'think_interval', 'reload_start_time', 'vehicle_order',
+        'fire_missions', 'vehicle_hits'
+    ]
+    for key in expected_keys:
+        if key not in vcrew:
+            issues.append(f'{b.name} missing {key} in task_vehicle_crew memory')
+
+    vehicle_role = vcrew.get('vehicle_role')
+    if vehicle_role is None:
+        issues.append(f'{b.name} vehicle_role is None in task_vehicle_crew')
     else:
-        vehicle_role = b.ai.memory['task_vehicle_crew']['vehicle_role']
-        if vehicle_role is None:
-            issues.append(f'{b.name} vehicle_role is None')
+        if vehicle_role.vehicle is None:
+            issues.append(f'{b.name} vehicle_role.vehicle is None')
         else:
-            if vehicle_role.vehicle is None:
-                issues.append(f'{b.name} vehicle_role.vehicle is None')
-            else:
-                if vehicle_role.vehicle not in world.grid_manager.get_all_objects():
-                    issues.append(f'{b.name} vehicle not in world objects')
-                if vehicle_role.vehicle.in_world is False:
-                    issues.append(f'{b.name} vehicle not in world')
-                if vehicle_role.role_occupied is False:
-                    issues.append(f'{b.name} vehicle_role not occupied')
-                if vehicle_role.human != b:
-                    issues.append(f'{b.name} vehicle_role.human mismatch')
-                if vehicle_role not in vehicle_role.vehicle.ai.vehicle_crew:
-                    issues.append(f'{b.name} vehicle_role not in vehicle crew')
-                # check distance
-                distance = engine.math_2d.get_distance(b.world_coords, vehicle_role.vehicle.world_coords)
-                if distance > 50:
-                    issues.append(f'{b.name} too far from vehicle {vehicle_role.vehicle.name} ({distance:.1f} units)')
-                    issues.append(f'{b.name} blood pressure {b.ai.blood_pressure} memory {b.ai.memory}')
-                    vehicle_role.vehicle.ai.update_child_position_rotation()
+            if vehicle_role.vehicle not in world.grid_manager.get_all_objects():
+                issues.append(f'{b.name} vehicle not in world objects')
+            if vehicle_role.vehicle.in_world is False:
+                issues.append(f'{b.name} vehicle not in world')
+            if vehicle_role.role_occupied is False:
+                issues.append(f'{b.name} vehicle_role not occupied')
+            if vehicle_role.human != b:
+                issues.append(f'{b.name} vehicle_role.human mismatch')
+            if vehicle_role not in vehicle_role.vehicle.ai.vehicle_crew:
+                issues.append(f'{b.name} vehicle_role not in vehicle crew')
+            # check distance (crew should be at/near their vehicle)
+            distance = engine.math_2d.get_distance(b.world_coords, vehicle_role.vehicle.world_coords)
+            if distance > 100:
+                issues.append(f'{b.name} too far from vehicle {vehicle_role.vehicle.name} ({distance:.1f} units)')
 
 
 
 #---------------------------------------------------------------------------
 def check_task_enter_vehicle(b, issues, world):
     '''sanity checks for task_enter_vehicle'''
-    if 'vehicle' not in b.ai.memory['task_enter_vehicle']:
-        issues.append(f'{b.name} missing vehicle in task_enter_vehicle memory')
+    task_mem = b.ai.memory.get('task_enter_vehicle', {})
+    for key in ('vehicle', 'vehicle_order', 'original_distance_to_vehicle'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_enter_vehicle memory')
+
+    vehicle = task_mem.get('vehicle')
+    if vehicle is None:
+        issues.append(f'{b.name} vehicle is None in task_enter_vehicle')
     else:
-        vehicle = b.ai.memory['task_enter_vehicle']['vehicle']
-        if vehicle is None:
-            issues.append(f'{b.name} vehicle is None in task_enter_vehicle')
-        else:
-            if vehicle not in world.grid_manager.get_all_objects():
-                issues.append(f'{b.name} target vehicle not in world objects')
-            if vehicle.in_world is False:
-                issues.append(f'{b.name} target vehicle not in world')
-            if vehicle.ai.vehicle_disabled:
-                issues.append(f'{b.name} target vehicle is disabled')
-            distance = engine.math_2d.get_distance(b.world_coords, vehicle.world_coords)
-            if distance > b.ai.max_walk_distance:
-                issues.append(f'{b.name} target vehicle too far ({distance:.1f} > {b.ai.max_walk_distance})')
+        if vehicle not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} target vehicle not in world objects')
+        if vehicle.in_world is False:
+            issues.append(f'{b.name} target vehicle not in world')
+        if vehicle.ai.vehicle_disabled:
+            issues.append(f'{b.name} target vehicle is disabled')
+        distance = engine.math_2d.get_distance(b.world_coords, vehicle.world_coords)
+        if distance > b.ai.max_walk_distance:
+            issues.append(f'{b.name} target vehicle too far ({distance:.1f} > {b.ai.max_walk_distance})')
 
 #---------------------------------------------------------------------------
 def check_task_move_to_location(b, issues, world):
     '''sanity checks for task_move_to_location'''
-    if 'destination' not in b.ai.memory['task_move_to_location']:
-        issues.append(f'{b.name} missing destination in task_move_to_location memory')
-    else:
-        dest = b.ai.memory['task_move_to_location']['destination']
-        # check if destination is within reasonable bounds (assuming world is around 0,0 to 10000,10000 or something)
-        if abs(dest[0]) > 50000 or abs(dest[1]) > 50000:
-            issues.append(f'{b.name} destination out of bounds: {dest}')
-        if 'moving_object' in b.ai.memory['task_move_to_location']:
-            mo = b.ai.memory['task_move_to_location']['moving_object']
-            if mo is not None:
-                if mo not in world.grid_manager.get_all_objects():
-                    issues.append(f'{b.name} moving_object not in world objects')
-                if mo.in_world is False:
-                    issues.append(f'{b.name} moving_object not in world')
+    task_mem = b.ai.memory.get('task_move_to_location', {})
+    for key in ('destination', 'moving_object', 'last_think_time', 'think_interval'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_move_to_location memory')
+
+    dest = task_mem.get('destination')
+    if dest is not None:
+        if not (isinstance(dest, (list, tuple)) and len(dest) == 2):
+            issues.append(f'{b.name} destination is not a 2-element list/tuple: {dest}')
+        else:
+            if abs(dest[0]) > 50000 or abs(dest[1]) > 50000:
+                issues.append(f'{b.name} destination out of bounds: {dest}')
+
+    mo = task_mem.get('moving_object')
+    if mo is not None:
+        if mo not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} moving_object not in world objects')
+        if mo.in_world is False:
+            issues.append(f'{b.name} moving_object not in world')
 
 #---------------------------------------------------------------------------
 def check_task_engage_enemy(b, issues, world):
     '''sanity checks for task_engage_enemy'''
-    if 'enemy' not in b.ai.memory['task_engage_enemy']:
-        issues.append(f'{b.name} missing enemy in task_engage_enemy memory')
+    task_mem = b.ai.memory.get('task_engage_enemy', {})
+    for key in ('enemy', 'last_think_time', 'think_interval'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_engage_enemy memory')
+
+    enemy = task_mem.get('enemy')
+    if enemy is None:
+        issues.append(f'{b.name} enemy is None in task_engage_enemy')
     else:
-        enemy = b.ai.memory['task_engage_enemy']['enemy']
-        if enemy is None:
-            issues.append(f'{b.name} enemy is None in task_engage_enemy')
-        else:
-            if enemy not in world.grid_manager.get_all_objects():
-                issues.append(f'{b.name} enemy not in world objects')
-            if enemy.in_world is False:
-                issues.append(f'{b.name} enemy not in world')
-            if not (enemy.is_human or enemy.is_vehicle):
-                issues.append(f'{b.name} enemy is neither human nor vehicle')
-            distance = engine.math_2d.get_distance(b.world_coords, enemy.world_coords)
-            if distance > 5000:  # arbitrary max engagement range
-                issues.append(f'{b.name} enemy too far ({distance:.1f} units)')
+        if enemy not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} enemy not in world objects')
+        if enemy.in_world is False:
+            issues.append(f'{b.name} enemy not in world')
+        if not (enemy.is_human or enemy.is_vehicle):
+            issues.append(f'{b.name} enemy is neither human nor vehicle')
+        distance = engine.math_2d.get_distance(b.world_coords, enemy.world_coords)
+        if distance > 5000:  # arbitrary max engagement range
+            issues.append(f'{b.name} enemy too far ({distance:.1f} units)')
+
+#---------------------------------------------------------------------------
+def check_task_exit_vehicle(b, issues, _world):
+    '''minimal sanity for task_exit_vehicle (memory is intentionally empty)'''
+    if 'task_exit_vehicle' not in b.ai.memory:
+        issues.append(f'{b.name} missing task_exit_vehicle memory dict')
+
+#---------------------------------------------------------------------------
+def check_task_loot_container(b, issues, world):
+    '''sanity for task_loot_container'''
+    task_mem = b.ai.memory.get('task_loot_container', {})
+    if 'container' not in task_mem:
+        issues.append(f'{b.name} missing container in task_loot_container memory')
+    container = task_mem.get('container')
+    if container is not None:
+        if container not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} loot container not in world objects')
+        if container.in_world is False:
+            issues.append(f'{b.name} loot container not in world')
+
+#---------------------------------------------------------------------------
+def check_task_medic(b, issues, world):
+    '''sanity for task_medic'''
+    task_mem = b.ai.memory.get('task_medic', {})
+    for key in ('wounded_humans', 'current_patient'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_medic memory')
+    for h in (task_mem.get('wounded_humans') or []):
+        if h is not None:
+            if h not in world.grid_manager.get_all_objects():
+                issues.append(f'{b.name} medic target {h.name} not in world objects')
+            if h.in_world is False:
+                issues.append(f'{b.name} medic target {h.name} not in world')
+    patient = task_mem.get('current_patient')
+    if patient is not None:
+        if patient not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} current_patient not in world objects')
+        if patient.in_world is False:
+            issues.append(f'{b.name} current_patient not in world')
+
+#---------------------------------------------------------------------------
+def check_task_mechanic(b, issues, world):
+    '''sanity for task_mechanic'''
+    task_mem = b.ai.memory.get('task_mechanic', {})
+    for key in ('damaged_vehicles', 'current_vehicle'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_mechanic memory')
+    for v in (task_mem.get('damaged_vehicles') or []):
+        if v is not None:
+            if v not in world.grid_manager.get_all_objects():
+                issues.append(f'{b.name} mechanic target vehicle not in world objects')
+            if v.in_world is False:
+                issues.append(f'{b.name} mechanic target vehicle not in world')
+    veh = task_mem.get('current_vehicle')
+    if veh is not None:
+        if veh not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} current_vehicle not in world objects')
+        if veh.in_world is False:
+            issues.append(f'{b.name} current_vehicle not in world')
+
+#---------------------------------------------------------------------------
+def check_task_pickup_objects(b, issues, world):
+    '''sanity for task_pickup_objects'''
+    task_mem = b.ai.memory.get('task_pickup_objects', {})
+    if 'objects' not in task_mem:
+        issues.append(f'{b.name} missing objects in task_pickup_objects memory')
+    for obj in (task_mem.get('objects') or []):
+        if obj is not None:
+            if obj not in world.grid_manager.get_all_objects():
+                issues.append(f'{b.name} pickup target not in world objects')
+            if obj.in_world is False:
+                issues.append(f'{b.name} pickup target not in world')
+
+#---------------------------------------------------------------------------
+def check_task_player_control(b, issues, _world):
+    '''minimal sanity for task_player_control (memory intentionally minimal for player)'''
+    if not b.is_player and 'task_player_control' not in b.ai.memory:
+        issues.append(f'{b.name} missing task_player_control memory dict')
+
+#---------------------------------------------------------------------------
+def check_task_reload(b, issues, world):
+    '''sanity for task_reload'''
+    task_mem = b.ai.memory.get('task_reload', {})
+    for key in ('weapon', 'reload_start_time'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_reload memory')
+    weapon = task_mem.get('weapon')
+    if weapon is not None:
+        # weapon may be in inventory (not in grid) or world object if dropped
+        if weapon not in b.ai.inventory and weapon not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} reload weapon neither in inventory nor world objects')
+        if hasattr(weapon, 'in_world') and weapon.in_world is False:
+            issues.append(f'{b.name} reload weapon not in world')
+
+#---------------------------------------------------------------------------
+def check_task_sit_down(b, issues, world):
+    '''sanity for task_sit_down'''
+    task_mem = b.ai.memory.get('task_sit_down', {})
+    for key in ('status', 'furniture_object', 'sit_start_time', 'sit_duration'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_sit_down memory')
+    furn = task_mem.get('furniture_object')
+    if furn is not None:
+        if furn not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} sit furniture not in world objects')
+        if furn.in_world is False:
+            issues.append(f'{b.name} sit furniture not in world')
+
+#---------------------------------------------------------------------------
+def check_task_squad_leader(b, issues, _world):
+    '''sanity for task_squad_leader (orders are TacticalOrder objects, not world objs)'''
+    task_mem = b.ai.memory.get('task_squad_leader', {})
+    for key in ('last_think_time', 'think_interval', 'orders'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_squad_leader memory')
+
+#---------------------------------------------------------------------------
+def check_task_think(b, issues, _world):
+    '''minimal sanity for task_think'''
+    if 'task_think' not in b.ai.memory:
+        issues.append(f'{b.name} missing task_think memory dict')
+
+#---------------------------------------------------------------------------
+def check_task_think_idle(b, issues, _world):
+    '''minimal sanity for task_think_idle'''
+    if 'task_think_idle' not in b.ai.memory:
+        issues.append(f'{b.name} missing task_think_idle memory dict')
+
+#---------------------------------------------------------------------------
+def check_task_wait(b, issues, _world):
+    '''sanity for task_wait'''
+    task_mem = b.ai.memory.get('task_wait', {})
+    if 'end_time' not in task_mem:
+        issues.append(f'{b.name} missing end_time in task_wait memory')
 
 #---------------------------------------------------------------------------
 def check_vehicle_sanity(b, issues, world):
@@ -198,7 +348,7 @@ def check_vehicle_sanity(b, issues, world):
         issues.append(f'{b.name} has batteries but electrical system not functioning')
 
 # ---------------------------------------------------------------------------
-def check_human_primary_weapon(b, issues, world):
+def check_human_primary_weapon(b, issues, _world):
     '''sanity checks for human primary_weapon'''
     if b.ai.primary_weapon is None:
         # check if there are unequipped guns in inventory that could be equipped
@@ -212,7 +362,7 @@ def check_human_primary_weapon(b, issues, world):
             weapon_name = b.ai.primary_weapon.name
         except AttributeError:
             weapon_name = b.ai.primary_weapon
-            
+
         # primary_weapon is not None
         if b.ai.primary_weapon not in b.ai.inventory:
             issues.append(f'{b.name} primary_weapon {weapon_name} not in inventory')
@@ -227,61 +377,6 @@ def check_human_primary_weapon(b, issues, world):
                     issues.append(f'{b.name} primary_weapon {weapon_name} has no ammo and may need resupply')
             except Exception as e:
                 issues.append(f'{b.name} primary_weapon check failed: {e}')
-
-# ---------------------------------------------------------------------------
-def check_crew_rotation_states(role, issues, world, index):
-    '''deep diagnostic for crew with rotation-related actions'''
-    if not role.role_occupied:
-        issues.append(f'  WARNING: {role.role_name} role is EMPTY (role_occupied=False)')
-        if role.is_commander or role.is_gunner:
-            issues.append(f'    CRITICAL: {role.role_name} role empty - driver may not find rotation requests!')
-        return
-    
-    if role.human is None:
-        issues.append(f'  WARNING: {role.role_name} has human=None')
-        return
-    
-    human = role.human
-    vc = human.ai.memory.get('task_vehicle_crew', {})
-    action = vc.get('current_action', 'NO_MEMORY')
-    
-    if 'Waiting' in action or 'rotating' in action or 'driving' in action:
-        issues.append(f'  >>> {human.name} ({role.role_name}): {action}')
-        issues.append(f'      calculated_vehicle_angle: {vc.get("calculated_vehicle_angle", "N/A")}')
-        issues.append(f'      think_interval: {vc.get("think_interval", "N/A")}')
-        issues.append(f'      vehicle_order: {vc.get("vehicle_order", "N/A")}')
-        
-        # Check if this is a commander role
-        if role.is_commander:
-            issues.append(f'      [COMMANDER] Checking if commander is correctly identified by driver...')
-            
-            # Verify vehicle matches
-            if vc.get('vehicle_role'):
-                actual_vehicle = vc['vehicle_role'].vehicle
-                if actual_vehicle != role.vehicle:
-                    issues.append(f'      [COMMANDER] VEHICLE MISMATCH! human points to {actual_vehicle.name}, role points to {role.vehicle.name}')
-            
-            # Check all crew roles to see if driver would find this commander
-            driver_would_find = False
-            for check_role in role.vehicle.ai.vehicle_crew:
-                if check_role.role_occupied and check_role.is_commander:
-                    if check_role == role:
-                        driver_would_find = True
-                    break
-            
-            if not driver_would_find:
-                issues.append(f'      [WARNING] Driver would NOT find this commander! Checking all roles...')
-                for i, check_role in enumerate(role.vehicle.ai.vehicle_crew):
-                    issues.append(f'        Role {i}: {check_role.role_name}')
-                    issues.append(f'          role_occupied={check_role.role_occupied}, is_commander={check_role.is_commander}')
-    
-    elif 'Waiting for driver to rotate' in action:
-        # This is the problematic action - should only exist on driver's perspective
-        if role.role_name != 'driver':
-            issues.append(f'  >>> CRITICAL STATE: {human.name} ({role.role_name}) has action "{action}"')
-            issues.append(f'      This human should be waiting for the driver, but driver may not be responding!')
-
-
 
 # ---------------------------------------------------------------------------
 def run_wo_objects_check(world):
@@ -303,14 +398,28 @@ def run_wo_objects_check(world):
 
         if b.is_human:
             current_task = b.ai.memory.get('current_task', '')
-            if current_task == 'task_vehicle_crew':
-                check_task_vehicle_crew(b, issues, world)
-            elif current_task == 'task_enter_vehicle':
-                check_task_enter_vehicle(b, issues, world)
-            elif current_task == 'task_move_to_location':
-                check_task_move_to_location(b, issues, world)
-            elif current_task == 'task_engage_enemy':
-                check_task_engage_enemy(b, issues, world)
+            # task -> checker function map (keeps dispatch clean & matches AI task_map pattern)
+            task_checkers = {
+                'task_vehicle_crew': check_task_vehicle_crew,
+                'task_enter_vehicle': check_task_enter_vehicle,
+                'task_move_to_location': check_task_move_to_location,
+                'task_engage_enemy': check_task_engage_enemy,
+                'task_exit_vehicle': check_task_exit_vehicle,
+                'task_loot_container': check_task_loot_container,
+                'task_medic': check_task_medic,
+                'task_mechanic': check_task_mechanic,
+                'task_pickup_objects': check_task_pickup_objects,
+                'task_player_control': check_task_player_control,
+                'task_reload': check_task_reload,
+                'task_sit_down': check_task_sit_down,
+                'task_squad_leader': check_task_squad_leader,
+                'task_think': check_task_think,
+                'task_think_idle': check_task_think_idle,
+                'task_wait': check_task_wait,
+            }
+            checker = task_checkers.get(current_task)
+            if checker:
+                checker(b, issues, world)
 
             # general human sanity checks
             check_human_primary_weapon(b, issues, world)
@@ -331,7 +440,7 @@ def run_wo_objects_check(world):
 def start(world):
     '''entry point. starts the debug'''
 
-    # for simplicity the debug will print out to console 
+    # for simplicity the debug will print out to console
 
     # object counts
     run_object_counts_report(world)
