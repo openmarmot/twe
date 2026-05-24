@@ -705,7 +705,7 @@ class AIHuman:
                 "hit by "
                 + event_data.ai.projectile_type
                 + " projectile at a distance of "
-                + str(distance)
+                + str(round(distance, 1))
             )
             starting_health = self.blood_pressure
 

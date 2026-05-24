@@ -1390,7 +1390,15 @@ class AIVehicle:
             # Air roll (ailerons)
             rotation_change = self.rotation_speed * self.ailerons * time_passed
 
-        if rotation_change != 0 and abs(self.current_speed) > 0.1:
+        if rotation_change != 0 and (
+            abs(self.current_speed) > 0.05
+            or (abs(self.wheel_steering) > 0.25 and (self.throttle > 0.05 or self.brake_power > 0.3))
+        ):
+            # relaxed gate for realistic pivot/skid-steer at low speed.
+            # Requires either forward speed OR active control input (throttle or brake)
+            # so that dead/engine-off vehicles cannot rotate in place.
+            # This still fully supports the AI ROTATING path (which sets throttle+brake+steering)
+            # and heavy casemates on bad terrain.
             self.owner.rotation_angle += rotation_change
             heading_changed = True
 

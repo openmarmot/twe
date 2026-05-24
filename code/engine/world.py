@@ -189,7 +189,8 @@ class World:
                 self.world_menu.activate_menu(vehicle)
             else:
                 self.world_menu.activate_menu(self.player)
-        else:
+        elif self.world_menu.active_menu != "death":
+            # death menu should not be closable (prevents stuck game state)
             self.world_menu.deactivate_menu()
 
     # ---------------------------------------------------------------------------

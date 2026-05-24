@@ -1964,5 +1964,6 @@ class World_Menu:
         if (
             self.time_since_input > self.max_menu_idle_time
             and self.active_menu != "start"
+            and self.active_menu != "death"
         ):
             self.deactivate_menu()

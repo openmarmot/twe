@@ -48,6 +48,12 @@ class AIHumanVehicleCommander:
                         if role.turret.ai.primary_weapon.ai.indirect_fire:
                             indirect_gunner_role = role
 
+        # self-preservation check - runs before any gunner-directed movement or fire mission logic.
+        # If we ordered a retreat, skip the gunner role handlers so they don't immediately
+        # countermand it by requesting new fire missions or positioning moves.
+        if self.think_vehicle_position(vehicle):
+            return
+
         if primary_gunner_role:
             self.think_primary_gunner_role(vehicle, primary_gunner_role)
 
@@ -357,3 +363,121 @@ class AIHumanVehicleCommander:
             )
 
             return
+
+    # ---------------------------------------------------------------------------
+    def think_vehicle_position(self, vehicle):
+        """self-preservation: assess nearby threats using sorted target lists and order retreat to spawn if vehicle is too vulnerable.
+
+        Returns True if a retreat order was issued (caller should skip the rest of commander think).
+        Returns False if no action was taken.
+        """
+        # human_targets and vehicle_targets are already sorted closest-first by evaluate_targets
+        human_targets = self.owner.ai.human_targets
+        vehicle_targets = self.owner.ai.vehicle_targets
+
+        if not human_targets and not vehicle_targets:
+            return False
+
+        # our vehicle characteristics for threat assessment
+        front_armor = vehicle.ai.vehicle_armor.get("front", [0])[0] if hasattr(vehicle.ai, "vehicle_armor") else 0
+        passenger_armor = getattr(vehicle.ai, "passenger_compartment_armor", {})
+        top_armor = passenger_armor.get("top", [0])[0] if isinstance(passenger_armor, dict) else 0
+        is_open_top = getattr(vehicle.ai, "open_top", False)
+
+        # does this vehicle have any direct-fire main armament? (mortar carriers like 251/2 do not)
+        has_direct_fire_armament = False
+        for role in vehicle.ai.vehicle_crew:
+            if role.is_gunner and role.role_occupied and role.turret and role.turret.ai.primary_weapon:
+                if role.turret.ai.primary_weapon.ai.direct_fire:
+                    has_direct_fire_armament = True
+                    break
+
+        # base vulnerability: soft skin, open top, or pure support vehicle (no way to fight back at close range)
+        is_vulnerable = (front_armor < 25) or (top_armor < 10) or is_open_top or (not has_direct_fire_armament)
+
+        if not is_vulnerable:
+            # we have decent protection and/or direct fire - let primary gunner logic decide engagement
+            return False
+
+        # --- threat scoring (humans first per request, then first ~4 vehicles) ---
+        threat_score = 0
+
+        # human targets - very close infantry is lethal to open/soft vehicles even without penetration
+        for target in human_targets[:3]:
+            distance = engine.math_2d.get_distance(vehicle.world_coords, target.world_coords)
+            if distance < 600:
+                threat_score += 35
+            elif distance < 1200:
+                threat_score += 20
+            elif distance < 1800:
+                threat_score += 8
+
+        # vehicle targets - first 4 closest (use similar penetration logic to think_primary_gunner_role)
+        for target in vehicle_targets[:4]:
+            distance = engine.math_2d.get_distance(vehicle.world_coords, target.world_coords)
+            if distance > 2200:
+                continue
+
+            penetration = 0
+            if len(getattr(target.ai, "turrets", [])) > 0:
+                try:
+                    penetration = target.ai.get_primary_gun_penetration(distance)
+                except (AttributeError, TypeError, KeyError):
+                    penetration = 0
+
+            # high threat if they can hurt us or are dangerously close
+            if penetration >= front_armor * 0.5 or distance < 900:
+                threat_score += 28 if distance < 700 else 18
+            elif penetration > 0:
+                threat_score += 10
+            elif distance < 1100:
+                # even unpenning vehicles are dangerous if very close (ramming, MG, etc.)
+                threat_score += 6
+
+        if threat_score < 25:
+            return False
+
+        # morale check - low morale makes retreat much more likely
+        flee_modifier = 0
+        if self.owner.ai.morale_check() is False:
+            flee_modifier = 25
+        elif self.owner.ai.morale < 60:
+            flee_modifier = 15
+
+        effective_threat = threat_score + flee_modifier
+
+        # final gate: only retreat on clearly high threat for this vulnerable vehicle
+        if effective_threat < 40:
+            return False
+
+        # --- issue retreat order toward spawn with +/- 400 randomness ---
+        spawn_location = self.owner.ai.squad.faction_tactical.spawn_location
+        if spawn_location is None:
+            return False
+
+        retreat_coords = engine.math_2d.randomize_coordinates(spawn_location, 400)
+
+        vehicle_order = VehicleOrder()
+        vehicle_order.order_drive_to_coords = True
+        vehicle_order.world_coords = retreat_coords
+        # keep the crew in the vehicle on arrival (we are retreating to safety, not dropping off)
+        vehicle_order.exit_vehicle_when_finished = False
+
+        self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+
+        self.owner.ai.speak("Driver, fall back!")
+        self.owner.ai.add_journal_entry(
+            f"Retreating {vehicle.name} due to threat (score {int(effective_threat)})"
+        )
+
+        # cancel any active indirect fire missions so we stop trying to close for positioning
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied:
+                vcrew_mem = role.human.ai.memory.get("task_vehicle_crew", {})
+                if "fire_missions" in vcrew_mem:
+                    vcrew_mem["fire_missions"] = []
+
+        # slow commander re-evaluation while we are moving out
+        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = random.uniform(6.0, 12.0)
+
+        return True

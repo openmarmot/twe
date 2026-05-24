@@ -1,9 +1,16 @@
 TWE Project : Change Log
 
+
+---------------------------------
+May 24 2026
+- added vehicle commander section to consider how vulnerable the current vehicle position is
+- ba64 and t_70 gunners are now commanders
+- rso_pak and sd.kfz.251 get a dedicated commander role
+- misc minor updtes/fixes
+
 ---------------------------------
 May 21 2026
 - bug fixes and logging
-
 
 ---------------------------------
 May 14 2026
