@@ -2977,7 +2977,13 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.is_gunner = True
         role.turret = turret
         role.seat_visible = True
-        role.seat_offset = [32, -8]
+        role.seat_offset = [14.0, -12.0]
+        z.ai.vehicle_crew.append(role)
+
+        role = VehicleRole("commander", z)
+        role.is_commander = True
+        role.seat_visible = True
+        role.seat_offset = [28.0, 18.0]
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed = 224.96
@@ -3667,6 +3673,13 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.seat_visible = True
         role.seat_offset = [-3, 0]
         z.ai.vehicle_crew.append(role)
+
+        # commander for threat assessment / self-preservation (new commander AI behaviors)
+        role = VehicleRole("commander", z)
+        role.is_commander = True
+        role.seat_visible = False
+        z.ai.vehicle_crew.append(role)
+
         passenger_positions = [
             [4, 10],
             [12, 10],
@@ -3680,7 +3693,7 @@ def spawn_object(world, world_coords, object_type, spawn):
             [51, -10],
         ]
         passenger_rotation = [90, 90, 90, 90, 90, 270, 270, 270, 270, 270]
-        for x in range(10):
+        for x in range(9):
             role = VehicleRole("passenger", z)
             role.is_passenger = True
             role.seat_visible = True
@@ -5512,6 +5525,7 @@ def spawn_object(world, world_coords, object_type, spawn):
 
         role = VehicleRole("gunner", z)
         role.is_gunner = True
+        role.is_commander = True
         role.turret = turret
         role.seat_offset = [13.6, -2.4]
         role.seat_visible = True
@@ -5910,6 +5924,7 @@ def spawn_object(world, world_coords, object_type, spawn):
 
         role = VehicleRole("gunner", z)
         role.is_gunner = True
+        role.is_commander = True
         role.turret = main_turret
         z.ai.vehicle_crew.append(role)
 

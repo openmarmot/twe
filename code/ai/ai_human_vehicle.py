@@ -157,12 +157,20 @@ class AIHumanVehicle:
         """update task_vehicle_crew"""
 
         # this is for all crew
-        vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
+        vcrew = self.owner.ai.memory.get("task_vehicle_crew", {})
+        role = vcrew.get("vehicle_role")
+        if role is None or role.human != self.owner or not role.role_occupied:
+            if role is not None and role.human == self.owner:
+                role.human = None
+            if role is not None:
+                role.role_occupied = False
+            self.owner.ai.memory.pop("task_vehicle_crew", None)
+            self.owner.ai.switch_task_think()
+            return
+        vehicle = role.vehicle
         if vehicle.ai.vehicle_disabled:
             self.owner.ai.switch_task_exit_vehicle()
             return
-
-        role = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"]
 
         if self.owner.is_player:
             self.update_task_vehicle_crew_player()

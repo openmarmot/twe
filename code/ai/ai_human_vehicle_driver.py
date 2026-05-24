@@ -84,24 +84,30 @@ class AIHumanVehicleDriver:
             return
 
         if current_action == VehicleCrewAction.ROTATING:
-            # rotating in place with minimal movement
-            # throttle + brake seems to be working here fairly well
+            # rotating in place with minimal forward movement (important for casemates
+            # like the Elefant with only +/-14 deg turret traverse).
+            # we use moderate throttle + partial brake + full steering. the physics
+            # layer now supports low-speed pivot rotation when wheel_steering is active.
 
             calculated_vehicle_angle = self.owner.ai.memory["task_vehicle_crew"][
                 "calculated_vehicle_angle"
             ]
 
+            mem = self.owner.ai.memory["task_vehicle_crew"]
+            if "rotate_start_time" not in mem:
+                mem["rotate_start_time"] = self.owner.world.world_seconds
+
             if vehicle.ai.current_speed == 0:
-                # this throttle boost helps vehicle overcome bad terrain like trees
-                # otherwise a 0.2 isn't enough to move against a tree tile and they will get stuck not moving or rotating
-                vehicle.ai.throttle = 0.5
-                vehicle.ai.brake_power = 1
-            elif vehicle.ai.current_speed > 10:
+                # higher kickstart for heavy vehicles on rough terrain / damaged wheels
+                vehicle.ai.throttle = 0.6
+                vehicle.ai.brake_power = 0.8
+            elif vehicle.ai.current_speed > 12:
+                # let it carry a little more speed before braking so rotation can happen
                 vehicle.ai.throttle = 0
-                vehicle.ai.brake_power = 1
+                vehicle.ai.brake_power = 0.9
             else:
-                vehicle.ai.throttle = 0.2
-                vehicle.ai.brake_power = 1
+                vehicle.ai.throttle = 0.35
+                vehicle.ai.brake_power = 0.5
 
             # Normalize both angles to [0, 360)
             current_angle = engine.math_2d.get_normalized_angle(vehicle.rotation_angle)
@@ -119,6 +125,7 @@ class AIHumanVehicleDriver:
                 vehicle.ai.update_heading()
                 vehicle.ai.throttle = 0
                 vehicle.ai.brake_power = 1
+                mem.pop("rotate_start_time", None)
                 # this action is now done
                 self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                     VehicleCrewAction.IDLE
@@ -129,6 +136,21 @@ class AIHumanVehicleDriver:
                     vehicle.ai.handle_steer_left()
                 else:
                     vehicle.ai.handle_steer_right()
+
+                # stuck escape hatch for heavy / high-resistance cases
+                elapsed = self.owner.world.world_seconds - mem.get("rotate_start_time", 0)
+                if elapsed > 5.0:
+                    vehicle.ai.throttle = max(vehicle.ai.throttle, 0.65)
+                    vehicle.ai.brake_power = min(vehicle.ai.brake_power, 0.3)
+                if elapsed > 10.0 and abs(diff) > 8:
+                    # give up so the gunner can re-evaluate instead of waiting forever
+                    vehicle.ai.handle_steer_neutral()
+                    vehicle.ai.throttle = 0
+                    vehicle.ai.brake_power = 1
+                    mem.pop("rotate_start_time", None)
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.IDLE
+                    )
 
     # ---------------------------------------------------------------------------
     def think_vehicle_order(self):
@@ -242,6 +264,9 @@ class AIHumanVehicleDriver:
         self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
             VehicleCrewAction.ROTATING
         )
+        self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
+            self.owner.world.world_seconds
+        )
         return
 
     # ---------------------------------------------------------------------------
@@ -349,6 +374,9 @@ class AIHumanVehicleDriver:
             self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                 VehicleCrewAction.ROTATING
             )
+            self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
+                self.owner.world.world_seconds
+            )
             return True
 
         return False
@@ -426,6 +454,7 @@ class AIHumanVehicleDriver:
         return False
 
     def handle_driver_decisions(self, vehicle, commander_role, gunner_role):
+        # handle driver decisions when there is no commander or gunner
         if commander_role or gunner_role:
             return False
 

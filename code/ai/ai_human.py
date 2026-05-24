@@ -705,7 +705,7 @@ class AIHuman:
                 "hit by "
                 + event_data.ai.projectile_type
                 + " projectile at a distance of "
-                + str(distance)
+                + str(round(distance, 1))
             )
             starting_health = self.blood_pressure
 
@@ -973,6 +973,9 @@ class AIHuman:
         """fires a weapon"""
 
         if weapon.ai.check_if_can_fire():
+            target_type = "soldiers" if target.is_human else target.name
+            self.add_journal_entry(f"Engaging {target_type}")
+
             self.recent_noise_or_move = True
             self.last_noise_or_move_time = self.owner.world.world_seconds
 
@@ -1800,12 +1803,6 @@ class AIHuman:
         self.memory[task_name] = task_details
         self.memory["current_task"] = task_name
 
-        target_type = "soldiers" if enemy.is_human else enemy.name
-        distance = engine.math_2d.get_distance(
-            self.owner.world_coords, enemy.world_coords
-        )
-        self.add_journal_entry(f"Engaging {target_type} at {int(distance)}m")
-
         self.owner.rotation_angle = engine.math_2d.get_rotation(
             self.owner.world_coords, enemy.world_coords
         )
@@ -2018,6 +2015,18 @@ class AIHuman:
         # A player can go through this if they enter a vehicle
         # this can also be used by a ai in a vehicle already that wants to change role
         # role should be NONE in most cases.
+
+        if (
+            self.memory.get("current_task") == "task_vehicle_crew"
+            and "task_vehicle_crew" in self.memory
+        ):
+            prev_role = self.memory["task_vehicle_crew"]["vehicle_role"]
+            if prev_role is not None and prev_role.human == self.owner:
+                prev_role.human = None
+                prev_role.role_occupied = False
+                if prev_role.role_name == "driver":
+                    prev_role.vehicle.ai.brake_power = 1
+                self.memory.pop("task_vehicle_crew", None)
 
         # first remove yourself from any existing crew spots
         for role in vehicle.ai.vehicle_crew:
