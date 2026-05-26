@@ -1491,6 +1491,10 @@ class AIHuman:
                 requested_role.role_occupied = True
                 requested_role.human = self.owner
 
+                # ensure correct seat position (important for visible seats and
+                # especially seat_rotates_with_turret roles)
+                vehicle.ai.update_child_position_rotation()
+
             else:
                 engine.log.add_data(
                     "warn",

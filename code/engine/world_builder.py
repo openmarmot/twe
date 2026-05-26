@@ -5527,8 +5527,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.is_gunner = True
         role.is_commander = True
         role.turret = turret
-        role.seat_offset = [13.6, -2.4]
+        role.seat_offset = [-5, -1]
         role.seat_visible = True
+        role.seat_rotates_with_turret = True
 
         z.ai.vehicle_crew.append(role)
 
