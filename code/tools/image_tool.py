@@ -452,7 +452,7 @@ image_tool.collision_radius=100
 #image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 #image_tool.image_objects.append(ImageObject(['ba_64_chassis'],0))
-image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
+#image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['warehouse-outside'],0))
 #image_tool.image_objects.append(ImageObject(['251_2_turret'],0))
@@ -461,14 +461,14 @@ image_tool.image_objects.append(ImageObject(['ba_64_turret'],0))
 #image_tool.image_objects.append(ImageObject(['crate'],0))
 
 #image_tool.image_objects.append(ImageObject(['rso_pak'],0))
-#image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
+image_tool.image_objects.append(ImageObject(['pak40_vehicle_turret'],0))
 
 #image_tool.image_objects.append(ImageObject(['rso_pak'],0))
 #image_tool.image_objects.append(ImageObject(['smg42_gun'],0))
 
 image_tool.image_objects.append(ImageObject(['german_soldier'],0))
-#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
-#image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
+image_tool.image_objects.append(ImageObject(['german_soldier'],0))
 
 
 # -----

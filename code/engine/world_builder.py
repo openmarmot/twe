@@ -2977,13 +2977,16 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.is_gunner = True
         role.turret = turret
         role.seat_visible = True
-        role.seat_offset = [14.0, -12.0]
+        role.seat_rotates_with_turret = True
+        role.seat_offset = [16.0, -15.0]
         z.ai.vehicle_crew.append(role)
 
         role = VehicleRole("commander", z)
         role.is_commander = True
         role.seat_visible = True
-        role.seat_offset = [28.0, 18.0]
+        role.turret = turret
+        role.seat_rotates_with_turret = True
+        role.seat_offset = [14.0, 14.0]
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed = 224.96
