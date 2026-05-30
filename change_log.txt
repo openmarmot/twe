@@ -8,6 +8,9 @@ May 24 2026
 - rso_pak and sd.kfz.251 get a dedicated commander role
 - misc minor updtes/fixes
 
+saw a sd.kfz.251 drive over a disabled sd.kfz.251 that burst into flames. the flames killed the crew on the
+healthy halftrack. didn't know that was possible. i'll allow it.
+
 ---------------------------------
 May 21 2026
 - bug fixes and logging
