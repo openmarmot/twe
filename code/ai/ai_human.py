@@ -1491,6 +1491,10 @@ class AIHuman:
                 requested_role.role_occupied = True
                 requested_role.human = self.owner
 
+                # ensure correct seat position (important for visible seats and
+                # especially seat_rotates_with_turret roles)
+                vehicle.ai.update_child_position_rotation()
+
             else:
                 engine.log.add_data(
                     "warn",
@@ -2520,7 +2524,56 @@ class AIHuman:
             if self.throwable is not None:
                 if distance < self.throwable.ai.range and distance > 150:
                     if enemy.is_human:
-                        self.throw(enemy.world_coords)
+                        aim_coords = enemy.world_coords
+                        if enemy.ai.in_vehicle():
+                            vehicle = enemy.ai.memory["task_vehicle_crew"][
+                                "vehicle_role"
+                            ].vehicle
+                            if vehicle.ai.current_speed > 0:
+                                speed = max(
+                                    getattr(self.throwable.ai, "max_speed", 150) or 150, 1
+                                )
+                                if getattr(
+                                    self.throwable.ai, "explode_on_contact", False
+                                ):
+                                    flight_time = distance / speed
+                                else:
+                                    max_flight = getattr(
+                                        self.throwable.ai, "max_flight_time", 2.0
+                                    ) or 2.0
+                                    flight_time = min(distance / speed, max_flight)
+                                aim_coords = engine.math_2d.moveAlongVector(
+                                    vehicle.ai.current_speed,
+                                    vehicle.world_coords,
+                                    vehicle.heading,
+                                    flight_time,
+                                )
+                        elif (
+                            enemy.ai.memory.get("current_task")
+                            == "task_move_to_location"
+                        ):
+                            destination = enemy.ai.memory["task_move_to_location"][
+                                "destination"
+                            ]
+                            speed = max(
+                                getattr(self.throwable.ai, "max_speed", 150) or 150, 1
+                            )
+                            if getattr(
+                                self.throwable.ai, "explode_on_contact", False
+                            ):
+                                flight_time = distance / speed
+                            else:
+                                max_flight = getattr(
+                                    self.throwable.ai, "max_flight_time", 2.0
+                                ) or 2.0
+                                flight_time = min(distance / speed, max_flight)
+                            aim_coords = engine.math_2d.moveTowardsTarget(
+                                enemy.ai.get_calculated_speed(),
+                                aim_coords,
+                                destination,
+                                flight_time,
+                            )
+                        self.throw(aim_coords)
                         self.speak("Throwing Grenade !!!!")
 
         else:
@@ -2561,18 +2614,36 @@ class AIHuman:
             if distance < self.antitank.ai.range:
                 self.launch_antitank(enemy.world_coords)
         else:
-            # also check if we should chuck a grenade at it
             if self.throwable is not None:
                 if distance < self.throwable.ai.range and distance > 60:
-                    # grenades will miss if the vehicle is moving fast
-                    if enemy.ai.current_speed < 160:
-                        # check pen
-                        if (
-                            enemy.ai.passenger_compartment_armor["top"][0] < 6
-                            or self.throwable.ai.use_antitank
-                        ):
-                            self.speak(f"Throwing {self.throwable.name} !!!!")
-                            self.throw(enemy.world_coords)
+                    speed_ok = enemy.ai.current_speed < 160
+                    armor_ok = (
+                        enemy.ai.passenger_compartment_armor["top"][0] < 6
+                        or self.throwable.ai.use_antitank
+                    )
+                    if speed_ok and armor_ok or random.random() < 0.5:
+                        aim_coords = enemy.world_coords
+                        if enemy.ai.current_speed > 0:
+                            speed = max(
+                                getattr(self.throwable.ai, "max_speed", 150) or 150, 1
+                            )
+                            if getattr(
+                                self.throwable.ai, "explode_on_contact", False
+                            ):
+                                flight_time = distance / speed
+                            else:
+                                max_flight = getattr(
+                                    self.throwable.ai, "max_flight_time", 2.0
+                                ) or 2.0
+                                flight_time = min(distance / speed, max_flight)
+                            aim_coords = engine.math_2d.moveAlongVector(
+                                enemy.ai.current_speed,
+                                enemy.world_coords,
+                                enemy.heading,
+                                flight_time,
+                            )
+                        self.speak(f"Throwing {self.throwable.name} !!!!")
+                        self.throw(aim_coords)
 
             # out of ammo ?
             ammo_gun, ammo_inventory, magazine_count = self.check_ammo(

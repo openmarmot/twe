@@ -628,10 +628,15 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     # testing
     elif battle_option == "4":
-        squads.append("German Panzerjager Tiger P camo1")
 
-        for s in range(100):
+        for s in range(20):
             squads.append("Soviet T-70")
+            squads.append("Soviet 1944 Rifle")
+            squads.append("Soviet 1944 Rifle Motorized")
+
+            squads.append("German Sd.kfz.251/9")
+            squads.append("German Sd.kfz.251/2")
+            squads.append("German 1944 Rifle")
 
         # squads.append('Soviet T34-76 Model 1943')
 
@@ -2977,13 +2982,16 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.is_gunner = True
         role.turret = turret
         role.seat_visible = True
-        role.seat_offset = [14.0, -12.0]
+        role.seat_rotates_with_turret = True
+        role.seat_offset = [16.0, -15.0]
         z.ai.vehicle_crew.append(role)
 
         role = VehicleRole("commander", z)
         role.is_commander = True
         role.seat_visible = True
-        role.seat_offset = [28.0, 18.0]
+        role.turret = turret
+        role.seat_rotates_with_turret = True
+        role.seat_offset = [14.0, 14.0]
         z.ai.vehicle_crew.append(role)
 
         z.ai.max_speed = 224.96
@@ -5527,8 +5535,9 @@ def spawn_object(world, world_coords, object_type, spawn):
         role.is_gunner = True
         role.is_commander = True
         role.turret = turret
-        role.seat_offset = [13.6, -2.4]
+        role.seat_offset = [-5, -1]
         role.seat_visible = True
+        role.seat_rotates_with_turret = True
 
         z.ai.vehicle_crew.append(role)
 

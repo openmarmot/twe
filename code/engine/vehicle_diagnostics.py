@@ -471,6 +471,24 @@ class VehicleDiagnostics:
                     ]
                 )
                 coord[1] += spacing
+
+                # display rounds fired by type
+                fired_types = getattr(b.ai.primary_weapon.ai, "rounds_fired_type", {})
+                if fired_types:
+                    self.text_queue.append(
+                        [" --> rounds fired by type:", copy.copy(coord), self.text_black]
+                    )
+                    coord[1] += spacing
+                    for p_type, count in fired_types.items():
+                        self.text_queue.append(
+                            [
+                                f"     {p_type}: {count}",
+                                copy.copy(coord),
+                                self.text_black,
+                            ]
+                        )
+                        coord[1] += spacing
+
                 self.text_queue.append(
                     [
                         f" --> accuracy: {b.ai.primary_weapon.ai.get_accuracy()}",
@@ -539,6 +557,24 @@ class VehicleDiagnostics:
                     ]
                 )
                 coord[1] += spacing
+
+                # display rounds fired by type
+                fired_types = getattr(b.ai.coaxial_weapon.ai, "rounds_fired_type", {})
+                if fired_types:
+                    self.text_queue.append(
+                        [" --> rounds fired by type:", copy.copy(coord), self.text_black]
+                    )
+                    coord[1] += spacing
+                    for p_type, count in fired_types.items():
+                        self.text_queue.append(
+                            [
+                                f"     {p_type}: {count}",
+                                copy.copy(coord),
+                                self.text_black,
+                            ]
+                        )
+                        coord[1] += spacing
+
                 self.text_queue.append(
                     [
                         f" --> accuracy: {b.ai.coaxial_weapon.ai.get_accuracy()}",

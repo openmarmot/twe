@@ -1,5 +1,27 @@
 TWE Project : Change Log
 
+---------------------------------
+May 31 2026
+- adjustments so that penetrating wheel hits can test against vehicle body + wheel armor
+- fixed graphics stutters on mac. needed vsyc
+- adjustments to make engagements with HE more likely
+- driver is now likely to move if the vehicle gets hit and is not currently engaging anything
+-adjustments to grenade throwing to make it somewhat more likely. it now leads targets as well
+
+---------------------------------
+May 29 2026
+- updated rso_pak gun crew to rotate with turret
+- updated panzer_iv j and panzer_vi to 5 crew members so the nahverteidigungswaffe_turret is manned
+
+this explains why i never see the n turret used, although the range is super short, so its a unlikely weapon
+---------------------------------
+May 26 2026
+- fixed temporary position issues when player switches to a visible vehicle role
+- added in vehicle roles that rotate with the turret.
+- updated ba_64 gunner role to the new turret rotation style
+
+i really need to go through each vehicle and fix all the minor details.
+they all need so much work (crying face)
 
 ---------------------------------
 May 24 2026
@@ -7,6 +29,9 @@ May 24 2026
 - ba64 and t_70 gunners are now commanders
 - rso_pak and sd.kfz.251 get a dedicated commander role
 - misc minor updtes/fixes
+
+saw a sd.kfz.251 drive over a disabled sd.kfz.251 that burst into flames. the flames killed the crew on the
+healthy halftrack. didn't know that was possible. i'll allow it.
 
 ---------------------------------
 May 21 2026

@@ -78,6 +78,9 @@ class AIGun():
         self.rounds_fired=0
         self.rounds_hit=0
 
+        # dict of projectile_type -> count fired (keyed by ai_projectile.projectile_type)
+        self.rounds_fired_type={}
+
         # the object that actually equipped this weapon. either a turret or a human
         # set by ai_man.event_inventory or worldbuilder for turrets
         self.equipper=None
@@ -144,6 +147,12 @@ class AIGun():
             self.last_fired_time=self.owner.world.world_seconds
             projectile=self.magazine.ai.projectiles.pop()
             self.rounds_fired+=1
+
+            # track per projectile type (from ai_projectile)
+            pt = projectile.ai.projectile_type
+            if pt not in self.rounds_fired_type:
+                self.rounds_fired_type[pt] = 0
+            self.rounds_fired_type[pt] += 1
 
             if projectile.ai.projectile_type in WATCHED_PROJECTILE_TYPES:
                 engine.log.add_data('info',f"Watched projectile '{projectile.ai.projectile_type}' fired by {self.owner.name} from {self.equipper.name if self.equipper else 'unknown'}",True)

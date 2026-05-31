@@ -30,7 +30,9 @@ class VehicleRole():
 
         # seat information
         self.seat_visible=False
-        # rotation relative to the vehicle
+        # if true, seat_offset and seat_rotation are relative to the turret (role.turret) instead of vehicle
+        self.seat_rotates_with_turret=False
+        # rotation relative to the vehicle (or turret if seat_rotates_with_turret)
         self.seat_rotation=0
-        # offset relative to the vehicle
+        # offset relative to the vehicle (or turret if seat_rotates_with_turret)
         self.seat_offset=[0,0]

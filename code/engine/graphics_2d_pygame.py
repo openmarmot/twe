@@ -48,6 +48,12 @@ class Graphics_2D_Pygame:
 
         self.double_buffering = True
 
+        # when True, request vsync from the display compositor and let it drive frame pacing.
+        # clock.tick() will not hard-limit the rate; flip() provides natural pacing.
+        # this eliminates micro-stutter on macOS (and often improves smoothness elsewhere).
+        # set False to restore the old clock.tick(max_fps) + no-vsync behavior.
+        self.vsync_enabled = True
+
         info = pygame.display.Info()
         desktops = pygame.display.get_desktop_sizes()
         if desktops:
@@ -72,8 +78,17 @@ class Graphics_2D_Pygame:
         print("Display detected:", display_w, "x", display_h)
         print("Using screen size:", self.screen_size[0], "x", self.screen_size[1])
 
-        self.screen = pygame.display.set_mode(self.screen_size, flags)
+        vsync_arg = 1 if self.vsync_enabled else 0
+        self.screen = pygame.display.set_mode(self.screen_size, flags, vsync=vsync_arg)
         self.screen_center = [self.screen_size[0] // 2, self.screen_size[1] // 2]
+
+        if self.vsync_enabled:
+            if pygame.display.is_vsync():
+                print("VSync: enabled (display is driving frame pacing)")
+            else:
+                print("VSync: requested but not active on this display")
+        else:
+            print("VSync: disabled (using clock.tick() frame limiting)")
 
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
@@ -847,7 +862,12 @@ class Graphics_2D_Pygame:
         self.handle_input()
 
         # update time
-        self.time_passed = self.clock.tick(self.max_fps)
+        if self.vsync_enabled:
+            # let the display's vsync (via flip) provide pacing; tick(0) just measures delta
+            # without imposing an artificial sleep that fights the compositor
+            self.time_passed = self.clock.tick(0)
+        else:
+            self.time_passed = self.clock.tick(self.max_fps)
         self.time_passed_seconds = self.time_passed / 1000.0
         fps = int(self.clock.get_fps())
 

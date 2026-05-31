@@ -400,8 +400,10 @@ class AITurret:
         """update turret physics"""
         time_passed = self.owner.world.time_passed_seconds
         moved = False
+        relative_rotation_changed = False
 
         if self.rotation_change != 0:
+            relative_rotation_changed = True
             moved = True
             self.turret_rotation += (
                 self.rotation_change * self.rotation_speed * time_passed
@@ -439,3 +441,8 @@ class AITurret:
                     self.vehicle.rotation_angle,
                     self.position_offset,
                 )
+                # Only force crew seat update when *this turret* yawed relative to the hull.
+                # Vehicle movement/rotation already triggers a full update_child from ai_vehicle
+                # (avoiding redundant double calculations on every movement frame for every turret).
+                if relative_rotation_changed:
+                    self.vehicle.ai.update_child_position_rotation()

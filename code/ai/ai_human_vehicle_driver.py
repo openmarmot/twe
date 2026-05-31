@@ -296,6 +296,39 @@ class AIHumanVehicleDriver:
             self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
 
     # ---------------------------------------------------------------------------
+    def react_to_hit(self):
+        vcrew = self.owner.ai.memory["task_vehicle_crew"]
+        role = vcrew["vehicle_role"]
+        vehicle = role.vehicle
+        if vcrew.get("vehicle_order") is None:
+            if vcrew.get("current_action") in (
+                VehicleCrewAction.IDLE,
+                VehicleCrewAction.WAITING,
+                VehicleCrewAction.WAITING_AT_DESTINATION,
+                VehicleCrewAction.NONE,
+            ):
+                gunner_engaging = False
+                for r in vehicle.ai.vehicle_crew:
+                    if r.role_occupied and r.is_gunner:
+                        g_action = (
+                            r.human.ai.memory.get("task_vehicle_crew", {}).get(
+                                "current_action"
+                            )
+                        )
+                        if g_action == VehicleCrewAction.ENGAGING:
+                            gunner_engaging = True
+                        break
+                if not gunner_engaging:
+                    forward = engine.math_2d.calculate_relative_position(
+                        vehicle.world_coords, vehicle.rotation_angle, [100, 0]
+                    )
+                    forward = engine.math_2d.randomize_coordinates(forward, 25)
+                    vehicle_order = VehicleOrder()
+                    vehicle_order.order_drive_to_coords = True
+                    vehicle_order.world_coords = forward
+                    vcrew["vehicle_order"] = vehicle_order
+
+    # ---------------------------------------------------------------------------
     def think(self):
         vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
 
