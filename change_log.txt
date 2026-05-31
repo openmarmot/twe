@@ -4,6 +4,9 @@ TWE Project : Change Log
 May 31 2026
 - adjustments so that penetrating wheel hits can test against vehicle body + wheel armor
 - fixed graphics stutters on mac. needed vsyc
+- adjustments to make engagements with HE more likely
+- driver is now likely to move if the vehicle gets hit and is not currently engaging anything
+-adjustments to grenade throwing to make it somewhat more likely. it now leads targets as well
 
 ---------------------------------
 May 29 2026
