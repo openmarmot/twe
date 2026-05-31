@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+May 31 2026
+- adjustments so that penetrating wheel hits can test against vehicle body + wheel armor
+
+---------------------------------
 May 29 2026
 - updated rso_pak gun crew to rotate with turret
 - updated panzer_iv j and panzer_vi to 5 crew members so the nahverteidigungswaffe_turret is manned

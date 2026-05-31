@@ -992,17 +992,20 @@ class AIVehicle:
             self.projectile_bounce(projectile)
 
     # ---------------------------------------------------------------------------
-    def projectile_hit_vehicle_body(self, projectile, side, relative_angle):
+    def projectile_hit_vehicle_body(self, projectile, side, relative_angle, armor_override=None):
         """handle a projectile hit to the vehicle body"""
         distance = engine.math_2d.get_distance(
             self.owner.world_coords, projectile.ai.starting_coords
+        )
+        armor_to_use = (
+            armor_override if armor_override is not None else self.vehicle_armor[side]
         )
         penetration, pen_value, armor_value, spaced_effect = (
             engine.penetration_calculator.calculate_penetration(
                 projectile,
                 distance,
                 "steel",
-                self.vehicle_armor[side],
+                armor_to_use,
                 side,
                 relative_angle,
             )
@@ -1047,11 +1050,14 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
-            self.projectile_bounce(projectile)
+            if armor_override is not None:
+                projectile.wo_stop()
+            else:
+                self.projectile_bounce(projectile)
 
     # ---------------------------------------------------------------------------
     def projectile_hit_wheel(self, projectile, side, relative_angle):
-        """handle a projectile hit to the vehicle body"""
+        """handle a projectile hit to a wheel"""
 
         # note - vehicles that only have wheels in some of the groups will fair
         # better here. the flow should probably be updated to fix this.
@@ -1087,7 +1093,7 @@ class AIVehicle:
 
             if penetration:
                 if wheel.ai.destroyed:
-                    # pass hit through to vehicle body
+                    # pass hit through to vehicle body (destroyed wheel adds no protection)
                     self.projectile_hit_vehicle_body(projectile, side, relative_angle)
                     result = "projectile passes through destroyed wheel"
 
@@ -1099,13 +1105,17 @@ class AIVehicle:
                         wheel.ai.damaged = True
                         result = "wheel damaged"
 
-                    # chance to continue into the body
-                    if random.randint(0, 2) == 2:
-                        self.projectile_hit_vehicle_body(
-                            projectile, side, relative_angle
-                        )
-                    else:
-                        projectile.wo_stop()
+                    # wheel penetrated - test against vehicle body with the wheel's
+                    # armor thickness added as additional protection
+                    augmented_armor = [
+                        self.vehicle_armor[side][0] + wheel.ai.armor[0],
+                        self.vehicle_armor[side][1],
+                        self.vehicle_armor[side][2] + wheel.ai.armor[2],
+                    ]
+                    self.projectile_hit_vehicle_body(
+                        projectile, side, relative_angle, armor_override=augmented_armor
+                    )
+                    # body handler records its own hit data + stops the projectile
 
                 # check if that was enough damage to disable the vehicle
                 self.check_wheel_health()
