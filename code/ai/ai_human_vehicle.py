@@ -117,6 +117,9 @@ class AIHumanVehicle:
                         )
                         return
 
+            if role.is_driver:
+                self.role_driver.react_to_hit()
+
             # maybe add some morale damage?
 
     # ---------------------------------------------------------------------------

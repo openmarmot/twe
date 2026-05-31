@@ -687,7 +687,40 @@ class AIHumanVehicleGunner:
                 if random.randint(0, 4) == 0:
                     engage_primary = True
 
-            # possibly should also check if we are engaging a soft skinned vehicle with AT
+            # Force reload if we have a pure AT round loaded on a soft/0-armor vehicle
+            # (the missing half of the HE->AT logic above). HE is far more effective
+            # on unarmored targets; this also helps when capacity>1 mags are in use.
+            if target.is_vehicle:
+                v_armor = target.ai.vehicle_armor.get("front", [0])[0]
+                v_pax = target.ai.passenger_compartment_armor.get("front", [0])[0]
+                if v_armor <= 4 and v_pax <= 2:
+                    if turret.ai.primary_weapon.ai.magazine:
+                        mag = turret.ai.primary_weapon.ai.magazine
+                        if mag.ai.use_antitank and not mag.ai.use_antipersonnel:
+                            # pure AT loaded; look for HE/AP in rack or inventory
+                            has_he = False
+                            for container in (vehicle.ai.ammo_rack, vehicle.ai.inventory):
+                                for m in container:
+                                    if m.is_gun_magazine:
+                                        if (
+                                            turret.ai.primary_weapon.world_builder_identity
+                                            in m.ai.compatible_guns
+                                        ):
+                                            if len(m.ai.projectiles) > 0:
+                                                if m.ai.use_antipersonnel:
+                                                    has_he = True
+                                                    break
+                                if has_he:
+                                    break
+                            if has_he:
+                                # always reload rather than wasting a valuable AT round
+                                self.owner.ai.memory["task_vehicle_crew"][
+                                    "reload_start_time"
+                                ] = self.owner.world.world_seconds
+                                self.owner.ai.memory["task_vehicle_crew"][
+                                    "current_action"
+                                ] = VehicleCrewAction.RELOADING_PRIMARY
+                                return
 
         # out_of_ammo_coax will be true if there is no coax, or the coax is damaged
         if out_of_ammo_coax is False:
@@ -895,7 +928,13 @@ class AIHumanVehicleGunner:
 
         if target is None:
             if self.owner.ai.vehicle_targets:
-                prefer_at = True
+                v = self.owner.ai.vehicle_targets[0]
+                v_armor = v.ai.vehicle_armor.get("front", [0])[0]
+                v_pax = v.ai.passenger_compartment_armor.get("front", [0])[0]
+                if v_armor > 4 or v_pax > 2:
+                    prefer_at = True
+                else:
+                    prefer_ap = True
             elif self.owner.ai.human_targets:
                 prefer_ap = True
 
