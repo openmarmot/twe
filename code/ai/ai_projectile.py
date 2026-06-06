@@ -6,7 +6,7 @@ notes :
 '''
 
 #import built in modules
-import random 
+import random
 
 #import custom packages
 import engine.math_2d
@@ -92,13 +92,13 @@ class AIProjectile():
                 # indirect fire mode ignores collision, so no further processing needed
                 return
 
-            # check collision 
+            # check collision
             if self.flightTime>self.last_collision_check+self.collision_check_interval:
                 self.last_collision_check=self.flightTime
                 objects=self.owner.grid_square.wo_objects_projectile_collision
                 collide_obj=self.owner.world.check_collision_return_object(self.owner,self.ignore_list,objects,True)
                 if collide_obj !=None:
-                    
+
                     # update hit counter
                     if self.weapon.is_gun:
                         self.weapon.ai.rounds_hit+=1
@@ -107,20 +107,26 @@ class AIProjectile():
                         # bullet has collided and exploded
                         self.contact_effect()
                     else:
-                        # tell the object that there has been a collision 
-                        collide_obj.ai.handle_event('collision',self.owner)
-
-                        if collide_obj.is_vehicle:
-                            # vehicles will remove or redirect projectiles based on penetration
-                            pass
+                        # tell the object that there has been a collision
+                        hit_vehicle = collide_obj.is_vehicle
+                        unoccupied = hit_vehicle and not collide_obj.ai.check_if_vehicle_is_occupied()
+                        if unoccupied and random.randint(0, 1) == 0:
+                            # 50% chance unoccupied vehicle does not block the shot
+                            # this is needed so that unoccupied vehicles don't excessively block shots as
+                            # the ai does not target unoccupied vehicles.
+                            self.ignore_list.append(collide_obj)
                         else:
-                            if engine.penetration_calculator.check_passthrough(self.owner,collide_obj):
-                                # add the collided object to ignore list so we don't hit it again
-                                # this is mostly to deal with buildings where we would hit it a ton of times
-                                self.ignore_list.append(collide_obj)
+                            collide_obj.ai.handle_event("collision", self.owner)
+                            if hit_vehicle:
+                                # vehicles will remove or redirect projectiles based on penetration
+                                pass
                             else:
-                                # bullet stuck in something. remove bullet from world
-                                self.owner.world.remove_queue.append(self.owner) 
-
-                        
-
+                                if engine.penetration_calculator.check_passthrough(
+                                    self.owner, collide_obj
+                                ):
+                                    # add the collided object to ignore list so we don't hit it again
+                                    # this is mostly to deal with buildings where we would hit it a ton of times
+                                    self.ignore_list.append(collide_obj)
+                                else:
+                                    # bullet stuck in something. remove bullet from world
+                                    self.owner.world.remove_queue.append(self.owner)

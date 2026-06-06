@@ -235,8 +235,8 @@ class World:
                 else:
                     # check if object misses due to prone
                     if consider_prone and collided.ai.prone:
-                        chance = random.randint(0, 1)
-                        if chance == 1:
+                        chance = random.randint(0, 3)
+                        if chance != 0:
                             # missed due to prone
                             collided = None
 

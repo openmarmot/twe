@@ -6,6 +6,10 @@ June 06 2026
 - added some building awareness to squad lead
 - squad lead now dynamically adjusts squad dispersion based on whether the squad lead is in a building
 - added some journal entries and speak for squad lead
+- prone is now a 75% chance bullets miss
+- projectiles have a 50% chance to ignore unoccupied vehicles so that they don't always block shots
+
+maybe 75% is too high for a prone miss, but i feel like it woud be pretty hard to hit a prone soldier.
 
 
 ---------------------------------
