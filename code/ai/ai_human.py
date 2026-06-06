@@ -799,6 +799,7 @@ class AIHuman:
         elif event_data.is_throwable:
             # throwable but not a grenade
             self.speak("Oww!")
+            self.add_journal_entry(f"hit by a {event_data.name}")
 
         else:
             engine.log.add_data(
@@ -2004,6 +2005,7 @@ class AIHuman:
             self.add_journal_entry(f"Threw: {self.throwable.name}")
             # this does all the needed internal ai stuff for the throwable
             self.throwable.ai.throw()
+            self.add_journal_entry(f"Threw a {self.throwable.name}")
 
             # set rotation and heading
             if self.owner.is_player:

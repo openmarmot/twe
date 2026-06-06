@@ -262,7 +262,7 @@ class AIHumanVehicle:
                 # if we don't have a vehicle order, check to see if we can create
                 # one from tactical orders
                 if self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] is None:
-                    self.owner.ai.squad_leader_review_orders()
+                    self.owner.ai.squad_leader_ai.review_orders()
 
         else:
             # some roles will want to do something every update cycle
