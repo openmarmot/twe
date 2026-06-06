@@ -8,7 +8,7 @@ most of the logic should be in ai_human
 
 
 #import built in modules
-import random 
+import random
 import copy
 
 #import custom packages
@@ -23,16 +23,16 @@ class AISquad():
         # !! NOTE - this should have as little as possible in it. most stuff should be in ai_human
 
         self.world=world
-        
-        # people in the squad 
-        # ai_human will remove itself on death 
+
+        # people in the squad
+        # ai_human will remove itself on death
         self.members=[]
 
         # vehicles the squad spawned with
         self.vehicles=[]
 
         # world_object squad member who is the leader.
-        # squad memebers will self elect and update this 
+        # squad memebers will self elect and update this
         # however if the squad is busy it might take a minute
         self.squad_leader=None
 
@@ -42,8 +42,12 @@ class AISquad():
         # a link back to the parent faction tactical
         self.faction_tactical=None
 
-
         self.name=''
+
+        # how close members try to stick to the squad leader
+        # this is adjusted by ai_human_squad_leader.py
+        self.max_distance_human = 300
+        self.max_distance_vehicle = 300
 
     #---------------------------------------------------------------------------
     def add_to_squad(self, WORLD_OBJECT):
@@ -51,7 +55,7 @@ class AISquad():
         if WORLD_OBJECT.is_human:
             # remmove from the old squad
             if WORLD_OBJECT.ai.squad!=None:
-                WORLD_OBJECT.ai.squad.members.remove(WORLD_OBJECT)    
+                WORLD_OBJECT.ai.squad.members.remove(WORLD_OBJECT)
 
             # add to this squad
             self.members.append(WORLD_OBJECT)
@@ -62,19 +66,11 @@ class AISquad():
             self.vehicles.append(WORLD_OBJECT)
         else:
             engine.log.add_data('error',f'AISquad.add_to_squad() unknown object type {WORLD_OBJECT.name}',True)
-            
+
 
     #---------------------------------------------------------------------------
     def reset_squad_variable(self):
-        # this is called by world builder after it adds the members 
+        # this is called by world builder after it adds the members
         for b in self.members:
             if b.is_human:
                 b.ai.squad=self
-
-
-
-
-
-
-          
-

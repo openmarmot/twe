@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 06 2026
+- split out squad lead logic as it was getting chunky
+- added some building awareness to squad lead
+- squad lead now dynamically adjusts squad dispersion based on whether the squad lead is in a building
+- added some journal entries and speak for squad lead
+
+
+---------------------------------
 May 31 2026
 - adjustments so that penetrating wheel hits can test against vehicle body + wheel armor
 - fixed graphics stutters on mac. needed vsyc

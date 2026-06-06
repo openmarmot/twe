@@ -10,6 +10,7 @@ notes :
 
 #import custom packages
 import engine.math_2d
+import random
 
 # this is for objects that don't need AI
 
@@ -22,6 +23,7 @@ class AIBuilding():
         self.show_interior_distance=500
 
         self.time_since_vis_update=6
+        self.vis_update_interval=random.uniform(1,2)
     #---------------------------------------------------------------------------
     def update(self):
         ''' overrides base update '''
@@ -29,7 +31,7 @@ class AIBuilding():
         time_passed=self.owner.world.time_passed_seconds
         self.time_since_vis_update+=time_passed
 
-        if self.time_since_vis_update>5 :
+        if self.time_since_vis_update>self.vis_update_interval :
             self.time_since_vis_update=0
             # check distance to player
             b=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
@@ -44,7 +46,7 @@ class AIBuilding():
                 self.owner.image_index=0
                 self.owner.reset_image=True
                 self.owner.render_level=6
-            
+
 
     #---------------------------------------------------------------------------
     def event_collision(self,event_data):

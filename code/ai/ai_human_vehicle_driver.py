@@ -609,7 +609,7 @@ class AIHumanVehicleDriver:
             self.owner.world_coords, self.owner.ai.squad.squad_leader.world_coords
         )
 
-        if distance_to_squad_lead <= 300:
+        if distance_to_squad_lead <= self.owner.ai.squad.max_distance_vehicle:
             return False
 
         vehicle_order = VehicleOrder()
