@@ -161,6 +161,7 @@ class AIHumanSquadLeader:
             tactical_order.world_coords = contested_area.get_location()
             tactical_order.world_area = contested_area
             self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
+            self.owner.ai.add_journal_entry(f"Ordered squad to defend {contested_area.name}")
             return
 
         # - move to a random area -
@@ -169,6 +170,7 @@ class AIHumanSquadLeader:
         tactical_order.order_move_to_location = True
         tactical_order.world_coords = random_area.get_location()
         self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
+        self.owner.ai.add_journal_entry(f"Ordered squad to move to {random_area.name}")
         return
 
     # ---------------------------------------------------------------------------
@@ -199,7 +201,6 @@ class AIHumanSquadLeader:
                     self.owner.ai.switch_task_move_to_location(
                         building.world_coords, None
                     )
-                    self.owner.ai.add_journal_entry(f"Ordered squad to move to {building.name}")
                     self.owner.ai.speak(f"Take cover in that {building.name}")
 
 

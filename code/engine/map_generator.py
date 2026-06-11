@@ -254,7 +254,7 @@ def generate_map_area_town(world_coords,name):
     for _ in range(count_warehouse):
         warehouse_coord=coords.pop()
         coords_to_avoid.append(warehouse_coord)
-        map_objects.append(MapObject('warehouse','a old warehouse',warehouse_coord,rotation,[]))
+        map_objects.append(MapObject('warehouse','old warehouse',warehouse_coord,rotation,[]))
     
     # add smaller square buildings in a more random pattern, avoiding the warehouses 
     building_max_area=3000

@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 10 2026
+- minor changes
+
+saw a journal entry for a soviet soldier that picked up a ptrs-41, looked a magazine,
+and successfully used it. i think thats the first time i've had confirmation that
+soldiers will pick up weapons. its very rare
+
+---------------------------------
 June 06 2026
 - split out squad lead logic as it was getting chunky
 - added some building awareness to squad lead
