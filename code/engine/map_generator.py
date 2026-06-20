@@ -183,10 +183,9 @@ def generate_map(map_areas):
     # generate clutter 
     map_objects+=generate_clutter(map_objects)
 
-    # generate vegetation
-    veg=generate_vegetation(map_objects,world_size)
-    roads=[o for o in map_objects if o.world_builder_identity=='road_300']
-    map_objects+= [v for v in veg if all(engine.math_2d.get_distance(v.world_coords,r.world_coords)>150 for r in roads)]
+    # generate vegetation (new generator already avoids buildings + roads via sized exclusions)
+    veg = generate_vegetation(map_objects, world_size)
+    map_objects += veg
 
     # generate civilians
     map_objects+=generate_civilians(map_objects)
@@ -254,7 +253,7 @@ def generate_map_area_town(world_coords,name):
     for _ in range(count_warehouse):
         warehouse_coord=coords.pop()
         coords_to_avoid.append(warehouse_coord)
-        map_objects.append(MapObject('warehouse','a old warehouse',warehouse_coord,rotation,[]))
+        map_objects.append(MapObject('warehouse','old warehouse',warehouse_coord,rotation,[]))
     
     # add smaller square buildings in a more random pattern, avoiding the warehouses 
     building_max_area=3000
@@ -320,63 +319,185 @@ def generate_vegetation(map_objects,world_size):
     map_objects - list of existing map objects
     world_size - size of map in all directions. should be > than town generation size
     returns a list of vegetation map objects
+
+    New implementation:
+    - Much faster generation (cheap local rejection instead of many heavy
+      get_random_constrained_* calls per forest clump).
+    - Proper sized exclusion zones for buildings and (sampled) roads so vegetation
+      does not overlap man-made features.
+    - Designed so you can easily increase coverage/density by adjusting a handful
+      of constants without the function becoming slow.
     '''
-    vegetation=[]
+    vegetation = []
+    half = world_size
 
-    # generate a list of coordinates to avoid
-    coordinates_to_avoid=[]
+    # Build sized exclusion zones once: (cx, cy, clearance_radius)
+    # These radii are chosen to keep sprites from visually/physically overlapping
+    # buildings, runways, and roads (with a little extra margin).
+    exclusions = []  # (x, y, rad)
+    building_clear = {
+        'hangar': 620,
+        'warehouse': 265,
+        'square_building': 130,
+        'concrete_square': 48,
+    }
+    ROAD_CLEAR = 148
+
+    roads = []
     for obj in map_objects:
-        if obj.world_builder_identity in ('warehouse','square_building','hangar','concrete_square','road_300'):
-            coordinates_to_avoid.append(obj.world_coords)
+        wid = obj.world_builder_identity
+        if wid in building_clear:
+            c = obj.world_coords
+            exclusions.append((c[0], c[1], building_clear[wid]))
+        elif wid == 'road_300':
+            roads.append(obj)
+
+    for r in roads:
+        # Sample a few points along each road segment for decent linear avoidance
+        c = r.world_coords
+        rot = getattr(r, 'rotation', 0)
+        rad = math.radians(rot)
+        hx = math.cos(rad)
+        hy = math.sin(rad)
+        for off in (-110.0, 0.0, 110.0):
+            exclusions.append((c[0] + off * hx, c[1] + off * hy, ROAD_CLEAR))
+
+    # Fast helper (nested so it can see exclusions list)
+    def _clear(x, y, margin):
+        for cx, cy, rad in exclusions:
+            dx = x - cx
+            dy = y - cy
+            if dx*dx + dy*dy < (rad + margin) * (rad + margin):
+                return False
+        return True
 
 
-    # -- forest area --
+    # --- 1. Very light global meadow (background green) ---
+    # We keep this sparse. Real visual density comes from the forest patch fills below.
+    # Using random target count + exclusion check is fast.
+    BASE_TARGET = 850
+    BASE_MARGIN = 22
+    base = []
+    b_att = 0
+    b_max = BASE_TARGET * 30
+    while len(base) < BASE_TARGET and b_att < b_max:
+        b_att += 1
+        bx = random.randint(-half, half)
+        by = random.randint(-half, half)
+        if _clear(bx, by, BASE_MARGIN):
+            base.append([float(bx), float(by)])
+    for bc in base:
+        vegetation.append(MapObject('terrain_green', 'terrain_green', bc, random.randint(0, 359), []))
 
-    # generate coord list of forested areas
-    max_size=world_size
-    min_seperation=1000
-    coord_count=random.randint(50,200)
-    forest_areas=engine.math_2d.get_random_constrained_coords_v2([0,0],max_size,
-        min_seperation,coord_count,coordinates_to_avoid,600)
+    # --- 2. Forest patches (main "more vegetation" mechanism) ---
+    NUM_PATCHES = random.randint(90, 190)
+    PATCH_SEP = 590
+    PATCH_MARGIN = 210
 
-    # generate each forest clump 
-    for area in forest_areas:
-        # - generate trees -
-        max_size=1000
-        min_seperation=100
-        coord_count=random.randint(1,20)
-        tree_coords=engine.math_2d.get_random_constrained_coords_v2(area,max_size,
-            min_seperation,coord_count,coordinates_to_avoid,100)
+    patches = []
+    attempts = 0
+    max_att = NUM_PATCHES * 45
+    while len(patches) < NUM_PATCHES and attempts < max_att:
+        attempts += 1
+        px = random.randint(-half, half)
+        py = random.randint(-half, half)
+        if not _clear(px, py, PATCH_MARGIN):
+            continue
+        if any((p[0]-px)*(p[0]-px) + (p[1]-py)*(p[1]-py) < PATCH_SEP*PATCH_SEP for p in patches):
+            continue
+        patches.append([px, py])
 
-        # Batch create vegetation objects
-        tree_vegetation=[]
-        for coords in tree_coords:
-            rotation=random.randint(0,359)
-            tree_vegetation.append(MapObject('pinus_sylvestris','pinus_sylvestris',coords,rotation,[]))
-            if random.randint(0,1)==1:
-                rotation=random.randint(0,359)
-                tree_vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
-        vegetation.extend(tree_vegetation)
+    for seed in patches:
+        # trees (denser clumps)
+        tr = random.randint(360, 680)
+        n_trees = random.randint(5, 24)
+        t_sep = 78
+        t_margin = 30
+        trees = []
+        ta = 0
+        tmax = n_trees * 65
+        while len(trees) < n_trees and ta < tmax:
+            ta += 1
+            ang = random.random() * (math.pi * 2)
+            d = (random.random() ** 0.72) * tr
+            tx = seed[0] + math.cos(ang) * d
+            ty = seed[1] + math.sin(ang) * d
+            if not _clear(tx, ty, t_margin):
+                continue
+            if any((tt[0]-tx)*(tt[0]-tx) + (tt[1]-ty)*(tt[1]-ty) < t_sep*t_sep for tt in trees):
+                continue
+            trees.append([tx, ty])
+        for tc in trees:
+            rot = random.randint(0, 359)
+            vegetation.append(MapObject('pinus_sylvestris', 'pinus_sylvestris', tc, rot, []))
+            if random.random() < 0.42:
+                ox = random.randint(-26, 26)
+                oy = random.randint(-26, 26)
+                vegetation.append(MapObject('terrain_green', 'terrain_green', [tc[0]+ox, tc[1]+oy], random.randint(0, 359), []))
 
+        # extra ground cover inside/around patch: random disk sampling for natural non-grid look
+        # (this is the main source of the "green carpet" density the user wants)
+        er = tr + random.randint(80, 170)
+        # target count scales with area. Tune the divisor (higher = fewer greens) and multiplier
+        # for desired "more vegetation" feel. Current tuned for natural look + playable object counts.
+        target_g = int((er / 82) ** 2 * 0.48)
+        g_margin = 2
+        added = 0
+        tries = 0
+        max_tries = max(30, target_g * 4)
+        while added < target_g and tries < max_tries:
+            tries += 1
+            ang = random.random() * (math.pi * 2)
+            d = (random.random() ** 0.5) * er
+            ex = seed[0] + math.cos(ang) * d
+            ey = seed[1] + math.sin(ang) * d
+            if _clear(ex, ey, g_margin):
+                vegetation.append(MapObject('terrain_green', 'terrain_green', [float(ex), float(ey)], random.randint(0, 359), []))
+                added += 1
 
-        # - add green areas 
-        max_size=random.randint(1000,3000)
-        min_seperation=150
-        max_seperation=300
-        coord_count=random.randint(20,60)
-        terrain_coords=engine.math_2d.get_random_constrained_coords_with_max_sep(area,max_size,
-            min_seperation,max_seperation,coord_count,coordinates_to_avoid,100)
+        # Sub-clumps to break circular/regular shapes and create more natural irregular blobs
+        if random.random() < 0.65:
+            nsubs = random.randint(1, 2)
+            for _ in range(nsubs):
+                sub_off_x = random.gauss(0, er * 0.30)
+                sub_off_y = random.gauss(0, er * 0.30)
+                sub_c = [seed[0] + sub_off_x, seed[1] + sub_off_y]
+                sub_r = er * random.uniform(0.50, 0.80)
+                sub_target = int((sub_r / 88) ** 2 * 0.38)
+                st = 0
+                smax = max(15, sub_target * 3)
+                while st < sub_target and st < smax:
+                    st += 1
+                    ang = random.random() * (math.pi * 2)
+                    dd = (random.random() ** 0.5) * sub_r
+                    ex = sub_c[0] + math.cos(ang) * dd
+                    ey = sub_c[1] + math.sin(ang) * dd
+                    if _clear(ex, ey, 2):
+                        vegetation.append(MapObject('terrain_green', 'terrain_green', [float(ex), float(ey)], random.randint(0, 359), []))
 
-        # Batch create terrain green objects
-        terrain_vegetation=[]
-        for coords in terrain_coords:
-            rotation=random.randint(0,359)
-            terrain_vegetation.append(MapObject('terrain_green','terrain_green',coords,rotation,[]))
-        vegetation.extend(terrain_vegetation)
-            
+    # --- 3. Scattered trees
+    SCAT_TARGET = random.randint(90, 240)
+    SCAT_SEP = 225
+    SCAT_MARGIN = 48
+    scats = []
+    sa = 0
+    smax = SCAT_TARGET * 55
+    while len(scats) < SCAT_TARGET and sa < smax:
+        sa += 1
+        sx = random.randint(-half, half)
+        sy = random.randint(-half, half)
+        if not _clear(sx, sy, SCAT_MARGIN):
+            continue
+        if any((ss[0]-sx)*(ss[0]-sx) + (ss[1]-sy)*(ss[1]-sy) < SCAT_SEP*SCAT_SEP for ss in scats):
+            continue
+        scats.append([sx, sy])
+    for sc in scats:
+        rot = random.randint(0, 359)
+        vegetation.append(MapObject('pinus_sylvestris', 'pinus_sylvestris', sc, rot, []))
+        if random.random() < 0.28:
+            vegetation.append(MapObject('terrain_green', 'terrain_green', [sc[0]+random.randint(-22,22), sc[1]+random.randint(-22,22)], random.randint(0, 359), []))
 
-
-
+    return vegetation
     return vegetation
 
 

@@ -54,8 +54,10 @@ class WorldObject():
 
 
         # if the object scale (world scale + scale_modifier) is under
-        # this it won't be rendered
-        self.minimum_visible_scale=0.1
+        # this it won't be rendered.
+        # Lowered from 0.1 so we can actually zoom out far for long-range
+        # visibility. Small clutter still sets 0.4 explicitly and will hide itself.
+        self.minimum_visible_scale = 0.005
 
         # updated by the object AI
         self.world_coords=[0,0]

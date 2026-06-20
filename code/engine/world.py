@@ -171,11 +171,21 @@ class World:
         #
         self.grid_manager = WorldGridManager()
 
-        # scale min/max limit
-        self.scale_limit = [0.1, 2.5]
+        # Discrete zoom levels. Lower values = zoomed out (see farther).
+        # Min (0.01) and max (2.5) kept; many more intermediate steps added
+        # for smoother control, especially at long range.
+        self.zoom_levels = [
+            0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05, 0.075,
+            0.1, 0.125, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5,
+            0.6, 0.75, 0.8, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5
+        ]
+
+        # scale min/max limit (derived from zoom_levels)
+        self.scale_limit = [self.zoom_levels[0], self.zoom_levels[-1]]
 
         # scale this is set by the player with []
-        self.scale = self.scale_limit[1]
+        # start at the most zoomed-in level
+        self.scale = self.zoom_levels[-1]
 
     # ---------------------------------------------------------------------------
     def activate_context_menu(self):
@@ -235,8 +245,8 @@ class World:
                 else:
                     # check if object misses due to prone
                     if consider_prone and collided.ai.prone:
-                        chance = random.randint(0, 1)
-                        if chance == 1:
+                        chance = random.randint(0, 3)
+                        if chance != 0:
                             # missed due to prone
                             collided = None
 
@@ -1148,14 +1158,25 @@ class World:
 
     # ------------------------------------------------------------------------------
     def zoom_out(self):
-        """zoom out"""
-        if self.scale > self.scale_limit[0]:
-            self.scale = round(self.scale - 0.1, 1)
+        """zoom out (see more of the world)"""
+        try:
+            idx = self.zoom_levels.index(round(self.scale, 3))
+        except ValueError:
+            # snap to nearest if somehow off the grid
+            idx = min(range(len(self.zoom_levels)),
+                      key=lambda i: abs(self.zoom_levels[i] - self.scale))
+        if idx > 0:
+            self.scale = self.zoom_levels[idx - 1]
             self.reset_all()
 
     # ------------------------------------------------------------------------------
     def zoom_in(self):
-        """zoom in"""
-        if self.scale < self.scale_limit[1]:
-            self.scale = round(self.scale + 0.1, 1)
+        """zoom in (see less of the world)"""
+        try:
+            idx = self.zoom_levels.index(round(self.scale, 3))
+        except ValueError:
+            idx = min(range(len(self.zoom_levels)),
+                      key=lambda i: abs(self.zoom_levels[i] - self.scale))
+        if idx < len(self.zoom_levels) - 1:
+            self.scale = self.zoom_levels[idx + 1]
             self.reset_all()

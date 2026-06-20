@@ -79,9 +79,13 @@ class ImageTool():
         # max_fps max frames for every second.
         self.max_fps=60
 
-        # scale min/max limit
-        #self.scale_limit=[0.2,1.1]
-        self.scale_limit=[0.1,2.5]
+        # Discrete zoom levels (synced with main game)
+        self.zoom_levels = [
+            0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05, 0.075,
+            0.1, 0.125, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5,
+            0.6, 0.75, 0.8, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5
+        ]
+        self.scale_limit = [self.zoom_levels[0], self.zoom_levels[-1]]
 
         # scale. normal is 1. this is set by the player with []
         self.scale=1
@@ -396,20 +400,31 @@ class ImageTool():
     #------------------------------------------------------------------------------
     def zoom_out(self):
         '''zoom out'''
-        if self.scale>self.scale_limit[0]:
-            self.scale=round(self.scale-0.1,1)
-            self.view_adjust+=self.view_adjustment
-            print('zoom out',self.scale)
+        try:
+            idx = self.zoom_levels.index(round(self.scale, 3))
+        except ValueError:
+            idx = min(range(len(self.zoom_levels)),
+                      key=lambda i: abs(self.zoom_levels[i] - self.scale))
+        if idx > 0:
+            self.scale = self.zoom_levels[idx - 1]
+            self.view_adjust += self.view_adjustment
+            print('zoom out', self.scale)
+
     #------------------------------------------------------------------------------
     def zoom_in(self):
         ''' zoom in'''
-        if self.scale<self.scale_limit[1]:
-            self.scale=round(self.scale+0.1,1)
-            self.view_adjust-=self.view_adjustment
+        try:
+            idx = self.zoom_levels.index(round(self.scale, 3))
+        except ValueError:
+            idx = min(range(len(self.zoom_levels)),
+                      key=lambda i: abs(self.zoom_levels[i] - self.scale))
+        if idx < len(self.zoom_levels) - 1:
+            self.scale = self.zoom_levels[idx + 1]
+            self.view_adjust -= self.view_adjustment
             # otherwise stuff starts getting clipped when its <0
-            if self.view_adjust<self.view_adjust_minimum:
-                self.view_adjust=self.view_adjust_minimum
-            print('zoom in',self.scale)
+            if self.view_adjust < self.view_adjust_minimum:
+                self.view_adjust = self.view_adjust_minimum
+            print('zoom in', self.scale)
 
 #------------------------------------------------------------------------------
 

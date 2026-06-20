@@ -1,6 +1,35 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 19 2026
+- updated zoom system to allow way more zoom
+- adjusted the terrain system a bit. not sure its better..
+- some minor weapon range adjustments.
+
+I am likely to create a new long distance range for a very limited number of weapons.
+might just be the long 88. probably 5k. still thinking about it
+
+---------------------------------
+June 10 2026
+- minor changes
+
+saw a journal entry for a soviet soldier that picked up a ptrs-41, looked a magazine,
+and successfully used it. i think thats the first time i've had confirmation that
+soldiers will pick up weapons. its very rare
+
+---------------------------------
+June 06 2026
+- split out squad lead logic as it was getting chunky
+- added some building awareness to squad lead
+- squad lead now dynamically adjusts squad dispersion based on whether the squad lead is in a building
+- added some journal entries and speak for squad lead
+- prone is now a 75% chance bullets miss
+- projectiles have a 50% chance to ignore unoccupied vehicles so that they don't always block shots
+
+maybe 75% is too high for a prone miss, but i feel like it woud be pretty hard to hit a prone soldier.
+
+
+---------------------------------
 May 31 2026
 - adjustments so that penetrating wheel hits can test against vehicle body + wheel armor
 - fixed graphics stutters on mac. needed vsyc

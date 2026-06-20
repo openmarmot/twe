@@ -24,6 +24,7 @@ from engine.tactical_order import TacticalOrder
 from ai.ai_human_vehicle import AIHumanVehicle
 from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 from ai.ai_human_radio_operator import AIHumanRadioOperator
+from ai.ai_human_squad_leader import AIHumanSquadLeader
 # import engine.global_exchange_rates
 
 # global variables
@@ -35,6 +36,7 @@ class AIHuman:
 
         self.in_vehicle_ai = AIHumanVehicle(self.owner)
         self.radio_operator_ai = AIHumanRadioOperator(self.owner)
+        self.squad_leader_ai = AIHumanSquadLeader(self.owner)
 
         self.task_map = {
             "task_player_control": self.update_task_player_control,
@@ -46,7 +48,7 @@ class AIHuman:
             "task_pickup_objects": self.update_task_pickup_objects,
             "task_think": self.update_task_think,
             "task_think_idle": self.update_task_think_idle,
-            "task_squad_leader": self.update_task_squad_leader,
+            "task_squad_leader": self.squad_leader_ai.update_task_squad_leader,
             "task_loot_container": self.update_task_loot_container,
             "task_sit_down": self.update_task_sit_down,
             "task_medic": self.update_task_medic,
@@ -143,7 +145,6 @@ class AIHuman:
 
         # the ai group that this human is a part of
         self.squad = None
-        self.squad_max_distance = 300
 
         # # target lists. these are refreshed by evaluate_targets
         self.human_targets = []
@@ -798,6 +799,7 @@ class AIHuman:
         elif event_data.is_throwable:
             # throwable but not a grenade
             self.speak("Oww!")
+            self.add_journal_entry(f"hit by a {event_data.name}")
 
         else:
             engine.log.add_data(
@@ -1652,135 +1654,6 @@ class AIHuman:
         return None
 
     # ---------------------------------------------------------------------------
-    def squad_leader_review_orders(self):
-        """review tactical orders return true if a action was taken"""
-
-        # the distance that is considered close enough to have arrived at a target distance
-        # this should be greater than the distance a vehicle driver stops at.
-        close_distance = 300
-
-        # note this can be called from inside a vehicle or from on foot
-
-        # this is a list of TacticalOrder objects
-        # for now i think its always only one
-        orders = self.memory["task_squad_leader"]["orders"]
-
-        if len(orders) == 0:
-            self.squad_leader_tactical_decision()
-            return False
-
-        # i think we will just focus on the first one
-        order = orders[0]
-
-        if order.order_defend_area:
-            distance = engine.math_2d.get_distance(
-                self.owner.world_coords, order.world_coords
-            )
-            if distance > close_distance:
-                # in a vehicle
-                if self.in_vehicle():
-                    vehicle_order = VehicleOrder()
-                    vehicle_order.order_drive_to_coords = True
-                    vehicle_order.world_coords = copy.copy(order.world_coords)
-                    if self.memory["task_vehicle_crew"][
-                        "vehicle_role"
-                    ].vehicle.ai.is_transport:
-                        vehicle_order.exit_vehicle_when_finished = True
-
-                    # the driver will grab this when out of orders
-                    self.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
-                    return True
-                # we must be on foot
-                self.switch_task_move_to_location(order.world_coords, None)
-                return True
-            else:
-                # we are in position - check if we should complete the defend order
-                if order.world_area.is_contested:
-                    # area is being contested - mark that it has been contested
-                    order.was_contested = True
-                elif order.was_contested:
-                    # area WAS contested but no longer is - we won, order complete
-                    orders.remove(order)
-                # else: area has never been contested, keep defending
-                return False
-        if order.order_move_to_location:
-            distance = engine.math_2d.get_distance(
-                self.owner.world_coords, order.world_coords
-            )
-            if distance > close_distance:
-                # in a vehicle
-                if self.in_vehicle():
-                    vehicle_order = VehicleOrder()
-                    vehicle_order.order_drive_to_coords = True
-                    vehicle_order.world_coords = copy.copy(order.world_coords)
-                    if self.memory["task_vehicle_crew"][
-                        "vehicle_role"
-                    ].vehicle.ai.is_transport:
-                        vehicle_order.exit_vehicle_when_finished = True
-
-                    # the driver will grab this when out of orders
-                    self.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
-                    return True
-                # we must be on foot
-                self.switch_task_move_to_location(order.world_coords, None)
-                return True
-            else:
-                # close enough. order is complete
-                orders.remove(order)
-                return False
-
-        # default
-        return False
-
-    # ---------------------------------------------------------------------------
-    def squad_leader_tactical_decision(self):
-        """the squad leader makes a tactical decision and generates a new order"""
-
-        # close_world_area=self.owner.world.get_closest_object(self.owner.world_coords,self.owner.world.world_areas,3000)
-
-        # - are we currently in combat?
-
-        if len(self.human_targets + self.vehicle_targets) > 0:
-            if len(self.vehicle_targets) > len(self.squad.vehicles):
-                # lets get out of here
-                friendly_area = None
-                for area in self.owner.world.world_areas:
-                    if area.faction == self.squad.faction:
-                        friendly_area = area
-                        break
-                if friendly_area is not None:
-                    tactical_order = TacticalOrder()
-                    tactical_order.order_move_to_location = True
-                    tactical_order.world_coords = friendly_area.get_location()
-                    self.memory["task_squad_leader"]["orders"].append(tactical_order)
-                    return
-
-            # default - stay and fight. do we need a order here ?
-            return
-
-        # - defend a contested area -
-        contested_area = None
-        for area in self.owner.world.world_areas:
-            if area.is_contested:
-                contested_area = area
-                break
-        if contested_area is not None:
-            tactical_order = TacticalOrder()
-            tactical_order.order_defend_area = True
-            tactical_order.world_coords = contested_area.get_location()
-            tactical_order.world_area = contested_area
-            self.memory["task_squad_leader"]["orders"].append(tactical_order)
-            return
-
-        # - move to a random area -
-        random_area = random.choice(self.owner.world.world_areas)
-        tactical_order = TacticalOrder()
-        tactical_order.order_move_to_location = True
-        tactical_order.world_coords = random_area.get_location()
-        self.memory["task_squad_leader"]["orders"].append(tactical_order)
-        return
-
-    # ---------------------------------------------------------------------------
     def switch_task_enter_vehicle(self, vehicle, vehicle_order):
         """switch task"""
         # vehicle_order a VehicleOrder object. can be None if there are no orders
@@ -1968,7 +1841,7 @@ class AIHuman:
         else:
             task_details = {
                 "last_think_time": 0,
-                "think_interval": 0.5,
+                "think_interval": 0,
                 "orders": [],
             }
             if order is not None:
@@ -2132,6 +2005,7 @@ class AIHuman:
             self.add_journal_entry(f"Threw: {self.throwable.name}")
             # this does all the needed internal ai stuff for the throwable
             self.throwable.ai.throw()
+            self.add_journal_entry(f"Threw a {self.throwable.name}")
 
             # set rotation and heading
             if self.owner.is_player:
@@ -3179,46 +3053,6 @@ class AIHuman:
             self.switch_task_think()
 
     # ---------------------------------------------------------------------------
-    def update_task_squad_leader(self):
-        """Squad leader AI task for temporary tactical oversight"""
-
-        # this is a task that is checked temporarily if there is nothing better to do.
-        # as such it should always switch_task_think() after doing what it planned on doing,
-        # unless if it switched to something else
-
-        last_think_time = self.memory["task_squad_leader"]["last_think_time"]
-        think_interval = self.memory["task_squad_leader"]["think_interval"]
-
-        if self.owner.world.world_seconds - last_think_time > think_interval:
-            # reset time
-            self.memory["task_squad_leader"]["last_think_time"] = (
-                self.owner.world.world_seconds
-            )
-
-            # -- do the longer thing ---
-            if self.squad_leader_review_orders() is False:
-                # this means the tactical orders didn't result in any new actions
-
-                self.switch_task_think()
-
-        else:
-            # -- do the shorter thing --
-            # only do random walks if we don't have active defend orders
-            orders = self.memory["task_squad_leader"]["orders"]
-            has_defend_order = any(o.order_defend_area for o in orders)
-
-            if not has_defend_order:
-                decision = random.randint(1, 100)
-                if decision == 1:
-                    coords = [
-                        self.owner.world_coords[0] + random.randint(-25, 25),
-                        self.owner.world_coords[1] + random.randint(-25, 25),
-                    ]
-                    self.switch_task_move_to_location(coords, None)
-
-            self.switch_task_think()
-
-    # ---------------------------------------------------------------------------
     def update_task_sit_down(self):
         """update task_sit_down"""
 
@@ -3454,7 +3288,7 @@ class AIHuman:
             self.owner.world_coords, self.squad.squad_leader.world_coords
         )
         # are we close enough to squad?
-        if distance > self.squad_max_distance:
+        if distance > self.squad.max_distance_human:
             self.switch_task_move_to_location(
                 self.squad.squad_leader.world_coords, None
             )

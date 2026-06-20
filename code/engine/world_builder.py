@@ -2111,7 +2111,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         )
         z.ai.rate_of_fire = 0.7
         z.ai.reload_speed = 5
-        z.ai.range = 1000
+        z.ai.range = 1500
         z.ai.type = "pistol"
         z.ai.use_antipersonnel = True
         z.rotation_angle = float(random.randint(0, 359))
@@ -4385,7 +4385,7 @@ def spawn_object(world, world_coords, object_type, spawn):
         )
         z.ai.rate_of_fire = 1
         z.ai.reload_speed = 5
-        z.ai.range = 150
+        z.ai.range = 250
         z.ai.type = "close defense weapon"
         z.ai.use_antitank = False
         z.ai.use_antipersonnel = True
