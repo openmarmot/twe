@@ -44,11 +44,11 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     # pak ammo
-    for b in range(15):
+    for b in range(20):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "75mm_pak40_magazine", False)
         )
-    for b in range(5):
+    for b in range(4):
         temp = engine.world_builder.spawn_object(world, world_coords, "75mm_pak40_magazine", False)
         engine.world_builder.load_magazine(world, temp, "Sprgr_34_75_L48")
         z.ai.ammo_rack.append(temp)

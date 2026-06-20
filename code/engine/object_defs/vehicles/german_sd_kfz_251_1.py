@@ -67,8 +67,8 @@ def create(world, world_coords):
         z.ai.vehicle_crew.append(role)
 
     # mg ammo (drums in old for this variant)
-    for b in range(10):
-        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
+    for b in range(11):
+        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_drum_magazine", False))
 
     # armor piercing belt
     if random.randint(0, 1) == 1:

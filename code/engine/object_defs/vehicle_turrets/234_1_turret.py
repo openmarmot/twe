@@ -28,16 +28,20 @@ def create(world, world_coords):
     z.ai.turret_armor["left"] = [8, 35, 0]
     z.ai.turret_armor["right"] = [8, 35, 0]
     z.ai.turret_armor["front"] = [30, 35, 0]
-    z.ai.turret_armor["rear"] = [8, 34, 0]
-    z.ai.position_offset = [0, 0]
+    z.ai.turret_armor["rear"] = [8, 33, 0]
+    z.ai.position_offset = [-16, 0]
     z.ai.rotation_range = [-360, 360]
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55", False)
     z.ai.primary_weapon.ai.smoke_on_fire = True
     z.ai.primary_weapon.ai.smoke_type = "cannon"
-    z.ai.primary_weapon.ai.smoke_offset = [-0, 0]
+    z.ai.primary_weapon.ai.smoke_offset = [-70, 0]
     z.ai.primary_weapon.ai.spawn_case = False
     z.ai.primary_weapon.ai.equipper = z
-    z.ai.primary_weapon_reload_speed = 3
+    z.ai.primary_weapon_reload_speed = 10
     z.ai.primary_turret = True
+    z.ai.coaxial_weapon = engine.world_builder.spawn_object(world, world_coords, "mg34", False)
+    z.ai.coaxial_weapon.ai.equipper = z
+    z.ai.coaxial_weapon.ai.spawn_case = False
+    z.ai.coaxial_weapon_reload_speed = 10
     z.no_save = True
     return z

@@ -42,14 +42,23 @@ def create(world, world_coords):
     role = VehicleRole("assistant_gunner", z)
     role.is_assistant_gunner = True
     z.ai.vehicle_crew.append(role)
+    for b in range(10):
+        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
+    # armor piercing belt
+    if random.randint(0, 1) == 1:
+        belt = engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False)
+        engine.world_builder.load_magazine(world, belt, "7.92x57_SMK")
+        z.add_inventory(belt)
 
-    # 75mm ammo
-    for b in range(15):
+    z.ai.ammo_rack_capacity = 52
+    # HE
+    for b in range(40):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "75mm_kwk37_l24_magazine", False)
         )
-    for b in range(5):
+    # HEAT
+    for b in range(12):
         temp = engine.world_builder.spawn_object(world, world_coords, "75mm_kwk37_l24_magazine", False)
-        engine.world_builder.load_magazine(world, temp, "Sprgr_34_75_L24")
+        engine.world_builder.load_magazine(world, temp, "HL_Gr_38A_L24")
         z.ai.ammo_rack.append(temp)
     return z

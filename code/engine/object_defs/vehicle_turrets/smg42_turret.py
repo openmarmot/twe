@@ -27,7 +27,7 @@ def create(world, world_coords):
     z.ai.turret_armor["front"] = [0, 0, 0]
     z.ai.turret_armor["rear"] = [0, 0, 0]
     z.ai.position_offset = [0, 0]
-    z.ai.rotation_range = [-360, 360]
+    z.ai.rotation_range = [-18.3, 18.3]
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "mg42", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon.ai.spawn_case = False

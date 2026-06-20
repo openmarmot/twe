@@ -28,7 +28,7 @@ def create(world, world_coords):
     z.ai.rate_of_fire = 1
     z.ai.reload_speed = 5
     z.ai.range = 250
-    z.ai.type = "close defense weapon"
+    z.ai.type = "pistol"
     z.ai.use_antitank = False
     z.ai.use_antipersonnel = True
     z.rotation_angle = float(random.randint(0, 359))

@@ -27,17 +27,21 @@ def create(world, world_coords):
     z.ai.turret_armor["bottom"] = [0, 0, 0]
     z.ai.turret_armor["left"] = [8, 19, 0]
     z.ai.turret_armor["right"] = [8, 19, 0]
-    z.ai.turret_armor["front"] = [30, 55, 0]
-    z.ai.turret_armor["rear"] = [10, 46, 0]
-    z.ai.position_offset = [0, 0]
+    z.ai.turret_armor["front"] = [30, 20, 0]
+    z.ai.turret_armor["rear"] = [14.5, 24, 0]
+    z.ai.position_offset = [-16, 0]
     z.ai.rotation_range = [-360, 360]
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "5cm_kwk39_l60", False)
     z.ai.primary_weapon.ai.smoke_on_fire = True
     z.ai.primary_weapon.ai.smoke_type = "cannon"
-    z.ai.primary_weapon.ai.smoke_offset = [-0, 0]
+    z.ai.primary_weapon.ai.smoke_offset = [-70, 0]
     z.ai.primary_weapon.ai.spawn_case = False
     z.ai.primary_weapon.ai.equipper = z
-    z.ai.primary_weapon_reload_speed = 5
+    z.ai.primary_weapon_reload_speed = 15
     z.ai.primary_turret = True
+    z.ai.coaxial_weapon = engine.world_builder.spawn_object(world, world_coords, "mg42", False)
+    z.ai.coaxial_weapon.ai.equipper = z
+    z.ai.coaxial_weapon.ai.spawn_case = False
+    z.ai.coaxial_weapon_reload_speed = 10
     z.no_save = True
     return z

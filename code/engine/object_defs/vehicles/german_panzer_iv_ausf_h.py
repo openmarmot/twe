@@ -80,7 +80,7 @@ def create(world, world_coords):
     z.bounding_circles.append([[7.0, 0.0], 40])
     z.bounding_circles.append([[34.0, 0.0], 40])
     z.bounding_circles.append([[48.0, 0.0], 40])
-    z.weight = 25000
+    z.weight = 26500
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(

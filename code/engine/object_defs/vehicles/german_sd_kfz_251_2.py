@@ -45,7 +45,7 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     # mortar ammo
-    for b in range(30):
+    for b in range(66):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "GrW34_magazine", False)
         )

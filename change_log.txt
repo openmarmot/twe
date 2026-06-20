@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 20 2026
+- started work on a zis 3 76mm gun
+- large re-org of the spawn_object code
+---------------------------------
 June 19 2026
 - updated zoom system to allow way more zoom
 - adjusted the terrain system a bit. not sure its better..

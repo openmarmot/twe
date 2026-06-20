@@ -15,5 +15,5 @@ def create(world, world_coords):
     z = WorldObject(world, ["volkswagen_wheel"], AIWheel)
     z.name = "PAK Wheel"
     z.ai.compatible_vehicles = ["german_pak40"]
-    z.ai.armor = [5, 0, 0]
+    
     return z
