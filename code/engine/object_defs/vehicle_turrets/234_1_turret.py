@@ -23,11 +23,11 @@ def create(world, world_coords):
     z.ai.gun_sight = engine.world_builder.spawn_object(world, world_coords, "optic_tzf_6", False)
     z.ai.vehicle_mount_side = "top"
     z.ai.turret_accuracy = 1
-    z.ai.turret_armor["top"] = [0, 0, 0]
-    z.ai.turret_armor["bottom"] = [0, 0, 0]
-    z.ai.turret_armor["left"] = [8, 35, 0]
-    z.ai.turret_armor["right"] = [8, 35, 0]
-    z.ai.turret_armor["front"] = [30, 35, 0]
+    z.ai.turret_armor["top"] = [1, 0, 0]
+    z.ai.turret_armor["bottom"] = [13, 0, 0]
+    z.ai.turret_armor["left"] = [8, 33, 0]
+    z.ai.turret_armor["right"] = [8, 33, 0]
+    z.ai.turret_armor["front"] = [30, 33, 0]
     z.ai.turret_armor["rear"] = [8, 33, 0]
     z.ai.position_offset = [-16, 0]
     z.ai.rotation_range = [-360, 360]

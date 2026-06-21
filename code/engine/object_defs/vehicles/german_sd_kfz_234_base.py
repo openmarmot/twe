@@ -79,7 +79,7 @@ def create(world, world_coords):
     z.ai.front_right_wheels.append(
         engine.world_builder.spawn_object(world, world_coords, "251_wheel", False)
     )
-    for b in range(3):
+    for b in range(2):
         z.ai.rear_left_wheels.append(
             engine.world_builder.spawn_object(world, world_coords, "251_wheel", False)
         )

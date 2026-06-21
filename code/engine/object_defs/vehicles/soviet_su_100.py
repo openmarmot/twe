@@ -87,11 +87,11 @@ def create(world, world_coords):
     )
     z.rotation_angle = float(random.randint(0, 359))
     z.ai.ammo_rack_capacity = 30
-    for b in range(30):
+    for b in range(25):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)
         )
-    for b in range(4):
+    for b in range(5):
         temp = engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)
         engine.world_builder.load_magazine(world, temp, "OF-412")
         z.ai.ammo_rack.append(temp)
