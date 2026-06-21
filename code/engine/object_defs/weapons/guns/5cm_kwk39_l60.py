@@ -20,15 +20,14 @@ def create(world, world_coords):
     z.name = "5 cm KwK 39 L/60"
     z.no_update = True
     z.is_gun = True
-    z.ai.mechanical_accuracy = 1
+    z.ai.mechanical_accuracy = 10
     z.ai.magazine = engine.world_builder.spawn_object(
         world, world_coords, "5cm_kwk39_l60_magazine", False
     )
-    z.ai.rate_of_fire = 0.5
-    z.ai.reload_speed = 5
-    z.ai.range = 2418
+    z.ai.rate_of_fire = 0.13
+    z.ai.range = 4000
     z.ai.type = "cannon"
     z.ai.use_antitank = True
     z.ai.use_antipersonnel = True
-    z.rotation_angle = float(random.randint(0, 359))
+    z.rotation_angle = 0
     return z

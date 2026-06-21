@@ -65,7 +65,7 @@ def create(world, world_coords):
     z.bounding_circles.append([[-23.0, 0.0], 40])
     z.bounding_circles.append([[13.0, 0.0], 40])
     z.bounding_circles.append([[52.0, 0.0], 40])
-    z.weight = 31600
+    z.weight = 31700
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(
@@ -86,7 +86,7 @@ def create(world, world_coords):
         engine.world_builder.get_random_from_list(world, world_coords, engine.world_builder.list_consumables, False)
     )
     z.rotation_angle = float(random.randint(0, 359))
-    z.ai.ammo_rack_capacity = 34
+    z.ai.ammo_rack_capacity = 30
     for b in range(30):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)

@@ -66,6 +66,9 @@ def create(world, world_coords):
         engine.world_builder.get_random_from_list(world, world_coords, engine.world_builder.list_consumables, False)
     )
     z.rotation_angle = float(random.randint(0, 359))
+    z.ai.radio = engine.world_builder.spawn_object(world, world_coords, "radio_feldfu_b", False)
+    if random.randint(0, 1) == 1:
+        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "panzerfaust_100", False))
     z.ai.min_wheels_per_side_front = 1
     z.ai.min_wheels_per_side_rear = 1
     z.ai.max_wheels = 8

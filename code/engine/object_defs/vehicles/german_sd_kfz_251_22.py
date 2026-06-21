@@ -37,12 +37,19 @@ def create(world, world_coords):
 
     role = VehicleRole("commander", z)
     role.is_commander = True
+    role.seat_visible = True
+    role.seat_rotation = 90
+    role.seat_offset = [30, 9]
     z.ai.vehicle_crew.append(role)
 
     role = VehicleRole("assistant_gunner", z)
     role.is_assistant_gunner = True
+    role.seat_visible = True
+    role.seat_rotation = 90
+    role.seat_offset = [49, -3]
     z.ai.vehicle_crew.append(role)
 
+    z.ai.ammo_rack_capacity = 24
     # pak ammo
     for b in range(20):
         z.ai.ammo_rack.append(

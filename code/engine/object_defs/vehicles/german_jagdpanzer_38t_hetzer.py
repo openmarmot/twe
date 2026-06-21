@@ -18,7 +18,7 @@ from engine.object_registry import register_object
 @register_object("german_jagdpanzer_38t_hetzer")
 def create(world, world_coords):
     z = WorldObject(world, ["hetzer_chassis", "hetzer_chassis_destroyed"], AIVehicle)
-    z.name = "Jagdpanzer 38t Hetzer"
+    z.name = "Jadgpanzer 38t Hetzer"
     z.is_vehicle = True
     z.is_towable = True
     z.ai.requires_afv_training = True
@@ -65,11 +65,10 @@ def create(world, world_coords):
     # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
     z.ai.rotation_speed = 40.0
     z.collision_radius = 100
-    z.bounding_circles.append([[-35.0, 0.0], 30])
-    z.bounding_circles.append([[-11.0, 0.0], 30])
-    z.bounding_circles.append([[13.0, 0.0], 30])
-    z.bounding_circles.append([[32.0, 0.0], 30])
-    z.weight = 16000
+    z.bounding_circles.append([[-36.0, 0.0], 40])
+    z.bounding_circles.append([[0.0, 0.0], 40])
+    z.bounding_circles.append([[33.0, 0.0], 40])
+    z.weight = 15800
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(
@@ -92,18 +91,18 @@ def create(world, world_coords):
     z.rotation_angle = float(random.randint(0, 359))
     for b in range(10):
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
-    z.ai.ammo_rack_capacity = 45
-    for b in range(40):
+    z.ai.ammo_rack_capacity = 41
+    for b in range(30):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "7.5cm_pak39_L48_magazine", False)
         )
-    for b in range(5):
+    for b in range(11):
         temp = engine.world_builder.spawn_object(world, world_coords, "7.5cm_pak39_L48_magazine", False)
         engine.world_builder.load_magazine(world, temp, "Sprgr_34_75_L48")
         z.ai.ammo_rack.append(temp)
-    z.ai.min_wheels_per_side_front = 2
-    z.ai.min_wheels_per_side_rear = 2
-    z.ai.max_wheels = 12
+    z.ai.min_wheels_per_side_front = 1
+    z.ai.min_wheels_per_side_rear = 1
+    z.ai.max_wheels = 8
     z.ai.max_spare_wheels = 0
     for b in range(3):
         z.ai.front_left_wheels.append(
