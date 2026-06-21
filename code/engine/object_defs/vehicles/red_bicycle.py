@@ -17,7 +17,7 @@ from engine.object_registry import register_object
 
 @register_object("red_bicycle")
 def create(world, world_coords):
-    z = WorldObject(world, ["bicycle", "bicycle_destroyed"], AIVehicle)
+    z = WorldObject(world, ["red_bicycle"], AIVehicle)
     z.name = "red_bicycle"
     z.is_vehicle = True
     z.ai.is_transport = True

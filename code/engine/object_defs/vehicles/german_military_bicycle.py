@@ -32,9 +32,9 @@ def create(world, world_coords):
     z.ai.max_offroad_speed = 142.08
     z.ai.rotation_speed = 50.0
     z.collision_radius = 50
-    z.bounding_circles.append([-12.0, 0.0], 10)
-    z.bounding_circles.append([0.0, 0.0], 10)
-    z.bounding_circles.append([12.0, 0.0], 10)
+    z.bounding_circles.append([[-12.0, 0.0], 10])
+    z.bounding_circles.append([[0.0, 0.0], 10])
+    z.bounding_circles.append([[12.0, 0.0], 10])
     z.ai.engines.append(
         engine.world_builder.spawn_object(world, world_coords, "bicycle_pedals", False)
     )
