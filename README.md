@@ -94,6 +94,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | Lend Lease American Truck | Utility | |
 | Soviet | GAZ-61 | Utility | off-road staff car|
 | Soviet | Su-85 | Tank | Basically a turretless T34-85 |
+| Soviet | Su-85M | Tank | SU-100 armor with a SU-85 gun|
 | Soviet | Su-100 | Tank | Better armor and gun than the Su-85 |
 | Soviet | T20 'Komsomolets' | Utility | Armored Tractor |
 | Soviet | T34-76 | Tank | A late model T34-76 |

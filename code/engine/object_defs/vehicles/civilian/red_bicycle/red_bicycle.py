@@ -24,6 +24,7 @@ def create(world, world_coords):
 
     role = VehicleRole("driver", z)
     role.is_driver = True
+    role.seat_visible = True
     z.ai.vehicle_crew.append(role)
 
     z.ai.max_speed = 177.6
