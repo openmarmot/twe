@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 ---------------------------------
+June 30 2026
+- more work on the object_defs re-org
+- added su85m
+- fixed red bicycle invisible driver
+- misc minor updates
+
+apparently they made around 315 SU-85M, which is more than
+enough to be included in this game..
+
+---------------------------------
 June 20 2026
 - started work on a zis 3 76mm gun
 - large re-org of the spawn_object code

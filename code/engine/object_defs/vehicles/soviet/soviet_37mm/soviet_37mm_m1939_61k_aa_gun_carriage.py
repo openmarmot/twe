@@ -59,7 +59,7 @@ def create(world, world_coords):
     # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
     z.ai.rotation_speed = 40.0
     z.collision_radius = 50
-    z.bounding_circles.append([[0.0, 0.0], 25])
+    z.bounding_circles.append([[0.0, 0.0], 40])
     z.weight = 2100
     z.drag_coefficient = 0.9
     z.frontal_area = 5
