@@ -622,14 +622,14 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     map_objects = engine.map_generator.generate_map(map_areas)
 
+    year = random.choice([1944, 1945])
+
     # -- initial troops --
     squads = []
 
     if battle_option == "1":
         points = 2500
         soviet_advantage = points * 0.3
-        year = random.choice([1944, 1945])
-        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -641,8 +641,6 @@ def load_quick_battle_map_objects(battle_option, result_container):
     elif battle_option == "2":
         points = 5000
         soviet_advantage = points * 0.3
-        year = random.choice([1944, 1945])
-        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -658,8 +656,6 @@ def load_quick_battle_map_objects(battle_option, result_container):
     elif battle_option == "3":
         points = 10000
         soviet_advantage = points * 0.3
-        year = random.choice([1944, 1945])
-        engine.log.add_data("note", f"Quick battle year: {year}", True)
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -699,6 +695,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
         squad_counts[s] = squad_counts.get(s, 0) + 1
     print("=" * 50)
     print("=" * 50)
+    engine.log.add_data("note", f"Quick battle year: {year}", True)
     print("\nSquad Summary:")
     print(f"{'Count':>5}  {'Squad Name'}")
     print("-" * 50)
