@@ -527,7 +527,7 @@ def get_squad_map_objects(squad_name):
     global squad_data
     members = []
     if squad_name in squad_data:
-        members = squad_data[squad_name]["members"].split(",")
+        members = [m.strip() for m in squad_data[squad_name]["members"].split(",")]
 
     else:
         print("squad data", squad_data)
@@ -692,6 +692,22 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     for squad in squads:
         map_objects += get_squad_map_objects(squad)
+
+    # print squad summary table
+    squad_counts = {}
+    for s in squads:
+        squad_counts[s] = squad_counts.get(s, 0) + 1
+    print("=" * 50)
+    print("=" * 50)
+    print("\nSquad Summary:")
+    print(f"{'Count':>5}  {'Squad Name'}")
+    print("-" * 50)
+    for name, count in sorted(squad_counts.items(), key=lambda x: (x[0], -x[1])):
+        print(f"{count:>5}  {name}")
+    print()
+    print("=" * 50)
+    print("=" * 50)
+    print()
 
     result_container[0] = map_objects
 

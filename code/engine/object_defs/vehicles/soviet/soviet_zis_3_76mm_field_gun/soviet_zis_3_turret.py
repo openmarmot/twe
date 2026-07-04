@@ -11,12 +11,12 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("pak40_turret")
+@register_object("soviet_zis_3_turret")
 def create(world, world_coords):
     # !! note - turrets should be spawned with spawn TRUE as they are always in world
     # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
     z = WorldObject(world, ["zis_3_turret"], AITurret)
-    z.name = "PAK 40 turret"
+    z.name = "ZiS 3 76 turret"
     z.ai.gun_sight = engine.world_builder.spawn_object(world, world_coords, "optic_zf_38", False)
     z.is_turret = True
     z.ai.vehicle_mount_side = "top"

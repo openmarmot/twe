@@ -35,7 +35,7 @@ def create_squads(world_objects):
         for squad_definition in engine.world_builder.squad_data.values():
             # Check if squad can be formed
             required = {}
-            for identity in squad_definition['members'].split(','):
+            for identity in [m.strip() for m in squad_definition['members'].split(',')]:
 
                 required[identity] = required.get(identity, 0) + 1
             can_form = all(len(squad_objects.get(identity, [])) >= count for identity, count in required.items())
@@ -43,7 +43,7 @@ def create_squads(world_objects):
             if can_form:
                 # Form the squad
                 current_squad = []
-                for identity in squad_definition['members'].split(','):
+                for identity in [m.strip() for m in squad_definition['members'].split(',')]:
                     current_squad.append(squad_objects[identity].pop(0))
                 squads.append(current_squad)
                 squad_made = True

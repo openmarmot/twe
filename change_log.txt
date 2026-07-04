@@ -4,6 +4,8 @@ TWE Project : Change Log
 July 04 2026
 - added code for the ZIS - 3 gun
 - upped max range to 5000
+- range changes for some weapons
+- availability changes for some squads
 
 zis3 gets a 13k indirect range. this is the first true artillery piece in teh game.
 
