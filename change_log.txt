@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 04 2026
+- added code for the ZIS - 3 gun
+- upped max range to 5000
+
+zis3 gets a 13k indirect range. this is the first true artillery piece in teh game.
+
+considered reducing the range on the t34 and the shorter german 7.5cm guns, but they are already terrible
+
+---------------------------------
 June 30 2026
 - more work on the object_defs re-org
 - added su85m

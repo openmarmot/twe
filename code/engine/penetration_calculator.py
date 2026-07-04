@@ -34,7 +34,7 @@ loaded=False
 projectile_data={}
 
 # the max distance in the penetration data 
-max_distance=4000
+max_distance=5000
 
 #---------------------------------------------------------------------------
 def evaluate_spaced_armor(projectile_type, max_penetration, spaced_armor_thickness):

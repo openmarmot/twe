@@ -27,7 +27,7 @@ def create(world, world_coords):
     )
     z.ai.rate_of_fire = 1
     z.ai.reload_speed = 20
-    z.ai.range = 4000
+    z.ai.range = 4200
     z.ai.type = "cannon"
     z.ai.use_antitank = True
     z.ai.use_antipersonnel = True

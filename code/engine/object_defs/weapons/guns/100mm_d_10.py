@@ -25,7 +25,7 @@ def create(world, world_coords):
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)
     z.ai.rate_of_fire = 1
     z.ai.reload_speed = 26
-    z.ai.range = 4000
+    z.ai.range = 4200
     z.ai.type = "cannon"
     z.ai.use_antitank = True
     z.ai.use_antipersonnel = True

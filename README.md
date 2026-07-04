@@ -100,6 +100,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | T34-76 | Tank | A late model T34-76 |
 | Soviet | T34-85 | Tank | |
 | Soviet | T70 | Tank | light tank with a 45mm gun |
+| Soviet | Zis 3 76mm Gun | Field Gun | |
 | Soviet | Zis 5 Trunk | Utility | |
 | Soviet | 37mm AA Gun | AA | Towed gun. Can be used against infantry and light vehicles|
 | Soviet | 82mm Mortar | Mortar | Mortar |
