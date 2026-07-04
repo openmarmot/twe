@@ -38,7 +38,7 @@ code/
   twe.py              # Entry point (run via start.sh; screen_size="auto")
   engine/             # Core game + world_builder.py (vehicle defs)
   ai/                 # 35+ AI modules: ai_human.py (~2700 lines), ai_vehicle.py (physics), ai_human_vehicle_*.py (crew)
-  data/               # holds the main database
+  data/               # holds data/data.sqlite (squad_data, projectile_data, names tables)
   tools/              # armor_thickness.py, image_tool.py
 ```
 
