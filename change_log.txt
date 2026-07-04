@@ -1,6 +1,32 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 04 2026
+- added code for the ZIS - 3 gun
+- upped max range to 5000
+- range changes for some weapons
+- availability changes for some squads
+- misc minor fixes
+
+zis3 gets a 13k indirect range. this is the first true artillery piece in teh game.
+
+considered reducing the range on the t34 and the shorter german 7.5cm guns, but they are already terrible
+
+---------------------------------
+June 30 2026
+- more work on the object_defs re-org
+- added su85m
+- fixed red bicycle invisible driver
+- misc minor updates
+
+apparently they made around 315 SU-85M, which is more than
+enough to be included in this game..
+
+---------------------------------
+June 20 2026
+- started work on a zis 3 76mm gun
+- large re-org of the spawn_object code
+---------------------------------
 June 19 2026
 - updated zoom system to allow way more zoom
 - adjusted the terrain system a bit. not sure its better..
