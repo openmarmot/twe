@@ -29,12 +29,15 @@ class AIHumanVehicleCommander:
     # ---------------------------------------------------------------------------
     def think(self):
         """commander role"""
-        vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
-
-        # reset to a default to clear any old states
-        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-            VehicleCrewAction.MONITORING
-        )
+        vehicle_role = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"]
+        vehicle = vehicle_role.vehicle
+        # dual-role commander/gunner shares task_vehicle_crew memory with gunner code.
+        # never reset current_action in that case - it would clobber ENGAGING / reload / etc.
+        dual_role_gunner = vehicle_role.is_gunner
+        if not dual_role_gunner:
+            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                VehicleCrewAction.MONITORING
+            )
 
         # determine what the primary weapon is and primary gunner is
         primary_gunner_role = None
@@ -302,65 +305,58 @@ class AIHumanVehicleCommander:
                 biggest_threat = v
 
         if biggest_threat:
+            gunner_mem = primary_gunner_role.human.ai.memory["task_vehicle_crew"]
+            # dual-role: commander is also this gunner (T-34-76 etc). Shared memory means
+            # hull-rotate WAITING_FOR_ROTATE and long think_interval would block shooting.
+            is_dual_role = primary_gunner_role.human == self.owner
+
             # check if we are already engaging the target
-            if (
-                primary_gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
-                != biggest_threat
-            ):
+            if gunner_mem["target"] != biggest_threat:
                 engage_primary, engage_primary_reason = (
                     self.owner.ai.calculate_engagement(
                         primary_gunner_role.turret.ai.primary_weapon, biggest_threat
                     )
                 )
-                if (
-                    engage_primary
-                    and primary_gunner_role.human.ai.memory["task_vehicle_crew"][
-                        "target"
-                    ]
-                    != biggest_threat
-                ):
+                if engage_primary and gunner_mem["target"] != biggest_threat:
                     # tell the gunner to engage
-                    primary_gunner_role.human.ai.memory["task_vehicle_crew"][
-                        "target"
-                    ] = biggest_threat
-                    self.owner.ai.speak(
-                        f"Gunner, prioritize the {biggest_threat.name} "
-                    )
-
-            # check if we should re-orientate the vehicle to face the biggest threat
-            # only do this for heavy armor vehicles
-            if biggest_threat.ai.vehicle_armor["front"][0] > 30:
-                # first check if the turret has 360 degree rotation.
-                # if it doesn't the vehicle will naturally orientate towards the vehicle
-                if primary_gunner_role.turret.ai.rotation_range[1] == 360:
-                    rotation_required = engine.math_2d.get_rotation(
-                        vehicle.world_coords, biggest_threat.world_coords
-                    )
-                    v = vehicle.rotation_angle
-                    rotation_fuzzyness = 5
-                    # rotate if we are NOT currently roughly facing the target
-                    current_angle = engine.math_2d.get_normalized_angle(v)
-                    desired_angle = engine.math_2d.get_normalized_angle(
-                        rotation_required
-                    )
-                    diff = (desired_angle - current_angle + 180) % 360 - 180
-                    if abs(diff) > rotation_fuzzyness:
-                        # we will just save the angle and the driver will grab it
-                        self.owner.ai.memory["task_vehicle_crew"][
-                            "calculated_vehicle_angle"
-                        ] = rotation_required
-                        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                            VehicleCrewAction.WAITING_FOR_ROTATE
+                    gunner_mem["target"] = biggest_threat
+                    if not is_dual_role:
+                        self.owner.ai.speak(
+                            f"Gunner, prioritize the {biggest_threat.name} "
                         )
-                        # engine.log.add_data(
-                        #    'debug',
-                        #    f'commander {self.owner.name} decision: - rotate {vehicle.name} due to {biggest_threat.name}',
-                        #    True)
 
-            # lets push out a rethink a bit so we aren't immediately changing the order
-            self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
-                random.uniform(15, 25)
-            )
+            # hull reorientation for armor facing - dedicated commander only.
+            # dual-role must keep gunner current_action / think_interval intact so the
+            # 360 turret can engage immediately instead of parking in WAITING_FOR_ROTATE.
+            if not is_dual_role:
+                if biggest_threat.ai.vehicle_armor["front"][0] > 30:
+                    # first check if the turret has 360 degree rotation.
+                    # if it doesn't the vehicle will naturally orientate towards the vehicle
+                    if primary_gunner_role.turret.ai.rotation_range[1] == 360:
+                        rotation_required = engine.math_2d.get_rotation(
+                            vehicle.world_coords, biggest_threat.world_coords
+                        )
+                        v = vehicle.rotation_angle
+                        rotation_fuzzyness = 5
+                        # rotate if we are NOT currently roughly facing the target
+                        current_angle = engine.math_2d.get_normalized_angle(v)
+                        desired_angle = engine.math_2d.get_normalized_angle(
+                            rotation_required
+                        )
+                        diff = (desired_angle - current_angle + 180) % 360 - 180
+                        if abs(diff) > rotation_fuzzyness:
+                            # we will just save the angle and the driver will grab it
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "calculated_vehicle_angle"
+                            ] = rotation_required
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "current_action"
+                            ] = VehicleCrewAction.WAITING_FOR_ROTATE
+
+                # push rethink so we aren't immediately changing the order
+                self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                    random.uniform(15, 25)
+                )
 
             return
 
@@ -462,6 +458,7 @@ class AIHumanVehicleCommander:
         vehicle_order.world_coords = retreat_coords
         # keep the crew in the vehicle on arrival (we are retreating to safety, not dropping off)
         vehicle_order.exit_vehicle_when_finished = False
+        vehicle_order.is_retreat = True
 
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
 
