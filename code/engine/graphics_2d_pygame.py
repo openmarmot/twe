@@ -93,10 +93,7 @@ class Graphics_2D_Pygame:
         self.background = pygame.surface.Surface(self.screen_size).convert()
         self.background.fill((255, 255, 255))
 
-        self.screenshot_folder = (
-            f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
-        )
-        os.makedirs(self.screenshot_folder, exist_ok=True)
+        self.screenshot_folder = None
 
         self.aar_screenshot_interval = 10
         self.last_aar_screenshot_time = 0
@@ -225,6 +222,11 @@ class Graphics_2D_Pygame:
 
     # ------------------------------------------------------------------------------
     def create_screenshot(self):
+        if self.screenshot_folder is None:
+            self.screenshot_folder = (
+                f"game_screenshots/{datetime.now().strftime('%Y_%m_%d_%H%M%S')}"
+            )
+            os.makedirs(self.screenshot_folder, exist_ok=True)
         pygame.image.save(
             self.screen,
             f"{self.screenshot_folder}/twe-{round(self.world.world_seconds, 2)}.png",
