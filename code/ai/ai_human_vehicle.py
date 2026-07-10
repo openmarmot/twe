@@ -232,7 +232,9 @@ class AIHumanVehicle:
                 # commander does a lot of heavy thinking. should not trigger very often
                 # set interval but gunner's faster rate will win if both roles active
                 if self.owner.ai.in_vehicle():
-                    # on some vehicles commanders are also gunners
+                    # on some vehicles commanders are also gunners (T-34-76, etc).
+                    # never let commander think interrupt active gunner work, and never
+                    # overwrite the gunner think_interval (commander used to force 15-25s).
                     if role.is_gunner:
                         current_action = self.owner.ai.memory["task_vehicle_crew"][
                             "current_action"
@@ -243,16 +245,22 @@ class AIHumanVehicle:
                             VehicleCrewAction.CLEARING_JAM,
                             VehicleCrewAction.TURRET_JAMMED,
                             VehicleCrewAction.ENGAGING,
+                            VehicleCrewAction.WAITING_FOR_ROTATE,
+                            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+                            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
                         )
                         if not is_gunner_busy:
                             self.role_commander.think()
+                        # keep gunner cadence
+                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                            random.uniform(0.1, 0.3)
+                        )
                     else:
                         self.role_commander.think()
-                # commander interval only applies when not also a gunner, or when gunner is busy
-                if role.is_gunner is False:
-                    self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
-                        random.uniform(5, 15)
-                    )
+                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                            random.uniform(5, 15)
+                        )
 
             # the squad lead has some stuff to do independent of their vehicle role
             if (

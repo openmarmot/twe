@@ -1,6 +1,26 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 09 2026
+- optimize startup
+- some modification to terrain values
+- fixed jitter for everything
+- fixed turret jitter (this was a different issue)
+- some adjustments to how hit side is determined for vehicles. not 100% sure if its good yet
+
+this was a big improvement on startup speed. it turns out the threads were making it worse (!)
+
+---------------------------------
+July 08 2026
+- screenshot folder is only created on first use now
+- rewrite of vehicle order logic to improve indirect fire missions
+- adjustments to commander ai so it behaves better when its also a gunner
+
+hopefully these changes make
+- 251 mortar half track less likely to charge the enemy
+- t34 commander/gunner more likely to actually shoot things
+
+---------------------------------
 July 04 2026
 - added code for the ZIS - 3 gun
 - upped max range to 5000

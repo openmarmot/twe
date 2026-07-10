@@ -81,14 +81,116 @@ def calculate_acceleration(force, rolling_resistance, drag_coefficient, air_dens
     return acceleration
 
 #------------------------------------------------------------------------------
-def calculate_hit_side(vehicle_angle,projectile_angle):
-    '''determine what side of a vehicle is hit'''
+def get_collision_half_extents(wo):
+    '''estimate local half-length (x) and half-width (y) from collision geometry'''
+    if wo.bounding_circles:
+        max_x = 0.0
+        max_y = 0.0
+        for offset, radius in wo.bounding_circles:
+            max_x = max(max_x, abs(offset[0]) + radius)
+            max_y = max(max_y, abs(offset[1]) + radius)
+        return max(max_x, 1.0), max(max_y, 1.0)
+    r = max(float(wo.collision_radius), 1.0)
+    return r, r
 
-    # ! Note - this is very roughly accurate
-    # for example if you hit the side while in front of the vehicle
-    # it will tend to record as front
-    
+#------------------------------------------------------------------------------
+def _aabb_entry_side(lx, ly, dx, dy, hx, hy):
+    '''which AABB face a ray entered, given a hit point (possibly inside).
+
+    local +x = rear, -x = front, +y = right, -y = left
+    (dx, dy) is projectile flight direction in local space
+    '''
+    # walk backward from hit along reverse flight path to find entry face
+    bx = -dx
+    by = -dy
+    best_t = None
+    best_side = None
+    epsilon = 1e-9
+
+    if abs(bx) > epsilon:
+        t = (hx - lx) / bx
+        if t >= 0:
+            y_at = ly + t * by
+            if abs(y_at) <= hy + epsilon:
+                if best_t is None or t < best_t:
+                    best_t = t
+                    best_side = "rear"
+        t = (-hx - lx) / bx
+        if t >= 0:
+            y_at = ly + t * by
+            if abs(y_at) <= hy + epsilon:
+                if best_t is None or t < best_t:
+                    best_t = t
+                    best_side = "front"
+
+    if abs(by) > epsilon:
+        t = (hy - ly) / by
+        if t >= 0:
+            x_at = lx + t * bx
+            if abs(x_at) <= hx + epsilon:
+                if best_t is None or t < best_t:
+                    best_t = t
+                    best_side = "right"
+        t = (-hy - ly) / by
+        if t >= 0:
+            x_at = lx + t * bx
+            if abs(x_at) <= hx + epsilon:
+                if best_t is None or t < best_t:
+                    best_t = t
+                    best_side = "left"
+
+    return best_side
+
+#------------------------------------------------------------------------------
+def calculate_hit_side(
+    vehicle_angle,
+    projectile_angle,
+    vehicle_coords=None,
+    hit_coords=None,
+    half_length=None,
+    half_width=None,
+):
+    '''determine what side of a vehicle is hit
+
+    When hit_coords + extents are provided, uses impact position in vehicle-local
+    space (ray vs AABB) so a frontal shot that clips a protruding side is
+    classified as a side hit. Without hit geometry, falls back to approach angle.
+    '''
     relative_angle = (projectile_angle - vehicle_angle) % 360
+
+    if (
+        vehicle_coords is not None
+        and hit_coords is not None
+        and half_length is not None
+        and half_width is not None
+        and half_length > 0
+        and half_width > 0
+    ):
+        world_offset = [
+            hit_coords[0] - vehicle_coords[0],
+            hit_coords[1] - vehicle_coords[1],
+        ]
+        local = get_vector_rotation(world_offset, vehicle_angle)
+        lx = local[0]
+        ly = local[1]
+        world_dir = get_heading_from_rotation(projectile_angle)
+        local_dir = get_vector_rotation(world_dir, vehicle_angle)
+
+        side = _aabb_entry_side(
+            lx, ly, local_dir[0], local_dir[1], half_length, half_width
+        )
+        if side is None:
+            # hit outside estimated AABB (common with circle colliders) —
+            # pick the nearest face by normalized local position
+            nx = abs(lx) / half_length
+            ny = abs(ly) / half_width
+            if nx >= ny:
+                side = "rear" if lx >= 0 else "front"
+            else:
+                side = "right" if ly >= 0 else "left"
+        return side, relative_angle
+
+    # approach-angle fallback (AI threat checks aiming at vehicle center)
     if 0 <= relative_angle < 45 or 315 <= relative_angle < 360:
         side = "rear"
     elif 45 <= relative_angle < 135:
@@ -97,7 +199,7 @@ def calculate_hit_side(vehicle_angle,projectile_angle):
         side = "front"
     else:  # 225 <= relative_angle < 315
         side = "left"
-    
+
     return side, relative_angle
 
 #------------------------------------------------------------------------------

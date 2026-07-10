@@ -27,6 +27,8 @@ def create(world, world_coords):
     z.ai.rate_of_fire = 1
     z.ai.range = 4000
     z.ai.indirect_range = 4500
+    # historical min ~60m; use a game-scale floor so AI doesn't try to fire under it
+    z.ai.minimum_range = 400
     z.ai.type = "cannon"
     z.ai.use_antitank = False
     z.ai.use_antipersonnel = True

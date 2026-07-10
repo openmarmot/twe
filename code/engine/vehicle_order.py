@@ -18,3 +18,6 @@ class VehicleOrder():
         self.exit_vehicle_when_finished=False
         self.world_coords=None # [0,0]
         self.target_object=None # a world_object
+        # commander self-preservation retreat - must not be overwritten by
+        # gunner close-with / fire-mission positioning
+        self.is_retreat=False
