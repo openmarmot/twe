@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 09 2026
+- optimize startup
+- some modification to terrain values
+- fixed jitter for everything
+- fixed turret jitter (this was a different issue)
+
+---------------------------------
 July 08 2026
 - screenshot folder is only created on first use now
 - rewrite of vehicle order logic to improve indirect fire missions
