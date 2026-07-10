@@ -656,9 +656,16 @@ class AIVehicle:
         explosion_coords = event_data["coords"]
 
         # Calculate which side of the vehicle was hit
+        half_length, half_width = engine.math_2d.get_collision_half_extents(
+            self.owner
+        )
         hit_side, relative_angle = engine.math_2d.calculate_hit_side(
             self.owner.rotation_angle,
             engine.math_2d.get_rotation(self.owner.world_coords, explosion_coords),
+            self.owner.world_coords,
+            explosion_coords,
+            half_length,
+            half_width,
         )
 
         # Get armor thickness for the hit side (including spaced armor)
@@ -843,8 +850,16 @@ class AIVehicle:
     def projectile_collision(self, projectile):
 
         # -- determine what area the projectile hit --
+        half_length, half_width = engine.math_2d.get_collision_half_extents(
+            self.owner
+        )
         hit_side, relative_angle = engine.math_2d.calculate_hit_side(
-            self.owner.rotation_angle, projectile.rotation_angle
+            self.owner.rotation_angle,
+            projectile.rotation_angle,
+            self.owner.world_coords,
+            projectile.world_coords,
+            half_length,
+            half_width,
         )
         hit_height = random.choice(["high", "low"])
 

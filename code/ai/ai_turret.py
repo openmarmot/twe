@@ -129,8 +129,16 @@ class AITurret:
                 self.owner.world_coords, projectile.ai.starting_coords
             )
 
+            half_length, half_width = engine.math_2d.get_collision_half_extents(
+                self.owner
+            )
             side, relative_angle = engine.math_2d.calculate_hit_side(
-                self.owner.rotation_angle, projectile.rotation_angle
+                self.owner.rotation_angle,
+                projectile.rotation_angle,
+                self.owner.world_coords,
+                projectile.world_coords,
+                half_length,
+                half_width,
             )
             penetration, pen_value, armor_value, spaced_effect = (
                 engine.penetration_calculator.calculate_penetration(

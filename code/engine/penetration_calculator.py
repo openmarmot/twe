@@ -120,7 +120,9 @@ def calculate_penetration(projectile, distance, armor_type, armor, side, relativ
     if side == "rear" and relative_angle > 180:
         relative_angle -= 360
     phi_h = abs(relative_angle - centers[side])
-    cos_phi_h = math.cos(math.radians(phi_h))
+    # clamp so high-obliquity side clips (near-parallel to plate) stay finite;
+    # ~85 deg is already effectively a ricochet-class impact
+    cos_phi_h = max(math.cos(math.radians(min(phi_h, 85))), 0.087)
 
     # calculate effective thickness, including both the vertical angle of the armor and
     # the horizontal angle relative to the projectile

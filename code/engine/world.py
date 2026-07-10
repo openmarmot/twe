@@ -891,7 +891,7 @@ class World:
         self.spawn_player()
 
         # run a immediate debug for useful info
-        engine.self_debug_world.start(self)
+        #engine.self_debug_world.start(self)
 
     # ---------------------------------------------------------------------------
     def toggle_hit_markers(self):

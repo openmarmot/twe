@@ -6,6 +6,9 @@ July 09 2026
 - some modification to terrain values
 - fixed jitter for everything
 - fixed turret jitter (this was a different issue)
+- some adjustments to how hit side is determined for vehicles. not 100% sure if its good yet
+
+this was a big improvement on startup speed. it turns out the threads were making it worse (!)
 
 ---------------------------------
 July 08 2026
