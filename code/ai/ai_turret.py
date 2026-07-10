@@ -388,6 +388,32 @@ class AITurret:
             )
 
     # ---------------------------------------------------------------------------
+    def sync_to_vehicle(self):
+        """attach turret to current vehicle position/rotation.
+
+        Called by ai_vehicle.update_child_position_rotation so hull and turret
+        share the same frame. Also used after turret yaw changes.
+        """
+        if self.vehicle is None:
+            return
+
+        new_angle = engine.math_2d.get_normalized_angle(
+            self.vehicle.rotation_angle + self.turret_rotation
+        )
+        self.owner.world_coords = engine.math_2d.calculate_relative_position(
+            self.vehicle.world_coords,
+            self.vehicle.rotation_angle,
+            self.position_offset,
+        )
+        # only rebuild sprite when facing actually changes (not every translate)
+        if self.owner.rotation_angle != new_angle:
+            self.owner.reset_image = True
+        self.owner.rotation_angle = new_angle
+
+        self.last_vehicle_position = copy.copy(self.vehicle.world_coords)
+        self.last_vehicle_rotation = self.vehicle.rotation_angle
+
+    # ---------------------------------------------------------------------------
     def update(self):
         """update the turret state"""
 
@@ -399,12 +425,10 @@ class AITurret:
     def update_physics(self):
         """update turret physics"""
         time_passed = self.owner.world.time_passed_seconds
-        moved = False
         relative_rotation_changed = False
 
         if self.rotation_change != 0:
             relative_rotation_changed = True
-            moved = True
             self.turret_rotation += (
                 self.rotation_change * self.rotation_speed * time_passed
             )
@@ -422,27 +446,19 @@ class AITurret:
                 elif self.turret_rotation > self.rotation_range[1]:
                     self.turret_rotation = self.rotation_range[1]
 
-        if self.vehicle is not None:
-            if self.last_vehicle_position != self.vehicle.world_coords:
-                moved = True
-                self.last_vehicle_position = copy.copy(self.vehicle.world_coords)
-            elif self.last_vehicle_rotation != self.vehicle.rotation_angle:
-                moved = True
-                self.last_vehicle_rotation = copy.copy(self.vehicle.rotation_angle)
+        if self.vehicle is None:
+            return
 
-        if moved:
-            self.owner.reset_image = True
-            if self.vehicle is not None:
-                self.owner.rotation_angle = engine.math_2d.get_normalized_angle(
-                    self.vehicle.rotation_angle + self.turret_rotation
-                )
-                self.owner.world_coords = engine.math_2d.calculate_relative_position(
-                    self.vehicle.world_coords,
-                    self.vehicle.rotation_angle,
-                    self.position_offset,
-                )
-                # Only force crew seat update when *this turret* yawed relative to the hull.
-                # Vehicle movement/rotation already triggers a full update_child from ai_vehicle
-                # (avoiding redundant double calculations on every movement frame for every turret).
-                if relative_rotation_changed:
-                    self.vehicle.ai.update_child_position_rotation()
+        # vehicle movement is normally applied via update_child_position_rotation.
+        # keep a fallback if this turret updates before the vehicle this frame,
+        # or if something moved the hull without going through update_child.
+        vehicle_moved = (
+            self.last_vehicle_position != self.vehicle.world_coords
+            or self.last_vehicle_rotation != self.vehicle.rotation_angle
+        )
+
+        if relative_rotation_changed or vehicle_moved:
+            self.sync_to_vehicle()
+            # crew seats relative to this turret need a refresh after yaw
+            if relative_rotation_changed:
+                self.vehicle.ai.update_child_position_rotation()

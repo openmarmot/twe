@@ -243,8 +243,8 @@ class Graphics_2D_Pygame:
         """return world coords of mouse"""
         x, y = pygame.mouse.get_pos()
         translation = self.get_translation()
-        world_x = (x - translation[0]) / self.scale
-        world_y = (y - translation[1]) / self.scale
+        world_x = (x - translation[0]) / self.world.scale
+        world_y = (y - translation[1]) / self.world.scale
         return [world_x, world_y]
 
     # -----------------------------------------------------------------------------
@@ -254,14 +254,22 @@ class Graphics_2D_Pygame:
 
     # ------------------------------------------------------------------------------
     def get_translation(self):
-        """returns the translation for world to screen coords"""
-        player_x = self.world.player.world_coords[0] * self.world.scale
-        player_y = self.world.player.world_coords[1] * self.world.scale
+        """returns integer translation for world to screen coords.
 
-        self.world.player.screen_coords = self.screen_center
+        Camera is snapped to whole pixels so neighboring objects keep stable
+        relative screen positions while the player moves (no 1px crawl).
+        """
+        scale = self.world.scale
+        cam_x = round(self.world.player.world_coords[0] * scale)
+        cam_y = round(self.world.player.world_coords[1] * scale)
 
-        translate = [self.screen_center[0] - player_x, self.screen_center[1] - player_y]
-        return translate
+        # copy, do not alias screen_center
+        self.world.player.screen_coords = [
+            self.screen_center[0],
+            self.screen_center[1],
+        ]
+
+        return [self.screen_center[0] - cam_x, self.screen_center[1] - cam_y]
 
     # ------------------------------------------------------------------------------
     def handle_input(self):
@@ -650,15 +658,14 @@ class Graphics_2D_Pygame:
             return
 
         vehicle = self.world.vehicle_diagnostics_vehicle
+        scale = self.world.scale
         if vehicle and hasattr(vehicle, "world_coords"):
-            player_x = vehicle.world_coords[0] * self.world.scale
-            player_y = vehicle.world_coords[1] * self.world.scale
-            translation = [
-                self.screen_center[0] - player_x,
-                self.screen_center[1] - player_y,
-            ]
+            cam_x = round(vehicle.world_coords[0] * scale)
+            cam_y = round(vehicle.world_coords[1] * scale)
+            tx = self.screen_center[0] - cam_x
+            ty = self.screen_center[1] - cam_y
         else:
-            translation = [0, 0]
+            tx, ty = 0, 0
 
         for c in self.vehicle_diagnostics.image_objects:
             if (
@@ -667,14 +674,13 @@ class Graphics_2D_Pygame:
                 and hasattr(vehicle, "world_coords")
             ):
                 if c == self.vehicle_diagnostics.image_objects[0]:
-                    c.screen_coords = self.screen_center
+                    c.screen_coords = [
+                        self.screen_center[0],
+                        self.screen_center[1],
+                    ]
                 else:
-                    c.screen_coords[0] = round(
-                        c.world_coords[0] * self.world.scale + translation[0]
-                    )
-                    c.screen_coords[1] = round(
-                        c.world_coords[1] * self.world.scale + translation[1]
-                    )
+                    c.screen_coords[0] = round(c.world_coords[0] * scale) + tx
+                    c.screen_coords[1] = round(c.world_coords[1] * scale) + ty
 
     # ------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
@@ -952,7 +958,9 @@ class Graphics_2D_Pygame:
         viewrange_y = (max_y, min_y)
 
         translation = self.get_translation()
-        renderable_objects = []
+        scale = self.world.scale
+        tx, ty = translation[0], translation[1]
+        render_count = 0
 
         # make a visibility determination per grid square. this worked well with grid square size set to 1000
         for grid_square in self.world.grid_manager.index_map.values():
@@ -967,21 +975,45 @@ class Graphics_2D_Pygame:
                 for obj in grid_square.wo_objects:
                     if (
                         obj.render
-                        and (self.world.scale + obj.scale_modifier)
+                        and (scale + obj.scale_modifier)
                         >= obj.minimum_visible_scale
                     ):
-                        renderable_objects.append(obj)
+                        self.renderlists[obj.render_level].append(obj)
+                        render_count += 1
+                        if not obj.is_player:
+                            # round in world-scaled space, then add integer camera
+                            # so relative spacing stays stable while moving
+                            if (
+                                obj.is_turret
+                                and obj.ai.vehicle is not None
+                            ):
+                                # attach to hull in screen space so co-moving
+                                # hull+turret do not crawl by 1px independently
+                                v = obj.ai.vehicle
+                                ox = (
+                                    obj.world_coords[0] - v.world_coords[0]
+                                )
+                                oy = (
+                                    obj.world_coords[1] - v.world_coords[1]
+                                )
+                                obj.screen_coords[0] = (
+                                    round(v.world_coords[0] * scale)
+                                    + round(ox * scale)
+                                    + tx
+                                )
+                                obj.screen_coords[1] = (
+                                    round(v.world_coords[1] * scale)
+                                    + round(oy * scale)
+                                    + ty
+                                )
+                            else:
+                                obj.screen_coords[0] = (
+                                    round(obj.world_coords[0] * scale) + tx
+                                )
+                                obj.screen_coords[1] = (
+                                    round(obj.world_coords[1] * scale) + ty
+                                )
             else:
                 grid_square.visible = False
 
-        for obj in renderable_objects:
-            self.renderlists[obj.render_level].append(obj)
-            if not obj.is_player:
-                obj.screen_coords[0] = round(
-                    obj.world_coords[0] * self.world.scale + translation[0]
-                )
-                obj.screen_coords[1] = round(
-                    obj.world_coords[1] * self.world.scale + translation[1]
-                )
-
-        self.render_count = len(renderable_objects)
+        self.render_count = render_count

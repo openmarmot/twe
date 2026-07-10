@@ -1243,6 +1243,10 @@ class AIVehicle:
         # it is also called by human_ai when it enters the vehicle
         # for roles with seat_rotates_with_turret, position/rot is relative to role.turret
 
+        # turrets first - crew seats may be relative to a turret
+        for turret in self.turrets:
+            turret.ai.sync_to_vehicle()
+
         # update passenger rotation and position
         for role in self.vehicle_crew:
             # if position is occupied

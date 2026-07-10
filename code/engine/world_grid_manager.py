@@ -5,7 +5,6 @@ notes :
 '''
 
 #import built in modules
-import threading
 
 #import custom packages
 from engine.world_grid_square import WorldGridSquare
@@ -33,15 +32,10 @@ class WorldGridManager:
     
     #---------------------------------------------------------------------------
     def compute_terrain_values(self):
-        # precompute world_area locations
+        # sequential: pure-Python stamps + GIL make one-thread-per-square much slower
         engine.log.add_data('note','Computing grid square terrain values..',True)
-        threads = []
         for g in self.index_map.values():
-            t = threading.Thread(target=g.compute_terrain_values)
-            threads.append(t)
-            t.start()
-        for t in threads:
-            t.join()
+            g.compute_terrain_values()
     
     #---------------------------------------------------------------------------
     def get_all_objects(self):

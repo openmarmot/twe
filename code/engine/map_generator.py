@@ -362,7 +362,7 @@ def generate_vegetation(map_objects,world_size):
         for off in (-110.0, 0.0, 110.0):
             exclusions.append((c[0] + off * hx, c[1] + off * hy, ROAD_CLEAR))
 
-    # Fast helper (nested so it can see exclusions list)
+    # Fast helpers (nested so they can see exclusions list)
     def _clear(x, y, margin):
         for cx, cy, rad in exclusions:
             dx = x - cx
@@ -371,28 +371,104 @@ def generate_vegetation(map_objects,world_size):
                 return False
         return True
 
+    def _pick_shape():
+        # weighted: ovals/kidneys more common than plain circles
+        return random.choices(
+            ['circle', 'oval', 'kidney'], weights=[0.18, 0.42, 0.40])[0]
 
-    # --- 1. Very light global meadow (background green) ---
-    # We keep this sparse. Real visual density comes from the forest patch fills below.
-    # Using random target count + exclusion check is fast.
-    BASE_TARGET = 850
-    BASE_MARGIN = 22
-    base = []
-    b_att = 0
-    b_max = BASE_TARGET * 30
-    while len(base) < BASE_TARGET and b_att < b_max:
-        b_att += 1
-        bx = random.randint(-half, half)
-        by = random.randint(-half, half)
-        if _clear(bx, by, BASE_MARGIN):
-            base.append([float(bx), float(by)])
-    for bc in base:
-        vegetation.append(MapObject('terrain_green', 'terrain_green', bc, random.randint(0, 359), []))
+    def _sample_blob(cx, cy, major, minor, orient, shape, edge_bias=0.5):
+        '''sample a point inside an oriented blob.
+        edge_bias: 0.5 ~ area-uniform disk; higher packs toward edge; lower toward center.
+        shape: circle | oval | kidney
+        '''
+        r = random.random() ** edge_bias
+        t = random.random() * math.pi * 2
+        ux = r * math.cos(t)
+        uy = r * math.sin(t)
+        if shape == 'circle':
+            lx = ux * major
+            ly = uy * major
+        elif shape == 'oval':
+            lx = ux * major
+            ly = uy * minor
+        else:
+            # kidney / cashew: elongate, then bend so one long side is concave
+            lx = ux * major * (0.78 + 0.22 * abs(uy))
+            ly = uy * minor
+            lx = lx + 0.52 * major * (uy * uy)
+        ca = math.cos(orient)
+        sa = math.sin(orient)
+        return [cx + lx * ca - ly * sa, cy + lx * sa + ly * ca]
+
+    def _blob_axes(size, shape):
+        '''return (major, minor) radii for a given nominal size + shape'''
+        if shape == 'circle':
+            return size, size
+        if shape == 'oval':
+            aspect = random.uniform(0.38, 0.72)
+            return size, size * aspect
+        # kidney: fairly elongated
+        aspect = random.uniform(0.42, 0.70)
+        return size, size * aspect
+
+
+    # --- 1. Small meadow clumps (never place solo terrain_green) ---
+    # terrain_green has a square sprite that looks bad in isolation; always
+    # place it in tight clumps so the pattern blends.
+    MEADOW_CLUMPS = random.randint(55, 95)
+    MEADOW_SEP = 420
+    MEADOW_MARGIN = 28
+    meadow_seeds = []
+    m_att = 0
+    m_max = MEADOW_CLUMPS * 40
+    while len(meadow_seeds) < MEADOW_CLUMPS and m_att < m_max:
+        m_att += 1
+        mx = random.randint(-half, half)
+        my = random.randint(-half, half)
+        if not _clear(mx, my, MEADOW_MARGIN):
+            continue
+        if any((s[0]-mx)*(s[0]-mx) + (s[1]-my)*(s[1]-my) < MEADOW_SEP*MEADOW_SEP
+               for s in meadow_seeds):
+            continue
+        meadow_seeds.append([float(mx), float(my)])
+    for seed in meadow_seeds:
+        shape = _pick_shape()
+        major, minor = _blob_axes(random.uniform(55, 130), shape)
+        orient = random.random() * math.pi * 2
+        n_green = random.randint(4, 12)
+        g_sep = 28
+        greens = []
+        ga = 0
+        gmax = n_green * 40
+        while len(greens) < n_green and ga < gmax:
+            ga += 1
+            gx, gy = _sample_blob(seed[0], seed[1], major, minor, orient, shape, 0.55)
+            if not _clear(gx, gy, 4):
+                continue
+            if any((g[0]-gx)*(g[0]-gx) + (g[1]-gy)*(g[1]-gy) < g_sep*g_sep
+                   for g in greens):
+                continue
+            greens.append([gx, gy])
+        # drop undersized clumps so we never leave a few lonely squares
+        if len(greens) < 3:
+            continue
+        for gc in greens:
+            vegetation.append(MapObject(
+                'terrain_green', 'terrain_green', gc, random.randint(0, 359), []))
 
     # --- 2. Forest patches (main "more vegetation" mechanism) ---
+    # Each patch picks a density profile and a blob shape so the map reads as
+    # mixed open woodland / medium stands / thick forest, not uniform circles.
     NUM_PATCHES = random.randint(90, 190)
     PATCH_SEP = 590
     PATCH_MARGIN = 210
+    # density: (tree_count_scale, tree_sep, green_fill_scale, understory_chance)
+    DENSITY_PROFILES = {
+        'sparse': (0.45, 110, 0.22, 0.18),
+        'medium': (0.85, 82, 0.48, 0.38),
+        'dense':  (1.35, 62, 0.78, 0.58),
+    }
+    DENSITY_WEIGHTS = [0.30, 0.45, 0.25]  # sparse, medium, dense
 
     patches = []
     attempts = 0
@@ -408,20 +484,26 @@ def generate_vegetation(map_objects,world_size):
         patches.append([px, py])
 
     for seed in patches:
-        # trees (denser clumps)
-        tr = random.randint(360, 680)
-        n_trees = random.randint(5, 24)
-        t_sep = 78
+        dens_name = random.choices(
+            ['sparse', 'medium', 'dense'], weights=DENSITY_WEIGHTS)[0]
+        t_scale, t_sep, g_scale, under_p = DENSITY_PROFILES[dens_name]
+        shape = _pick_shape()
+        orient = random.random() * math.pi * 2
+        size = random.uniform(340, 700)
+        major, minor = _blob_axes(size, shape)
+
+        # trees
+        area_scale = (major * minor) / (520.0 * 520.0)
+        n_trees = max(2, int(random.randint(6, 22) * t_scale * math.sqrt(max(0.25, area_scale))))
         t_margin = 30
         trees = []
         ta = 0
-        tmax = n_trees * 65
+        tmax = n_trees * 70
         while len(trees) < n_trees and ta < tmax:
             ta += 1
-            ang = random.random() * (math.pi * 2)
-            d = (random.random() ** 0.72) * tr
-            tx = seed[0] + math.cos(ang) * d
-            ty = seed[1] + math.sin(ang) * d
+            # trees slightly more center-weighted in dense stands, more spread in sparse
+            edge = 0.78 if dens_name == 'sparse' else (0.62 if dens_name == 'medium' else 0.48)
+            tx, ty = _sample_blob(seed[0], seed[1], major, minor, orient, shape, edge)
             if not _clear(tx, ty, t_margin):
                 continue
             if any((tt[0]-tx)*(tt[0]-tx) + (tt[1]-ty)*(tt[1]-ty) < t_sep*t_sep for tt in trees):
@@ -430,52 +512,66 @@ def generate_vegetation(map_objects,world_size):
         for tc in trees:
             rot = random.randint(0, 359)
             vegetation.append(MapObject('pinus_sylvestris', 'pinus_sylvestris', tc, rot, []))
-            if random.random() < 0.42:
-                ox = random.randint(-26, 26)
-                oy = random.randint(-26, 26)
-                vegetation.append(MapObject('terrain_green', 'terrain_green', [tc[0]+ox, tc[1]+oy], random.randint(0, 359), []))
+            # small under-tree clump (never a single square)
+            if random.random() < under_p:
+                for _ in range(random.randint(3, 6)):
+                    ox = random.randint(-30, 30)
+                    oy = random.randint(-30, 30)
+                    vegetation.append(MapObject(
+                        'terrain_green', 'terrain_green',
+                        [tc[0]+ox, tc[1]+oy], random.randint(0, 359), []))
 
-        # extra ground cover inside/around patch: random disk sampling for natural non-grid look
-        # (this is the main source of the "green carpet" density the user wants)
-        er = tr + random.randint(80, 170)
-        # target count scales with area. Tune the divisor (higher = fewer greens) and multiplier
-        # for desired "more vegetation" feel. Current tuned for natural look + playable object counts.
-        target_g = int((er / 82) ** 2 * 0.48)
+        # ground cover fill inside the same blob (main green carpet)
+        g_major = major + random.uniform(60, 160)
+        g_minor = minor + random.uniform(40, 120)
+        target_g = int((g_major / 82.0) * (g_minor / 82.0) * g_scale)
         g_margin = 2
         added = 0
         tries = 0
         max_tries = max(30, target_g * 4)
         while added < target_g and tries < max_tries:
             tries += 1
-            ang = random.random() * (math.pi * 2)
-            d = (random.random() ** 0.5) * er
-            ex = seed[0] + math.cos(ang) * d
-            ey = seed[1] + math.sin(ang) * d
+            ex, ey = _sample_blob(seed[0], seed[1], g_major, g_minor, orient, shape, 0.5)
             if _clear(ex, ey, g_margin):
-                vegetation.append(MapObject('terrain_green', 'terrain_green', [float(ex), float(ey)], random.randint(0, 359), []))
+                vegetation.append(MapObject(
+                    'terrain_green', 'terrain_green',
+                    [float(ex), float(ey)], random.randint(0, 359), []))
                 added += 1
 
-        # Sub-clumps to break circular/regular shapes and create more natural irregular blobs
-        if random.random() < 0.65:
-            nsubs = random.randint(1, 2)
+        # lobe / satellite sub-clumps: push along the long axis to reinforce
+        # kidney/oval silhouettes (and break remaining circular feel)
+        if dens_name != 'sparse' and random.random() < 0.70:
+            nsubs = 1 if dens_name == 'medium' else random.randint(1, 2)
             for _ in range(nsubs):
-                sub_off_x = random.gauss(0, er * 0.30)
-                sub_off_y = random.gauss(0, er * 0.30)
-                sub_c = [seed[0] + sub_off_x, seed[1] + sub_off_y]
-                sub_r = er * random.uniform(0.50, 0.80)
-                sub_target = int((sub_r / 88) ** 2 * 0.38)
+                # prefer offset along major axis with some lateral noise
+                along = random.uniform(0.35, 0.75) * major * random.choice([-1.0, 1.0])
+                across = random.gauss(0, minor * 0.28)
+                ca = math.cos(orient)
+                sa = math.sin(orient)
+                sub_c = [
+                    seed[0] + along * ca - across * sa,
+                    seed[1] + along * sa + across * ca,
+                ]
+                sub_shape = random.choice(['oval', 'kidney', shape])
+                sub_major, sub_minor = _blob_axes(
+                    random.uniform(0.35, 0.65) * major, sub_shape)
+                sub_orient = orient + random.uniform(-0.55, 0.55)
+                sub_target = int((sub_major / 88.0) * (sub_minor / 88.0) * g_scale * 0.85)
                 st = 0
                 smax = max(15, sub_target * 3)
-                while st < sub_target and st < smax:
+                placed = 0
+                while placed < sub_target and st < smax:
                     st += 1
-                    ang = random.random() * (math.pi * 2)
-                    dd = (random.random() ** 0.5) * sub_r
-                    ex = sub_c[0] + math.cos(ang) * dd
-                    ey = sub_c[1] + math.sin(ang) * dd
+                    ex, ey = _sample_blob(
+                        sub_c[0], sub_c[1], sub_major, sub_minor,
+                        sub_orient, sub_shape, 0.5)
                     if _clear(ex, ey, 2):
-                        vegetation.append(MapObject('terrain_green', 'terrain_green', [float(ex), float(ey)], random.randint(0, 359), []))
+                        vegetation.append(MapObject(
+                            'terrain_green', 'terrain_green',
+                            [float(ex), float(ey)], random.randint(0, 359), []))
+                        placed += 1
 
-    # --- 3. Scattered trees
+    # --- 3. Scattered trees (open country, light understory) ---
     SCAT_TARGET = random.randint(90, 240)
     SCAT_SEP = 225
     SCAT_MARGIN = 48
@@ -494,10 +590,14 @@ def generate_vegetation(map_objects,world_size):
     for sc in scats:
         rot = random.randint(0, 359)
         vegetation.append(MapObject('pinus_sylvestris', 'pinus_sylvestris', sc, rot, []))
+        # small under-tree clump (never a single square)
         if random.random() < 0.28:
-            vegetation.append(MapObject('terrain_green', 'terrain_green', [sc[0]+random.randint(-22,22), sc[1]+random.randint(-22,22)], random.randint(0, 359), []))
+            for _ in range(random.randint(3, 5)):
+                vegetation.append(MapObject(
+                    'terrain_green', 'terrain_green',
+                    [sc[0]+random.randint(-28, 28), sc[1]+random.randint(-28, 28)],
+                    random.randint(0, 359), []))
 
-    return vegetation
     return vegetation
 
 
