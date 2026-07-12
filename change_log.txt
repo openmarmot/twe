@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 12 2026
+- added reinforcement squads back in
+- spawn points are now randomized.
+
+---------------------------------
 July 09 2026
 - optimize startup
 - some modification to terrain values

@@ -115,42 +115,57 @@ class AIFactionTactical:
     def create_squads(self):
         """sort a list of humans into squads and initialize them"""
 
-        # create a list of squad objects
-        squad_objects = []
+        # split main force vs reinforcements before squad_builder so composition
+        # matching does not mix the two pools. reinforcement units are marked with
+        # REINFORCEMENT_MAP_COORDS at map load (main force stays at [0, 0]).
+        main_objects = []
+        reinforcement_objects = []
+        rein_marker = engine.world_builder.REINFORCEMENT_MAP_COORDS
         for b in self.world.grid_manager.get_objects_from_all_grid_squares(True, True):
             if b.world_builder_identity.startswith(self.faction):
                 if b.is_human or b.is_vehicle:
-                    squad_objects.append(b)
+                    if b.world_coords == rein_marker:
+                        reinforcement_objects.append(b)
+                    else:
+                        main_objects.append(b)
 
-        # sort this into squad lists
-        squad_lists = engine.squad_builder.create_squads(squad_objects)
-
-        # create the squads
         squad_number = 0
-        for b in squad_lists:
-            squad = AISquad(self.world)
-            squad.faction = self.faction
-            squad.faction_tactical = self
-            squad.name = f"squad{squad_number}"
-            squad_number += 1
-            for c in b:
-                squad.add_to_squad(c)
+        for object_list, is_reinforcement in (
+            (main_objects, False),
+            (reinforcement_objects, True),
+        ):
+            squad_lists = engine.squad_builder.create_squads(object_list)
+            for b in squad_lists:
+                squad = AISquad(self.world)
+                squad.faction = self.faction
+                squad.faction_tactical = self
+                squad.is_reinforcement = is_reinforcement
+                if is_reinforcement:
+                    squad.name = f"reinforcement_squad{squad_number}"
+                else:
+                    squad.name = f"squad{squad_number}"
+                squad_number += 1
+                for c in b:
+                    squad.add_to_squad(c)
 
-            # set the initial squad leader
-            if len(squad.members) > 0:
-                squad.squad_leader = squad.members[0]
-            else:
-                # some squads end up vehicle only due to the current squad creation algo.
-                # print(f'squad error. member count:{len(squad.members)}, vehicle count:{len(squad.vehicles)}')
+                # set the initial squad leader
+                if len(squad.members) > 0:
+                    squad.squad_leader = squad.members[0]
+                else:
+                    # some squads end up vehicle only due to the current squad creation algo.
+                    # set the spawn location so the vehicles end up in the right area
+                    if is_reinforcement:
+                        self.set_squad_starting_position(
+                            squad, self.get_reinforcement_spawn_location()
+                        )
+                    else:
+                        self.set_squad_starting_position(squad, self.spawn_location)
 
-                # set the spawn location so the vehicles end up in the right area
-                self.set_squad_starting_position(squad, self.spawn_location)
+                    # skip adding vehicle-only squads to ai tactical so the squad isn't saved
+                    # they will just be extra vehicles that the ai can use if it wants
+                    continue
 
-                # lets just skip adding those squads to ai tactical so the squad isn't saved
-                # they will just be extra vehicles that the ai can use if it wants
-                continue
-
-            self.squads.append(squad)
+                self.squads.append(squad)
 
     # ---------------------------------------------------------------------------
     def get_area_enemy_count(self, area):
@@ -227,6 +242,67 @@ class AIFactionTactical:
         self.radio.ai.send_message("HQ,ALL,Sending a comms check, ")
 
     # ---------------------------------------------------------------------------
+    def get_reinforcement_spawn_location(self):
+        """spawn point further behind the faction spawn location"""
+        # 10000-15000 further out from spawn, away from map center / enemy
+        main_offset = random.randint(10000, 15000)
+        # secondary direction random offset
+        secondary_offset = random.randint(-7000,7000)
+        sx = self.spawn_location[0]
+        sy = self.spawn_location[1]
+        if abs(sx) >= abs(sy):
+            # east/west spawn - push further on X, jitter Y
+            direction = 1 if sx > 0 else -1
+            return [sx + direction * main_offset, sy + secondary_offset]
+        # north/south spawn - push further on Y, jitter X
+        direction = 1 if sy > 0 else -1
+        return [sx + secondary_offset, sy + direction * main_offset]
+
+    # ---------------------------------------------------------------------------
+    def set_reinforcement_orders_and_positions(self, reinforcement_squads):
+        """place reinforcement squads far behind spawn and send them to world areas"""
+        if not reinforcement_squads:
+            return
+
+        motorized_squads = [s for s in reinforcement_squads if len(s.vehicles) > 0]
+        foot_squads = [s for s in reinforcement_squads if len(s.vehicles) == 0]
+        random.shuffle(motorized_squads)
+        random.shuffle(foot_squads)
+        ordered_squads = motorized_squads + foot_squads
+
+        rein_spawn = self.get_reinforcement_spawn_location()
+        squad_spacing = 250
+        squad_grid = engine.math_2d.get_grid_coords(
+            rein_spawn, squad_spacing, len(ordered_squads)
+        )
+
+        areas = self.world.world_areas[:]
+        random.shuffle(areas)
+
+        if not areas:
+            # place them even if there are no world areas yet
+            for squad in ordered_squads:
+                spawn_location = squad_grid.pop()
+                threat_direction = self.get_threat_direction(self.spawn_location)
+                self.set_squad_starting_position(
+                    squad, spawn_location, threat_direction
+                )
+            return
+
+        area_cycle = cycle(areas)
+        for squad in ordered_squads:
+            world_area = next(area_cycle)
+            spawn_location = squad_grid.pop()
+            destination = world_area.get_location()
+            threat_direction = self.get_threat_direction(destination)
+            self.set_squad_defend_order(
+                squad, world_area, destination, threat_direction
+            )
+            self.set_squad_starting_position(
+                squad, spawn_location, threat_direction
+            )
+
+    # ---------------------------------------------------------------------------
     def set_initial_orders_and_positions(self):
         """hand out the initial tactical orders to the squad leads"""
 
@@ -234,9 +310,12 @@ class AIFactionTactical:
         min_squads_per_area = 2
         max_squads_per_area = 5
 
+        # main force only - reinforcements are handled separately farther back
+        main_squads = [s for s in self.squads if not s.is_reinforcement]
+
         # Sort all squads by type first
-        motorized_squads = [s for s in self.squads if len(s.vehicles) > 0]
-        foot_squads = [s for s in self.squads if len(s.vehicles) == 0]
+        motorized_squads = [s for s in main_squads if len(s.vehicles) > 0]
+        foot_squads = [s for s in main_squads if len(s.vehicles) == 0]
 
         # Separate towed gun squads (vehicles where vehicle.ai.is_towed_gun==True)
         towed_gun_squads = []
@@ -338,6 +417,10 @@ class AIFactionTactical:
                     self.set_squad_starting_position(
                         squad, spawn_location, threat_direction
                     )
+
+        # --- Reinforcements: far behind spawn, march to world areas ---
+        reinforcement_squads = [s for s in self.squads if s.is_reinforcement]
+        self.set_reinforcement_orders_and_positions(reinforcement_squads)
 
     # ---------------------------------------------------------------------------
     def get_threat_direction(self, from_coords):

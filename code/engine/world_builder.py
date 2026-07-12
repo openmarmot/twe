@@ -522,8 +522,18 @@ def get_random_from_list(world, world_coords, OBJECT_LIST, spawn):
 
 
 # ------------------------------------------------------------------------------
-def get_squad_map_objects(squad_name):
+# map object world_coords marker for reinforcement units (main force uses [0, 0]).
+# create_squads reads this before positions are reassigned.
+REINFORCEMENT_MAP_COORDS = [1, 0]
+
+
+def get_squad_map_objects(squad_name, world_coords=None):
     """get a list of map objects that make up a squad"""
+    # world_coords - optional spawn marker. default [0, 0] for main force.
+    # use REINFORCEMENT_MAP_COORDS for reinforcement units.
+    if world_coords is None:
+        world_coords = [0, 0]
+
     global squad_data
     members = []
     if squad_name in squad_data:
@@ -542,7 +552,7 @@ def get_squad_map_objects(squad_name):
     # convert each member to a map_object
     map_objects = []
     for b in members:
-        map_objects.append(MapObject(b, "none", [0, 0], 0, []))
+        map_objects.append(MapObject(b, "none", list(world_coords), 0, []))
 
     return map_objects
 
@@ -614,6 +624,8 @@ def load_quick_battle_map_objects(battle_option, result_container):
     """load quick battle map objects. called by game menu"""
 
     # this is called in a thread by graphics_2d_pygame.load_quick_battle
+    # normalize - game menu passes string keys; --ai-test / --quick-battle pass ints
+    battle_option = str(battle_option)
 
     world_area_options = []
     world_area_options.append(["town", "town", "town"])
@@ -626,6 +638,9 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     # -- initial troops --
     squads = []
+    reinforcement_squads = []
+    points = 0
+    soviet_advantage = 0
 
     if battle_option == "1":
         points = 2500
@@ -686,13 +701,32 @@ def load_quick_battle_map_objects(battle_option, result_container):
             squads.append("Soviet T34-76 Model 1943")
             squads.append("German Panzer IV Ausf G")
 
+    # -- reinforcements (10% of main force points, battle options 1-3) --
+    if points > 0:
+        rein_points = int(points * 0.1)
+        rein_soviet_advantage = soviet_advantage * 0.1
+        print(f"reinforcement points: {rein_points}")
+        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "german", rein_points, squad_data, year
+        )
+        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "soviet", rein_points + rein_soviet_advantage, squad_data, year
+        )
+
+    # convert squads to map objects
+    # main force: [0, 0]. reinforcements: REINFORCEMENT_MAP_COORDS marker for create_squads
     for squad in squads:
         map_objects += get_squad_map_objects(squad)
+    for squad in reinforcement_squads:
+        map_objects += get_squad_map_objects(squad, REINFORCEMENT_MAP_COORDS)
 
     # print squad summary table
     squad_counts = {}
     for s in squads:
         squad_counts[s] = squad_counts.get(s, 0) + 1
+    rein_squad_counts = {}
+    for s in reinforcement_squads:
+        rein_squad_counts[s] = rein_squad_counts.get(s, 0) + 1
     print("=" * 50)
     print("=" * 50)
     engine.log.add_data("note", f"Quick battle year: {year}", True)
@@ -701,6 +735,14 @@ def load_quick_battle_map_objects(battle_option, result_container):
     print("-" * 50)
     for name, count in sorted(squad_counts.items(), key=lambda x: (x[0], -x[1])):
         print(f"{count:>5}  {name}")
+    if rein_squad_counts:
+        print("\nReinforcement Squad Summary:")
+        print(f"{'Count':>5}  {'Squad Name'}")
+        print("-" * 50)
+        for name, count in sorted(
+            rein_squad_counts.items(), key=lambda x: (x[0], -x[1])
+        ):
+            print(f"{count:>5}  {name}")
     print()
     print("=" * 50)
     print("=" * 50)
