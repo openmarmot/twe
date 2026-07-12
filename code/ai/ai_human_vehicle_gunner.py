@@ -857,6 +857,18 @@ class AIHumanVehicleGunner:
             )
             return
 
+        # ensure we have HE loaded for indirect fire
+        if turret.ai.primary_weapon.ai.magazine:
+            mag = turret.ai.primary_weapon.ai.magazine
+            if mag.ai.use_antitank and not mag.ai.use_antipersonnel:
+                self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
+                    self.owner.world.world_seconds
+                )
+                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                    VehicleCrewAction.RELOADING_PRIMARY
+                )
+                return
+
         # if we got this far then we are set to fire i guess
         self.calculate_turret_aim_indirect(
             turret, fire_mission.world_coords, turret.ai.primary_weapon
@@ -927,7 +939,9 @@ class AIHumanVehicleGunner:
         prefer_ap = False
 
         if target is None:
-            if self.owner.ai.vehicle_targets:
+            if self.owner.ai.memory["task_vehicle_crew"]["fire_missions"]:
+                prefer_ap = True
+            elif self.owner.ai.vehicle_targets:
                 v = self.owner.ai.vehicle_targets[0]
                 v_armor = v.ai.vehicle_armor.get("front", [0])[0]
                 v_pax = v.ai.passenger_compartment_armor.get("front", [0])[0]
