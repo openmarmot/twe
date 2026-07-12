@@ -720,35 +720,85 @@ def load_quick_battle_map_objects(battle_option, result_container):
     for squad in reinforcement_squads:
         map_objects += get_squad_map_objects(squad, REINFORCEMENT_MAP_COORDS)
 
-    # print squad summary table
-    squad_counts = {}
-    for s in squads:
-        squad_counts[s] = squad_counts.get(s, 0) + 1
-    rein_squad_counts = {}
-    for s in reinforcement_squads:
-        rein_squad_counts[s] = rein_squad_counts.get(s, 0) + 1
-    print("=" * 50)
-    print("=" * 50)
     engine.log.add_data("note", f"Quick battle year: {year}", True)
-    print("\nSquad Summary:")
-    print(f"{'Count':>5}  {'Squad Name'}")
-    print("-" * 50)
-    for name, count in sorted(squad_counts.items(), key=lambda x: (x[0], -x[1])):
-        print(f"{count:>5}  {name}")
-    if rein_squad_counts:
-        print("\nReinforcement Squad Summary:")
-        print(f"{'Count':>5}  {'Squad Name'}")
-        print("-" * 50)
-        for name, count in sorted(
-            rein_squad_counts.items(), key=lambda x: (x[0], -x[1])
-        ):
-            print(f"{count:>5}  {name}")
-    print()
-    print("=" * 50)
-    print("=" * 50)
-    print()
+    print_quick_battle_squad_summary(year, squads, reinforcement_squads)
 
     result_container[0] = map_objects
+
+
+# ------------------------------------------------------------------------------
+def print_quick_battle_squad_summary(year, squads, reinforcement_squads):
+    """print a clean terminal summary of quick battle forces by faction"""
+
+    def count_squads(squad_list):
+        counts = {}
+        for s in squad_list:
+            counts[s] = counts.get(s, 0) + 1
+        return counts
+
+    def faction_of(squad_name):
+        if squad_name in squad_data:
+            return squad_data[squad_name].get("faction", "unknown")
+        lower = squad_name.lower()
+        if lower.startswith("german"):
+            return "german"
+        if lower.startswith("soviet"):
+            return "soviet"
+        if lower.startswith("american"):
+            return "american"
+        return "unknown"
+
+    def filter_faction(counts, faction):
+        return {k: v for k, v in counts.items() if faction_of(k) == faction}
+
+    def print_force_block(label, counts):
+        if not counts:
+            return
+        total = sum(counts.values())
+        print(f"  {label}  ({total} squad{'s' if total != 1 else ''})")
+        print(f"  {'#':>4}  Squad")
+        print(f"  {'----':>4}  {'-' * (width - 10)}")
+        for name, count in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
+            print(f"  {count:>4}  {name}")
+        print()
+
+    main_counts = count_squads(squads)
+    rein_counts = count_squads(reinforcement_squads)
+    width = 62
+
+    print()
+    print("=" * width)
+    print(f"  QUICK BATTLE SUMMARY  |  Year {year}")
+    print("=" * width)
+
+    faction_labels = (
+        ("german", "GERMAN"),
+        ("soviet", "SOVIET"),
+        ("american", "AMERICAN"),
+    )
+    for faction, label in faction_labels:
+        main_f = filter_faction(main_counts, faction)
+        rein_f = filter_faction(rein_counts, faction)
+        if not main_f and not rein_f:
+            continue
+
+        main_total = sum(main_f.values())
+        rein_total = sum(rein_f.values())
+        force_total = main_total + rein_total
+
+        print()
+        print(f"  {label}")
+        print(f"  {'-' * (width - 2)}")
+        print(
+            f"  Total: {force_total} squads"
+            f"  (main {main_total}, reinforcements {rein_total})"
+        )
+        print()
+        print_force_block("Main Force", main_f)
+        print_force_block("Reinforcements", rein_f)
+
+    print("=" * width)
+    print()
 
 
 # ------------------------------------------------------------------------------
