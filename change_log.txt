@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 17 2026
+- adjustments to vehicle crew ai to improve tactics against tanks
+- misc bug fix
+- fixed occasional crash with soldiers that lose their weapon somehow (run out of ammo ?)
+
+---------------------------------
 July 16 2026
 - adjusted initial idirect fire missiosn to only go to vehicles that are in range
 

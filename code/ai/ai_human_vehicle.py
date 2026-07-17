@@ -247,6 +247,7 @@ class AIHumanVehicle:
                             VehicleCrewAction.ENGAGING,
                             VehicleCrewAction.WAITING_FOR_ROTATE,
                             VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
                             VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
                             VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
                         )

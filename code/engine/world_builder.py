@@ -390,7 +390,7 @@ def convert_map_objects_to_world_objects(world, map_objects):
         if map_object.world_builder_identity.startswith("world_area"):
             # make the corresponding WorldArea object
             w = WorldArea(world)
-            w.world_coords = map_object.world_coords
+            w.world_coords = copy.copy(map_object.world_coords)
             w.name = map_object.name
             w.area_type = map_object.world_builder_identity.split("world_area_")[1]
 
@@ -885,7 +885,7 @@ def spawn_aligned_pile(
 
         x = spawn_object(world, current_coords, spawn_string, True)
         x.rotation_angle = rotation
-        x.heading = heading
+        x.heading = copy.copy(heading)
 
     if second_layer:
         current_coords = engine.math_2d.moveAlongVector(
@@ -898,7 +898,7 @@ def spawn_aligned_pile(
 
             x = spawn_object(world, current_coords, spawn_string, True)
             x.rotation_angle = rotation
-            x.heading = heading
+            x.heading = copy.copy(heading)
 
 
 # ------------------------------------------------------------------------------
@@ -912,7 +912,7 @@ def spawn_container_body(name, world_object, image_index):
     )
     z.is_container = True
     z.name = name
-    z.world_coords = world_object.world_coords
+    z.world_coords = copy.copy(world_object.world_coords)
     z.rotation_angle = world_object.rotation_angle
     z.ai.inventory = world_object.ai.inventory.copy()
     z.world_builder_identity = "body"
@@ -970,7 +970,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_smoke", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(30, 40)
         z.ai.rotate_time_max = 60
@@ -983,7 +983,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_fire", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(80, 90)
         z.ai.rotate_time_max = 5
@@ -996,7 +996,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_flash", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -1009,7 +1009,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_explosion", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -1027,7 +1027,7 @@ def spawn_flash(world, world_coords, heading, amount=2):
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_flash", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -1066,21 +1066,23 @@ def spawn_object(world, world_coords, object_type, spawn):
 
 # ------------------------------------------------------------------------------
 def spawn_map_pointer(world, TARGET_COORDS, TYPE):
+    # snapshot so the pin does not share a live object world_coords list
+    pin_coords = copy.copy(TARGET_COORDS)
     if TYPE == "normal":
         z = WorldObject(world, ["map_pointer_green"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
     if TYPE == "blue":
         z = WorldObject(world, ["map_pointer_blue"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
     if TYPE == "orange":
         z = WorldObject(world, ["map_pointer_orange"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
@@ -1163,7 +1165,7 @@ def spawn_smoke_cloud(world, world_coords, heading, amount=30):
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_smoke", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(5, 7)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8

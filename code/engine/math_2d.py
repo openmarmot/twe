@@ -377,10 +377,20 @@ def get_heading_vector(location,destination):
 
 #--------------------------------------------------------------------------------
 @lru_cache(maxsize=2000)
-def get_heading_from_rotation(rotation):
+def _heading_from_rotation_cached(rotation):
+    '''cached pure result as a tuple so the cache never holds a shared mutable list'''
     r = math.radians(rotation)
     b = [-math.sin(r), -math.cos(r)]
-    return get_normalized(b)
+    l = math.sqrt(b[0] * b[0] + b[1] * b[1])
+    if l == 0:
+        return (0.0, 0.0)
+    return (b[0] / l, b[1] / l)
+
+#--------------------------------------------------------------------------------
+def get_heading_from_rotation(rotation):
+    '''normalized heading vector for a rotation (degrees). always a fresh list.'''
+    h = _heading_from_rotation_cached(rotation)
+    return [h[0], h[1]]
 
 #------------------------------------------------------------------------------
 def get_normalized(vec2):

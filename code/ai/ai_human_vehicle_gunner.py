@@ -681,6 +681,22 @@ class AIHumanVehicleGunner:
                                 "current_action_details"
                             ] = f"Waiting for driver to close distance with {target.name}"
                             return
+                elif engage_primary_reason == "need better angle":
+                    if turret.ai.primary_turret:
+                        if (
+                            vehicle.ai.vehicle_crew[0].is_driver
+                            and vehicle.ai.vehicle_crew[0].role_occupied
+                        ):
+                            self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                                random.uniform(0.5, 1)
+                            )
+                            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                                VehicleCrewAction.WAITING_FOR_BETTER_ANGLE
+                            )
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "current_action_details"
+                            ] = f"Waiting for driver to get a better angle on {target.name}"
+                            return
 
             # if we can't pen occasionally send a round out anyways.
             if engage_primary is False and engage_primary_reason == "":

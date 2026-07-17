@@ -270,10 +270,24 @@ class AIHumanVehicleDriver:
         return
 
     # ---------------------------------------------------------------------------
+    def flank_sign_for_pair(self, vehicle, target_coords):
+        """stable left/right split so multiple friendlies do not all arc the same way"""
+        # target_coords may be a list; use a coarse grid hash when no object id
+        key = id(vehicle) + int(target_coords[0]) + int(target_coords[1])
+        if key % 2 == 0:
+            return 1
+        return -1
+
+    # ---------------------------------------------------------------------------
     def calculate_engagement_position(
-        self, vehicle_coords, target_coords, desired_range
+        self, vehicle_coords, target_coords, desired_range, angle_offset_deg=0
     ):
-        """point on the vehicle-target line, desired_range from the target (vehicle side)"""
+        """point near the target at desired_range, optionally rotated off the radial line.
+
+        angle_offset_deg: degrees to rotate the vehicle->target bearing around the
+        target. Non-zero values create an arc approach (flank) instead of driving
+        straight down the gun line.
+        """
         dist = engine.math_2d.get_distance(vehicle_coords, target_coords)
         if dist < 1.0:
             # coinciding with target - pick any point on a ring at desired_range
@@ -281,22 +295,39 @@ class AIHumanVehicleDriver:
                 list(target_coords), desired_range
             )
 
-        # stay on our side of the target: target + unit(vehicle - target) * desired_range
-        scale = desired_range / dist
+        # vector from target toward our current position
+        offset = [
+            vehicle_coords[0] - target_coords[0],
+            vehicle_coords[1] - target_coords[1],
+        ]
+        if angle_offset_deg != 0:
+            offset = engine.math_2d.get_vector_rotation(offset, angle_offset_deg)
+
+        length = engine.math_2d.get_vector_length(offset)
+        if length < 0.001:
+            return engine.math_2d.randomize_coordinates(
+                list(target_coords), desired_range
+            )
+
+        scale = desired_range / length
         dest = [
-            target_coords[0] + (vehicle_coords[0] - target_coords[0]) * scale,
-            target_coords[1] + (vehicle_coords[1] - target_coords[1]) * scale,
+            target_coords[0] + offset[0] * scale,
+            target_coords[1] + offset[1] * scale,
         ]
         # light scatter so multiple vehicles don't stack on the same point
         return engine.math_2d.randomize_coordinates(dest, 50)
 
     # ---------------------------------------------------------------------------
-    def create_vehicle_order_for_target(self, target_or_coords, desired_range=None):
+    def create_vehicle_order_for_target(
+        self, target_or_coords, desired_range=None, angle_offset_deg=0
+    ):
         """create vehicle order to position for engagement at a standoff from target.
 
-        desired_range: distance from the target to stop at. If None, uses a short
-        close-with distance suitable for direct-fire 'need to get closer' cases.
-        For indirect fire, pass a value derived from the weapon's max range.
+        desired_range: distance from the target to stop at. If None, uses a medium
+        close-with band suitable for direct-fire 'need to get closer' cases
+        (pen tables: ~2000 GU ≈ 1000m). For indirect fire, pass a value derived
+        from the weapon's max range.
+        angle_offset_deg: arc off the radial line for flanks / safer approaches.
         Never overrides a commander retreat order.
 
         Returns True if a close-with order is ready to execute (new or existing).
@@ -311,13 +342,16 @@ class AIHumanVehicleDriver:
                 return True
 
         if desired_range is None:
-            # direct-fire close-with: approach but not into melee
-            desired_range = 500
+            # medium pen band, not melee - see game_unit_conversions.txt
+            desired_range = 2000
 
         vehicle_order = VehicleOrder()
         vehicle_order.order_close_with_enemy = True
         vehicle_order.world_coords = self.calculate_engagement_position(
-            vehicle.world_coords, target_or_coords, desired_range
+            vehicle.world_coords,
+            target_or_coords,
+            desired_range,
+            angle_offset_deg,
         )
         if vehicle.ai.is_transport:
             vehicle_order.exit_vehicle_when_finished = True
@@ -525,7 +559,17 @@ class AIHumanVehicleDriver:
         if current_action == VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE:
             target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
             if target is not None:
-                if self.create_vehicle_order_for_target(target.world_coords):
+                # arc inward toward a medium pen band (~1000m table range), not nose-first to 500
+                dist = engine.math_2d.get_distance(
+                    vehicle.world_coords, target.world_coords
+                )
+                desired_range = min(2000, max(1200, dist * 0.55))
+                angle_offset = 55 * self.flank_sign_for_pair(
+                    vehicle, target.world_coords
+                )
+                if self.create_vehicle_order_for_target(
+                    target.world_coords, desired_range, angle_offset
+                ):
                     self.think_vehicle_order()
                     return True
                 return False
@@ -533,6 +577,33 @@ class AIHumanVehicleDriver:
                 engine.log.add_data(
                     "debug",
                     f"driver: gunner waiting for close distance but target is None",
+                    False,
+                )
+
+        if current_action == VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
+            target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
+            if target is not None:
+                # hold roughly current range (slight close if very far) and swing for side aspect
+                dist = engine.math_2d.get_distance(
+                    vehicle.world_coords, target.world_coords
+                )
+                if dist > 3500:
+                    desired_range = 2800
+                else:
+                    desired_range = max(1500, min(dist, 3500))
+                angle_offset = 80 * self.flank_sign_for_pair(
+                    vehicle, target.world_coords
+                )
+                if self.create_vehicle_order_for_target(
+                    target.world_coords, desired_range, angle_offset
+                ):
+                    self.think_vehicle_order()
+                    return True
+                return False
+            else:
+                engine.log.add_data(
+                    "debug",
+                    "driver: gunner waiting for better angle but target is None",
                     False,
                 )
 

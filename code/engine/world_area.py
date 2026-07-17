@@ -7,7 +7,8 @@ notes : kind of a control point, a map feature that the factions will want to at
 
 
 #import built in modules
-import random 
+import random
+import copy
 
 #import custom packages
 import engine.math_2d
@@ -92,7 +93,8 @@ class WorldArea():
 
         location=self.locations.pop(random.randint(0, len(self.locations) - 1))
         self.used_locations.append(location)
-        return location
+        # return a snapshot so callers (orders, spawns) do not share the pool list
+        return copy.copy(location)
 
     #---------------------------------------------------------------------------
     def update(self):

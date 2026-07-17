@@ -239,25 +239,41 @@ class AIHuman:
             if armor_value - pen_value < (armor_value * self.armor_knowledge):
                 return True, ""
 
-            if distance > 2000:
-                # check if we would penetrate at a much closer distance
-                fake_distance = 400
-                penetration, pen_value, armor_value, _ = (
-                    engine.penetration_calculator.calculate_penetration(
+            # ideal relative angles for a flat hit on each face (see penetration_calculator)
+            side_centers = {"rear": 0, "right": 90, "front": 180, "left": 270}
+
+            def can_pen_face(side, check_distance):
+                # hits can land on passenger compartment or hull; either is a usable shot
+                for armor_dict in (
+                    target.ai.passenger_compartment_armor,
+                    target.ai.vehicle_armor,
+                ):
+                    p, _, _, _ = engine.penetration_calculator.calculate_penetration(
                         projectile,
-                        fake_distance,
+                        check_distance,
                         "steel",
-                        target.ai.passenger_compartment_armor["left"],
-                        "front",
-                        180,
+                        armor_dict[side],
+                        side,
+                        side_centers[side],
                     )
-                )
-                if penetration:
-                    return False, "need to get closer to penetrate"
-                else:
-                    return False, ""
-            else:
-                return False, ""
+                    if p:
+                        return True
+                return False
+
+            # side/rear would pen at *current* range -> reposition for angle, not charge in
+            for side in ("left", "right", "rear"):
+                if can_pen_face(side, distance):
+                    return False, "need better angle"
+
+            # nothing weak enough now: would a shorter range unlock pen?
+            # ~2000 GU maps to ~1000m in the pen tables (see misc_notes/game_unit_conversions.txt)
+            close_distance = min(2000, max(800, distance * 0.55))
+            if close_distance < distance - 150:
+                for side in ("front", "left", "right", "rear"):
+                    if can_pen_face(side, close_distance):
+                        return False, "need to get closer to penetrate"
+
+            return False, ""
 
         # default
         return True, ""
@@ -2321,7 +2337,6 @@ class AIHuman:
     def update_task_engage_enemy(self):
         """Engage enemy targets with weapons or tactics"""
 
-        # - getting this far assumes that you have a primary weapon
         enemy = self.memory["task_engage_enemy"]["enemy"]
         if enemy.is_human:
             if enemy.ai.blood_pressure < 1:
@@ -2330,6 +2345,17 @@ class AIHuman:
                 return
         elif enemy.is_vehicle:
             if enemy.ai.vehicle_disabled:
+                self.memory.pop("task_engage_enemy", None)
+                self.switch_task_think()
+                return
+
+        # primary can be None (unarmed medics, empty gun dropped, etc.).
+        # human engage needs a gun; vehicle engage can still use AT/grenades.
+        if self.primary_weapon is None:
+            can_vehicle = enemy.is_vehicle and (
+                self.antitank is not None or self.throwable is not None
+            )
+            if not can_vehicle:
                 self.memory.pop("task_engage_enemy", None)
                 self.switch_task_think()
                 return
@@ -2361,8 +2387,12 @@ class AIHuman:
 
         else:
             # -- fire --
-            self.fire(self.primary_weapon, enemy)
-            self.fatigue += self.fatigue_add_rate * self.owner.world.time_passed_seconds
+            # only fire with a primary; AT/grenade actions happen on think ticks
+            if self.primary_weapon is not None:
+                self.fire(self.primary_weapon, enemy)
+                self.fatigue += (
+                    self.fatigue_add_rate * self.owner.world.time_passed_seconds
+                )
 
     # ---------------------------------------------------------------------------
     def update_task_engage_enemy_human(self):
@@ -2370,7 +2400,11 @@ class AIHuman:
 
         # note - this is a think method
 
-        # - getting this far assumes that you have a primary weapon
+        if self.primary_weapon is None:
+            self.memory.pop("task_engage_enemy", None)
+            self.switch_task_think()
+            return
+
         enemy = self.memory["task_engage_enemy"]["enemy"]
         distance = engine.math_2d.get_distance(
             self.owner.world_coords, enemy.world_coords
@@ -2518,6 +2552,13 @@ class AIHuman:
                             )
                         self.speak(f"Throwing {self.throwable.name} !!!!")
                         self.throw(aim_coords)
+
+            if self.primary_weapon is None:
+                # grenade-only unit: stay on task for more throws, or bail if no throwable
+                if self.throwable is None:
+                    self.memory.pop("task_engage_enemy", None)
+                    self.switch_task_think()
+                return
 
             # out of ammo ?
             ammo_gun, ammo_inventory, magazine_count = self.check_ammo(
@@ -3178,8 +3219,12 @@ class AIHuman:
                     return
 
         # -- primary weapon --
+        # re-equip a gun from inventory if the slot is empty (e.g. after drop)
         if self.primary_weapon is None:
-            # need to get a gun
+            self.update_equipment_slots()
+
+        if self.primary_weapon is None:
+            # need to get a gun from the world
             distance = 4000
             if self.human_targets:
                 distance = 800
@@ -3230,8 +3275,9 @@ class AIHuman:
                     self.switch_task_loot_container(random.choice(containers))
                     return
 
-                # ran out of options to find ammo. set this to cause the bot to pickup a new weapon
-                self.primary_weapon = None
+                # no ammo left for this gun — drop it so we can pick up something usable
+                # (clearing the slot alone left an empty gun in inventory forever)
+                self.drop_object(self.primary_weapon)
 
         # -- check if we have older tasks to resume --
         # this is important for compound tasks

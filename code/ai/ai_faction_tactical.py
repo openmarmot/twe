@@ -492,7 +492,7 @@ class AIFactionTactical:
             order = TacticalOrder()
             order.order_defend_area = True
             order.world_area = world_area
-            order.world_coords = world_area_location
+            order.world_coords = copy.copy(world_area_location)
             order.threat_direction = threat_direction
             squad.squad_leader.ai.switch_task_squad_leader(order)
 
@@ -520,12 +520,15 @@ class AIFactionTactical:
             if squad.squad_leader.ai.memory["task_squad_leader"]["orders"]:
                 vehicle_order = VehicleOrder()
                 vehicle_order.order_drive_to_coords = True
-                vehicle_order.world_coords = squad.squad_leader.ai.memory[
-                    "task_squad_leader"
-                ]["orders"][0].world_coords
+                vehicle_order.world_coords = copy.copy(
+                    squad.squad_leader.ai.memory["task_squad_leader"]["orders"][
+                        0
+                    ].world_coords
+                )
 
         for vehicle in squad.vehicles:
-            vehicle.world_coords = position
+            # each vehicle needs its own list; sharing position aliases them all
+            vehicle.world_coords = copy.copy(position)
             # set initial rotation toward threat direction if known
             if threat_direction is not None:
                 vehicle.rotation_angle = threat_direction
