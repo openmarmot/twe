@@ -39,7 +39,7 @@ def create(world, world_coords):
     z.ai.coaxial_weapon = engine.world_builder.spawn_object(world, world_coords, "mg34", False)
     z.ai.coaxial_weapon.ai.equipper = z
     z.ai.primary_turret = True
-    z.ai.primary_weapon_reload_speed = 21
+    z.ai.primary_weapon_reload_speed = 22
     z.ai.coaxial_weapon_reload_speed = 10
     z.no_save = True
     return z

@@ -641,10 +641,10 @@ def load_quick_battle_map_objects(battle_option, result_container):
     reinforcement_squads = []
     points = 0
     soviet_advantage = 0
-
+    soviet_advantage_multiplier=0.5
     if battle_option == "1":
         points = 2500
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -655,7 +655,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     elif battle_option == "2":
         points = 5000
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -670,7 +670,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     elif battle_option == "3":
         points = 10000
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year

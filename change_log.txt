@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 16 2026
+- adjusted initial idirect fire missiosn to only go to vehicles that are in range
+
+---------------------------------
+July 15 2026
+- updated soviet bonus multiplier from .3 to .5
+
+the game is in a odd spot where the soviets pretty much never win.
+they do fine in infantry combat- rifles are plenty deadly, however their tanks always lose.
+the issue is their armor penetration at range is worse, and their armor is also worse.
+a numerical advantage doesn't really help, they just get picked off.
+
+---------------------------------
+July 14 2026
+- some adjust to vehicle weapon and turret accuracy
+---------------------------------
 July 12 2026
 - added reinforcement squads back in
 - spawn points are now randomized.

@@ -64,6 +64,8 @@ class AIFactionTactical:
 
         self.initial_fire_missions = 0
         self.indirect_fire_vehicles = []
+        # world.world_seconds deadline for handing out bootstrap fire missions
+        self.initial_fire_missions_deadline = 0
 
         self.allied_humans = []
         self.hostile_humans = []
@@ -78,6 +80,15 @@ class AIFactionTactical:
 
         # this is kind of awful but we don't really have a better way of assigning these
         # as we don't know who ends up being a indirect gunner
+        # only assign targets already in range so vehicles do not drive into enemy fire
+        # trying to get into position for the mission
+
+        # stop retrying after the deadline - commander can still create missions later
+        if self.world.world_seconds >= self.initial_fire_missions_deadline:
+            self.initial_fire_missions = 0
+            self.indirect_fire_vehicles = []
+            self.think_rate = 30
+            return
 
         hostile_world_areas = []
         for b in self.world.world_areas:
@@ -89,12 +100,38 @@ class AIFactionTactical:
                     hostile_world_areas.append(b)
 
         if hostile_world_areas:
+            still_waiting = []
             for v in self.indirect_fire_vehicles:
+                assigned = False
                 for role in v.ai.vehicle_crew:
                     if role.role_occupied and role.is_gunner:
                         if role.turret.ai.primary_weapon.ai.indirect_fire:
-                            # random for now
-                            random_world_area = random.choice(hostile_world_areas)
+                            if "task_vehicle_crew" not in role.human.ai.memory:
+                                continue
+
+                            weapon = role.turret.ai.primary_weapon
+                            max_range = (
+                                weapon.ai.indirect_range
+                                or weapon.ai.range
+                                or 2000
+                            )
+                            min_range = weapon.ai.minimum_range or 0
+
+                            in_range_areas = []
+                            for area in hostile_world_areas:
+                                distance = engine.math_2d.get_distance(
+                                    v.world_coords, area.get_location()
+                                )
+                                if min_range <= distance <= max_range:
+                                    in_range_areas.append(area)
+
+                            if not in_range_areas:
+                                continue
+
+                            fire_missions = role.human.ai.memory["task_vehicle_crew"][
+                                "fire_missions"
+                            ]
+                            random_world_area = random.choice(in_range_areas)
                             for _ in range(3):
                                 f = FireMission(
                                     random_world_area.get_location(),
@@ -102,10 +139,15 @@ class AIFactionTactical:
                                     None,
                                 )
                                 f.rounds_requested = 5
-                                role.human.ai.memory["task_vehicle_crew"][
-                                    "fire_missions"
-                                ].append(f)
+                                fire_missions.append(f)
+                            assigned = True
                             self.initial_fire_missions -= 1
+                            break
+
+                if not assigned:
+                    still_waiting.append(v)
+
+            self.indirect_fire_vehicles = still_waiting
 
         if self.initial_fire_missions < 1:
             # reset think rate to normal
@@ -207,6 +249,8 @@ class AIFactionTactical:
         """identify friendly vehicles with indirect fire weapons"""
         self.indirect_fire_vehicles = []
         self.initial_fire_missions = 0
+        # give crew time to mount up and vehicles a short window to be in range
+        self.initial_fire_missions_deadline = self.world.world_seconds + 60
 
         for squad in self.squads:
             # compiles list of indirect fire vehicles

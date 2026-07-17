@@ -37,7 +37,7 @@ def create(world, world_coords):
     z.ai.primary_weapon.ai.smoke_offset = [-100.0, 1.0]
     z.ai.primary_weapon.ai.spawn_case = False
     z.ai.primary_turret = True
-    z.ai.primary_weapon_reload_speed = 20
+    z.ai.primary_weapon_reload_speed = 23
     z.ai.coaxial_weapon_reload_speed = 10
     z.no_save = True
     return z
