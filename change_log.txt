@@ -1,6 +1,9 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 18 2026
+
+---------------------------------
 July 17 2026
 - adjustments to vehicle crew ai to improve tactics against tanks
 - misc bug fix

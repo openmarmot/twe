@@ -225,6 +225,16 @@ class AIHumanSquadLeader:
     def update_task_squad_leader(self):
         """Squad leader AI task for temporary tactical oversight"""
 
+        # civilians flee gunfire instead of squad-leading / seeking local cover
+        if self.owner.ai.is_civilian:
+            recent_fire = (
+                self.owner.grid_square.last_gun_fired + 30
+                > self.owner.world.world_seconds
+            )
+            if recent_fire:
+                self.owner.ai.civilian_flee_gunfire()
+                return
+
         last_think_time = self.owner.ai.memory["task_squad_leader"]["last_think_time"]
         think_interval = self.owner.ai.memory["task_squad_leader"]["think_interval"]
 

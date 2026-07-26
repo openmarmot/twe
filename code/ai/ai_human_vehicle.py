@@ -298,7 +298,13 @@ class AIHumanVehicle:
                     - self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"]
                     > turret.ai.primary_weapon_reload_speed
                 ):
-                    self.owner.ai.reload_weapon(turret.ai.primary_weapon, vehicle, None)
+                    magazine = self.owner.ai.memory["task_vehicle_crew"].get(
+                        "reload_magazine"
+                    )
+                    self.owner.ai.reload_weapon(
+                        turret.ai.primary_weapon, vehicle, magazine
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"]["reload_magazine"] = None
                     self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                         VehicleCrewAction.NONE
                     )
@@ -313,7 +319,13 @@ class AIHumanVehicle:
                     - self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"]
                     > turret.ai.coaxial_weapon_reload_speed
                 ):
-                    self.owner.ai.reload_weapon(turret.ai.coaxial_weapon, vehicle, None)
+                    magazine = self.owner.ai.memory["task_vehicle_crew"].get(
+                        "reload_magazine"
+                    )
+                    self.owner.ai.reload_weapon(
+                        turret.ai.coaxial_weapon, vehicle, magazine
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"]["reload_magazine"] = None
                     self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                         VehicleCrewAction.NONE
                     )

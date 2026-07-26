@@ -114,6 +114,7 @@ class AIHuman:
         self.is_medic = False
         self.is_mechanic = False
         self.is_small_arms_trained = False  # this is true for soldiers. determines if they will pick up a gun with no enemy
+        self.is_civilian = False
         # used by calculate_engagement. lower is better
         self.armor_knowledge = 0.3
         # -- stats --
@@ -764,15 +765,8 @@ class AIHuman:
                 # - we are on foot -
 
                 if self.owner.is_player is False:
-                    destination = [0, 0]
-                    if self.squad.faction_tactical.faction == "civilian":
-                        # civilian runs further
-                        destination = [
-                            self.owner.world_coords[0]
-                            + float(random.randint(-560, 560)),
-                            self.owner.world_coords[1]
-                            + float(random.randint(-560, 560)),
-                        ]
+                    if self.is_civilian:
+                        self.civilian_flee_gunfire("Hit by gunfire, fleeing")
                     else:
                         # soldier repositions to get away from the fire
                         # low morale soldiers run further
@@ -787,9 +781,9 @@ class AIHuman:
                             self.owner.world_coords[1]
                             + float(random.randint(-run_distance, run_distance)),
                         ]
-                    if self.prone is False:
-                        self.prone_state_change()
-                    self.switch_task_move_to_location(destination, None)
+                        if self.prone is False:
+                            self.prone_state_change()
+                        self.switch_task_move_to_location(destination, None)
 
         elif event_data.is_grenade:
             # not sure what to do here. the grenade explodes too fast to really do anything
@@ -1104,6 +1098,44 @@ class AIHuman:
         return calc_speed
 
     # ---------------------------------------------------------------------------
+    def get_civilian_flee_destination(self):
+        """Pick a flee point in a neighboring grid square, preferring buildings."""
+        current = self.owner.grid_square
+        grid_size = current.grid_size
+        nearby = self.owner.world.grid_manager.get_grid_squares_near_world_coords(
+            self.owner.world_coords, grid_size * 1.5
+        )
+        other_squares = [s for s in nearby if s is not current]
+
+        buildings = []
+        for s in other_squares:
+            buildings.extend(s.wo_objects_building)
+
+        if buildings:
+            return copy.copy(random.choice(buildings).world_coords)
+
+        if other_squares:
+            square = random.choice(other_squares)
+            return [
+                square.center[0] + random.randint(-100, 100),
+                square.center[1] + random.randint(-100, 100),
+            ]
+
+        return [
+            self.owner.world_coords[0] + float(random.randint(-grid_size, grid_size)),
+            self.owner.world_coords[1] + float(random.randint(-grid_size, grid_size)),
+        ]
+
+    # ---------------------------------------------------------------------------
+    def civilian_flee_gunfire(self, reason="Heard gunfire, fleeing"):
+        """Stand up and run to a neighboring grid square."""
+        if self.prone:
+            self.prone_state_change()
+        self.speak("Run!")
+        self.add_journal_entry(reason)
+        self.switch_task_move_to_location(self.get_civilian_flee_destination(), None)
+
+    # ---------------------------------------------------------------------------
     def get_compatible_magazines_within_range(self, gun, max_distance):
         """Find compatible magazines within max distance"""
 
@@ -1302,46 +1334,35 @@ class AIHuman:
             vehicle = self.memory["task_vehicle_crew"]["vehicle_role"].vehicle
             # make sure the player is actually in a turret
             if turret != None:
-                # basically if both are out of ammo the player will have to reload twice to get both done
+                # already reloading - ignore further R presses until done
+                current_action = self.memory["task_vehicle_crew"]["current_action"]
+                if current_action in (
+                    VehicleCrewAction.RELOADING_PRIMARY,
+                    VehicleCrewAction.RELOADING_COAX,
+                ):
+                    return
 
-                # check main gun ammo
-                ammo_gun, ammo_inventory, magazine_count = self.check_ammo(
-                    turret.ai.primary_weapon, vehicle
-                )
-                if ammo_gun == 0:
-                    if ammo_inventory > 0:
-                        # start the reload process
-                        self.memory["task_vehicle_crew"]["reload_start_time"] = (
-                            self.owner.world.world_seconds
-                        )
-                        self.memory["task_vehicle_crew"]["current_action"] = (
-                            VehicleCrewAction.RELOADING_PRIMARY
-                        )
-                        self.memory["task_vehicle_crew"]["current_action_details"] = (
-                            "reloading main gun"
-                        )
-                        self.speak("reloading main gun")
-                        return
+                # open unified menu if main gun and/or coax need reload with ammo available
+                can_reload = False
+                if turret.ai.primary_weapon is not None:
+                    ammo_gun, ammo_inventory, magazine_count = self.check_ammo(
+                        turret.ai.primary_weapon, vehicle
+                    )
+                    if ammo_gun == 0 and ammo_inventory > 0:
+                        can_reload = True
 
-                # check coax ammo
                 if turret.ai.coaxial_weapon is not None:
                     ammo_gun, ammo_inventory, magazine_count = self.check_ammo(
                         turret.ai.coaxial_weapon, vehicle
                     )
-                    if ammo_gun == 0:
-                        if ammo_inventory > 0:
-                            # start the reload process
-                            self.memory["task_vehicle_crew"]["reload_start_time"] = (
-                                self.owner.world.world_seconds
-                            )
-                            self.memory["task_vehicle_crew"]["current_action"] = (
-                                VehicleCrewAction.RELOADING_COAX
-                            )
-                            self.memory["task_vehicle_crew"][
-                                "current_action_details"
-                            ] = "reloading coax"
-                            self.speak("reloading coax")
-                            return
+                    if ammo_gun == 0 and ammo_inventory > 0:
+                        can_reload = True
+
+                if can_reload:
+                    self.owner.world.world_menu.activate_vehicle_reload_menu(
+                        vehicle, turret
+                    )
+                    return
             else:
                 # in the future it will probably be possible to shoot a regular gun from a vehicle
                 # and then this can be reloaded here
@@ -1546,6 +1567,20 @@ class AIHuman:
         # add fatigue only when standing up (from prone to standing)
         if not self.prone:
             self.fatigue += 15
+
+    # ---------------------------------------------------------------------------
+    def start_player_vehicle_reload(self, magazine, reload_action, weapon_label):
+        """begin timed vehicle gun reload with a chosen magazine"""
+        # called by world_menu.vehicle_reload_menu after ammo type selection
+        self.memory["task_vehicle_crew"]["reload_start_time"] = (
+            self.owner.world.world_seconds
+        )
+        self.memory["task_vehicle_crew"]["current_action"] = reload_action
+        self.memory["task_vehicle_crew"]["current_action_details"] = (
+            f"reloading {weapon_label}"
+        )
+        self.memory["task_vehicle_crew"]["reload_magazine"] = magazine
+        self.speak(f"reloading {weapon_label}")
 
     # -----------------------------------------------------------------------
     def reload_weapon(self, weapon, obj_with_inventory, new_magazine):
@@ -3097,6 +3132,17 @@ class AIHuman:
     def update_task_sit_down(self):
         """update task_sit_down"""
 
+        # civilians bail out of sitting when they hear gunfire
+        if self.is_civilian:
+            recent_fire = (
+                self.owner.grid_square.last_gun_fired + 30
+                > self.owner.world.world_seconds
+            )
+            if recent_fire:
+                self.memory.pop("task_sit_down", None)
+                self.civilian_flee_gunfire()
+                return
+
         if self.memory["task_sit_down"]["status"] == "searching":
             distance = 1000
             # don't want the soldiers wandering off too far
@@ -3158,11 +3204,17 @@ class AIHuman:
             self.switch_task_player_control()
             return
 
-        # -- check if we should prone / un-prone --
+        # -- check if we should prone / un-prone / flee --
 
         recent_danger = (
             self.owner.grid_square.last_gun_fired + 30 > self.owner.world.world_seconds
         )
+
+        # civilians flee gunfire to a neighboring grid square (prefer buildings)
+        if self.is_civilian and recent_danger:
+            self.civilian_flee_gunfire()
+            return
+
         has_target = bool(self.human_targets)
         in_range = False
 
