@@ -13,6 +13,7 @@ import math
 # import custom packages
 import engine.math_2d
 import engine.log
+import engine.penetration_calculator
 from engine.vehicle_order import VehicleOrder
 from engine.tactical_order import TacticalOrder
 from engine.fire_mission import FireMission
@@ -328,30 +329,41 @@ class AIHumanVehicleCommander:
             # hull reorientation for armor facing - dedicated commander only.
             # dual-role must keep gunner current_action / think_interval intact so the
             # 360 turret can engage immediately instead of parking in WAITING_FOR_ROTATE.
+            # note - separate 360 gunners are not blocked by this; hull face still helps
+            # (best armor + smaller silhouette) when the trade is one we can accept.
             if not is_dual_role:
                 if biggest_threat.ai.vehicle_armor["front"][0] > 30:
                     # first check if the turret has 360 degree rotation.
                     # if it doesn't the vehicle will naturally orientate towards the vehicle
                     if primary_gunner_role.turret.ai.rotation_range[1] == 360:
-                        rotation_required = engine.math_2d.get_rotation(
-                            vehicle.world_coords, biggest_threat.world_coords
+                        # only hull-face when we can pen their front at current range.
+                        # if we cannot, driver/gunner reposition for angle/range instead
+                        # of sitting nose-on in a losing long-range trade.
+                        hull_face = self.can_pen_target_front(
+                            primary_gunner_role.turret.ai.primary_weapon,
+                            vehicle,
+                            biggest_threat,
                         )
-                        v = vehicle.rotation_angle
-                        rotation_fuzzyness = 5
-                        # rotate if we are NOT currently roughly facing the target
-                        current_angle = engine.math_2d.get_normalized_angle(v)
-                        desired_angle = engine.math_2d.get_normalized_angle(
-                            rotation_required
-                        )
-                        diff = (desired_angle - current_angle + 180) % 360 - 180
-                        if abs(diff) > rotation_fuzzyness:
-                            # we will just save the angle and the driver will grab it
-                            self.owner.ai.memory["task_vehicle_crew"][
-                                "calculated_vehicle_angle"
-                            ] = rotation_required
-                            self.owner.ai.memory["task_vehicle_crew"][
-                                "current_action"
-                            ] = VehicleCrewAction.WAITING_FOR_ROTATE
+                        if hull_face:
+                            rotation_required = engine.math_2d.get_rotation(
+                                vehicle.world_coords, biggest_threat.world_coords
+                            )
+                            v = vehicle.rotation_angle
+                            rotation_fuzzyness = 5
+                            # rotate if we are NOT currently roughly facing the target
+                            current_angle = engine.math_2d.get_normalized_angle(v)
+                            desired_angle = engine.math_2d.get_normalized_angle(
+                                rotation_required
+                            )
+                            diff = (desired_angle - current_angle + 180) % 360 - 180
+                            if abs(diff) > rotation_fuzzyness:
+                                # we will just save the angle and the driver will grab it
+                                self.owner.ai.memory["task_vehicle_crew"][
+                                    "calculated_vehicle_angle"
+                                ] = rotation_required
+                                self.owner.ai.memory["task_vehicle_crew"][
+                                    "current_action"
+                                ] = VehicleCrewAction.WAITING_FOR_ROTATE
 
                 # push rethink so we aren't immediately changing the order
                 self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
@@ -359,6 +371,30 @@ class AIHumanVehicleCommander:
                 )
 
             return
+
+    # ---------------------------------------------------------------------------
+    def can_pen_target_front(self, weapon, vehicle, target):
+        """True if loaded AP would pen target front armor at current range (ideal hit)."""
+        if weapon is None or weapon.ai.magazine is None:
+            return False
+        if len(weapon.ai.magazine.ai.projectiles) == 0:
+            return False
+        if not target.is_vehicle:
+            return True
+
+        distance = engine.math_2d.get_distance(
+            vehicle.world_coords, target.world_coords
+        )
+        projectile = weapon.ai.magazine.ai.projectiles[0]
+        penetration, _, _, _ = engine.penetration_calculator.calculate_penetration(
+            projectile,
+            distance,
+            "steel",
+            target.ai.passenger_compartment_armor["front"],
+            "front",
+            180,
+        )
+        return penetration
 
     # ---------------------------------------------------------------------------
     def think_vehicle_position(self, vehicle):

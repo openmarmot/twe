@@ -301,6 +301,38 @@ def get_distance(coords1, coords2):
     return distance
 
 #------------------------------------------------------------------------------
+def segment_intersects_circle(p1, p2, center, radius):
+    '''True if line segment p1-p2 intersects or touches a circle.
+
+    Used for building line-of-sight checks. Endpoints inside the circle
+    count as intersecting (wall between inside and outside).
+    '''
+    if radius <= 0:
+        return False
+
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    fx = p1[0] - center[0]
+    fy = p1[1] - center[1]
+    radius_sq = radius * radius
+
+    a = dx * dx + dy * dy
+    if a < 1e-12:
+        # segment is a point
+        return (fx * fx + fy * fy) <= radius_sq
+
+    # clamp projection of center onto segment to [0, 1]
+    t = -(fx * dx + fy * dy) / a
+    if t < 0.0:
+        t = 0.0
+    elif t > 1.0:
+        t = 1.0
+
+    closest_x = p1[0] + t * dx - center[0]
+    closest_y = p1[1] + t * dy - center[1]
+    return (closest_x * closest_x + closest_y * closest_y) <= radius_sq
+
+#------------------------------------------------------------------------------
 def get_column_coords(initial_coords, diameter, count, rotation_degrees, width):
     """
     Returns an array of world coordinates to arrange 'count' of objects in columns.
@@ -377,10 +409,20 @@ def get_heading_vector(location,destination):
 
 #--------------------------------------------------------------------------------
 @lru_cache(maxsize=2000)
-def get_heading_from_rotation(rotation):
+def _heading_from_rotation_cached(rotation):
+    '''cached pure result as a tuple so the cache never holds a shared mutable list'''
     r = math.radians(rotation)
     b = [-math.sin(r), -math.cos(r)]
-    return get_normalized(b)
+    l = math.sqrt(b[0] * b[0] + b[1] * b[1])
+    if l == 0:
+        return (0.0, 0.0)
+    return (b[0] / l, b[1] / l)
+
+#--------------------------------------------------------------------------------
+def get_heading_from_rotation(rotation):
+    '''normalized heading vector for a rotation (degrees). always a fresh list.'''
+    h = _heading_from_rotation_cached(rotation)
+    return [h[0], h[1]]
 
 #------------------------------------------------------------------------------
 def get_normalized(vec2):

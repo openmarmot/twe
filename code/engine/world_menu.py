@@ -20,6 +20,7 @@ import engine.math_2d
 import engine.world_radio
 import engine.log
 import engine.self_debug_world
+from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 
 # global variables
 
@@ -50,6 +51,11 @@ class World_Menu:
 
         # used by storage menu
         self.storage_menu_selection = None
+
+        # used by vehicle reload menu (ammo type selection)
+        self.reload_menu_vehicle = None
+        self.reload_menu_turret = None
+        self.reload_menu_options = []
 
         self.text_queue = []
 
@@ -115,6 +121,8 @@ class World_Menu:
             self.exit_world_menu(key)
         elif self.active_menu == "hit_marker":
             self.hit_marker_menu(key)
+        elif self.active_menu == "vehicle_reload":
+            self.vehicle_reload_menu(key)
         else:
             if self.active_menu != "none":
                 print("Error : active menu not recognized ", self.active_menu)
@@ -125,7 +133,7 @@ class World_Menu:
 
         if SELECTED_OBJECT is None:
             engine.log.add_data(
-                "error", "world_menu.activate_menu SELECTED_OBJECT is None"
+                "error", "world_menu.activate_menu SELECTED_OBJECT is None",True
             )
             return
 
@@ -189,7 +197,7 @@ class World_Menu:
         currentRole = self.world.player.ai.memory["task_vehicle_crew"]["vehicle_role"]
         if currentRole is None:
             engine.log.add_data(
-                "error", "world_menu.change_vehicle_role: current role is None"
+                "error", "world_menu.change_vehicle_role: current role is None",True
             )
             return
 
@@ -278,11 +286,31 @@ class World_Menu:
                 self.deactivate_menu()
 
     # ---------------------------------------------------------------------------
+    def activate_vehicle_reload_menu(self, vehicle, turret):
+        """open ammo type selection menu for vehicle gun reload"""
+        # called by ai_human.handle_player_reload
+        # shows primary and coax options when those weapons need/can reload
+        if self.active_menu == "death":
+            return
+
+        self.deactivate_menu()
+        self.reload_menu_vehicle = vehicle
+        self.reload_menu_turret = turret
+        self.reload_menu_options = []
+        self.active_menu = "vehicle_reload"
+        self.menu_state = "none"
+        self.time_since_input = 0
+        self.vehicle_reload_menu(None)
+
+    # ---------------------------------------------------------------------------
     def deactivate_menu(self):
         self.selected_object = None
         self.active_menu = "none"
         self.menu_state = "none"
         self.text_queue = []
+        self.reload_menu_vehicle = None
+        self.reload_menu_turret = None
+        self.reload_menu_options = []
 
     # ---------------------------------------------------------------------------
     def death_menu(self, key):
@@ -1713,6 +1741,122 @@ class World_Menu:
             temp = 8
 
         return temp
+
+    # ---------------------------------------------------------------------------
+    def _build_reload_options_for_weapon(
+        self, weapon, vehicle, weapon_label, reload_action
+    ):
+        """build selectable reload options for one weapon from vehicle magazines"""
+        # returns list of option dicts: display_text, magazine, reload_action, weapon_label
+        options = []
+        if weapon is None:
+            return options
+
+        magazines_by_type = {}
+        sources = list(vehicle.ai.ammo_rack) + list(vehicle.ai.inventory)
+        for magazine in sources:
+            if magazine.is_gun_magazine:
+                if weapon.world_builder_identity in magazine.ai.compatible_guns:
+                    if len(magazine.ai.projectiles) > 0:
+                        projectile_type = magazine.ai.projectiles[0].ai.projectile_type
+                        if projectile_type not in magazines_by_type:
+                            magazines_by_type[projectile_type] = []
+                        magazines_by_type[projectile_type].append(magazine)
+
+        for projectile_type in magazines_by_type:
+            mags = magazines_by_type[projectile_type]
+            mag_count = len(mags)
+            round_count = 0
+            for m in mags:
+                round_count += len(m.ai.projectiles)
+            options.append(
+                {
+                    "display_text": (
+                        f"{weapon_label}: {projectile_type} "
+                        f"({mag_count} mags, {round_count} rounds)"
+                    ),
+                    "magazine": mags[0],
+                    "reload_action": reload_action,
+                    "weapon_label": weapon_label,
+                }
+            )
+        return options
+
+    # ---------------------------------------------------------------------------
+    def vehicle_reload_menu(self, key):
+        """ammo type selection for player vehicle gun reload"""
+        # opened via activate_vehicle_reload_menu when player hits R as gunner
+        # offers main gun and coax options when each needs/can be reloaded
+
+        vehicle = self.reload_menu_vehicle
+        turret = self.reload_menu_turret
+
+        if vehicle is None or turret is None:
+            self.deactivate_menu()
+            return
+
+        player_ai = self.world.player.ai
+        options = []
+
+        # main gun - only if empty and spare ammo exists
+        if turret.ai.primary_weapon is not None:
+            ammo_gun, ammo_inventory, magazine_count = player_ai.check_ammo(
+                turret.ai.primary_weapon, vehicle
+            )
+            if ammo_gun == 0 and ammo_inventory > 0:
+                options.extend(
+                    self._build_reload_options_for_weapon(
+                        turret.ai.primary_weapon,
+                        vehicle,
+                        "main gun",
+                        VehicleCrewAction.RELOADING_PRIMARY,
+                    )
+                )
+
+        # coax - only if present, empty, and spare ammo exists
+        if turret.ai.coaxial_weapon is not None:
+            ammo_gun, ammo_inventory, magazine_count = player_ai.check_ammo(
+                turret.ai.coaxial_weapon, vehicle
+            )
+            if ammo_gun == 0 and ammo_inventory > 0:
+                options.extend(
+                    self._build_reload_options_for_weapon(
+                        turret.ai.coaxial_weapon,
+                        vehicle,
+                        "coax",
+                        VehicleCrewAction.RELOADING_COAX,
+                    )
+                )
+
+        self.reload_menu_options = options
+
+        self.text_queue = []
+        self.text_queue.append("-- Vehicle Reload --")
+
+        if len(options) == 0:
+            self.text_queue.append("No weapons need reloading / no ammo available")
+            self.text_queue.append("esc - Cancel")
+            return
+
+        selection_key = 1
+        for option in options:
+            if selection_key > 9:
+                break
+            self.text_queue.append(f"{selection_key} - {option['display_text']}")
+            selection_key += 1
+
+        self.text_queue.append("esc - Cancel")
+
+        temp = self.translate_key_to_array_position(key)
+        if temp is not None:
+            if temp < len(options) and temp < 9:
+                option = options[temp]
+                self.world.player.ai.start_player_vehicle_reload(
+                    option["magazine"],
+                    option["reload_action"],
+                    option["weapon_label"],
+                )
+                self.deactivate_menu()
 
     # ---------------------------------------------------------------------------
     def vehicle_menu(self, key):

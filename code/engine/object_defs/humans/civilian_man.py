@@ -22,6 +22,7 @@ def create(world, world_coords):
     z.name = engine.name_gen.get_name("civilian")
     z.ai.speed = 30
     z.ai.morale = 70
+    z.ai.is_civilian = True
     z.collision_radius = 15
     z.is_human = True
     if random.randint(0, 1) == 1:

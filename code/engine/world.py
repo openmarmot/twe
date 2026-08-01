@@ -67,10 +67,6 @@ class World:
         self.tactical_ai["american"] = AIFactionTactical(self, "american", [], [], 10)
         self.tactical_ai["civilian"] = AIFactionTactical(self, "civilian", [], [], 12)
 
-        # off man reinforcements
-        # array of  [time,faction,[spawn_point,squad]]
-        self.reinforcements = []
-
         # world objects that need to exit the map
         self.exit_queue = []
 
@@ -751,21 +747,6 @@ class World:
         self.exit_queue = []
 
     # ---------------------------------------------------------------------------
-    def process_reinforcements(self):
-        """Process queued reinforcements ready to spawn"""
-
-        # array of  [time,faction,spawn_point,squad]
-        process_queue = []
-        for b in self.reinforcements:
-            if b[0] < self.world_seconds:
-                process_queue.append(b)
-        for b in process_queue:
-            self.reinforcements.remove(b)
-            engine.log.add_data(
-                "error", "world.process_reinforcements is disabled ! ", True
-            )
-
-    # ---------------------------------------------------------------------------
     def remove_hit_markers(self):
         """Remove hit marker objects from grid"""
 
@@ -808,16 +789,29 @@ class World:
             if w.world_coords[1] < y_negative:
                 y_negative = w.world_coords[1]
 
-        standoff = 8000
+        # main offset past map extent + secondary-axis jitter
+        # (same pattern as AIFactionTactical.get_reinforcement_spawn_location)
+        standoff_a = random.randint(6000, 12000)
+        standoff_b = random.randint(6000, 12000)
+        secondary_a = random.randint(-7000, 7000)
+        secondary_b = random.randint(-7000, 7000)
 
-        spawn_center = [0, 0]
-        spawn_north = [0, -standoff + y_negative]
-        spawn_south = [0, standoff + y_positive]
-        spawn_west = [-standoff + x_negative, 0]
-        spawn_east = [standoff + x_positive, 0]
+        # pick opposing axis, then assign factions to opposite sides
+        if random.randint(0, 1) == 0:
+            # east / west
+            side_a = [-standoff_a + x_negative, secondary_a]
+            side_b = [standoff_b + x_positive, secondary_b]
+        else:
+            # north / south
+            side_a = [secondary_a, -standoff_a + y_negative]
+            side_b = [secondary_b, standoff_b + y_positive]
 
-        self.tactical_ai["german"].spawn_location = spawn_west
-        self.tactical_ai["soviet"].spawn_location = spawn_east
+        if random.randint(0, 1) == 0:
+            self.tactical_ai["german"].spawn_location = side_a
+            self.tactical_ai["soviet"].spawn_location = side_b
+        else:
+            self.tactical_ai["german"].spawn_location = side_b
+            self.tactical_ai["soviet"].spawn_location = side_a
 
     # ---------------------------------------------------------------------------
     def spawn_hit_markers(self):
@@ -930,7 +924,6 @@ class World:
 
         if self.is_paused is False:
             self.world_seconds = round(self.world_seconds + self.time_passed_seconds, 2)
-            self.process_reinforcements()
 
             # cycle the text queue
             self.time_since_last_text_clear += self.time_passed_seconds

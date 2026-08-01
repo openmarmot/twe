@@ -44,6 +44,9 @@ class AISquad():
 
         self.name=''
 
+        # True if this squad entered as reinforcements (spawned farther back)
+        self.is_reinforcement = False
+
         # how close members try to stick to the squad leader
         # this is adjusted by ai_human_squad_leader.py
         self.max_distance_human = 300

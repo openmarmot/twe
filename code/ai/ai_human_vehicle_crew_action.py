@@ -22,6 +22,7 @@ class VehicleCrewAction(Enum):
         "Waiting for driver to get in position for fire mission"
     )
     WAITING_FOR_CLOSE_DISTANCE = "Waiting for driver to close distance"
+    WAITING_FOR_BETTER_ANGLE = "Waiting for driver to get a better firing angle"
     ENGAGING = "Engaging"
     RELOADING_PRIMARY = "reloading primary weapon"
     RELOADING_COAX = "reloading coax gun"

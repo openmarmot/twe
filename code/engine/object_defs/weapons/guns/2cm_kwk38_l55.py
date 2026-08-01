@@ -21,7 +21,7 @@ def create(world, world_coords):
     z.no_update = True
     z.is_gun = True
     z.ai.mechanical_accuracy = 10
-    z.ai.mechanical_accuracy_deg = 0.15
+    z.ai.mechanical_accuracy_deg = 0.20
     z.ai.magazine = engine.world_builder.spawn_object(
         world, world_coords, "2cm_kwk38_l55_magazine", False
     )

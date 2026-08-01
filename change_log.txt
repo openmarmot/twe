@@ -1,6 +1,48 @@
 TWE Project : Change Log
 
 ---------------------------------
+July 31 2026
+- buildings now block line of site
+
+couldn't confirm this, but battles feel different anyways
+
+---------------------------------
+July 26 2026
+- civilian retreats from gun fire
+
+also previously
+- player vehicle reloads now get a ammo choice menu
+
+---------------------------------
+July 17 2026
+- adjustments to vehicle crew ai to improve tactics against tanks
+- misc bug fix
+- fixed occasional crash with soldiers that lose their weapon somehow (run out of ammo ?)
+
+---------------------------------
+July 16 2026
+- adjusted initial idirect fire missiosn to only go to vehicles that are in range
+
+---------------------------------
+July 15 2026
+- updated soviet bonus multiplier from .3 to .5
+
+the game is in a odd spot where the soviets pretty much never win.
+they do fine in infantry combat- rifles are plenty deadly, however their tanks always lose.
+the issue is their armor penetration at range is worse, and their armor is also worse.
+a numerical advantage doesn't really help, they just get picked off.
+
+---------------------------------
+July 14 2026
+- some adjust to vehicle weapon and turret accuracy
+---------------------------------
+July 12 2026
+- added reinforcement squads back in
+- spawn points are now randomized.
+- make indirect fire with armor piercing rounds less likely
+- minor changes
+
+---------------------------------
 July 09 2026
 - optimize startup
 - some modification to terrain values

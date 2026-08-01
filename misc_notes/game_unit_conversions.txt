@@ -61,7 +61,7 @@ game unit -> meters conversion for penetration data
 3000 -> 1500 meters
 3500
 4000 -> 2000 meters
-
+>4000 -> reserved for exceptional weapons like the L71 88mm cannon.
 
 Most direct fire guns max out at 4000
 Some exceptional weapons exeed 4000, with a absolue max of 5000

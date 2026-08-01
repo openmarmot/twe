@@ -390,7 +390,7 @@ def convert_map_objects_to_world_objects(world, map_objects):
         if map_object.world_builder_identity.startswith("world_area"):
             # make the corresponding WorldArea object
             w = WorldArea(world)
-            w.world_coords = map_object.world_coords
+            w.world_coords = copy.copy(map_object.world_coords)
             w.name = map_object.name
             w.area_type = map_object.world_builder_identity.split("world_area_")[1]
 
@@ -522,8 +522,18 @@ def get_random_from_list(world, world_coords, OBJECT_LIST, spawn):
 
 
 # ------------------------------------------------------------------------------
-def get_squad_map_objects(squad_name):
+# map object world_coords marker for reinforcement units (main force uses [0, 0]).
+# create_squads reads this before positions are reassigned.
+REINFORCEMENT_MAP_COORDS = [1, 0]
+
+
+def get_squad_map_objects(squad_name, world_coords=None):
     """get a list of map objects that make up a squad"""
+    # world_coords - optional spawn marker. default [0, 0] for main force.
+    # use REINFORCEMENT_MAP_COORDS for reinforcement units.
+    if world_coords is None:
+        world_coords = [0, 0]
+
     global squad_data
     members = []
     if squad_name in squad_data:
@@ -542,7 +552,7 @@ def get_squad_map_objects(squad_name):
     # convert each member to a map_object
     map_objects = []
     for b in members:
-        map_objects.append(MapObject(b, "none", [0, 0], 0, []))
+        map_objects.append(MapObject(b, "none", list(world_coords), 0, []))
 
     return map_objects
 
@@ -614,6 +624,8 @@ def load_quick_battle_map_objects(battle_option, result_container):
     """load quick battle map objects. called by game menu"""
 
     # this is called in a thread by graphics_2d_pygame.load_quick_battle
+    # normalize - game menu passes string keys; --ai-test / --quick-battle pass ints
+    battle_option = str(battle_option)
 
     world_area_options = []
     world_area_options.append(["town", "town", "town"])
@@ -626,10 +638,13 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     # -- initial troops --
     squads = []
-
+    reinforcement_squads = []
+    points = 0
+    soviet_advantage = 0
+    soviet_advantage_multiplier=0.5
     if battle_option == "1":
         points = 2500
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -640,7 +655,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     elif battle_option == "2":
         points = 5000
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -655,7 +670,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     elif battle_option == "3":
         points = 10000
-        soviet_advantage = points * 0.3
+        soviet_advantage = points * soviet_advantage_multiplier
         print(f"soviet advantage: {soviet_advantage}")
         squads += engine.battlegroup_generator.create_random_battlegroup(
             "german", points, squad_data, year
@@ -686,27 +701,104 @@ def load_quick_battle_map_objects(battle_option, result_container):
             squads.append("Soviet T34-76 Model 1943")
             squads.append("German Panzer IV Ausf G")
 
+    # -- reinforcements (10% of main force points, battle options 1-3) --
+    if points > 0:
+        rein_points = int(points * 0.1)
+        rein_soviet_advantage = soviet_advantage * 0.1
+        print(f"reinforcement points: {rein_points}")
+        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "german", rein_points, squad_data, year
+        )
+        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "soviet", rein_points + rein_soviet_advantage, squad_data, year
+        )
+
+    # convert squads to map objects
+    # main force: [0, 0]. reinforcements: REINFORCEMENT_MAP_COORDS marker for create_squads
     for squad in squads:
         map_objects += get_squad_map_objects(squad)
+    for squad in reinforcement_squads:
+        map_objects += get_squad_map_objects(squad, REINFORCEMENT_MAP_COORDS)
 
-    # print squad summary table
-    squad_counts = {}
-    for s in squads:
-        squad_counts[s] = squad_counts.get(s, 0) + 1
-    print("=" * 50)
-    print("=" * 50)
     engine.log.add_data("note", f"Quick battle year: {year}", True)
-    print("\nSquad Summary:")
-    print(f"{'Count':>5}  {'Squad Name'}")
-    print("-" * 50)
-    for name, count in sorted(squad_counts.items(), key=lambda x: (x[0], -x[1])):
-        print(f"{count:>5}  {name}")
-    print()
-    print("=" * 50)
-    print("=" * 50)
-    print()
+    print_quick_battle_squad_summary(year, squads, reinforcement_squads)
 
     result_container[0] = map_objects
+
+
+# ------------------------------------------------------------------------------
+def print_quick_battle_squad_summary(year, squads, reinforcement_squads):
+    """print a clean terminal summary of quick battle forces by faction"""
+
+    def count_squads(squad_list):
+        counts = {}
+        for s in squad_list:
+            counts[s] = counts.get(s, 0) + 1
+        return counts
+
+    def faction_of(squad_name):
+        if squad_name in squad_data:
+            return squad_data[squad_name].get("faction", "unknown")
+        lower = squad_name.lower()
+        if lower.startswith("german"):
+            return "german"
+        if lower.startswith("soviet"):
+            return "soviet"
+        if lower.startswith("american"):
+            return "american"
+        return "unknown"
+
+    def filter_faction(counts, faction):
+        return {k: v for k, v in counts.items() if faction_of(k) == faction}
+
+    def print_force_block(label, counts):
+        if not counts:
+            return
+        total = sum(counts.values())
+        print(f"  {label}  ({total} squad{'s' if total != 1 else ''})")
+        print(f"  {'#':>4}  Squad")
+        print(f"  {'----':>4}  {'-' * (width - 10)}")
+        for name, count in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
+            print(f"  {count:>4}  {name}")
+        print()
+
+    main_counts = count_squads(squads)
+    rein_counts = count_squads(reinforcement_squads)
+    width = 62
+
+    print()
+    print("=" * width)
+    print(f"  QUICK BATTLE SUMMARY  |  Year {year}")
+    print("=" * width)
+
+    faction_labels = (
+        ("german", "GERMAN"),
+        ("soviet", "SOVIET"),
+        ("american", "AMERICAN"),
+    )
+    for faction, label in faction_labels:
+        main_f = filter_faction(main_counts, faction)
+        rein_f = filter_faction(rein_counts, faction)
+        if not main_f and not rein_f:
+            continue
+
+        main_total = sum(main_f.values())
+        rein_total = sum(rein_f.values())
+        force_total = main_total + rein_total
+
+        print()
+        print(f"  {label}")
+        print(f"  {'-' * (width - 2)}")
+        print(
+            f"  Total: {force_total} squads"
+            f"  (main {main_total}, reinforcements {rein_total})"
+        )
+        print()
+        print_force_block("Main Force", main_f)
+        print_force_block("Reinforcements", rein_f)
+
+    print("=" * width)
+    print()
 
 
 # ------------------------------------------------------------------------------
@@ -793,7 +885,7 @@ def spawn_aligned_pile(
 
         x = spawn_object(world, current_coords, spawn_string, True)
         x.rotation_angle = rotation
-        x.heading = heading
+        x.heading = copy.copy(heading)
 
     if second_layer:
         current_coords = engine.math_2d.moveAlongVector(
@@ -806,7 +898,7 @@ def spawn_aligned_pile(
 
             x = spawn_object(world, current_coords, spawn_string, True)
             x.rotation_angle = rotation
-            x.heading = heading
+            x.heading = copy.copy(heading)
 
 
 # ------------------------------------------------------------------------------
@@ -820,7 +912,7 @@ def spawn_container_body(name, world_object, image_index):
     )
     z.is_container = True
     z.name = name
-    z.world_coords = world_object.world_coords
+    z.world_coords = copy.copy(world_object.world_coords)
     z.rotation_angle = world_object.rotation_angle
     z.ai.inventory = world_object.ai.inventory.copy()
     z.world_builder_identity = "body"
@@ -878,7 +970,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_smoke", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(30, 40)
         z.ai.rotate_time_max = 60
@@ -891,7 +983,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_fire", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(80, 90)
         z.ai.rotate_time_max = 5
@@ -904,7 +996,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_flash", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -917,7 +1009,7 @@ def spawn_explosion_and_fire(world, world_coords, fire_duration, smoke_duration)
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_explosion", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -935,7 +1027,7 @@ def spawn_flash(world, world_coords, heading, amount=2):
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_flash", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(1, 2)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8
@@ -974,21 +1066,23 @@ def spawn_object(world, world_coords, object_type, spawn):
 
 # ------------------------------------------------------------------------------
 def spawn_map_pointer(world, TARGET_COORDS, TYPE):
+    # snapshot so the pin does not share a live object world_coords list
+    pin_coords = copy.copy(TARGET_COORDS)
     if TYPE == "normal":
         z = WorldObject(world, ["map_pointer_green"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
     if TYPE == "blue":
         z = WorldObject(world, ["map_pointer_blue"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
     if TYPE == "orange":
         z = WorldObject(world, ["map_pointer_orange"], AIMapPointer)
-        z.ai.target_coords = TARGET_COORDS
+        z.ai.target_coords = pin_coords
         z.render_level = 4
         z.is_map_pointer = True
         z.wo_start()
@@ -1071,7 +1165,7 @@ def spawn_smoke_cloud(world, world_coords, heading, amount=30):
             world_coords[1] + random.randint(-2, 2),
         ]
         z = spawn_object(world, coords, "small_smoke", True)
-        z.heading = heading
+        z.heading = copy.copy(heading)
         z.ai.speed = random.uniform(5, 7)
         z.ai.rotation_speed = random.randint(400, 500)
         z.ai.rotate_time_max = 1.8

@@ -484,7 +484,7 @@ class AIVehicle:
             )
             shrapnel.ai.projectile_type = "shrapnel"
             shrapnel.name = "shrapnel"
-            shrapnel.ai.starting_coords = self.owner.world_coords
+            shrapnel.ai.starting_coords = copy.copy(self.owner.world_coords)
             shrapnel.ai.shooter = throwable.ai.equipper
             shrapnel.ai.weapon = throwable
             if compartment == "vehicle_body":
@@ -702,7 +702,7 @@ class AIVehicle:
                 )
                 shrapnel.ai.projectile_type = "shrapnel"
                 shrapnel.name = "shrapnel"
-                shrapnel.ai.starting_coords = self.owner.world_coords
+                shrapnel.ai.starting_coords = copy.copy(self.owner.world_coords)
                 shrapnel.ai.shooter = projectile.ai.shooter
                 shrapnel.ai.weapon = projectile.ai.weapon
 

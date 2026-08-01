@@ -138,7 +138,9 @@ class AIHumanSquadLeader:
                 if friendly_area is not None:
                     tactical_order = TacticalOrder()
                     tactical_order.order_move_to_location = True
-                    tactical_order.world_coords = friendly_area.get_location()
+                    tactical_order.world_coords = copy.copy(
+                        friendly_area.get_location()
+                    )
                     self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
 
                     self.owner.ai.add_journal_entry(f"Ordered squad to fall back to {friendly_area.name}")
@@ -158,7 +160,7 @@ class AIHumanSquadLeader:
         if contested_area is not None:
             tactical_order = TacticalOrder()
             tactical_order.order_defend_area = True
-            tactical_order.world_coords = contested_area.get_location()
+            tactical_order.world_coords = copy.copy(contested_area.get_location())
             tactical_order.world_area = contested_area
             self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
             self.owner.ai.add_journal_entry(f"Ordered squad to defend {contested_area.name}")
@@ -168,7 +170,7 @@ class AIHumanSquadLeader:
         random_area = random.choice(self.owner.world.world_areas)
         tactical_order = TacticalOrder()
         tactical_order.order_move_to_location = True
-        tactical_order.world_coords = random_area.get_location()
+        tactical_order.world_coords = copy.copy(random_area.get_location())
         self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
         self.owner.ai.add_journal_entry(f"Ordered squad to move to {random_area.name}")
         return
@@ -222,6 +224,16 @@ class AIHumanSquadLeader:
     # ---------------------------------------------------------------------------
     def update_task_squad_leader(self):
         """Squad leader AI task for temporary tactical oversight"""
+
+        # civilians flee gunfire instead of squad-leading / seeking local cover
+        if self.owner.ai.is_civilian:
+            recent_fire = (
+                self.owner.grid_square.last_gun_fired + 30
+                > self.owner.world.world_seconds
+            )
+            if recent_fire:
+                self.owner.ai.civilian_flee_gunfire()
+                return
 
         last_think_time = self.owner.ai.memory["task_squad_leader"]["last_think_time"]
         think_interval = self.owner.ai.memory["task_squad_leader"]["think_interval"]

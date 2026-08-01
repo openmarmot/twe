@@ -62,7 +62,7 @@ class VehicleDiagnostics:
         # add the main object
         v = VehicleDiagnosticObject()
         v.image_list = self.vehicle.image_list
-        v.world_coords = self.vehicle.world_coords
+        v.world_coords = copy.copy(self.vehicle.world_coords)
         self.image_objects.append(v)
 
         self.text_queue = []

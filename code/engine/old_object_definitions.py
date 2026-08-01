@@ -6583,6 +6583,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "german_medic":
         z = spawn_object(world, world_coords, "german_soldier", False)
         add_standard_loadout(z, world, "standard_german_gear")
+        add_random_pistol_to_inventory(z, world)
         z.ai.is_medic = True
 
     elif object_type == "german_mechanic":
@@ -6671,6 +6672,7 @@ def spawn_object(world, world_coords, object_type, spawn):
     elif object_type == "soviet_medic":
         z = spawn_object(world, world_coords, "soviet_soldier", False)
         add_standard_loadout(z, world, "standard_soviet_gear")
+        add_standard_loadout(z, world, "tt33")
         z.ai.is_medic = True
 
     elif object_type == "soviet_mechanic":
