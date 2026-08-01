@@ -628,6 +628,51 @@ class AIHuman:
         self.event_remove_inventory(CONSUMABLE)
 
     # ---------------------------------------------------------------------------
+    def _get_nearby_buildings(self, max_search_distance):
+        """buildings that could block LOS within max_search_distance.
+
+        Pads the grid query so large footprints (hangar radius ~600) whose
+        centers sit outside the search radius still get considered.
+        """
+        # hangar collision_radius is 600; pad so centers just outside still count
+        pad = 600
+        squares = self.owner.world.grid_manager.get_grid_squares_near_world_coords(
+            self.owner.world_coords, max_search_distance + pad
+        )
+        origin = self.owner.world_coords
+        buildings = []
+        for g in squares:
+            for b in g.wo_objects_building:
+                d = engine.math_2d.get_distance(origin, b.world_coords)
+                if d <= max_search_distance + b.collision_radius:
+                    buildings.append(b)
+        return buildings
+
+    # ---------------------------------------------------------------------------
+    def has_line_of_sight(self, target, buildings):
+        """True if no building circle blocks the segment to target.
+
+        Buildings that contain both the observer and the target are skipped
+        so units inside the same structure can still engage each other.
+        """
+        origin = self.owner.world_coords
+        dest = target.world_coords
+        for building in buildings:
+            radius = building.collision_radius
+            if radius <= 0:
+                continue
+            d_origin = engine.math_2d.get_distance(origin, building.world_coords)
+            d_dest = engine.math_2d.get_distance(dest, building.world_coords)
+            # both endpoints inside this building -> no wall between them
+            if d_origin < radius and d_dest < radius:
+                continue
+            if engine.math_2d.segment_intersects_circle(
+                origin, dest, building.world_coords, radius
+            ):
+                return False
+        return True
+
+    # ---------------------------------------------------------------------------
     def evaluate_targets(self, max_search_distance):
         """find and categorize targets. react to close ones"""
         # max_search_distance - determines how many grid squares out the search goes
@@ -639,6 +684,9 @@ class AIHuman:
         possible_humans = self.owner.world.grid_manager.get_objects_from_grid_squares_near_world_coords(
             self.owner.world_coords, max_search_distance, True, False
         )
+
+        # prune once per eval; only buildings block LOS currently
+        buildings = self._get_nearby_buildings(max_search_distance)
 
         spotted = []  # List of (distance, target) tuples
         seen_vehicles = set()  # For unique vehicle tracking
@@ -673,11 +721,17 @@ class AIHuman:
             else:
                 spotted_flag = self.check_visibility(target, d)
 
-            if spotted_flag:
-                spotted.append((d, target))
-                if d < closest_distance:
-                    closest_distance = d
-                    closest_object = target
+            if not spotted_flag:
+                continue
+
+            # geometric LOS: drop targets behind buildings from engage lists
+            if not self.has_line_of_sight(target, buildings):
+                continue
+
+            spotted.append((d, target))
+            if d < closest_distance:
+                closest_distance = d
+                closest_object = target
 
         if not spotted:
             return  # Early exit if no targets

@@ -301,6 +301,38 @@ def get_distance(coords1, coords2):
     return distance
 
 #------------------------------------------------------------------------------
+def segment_intersects_circle(p1, p2, center, radius):
+    '''True if line segment p1-p2 intersects or touches a circle.
+
+    Used for building line-of-sight checks. Endpoints inside the circle
+    count as intersecting (wall between inside and outside).
+    '''
+    if radius <= 0:
+        return False
+
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    fx = p1[0] - center[0]
+    fy = p1[1] - center[1]
+    radius_sq = radius * radius
+
+    a = dx * dx + dy * dy
+    if a < 1e-12:
+        # segment is a point
+        return (fx * fx + fy * fy) <= radius_sq
+
+    # clamp projection of center onto segment to [0, 1]
+    t = -(fx * dx + fy * dy) / a
+    if t < 0.0:
+        t = 0.0
+    elif t > 1.0:
+        t = 1.0
+
+    closest_x = p1[0] + t * dx - center[0]
+    closest_y = p1[1] + t * dy - center[1]
+    return (closest_x * closest_x + closest_y * closest_y) <= radius_sq
+
+#------------------------------------------------------------------------------
 def get_column_coords(initial_coords, diameter, count, rotation_degrees, width):
     """
     Returns an array of world coordinates to arrange 'count' of objects in columns.

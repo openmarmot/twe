@@ -1,7 +1,17 @@
 TWE Project : Change Log
 
 ---------------------------------
-July 18 2026
+July 31 2026
+- buildings now block line of site
+
+couldn't confirm this, but battles feel different anyways
+
+---------------------------------
+July 26 2026
+- civilian retreats from gun fire
+
+also previously
+- player vehicle reloads now get a ammo choice menu
 
 ---------------------------------
 July 17 2026
