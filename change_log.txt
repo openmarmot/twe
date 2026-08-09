@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 8 2026
+- adjustments to vehicle driver and gunner ai to prevent stuck ai
+
+there were some states that that ai could get stuck in.
+unsure if that is now fixed.
+
+---------------------------------
 July 31 2026
 - buildings now block line of site
 

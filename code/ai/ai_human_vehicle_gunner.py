@@ -28,6 +28,9 @@ class AIHumanVehicleGunner:
         self.current_burst = 0  # int number of bullets shot in current burst
         self.max_burst = 5
 
+        # how long to wait for the driver to rotate before backing off
+        self.wait_timeout = 8  # slightly under the driver's 10s give-up
+
     # ---------------------------------------------------------------------------
     def action(self):
         """action - called by ai_human_vehicle.update_task_vehicle_crew()"""
@@ -43,10 +46,20 @@ class AIHumanVehicleGunner:
         ):
             self.action_engage_indirect_fire()
 
+        current_action = self.owner.ai.memory["task_vehicle_crew"]["current_action"]
+        waiting_on_driver = current_action in (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+        )
+
         if self.owner.ai.memory["task_vehicle_crew"]["target"] is not None:
             if (
                 self.owner.ai.memory["task_vehicle_crew"]["calculated_turret_angle"]
                 is not None
+                and not waiting_on_driver
             ):
                 self.action_engage_target()
         elif vehicle.ai.current_speed > 5:
@@ -404,6 +417,36 @@ class AIHumanVehicleGunner:
         self.owner.ai.memory["task_vehicle_crew"]["engage_primary_weapon"] = False
         self.owner.ai.memory["task_vehicle_crew"]["engage_coaxial_weapon"] = False
         self.owner.ai.memory["task_vehicle_crew"]["engage_indirect_fire"] = False
+
+        # watchdog: don't sit in a rotation wait forever if the driver can't
+        # turn the hull (heavy casemate on bad terrain). back off and re-evaluate.
+        current_action = self.owner.ai.memory["task_vehicle_crew"]["current_action"]
+        if current_action in (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+        ):
+            wait_start = self.owner.ai.memory["task_vehicle_crew"].get(
+                "wait_start_time", 0
+            )
+            if wait_start == 0:
+                self.owner.ai.memory["task_vehicle_crew"]["wait_start_time"] = (
+                    self.owner.world.world_seconds
+                )
+            elif (
+                self.owner.world.world_seconds - wait_start
+            ) > self.wait_timeout:
+                self.owner.ai.memory["task_vehicle_crew"]["target"] = None
+                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                    VehicleCrewAction.SCANNING
+                )
+                self.owner.ai.memory["task_vehicle_crew"].pop(
+                    "wait_start_time", None
+                )
+                return
+        else:
+            self.owner.ai.memory["task_vehicle_crew"].pop(
+                "wait_start_time", None
+            )
 
         # handle the reloading action
         if (
@@ -899,7 +942,18 @@ class AIHumanVehicleGunner:
     # ---------------------------------------------------------------------------
     def think_idle(self):
         """think about what to do when we have no other tasks"""
-        pass
+        # if we were waiting on the driver for something that no longer exists
+        # (no target / no fire mission) drop the stale wait so we don't deadlock
+        if self.owner.ai.memory["task_vehicle_crew"]["current_action"] in (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+        ):
+            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                VehicleCrewAction.SCANNING
+            )
 
     # ---------------------------------------------------------------------------
     def think_reload(self, weapon):

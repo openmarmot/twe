@@ -258,15 +258,15 @@ class AIHumanVehicleDriver:
             )
             return
         # default
-        self.owner.ai.memory["task_vehicle_crew"]["calculated_vehicle_angle"] = (
-            rotation_required
-        )
-        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-            VehicleCrewAction.ROTATING
-        )
-        self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
-            self.owner.world.world_seconds
-        )
+        mem = self.owner.ai.memory["task_vehicle_crew"]
+        was_rotating = mem["current_action"] == VehicleCrewAction.ROTATING
+        mem["calculated_vehicle_angle"] = rotation_required
+        mem["current_action"] = VehicleCrewAction.ROTATING
+        # start the rotation stopwatch when (re)entering ROTATING, but keep it
+        # running while already rotating so the action() stuck-escape (elapsed
+        # > 10s) can fire instead of being reset on every think.
+        if not was_rotating:
+            mem["rotate_start_time"] = self.owner.world.world_seconds
         return
 
     # ---------------------------------------------------------------------------
@@ -470,15 +470,12 @@ class AIHumanVehicleDriver:
                     random.uniform(0.5, 2.0)
                 )
                 return True
-            self.owner.ai.memory["task_vehicle_crew"]["calculated_vehicle_angle"] = (
-                rotation_required
-            )
-            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                VehicleCrewAction.ROTATING
-            )
-            self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
-                self.owner.world.world_seconds
-            )
+            mem = self.owner.ai.memory["task_vehicle_crew"]
+            was_rotating = mem["current_action"] == VehicleCrewAction.ROTATING
+            mem["calculated_vehicle_angle"] = rotation_required
+            mem["current_action"] = VehicleCrewAction.ROTATING
+            if not was_rotating:
+                mem["rotate_start_time"] = self.owner.world.world_seconds
             return True
 
         return False
