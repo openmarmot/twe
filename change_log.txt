@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 9 2026
+- driver ai gets a flee option
+
+---------------------------------
 August 8 2026
 - adjustments to vehicle driver and gunner ai to prevent stuck ai
 

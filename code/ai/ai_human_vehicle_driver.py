@@ -404,6 +404,10 @@ class AIHumanVehicleDriver:
         if self.adopt_retreat_order(vehicle):
             return
 
+        # no-commander driver self-preservation - get out of danger
+        if self.handle_flee_combat(vehicle, commander_role, gunner_role):
+            return
+
         if self.handle_gunner_actions(vehicle, gunner_role):
             return
 
@@ -657,6 +661,103 @@ class AIHumanVehicleDriver:
         )
         vehicle_order.exit_vehicle_when_finished = True
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+        return True
+
+    def handle_flee_combat(self, vehicle, commander_role, gunner_role):
+        """no-commander driver self-preservation: pull the vehicle out of danger.
+
+        Only activates when there is no crewed commander, so it never overrides
+        tactical decisions. Yields while a gunner is actively engaging (let it
+        fight) and while an empty gunner seat is available (the driver would
+        rather take the gun than flee). Otherwise, if morale fails or a close
+        threat is pressing, drive away to friendly spawn and keep the crew.
+        """
+        if commander_role:
+            return False
+
+        # let an engaging gunner keep fighting instead of pulling it out
+        if gunner_role:
+            if gunner_role.human.ai.memory["task_vehicle_crew"]["current_action"] in (
+                VehicleCrewAction.ENGAGING,
+            ):
+                return False
+
+        # prefer to take an open gunner seat and fight over fleeing
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied is False and role.is_gunner:
+                return False
+
+        has_targets = (
+            len(self.owner.ai.human_targets) > 0
+            or len(self.owner.ai.vehicle_targets) > 0
+        )
+        if not has_targets:
+            return False
+
+        # a driver alone can't fight back, so clear out on morale failure or
+        # when a threat closes too far in.
+        should_flee = False
+        if self.owner.ai.morale_check() is False:
+            should_flee = True
+        else:
+            for target in self.owner.ai.human_targets[:3]:
+                d = engine.math_2d.get_distance(
+                    vehicle.world_coords, target.world_coords
+                )
+                if d < 700:
+                    should_flee = True
+                    break
+            if not should_flee:
+                for target in self.owner.ai.vehicle_targets[:3]:
+                    d = engine.math_2d.get_distance(
+                        vehicle.world_coords, target.world_coords
+                    )
+                    if d < 1200:
+                        should_flee = True
+                        break
+
+        if not should_flee:
+            return False
+
+        # don't fight an existing order - keep driving it rather than re-issuing
+        if self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] is not None:
+            return False
+
+        spawn_coords = self.owner.ai.squad.faction_tactical.spawn_location
+        if spawn_coords is None:
+            return False
+
+        # don't run all the way home - just pull back a random 1/3 to 1/2 of
+        # the way toward spawn (roughly the direction we came from)
+        distance_to_spawn = engine.math_2d.get_distance(
+            vehicle.world_coords, spawn_coords
+        )
+        if distance_to_spawn < 1:
+            return False
+
+        fallback_fraction = random.uniform(1.0 / 3.0, 1.0 / 2.0)
+        fallback_distance = distance_to_spawn * fallback_fraction
+        flee_direction = engine.math_2d.get_normalized(
+            [
+                spawn_coords[0] - vehicle.world_coords[0],
+                spawn_coords[1] - vehicle.world_coords[1],
+            ]
+        )
+        flee_destination = engine.math_2d.moveAlongVector(
+            fallback_distance, vehicle.world_coords, flee_direction, 1
+        )
+
+        vehicle_order = VehicleOrder()
+        vehicle_order.order_drive_to_coords = True
+        vehicle_order.world_coords = flee_destination
+        vehicle_order.exit_vehicle_when_finished = False
+        # mark as retreat so the gunner won't re-issue a close-with order
+        # and adopt_retreat_order will keep driving it
+        vehicle_order.is_retreat = True
+        self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+
+        self.owner.ai.speak("No commander - getting us out of here!")
+        self.owner.ai.add_journal_entry(f"Fleeing {vehicle.name} due to threat")
         return True
 
     def handle_passenger_loading(self, vehicle):
