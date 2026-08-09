@@ -878,7 +878,7 @@ class AIHumanVehicleGunner:
         # getting this far means we have ammo for the primary weapon and a fire mission
 
         # check if the fire mission is complete
-        if fire_mission.rounds_fired > fire_mission.rounds_requested:
+        if fire_mission.rounds_fired >= fire_mission.rounds_requested:
             # remove the fire mission. maybe we should do a radio broadcast ?
             self.owner.ai.memory["task_vehicle_crew"]["fire_missions"].pop(0)
             return

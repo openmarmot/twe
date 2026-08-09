@@ -77,7 +77,7 @@ class AIHumanVehicleCommander:
             # commander adds own filter for vehicle status + armor
 
             if not target.ai.vehicle_disabled:
-                top_armor = target.ai.passenger_compartment_armor["top"][0]
+                top_armor = target.ai.passenger_compartment_armor.get("top", [0])[0]
                 if top_armor < 10:
                     if target.ai.check_if_vehicle_is_occupied():
                         distance = engine.math_2d.get_distance(
@@ -214,7 +214,7 @@ class AIHumanVehicleCommander:
             fire_mission = fire_missions[0]
 
             # check if mission is complete
-            if fire_mission.rounds_fired > fire_mission.rounds_requested:
+            if fire_mission.rounds_fired >= fire_mission.rounds_requested:
                 fire_missions.pop(0)
                 return
 
@@ -277,7 +277,7 @@ class AIHumanVehicleCommander:
         our_front_armor = vehicle.ai.vehicle_armor["front"][0]
 
         for v in self.owner.ai.vehicle_targets:
-            armor = v.ai.vehicle_armor["front"][0]
+            armor = v.ai.vehicle_armor.get("front", [0])[0]
 
             if len(v.ai.turrets) == 0:
                 penetration = 0
@@ -332,7 +332,7 @@ class AIHumanVehicleCommander:
             # note - separate 360 gunners are not blocked by this; hull face still helps
             # (best armor + smaller silhouette) when the trade is one we can accept.
             if not is_dual_role:
-                if biggest_threat.ai.vehicle_armor["front"][0] > 30:
+                if biggest_threat.ai.vehicle_armor.get("front", [0])[0] > 30:
                     # first check if the turret has 360 degree rotation.
                     # if it doesn't the vehicle will naturally orientate towards the vehicle
                     if primary_gunner_role.turret.ai.rotation_range[1] == 360:
