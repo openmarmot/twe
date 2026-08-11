@@ -1,6 +1,12 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 10 2026
+- attempt to fix soft locks with driver repositioning for a better angle
+
+i mostly see with with the t34-76
+
+---------------------------------
 August 9 2026
 - driver ai gets a flee option
 

@@ -30,6 +30,8 @@ class AIHumanVehicleGunner:
 
         # how long to wait for the driver to rotate before backing off
         self.wait_timeout = 8  # slightly under the driver's 10s give-up
+        # longer budget for drive-to-flank / close-distance reposition
+        self.reposition_wait_timeout = 20
 
     # ---------------------------------------------------------------------------
     def action(self):
@@ -418,13 +420,19 @@ class AIHumanVehicleGunner:
         self.owner.ai.memory["task_vehicle_crew"]["engage_coaxial_weapon"] = False
         self.owner.ai.memory["task_vehicle_crew"]["engage_indirect_fire"] = False
 
-        # watchdog: don't sit in a rotation wait forever if the driver can't
-        # turn the hull (heavy casemate on bad terrain). back off and re-evaluate.
+        # watchdog: don't sit in a driver wait forever (stuck rotate, no-op
+        # flank, or driver never picking up the request). back off and re-evaluate.
         current_action = self.owner.ai.memory["task_vehicle_crew"]["current_action"]
-        if current_action in (
+        rotate_waits = (
             VehicleCrewAction.WAITING_FOR_ROTATE,
             VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
-        ):
+        )
+        reposition_waits = (
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+        )
+        if current_action in rotate_waits or current_action in reposition_waits:
             wait_start = self.owner.ai.memory["task_vehicle_crew"].get(
                 "wait_start_time", 0
             )
@@ -432,17 +440,30 @@ class AIHumanVehicleGunner:
                 self.owner.ai.memory["task_vehicle_crew"]["wait_start_time"] = (
                     self.owner.world.world_seconds
                 )
-            elif (
-                self.owner.world.world_seconds - wait_start
-            ) > self.wait_timeout:
-                self.owner.ai.memory["task_vehicle_crew"]["target"] = None
-                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                    VehicleCrewAction.SCANNING
-                )
-                self.owner.ai.memory["task_vehicle_crew"].pop(
-                    "wait_start_time", None
-                )
-                return
+            else:
+                elapsed = self.owner.world.world_seconds - wait_start
+                if current_action in rotate_waits and elapsed > self.wait_timeout:
+                    # hull never came around - drop target and rescan
+                    self.owner.ai.memory["task_vehicle_crew"]["target"] = None
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.SCANNING
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"].pop(
+                        "wait_start_time", None
+                    )
+                    return
+                if (
+                    current_action in reposition_waits
+                    and elapsed > self.reposition_wait_timeout
+                ):
+                    # driver flank/close stalled - clear wait and fall through so
+                    # think_examine_target can retry or take a speculative shot
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.NONE
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"].pop(
+                        "wait_start_time", None
+                    )
         else:
             self.owner.ai.memory["task_vehicle_crew"].pop(
                 "wait_start_time", None

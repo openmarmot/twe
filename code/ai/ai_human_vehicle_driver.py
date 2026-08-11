@@ -24,6 +24,9 @@ class AIHumanVehicleDriver:
         # distance tuning
         # when a vehicle is < this distance to a target it is considered arrived
         self.vehicle_arrival_distance = 150
+        # reposition orders must move at least this far or they instantly "arrive"
+        # and stall with gunner still WAITING_FOR_BETTER_ANGLE / CLOSE_DISTANCE
+        self.min_reposition_move = 300
 
     # ---------------------------------------------------------------------------
     def action(self):
@@ -166,9 +169,8 @@ class AIHumanVehicleDriver:
                 and vehicle.ai.current_speed < 10
             ):
                 # we have arrived and can delete the order.
-                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                    VehicleCrewAction.WAITING
-                )
+                mem = self.owner.ai.memory["task_vehicle_crew"]
+                mem["current_action"] = VehicleCrewAction.WAITING
                 vehicle.ai.brake_power = 1
                 vehicle.ai.throttle = 0
 
@@ -179,8 +181,13 @@ class AIHumanVehicleDriver:
                                 role.human.ai.switch_task_exit_vehicle()
                                 # this will also clear out any vehicle_orders they had
 
+                # next better-angle request should escalate flank (same geometry
+                # would no-op and leave gunner stuck advertising the wait)
+                if order.order_close_with_enemy:
+                    mem["flank_attempt"] = mem.get("flank_attempt", 0) + 1
+
                 # delete the order
-                self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = None
+                mem["vehicle_order"] = None
 
                 return
             # default
@@ -318,8 +325,52 @@ class AIHumanVehicleDriver:
         return engine.math_2d.randomize_coordinates(dest, 50)
 
     # ---------------------------------------------------------------------------
+    def pick_reposition_destination(
+        self, vehicle_coords, target_coords, desired_range, sign, attempt=0
+    ):
+        """pick a flank/reposition point that is far enough to actually drive to.
+
+        Escalates arc (80->120->160->180) then flips side so repeated better-angle
+        requests do not no-op on the same geometry.
+        Returns (dest, attempt_index_used).
+        """
+        angles = [80, 120, 160, 180]
+        candidates = []
+        for s in (sign, -sign):
+            for ang in angles:
+                candidates.append(ang * s)
+
+        start = max(0, min(attempt, len(candidates) - 1))
+        for i in range(start, len(candidates)):
+            dest = self.calculate_engagement_position(
+                vehicle_coords, target_coords, desired_range, candidates[i]
+            )
+            if (
+                engine.math_2d.get_distance(vehicle_coords, dest)
+                >= self.min_reposition_move
+            ):
+                return dest, i
+
+        # last resort: ring point opposite our current bearing
+        dest = self.calculate_engagement_position(
+            vehicle_coords, target_coords, desired_range, 180 * sign
+        )
+        if (
+            engine.math_2d.get_distance(vehicle_coords, dest)
+            < self.min_reposition_move
+        ):
+            dest = engine.math_2d.randomize_coordinates(
+                list(target_coords), desired_range
+            )
+        return dest, start
+
+    # ---------------------------------------------------------------------------
     def create_vehicle_order_for_target(
-        self, target_or_coords, desired_range=None, angle_offset_deg=0
+        self,
+        target_or_coords,
+        desired_range=None,
+        angle_offset_deg=0,
+        dest_coords=None,
     ):
         """create vehicle order to position for engagement at a standoff from target.
 
@@ -328,34 +379,67 @@ class AIHumanVehicleDriver:
         (pen tables: ~2000 GU ≈ 1000m). For indirect fire, pass a value derived
         from the weapon's max range.
         angle_offset_deg: arc off the radial line for flanks / safer approaches.
+        dest_coords: optional precomputed destination (skips angle/range calc).
         Never overrides a commander retreat order.
 
         Returns True if a close-with order is ready to execute (new or existing).
         Returns False if blocked (e.g. retreat) so other driver handlers can run.
         """
         vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
-        existing = self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"]
+        mem = self.owner.ai.memory["task_vehicle_crew"]
+        existing = mem["vehicle_order"]
         if existing is not None:
             if existing.is_retreat:
                 return False
             if existing.order_close_with_enemy:
-                return True
+                # keep an in-progress move; drop no-op orders already at dest
+                if existing.world_coords is not None:
+                    d_exist = engine.math_2d.get_distance(
+                        vehicle.world_coords, existing.world_coords
+                    )
+                    if d_exist >= self.vehicle_arrival_distance:
+                        return True
+                mem["vehicle_order"] = None
 
         if desired_range is None:
             # medium pen band, not melee - see game_unit_conversions.txt
             desired_range = 2000
 
+        if dest_coords is not None:
+            dest = dest_coords
+        else:
+            dest = self.calculate_engagement_position(
+                vehicle.world_coords,
+                target_or_coords,
+                desired_range,
+                angle_offset_deg,
+            )
+            # single-offset path (close-distance etc): if no-op, pull closer
+            if (
+                engine.math_2d.get_distance(vehicle.world_coords, dest)
+                < self.min_reposition_move
+            ):
+                closer = max(800, desired_range * 0.65)
+                dest = self.calculate_engagement_position(
+                    vehicle.world_coords,
+                    target_or_coords,
+                    closer,
+                    angle_offset_deg,
+                )
+                if (
+                    engine.math_2d.get_distance(vehicle.world_coords, dest)
+                    < self.min_reposition_move
+                ):
+                    dest = engine.math_2d.randomize_coordinates(
+                        list(target_or_coords), closer
+                    )
+
         vehicle_order = VehicleOrder()
         vehicle_order.order_close_with_enemy = True
-        vehicle_order.world_coords = self.calculate_engagement_position(
-            vehicle.world_coords,
-            target_or_coords,
-            desired_range,
-            angle_offset_deg,
-        )
+        vehicle_order.world_coords = dest
         if vehicle.ai.is_transport:
             vehicle_order.exit_vehicle_when_finished = True
-        self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+        mem["vehicle_order"] = vehicle_order
         return True
 
     # ---------------------------------------------------------------------------
@@ -492,6 +576,10 @@ class AIHumanVehicleDriver:
             "current_action"
         ]
 
+        # clear flank escalation once gunner is no longer asking for angle
+        if current_action != VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
+            self.owner.ai.memory["task_vehicle_crew"].pop("flank_attempt", None)
+
         if gunner_role.turret.ai.primary_weapon:
             if current_action in (
                 VehicleCrewAction.RELOADING_PRIMARY,
@@ -584,7 +672,8 @@ class AIHumanVehicleDriver:
         if current_action == VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
             target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
             if target is not None:
-                # hold roughly current range (slight close if very far) and swing for side aspect
+                # hold roughly current range (slight close if very far) and swing
+                # for side/rear aspect; escalate arc if prior flanks no-op'd
                 dist = engine.math_2d.get_distance(
                     vehicle.world_coords, target.world_coords
                 )
@@ -592,11 +681,21 @@ class AIHumanVehicleDriver:
                     desired_range = 2800
                 else:
                     desired_range = max(1500, min(dist, 3500))
-                angle_offset = 80 * self.flank_sign_for_pair(
-                    vehicle, target.world_coords
+                mem = self.owner.ai.memory["task_vehicle_crew"]
+                sign = self.flank_sign_for_pair(vehicle, target.world_coords)
+                attempt = mem.get("flank_attempt", 0)
+                dest, used = self.pick_reposition_destination(
+                    vehicle.world_coords,
+                    target.world_coords,
+                    desired_range,
+                    sign,
+                    attempt,
                 )
+                mem["flank_attempt"] = used
                 if self.create_vehicle_order_for_target(
-                    target.world_coords, desired_range, angle_offset
+                    target.world_coords,
+                    desired_range,
+                    dest_coords=dest,
                 ):
                     self.think_vehicle_order()
                     return True
