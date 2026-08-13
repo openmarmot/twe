@@ -57,13 +57,23 @@ class AIHumanVehicleGunner:
             VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
         )
 
-        if self.owner.ai.memory["task_vehicle_crew"]["target"] is not None:
+        target = self.owner.ai.memory["task_vehicle_crew"]["target"]
+        if target is not None:
             if (
                 self.owner.ai.memory["task_vehicle_crew"]["calculated_turret_angle"]
                 is not None
                 and not waiting_on_driver
             ):
                 self.action_engage_target()
+            elif current_action in (
+                VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+            ):
+                if turret is not None:
+                    aim = engine.math_2d.get_rotation(
+                        turret.world_coords, target.world_coords
+                    )
+                    self.rotate_turret(turret, aim)
         elif vehicle.ai.current_speed > 5:
             self.action_align_turret_forward()
 
@@ -375,6 +385,14 @@ class AIHumanVehicleGunner:
         )
 
     # ---------------------------------------------------------------------------
+    def crew_has_driver(self, vehicle):
+        """True if an occupied driver role exists (do not assume crew[0])."""
+        for role in vehicle.ai.vehicle_crew:
+            if role.is_driver and role.role_occupied:
+                return True
+        return False
+
+    # ---------------------------------------------------------------------------
     def rotate_turret(self, turret, desired_angle):
         """rotates a turret. returns True/False as to whether the turret is at the desired angle"""
 
@@ -443,7 +461,11 @@ class AIHumanVehicleGunner:
             else:
                 elapsed = self.owner.world.world_seconds - wait_start
                 if current_action in rotate_waits and elapsed > self.wait_timeout:
-                    # hull never came around - drop target and rescan
+                    # hull never came around - drop target and don't
+                    # immediately re-request rotate on the same geometry
+                    self.owner.ai.memory["task_vehicle_crew"][
+                        "rotate_cooldown_until"
+                    ] = self.owner.world.world_seconds + 4
                     self.owner.ai.memory["task_vehicle_crew"]["target"] = None
                     self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                         VehicleCrewAction.SCANNING
@@ -712,28 +734,22 @@ class AIHumanVehicleGunner:
                                     if len(m.ai.projectiles) > 0:
                                         if m.ai.use_antitank:
                                             if random.randint(0, 1) == 0:
-                                                # fire to clear the shell out
-                                                return
-                                            else:
-                                                # reload to clear the shell out
-                                                # start the reload process
-                                                self.owner.ai.memory[
-                                                    "task_vehicle_crew"
-                                                ][
-                                                    "reload_start_time"
-                                                ] = self.owner.world.world_seconds
-                                                self.owner.ai.memory[
-                                                    "task_vehicle_crew"
-                                                ][
-                                                    "current_action"
-                                                ] = VehicleCrewAction.RELOADING_PRIMARY
-                                                return
+                                                engage_primary = True
+                                                break
+                                            self.owner.ai.memory[
+                                                "task_vehicle_crew"
+                                            ][
+                                                "reload_start_time"
+                                            ] = self.owner.world.world_seconds
+                                            self.owner.ai.memory[
+                                                "task_vehicle_crew"
+                                            ][
+                                                "current_action"
+                                            ] = VehicleCrewAction.RELOADING_PRIMARY
+                                            return
                 elif engage_primary_reason == "need to get closer to penetrate":
                     if turret.ai.primary_turret:
-                        if (
-                            vehicle.ai.vehicle_crew[0].is_driver
-                            and vehicle.ai.vehicle_crew[0].role_occupied
-                        ):
+                        if self.crew_has_driver(vehicle):
                             # wait for a couple seconds before rechecking
                             self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
                                 random.uniform(0.5, 1)
@@ -747,10 +763,7 @@ class AIHumanVehicleGunner:
                             return
                 elif engage_primary_reason == "need better angle":
                     if turret.ai.primary_turret:
-                        if (
-                            vehicle.ai.vehicle_crew[0].is_driver
-                            and vehicle.ai.vehicle_crew[0].role_occupied
-                        ):
+                        if self.crew_has_driver(vehicle):
                             self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
                                 random.uniform(0.5, 1)
                             )
@@ -867,11 +880,12 @@ class AIHumanVehicleGunner:
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
                 if engage_primary or engage_coaxial:
-                    # check if there is a driver
-                    # note this should be fixed in the future. we shouldn't assume driver is in position 0
+                    cooldown = self.owner.ai.memory["task_vehicle_crew"].get(
+                        "rotate_cooldown_until", 0
+                    )
                     if (
-                        vehicle.ai.vehicle_crew[0].is_driver
-                        and vehicle.ai.vehicle_crew[0].role_occupied
+                        self.crew_has_driver(vehicle)
+                        and self.owner.world.world_seconds >= cooldown
                     ):
                         # ask the driver to rotate towards the target
                         if target.is_vehicle or random.randint(0, 1) == 1:

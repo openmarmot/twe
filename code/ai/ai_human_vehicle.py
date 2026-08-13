@@ -251,7 +251,9 @@ class AIHumanVehicle:
                             VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
                             VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
                         )
-                        if not is_gunner_busy:
+                        if is_gunner_busy:
+                            self.role_commander.think_vehicle_position(vehicle)
+                        else:
                             self.role_commander.think()
                         # keep gunner cadence
                         self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
@@ -259,9 +261,6 @@ class AIHumanVehicle:
                         )
                     else:
                         self.role_commander.think()
-                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
-                            random.uniform(5, 15)
-                        )
 
             # the squad lead has some stuff to do independent of their vehicle role
             if (

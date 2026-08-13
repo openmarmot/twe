@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 12 2026
+- more vehicle ai tweaks
+
+---------------------------------
 August 10 2026
 - attempt to fix soft locks with driver repositioning for a better angle
 

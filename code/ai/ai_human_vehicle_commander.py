@@ -39,6 +39,9 @@ class AIHumanVehicleCommander:
             self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
                 VehicleCrewAction.MONITORING
             )
+            self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                random.uniform(5, 15)
+            )
 
         # determine what the primary weapon is and primary gunner is
         primary_gunner_role = None
@@ -244,6 +247,8 @@ class AIHumanVehicleCommander:
                         fire_missions.pop(0)
                         return
 
+            return
+
         # mission is invalid or doesn't exist: find new targets
         valid_targets = self.get_indirect_fire_targets(vehicle)
 
@@ -335,15 +340,25 @@ class AIHumanVehicleCommander:
                 if biggest_threat.ai.vehicle_armor.get("front", [0])[0] > 30:
                     # first check if the turret has 360 degree rotation.
                     # if it doesn't the vehicle will naturally orientate towards the vehicle
-                    if primary_gunner_role.turret.ai.rotation_range[1] == 360:
+                    rot_min, rot_max = primary_gunner_role.turret.ai.rotation_range
+                    if (rot_max - rot_min) >= 360:
                         # only hull-face when we can pen their front at current range.
                         # if we cannot, driver/gunner reposition for angle/range instead
                         # of sitting nose-on in a losing long-range trade.
-                        hull_face = self.can_pen_target_front(
-                            primary_gunner_role.turret.ai.primary_weapon,
-                            vehicle,
-                            biggest_threat,
-                        )
+                        gunner_action = gunner_mem["current_action"]
+                        if gunner_action in (
+                            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+                            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+                            VehicleCrewAction.WAITING_FOR_ROTATE,
+                        ):
+                            hull_face = False
+                        else:
+                            hull_face = self.can_pen_target_front(
+                                primary_gunner_role.turret.ai.primary_weapon,
+                                vehicle,
+                                biggest_threat,
+                            )
                         if hull_face:
                             rotation_required = engine.math_2d.get_rotation(
                                 vehicle.world_coords, biggest_threat.world_coords
@@ -403,6 +418,17 @@ class AIHumanVehicleCommander:
         Returns True if a retreat order was issued (caller should skip the rest of commander think).
         Returns False if no action was taken.
         """
+        existing = self.owner.ai.memory["task_vehicle_crew"].get("vehicle_order")
+        if existing is not None and existing.is_retreat:
+            return True
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied and role.is_driver:
+                driver_order = role.human.ai.memory["task_vehicle_crew"].get(
+                    "vehicle_order"
+                )
+                if driver_order is not None and driver_order.is_retreat:
+                    return True
+
         # human_targets and vehicle_targets are already sorted closest-first by evaluate_targets
         human_targets = self.owner.ai.human_targets
         vehicle_targets = self.owner.ai.vehicle_targets
