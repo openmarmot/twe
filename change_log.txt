@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 16 2026
+- started work on 'trader' civilian task
+
+---------------------------------
 August 12 2026
 - more vehicle ai tweaks
 
