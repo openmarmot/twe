@@ -74,6 +74,9 @@ class AIHuman:
         # amount can be a float to account for coinage
         # 'currency name',amount
         self.wallet = {}
+        # last time a trader made contact. used so several traders do not mob one person
+        self.last_trader_contact_time = 0
+        self.last_trader_contact_cooldown = 0
 
         # -- health stuff --
         self.blood_pressure = 100

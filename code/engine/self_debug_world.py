@@ -276,8 +276,6 @@ def check_task_trader(b, issues, world):
         'status',
         'building',
         'customer',
-        'last_customer',
-        'last_customer_time',
         'last_think_time',
         'think_interval',
     ):
