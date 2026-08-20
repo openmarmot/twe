@@ -27,10 +27,18 @@ class AIHumanSquadLeader:
         close_distance = 300
 
         # note this can be called from inside a vehicle or from on foot
+        # vehicle crew calls this for whoever is squad.squad_leader, which
+        # does not guarantee task_squad_leader memory exists (civilians never
+        # get switch_task_squad_leader)
+        if self.owner.ai.is_civilian:
+            return False
+        task_mem = self.owner.ai.memory.get("task_squad_leader")
+        if task_mem is None:
+            return False
 
         # this is a list of TacticalOrder objects
         # for now i think its always only one
-        orders = self.owner.ai.memory["task_squad_leader"]["orders"]
+        orders = task_mem["orders"]
 
         if len(orders) == 0:
             self.tactical_decision()

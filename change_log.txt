@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 19 2026
+- fixed a new crash caused by inactive civilian squad leaders
+
+---------------------------------
 August 16 2026
 - started work on 'trader' civilian task
 

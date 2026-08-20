@@ -263,9 +263,12 @@ class AIHumanVehicle:
                         self.role_commander.think()
 
             # the squad lead has some stuff to do independent of their vehicle role
+            # civilians are assigned squad_leader at spawn but never get
+            # task_squad_leader memory / tactical orders
             if (
                 self.owner == self.owner.ai.squad.squad_leader
                 and self.owner.ai.in_vehicle()
+                and not self.owner.ai.is_civilian
             ):
                 # if we don't have a vehicle order, check to see if we can create
                 # one from tactical orders
