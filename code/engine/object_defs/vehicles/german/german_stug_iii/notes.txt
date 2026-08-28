@@ -1,0 +1,13 @@
+Stug III G
+
+-- ref ---
+https://tanks-encyclopedia.com/ww2/nazi_germany/stugiiig
+
+
+--------
+
+Measurement,Real,Pixels
+Overall length (gun forward),~22.2 ft,~178 px
+Hull length,~17.7 ft,~142 px
+Width (no skirts),~9.7 ft,~78 px
+Height (to cupola),~7.1 ft,~57 px

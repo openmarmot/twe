@@ -62,7 +62,7 @@ this is not a full list of what is in game, it is just a way for me to keep trac
 - panzer 3 M
 - panzer 3 N
 - panther g
-- stug 3 g
+- (done) stug 3 g
 - stuh 42
 - stug iv 
 - nashorn

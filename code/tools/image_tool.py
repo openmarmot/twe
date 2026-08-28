@@ -70,6 +70,9 @@ class ImageTool():
         # draw alignment lines (new)
         self.draw_alignment_lines=True
 
+        # click sets image_rotation_offset instead of moving the object
+        self.pivot_set_mode=False
+
         # colors for different images
         self.colors = [(255,0,0), (0,255,0), (0,0,255), (255,165,0), (128,0,128), (0,255,255), (255,0,255), (255,255,0)]
 
@@ -96,8 +99,13 @@ class ImageTool():
         self.view_adjust=self.view_adjust_minimum
         self.view_adjustment=400
 
-        # load all images
-        self.load_all_images('../images')
+        # load all images. object_defs is the source of truth (typically
+        # an images/ folder next to each object). code/images is a
+        # fallback for sprites that have not been moved yet.
+        tools_dir = os.path.dirname(os.path.abspath(__file__))
+        code_dir = os.path.dirname(tools_dir)
+        self.load_all_images(os.path.join(code_dir, 'engine', 'object_defs'))
+        self.load_all_images(os.path.join(code_dir, 'images'), overwrite=False)
 
 
     #------------------------------------------------------------------------------
@@ -145,6 +153,12 @@ class ImageTool():
                 if event.key==49: #1
                     self.print_offsets()
 
+                if event.key==99: #c
+                    self.pivot_set_mode=not self.pivot_set_mode
+
+                if event.key==120: #x
+                    self.reset_selected_pivot()
+
                 if event.key==91: # [
                     self.zoom_out()
                 elif event.key==93: # ]
@@ -156,7 +170,10 @@ class ImageTool():
                 # left click
                 if event.button==1:
                     if self.selected_object:
-                        self.selected_object.world_coords=self.get_mouse_world_coords()
+                        if self.pivot_set_mode:
+                            self.set_selected_pivot(self.get_mouse_world_coords())
+                        else:
+                            self.selected_object.world_coords=self.get_mouse_world_coords()
                 # middle button click
                 if event.button==2:
                     pass
@@ -169,22 +186,38 @@ class ImageTool():
 
 
     #------------------------------------------------------------------------------
-    def load_all_images(self,folder_path):
-        '''load all the images into pygame'''
-        files_and_dirs = os.listdir(folder_path)
-        # Filter out directories, keeping only files
-        files = [f for f in files_and_dirs if os.path.isfile(os.path.join(folder_path, f))]
+    def load_all_images(self,folder_path,overwrite=True):
+        '''Recursively load PNG images from folder_path into pygame.
 
-        for b in files:
-            name=b.split('.')[0]
-            image_path=folder_path+'/'+b
-            image = pygame.image.load(image_path).convert_alpha()
-            w, h = image.get_size()
-            if w != h:
-                print(f"Alert: Image {name} is not square (width: {w}, height: {h})")
-            self.images[name]=image
+        Images are keyed by filename without extension so existing
+        image_list entries keep working. Skip __pycache__.
+        overwrite=False leaves the first loaded image in place.
+        '''
+        folder_path=os.path.abspath(folder_path)
+        if not os.path.isdir(folder_path):
+            print('error','Image folder does not exist: '+folder_path)
+            return
 
-        print('Image loading complete')
+        loaded=0
+        for root, dirs, files in os.walk(folder_path):
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+            for filename in files:
+                name, ext = os.path.splitext(filename)
+                if ext.lower() != '.png':
+                    continue
+                if name in self.images and not overwrite:
+                    continue
+                image_path=os.path.join(root, filename)
+                if name in self.images:
+                    print('warn','Duplicate image name '+name+', replacing with '+image_path)
+                image = pygame.image.load(image_path).convert_alpha()
+                w, h = image.get_size()
+                if w != h:
+                    print(f"Alert: Image {name} is not square (width: {w}, height: {h})")
+                self.images[name]=image
+                loaded+=1
+
+        print('Image loading complete: '+str(loaded)+' from '+folder_path)
 
     #------------------------------------------------------------------------------
     def print_offsets(self):
@@ -192,6 +225,12 @@ class ImageTool():
             print('----------------------------------')
             print('offsets')
             print('----------------------------------')
+
+            for b in self.image_objects:
+                ox=round(b.image_rotation_offset[0],1)
+                oy=round(b.image_rotation_offset[1],1)
+                print(b.image_list[b.image_index],' image_rotation_offset:',[ox,oy])
+                print(f"z.image_rotation_offset = [{ox}, {oy}]")
 
             for b in self.image_objects:
                 if b!=self.selected_object:
@@ -222,24 +261,27 @@ class ImageTool():
 
         for i, b in enumerate(self.image_objects):
             self.reset_pygame_image(b)
-            self.screen.blit(b.image, (b.screen_coords[0]-b.image_center[0], b.screen_coords[1]-b.image_center[1]))
-
-
+            blit_offset=b.image_blit_offset
+            if blit_offset is None:
+                blit_offset=b.image_center
+            blit_x=b.screen_coords[0]-blit_offset[0]
+            blit_y=b.screen_coords[1]-blit_offset[1]
+            self.screen.blit(b.image, (blit_x, blit_y))
 
             if self.draw_alignment_lines:
                 color = self.colors[i % len(self.colors)]
-                center_x, center_y = b.screen_coords
-                # Vertical line through center, spanning image height
-                v_start = (center_x, center_y - b.image_center[1])
-                v_end = (center_x, center_y + b.image_center[1])
+                pivot_x, pivot_y = b.screen_coords
+                # Vertical / horizontal lines through the rotation origin
+                v_start = (pivot_x, blit_y)
+                v_end = (pivot_x, blit_y + b.image_size[1])
                 pygame.draw.line(self.screen, color, v_start, v_end, 1)
-                # Horizontal line through center, spanning image width
-                h_start = (center_x - b.image_center[0], center_y)
-                h_end = (center_x + b.image_center[0], center_y)
+                h_start = (blit_x, pivot_y)
+                h_end = (blit_x + b.image_size[0], pivot_y)
                 pygame.draw.line(self.screen, color, h_start, h_end, 1)
                 # Outline around the image
-                top_left = (center_x - b.image_center[0], center_y - b.image_center[1])
-                pygame.draw.rect(self.screen, color, (top_left[0], top_left[1], b.image_size[0], b.image_size[1]), 1)
+                pygame.draw.rect(self.screen, color, (blit_x, blit_y, b.image_size[0], b.image_size[1]), 1)
+                # rotation origin
+                pygame.draw.circle(self.screen, color, (int(pivot_x), int(pivot_y)), 4, 1)
 
 
         # text stuff
@@ -288,7 +330,14 @@ class ImageTool():
             self.text_queue.append('Rotation angle: '+str(round(self.selected_object.rotation_angle,2)))
             self.text_queue.append('W/S/A/D or mouse click to move')
             self.text_queue.append('R to rotate')
+            self.text_queue.append('C: pivot-set mode (click origin, rotation 0)')
+            self.text_queue.append('X: reset pivot to image center')
             self.text_queue.append('1: print offsets relative to this object (rotation should be 0)')
+            ox=round(self.selected_object.image_rotation_offset[0],1)
+            oy=round(self.selected_object.image_rotation_offset[1],1)
+            self.text_queue.append(f'image_rotation_offset: [{ox}, {oy}]')
+            if self.pivot_set_mode:
+                self.text_queue.append('PIVOT SET MODE - click the rotation origin')
 
             if self.selected_object!=self.image_objects[0]:
                 offset=[self.selected_object.world_coords[0]-self.image_objects[0].world_coords[0],self.selected_object.world_coords[1]-self.image_objects[0].world_coords[1]]
@@ -380,21 +429,62 @@ class ImageTool():
     def reset_pygame_image(self, wo):
         '''reset the image for a world object'''
         obj_scale=self.scale+wo.scale_modifier
-        wo.image_size=self.images[wo.image_list[wo.image_index]].get_size()
-        wo.image_size=[int(wo.image_size[0]*obj_scale),int(wo.image_size[1]*obj_scale)]
-        wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
 
         try:
             image=self.images[wo.image_list[wo.image_index]]
-            orig_rect = image.get_rect()
-            rot_image = pygame.transform.rotate(image, wo.rotation_angle)
-            rot_rect = orig_rect.copy()
-            rot_rect.center = rot_image.get_rect().center
-            rot_image = rot_image.subsurface(rot_rect).copy()
-            resize_image=pygame.transform.scale(rot_image,wo.image_size)
-            wo.image=resize_image
+            wo.image=pygame.transform.rotozoom(image, wo.rotation_angle, obj_scale)
+            wo.image_size=wo.image.get_size()
+            wo.image_center=[round(wo.image_size[0]*0.5,1),round(wo.image_size[1]*0.5,1)]
+            self.update_image_blit_offset(wo, obj_scale)
         except:
             print('error','graphics_2d_pygame.reset_pygame_image: image transform error with image '+wo.image_list[wo.image_index])
+
+    #------------------------------------------------------------------------------
+    def reset_selected_pivot(self):
+        '''move rotation origin back to the source image center'''
+        obj=self.selected_object
+        if obj is None:
+            return
+        if obj.rotation_angle!=0:
+            print('reset pivot: set rotation to 0 first (R)')
+            return
+        obj.world_coords=[
+            obj.world_coords[0]-obj.image_rotation_offset[0],
+            obj.world_coords[1]-obj.image_rotation_offset[1],
+        ]
+        obj.image_rotation_offset=[0,0]
+        print('pivot reset to image center')
+
+    #------------------------------------------------------------------------------
+    def set_selected_pivot(self, click_world):
+        '''set rotation origin to the clicked point. rotation must be 0'''
+        obj=self.selected_object
+        if obj is None:
+            return
+        if obj.rotation_angle!=0:
+            print('set pivot: set rotation to 0 first (R)')
+            return
+        old=obj.image_rotation_offset
+        obj.image_rotation_offset=[
+            click_world[0]-obj.world_coords[0]+old[0],
+            click_world[1]-obj.world_coords[1]+old[1],
+        ]
+        obj.world_coords=[click_world[0], click_world[1]]
+        ox=round(obj.image_rotation_offset[0],1)
+        oy=round(obj.image_rotation_offset[1],1)
+        print(f'pivot set image_rotation_offset=[{ox}, {oy}]')
+
+    #------------------------------------------------------------------------------
+    def update_image_blit_offset(self, wo, obj_scale):
+        '''set blit offset so image_rotation_offset stays on screen_coords'''
+        center=wo.image_center
+        offset=wo.image_rotation_offset
+        if center is None or (offset[0]==0 and offset[1]==0):
+            wo.image_blit_offset=[center[0], center[1]] if center is not None else None
+            return
+        scaled=pygame.math.Vector2(offset[0]*obj_scale, offset[1]*obj_scale)
+        rotated=scaled.rotate(-wo.rotation_angle)
+        wo.image_blit_offset=[center[0]+rotated.x, center[1]+rotated.y]
 
 
     #------------------------------------------------------------------------------
@@ -436,6 +526,8 @@ class ImageObject():
         self.image=None
         self.image_size=None
         self.image_center=None
+        self.image_rotation_offset=[0,0]
+        self.image_blit_offset=None
         self.world_coords=[0,0]
         self.screen_coords=[0,0]
         self.rotation_angle=rotation_angle

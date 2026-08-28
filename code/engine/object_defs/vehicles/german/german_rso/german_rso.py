@@ -19,7 +19,7 @@ from engine.object_registry import register_object
 def create(world, world_coords):
     # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
     # related ref : https://tanks-encyclopedia.com/ww2/nazi_germany/Raupenschlepper-Ost-Artillery-SPG.php
-    z = WorldObject(world, ["rso", "rso_destroyed"], AIVehicle)
+    z = WorldObject(world, ["rso"], AIVehicle)
     z.name = "Raupenschlepper Ost"
     z.is_vehicle = True
     z.is_towable = True

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 28 2026
+- added stug III ausf g
+- changes to allow a image rotation point to be set
+
+---------------------------------
 August 19 2026
 - fixed a new crash caused by inactive civilian squad leaders
 

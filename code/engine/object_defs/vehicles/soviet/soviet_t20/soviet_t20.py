@@ -19,7 +19,7 @@ from engine.object_registry import register_object
 def create(world, world_coords):
     # ref : https://en.wikipedia.org/wiki/Komsomolets_armored_tractor
     # ref : https://wiki.warthunder.com/ZiS-30
-    z = WorldObject(world, ["t20", "t20_destroyed"], AIVehicle)
+    z = WorldObject(world, ["t20"], AIVehicle)
     z.name = "T20 Komsomolets armored tractor"
     z.is_vehicle = True
     z.is_towable = True

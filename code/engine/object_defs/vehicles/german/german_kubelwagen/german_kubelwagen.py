@@ -17,7 +17,7 @@ from engine.object_registry import register_object
 
 @register_object("german_kubelwagen")
 def create(world, world_coords):
-    z = WorldObject(world, ["kubelwagen", "kubelwagen_destroyed"], AIVehicle)
+    z = WorldObject(world, ["kubelwagen"], AIVehicle)
     z.name = "Kubelwagen"
     z.is_vehicle = True
     z.is_towable = True

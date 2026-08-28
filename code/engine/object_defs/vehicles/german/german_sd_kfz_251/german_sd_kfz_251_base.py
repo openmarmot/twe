@@ -18,7 +18,7 @@ from engine.object_registry import register_object
 @register_object("german_sd_kfz_251_base")
 def create(world, world_coords):
     # ref : https://tanks-encyclopedia.com/ww2/nazi_germany/sdkfz-251_hanomag.php
-    z = WorldObject(world, ["sd_kfz_251", "sd_kfz_251_destroyed"], AIVehicle)
+    z = WorldObject(world, ["sd_kfz_251"], AIVehicle)
     z.name = "Sd.Kfz.251"
     z.is_vehicle = True
     z.is_towable = True

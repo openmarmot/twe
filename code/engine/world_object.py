@@ -44,6 +44,13 @@ class WorldObject():
         self.image_size=None
         # image center. calculated by graphics_engine
         self.image_center=None
+        # offset of the sprite rotation origin from the source image
+        # center, in pixels (world units at scale 1).
+        # [0, 0] rotates around the image center (default)
+        self.image_rotation_offset=[0,0]
+        # blit offset so the rotation origin lands on screen_coords.
+        # set by the graphics engine
+        self.image_blit_offset=None
 
         # tell graphicsEngine to reset the image (need to rotate, etc)
         self.reset_image=True
