@@ -42,6 +42,7 @@ import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator
 import engine.battlegroup_generator
+import engine.scenario_defs
 
 
 # load AI
@@ -253,6 +254,7 @@ list_medical_ultra_rare = []
 
 # ------ variables that get pulled from sqlite -----------------------------------
 squad_data = {}
+scenario_data = []
 
 
 # ------------------------------------------------------------------------------
@@ -620,6 +622,98 @@ def load_magazine(world, magazine, projectile_type=None, tracers=False):
 
 
 # ------------------------------------------------------------------------------
+def parse_squad_list(text):
+    """Parse 'Squad Name:3, Other Squad:1' into a list of squad names"""
+
+    squads = []
+    if text is None:
+        return squads
+    text = str(text).strip()
+    if text == "":
+        return squads
+    for entry in text.split(","):
+        entry = entry.strip()
+        if entry == "":
+            continue
+        if ":" in entry:
+            name, count_text = entry.rsplit(":", 1)
+            name = name.strip()
+            count_text = count_text.strip()
+            try:
+                count = int(count_text)
+            except ValueError:
+                engine.log.add_data(
+                    "error", "parse_squad_list bad count in: " + entry, True
+                )
+                count = 1
+        else:
+            name = entry
+            count = 1
+        if name not in squad_data:
+            engine.log.add_data(
+                "error", "parse_squad_list unknown squad: " + name, True
+            )
+            continue
+        if count < 1:
+            continue
+        for _ in range(count):
+            squads.append(name)
+    return squads
+
+
+# ------------------------------------------------------------------------------
+def parse_map_areas(text):
+    """Parse a comma list of map area types"""
+
+    valid = ["town", "airport", "rail_yard"]
+    areas = []
+    if text is None:
+        return ["town"]
+    for part in str(text).split(","):
+        area = part.strip().lower()
+        if area == "":
+            continue
+        if area not in valid:
+            engine.log.add_data(
+                "warn", "unknown map area '" + area + "', using town", True
+            )
+            area = "town"
+        areas.append(area)
+    if not areas:
+        areas = ["town"]
+    return areas
+
+
+# ------------------------------------------------------------------------------
+def assemble_battle_map_objects(
+    map_areas, squads, reinforcement_squads, defending_faction, name, year
+):
+    """Build map objects and a result dict shared by quick battle and scenarios"""
+
+    if not map_areas:
+        map_areas = ["town"]
+    map_objects = engine.map_generator.generate_map(map_areas)
+
+    # main force: [0, 0]. reinforcements: REINFORCEMENT_MAP_COORDS marker
+    for squad in squads:
+        map_objects += get_squad_map_objects(squad)
+    for squad in reinforcement_squads:
+        map_objects += get_squad_map_objects(squad, REINFORCEMENT_MAP_COORDS)
+
+    engine.log.add_data("note", f"{name} year: {year}", True)
+    print_quick_battle_squad_summary(
+        year, squads, reinforcement_squads, title=name
+    )
+
+    return {
+        "map_objects": map_objects,
+        "defending_faction": defending_faction,
+        "name": name,
+        "year": year,
+    }
+
+
+# ------------------------------------------------------------------------------
 def load_quick_battle_map_objects(battle_option, result_container):
     """load quick battle map objects. called by game menu"""
 
@@ -632,8 +726,6 @@ def load_quick_battle_map_objects(battle_option, result_container):
     world_area_options.append(["airport", "town"])
     map_areas = random.choice(world_area_options)
 
-    map_objects = engine.map_generator.generate_map(map_areas)
-
     year = random.choice([1944, 1945])
 
     # -- initial troops --
@@ -641,7 +733,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
     reinforcement_squads = []
     points = 0
     soviet_advantage = 0
-    soviet_advantage_multiplier=0.5
+    soviet_advantage_multiplier = 0.5
     if battle_option == "1":
         points = 2500
         soviet_advantage = points * soviet_advantage_multiplier
@@ -682,7 +774,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
     # testing
     elif battle_option == "4":
 
-        for s in range(20):
+        for _ in range(20):
             squads.append("Soviet T-70")
             squads.append("Soviet 1944 Rifle")
             squads.append("Soviet 1944 Rifle Motorized")
@@ -697,7 +789,7 @@ def load_quick_battle_map_objects(battle_option, result_container):
 
     # bench mark
     elif battle_option == "5":
-        for b in range(100):
+        for _ in range(100):
             squads.append("Soviet T34-76 Model 1943")
             squads.append("German Panzer IV Ausf G")
 
@@ -713,22 +805,62 @@ def load_quick_battle_map_objects(battle_option, result_container):
             "soviet", rein_points + rein_soviet_advantage, squad_data, year
         )
 
-    # convert squads to map objects
-    # main force: [0, 0]. reinforcements: REINFORCEMENT_MAP_COORDS marker for create_squads
-    for squad in squads:
-        map_objects += get_squad_map_objects(squad)
-    for squad in reinforcement_squads:
-        map_objects += get_squad_map_objects(squad, REINFORCEMENT_MAP_COORDS)
-
-    engine.log.add_data("note", f"Quick battle year: {year}", True)
-    print_quick_battle_squad_summary(year, squads, reinforcement_squads)
-
-    result_container[0] = map_objects
+    defending_faction = random.choice(["german", "soviet", "none", "contested"])
+    result_container[0] = assemble_battle_map_objects(
+        map_areas,
+        squads,
+        reinforcement_squads,
+        defending_faction,
+        "Quick battle",
+        year,
+    )
 
 
 # ------------------------------------------------------------------------------
-def print_quick_battle_squad_summary(year, squads, reinforcement_squads):
-    """print a clean terminal summary of quick battle forces by faction"""
+def load_scenario_map_objects(scenario, result_container):
+    """load a predefined scenario plus a small random battlegroup attachment"""
+
+    # this is called in a thread by graphics_2d_pygame.load_scenario
+
+    year = int(scenario.get("year", 1944))
+    name = scenario.get("name", "Scenario")
+    defending_faction = scenario.get("defending_faction", "none")
+    attacking_faction = scenario.get("attacking_faction", "none")
+
+    german_squads = parse_squad_list(scenario.get("german_squads", ""))
+    soviet_squads = parse_squad_list(scenario.get("soviet_squads", ""))
+
+    german_random = int(scenario.get("german_random_points", 0) or 0)
+    soviet_random = int(scenario.get("soviet_random_points", 0) or 0)
+    if german_random > 0:
+        german_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "german", german_random, squad_data, year
+        )
+    if soviet_random > 0:
+        soviet_squads += engine.battlegroup_generator.create_random_battlegroup(
+            "soviet", soviet_random, squad_data, year
+        )
+
+    squads = german_squads + soviet_squads
+    map_areas = parse_map_areas(scenario.get("map_areas", "town"))
+
+    engine.log.add_data(
+        "note",
+        f"Scenario '{name}': {attacking_faction} attacking, "
+        f"{defending_faction} defending",
+        True,
+    )
+
+    result_container[0] = assemble_battle_map_objects(
+        map_areas, squads, [], defending_faction, name, year
+    )
+
+
+# ------------------------------------------------------------------------------
+def print_quick_battle_squad_summary(
+    year, squads, reinforcement_squads, title="QUICK BATTLE SUMMARY"
+):
+    """print a clean terminal summary of battle forces by faction"""
 
     def count_squads(squad_list):
         counts = {}
@@ -768,7 +900,7 @@ def print_quick_battle_squad_summary(year, squads, reinforcement_squads):
 
     print()
     print("=" * width)
-    print(f"  QUICK BATTLE SUMMARY  |  Year {year}")
+    print(f"  {title}  |  Year {year}")
     print("=" * width)
 
     faction_labels = (
@@ -829,6 +961,87 @@ def load_sqlite_squad_data():
         squad_data[key] = row_dict
 
     # Close the database connection
+    conn.close()
+
+
+# ------------------------------------------------------------------------------
+def load_sqlite_scenario_data():
+    """create/update scenario_data table and load it into memory"""
+    global scenario_data
+    scenario_data = []
+
+    conn = sqlite3.connect("data/data.sqlite")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS scenario_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sort_order INTEGER,
+            name TEXT NOT NULL UNIQUE,
+            description TEXT,
+            year INTEGER,
+            attacking_faction TEXT,
+            defending_faction TEXT,
+            map_areas TEXT,
+            german_squads TEXT,
+            soviet_squads TEXT,
+            german_random_points INTEGER,
+            soviet_random_points INTEGER
+        )
+        """
+    )
+
+    # upsert built-in scenarios. extra rows added only in sqlite are kept
+    for s in engine.scenario_defs.SCENARIOS:
+        cursor.execute(
+            """
+            INSERT INTO scenario_data (
+                sort_order, name, description, year,
+                attacking_faction, defending_faction, map_areas,
+                german_squads, soviet_squads,
+                german_random_points, soviet_random_points
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(name) DO UPDATE SET
+                sort_order=excluded.sort_order,
+                description=excluded.description,
+                year=excluded.year,
+                attacking_faction=excluded.attacking_faction,
+                defending_faction=excluded.defending_faction,
+                map_areas=excluded.map_areas,
+                german_squads=excluded.german_squads,
+                soviet_squads=excluded.soviet_squads,
+                german_random_points=excluded.german_random_points,
+                soviet_random_points=excluded.soviet_random_points
+            """,
+            (
+                s["sort_order"],
+                s["name"],
+                s["description"],
+                s["year"],
+                s["attacking_faction"],
+                s["defending_faction"],
+                s["map_areas"],
+                s["german_squads"],
+                s["soviet_squads"],
+                s["german_random_points"],
+                s["soviet_random_points"],
+            ),
+        )
+
+    conn.commit()
+
+    cursor.execute(
+        "SELECT * FROM scenario_data ORDER BY sort_order, id"
+    )
+    column_names = [description[0] for description in cursor.description]
+    rows = cursor.fetchall()
+    for row in rows:
+        row_dict = {
+            column_names[i]: row[i] for i in range(len(column_names))
+        }
+        scenario_data.append(row_dict)
+
     conn.close()
 
 
@@ -1219,6 +1432,7 @@ def spawn_heat_jet(
 
 # load squad data
 load_sqlite_squad_data()
+load_sqlite_scenario_data()
 
 # populate the new per-file object registry (supports subfolders under object_defs/)
 _load_object_definitions()

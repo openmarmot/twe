@@ -385,25 +385,22 @@ class Graphics_2D_Pygame:
             )
 
     # ------------------------------------------------------------------------------
-    def load_quick_battle(self, player_spawn_faction, battle_option):
-        """load a quick battle"""
+    def load_battle_from_thread(
+        self, player_spawn_faction, target, args, loading_text
+    ):
+        """run a map-object builder in a thread, then load_world from the result"""
 
-        # called by game_menu.start_menu
+        # used by load_quick_battle and load_scenario
+        # result_container[0] is a dict:
+        #   map_objects, defending_faction, name, year
 
-        # this uses a thread to prevent the game from going unresponsive while
-        # all the data is being generated
-
-        # Start computation in a separate thread
-        # Container to store result from thread
-        result_container = [None]
+        result_container = [{}]
         thread = threading.Thread(
-            target=engine.world_builder.load_quick_battle_map_objects,
-            args=(battle_option, result_container),
+            target=target, args=tuple(args) + (result_container,)
         )
         thread.start()
 
-        self.game_menu.text_queue = ["Creating quick battle map objects..."]
-        # render
+        self.game_menu.text_queue = [loading_text]
         self.render_mode_0()
 
         loading = True
@@ -413,14 +410,47 @@ class Graphics_2D_Pygame:
                     loading = False
                     self.quit = True
 
-            # Check if thread is done
             if not thread.is_alive():
                 loading = False
 
-        defending_faction = random.choice(["german", "soviet", "none", "contested"])
+        result = result_container[0]
+        if "map_objects" not in result:
+            engine.log.add_data(
+                "error", "battle load returned no result", True
+            )
+            return
 
         self.load_world(
-            player_spawn_faction, "Quick battle", result_container[0], defending_faction
+            player_spawn_faction,
+            result.get("name", "Battle"),
+            result["map_objects"],
+            result.get("defending_faction", "none"),
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_quick_battle(self, player_spawn_faction, battle_option):
+        """load a quick battle"""
+
+        # called by game_menu.start_menu
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_quick_battle_map_objects,
+            (battle_option,),
+            "Creating quick battle map objects...",
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_scenario(self, player_spawn_faction, scenario):
+        """load a predefined scenario"""
+
+        # called by game_menu.scenario_menu
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_scenario_map_objects,
+            (scenario,),
+            "Creating scenario map objects...",
         )
 
     # ------------------------------------------------------------------------------

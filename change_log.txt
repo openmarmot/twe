@@ -4,6 +4,9 @@ TWE Project : Change Log
 August 28 2026
 - added stug III ausf g
 - changes to allow a image rotation point to be set
+- changes to battle_group generator to make it more historical
+- rebalance rarity to make it more historical
+- added Scenario menu with predefined battles (fixed force + small random attachment)
 
 ---------------------------------
 August 19 2026

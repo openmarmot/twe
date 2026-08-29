@@ -20,6 +20,32 @@ import engine.math_2d
 #global variables
 
 
+# ------------------------------------------------------------------------------
+def wrap_menu_text(text, width=58):
+    '''word wrap a block of text for the menu text_queue'''
+    lines = []
+    if text is None:
+        return lines
+    paragraphs = str(text).split('\n')
+    for para in paragraphs:
+        para = para.strip()
+        if para == '':
+            lines.append('')
+            continue
+        current = ''
+        for word in para.split():
+            if current == '':
+                current = word
+            elif len(current) + 1 + len(word) <= width:
+                current = current + ' ' + word
+            else:
+                lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+    return lines
+
+
 class GameMenu():
     ''' in game menu '''
 
@@ -40,6 +66,9 @@ class GameMenu():
         #
         self.player_spawn_faction=""
 
+        # index into world_builder.scenario_data for the Scenario menu
+        self.scenario_index=0
+
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -56,6 +85,8 @@ class GameMenu():
             self.start_menu(key)
         elif self.active_menu=='load_save':
             self.load_save_menu(key)
+        elif self.active_menu=='scenario':
+            self.scenario_menu(key)
 
         else:
             print('Error : active menu not recognized ',self.active_menu)
@@ -143,7 +174,8 @@ class GameMenu():
             self.text_queue.append('1 - New Campaign (preview)')
             self.text_queue.append('2 - Load Campaign (preview)')
             self.text_queue.append('3 - Quick Battle (choose this)')
-            self.text_queue.append('4 - Exit')
+            self.text_queue.append('4 - Scenario')
+            self.text_queue.append('5 - Exit')
 
             if key=='1':
                 self.graphics_engine.mode=2
@@ -155,6 +187,8 @@ class GameMenu():
                 self.menu_state='faction_select'
                 key='none'
             elif key=='4':
+                self.change_menu('scenario')
+            elif key=='5':
                 print('----------------------')
                 print('Good Bye!')
                 self.graphics_engine.quit=True
@@ -199,9 +233,84 @@ class GameMenu():
             if key in ['1','2','3','4','5']:
                 self.deactivate_menu()
                 self.graphics_engine.load_quick_battle(self.player_spawn_faction,key)
-                
 
+    #---------------------------------------------------------------------------
+    def scenario_menu(self, key):
+        '''browse and start a predefined scenario'''
 
+        scenarios = engine.world_builder.scenario_data
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append('---------------')
+
+        if not scenarios:
+            self.text_queue.append('No scenarios found')
+            self.text_queue.append('Press [Esc] to return to the main menu')
+            return
+
+        if self.scenario_index >= len(scenarios) or self.scenario_index < 0:
+            self.scenario_index = 0
+
+        # next / previous. wrap around so a long list stays usable
+        if key in ['4', '+']:
+            self.scenario_index = (self.scenario_index + 1) % len(scenarios)
+            key = None
+        elif key in ['5', '-']:
+            self.scenario_index = (self.scenario_index - 1) % len(scenarios)
+            key = None
+
+        s = scenarios[self.scenario_index]
+        total = len(scenarios)
+        attacking = str(s.get('attacking_faction', 'none'))
+        defending = str(s.get('defending_faction', 'none'))
+        year = s.get('year', '')
+        map_parts = []
+        for part in str(s.get('map_areas', '')).split(','):
+            part = part.strip().replace('_', ' ')
+            if part:
+                map_parts.append(part.title())
+        map_areas = ', '.join(map_parts)
+
+        self.text_queue.append(
+            'Scenario  ' + str(self.scenario_index + 1) + ' / ' + str(total)
+        )
+        self.text_queue.append(str(s.get('name', 'Unnamed')))
+        self.text_queue.append('Year ' + str(year))
+        if defending in ['none', 'contested']:
+            self.text_queue.append(
+                'Meeting engagement  (' + defending + ')'
+            )
+        else:
+            self.text_queue.append(
+                attacking.capitalize()
+                + ' attacking  /  '
+                + defending.capitalize()
+                + ' defending'
+            )
+        self.text_queue.append('Map: ' + map_areas)
+        self.text_queue.append('---------------')
+        for line in wrap_menu_text(s.get('description', '')):
+            self.text_queue.append(line)
+        self.text_queue.append('---------------')
+        self.text_queue.append('1 - Play as German')
+        self.text_queue.append('2 - Play as Soviet')
+        self.text_queue.append('3 - Play as Civilian/Neutral')
+        self.text_queue.append('4 - Next scenario')
+        self.text_queue.append('5 - Previous scenario')
+
+        if key == '1':
+            faction = 'german'
+        elif key == '2':
+            faction = 'soviet'
+        elif key == '3':
+            faction = 'civilian'
+        else:
+            faction = None
+
+        if faction is not None:
+            self.player_spawn_faction = faction
+            self.deactivate_menu()
+            self.graphics_engine.load_scenario(faction, s)
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):

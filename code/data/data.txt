@@ -1,4 +1,39 @@
 # squad_data table
 
-chance_1944 and chance_1945 are the relative chance that a unit will be available that year out of 100.
-basically how rare it is, with 100 being common, and 0 being completely unavailable.
+chance_1944 and chance_1945 are the relative chance that a unit will be
+available that year out of 100.
+
+100 = ubiquitous in a typical mixed force that year
+ 50 = common but not standard in every battlegroup
+ 15-25 = regular minority / occasional attachment
+  5-10 = uncommon specialist
+  1-4  = rare (dozens to low hundreds in the whole army)
+  0    = not fielded that year
+
+Scaled from 1944-45 inventory and production share of the field army
+(Eastern Front weighted), not from "did this vehicle exist."
+Camo skins share the base squad's chance in the battlegroup generator.
+
+# scenario_data table
+
+Predefined tactical scenarios for the Scenario menu.
+
+Built-in rows are defined in code/engine/scenario_defs.py and upserted
+into this table on load (matched by name). Extra rows added only in
+sqlite are kept and will also appear in the menu.
+
+Columns:
+  sort_order            menu order
+  name                  unique display name
+  description           text shown in the Scenario menu
+  year                  1944 or 1945 (used by battlegroup_generator)
+  attacking_faction     german / soviet
+  defending_faction     german / soviet / none / contested
+  map_areas             comma list: town, airport, rail_yard
+  german_squads         "Squad Name:count, Squad Name:count"
+  soviet_squads         same format
+  german_random_points  extra battlegroup_generator budget
+  soviet_random_points  extra battlegroup_generator budget
+
+The fixed squad list is the core force. random_points buys a small
+random attachment so replays of the same scenario are not identical.

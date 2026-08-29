@@ -28,8 +28,8 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [50, 0, 0]
     # gun port is front-right of the casemate. pivot is the mantlet face
     # so the recoil housing sits in the port and the barrel extends forward
-    z.ai.position_offset = [-46, 12]
-    z.image_rotation_offset = [0, 26]
+    z.ai.position_offset = [-22, 2.4]
+    z.image_rotation_offset = [0, 38]
     z.ai.rotation_range = [-10, 10]
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "75mm_kwk40_l48", False)
     z.ai.primary_weapon.ai.equipper = z
