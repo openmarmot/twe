@@ -24,6 +24,9 @@ class AIHumanVehicleDriver:
         # distance tuning
         # when a vehicle is < this distance to a target it is considered arrived
         self.vehicle_arrival_distance = 150
+        # reposition orders must move at least this far or they instantly "arrive"
+        # and stall with gunner still WAITING_FOR_BETTER_ANGLE / CLOSE_DISTANCE
+        self.min_reposition_move = 300
 
     # ---------------------------------------------------------------------------
     def action(self):
@@ -166,9 +169,8 @@ class AIHumanVehicleDriver:
                 and vehicle.ai.current_speed < 10
             ):
                 # we have arrived and can delete the order.
-                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                    VehicleCrewAction.WAITING
-                )
+                mem = self.owner.ai.memory["task_vehicle_crew"]
+                mem["current_action"] = VehicleCrewAction.WAITING
                 vehicle.ai.brake_power = 1
                 vehicle.ai.throttle = 0
 
@@ -179,8 +181,13 @@ class AIHumanVehicleDriver:
                                 role.human.ai.switch_task_exit_vehicle()
                                 # this will also clear out any vehicle_orders they had
 
+                # next better-angle request should escalate flank (same geometry
+                # would no-op and leave gunner stuck advertising the wait)
+                if order.order_close_with_enemy:
+                    mem["flank_attempt"] = mem.get("flank_attempt", 0) + 1
+
                 # delete the order
-                self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = None
+                mem["vehicle_order"] = None
 
                 return
             # default
@@ -258,15 +265,15 @@ class AIHumanVehicleDriver:
             )
             return
         # default
-        self.owner.ai.memory["task_vehicle_crew"]["calculated_vehicle_angle"] = (
-            rotation_required
-        )
-        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-            VehicleCrewAction.ROTATING
-        )
-        self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
-            self.owner.world.world_seconds
-        )
+        mem = self.owner.ai.memory["task_vehicle_crew"]
+        was_rotating = mem["current_action"] == VehicleCrewAction.ROTATING
+        mem["calculated_vehicle_angle"] = rotation_required
+        mem["current_action"] = VehicleCrewAction.ROTATING
+        # start the rotation stopwatch when (re)entering ROTATING, but keep it
+        # running while already rotating so the action() stuck-escape (elapsed
+        # > 10s) can fire instead of being reset on every think.
+        if not was_rotating:
+            mem["rotate_start_time"] = self.owner.world.world_seconds
         return
 
     # ---------------------------------------------------------------------------
@@ -318,8 +325,52 @@ class AIHumanVehicleDriver:
         return engine.math_2d.randomize_coordinates(dest, 50)
 
     # ---------------------------------------------------------------------------
+    def pick_reposition_destination(
+        self, vehicle_coords, target_coords, desired_range, sign, attempt=0
+    ):
+        """pick a flank/reposition point that is far enough to actually drive to.
+
+        Escalates arc (80->120->160->180) then flips side so repeated better-angle
+        requests do not no-op on the same geometry.
+        Returns (dest, attempt_index_used).
+        """
+        angles = [80, 120, 160, 180]
+        candidates = []
+        for s in (sign, -sign):
+            for ang in angles:
+                candidates.append(ang * s)
+
+        start = max(0, min(attempt, len(candidates) - 1))
+        for i in range(start, len(candidates)):
+            dest = self.calculate_engagement_position(
+                vehicle_coords, target_coords, desired_range, candidates[i]
+            )
+            if (
+                engine.math_2d.get_distance(vehicle_coords, dest)
+                >= self.min_reposition_move
+            ):
+                return dest, i
+
+        # last resort: ring point opposite our current bearing
+        dest = self.calculate_engagement_position(
+            vehicle_coords, target_coords, desired_range, 180 * sign
+        )
+        if (
+            engine.math_2d.get_distance(vehicle_coords, dest)
+            < self.min_reposition_move
+        ):
+            dest = engine.math_2d.randomize_coordinates(
+                list(target_coords), desired_range
+            )
+        return dest, start
+
+    # ---------------------------------------------------------------------------
     def create_vehicle_order_for_target(
-        self, target_or_coords, desired_range=None, angle_offset_deg=0
+        self,
+        target_or_coords,
+        desired_range=None,
+        angle_offset_deg=0,
+        dest_coords=None,
     ):
         """create vehicle order to position for engagement at a standoff from target.
 
@@ -328,34 +379,77 @@ class AIHumanVehicleDriver:
         (pen tables: ~2000 GU ≈ 1000m). For indirect fire, pass a value derived
         from the weapon's max range.
         angle_offset_deg: arc off the radial line for flanks / safer approaches.
+        dest_coords: optional precomputed destination (skips angle/range calc).
         Never overrides a commander retreat order.
 
         Returns True if a close-with order is ready to execute (new or existing).
         Returns False if blocked (e.g. retreat) so other driver handlers can run.
         """
         vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
-        existing = self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"]
+        mem = self.owner.ai.memory["task_vehicle_crew"]
+        target_obj = None
+        if hasattr(target_or_coords, "world_coords"):
+            target_obj = target_or_coords
+            target_coords = target_or_coords.world_coords
+        else:
+            target_coords = target_or_coords
+        existing = mem["vehicle_order"]
         if existing is not None:
             if existing.is_retreat:
                 return False
             if existing.order_close_with_enemy:
-                return True
+                if existing.target_object is not target_obj:
+                    mem["vehicle_order"] = None
+                elif existing.world_coords is not None:
+                    d_exist = engine.math_2d.get_distance(
+                        vehicle.world_coords, existing.world_coords
+                    )
+                    if d_exist >= self.vehicle_arrival_distance:
+                        return True
+                    mem["vehicle_order"] = None
+                else:
+                    mem["vehicle_order"] = None
 
         if desired_range is None:
             # medium pen band, not melee - see game_unit_conversions.txt
             desired_range = 2000
 
+        if dest_coords is not None:
+            dest = dest_coords
+        else:
+            dest = self.calculate_engagement_position(
+                vehicle.world_coords,
+                target_coords,
+                desired_range,
+                angle_offset_deg,
+            )
+            # single-offset path (close-distance etc): if no-op, pull closer
+            if (
+                engine.math_2d.get_distance(vehicle.world_coords, dest)
+                < self.min_reposition_move
+            ):
+                closer = max(800, desired_range * 0.65)
+                dest = self.calculate_engagement_position(
+                    vehicle.world_coords,
+                    target_coords,
+                    closer,
+                    angle_offset_deg,
+                )
+                if (
+                    engine.math_2d.get_distance(vehicle.world_coords, dest)
+                    < self.min_reposition_move
+                ):
+                    dest = engine.math_2d.randomize_coordinates(
+                        list(target_coords), closer
+                    )
+
         vehicle_order = VehicleOrder()
         vehicle_order.order_close_with_enemy = True
-        vehicle_order.world_coords = self.calculate_engagement_position(
-            vehicle.world_coords,
-            target_or_coords,
-            desired_range,
-            angle_offset_deg,
-        )
+        vehicle_order.world_coords = dest
+        vehicle_order.target_object = target_obj
         if vehicle.ai.is_transport:
             vehicle_order.exit_vehicle_when_finished = True
-        self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+        mem["vehicle_order"] = vehicle_order
         return True
 
     # ---------------------------------------------------------------------------
@@ -397,14 +491,24 @@ class AIHumanVehicleDriver:
 
         commander_role, gunner_role = self.identify_crew_roles(vehicle)
 
-        if self.handle_commander_actions(vehicle, commander_role):
+        if self.handle_commander_actions(vehicle, commander_role, gunner_role):
             return
 
         # adopt commander retreat before gunner can issue close-with positioning
         if self.adopt_retreat_order(vehicle):
             return
 
+        # no-commander driver self-preservation - get out of danger
+        if self.handle_flee_combat(vehicle, commander_role, gunner_role):
+            return
+
         if self.handle_gunner_actions(vehicle, gunner_role):
+            return
+
+        if (
+            self.owner.ai.memory["task_vehicle_crew"]["current_action"]
+            == VehicleCrewAction.ROTATING
+        ):
             return
 
         if self.handle_driver_decisions(vehicle, commander_role, gunner_role):
@@ -442,7 +546,7 @@ class AIHumanVehicleDriver:
 
         return commander_role, gunner_role
 
-    def handle_commander_actions(self, vehicle, commander_role):
+    def handle_commander_actions(self, vehicle, commander_role, gunner_role=None):
         if not commander_role:
             return False
 
@@ -450,6 +554,16 @@ class AIHumanVehicleDriver:
         current_action = commander_mem["current_action"]
 
         if current_action == VehicleCrewAction.WAITING_FOR_ROTATE:
+            if gunner_role:
+                gunner_action = gunner_role.human.ai.memory["task_vehicle_crew"][
+                    "current_action"
+                ]
+                if gunner_action in (
+                    VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+                    VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                    VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+                ):
+                    return False
             # dual-role commander/gunner: WAITING_FOR_ROTATE may be from gunner
             # (needs target) rather than commander hull-face (needs calculated_vehicle_angle).
             # only handle the commander form here; gunner form falls through to handle_gunner_actions.
@@ -470,15 +584,12 @@ class AIHumanVehicleDriver:
                     random.uniform(0.5, 2.0)
                 )
                 return True
-            self.owner.ai.memory["task_vehicle_crew"]["calculated_vehicle_angle"] = (
-                rotation_required
-            )
-            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
-                VehicleCrewAction.ROTATING
-            )
-            self.owner.ai.memory["task_vehicle_crew"]["rotate_start_time"] = (
-                self.owner.world.world_seconds
-            )
+            mem = self.owner.ai.memory["task_vehicle_crew"]
+            was_rotating = mem["current_action"] == VehicleCrewAction.ROTATING
+            mem["calculated_vehicle_angle"] = rotation_required
+            mem["current_action"] = VehicleCrewAction.ROTATING
+            if not was_rotating:
+                mem["rotate_start_time"] = self.owner.world.world_seconds
             return True
 
         return False
@@ -490,6 +601,10 @@ class AIHumanVehicleDriver:
         current_action = gunner_role.human.ai.memory["task_vehicle_crew"][
             "current_action"
         ]
+
+        # clear flank escalation once gunner is no longer asking for angle
+        if current_action != VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
+            self.owner.ai.memory["task_vehicle_crew"].pop("flank_attempt", None)
 
         if gunner_role.turret.ai.primary_weapon:
             if current_action in (
@@ -568,7 +683,7 @@ class AIHumanVehicleDriver:
                     vehicle, target.world_coords
                 )
                 if self.create_vehicle_order_for_target(
-                    target.world_coords, desired_range, angle_offset
+                    target, desired_range, angle_offset
                 ):
                     self.think_vehicle_order()
                     return True
@@ -583,7 +698,8 @@ class AIHumanVehicleDriver:
         if current_action == VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
             target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
             if target is not None:
-                # hold roughly current range (slight close if very far) and swing for side aspect
+                # hold roughly current range (slight close if very far) and swing
+                # for side/rear aspect; escalate arc if prior flanks no-op'd
                 dist = engine.math_2d.get_distance(
                     vehicle.world_coords, target.world_coords
                 )
@@ -591,11 +707,21 @@ class AIHumanVehicleDriver:
                     desired_range = 2800
                 else:
                     desired_range = max(1500, min(dist, 3500))
-                angle_offset = 80 * self.flank_sign_for_pair(
-                    vehicle, target.world_coords
+                mem = self.owner.ai.memory["task_vehicle_crew"]
+                sign = self.flank_sign_for_pair(vehicle, target.world_coords)
+                attempt = mem.get("flank_attempt", 0)
+                dest, used = self.pick_reposition_destination(
+                    vehicle.world_coords,
+                    target.world_coords,
+                    desired_range,
+                    sign,
+                    attempt,
                 )
+                mem["flank_attempt"] = used
                 if self.create_vehicle_order_for_target(
-                    target.world_coords, desired_range, angle_offset
+                    target,
+                    desired_range,
+                    dest_coords=dest,
                 ):
                     self.think_vehicle_order()
                     return True
@@ -660,6 +786,103 @@ class AIHumanVehicleDriver:
         )
         vehicle_order.exit_vehicle_when_finished = True
         self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+        return True
+
+    def handle_flee_combat(self, vehicle, commander_role, gunner_role):
+        """no-commander driver self-preservation: pull the vehicle out of danger.
+
+        Only activates when there is no crewed commander, so it never overrides
+        tactical decisions. Yields while a gunner is actively engaging (let it
+        fight) and while an empty gunner seat is available (the driver would
+        rather take the gun than flee). Otherwise, if morale fails or a close
+        threat is pressing, drive away to friendly spawn and keep the crew.
+        """
+        if commander_role:
+            return False
+
+        # let an engaging gunner keep fighting instead of pulling it out
+        if gunner_role:
+            if gunner_role.human.ai.memory["task_vehicle_crew"]["current_action"] in (
+                VehicleCrewAction.ENGAGING,
+            ):
+                return False
+
+        # prefer to take an open gunner seat and fight over fleeing
+        for role in vehicle.ai.vehicle_crew:
+            if role.role_occupied is False and role.is_gunner:
+                return False
+
+        has_targets = (
+            len(self.owner.ai.human_targets) > 0
+            or len(self.owner.ai.vehicle_targets) > 0
+        )
+        if not has_targets:
+            return False
+
+        # a driver alone can't fight back, so clear out on morale failure or
+        # when a threat closes too far in.
+        should_flee = False
+        if self.owner.ai.morale_check() is False:
+            should_flee = True
+        else:
+            for target in self.owner.ai.human_targets[:3]:
+                d = engine.math_2d.get_distance(
+                    vehicle.world_coords, target.world_coords
+                )
+                if d < 700:
+                    should_flee = True
+                    break
+            if not should_flee:
+                for target in self.owner.ai.vehicle_targets[:3]:
+                    d = engine.math_2d.get_distance(
+                        vehicle.world_coords, target.world_coords
+                    )
+                    if d < 1200:
+                        should_flee = True
+                        break
+
+        if not should_flee:
+            return False
+
+        # don't fight an existing order - keep driving it rather than re-issuing
+        if self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] is not None:
+            return False
+
+        spawn_coords = self.owner.ai.squad.faction_tactical.spawn_location
+        if spawn_coords is None:
+            return False
+
+        # don't run all the way home - just pull back a random 1/3 to 1/2 of
+        # the way toward spawn (roughly the direction we came from)
+        distance_to_spawn = engine.math_2d.get_distance(
+            vehicle.world_coords, spawn_coords
+        )
+        if distance_to_spawn < 1:
+            return False
+
+        fallback_fraction = random.uniform(1.0 / 3.0, 1.0 / 2.0)
+        fallback_distance = distance_to_spawn * fallback_fraction
+        flee_direction = engine.math_2d.get_normalized(
+            [
+                spawn_coords[0] - vehicle.world_coords[0],
+                spawn_coords[1] - vehicle.world_coords[1],
+            ]
+        )
+        flee_destination = engine.math_2d.moveAlongVector(
+            fallback_distance, vehicle.world_coords, flee_direction, 1
+        )
+
+        vehicle_order = VehicleOrder()
+        vehicle_order.order_drive_to_coords = True
+        vehicle_order.world_coords = flee_destination
+        vehicle_order.exit_vehicle_when_finished = False
+        # mark as retreat so the gunner won't re-issue a close-with order
+        # and adopt_retreat_order will keep driving it
+        vehicle_order.is_retreat = True
+        self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
+
+        self.owner.ai.speak("No commander - getting us out of here!")
+        self.owner.ai.add_journal_entry(f"Fleeing {vehicle.name} due to threat")
         return True
 
     def handle_passenger_loading(self, vehicle):

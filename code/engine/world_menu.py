@@ -123,6 +123,8 @@ class World_Menu:
             self.hit_marker_menu(key)
         elif self.active_menu == "vehicle_reload":
             self.vehicle_reload_menu(key)
+        elif self.active_menu == "trade":
+            self.trade_menu(key)
         else:
             if self.active_menu != "none":
                 print("Error : active menu not recognized ", self.active_menu)
@@ -301,6 +303,15 @@ class World_Menu:
         self.menu_state = "none"
         self.time_since_input = 0
         self.vehicle_reload_menu(None)
+
+    # ---------------------------------------------------------------------------
+    def append_wallet_lines(self, wallet):
+        """append wallet contents to the current text_queue"""
+        if not wallet:
+            self.text_queue.append("(none)")
+            return
+        for currency_name, currency_amount in wallet.items():
+            self.text_queue.append(currency_name + ": " + str(currency_amount))
 
     # ---------------------------------------------------------------------------
     def deactivate_menu(self):
@@ -502,6 +513,7 @@ class World_Menu:
         if self.menu_state == "spawn_vehicles":
             self.text_queue = []
             self.text_queue.append("--Debug -> Spawn Menu -> Vehicles --")
+            self.text_queue.append("0 - german_stug_iii_ausf_g")
             self.text_queue.append("1 - german_8cm_mortar")
             self.text_queue.append("2 - german_smg42")
             self.text_queue.append("3 - soviet_ba_64")
@@ -511,7 +523,17 @@ class World_Menu:
             self.text_queue.append("7 - german_rso_pak")
             self.text_queue.append("8 - t34-76 model 1943")
             self.text_queue.append("9 - t34-85")
-            if key == "1":
+            if key == "0":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "german_stug_iii_ausf_g",
+                    True,
+                )
+            elif key == "1":
                 engine.world_builder.spawn_object(
                     self.world,
                     [
@@ -1211,6 +1233,8 @@ class World_Menu:
                 self.text_queue.append("AFV Trained")
             if self.selected_object.ai.is_expert_marksman:
                 self.text_queue.append("Marksman")
+            if self.selected_object.ai.memory.get("current_task") == "task_trader":
+                self.text_queue.append("Trader")
             if self.selected_object.ai.squad.squad_leader == self.selected_object:
                 self.text_queue.append("Squad Leader")
 
@@ -2090,6 +2114,41 @@ class World_Menu:
                         "Engine : "
                         + str(self.selected_object.ai.engines[0].ai.engine_on)
                     )
+
+    # ---------------------------------------------------------------------------
+    def open_trade_menu(self, trader):
+        """open the trade menu with the given trader world object"""
+        if self.active_menu in ("death", "start"):
+            return
+        if trader is None:
+            return
+        self.deactivate_menu()
+        self.selected_object = trader
+        self.active_menu = "trade"
+        self.trade_menu(None)
+
+    # ---------------------------------------------------------------------------
+    def trade_menu(self, _key):
+        """trade menu. shows player and trader wallets"""
+        self.text_queue = []
+        self.text_queue.append("-- Trade --")
+
+        trader = self.selected_object
+        player = self.world.player
+        if trader is None or player is None:
+            self.text_queue.append("No trader")
+            return
+
+        self.text_queue.append("Trader: " + trader.name)
+        self.text_queue.append("")
+        self.text_queue.append("--- Trader's Money ---")
+        self.append_wallet_lines(trader.ai.wallet)
+        self.text_queue.append("")
+        self.text_queue.append("--- Your Money ---")
+        self.append_wallet_lines(player.ai.wallet)
+
+        self.text_queue.append("")
+        self.text_queue.append("esc - close")
 
     # ---------------------------------------------------------------------------
     def update(self):

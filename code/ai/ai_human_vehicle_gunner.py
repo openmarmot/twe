@@ -28,6 +28,11 @@ class AIHumanVehicleGunner:
         self.current_burst = 0  # int number of bullets shot in current burst
         self.max_burst = 5
 
+        # how long to wait for the driver to rotate before backing off
+        self.wait_timeout = 8  # slightly under the driver's 10s give-up
+        # longer budget for drive-to-flank / close-distance reposition
+        self.reposition_wait_timeout = 20
+
     # ---------------------------------------------------------------------------
     def action(self):
         """action - called by ai_human_vehicle.update_task_vehicle_crew()"""
@@ -43,12 +48,32 @@ class AIHumanVehicleGunner:
         ):
             self.action_engage_indirect_fire()
 
-        if self.owner.ai.memory["task_vehicle_crew"]["target"] is not None:
+        current_action = self.owner.ai.memory["task_vehicle_crew"]["current_action"]
+        waiting_on_driver = current_action in (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+        )
+
+        target = self.owner.ai.memory["task_vehicle_crew"]["target"]
+        if target is not None:
             if (
                 self.owner.ai.memory["task_vehicle_crew"]["calculated_turret_angle"]
                 is not None
+                and not waiting_on_driver
             ):
                 self.action_engage_target()
+            elif current_action in (
+                VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+                VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+            ):
+                if turret is not None:
+                    aim = engine.math_2d.get_rotation(
+                        turret.world_coords, target.world_coords
+                    )
+                    self.rotate_turret(turret, aim)
         elif vehicle.ai.current_speed > 5:
             self.action_align_turret_forward()
 
@@ -360,6 +385,14 @@ class AIHumanVehicleGunner:
         )
 
     # ---------------------------------------------------------------------------
+    def crew_has_driver(self, vehicle):
+        """True if an occupied driver role exists (do not assume crew[0])."""
+        for role in vehicle.ai.vehicle_crew:
+            if role.is_driver and role.role_occupied:
+                return True
+        return False
+
+    # ---------------------------------------------------------------------------
     def rotate_turret(self, turret, desired_angle):
         """rotates a turret. returns True/False as to whether the turret is at the desired angle"""
 
@@ -404,6 +437,59 @@ class AIHumanVehicleGunner:
         self.owner.ai.memory["task_vehicle_crew"]["engage_primary_weapon"] = False
         self.owner.ai.memory["task_vehicle_crew"]["engage_coaxial_weapon"] = False
         self.owner.ai.memory["task_vehicle_crew"]["engage_indirect_fire"] = False
+
+        # watchdog: don't sit in a driver wait forever (stuck rotate, no-op
+        # flank, or driver never picking up the request). back off and re-evaluate.
+        current_action = self.owner.ai.memory["task_vehicle_crew"]["current_action"]
+        rotate_waits = (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+        )
+        reposition_waits = (
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+        )
+        if current_action in rotate_waits or current_action in reposition_waits:
+            wait_start = self.owner.ai.memory["task_vehicle_crew"].get(
+                "wait_start_time", 0
+            )
+            if wait_start == 0:
+                self.owner.ai.memory["task_vehicle_crew"]["wait_start_time"] = (
+                    self.owner.world.world_seconds
+                )
+            else:
+                elapsed = self.owner.world.world_seconds - wait_start
+                if current_action in rotate_waits and elapsed > self.wait_timeout:
+                    # hull never came around - drop target and don't
+                    # immediately re-request rotate on the same geometry
+                    self.owner.ai.memory["task_vehicle_crew"][
+                        "rotate_cooldown_until"
+                    ] = self.owner.world.world_seconds + 4
+                    self.owner.ai.memory["task_vehicle_crew"]["target"] = None
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.SCANNING
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"].pop(
+                        "wait_start_time", None
+                    )
+                    return
+                if (
+                    current_action in reposition_waits
+                    and elapsed > self.reposition_wait_timeout
+                ):
+                    # driver flank/close stalled - clear wait and fall through so
+                    # think_examine_target can retry or take a speculative shot
+                    self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                        VehicleCrewAction.NONE
+                    )
+                    self.owner.ai.memory["task_vehicle_crew"].pop(
+                        "wait_start_time", None
+                    )
+        else:
+            self.owner.ai.memory["task_vehicle_crew"].pop(
+                "wait_start_time", None
+            )
 
         # handle the reloading action
         if (
@@ -648,28 +734,22 @@ class AIHumanVehicleGunner:
                                     if len(m.ai.projectiles) > 0:
                                         if m.ai.use_antitank:
                                             if random.randint(0, 1) == 0:
-                                                # fire to clear the shell out
-                                                return
-                                            else:
-                                                # reload to clear the shell out
-                                                # start the reload process
-                                                self.owner.ai.memory[
-                                                    "task_vehicle_crew"
-                                                ][
-                                                    "reload_start_time"
-                                                ] = self.owner.world.world_seconds
-                                                self.owner.ai.memory[
-                                                    "task_vehicle_crew"
-                                                ][
-                                                    "current_action"
-                                                ] = VehicleCrewAction.RELOADING_PRIMARY
-                                                return
+                                                engage_primary = True
+                                                break
+                                            self.owner.ai.memory[
+                                                "task_vehicle_crew"
+                                            ][
+                                                "reload_start_time"
+                                            ] = self.owner.world.world_seconds
+                                            self.owner.ai.memory[
+                                                "task_vehicle_crew"
+                                            ][
+                                                "current_action"
+                                            ] = VehicleCrewAction.RELOADING_PRIMARY
+                                            return
                 elif engage_primary_reason == "need to get closer to penetrate":
                     if turret.ai.primary_turret:
-                        if (
-                            vehicle.ai.vehicle_crew[0].is_driver
-                            and vehicle.ai.vehicle_crew[0].role_occupied
-                        ):
+                        if self.crew_has_driver(vehicle):
                             # wait for a couple seconds before rechecking
                             self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
                                 random.uniform(0.5, 1)
@@ -683,10 +763,7 @@ class AIHumanVehicleGunner:
                             return
                 elif engage_primary_reason == "need better angle":
                     if turret.ai.primary_turret:
-                        if (
-                            vehicle.ai.vehicle_crew[0].is_driver
-                            and vehicle.ai.vehicle_crew[0].role_occupied
-                        ):
+                        if self.crew_has_driver(vehicle):
                             self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
                                 random.uniform(0.5, 1)
                             )
@@ -803,11 +880,12 @@ class AIHumanVehicleGunner:
             # lets only ask to rotate if we are the main turret
             if turret.ai.primary_turret:
                 if engage_primary or engage_coaxial:
-                    # check if there is a driver
-                    # note this should be fixed in the future. we shouldn't assume driver is in position 0
+                    cooldown = self.owner.ai.memory["task_vehicle_crew"].get(
+                        "rotate_cooldown_until", 0
+                    )
                     if (
-                        vehicle.ai.vehicle_crew[0].is_driver
-                        and vehicle.ai.vehicle_crew[0].role_occupied
+                        self.crew_has_driver(vehicle)
+                        and self.owner.world.world_seconds >= cooldown
                     ):
                         # ask the driver to rotate towards the target
                         if target.is_vehicle or random.randint(0, 1) == 1:
@@ -835,7 +913,7 @@ class AIHumanVehicleGunner:
         # getting this far means we have ammo for the primary weapon and a fire mission
 
         # check if the fire mission is complete
-        if fire_mission.rounds_fired > fire_mission.rounds_requested:
+        if fire_mission.rounds_fired >= fire_mission.rounds_requested:
             # remove the fire mission. maybe we should do a radio broadcast ?
             self.owner.ai.memory["task_vehicle_crew"]["fire_missions"].pop(0)
             return
@@ -899,7 +977,18 @@ class AIHumanVehicleGunner:
     # ---------------------------------------------------------------------------
     def think_idle(self):
         """think about what to do when we have no other tasks"""
-        pass
+        # if we were waiting on the driver for something that no longer exists
+        # (no target / no fire mission) drop the stale wait so we don't deadlock
+        if self.owner.ai.memory["task_vehicle_crew"]["current_action"] in (
+            VehicleCrewAction.WAITING_FOR_ROTATE,
+            VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
+            VehicleCrewAction.WAITING_FOR_CLOSE_DISTANCE,
+            VehicleCrewAction.WAITING_FOR_BETTER_ANGLE,
+        ):
+            self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                VehicleCrewAction.SCANNING
+            )
 
     # ---------------------------------------------------------------------------
     def think_reload(self, weapon):

@@ -213,8 +213,14 @@ class Graphics_2D_Pygame:
             pygame.K_m: "m",
         }
 
-        # load all images
-        self.load_all_images("images")
+        # load all images. object_defs is the source of truth (typically
+        # an images/ folder next to each object). code/images is a
+        # fallback for sprites that have not been moved yet.
+        engine_dir = os.path.dirname(os.path.abspath(__file__))
+        self.load_all_images(os.path.join(engine_dir, "object_defs"))
+        self.load_all_images(
+            os.path.join(engine_dir, "..", "images"), overwrite=False
+        )
 
         # setup and scale the background images
         self.menu_background_image = None
@@ -338,40 +344,63 @@ class Graphics_2D_Pygame:
                     action()
 
     # ------------------------------------------------------------------------------
-    def load_all_images(self, folder_path):
-        """load all the images into pygame"""
+    def load_all_images(self, folder_path, overwrite=True):
+        """Recursively load PNG images from folder_path into pygame.
+
+        Images are keyed by filename without extension so existing
+        image_list entries (e.g. "kar98k") keep working. Skip
+        __pycache__. Duplicate names log a warning; overwrite=False
+        leaves the first loaded image in place.
+        """
+        folder_path = os.path.abspath(folder_path)
+        if not os.path.isdir(folder_path):
+            engine.log.add_data(
+                "error", f"Image folder does not exist: {folder_path}", True
+            )
+            return
+
+        loaded = 0
         try:
-            for filename in os.listdir(folder_path):
-                filepath = os.path.join(folder_path, filename)
-                if os.path.isfile(filepath):
+            for root, dirs, files in os.walk(folder_path):
+                dirs[:] = [d for d in dirs if d != "__pycache__"]
+                for filename in files:
                     name, ext = os.path.splitext(filename)
-                    # just loading png for now, but could add other formats later
-                    if ext.lower() in [".png"]:
-                        self.images[name] = pygame.image.load(filepath).convert_alpha()
-            print("Image loading complete")
+                    if ext.lower() != ".png":
+                        continue
+                    if name in self.images and not overwrite:
+                        continue
+                    filepath = os.path.join(root, filename)
+                    if name in self.images:
+                        engine.log.add_data(
+                            "warn",
+                            f"Duplicate image name '{name}', replacing with {filepath}",
+                            True,
+                        )
+                    self.images[name] = pygame.image.load(filepath).convert_alpha()
+                    loaded += 1
+            print(f"Image loading complete: {loaded} from {folder_path}")
         except Exception as e:
-            engine.log.add_data("error", f"Failed to load images: {e}", True)
+            engine.log.add_data(
+                "error", f"Failed to load images from {folder_path}: {e}", True
+            )
 
     # ------------------------------------------------------------------------------
-    def load_quick_battle(self, player_spawn_faction, battle_option):
-        """load a quick battle"""
+    def load_battle_from_thread(
+        self, player_spawn_faction, target, args, loading_text
+    ):
+        """run a map-object builder in a thread, then load_world from the result"""
 
-        # called by game_menu.start_menu
+        # used by load_quick_battle and load_scenario
+        # result_container[0] is a dict:
+        #   map_objects, defending_faction, name, year
 
-        # this uses a thread to prevent the game from going unresponsive while
-        # all the data is being generated
-
-        # Start computation in a separate thread
-        # Container to store result from thread
-        result_container = [None]
+        result_container = [{}]
         thread = threading.Thread(
-            target=engine.world_builder.load_quick_battle_map_objects,
-            args=(battle_option, result_container),
+            target=target, args=tuple(args) + (result_container,)
         )
         thread.start()
 
-        self.game_menu.text_queue = ["Creating quick battle map objects..."]
-        # render
+        self.game_menu.text_queue = [loading_text]
         self.render_mode_0()
 
         loading = True
@@ -381,14 +410,47 @@ class Graphics_2D_Pygame:
                     loading = False
                     self.quit = True
 
-            # Check if thread is done
             if not thread.is_alive():
                 loading = False
 
-        defending_faction = random.choice(["german", "soviet", "none", "contested"])
+        result = result_container[0]
+        if "map_objects" not in result:
+            engine.log.add_data(
+                "error", "battle load returned no result", True
+            )
+            return
 
         self.load_world(
-            player_spawn_faction, "Quick battle", result_container[0], defending_faction
+            player_spawn_faction,
+            result.get("name", "Battle"),
+            result["map_objects"],
+            result.get("defending_faction", "none"),
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_quick_battle(self, player_spawn_faction, battle_option):
+        """load a quick battle"""
+
+        # called by game_menu.start_menu
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_quick_battle_map_objects,
+            (battle_option,),
+            "Creating quick battle map objects...",
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_scenario(self, player_spawn_faction, scenario):
+        """load a predefined scenario"""
+
+        # called by game_menu.scenario_menu
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_scenario_map_objects,
+            (scenario,),
+            "Creating scenario map objects...",
         )
 
     # ------------------------------------------------------------------------------
@@ -468,13 +530,7 @@ class Graphics_2D_Pygame:
             for c in b:
                 if c.reset_image:
                     self.reset_pygame_image(c)
-                self.screen.blit(
-                    c.image,
-                    (
-                        c.screen_coords[0] - c.image_center[0],
-                        c.screen_coords[1] - c.image_center[1],
-                    ),
-                )
+                self.blit_world_object(c)
 
                 if self.draw_collision:
                     pygame.draw.circle(
@@ -572,13 +628,7 @@ class Graphics_2D_Pygame:
         for c in self.strategic_map.map_squares:
             if c.reset_image:
                 self.reset_pygame_image(c)
-            self.screen.blit(
-                c.image,
-                (
-                    c.screen_coords[0] - c.image_center[0],
-                    c.screen_coords[1] - c.image_center[1],
-                ),
-            )
+            self.blit_world_object(c)
 
             if c.airport:
                 self.small_font.render_to(
@@ -635,13 +685,7 @@ class Graphics_2D_Pygame:
         for c in self.vehicle_diagnostics.image_objects:
             if c.reset_image:
                 self.reset_pygame_image(c)
-            self.screen.blit(
-                c.image,
-                (
-                    c.screen_coords[0] - c.image_center[0],
-                    c.screen_coords[1] - c.image_center[1],
-                ),
-            )
+            self.blit_world_object(c)
 
         for text in self.vehicle_diagnostics.text_queue:
             self.small_font.render_to(self.screen, text[1], text[0], text[2])
@@ -683,6 +727,46 @@ class Graphics_2D_Pygame:
                     c.screen_coords[1] = round(c.world_coords[1] * scale) + ty
 
     # ------------------------------------------------------------------------------
+    def blit_world_object(self, wo):
+        """blit a world object so its rotation origin lands on screen_coords"""
+        offset = getattr(wo, "image_blit_offset", None)
+        if offset is None:
+            offset = wo.image_center
+        self.screen.blit(
+            wo.image,
+            (
+                wo.screen_coords[0] - offset[0],
+                wo.screen_coords[1] - offset[1],
+            ),
+        )
+
+    # ------------------------------------------------------------------------------
+    def update_image_blit_offset(self, wo, obj_scale):
+        """set blit offset so image_rotation_offset stays on screen_coords.
+
+        pygame.rotozoom rotates around the image geometric center. a non-zero
+        image_rotation_offset is the source-pixel offset of the desired origin
+        from that center. Vector2.rotate(-angle) matches pygame's CCW rotate
+        in y-down screen space.
+        """
+        center = wo.image_center
+        offset = getattr(wo, "image_rotation_offset", None)
+        if center is None:
+            wo.image_blit_offset = None
+            return
+        if offset is None or (offset[0] == 0 and offset[1] == 0):
+            wo.image_blit_offset = [center[0], center[1]]
+            return
+        scaled = pygame.math.Vector2(
+            offset[0] * obj_scale, offset[1] * obj_scale
+        )
+        rotated = scaled.rotate(-wo.rotation_angle)
+        wo.image_blit_offset = [
+            center[0] + rotated.x,
+            center[1] + rotated.y,
+        ]
+
+    # ------------------------------------------------------------------------------
     def reset_pygame_image(self, wo):
         """Reset the image with optional smoothing + improved caching"""
         wo.reset_image = False
@@ -699,6 +783,7 @@ class Graphics_2D_Pygame:
                 round(wo.image_size[0] * 0.5, 1),
                 round(wo.image_size[1] * 0.5, 1),
             ]
+            self.update_image_blit_offset(wo, obj_scale)
             return
 
         try:
@@ -715,6 +800,7 @@ class Graphics_2D_Pygame:
                 round(wo.image_size[1] * 0.5, 1),
             ]
             scale_cache[key] = wo.image
+            self.update_image_blit_offset(wo, obj_scale)
 
         except Exception as e:
             engine.log.add_data("error", f"reset_pygame_image failed: {e}", True)

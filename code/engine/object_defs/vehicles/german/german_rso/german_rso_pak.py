@@ -19,7 +19,7 @@ from engine.object_registry import register_object
 def create(world, world_coords):
     # ref : https://en.wikipedia.org/wiki/Raupenschlepper_Ost
     # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
-    z = WorldObject(world, ["rso_pak", "rso_destroyed"], AIVehicle)
+    z = WorldObject(world, ["rso_pak"], AIVehicle)
     z.name = "Raupenschlepper Ost PAK"
     z.is_vehicle = True
     z.is_towable = True

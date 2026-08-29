@@ -251,7 +251,9 @@ class AIHumanVehicle:
                             VehicleCrewAction.WAITING_FOR_ROTATE_FIRE_MISSION,
                             VehicleCrewAction.WAITING_FOR_POSITION_FIRE_MISSION,
                         )
-                        if not is_gunner_busy:
+                        if is_gunner_busy:
+                            self.role_commander.think_vehicle_position(vehicle)
+                        else:
                             self.role_commander.think()
                         # keep gunner cadence
                         self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
@@ -259,14 +261,14 @@ class AIHumanVehicle:
                         )
                     else:
                         self.role_commander.think()
-                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
-                            random.uniform(5, 15)
-                        )
 
             # the squad lead has some stuff to do independent of their vehicle role
+            # civilians are assigned squad_leader at spawn but never get
+            # task_squad_leader memory / tactical orders
             if (
                 self.owner == self.owner.ai.squad.squad_leader
                 and self.owner.ai.in_vehicle()
+                and not self.owner.ai.is_civilian
             ):
                 # if we don't have a vehicle order, check to see if we can create
                 # one from tactical orders

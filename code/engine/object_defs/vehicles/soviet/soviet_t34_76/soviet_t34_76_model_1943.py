@@ -18,7 +18,7 @@ from engine.object_registry import register_object
 @register_object("soviet_t34_76_model_1943")
 def create(world, world_coords):
     # ref : https://wiki.warthunder.com/T-34_(1942)
-    z = WorldObject(world, ["t34_chassis", "t34_chassis_destroyed"], AIVehicle)
+    z = WorldObject(world, ["t34_chassis"], AIVehicle)
     z.name = "T34-76 Model 1943"
     z.is_vehicle = True
     z.is_towable = True

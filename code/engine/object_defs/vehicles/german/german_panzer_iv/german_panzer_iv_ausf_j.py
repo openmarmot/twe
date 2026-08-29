@@ -18,9 +18,7 @@ from engine.object_registry import register_object
 @register_object("german_panzer_iv_ausf_j")
 def create(world, world_coords):
     # ref : https://wiki.warthunder.com/unit/germ_pzkpfw_IV_ausf_G
-    z = WorldObject(
-        world, ["panzer_iv_j_chassis", "panzer_iv_j_chassis_destroyed"], AIVehicle
-    )
+    z = WorldObject(world, ["panzer_iv_j_chassis"], AIVehicle)
     z.name = "Panzer IV Ausf. J"
     z.is_vehicle = True
     z.is_towable = True

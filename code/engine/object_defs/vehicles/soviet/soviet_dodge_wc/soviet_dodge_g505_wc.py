@@ -21,7 +21,7 @@ def create(world, world_coords):
     #
     # ref : https://truck-encyclopedia.com/ww2/us/Dodge-WC-3-4-tons-series.php
     # ref : https://truck-encyclopedia.com/ww2/us/dodge-WC-62-63-6x6.php
-    z = WorldObject(world, ["dodge_g505_wc", "dodge_g505_wc_destroyed"], AIVehicle)
+    z = WorldObject(world, ["dodge_g505_wc"], AIVehicle)
     z.name = "Dodge G505 WC Truck"
     z.is_vehicle = True
     z.is_towable = True

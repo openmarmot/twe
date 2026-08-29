@@ -1,6 +1,43 @@
 TWE Project : Change Log
 
 ---------------------------------
+August 28 2026
+- added stug III ausf g
+- changes to allow a image rotation point to be set
+- changes to battle_group generator to make it more historical
+- rebalance rarity to make it more historical
+- added Scenario menu with predefined battles (fixed force + small random attachment)
+
+---------------------------------
+August 19 2026
+- fixed a new crash caused by inactive civilian squad leaders
+
+---------------------------------
+August 16 2026
+- started work on 'trader' civilian task
+
+---------------------------------
+August 12 2026
+- more vehicle ai tweaks
+
+---------------------------------
+August 10 2026
+- attempt to fix soft locks with driver repositioning for a better angle
+
+i mostly see with with the t34-76
+
+---------------------------------
+August 9 2026
+- driver ai gets a flee option
+
+---------------------------------
+August 8 2026
+- adjustments to vehicle driver and gunner ai to prevent stuck ai
+
+there were some states that that ai could get stuck in.
+unsure if that is now fixed.
+
+---------------------------------
 July 31 2026
 - buildings now block line of site
 

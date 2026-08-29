@@ -269,6 +269,26 @@ def check_task_wait(b, issues, _world):
         issues.append(f'{b.name} missing end_time in task_wait memory')
 
 #---------------------------------------------------------------------------
+def check_task_trader(b, issues, world):
+    '''sanity for task_trader'''
+    task_mem = b.ai.memory.get('task_trader', {})
+    for key in (
+        'status',
+        'building',
+        'customer',
+        'last_think_time',
+        'think_interval',
+    ):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_trader memory')
+    building = task_mem.get('building')
+    if building is not None:
+        if building.in_world is False:
+            issues.append(f'{b.name} trader building not in world')
+        elif building not in world.grid_manager.get_all_objects():
+            issues.append(f'{b.name} trader building not in world objects')
+
+#---------------------------------------------------------------------------
 def check_vehicle_sanity(b, issues, world):
     '''sanity checks for vehicles'''
     # check crew
@@ -416,6 +436,7 @@ def run_wo_objects_check(world):
                 'task_think': check_task_think,
                 'task_think_idle': check_task_think_idle,
                 'task_wait': check_task_wait,
+                'task_trader': check_task_trader,
             }
             checker = task_checkers.get(current_task)
             if checker:

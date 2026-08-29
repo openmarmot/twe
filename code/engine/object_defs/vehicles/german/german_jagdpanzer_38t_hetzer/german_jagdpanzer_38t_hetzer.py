@@ -17,14 +17,7 @@ from engine.object_registry import register_object
 
 @register_object("german_jagdpanzer_38t_hetzer")
 def create(world, world_coords):
-    z = WorldObject(
-        world,
-        [
-            "jagdpanzer_38t_hetzer_chassis",
-            "jagdpanzer_38t_hetzer_chassis_destroyed",
-        ],
-        AIVehicle,
-    )
+    z = WorldObject(world, ["jagdpanzer_38t_hetzer_chassis"], AIVehicle)
     z.name = "Jadgpanzer 38t Hetzer"
     z.is_vehicle = True
     z.is_towable = True

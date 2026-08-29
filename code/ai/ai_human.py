@@ -25,6 +25,7 @@ from ai.ai_human_vehicle import AIHumanVehicle
 from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 from ai.ai_human_radio_operator import AIHumanRadioOperator
 from ai.ai_human_squad_leader import AIHumanSquadLeader
+from ai.ai_human_trader import AIHumanTrader
 # import engine.global_exchange_rates
 
 # global variables
@@ -37,6 +38,7 @@ class AIHuman:
         self.in_vehicle_ai = AIHumanVehicle(self.owner)
         self.radio_operator_ai = AIHumanRadioOperator(self.owner)
         self.squad_leader_ai = AIHumanSquadLeader(self.owner)
+        self.trader_ai = AIHumanTrader(self.owner)
 
         self.task_map = {
             "task_player_control": self.update_task_player_control,
@@ -55,6 +57,7 @@ class AIHuman:
             "task_mechanic": self.update_task_mechanic,
             "task_reload": self.update_task_reload,
             "task_wait": self.update_task_wait,
+            "task_trader": self.trader_ai.update_task_trader,
         }
 
         # memory a dictionary with a ton of stuff in it.
@@ -71,6 +74,9 @@ class AIHuman:
         # amount can be a float to account for coinage
         # 'currency name',amount
         self.wallet = {}
+        # last time a trader made contact. used so several traders do not mob one person
+        self.last_trader_contact_time = 0
+        self.last_trader_contact_cooldown = 0
 
         # -- health stuff --
         self.blood_pressure = 100
@@ -1991,6 +1997,11 @@ class AIHuman:
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
+    def switch_task_trader(self):
+        """switch to task_trader"""
+        self.trader_ai.switch_task_trader()
+
+    # ---------------------------------------------------------------------------
     def switch_task_vehicle_crew(self, vehicle, vehicle_order):
         """switch task to vehicle crew and determine role"""
         # this should always overwrite if it exists
@@ -3405,6 +3416,9 @@ class AIHuman:
         if "task_mechanic" in self.memory:
             self.memory["current_task"] = "task_mechanic"
             return
+        if "task_trader" in self.memory:
+            self.memory["current_task"] = "task_trader"
+            return
 
         # -- unique job role stuff --
         if self.is_medic:
@@ -3425,6 +3439,12 @@ class AIHuman:
         if self.large_pickup:
             if self.large_pickup.is_radio:
                 self.radio_operator_ai.update()
+
+        # civilians do not squad-lead or stick to a leader. they idle locally
+        # (sit, wander, trade) instead of marching as a military squad
+        if self.is_civilian:
+            self.switch_task_think_idle()
+            return
 
         # -- squad stuff (lower importance)--
         # could maybe have some logic to this if i ever add ranks
@@ -3470,6 +3490,9 @@ class AIHuman:
         # this task is used to figure out something to do when the bot is idle (has nothing urgent to do)
 
         decision = random.randint(0, 10)
+        if self.is_civilian and decision == 6:
+            self.switch_task_trader()
+            return
         if decision == 1:
             # go for a walk
             coords = [
