@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 ---------------------------------
+September 23 2026
+- updates for mortars. they get their own turret and the soviet one is no longer a copy
+
+---------------------------------
 August 28 2026
 - added stug III ausf g
 - changes to allow a image rotation point to be set

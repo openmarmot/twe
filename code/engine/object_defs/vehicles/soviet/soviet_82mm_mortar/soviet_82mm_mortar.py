@@ -18,12 +18,10 @@ from engine.object_registry import register_object
 @register_object("soviet_82mm_mortar")
 def create(world, world_coords):
     z = WorldObject(world, ["mortar_base"], AIVehicle)
-    z.name = "Soviet 82mm Mortar System"
+    z.name = "82-BM-37 Mortar System"
     z.is_vehicle = True
     z.is_towable = False
-    turret = engine.world_builder.spawn_object(world, world_coords, "251_2_turret", True)
-    turret.ai.position_offset = [0, 0]
-    turret.ai.rotation_range = [-30, 30]
+    turret = engine.world_builder.spawn_object(world, world_coords, "soviet_82mm_mortar_turret", True)
     z.ai.turrets.append(turret)
     turret.ai.vehicle = z
 
@@ -61,7 +59,7 @@ def create(world, world_coords):
     z.ai.ammo_rack_capacity = 30
     for b in range(30):
         z.ai.ammo_rack.append(
-            engine.world_builder.spawn_object(world, world_coords, "GrW34_magazine", False)
+            engine.world_builder.spawn_object(world, world_coords, "82mm_bm37_magazine", False)
         )
     z.ai.max_wheels = 0
     z.ai.max_spare_wheels = 0
