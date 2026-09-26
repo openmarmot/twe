@@ -23,8 +23,9 @@ def create(world, world_coords):
     z.is_gun = True
     z.ai.mechanical_accuracy = 1
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "mosin_magazine", False)
-    z.ai.rate_of_fire = 1.1
-    z.ai.reload_speed = 11
+    # longer, stiffer bolt than the Kar98k
+    z.ai.rate_of_fire = 2.8
+    z.ai.reload_speed = 6
     z.ai.range = 2418
     z.ai.type = "rifle"
     z.ai.use_antipersonnel = True

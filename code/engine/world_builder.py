@@ -189,7 +189,8 @@ list_guns = [
     "mg34",
     "mg42",
     "mosin_nagant",
-    "ppsh43",
+    "mosin_nagant-sniper",
+    "pps43",
     "ppsh41",
     "dp28",
     "1911",
@@ -199,18 +200,27 @@ list_guns = [
     "k43",
     "svt40",
     "svt40-sniper",
+    "kar98k-sniper",
+    "kar98k-zf41",
+    "k43-sniper",
     "mg15",
     "fg42-type1",
     "fg42-type2",
     "c96",
     "c96_red_9",
+    "vg1_5",
+    "mp3008",
+    "nagant_m1895",
 ]
-list_guns_common = ["kar98k", "mosin_nagant", "ppsh43", "ppsh41", "tt33", "svt40"]
-list_guns_rare = ["mp40", "ppk", "stg44", "mg34", "dp28", "k43", "g41w", "c96"]
+list_guns_common = ["kar98k", "mosin_nagant", "pps43", "ppsh41", "tt33", "svt40"]
+list_guns_rare = ["mp40", "ppk", "stg44", "mg34", "dp28", "k43", "g41w", "c96", "kar98k-zf41", "vg1_5", "mp3008"]
 list_guns_ultra_rare = [
     "fg42-type1",
     "fg42-type2",
     "svt40-sniper",
+    "kar98k-sniper",
+    "k43-sniper",
+    "mosin_nagant-sniper",
     "1911",
     "mg15",
     "c96_red_9",
@@ -228,8 +238,19 @@ list_german_guns = [
     "walther_p38",
 ]
 
-list_guns_rifles = ["kar98k", "mosin_nagant", "g41w", "k43", "svt40", "svt40-sniper"]
-list_guns_smg = ["mp40", "ppsh43", "ppsh41"]
+list_guns_rifles = [
+    "kar98k",
+    "kar98k-zf41",
+    "kar98k-sniper",
+    "mosin_nagant",
+    "mosin_nagant-sniper",
+    "g41w",
+    "k43",
+    "k43-sniper",
+    "svt40",
+    "svt40-sniper",
+]
+list_guns_smg = ["mp40", "mp3008", "pps43", "ppsh41"]
 list_guns_assault_rifles = ["stg44"]
 list_guns_machine_guns = ["mg34", "mg42", "dp28", "mg15", "fg42-type1", "fg42-type2"]
 list_guns_pistols = [
@@ -240,6 +261,7 @@ list_guns_pistols = [
     "c96_red_9",
     "walther_p38",
     "luger_p08",
+    "nagant_m1895",
 ]
 list_guns_at_rifles = ["ptrs_41"]
 
@@ -336,10 +358,10 @@ def add_standard_loadout(wo, world, loadout):
             wo.add_inventory(
                 spawn_object(world, [0, 0], "panzerschreck_magazine", False)
             )
-    elif loadout == "ppsh43":
-        wo.add_inventory(spawn_object(world, [0, 0], "ppsh43", False))
+    elif loadout == "pps43":
+        wo.add_inventory(spawn_object(world, [0, 0], "pps43", False))
         for _ in range(6):
-            wo.add_inventory(spawn_object(world, [0, 0], "ppsh43_magazine", False))
+            wo.add_inventory(spawn_object(world, [0, 0], "pps43_magazine", False))
     elif loadout == "ppsh41":
         wo.add_inventory(spawn_object(world, [0, 0], "ppsh41", False))
         for _ in range(6):
@@ -366,10 +388,26 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "svt40", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "svt40_magazine", False))
+    elif loadout == "kar98k-zf41":
+        wo.add_inventory(spawn_object(world, [0, 0], "kar98k-zf41", False))
+        for _ in range(12):
+            wo.add_inventory(spawn_object(world, [0, 0], "kar98k_magazine", False))
+    elif loadout == "mp3008":
+        wo.add_inventory(spawn_object(world, [0, 0], "mp3008", False))
+        for _ in range(4):
+            wo.add_inventory(spawn_object(world, [0, 0], "mp3008_magazine", False))
+    elif loadout == "nagant_m1895":
+        wo.add_inventory(spawn_object(world, [0, 0], "nagant_m1895", False))
+        for _ in range(3):
+            wo.add_inventory(spawn_object(world, [0, 0], "nagant_m1895_magazine", False))
     elif loadout == "tt33":
         wo.add_inventory(spawn_object(world, [0, 0], "tt33", False))
         for _ in range(2):
             wo.add_inventory(spawn_object(world, [0, 0], "tt33_magazine", False))
+    elif loadout == "vg1_5":
+        wo.add_inventory(spawn_object(world, [0, 0], "vg1_5", False))
+        for _ in range(4):
+            wo.add_inventory(spawn_object(world, [0, 0], "stg44_magazine", False))
     elif loadout == "walther_p38":
         wo.add_inventory(spawn_object(world, [0, 0], "walther_p38", False))
         for _ in range(2):

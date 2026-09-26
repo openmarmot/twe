@@ -227,7 +227,7 @@ class AIHumanVehicleGunner:
             distance_dispersion += 0.5
 
         # --- Optic influence (only affects the distance/aiming component) ---
-        optic = getattr(turret, "gun_sight", None)
+        optic = turret.ai.gun_sight
         if optic:
             multiplier = optic.ai.get_dispersion_multiplier(distance)
             distance_dispersion *= multiplier
@@ -536,7 +536,11 @@ class AIHumanVehicleGunner:
         )
         if ammo_gun == 0:
             if ammo_inventory > 0:
-                # start the reload process
+                # remember the vehicle being shot at. the target itself is
+                # cleared below, and the round is chosen when the reload ends.
+                judge = self.owner.ai.memory["task_vehicle_crew"]["target"]
+                if judge is not None and judge.is_vehicle:
+                    self.owner.ai.memory["task_vehicle_crew"]["reload_judge"] = judge
                 self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
                     self.owner.world.world_seconds
                 )
@@ -697,6 +701,13 @@ class AIHumanVehicleGunner:
                 )
                 return
 
+        # a loaded full-caliber AP round stays put when it can penetrate.
+        # subcaliber is loaded only when that round cannot, and is put back
+        # once a full-caliber round can.
+        if target.is_vehicle and out_of_ammo_primary is False:
+            if self.swap_at_round(turret.ai.primary_weapon, vehicle, target):
+                return
+
         # check rotation
         rotation_angle = engine.math_2d.get_rotation(
             turret.world_coords, target.world_coords
@@ -789,8 +800,8 @@ class AIHumanVehicleGunner:
                 if v_armor <= 4 and v_pax <= 2:
                     if turret.ai.primary_weapon.ai.magazine:
                         mag = turret.ai.primary_weapon.ai.magazine
-                        if mag.ai.use_antitank and not mag.ai.use_antipersonnel:
-                            # pure AT loaded; look for HE/AP in rack or inventory
+                        if mag.ai.use_antitank:
+                            # pure AT or HEAT loaded; look for a plain HE round
                             has_he = False
                             for container in (vehicle.ai.ammo_rack, vehicle.ai.inventory):
                                 for m in container:
@@ -800,7 +811,10 @@ class AIHumanVehicleGunner:
                                             in m.ai.compatible_guns
                                         ):
                                             if len(m.ai.projectiles) > 0:
-                                                if m.ai.use_antipersonnel:
+                                                if (
+                                                    m.ai.use_antipersonnel
+                                                    and m.ai.use_antitank is False
+                                                ):
                                                     has_he = True
                                                     break
                                 if has_he:
@@ -991,6 +1005,133 @@ class AIHumanVehicleGunner:
             )
 
     # ---------------------------------------------------------------------------
+    def magazine_projectile_type(self, magazine):
+        """projectile name loaded in a magazine, or None"""
+        if magazine is None or len(magazine.ai.projectiles) == 0:
+            return None
+        return magazine.ai.projectiles[0].ai.projectile_type
+
+    # ---------------------------------------------------------------------------
+    def is_subcaliber(self, projectile_type):
+        """tungsten core. full-caliber AP is preferred when it can penetrate"""
+        if projectile_type is None:
+            return False
+        data = engine.penetration_calculator.projectile_data.get(projectile_type)
+        if data is None:
+            return False
+        return data["projectile_material"] == "tungsten"
+
+    # ---------------------------------------------------------------------------
+    def magazine_can_pen_vehicle(self, magazine, target):
+        """True if this round can penetrate the faced hull or casemate"""
+        projectile = magazine.ai.projectiles[0]
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, target.world_coords
+        )
+        rotation_angle = engine.math_2d.get_rotation(
+            self.owner.world_coords, target.world_coords
+        )
+        hit_side, relative_angle = engine.math_2d.calculate_hit_side(
+            target.rotation_angle, rotation_angle
+        )
+        for armor_dict in (
+            target.ai.passenger_compartment_armor,
+            target.ai.vehicle_armor,
+        ):
+            penetrated, _, _, _ = engine.penetration_calculator.calculate_penetration(
+                projectile,
+                distance,
+                "steel",
+                armor_dict[hit_side],
+                hit_side,
+                relative_angle,
+            )
+            if penetrated:
+                return True
+        return False
+
+    # ---------------------------------------------------------------------------
+    def choose_at_magazine(self, magazines, target, heat_magazines=None):
+        """full-caliber AP, then HEAT, then subcaliber, whichever can penetrate"""
+        if heat_magazines is None:
+            heat_magazines = []
+        standard = []
+        subcaliber = []
+        for magazine in magazines:
+            projectile_type = self.magazine_projectile_type(magazine)
+            if self.is_subcaliber(projectile_type):
+                subcaliber.append(magazine)
+            else:
+                standard.append(magazine)
+
+        if target is not None and target.is_vehicle:
+            for magazine in standard:
+                if self.magazine_can_pen_vehicle(magazine, target):
+                    return magazine
+            for magazine in heat_magazines:
+                if self.magazine_can_pen_vehicle(magazine, target):
+                    return magazine
+            for magazine in subcaliber:
+                if self.magazine_can_pen_vehicle(magazine, target):
+                    return magazine
+
+        # nothing penetrates: keep a full-caliber round rather than spending HEAT or tungsten
+        if len(standard) > 0:
+            return standard[0]
+        if len(subcaliber) > 0:
+            return subcaliber[0]
+        if len(heat_magazines) > 0:
+            return heat_magazines[0]
+        return None
+
+    # ---------------------------------------------------------------------------
+    def swap_at_round(self, weapon, vehicle, target):
+        """start a reload when the loaded AT round is the wrong type. returns bool"""
+        if weapon is None or weapon.ai.magazine is None:
+            return False
+        loaded = weapon.ai.magazine
+        # plain HE stays on its own reload path. HEAT is use_antitank and use_antipersonnel.
+        if loaded.ai.use_antitank is False:
+            return False
+        # soft vehicles are reloaded to HE by the caller
+        v_armor = target.ai.vehicle_armor.get("front", [0])[0]
+        v_pax = target.ai.passenger_compartment_armor.get("front", [0])[0]
+        if v_armor <= 4 and v_pax <= 2:
+            return False
+
+        at_magazines = []
+        heat_magazines = []
+        for container in (vehicle.ai.ammo_rack, vehicle.ai.inventory):
+            for magazine in container:
+                if magazine.is_gun_magazine is False:
+                    continue
+                if weapon.world_builder_identity not in magazine.ai.compatible_guns:
+                    continue
+                if len(magazine.ai.projectiles) == 0:
+                    continue
+                if magazine.ai.use_antitank is False:
+                    continue
+                if magazine.ai.use_antipersonnel:
+                    heat_magazines.append(magazine)
+                else:
+                    at_magazines.append(magazine)
+        chosen = self.choose_at_magazine(at_magazines, target, heat_magazines)
+        if chosen is None:
+            return False
+        loaded_type = self.magazine_projectile_type(loaded)
+        chosen_type = self.magazine_projectile_type(chosen)
+        if loaded_type == chosen_type:
+            return False
+
+        self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
+            self.owner.world.world_seconds
+        )
+        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+            VehicleCrewAction.RELOADING_PRIMARY
+        )
+        return True
+
+    # ---------------------------------------------------------------------------
     def think_reload(self, weapon):
         """think about how we want to reload"""
         vehicle = self.owner.ai.memory["task_vehicle_crew"]["vehicle_role"].vehicle
@@ -1066,11 +1207,21 @@ class AIHumanVehicleGunner:
             else:
                 prefer_ap = True
 
+        stashed_judge = None
+        if weapon == turret.ai.primary_weapon:
+            stashed_judge = self.owner.ai.memory["task_vehicle_crew"].pop(
+                "reload_judge", None
+            )
         if prefer_at:
-            if len(for_at) > 0:
-                new_magazine = for_at[0]
-            elif len(for_both) > 0:
-                new_magazine = for_both[0]
+            judge = None
+            if target is not None and target.is_vehicle:
+                judge = target
+            elif stashed_judge is not None:
+                judge = stashed_judge
+            elif self.owner.ai.vehicle_targets:
+                judge = self.owner.ai.vehicle_targets[0]
+            if len(for_at) > 0 or len(for_both) > 0:
+                new_magazine = self.choose_at_magazine(for_at, judge, for_both)
 
         elif prefer_ap:
             if len(for_ap) > 0:

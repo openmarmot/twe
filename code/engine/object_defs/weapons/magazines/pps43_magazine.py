@@ -1,5 +1,5 @@
 """
-ppsh43_magazine object definition
+pps43_magazine object definition
 
 repo : https://github.com/openmarmot/twe
 """
@@ -14,14 +14,14 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("ppsh43_magazine")
+@register_object("pps43_magazine")
 def create(world, world_coords):
     z = WorldObject(world, ["stg44_magazine"], AIMagazine)
-    z.name = "ppsh43_magazine"
-    z.description = "A magazine for the PPSh-43"
+    z.name = "pps43_magazine"
+    z.description = "A magazine for the PPS-43"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
-    z.ai.compatible_guns = ["ppsh43"]
+    z.ai.compatible_guns = ["pps43"]
     z.ai.compatible_projectiles = ["7.62x25"]
     z.ai.capacity = 35
     z.rotation_angle = float(random.randint(0, 359))

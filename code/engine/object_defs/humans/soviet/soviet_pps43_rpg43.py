@@ -1,5 +1,5 @@
 """
-soviet_ppsh43_molotov object definition
+soviet_pps43_rpg43 object definition
 
 repo : https://github.com/openmarmot/twe
 """
@@ -9,11 +9,11 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("soviet_ppsh43_molotov")
+@register_object("soviet_pps43_rpg43")
 def create(world, world_coords):
     z = engine.world_builder.spawn_object(world, world_coords, "soviet_soldier", False)
     engine.world_builder.add_standard_loadout(z, world, "standard_soviet_gear")
-    engine.world_builder.add_standard_loadout(z, world, "ppsh43")
-    z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "molotov_cocktail", False))
-    z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "molotov_cocktail", False))
+    engine.world_builder.add_standard_loadout(z, world, "pps43")
+    z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "rpg43", False))
+    z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "rpg43", False))
     return z

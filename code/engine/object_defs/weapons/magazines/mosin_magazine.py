@@ -20,7 +20,7 @@ def create(world, world_coords):
     z.name = "mosin_magazine"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
-    z.ai.compatible_guns = ["mosin_nagant"]
+    z.ai.compatible_guns = ["mosin_nagant", "mosin_nagant-sniper"]
     z.ai.compatible_projectiles = ["7.62x54_L", "7.62x54_D"]
     z.ai.capacity = 5
     z.ai.removable = False

@@ -1,5 +1,5 @@
 """
-svt40-sniper object definition
+vg1_5 object definition
 
 repo : https://github.com/openmarmot/twe
 """
@@ -14,21 +14,20 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("svt40-sniper")
+@register_object("vg1_5")
 def create(world, world_coords):
-    z = WorldObject(world, ["svt40-sniper"], AIGun)
-    z.name = "svt40-sniper"
+    # Gustloff Volkssturmgewehr, early 1945. semi-auto only, StG 44 magazine
+    z = WorldObject(world, ["vg1_5"], AIGun)
+    z.name = "vg1_5"
+    z.description = "A Gustloff VG 1-5 Volkssturm rifle"
     z.no_update = True
     z.minimum_visible_scale = 0.4
     z.is_gun = True
-    z.ai.mechanical_accuracy = 1
-    z.ai.scope = True
-    z.ai.scope_magnification = 3.5
-    z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "svt40_magazine", False)
-    # deliberate fire; the PU scope does the accuracy work
-    z.ai.rate_of_fire = 1.4
-    z.ai.reload_speed = 6
-    z.ai.range = 2500
+    z.ai.mechanical_accuracy = 3
+    z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "stg44_magazine", False)
+    z.ai.rate_of_fire = 1.1
+    z.ai.reload_speed = 8
+    z.ai.range = 1813
     z.ai.type = "semi auto rifle"
     z.ai.use_antipersonnel = True
     z.rotation_angle = float(random.randint(0, 359))

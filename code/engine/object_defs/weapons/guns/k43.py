@@ -21,10 +21,11 @@ def create(world, world_coords):
     z.no_update = True
     z.minimum_visible_scale = 0.4
     z.is_gun = True
-    z.ai.mechanical_accuracy = 1
+    z.ai.mechanical_accuracy = 2
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "k43_magazine", False)
-    z.ai.rate_of_fire = 0.8
-    z.ai.reload_speed = 7
+    # aimed semi-auto; detachable 10-round magazine
+    z.ai.rate_of_fire = 1.0
+    z.ai.reload_speed = 5
     z.ai.range = 2418
     z.ai.type = "semi auto rifle"
     z.ai.use_antipersonnel = True

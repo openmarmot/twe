@@ -28,14 +28,14 @@ def create(world, world_coords):
     z.ai.vehicle_armor["bottom"] = [8, 0, 0]
     z.ai.vehicle_armor["left"] = [30, 0, 0]
     z.ai.vehicle_armor["right"] = [30, 0, 0]
-    z.ai.vehicle_armor["front"] = [80, 64, 0]
-    z.ai.vehicle_armor["rear"] = [30, 15, 0]
+    z.ai.vehicle_armor["front"] = [80, 14, 0]  # lower hull, degrees from vertical
+    z.ai.vehicle_armor["rear"] = [20, 11, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
     z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]
     z.ai.passenger_compartment_armor["left"] = [30, 0, 0]
     z.ai.passenger_compartment_armor["right"] = [30, 0, 0]
     z.ai.passenger_compartment_armor["front"] = [80, 11, 0]
-    z.ai.passenger_compartment_armor["rear"] = [30, 15, 0]
+    z.ai.passenger_compartment_armor["rear"] = [20, 11, 0]
     main_turret = engine.world_builder.spawn_object(world, world_coords, "panzer_iv_g_turret", True)
     z.ai.turrets.append(main_turret)
     main_turret.ai.vehicle = z

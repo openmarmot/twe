@@ -118,7 +118,7 @@ SCENARIOS = [
         "soviet_squads": (
             "Soviet 1944 Rifle:6,"
             "Soviet 1944 SMG:3,"
-            "Soviet ZiS-3 76mm Divisional Gun:2,"
+            "Soviet ZiS-3 Artillery:2,"
             "Soviet T34-76 Model 1943:2,"
             "Soviet PTRS-41 AT Squad:2,"
             "Soviet 82 mm Mortar Team:1,"
@@ -157,7 +157,7 @@ SCENARIOS = [
             "Soviet T34-76 Model 1943:2,"
             "Soviet SU-85:2,"
             "Soviet PTRS-41 AT Squad:2,"
-            "Soviet ZiS-3 76mm Divisional Gun:3,"
+            "Soviet ZiS-3 Artillery:3,"
             "Soviet Medic:1"
         ),
         "description": (

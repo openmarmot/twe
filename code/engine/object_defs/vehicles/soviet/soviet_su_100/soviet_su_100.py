@@ -28,7 +28,7 @@ def create(world, world_coords):
     z.ai.vehicle_armor["bottom"] = [8, 0, 0]
     z.ai.vehicle_armor["left"] = [45, 0, 0]
     z.ai.vehicle_armor["right"] = [45, 0, 0]
-    z.ai.vehicle_armor["front"] = [75, 50, 0]
+    z.ai.vehicle_armor["front"] = [45, 60, 0]  # T-34 lower nose. casemate is the upper plate
     z.ai.vehicle_armor["rear"] = [45, 47, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
     z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]

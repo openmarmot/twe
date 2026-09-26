@@ -1,5 +1,5 @@
 """
-kar98k_magazine object definition
+mp3008_magazine object definition
 
 repo : https://github.com/openmarmot/twe
 """
@@ -14,21 +14,16 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("kar98k_magazine")
+@register_object("mp3008_magazine")
 def create(world, world_coords):
     z = WorldObject(world, ["stg44_magazine"], AIMagazine)
-    z.name = "kar98k_magazine"
+    z.name = "mp3008_magazine"
+    z.description = "A 32-round magazine for the MP 3008"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
-    z.ai.compatible_guns = ["kar98k", "kar98k-sniper", "kar98k-zf41", "kar98k_schiessbecher"]
-    z.ai.compatible_projectiles = [
-        "7.92x57_SSP",
-        "7.92x57_SME",
-        "7.92x57_SMK",
-        "7.92x57_SMKH",
-    ]
-    z.ai.capacity = 5
-    z.ai.removable = False
+    z.ai.compatible_guns = ["mp3008"]
+    z.ai.compatible_projectiles = ["9mm_124", "9mm_115", "9mm_ME"]
+    z.ai.capacity = 32
     z.rotation_angle = float(random.randint(0, 359))
     engine.world_builder.load_magazine(world, z)
     return z

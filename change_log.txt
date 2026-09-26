@@ -1,5 +1,13 @@
 TWE Project : Change Log
 
+--------------------------------
+September 26 2026
+- adjustments to various weapons
+- added several sniper variants
+- added nagant revolver
+- added mp3008 smg
+- added vg1_5 rifle
+- added some different ammo types for cannons
 ---------------------------------
 September 23 2026
 - updates for mortars. they get their own turret and the soviet one is no longer a copy

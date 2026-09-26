@@ -24,8 +24,9 @@ def create(world, world_coords):
     z.is_gun = True
     z.ai.mechanical_accuracy = 1
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "kar98k_magazine", False)
-    z.ai.rate_of_fire = 1.1
-    z.ai.reload_speed = 10
+    # ball-ammo cycle matches the Kar98k
+    z.ai.rate_of_fire = 2.5
+    z.ai.reload_speed = 5
     z.ai.range = 2418
     z.ai.type = "rifle"
     z.ai.use_antipersonnel = True
