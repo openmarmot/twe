@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 --------------------------------
+October 03 2026
+- added ai-play which allows a local ai model to play the game.
+
+this was designed and tested on a DGX Spark. Will probably only work on Linux X windows systems.
+The AI isn't good at it by any means, but it is interesting.
+Tested with DeepSeek V4 Flash Vision.
+
+--------------------------------
 September 26 2026
 - adjustments to various weapons
 - added several sniper variants
