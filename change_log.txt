@@ -2,7 +2,11 @@ TWE Project : Change Log
 
 --------------------------------
 October 03 2026
+- set per-vehicle turret traverse speeds instead of the shared 20 deg/s default
+- panzer iv g/h/j now use a maybach hl 120 trm on gasoline instead of the v-2 diesel
 - added ai-play which allows a local ai model to play the game.
+- scenarios no longer upload to the db from a python file
+- humans sample the terrain under them. vegetation and trees make them harder to see until they fire
 
 this was designed and tested on a DGX Spark. Will probably only work on Linux X windows systems.
 The AI isn't good at it by any means, but it is interesting.

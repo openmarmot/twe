@@ -32,6 +32,7 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [0, 0, 0]
     z.ai.position_offset = [0, 0]
     z.ai.rotation_range = [-30, 30]
+    z.ai.rotation_speed = 10  # bipod lay
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "82mm_bm37", False)
     z.ai.primary_weapon.ai.smoke_on_fire = True
     z.ai.primary_weapon.ai.smoke_type = "cannon"

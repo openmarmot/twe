@@ -42,7 +42,6 @@ import engine.penetration_calculator
 from engine.vehicle_role import VehicleRole
 import engine.map_generator
 import engine.battlegroup_generator
-import engine.scenario_defs
 
 
 # load AI
@@ -1004,70 +1003,14 @@ def load_sqlite_squad_data():
 
 # ------------------------------------------------------------------------------
 def load_sqlite_scenario_data():
-    """create/update scenario_data table and load it into memory"""
+    """load scenario_data from sqlite. the game does not write this table"""
     global scenario_data
     scenario_data = []
 
+    # query_only so startup cannot bump sqlite_sequence or rewrite rows
     conn = sqlite3.connect("data/data.sqlite")
+    conn.execute("PRAGMA query_only = ON")
     cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS scenario_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            sort_order INTEGER,
-            name TEXT NOT NULL UNIQUE,
-            description TEXT,
-            year INTEGER,
-            attacking_faction TEXT,
-            defending_faction TEXT,
-            map_areas TEXT,
-            german_squads TEXT,
-            soviet_squads TEXT,
-            german_random_points INTEGER,
-            soviet_random_points INTEGER
-        )
-        """
-    )
-
-    # upsert built-in scenarios. extra rows added only in sqlite are kept
-    for s in engine.scenario_defs.SCENARIOS:
-        cursor.execute(
-            """
-            INSERT INTO scenario_data (
-                sort_order, name, description, year,
-                attacking_faction, defending_faction, map_areas,
-                german_squads, soviet_squads,
-                german_random_points, soviet_random_points
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(name) DO UPDATE SET
-                sort_order=excluded.sort_order,
-                description=excluded.description,
-                year=excluded.year,
-                attacking_faction=excluded.attacking_faction,
-                defending_faction=excluded.defending_faction,
-                map_areas=excluded.map_areas,
-                german_squads=excluded.german_squads,
-                soviet_squads=excluded.soviet_squads,
-                german_random_points=excluded.german_random_points,
-                soviet_random_points=excluded.soviet_random_points
-            """,
-            (
-                s["sort_order"],
-                s["name"],
-                s["description"],
-                s["year"],
-                s["attacking_faction"],
-                s["defending_faction"],
-                s["map_areas"],
-                s["german_squads"],
-                s["soviet_squads"],
-                s["german_random_points"],
-                s["soviet_random_points"],
-            ),
-        )
-
-    conn.commit()
 
     cursor.execute(
         "SELECT * FROM scenario_data ORDER BY sort_order, id"

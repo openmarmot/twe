@@ -31,6 +31,7 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [0, 0, 0]
     z.ai.position_offset = [0, 0]
     z.ai.rotation_range = [-360, 360]
+    z.ai.rotation_speed = 20  # AA mount
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "37mm_m1939_k61", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon.ai.smoke_on_fire = True

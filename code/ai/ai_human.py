@@ -145,10 +145,18 @@ class AIHuman:
         self.last_building_check_time = 0
         self.building_check_rate = 1
 
+        # terrain under this human. 0 open, 1 vegetation, 2 tree, 3 road.
+        # sampled on a timer so a group does not all read the grid together
+        self.terrain = 0
+        self.last_terrain_check_time = None
+        self.terrain_check_rate = 0
+
         self.recent_noise_or_move = False
         # reset in update
         self.last_noise_or_move_time = 0  # in world.world_seconds
         self.recent_noise_or_move_reset_seconds = 30
+        # world_seconds of the last shot. negative means this human has not fired
+        self.last_shot_time = -100
 
         # the ai group that this human is a part of
         self.squad = None
@@ -199,6 +207,17 @@ class AIHuman:
             if distance < (self.owner.collision_radius + b.collision_radius):
                 self.building_list.append(b)
                 self.in_building = True
+
+    # ---------------------------------------------------------------------------
+    def terrain_check(self):
+        """sample the terrain type under this human"""
+
+        # next sample is a couple seconds out, and not the same gap every time
+        self.terrain_check_rate = random.uniform(2.0, 4.0)
+        grid_square = self.owner.grid_square
+        if grid_square is None:
+            return
+        self.terrain = grid_square.get_terrain_type(self.owner.world_coords)
 
     # ---------------------------------------------------------------------------
     def calculate_engagement(self, weapon, target):
@@ -519,10 +538,44 @@ class AIHuman:
         return False
 
     # ---------------------------------------------------------------------------
+    def recently_fired(self):
+        """True if this human shot within the recent-noise window."""
+        if self.last_shot_time < 0:
+            return False
+        return (
+            self.owner.world.world_seconds - self.last_shot_time
+            < self.recent_noise_or_move_reset_seconds
+        )
+
+    # ---------------------------------------------------------------------------
+    def terrain_hides_human(self, target, vegetation_hides):
+        """True when this human is concealed by the terrain under them.
+
+        0 open and 3 road do not conceal. 2 tree does. 1 vegetation does
+        when vegetation_hides is set. A recent shot cancels the concealment.
+        """
+        if target.is_human is False:
+            return False
+        if target.ai.recently_fired():
+            return False
+        terrain = target.ai.terrain
+        if terrain == 2:
+            return True
+        if vegetation_hides and terrain == 1:
+            return True
+        return False
+
+    # ---------------------------------------------------------------------------
     def check_visibility(self, target, distance):
         """check whether we can see a target at a distance"""
+        if distance < 400:
+            # close enough that terrain does not matter
+            return True
         if distance < 800:
-            # humans always see everything at this range
+            # trees hide a human who has not fired recently
+            if self.terrain_hides_human(target, False):
+                return False
+            # humans see everything else at this range
             return True
         if distance < 1500:
             if target.is_human:
@@ -531,16 +584,25 @@ class AIHuman:
                     if target.ai.recent_noise_or_move:
                         return True
                     return False
-                # if not in building, everything is seen at this range
+                # vegetation and trees hide a human who has not fired recently
+                if self.terrain_hides_human(target, True):
+                    return False
                 return True
             # vehicles are ALWAYS seen by humans at this range
             return True
         if distance < 2500:
             if target.is_human:
-                if target.ai.recent_noise_or_move and target.ai.in_building is False:
-                    return True
-                else:
+                # buildings hide completely at this range
+                if target.ai.in_building:
                     return False
+                # a shot gives away a human in the trees. walking does not
+                if target.ai.recently_fired():
+                    return True
+                if self.terrain_hides_human(target, False):
+                    return False
+                if target.ai.recent_noise_or_move:
+                    return True
+                return False
             # vehicle
             if target.ai.recent_noise_or_move:
                 return True
@@ -552,7 +614,12 @@ class AIHuman:
     # ---------------------------------------------------------------------------
     def check_visibility_from_vehicle(self, target, distance):
         """check whether we can see a target at a distance from inside a vehicle"""
+        if distance < 200:
+            return True
         if distance < 400:
+            # trees hide a human who has not fired recently
+            if self.terrain_hides_human(target, False):
+                return False
             return True
         if distance < 800:
             if target.is_human:
@@ -560,6 +627,9 @@ class AIHuman:
                 if target.ai.in_building:
                     if target.ai.recent_noise_or_move:
                         return True
+                    return False
+                # vegetation and trees hide a human who has not fired recently
+                if self.terrain_hides_human(target, True):
                     return False
                 return True
             # vehicles are ALWAYS seen at this range
@@ -572,17 +642,22 @@ class AIHuman:
                         return True
                     return False
                 if target.ai.prone is False:
+                    if self.terrain_hides_human(target, True):
+                        return False
                     return True
                 return False
             # vehicles are seen at this range
             return True
         if distance < 2000:
             if target.is_human:
-                if (
-                    target.ai.recent_noise_or_move
-                    and target.ai.in_building is False
-                    and target.ai.prone is False
-                ):
+                if target.ai.in_building or target.ai.prone:
+                    return False
+                # a shot gives away a human in the trees. walking does not
+                if target.ai.recently_fired():
+                    return True
+                if self.terrain_hides_human(target, False):
+                    return False
+                if target.ai.recent_noise_or_move:
                     return True
                 return False
             # vehicles are visible at this range
@@ -1050,6 +1125,7 @@ class AIHuman:
 
             self.recent_noise_or_move = True
             self.last_noise_or_move_time = self.owner.world.world_seconds
+            self.last_shot_time = self.owner.world.world_seconds
 
             aim_coords = target.world_coords
             # guess how long it will take for the bullet to arrive
@@ -1131,6 +1207,7 @@ class AIHuman:
             weapon.ai.calculated_range = weapon.ai.range
             self.owner.rotation_angle = rotation_angle
             self.owner.reset_image = True
+            self.last_shot_time = self.owner.world.world_seconds
             weapon.ai.fire()
 
     # ---------------------------------------------------------------------------
@@ -1483,7 +1560,10 @@ class AIHuman:
                 )
                 self.antitank.ai.calculated_range = calculated_range
 
+            fired_at = self.antitank.ai.last_fired_time
             self.antitank.ai.fire()
+            if self.antitank.ai.last_fired_time != fired_at:
+                self.last_shot_time = self.antitank.ai.last_fired_time
             self.add_journal_entry(f"Fired {self.antitank.name}")
 
             # drop panzerfausts always
@@ -2240,6 +2320,18 @@ class AIHuman:
             ):
                 self.last_building_check_time = self.owner.world.world_seconds
                 self.building_check()
+
+            # terrain underfoot. first sample is delayed by a random gap so
+            # humans spawned together do not all read the grid on one tick
+            if self.last_terrain_check_time is None:
+                self.last_terrain_check_time = self.owner.world.world_seconds
+                self.terrain_check_rate = random.uniform(0.3, 2.5)
+            elif (
+                self.owner.world.world_seconds - self.last_terrain_check_time
+                > self.terrain_check_rate
+            ):
+                self.last_terrain_check_time = self.owner.world.world_seconds
+                self.terrain_check()
 
             if self.recent_noise_or_move:
                 if (

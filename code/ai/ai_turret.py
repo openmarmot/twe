@@ -62,7 +62,8 @@ class AITurret:
         # full rotation is [-360,360]
         self.rotation_range = [-20, 20]
 
-        # speed of rotation
+        # degrees per second at a full traverse command.
+        # turret definitions override this.
         self.rotation_speed = 20
 
         self.vehicle = None

@@ -31,6 +31,7 @@ def create(world, world_coords):
     # this weapon is shared, so set this when you add the turret
     # z.ai.position_offset=[-65,13] # Best to set this when you spawn per vehicle
     z.ai.rotation_range = [-360, 360]
+    z.ai.rotation_speed = 10  # periscope crank
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "mg34", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon_reload_speed = 10

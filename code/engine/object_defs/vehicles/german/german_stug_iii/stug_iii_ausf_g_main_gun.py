@@ -31,6 +31,7 @@ def create(world, world_coords):
     z.ai.position_offset = [-22, 2.4]
     z.image_rotation_offset = [0, 38]
     z.ai.rotation_range = [-10, 10]
+    z.ai.rotation_speed = 5  # handwheel
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "75mm_kwk40_l48", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon.ai.smoke_on_fire = True
