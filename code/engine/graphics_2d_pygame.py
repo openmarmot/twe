@@ -61,6 +61,8 @@ class Graphics_2D_Pygame:
         else:
             display_w, display_h = info.current_w, info.current_h
 
+        # explicit pixel size, as opposed to fullscreen or auto
+        explicit_size = False
         if screen_size is None:
             self.screen_size = (display_w, display_h)
             flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED
@@ -72,6 +74,7 @@ class Graphics_2D_Pygame:
             self.screen_size = (w, h)
             flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
         else:
+            explicit_size = True
             self.screen_size = screen_size
             flags = pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.SCALED
 
@@ -80,6 +83,17 @@ class Graphics_2D_Pygame:
 
         vsync_arg = 1 if self.vsync_enabled else 0
         self.screen = pygame.display.set_mode(self.screen_size, flags, vsync=vsync_arg)
+        # SCALED grows a small surface to fill a high-resolution desktop.
+        # A requested size should still open at that size. Auto is unchanged.
+        if explicit_size:
+            window = pygame.Window.from_display_module()
+            # SCALED will not shrink below the logical size. The player docks
+            # this window into a pane, so the pane has to be able to win.
+            window.minimum_size = (320, 240)
+            wanted = (int(self.screen_size[0]), int(self.screen_size[1]))
+            if window.size != wanted:
+                window.size = wanted
+            print("Window size:", window.size[0], "x", window.size[1])
         self.screen_center = [self.screen_size[0] // 2, self.screen_size[1] // 2]
 
         if self.vsync_enabled:
