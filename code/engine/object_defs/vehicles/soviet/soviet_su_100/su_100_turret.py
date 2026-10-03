@@ -28,6 +28,7 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [45, 9, 0]
     z.ai.position_offset = [-67, 8]
     z.ai.rotation_range = [-8, 8]
+    z.ai.rotation_speed = 4  # handwheel, heavy gun
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "100mm_d_10", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon.ai.smoke_on_fire = True

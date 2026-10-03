@@ -28,7 +28,7 @@ def create(world, world_coords):
     z.ai.vehicle_armor["bottom"] = [8, 0, 0]
     z.ai.vehicle_armor["left"] = [45, 0, 0]
     z.ai.vehicle_armor["right"] = [45, 0, 0]
-    z.ai.vehicle_armor["front"] = [75, 50, 0]
+    z.ai.vehicle_armor["front"] = [45, 60, 0]  # T-34 lower nose. casemate is the upper plate
     z.ai.vehicle_armor["rear"] = [45, 47, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
     z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]
@@ -86,12 +86,22 @@ def create(world, world_coords):
         engine.world_builder.get_random_from_list(world, world_coords, engine.world_builder.list_consumables, False)
     )
     z.rotation_angle = float(random.randint(0, 359))
+    # SU-85M stowage was 60. No manual type split. Same 1944 tank-destroyer
+    # mix as the SU-85: AP split between BR-365 and BR-365K, 5 BR-365P, and HE.
     z.ai.ammo_rack_capacity = 60
-    for b in range(50):
-        z.ai.ammo_rack.append(
-            engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
-        )
-    for b in range(10):
+    for b in range(20):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365")
+        z.ai.ammo_rack.append(temp)
+    for b in range(15):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365k")
+        z.ai.ammo_rack.append(temp)
+    for b in range(5):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365P")
+        z.ai.ammo_rack.append(temp)
+    for b in range(20):
         temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
         engine.world_builder.load_magazine(world, temp, "O365k")
         z.ai.ammo_rack.append(temp)

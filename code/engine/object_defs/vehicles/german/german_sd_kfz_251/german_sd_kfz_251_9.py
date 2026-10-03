@@ -50,14 +50,17 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     z.ai.ammo_rack_capacity = 52
-    # HE
-    for b in range(40):
+    # 1944 Stummel load: mostly HE, a few K.Gr.rot Pz, and Gr.38 Hl/C
+    for b in range(32):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "75mm_kwk37_l24_magazine", False)
         )
-    # HEAT
+    for b in range(8):
+        temp = engine.world_builder.spawn_object(world, world_coords, "75mm_kwk37_l24_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "KGr_rot_Pz_L24")
+        z.ai.ammo_rack.append(temp)
     for b in range(12):
         temp = engine.world_builder.spawn_object(world, world_coords, "75mm_kwk37_l24_magazine", False)
-        engine.world_builder.load_magazine(world, temp, "HL_Gr_38A_L24")
+        engine.world_builder.load_magazine(world, temp, "HL_Gr_38C_L24")
         z.ai.ammo_rack.append(temp)
     return z

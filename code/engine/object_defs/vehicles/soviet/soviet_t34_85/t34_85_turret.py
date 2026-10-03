@@ -28,6 +28,7 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [52, 9, 0]
     z.ai.position_offset = [5, 0]
     z.ai.rotation_range = [-360, 360]
+    z.ai.rotation_speed = 18  # electric traverse, full turn about 20 s
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53", False)
     z.ai.primary_weapon.ai.equipper = z
     z.ai.primary_weapon.ai.smoke_on_fire = True

@@ -1,5 +1,5 @@
 """
-ppsh43 object definition
+pps43 object definition
 
 repo : https://github.com/openmarmot/twe
 """
@@ -14,17 +14,18 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-@register_object("ppsh43")
+@register_object("pps43")
 def create(world, world_coords):
-    z = WorldObject(world, ["ppsh43"], AIGun)
-    z.name = "ppsh43"
-    z.description = "A Soviet PPSh-43 submachine gun"
+    z = WorldObject(world, ["pps43"], AIGun)
+    z.name = "pps43"
+    z.description = "A Soviet PPS-43 submachine gun"
     z.no_update = True
     z.minimum_visible_scale = 0.4
     z.is_gun = True
     z.ai.mechanical_accuracy = 3
-    z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "ppsh43_magazine", False)
-    z.ai.rate_of_fire = 0.12
+    z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "pps43_magazine", False)
+    # cyclic rate about 600 rpm
+    z.ai.rate_of_fire = 0.1
     z.ai.reload_speed = 7
     z.ai.range = 1209
     z.ai.type = "submachine gun"

@@ -28,7 +28,8 @@ def create(world, world_coords):
         "7.92x57_SMKH",
     ]
     z.ai.capacity = 10
-    z.ai.removable = True
+    # fixed magazine. inventory "magazines" are stripper-clip refills
+    z.ai.removable = False
     z.rotation_angle = float(random.randint(0, 359))
     engine.world_builder.load_magazine(world, z)
     return z

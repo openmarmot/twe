@@ -25,9 +25,9 @@ def create(world, world_coords):
     z.ai.scope = True
     z.ai.scope_magnification = 3.5
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "svt40_magazine", False)
-    z.ai.mag_capacity = 10
-    z.ai.rate_of_fire = 0.8
-    z.ai.reload_speed = 10
+    # deliberate fire; the PU scope does the accuracy work
+    z.ai.rate_of_fire = 1.4
+    z.ai.reload_speed = 6
     z.ai.range = 2500
     z.ai.type = "semi auto rifle"
     z.ai.use_antipersonnel = True

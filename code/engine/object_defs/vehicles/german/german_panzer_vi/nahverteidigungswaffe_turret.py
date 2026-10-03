@@ -31,6 +31,7 @@ def create(world, world_coords):
     z.ai.turret_armor["rear"] = [5, 0, 0]
     z.ai.position_offset = [0, 0]
     z.ai.rotation_range = [-360, 360]
+    z.ai.rotation_speed = 40  # hand-turned roof launcher
     z.ai.primary_weapon = engine.world_builder.spawn_object(
         world, world_coords, "nahverteidigungswaffe", False
     )

@@ -15,6 +15,6 @@ def create(world, world_coords):
     engine.world_builder.add_standard_loadout(z, world, "standard_soviet_gear")
     # sidearm for self-defense; without this medics spawn unarmed and can
     # hit engage-enemy paths with primary_weapon is None
-    engine.world_builder.add_standard_loadout(z, world, "tt33")
+    engine.world_builder.add_standard_loadout(z, world, "nagant_m1895")
     z.ai.is_medic = True
     return z

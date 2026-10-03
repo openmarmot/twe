@@ -28,14 +28,14 @@ def create(world, world_coords):
     z.ai.vehicle_armor["bottom"] = [8, 0, 0]
     z.ai.vehicle_armor["left"] = [30, 0, 1]
     z.ai.vehicle_armor["right"] = [30, 0, 1]
-    z.ai.vehicle_armor["front"] = [80, 64, 0]
-    z.ai.vehicle_armor["rear"] = [30, 15, 0]
+    z.ai.vehicle_armor["front"] = [80, 14, 0]  # lower hull, degrees from vertical
+    z.ai.vehicle_armor["rear"] = [20, 11, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
     z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]
     z.ai.passenger_compartment_armor["left"] = [30, 0, 1]
     z.ai.passenger_compartment_armor["right"] = [30, 0, 1]
     z.ai.passenger_compartment_armor["front"] = [80, 11, 0]
-    z.ai.passenger_compartment_armor["rear"] = [30, 15, 0]
+    z.ai.passenger_compartment_armor["rear"] = [20, 11, 0]
     main_turret = engine.world_builder.spawn_object(world, world_coords, "panzer_iv_j_turret", True)
     z.ai.turrets.append(main_turret)
     main_turret.ai.vehicle = z
@@ -92,9 +92,9 @@ def create(world, world_coords):
         engine.world_builder.spawn_object(world, world_coords, "vehicle_fuel_tank", False)
     )
     z.ai.fuel_tanks[0].volume = 114
-    engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "diesel")
+    engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "gas_80_octane")
     z.ai.engines.append(
-        engine.world_builder.spawn_object(world, world_coords, "kharkiv_v2-34_engine", False)
+        engine.world_builder.spawn_object(world, world_coords, "maybach_hl120_trm_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [75, 10]
     z.ai.batteries.append(

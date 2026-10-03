@@ -20,7 +20,7 @@ def create(world, world_coords):
     z.name = "kar98k_magazine"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
-    z.ai.compatible_guns = ["kar98k", "kar98k_schiessbecher"]
+    z.ai.compatible_guns = ["kar98k", "kar98k-sniper", "kar98k-zf41", "kar98k_schiessbecher"]
     z.ai.compatible_projectiles = [
         "7.92x57_SSP",
         "7.92x57_SME",

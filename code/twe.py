@@ -10,6 +10,9 @@ python twe.py will run the project
 
 test run with : python3 twe.py --quick-battle civilian 2
 
+force a smaller window with : python3 twe.py --screen-size 1280x720
+default remains auto, which sizes the window for a desktop
+
 Project Github : https://github.com/openmarmot/twe
 
 This is not meant to be run directly. instead use start.sh
@@ -38,6 +41,21 @@ from engine.graphics_2d_pygame import Graphics_2D_Pygame
 screen_size = "auto"
 
 #------------------------------------------------------------------------------
+def parse_screen_size(text):
+    '''parse WxH into a pixel size. returns None when text is not usable.'''
+    parts = str(text).lower().split("x")
+    if len(parts) != 2:
+        return None
+    if parts[0].isdigit() is False or parts[1].isdigit() is False:
+        return None
+    width = int(parts[0])
+    height = int(parts[1])
+    # keep the surface large enough for the menu text and the view
+    if width < 320 or height < 240:
+        return None
+    return (width, height)
+
+#------------------------------------------------------------------------------
 def run():
     '''main function'''
 
@@ -46,9 +64,19 @@ def run():
                         help="Start quick battle immediately: FACTION (civilian, german, soviet), OPTION (number)")
     parser.add_argument('--ai-test', nargs=2, metavar=('FACTION', 'SECONDS'),
                         help="AI testing mode: auto-run quick battle and exit after SECONDS")
+    parser.add_argument('--screen-size', metavar='WxH',
+                        help="Force a window size in pixels, for example 1280x720. "
+                             "Default is auto, sized for a desktop.")
     args = parser.parse_args()
 
-    graphic_engine=Graphics_2D_Pygame(screen_size)
+    chosen_size = screen_size
+    if args.screen_size:
+        chosen_size = parse_screen_size(args.screen_size)
+        if chosen_size is None:
+            print("screen-size must look like 1280x720, and be at least 320x240")
+            return
+
+    graphic_engine=Graphics_2D_Pygame(chosen_size)
     graphic_engine.switch_mode(0)
     if args.quick_battle:
         faction = args.quick_battle[0]

@@ -24,7 +24,8 @@ def create(world, world_coords):
     z.is_gun = True
     z.ai.mechanical_accuracy = 3
     z.ai.magazine = engine.world_builder.spawn_object(world, world_coords, "ppsh41_drum_magazine", False)
-    z.ai.rate_of_fire = 0.048
+    # cyclic rate about 900 rpm
+    z.ai.rate_of_fire = 0.067
     z.ai.reload_speed = 7
     z.ai.range = 1209
     z.ai.type = "submachine gun"

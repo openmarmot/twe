@@ -21,9 +21,7 @@ def create(world, world_coords):
     z.name = "8cm Granatwerfer 34 Mortar System"
     z.is_vehicle = True
     z.is_towable = False
-    turret = engine.world_builder.spawn_object(world, world_coords, "251_2_turret", True)
-    turret.ai.position_offset = [0, 0]
-    turret.ai.rotation_range = [-30, 30]
+    turret = engine.world_builder.spawn_object(world, world_coords, "german_8cm_mortar_turret", True)
     z.ai.turrets.append(turret)
     turret.ai.vehicle = z
 

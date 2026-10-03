@@ -99,12 +99,24 @@ def create(world, world_coords):
     z.rotation_angle = float(random.randint(0, 359))
     for b in range(10):
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "dtm_magazine", False))
+    # T-34-85 basic load was 55: 36 O-365K, 14 AP, 5 BR-365P.
+    # This rack is 57, so the two extra rounds are HE.
+    # The 14 AP were BR-365 or BR-365K from the same quota. Both were issued
+    # in 1944-45, so the quota is split and BR-365 is stocked first.
     z.ai.ammo_rack_capacity = 57
-    for b in range(50):
-        z.ai.ammo_rack.append(
-            engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
-        )
-    for b in range(7):
+    for b in range(8):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365")
+        z.ai.ammo_rack.append(temp)
+    for b in range(6):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365k")
+        z.ai.ammo_rack.append(temp)
+    for b in range(5):
+        temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "BR-365P")
+        z.ai.ammo_rack.append(temp)
+    for b in range(38):
         temp = engine.world_builder.spawn_object(world, world_coords, "85mm_zis_s_53_magazine", False)
         engine.world_builder.load_magazine(world, temp, "O365k")
         z.ai.ammo_rack.append(temp)

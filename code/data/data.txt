@@ -18,9 +18,8 @@ Camo skins share the base squad's chance in the battlegroup generator.
 
 Predefined tactical scenarios for the Scenario menu.
 
-Built-in rows are defined in code/engine/scenario_defs.py and upserted
-into this table on load (matched by name). Extra rows added only in
-sqlite are kept and will also appear in the menu.
+The game only reads this table. Edit rows here; startup does not
+insert or update them. Every row appears in the Scenario menu.
 
 Columns:
   sort_order            menu order

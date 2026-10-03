@@ -51,12 +51,15 @@ def create(world, world_coords):
         z.add_inventory(belt)
 
     z.ai.ammo_rack_capacity = 25
-    # AP
-    for b in range(15):
+    # API-T, a few Pzgr.40 belts, HE
+    for b in range(12):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
         )
-    # HE
+    for b in range(3):
+        temp = engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "20x138_PzGr40")
+        z.ai.ammo_rack.append(temp)
     for b in range(10):
         temp = engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
         engine.world_builder.load_magazine(world, temp, "20x138_HE")
