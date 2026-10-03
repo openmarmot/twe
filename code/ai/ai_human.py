@@ -3417,13 +3417,18 @@ class AIHuman:
             self.prone_state_change()
 
         # -- check for AT targets as a high priority --
-        if self.antitank is not None:
+        # note - vehicle_targets only, and only inside launcher range.
+        # get_target(False, True) falls through to infantry, and the old
+        # journal claimed "AT weapon acquired" on every think even though
+        # the launcher was already equipped.
+        if self.antitank is not None and self.vehicle_targets:
             if self.check_ammo_bool(self.antitank, self.owner):
-                vehicle_target = self.get_target(False, True)
-                if vehicle_target is not None:
-                    self.add_journal_entry(
-                        f"AT weapon acquired, engaging {vehicle_target.name}"
-                    )
+                vehicle_target = self.vehicle_targets[0]
+                distance = engine.math_2d.get_distance(
+                    self.owner.world_coords, vehicle_target.world_coords
+                )
+                if distance < self.antitank.ai.range:
+                    self.vehicle_targets.pop(0)
                     self.switch_task_engage_enemy(vehicle_target)
                     return
 
