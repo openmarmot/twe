@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 --------------------------------
+October 09 2026
+- ai-play can now optionally use decision models. tested with cloudflares clef model
+- ai-play now uses disabled reasoning and faster cycles with the LLM
+
+clef did not end up being useful for this. about a 1 second response vs 2 seconds for deepseek v4 flash vision with reasoning turned off.
+
+--------------------------------
 October 03 2026
 - set per-vehicle turret traverse speeds instead of the shared 20 deg/s default
 - panzer iv g/h/j now use a maybach hl 120 trm on gasoline instead of the v-2 diesel
