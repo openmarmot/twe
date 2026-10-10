@@ -1,6 +1,16 @@
 TWE Project : Change Log
 
 --------------------------------
+October 04 2026
+- 1945 towed Pak 40 chance is 25, and the Sd.Kfz. 10 towed version is 40. 1944 is unchanged
+- towed guns are no longer capped by the rare-vehicle rule. a quick battle buys at most two of one towed gun
+- Soviet ZiS-3 Antitank year chance is 80/70, so the direct-fire gun shows up in a normal quick battle
+- added BR-350B for the F-34 and ZiS-3, and a few Pzgr.40 rounds for the 5 cm, 7.5 cm, and 8.8 cm L/56
+- vehicle penetrations throw plate fragments, and near-miss spall requires plate thick enough to flake
+- APHE bursts inside the compartment after it defeats the plate. the hit log lists each effect
+- hull penetrations hit the crew in that compartment. the engine is only damaged from the end where it is mounted
+
+--------------------------------
 October 03 2026
 - set per-vehicle turret traverse speeds instead of the shared 20 deg/s default
 - panzer iv g/h/j now use a maybach hl 120 trm on gasoline instead of the v-2 diesel

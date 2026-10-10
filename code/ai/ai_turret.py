@@ -155,14 +155,15 @@ class AITurret:
             if spaced_effect == "destabilized":
                 result = "destabilized by spaced armor"
 
+            into_hull = False
+            burst_already = False
             if penetration:
-                event_data.wo_stop()
-                result = self.handle_penetration(
-                    projectile, side, distance, pen_value, armor_value
+                result, into_hull, burst_already = self.handle_penetration(
+                    projectile, side, pen_value, armor_value, result
                 )
             else:
                 result = self.handle_non_penetration(
-                    projectile, pen_value, armor_value, spaced_effect
+                    projectile, side, pen_value, armor_value, spaced_effect, result
                 )
 
             if self.vehicle is not None:
@@ -176,6 +177,13 @@ class AITurret:
                     pen_value,
                     armor_value,
                 )
+            # hull line follows the turret line. a burst already logged above does not repeat.
+            if into_hull and self.vehicle is not None:
+                self.vehicle.ai.projectile_hit_vehicle_body(
+                    projectile, side, relative_angle, burst_already=burst_already
+                )
+            elif penetration:
+                projectile.wo_stop()
 
         elif event_data.is_grenade:
             print("bonk")
@@ -210,13 +218,37 @@ class AITurret:
             print("Error: " + self.owner.name + " cannot handle event " + event)
 
     # ---------------------------------------------------------------------------
-    def handle_spalling_damage(self, projectile):
-        """handle damage from armor spalling due to near-miss penetrations"""
+    def strike_turret_crew(self, projectile):
+        """one pass of a projectile through the crew serving this turret.
 
-        num_fragments = random.randint(1, 3)
+        Each occupied crewman is hit at 50%. Remote mounts have no crew in the
+        fragment path. Returns True when somebody was hit.
+        """
+        if self.vehicle is None or self.remote_operated:
+            return False
+        struck = False
+        for role in self.vehicle.ai.vehicle_crew:
+            if role.role_occupied and role.turret == self.owner:
+                if random.randint(0, 1) == 1:
+                    role.human.ai.handle_event("collision", projectile)
+                    struck = True
+        return struck
 
-        for i in range(num_fragments):
-            if random.randint(0, 2) == 0:
+    # ---------------------------------------------------------------------------
+    def handle_spalling_damage(self, projectile, attempts=None, keep_all=False):
+        """throw armor fragments at the crew serving this turret.
+
+        attempts None is the near-miss roll: 1-3 tries, one in three kept.
+        A perforation passes an attempt count and keep_all, because the plug
+        is already inside. Returns how many fragments were spawned.
+        """
+        if attempts is None:
+            attempts = random.randint(1, 3)
+            keep_all = False
+
+        spawned = 0
+        for _ in range(attempts):
+            if keep_all or random.randint(0, 2) == 0:
                 shrapnel = engine.world_builder.spawn_object(
                     self.owner.world, self.owner.world_coords, "projectile", False
                 )
@@ -226,12 +258,13 @@ class AITurret:
                 shrapnel.ai.shooter = projectile.ai.shooter
                 shrapnel.ai.weapon = projectile.ai.weapon
 
-                if self.remote_operated is False:
+                if self.remote_operated is False and self.vehicle is not None:
                     for role in self.vehicle.ai.vehicle_crew:
-                        if role.role_occupied:
-                            if role.turret == self.owner:
-                                if random.randint(0, 1) == 1:
-                                    role.human.ai.handle_event("collision", shrapnel)
+                        if role.role_occupied and role.turret == self.owner:
+                            if random.randint(0, 1) == 1:
+                                role.human.ai.handle_event("collision", shrapnel)
+                spawned += 1
+        return spawned
 
     # ---------------------------------------------------------------------------
     def handle_rotate_left(self):
@@ -272,113 +305,117 @@ class AITurret:
         return False
 
     # ---------------------------------------------------------------------------
-    def handle_penetration(self, projectile, side, distance, pen_value, armor_value):
-        """handle projectile penetration of turret armor"""
+    def handle_penetration(self, projectile, side, pen_value, armor_value, result):
+        """handle projectile penetration of turret armor.
 
-        projectile_diameter = engine.penetration_calculator.projectile_data[
-            projectile.ai.projectile_type
-        ]["diameter"]
+        The crew in this turret are hit by the penetrator, or by the shell
+        burst if it is APHE. Hardware damage is additional. A large overmatch
+        can continue down into the hull. Returns (result, into_hull, burst_already).
+        The caller logs this hit before applying the hull follow-through.
+        """
+        thickness = self.turret_armor[side][0]
+        diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        overmatch = engine.penetration_calculator.overmatch_ratio(pen_value, armor_value)
+        internal = (
+            thickness >= 1
+            and self.remote_operated is False
+            and engine.penetration_calculator.is_internal_burst(projectile)
+        )
+        join = engine.penetration_calculator.join_hit_result
 
-        result = ""
-        damage_options = ["turret track"]
+        attempts = engine.penetration_calculator.perforation_fragment_attempts(
+            thickness, diameter, pen_value, armor_value
+        )
+        if attempts > 0:
+            count = self.handle_spalling_damage(projectile, attempts, True)
+            result = join(result, f"spall x{count}")
 
-        if self.remote_operated is False:
-            damage_options.append("gunner hit")
-
-        if self.primary_weapon:
-            damage_options.append("primary weapon")
-        if self.coaxial_weapon:
-            damage_options.append("coaxial weapon")
-
-        if self.vehicle:
-            if self.vehicle_mount_side != "top":
-                damage_options.append("penetration into vehicle")
-
-            if len(self.vehicle.ai.ammo_rack) > 0 and self.remote_operated is False:
-                damage_options.append("ammo_rack")
-
-        result = random.choice(damage_options)
-
-        if result == "turret track":
-            self.turret_jammed = True
-            if self.primary_turret and self.vehicle:
-                self.vehicle.ai.vehicle_disabled = True
-        elif result == "primary weapon":
-            if self.primary_weapon:
-                if projectile_diameter > 20:
-                    self.primary_weapon.ai.damaged = True
-                else:
-                    if random.randint(0, 1) == 1:
-                        if self.primary_weapon.ai.action_jammed:
-                            self.primary_weapon.ai.damaged = True
-                        else:
-                            self.primary_weapon.ai.action_jammed = True
-                    else:
-                        self.primary_weapon.ai.damaged = True
-
-                if self.primary_turret and self.primary_weapon.ai.damaged:
-                    if self.vehicle and self.vehicle.ai.is_transport is False:
-                        self.vehicle.ai.vehicle_disabled = True
-                
-                if projectile_diameter>40:
-                    # penetrate through and hit gunner
-                    for role in self.vehicle.ai.vehicle_crew:
-                        if role.role_occupied and role.turret == self.owner:
-                            role.human.ai.handle_event("collision", projectile)
-
-        elif result == "coaxial weapon":
-            if self.coaxial_weapon:
-                if projectile_diameter > 10:
-                    self.coaxial_weapon.ai.damaged = True
-                else:
-                    if random.randint(0, 1) == 1:
-                        if self.coaxial_weapon.ai.action_jammed:
-                            self.coaxial_weapon.ai.damaged = True
-                        else:
-                            self.coaxial_weapon.ai.action_jammed = True
-                    else:
-                        self.coaxial_weapon.ai.damaged = True
-                
-                if projectile_diameter>40:
-                    # penetrate through and hit gunner
-                    for role in self.vehicle.ai.vehicle_crew:
-                        if role.role_occupied and role.turret == self.owner:
-                            role.human.ai.handle_event("collision", projectile)
-
-        elif result == "gunner hit":
-            for role in self.vehicle.ai.vehicle_crew:
-                if role.role_occupied and role.turret == self.owner:
-                    role.human.ai.handle_event("collision", projectile)
-
-        elif result == "penetration into vehicle":
-            extra_damage_options = [
-                "random_crew_projectile",
-                "random_crew_fire",
-                "engine",
-            ]
-            extra_damage = random.choice(extra_damage_options)
-            result += f": {extra_damage}"
-            self.vehicle.ai.handle_component_damage(extra_damage, projectile)
-            
-        elif result == "ammo_rack":
-            self.vehicle.ai.handle_component_damage("ammo_rack", projectile)
-
+        if thickness < 1:
+            # no plate and no fuze. half the time the shot misses the crew entirely.
+            if self.remote_operated or self.vehicle is None:
+                result = join(result, "sailed through")
+            elif random.randint(0, 1) == 0:
+                result = join(result, "sailed through")
+            elif self.strike_turret_crew(projectile):
+                result = join(result, "crew")
+            else:
+                result = join(result, "crew missed")
+        elif internal:
+            struck = self.strike_turret_crew(projectile)
+            struck = self.strike_turret_crew(projectile) or struck
+            result = join(result, "internal burst")
+            if struck is False:
+                result = join(result, "crew missed")
+        elif self.remote_operated or self.vehicle is None:
+            pass
+        elif self.strike_turret_crew(projectile):
+            result = join(result, "crew")
         else:
-            engine.log.add_data(
-                "error", f"ai_turret.handle_penetration unknown result: {result}", True
-            )
+            result = join(result, "crew missed")
 
-        return result
+        if diameter > 20 and self.primary_weapon:
+            self.primary_weapon.ai.damaged = True
+            if (
+                self.primary_turret
+                and self.vehicle is not None
+                and self.vehicle.ai.is_transport is False
+            ):
+                self.vehicle.ai.vehicle_disabled = True
+            result = join(result, "primary weapon")
+        if diameter > 20 and self.coaxial_weapon:
+            self.coaxial_weapon.ai.damaged = True
+            result = join(result, "coaxial weapon")
+
+        # a marginal perforation fouls the traverse. a gross overmatch punches a hole and moves on.
+        if overmatch < 2 and random.randint(0, 1) == 0:
+            self.turret_jammed = True
+            if (
+                self.primary_turret
+                and self.vehicle is not None
+                and self.vehicle.ai.is_transport is False
+            ):
+                self.vehicle.ai.vehicle_disabled = True
+            result = join(result, "traverse jammed")
+
+        if (
+            self.vehicle is not None
+            and self.remote_operated is False
+            and self.vehicle.ai.roll_ammo_detonation(
+                projectile, len(self.vehicle.ai.ammo_rack) > 0, internal
+            )
+        ):
+            result = join(result, "ammo rack")
+
+        into_hull = (
+            overmatch >= 2
+            and self.vehicle is not None
+            and random.randint(0, 1) == 0
+        )
+        if into_hull:
+            result = join(result, "continued into hull")
+
+        if result == "":
+            result = "penetration"
+        return result, into_hull, internal
 
     # ---------------------------------------------------------------------------
-    def handle_non_penetration(self, projectile, pen_value, armor_value, spaced_effect):
+    def handle_non_penetration(
+        self, projectile, side, pen_value, armor_value, spaced_effect, result
+    ):
         """handle projectile that does not penetrate turret armor"""
 
-        result = ""
-        if pen_value >= armor_value * 0.9 and spaced_effect != "destabilized":
-            self.handle_spalling_damage(projectile)
-            result = "spalling"
-        else:
+        thickness = self.turret_armor[side][0]
+        diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        join = engine.penetration_calculator.join_hit_result
+        # near the ballistic limit, thick plate can scab with the shot still outside
+        if (
+            pen_value >= armor_value * 0.9
+            and spaced_effect != "destabilized"
+            and engine.penetration_calculator.plate_throws_fragments(thickness, diameter)
+        ):
+            count = self.handle_spalling_damage(projectile)
+            result = join(result, f"spalling x{count}")
+        elif self.vehicle is not None:
             self.vehicle.ai.projectile_bounce(projectile)
 
         return result

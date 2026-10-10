@@ -84,6 +84,10 @@ class AIVehicle:
         # array of engine objects
         self.engines = []
 
+        # nose-mounted engine. a front plate perforation can reach it.
+        # tanks and rear-engine armored cars leave this False.
+        self.engine_at_front = False
+
         # array of fuel tank objects
         self.fuel_tanks = []
 
@@ -563,6 +567,8 @@ class AIVehicle:
                 engine.world_builder.spawn_explosion_and_fire(
                     self.owner.world, self.owner.world_coords, 10, 30
                 )
+                return True
+            return False
         elif damaged_component == "miraculously unharmed":
             pass
         elif damaged_component == "fuel_tank":
@@ -690,13 +696,78 @@ class AIVehicle:
                 self.handle_component_damage("random_crew_fire", None)
 
     # ---------------------------------------------------------------------------
-    def handle_spalling_damage(self, compartment, projectile):
-        """handle damage from armor spalling due to near-miss penetrations"""
+    def handle_internal_burst(self, projectile):
+        """APHE shell body breaks up after the plate is defeated.
 
-        num_fragments = random.randint(1, 3)
+        Two applications of the shell itself. This replaces the intact-shell
+        crew hit. Plate fragments are applied separately.
+        """
+        self.handle_component_damage("random_crew_projectile", projectile)
+        self.handle_component_damage("random_crew_projectile", projectile)
 
-        for i in range(num_fragments):
-            if random.randint(0, 2) == 0:
+    # ---------------------------------------------------------------------------
+    def roll_ammo_detonation(self, projectile, has_racks, internal_burst):
+        """chance the round finds stowed ammunition.
+
+        A burst fills the compartment, so the rack is more likely to be in
+        the fragment cone than it is for a single intact shot.
+        Returns True when a stowed round actually cooks off.
+        """
+        if has_racks is False:
+            return False
+        # 1 in 2 after a burst, 1 in 3 for intact shot
+        if internal_burst:
+            chance = 2
+        else:
+            chance = 3
+        if random.randint(1, chance) != 1:
+            return False
+        return self.handle_component_damage("ammo_rack", projectile) is True
+
+    # ---------------------------------------------------------------------------
+    def hull_machinery_hit(self, side, projectile):
+        """one extra component behind the hull plate that was defeated.
+
+        The engine is only on the end of the vehicle where it is mounted.
+        Fuel sits at the rear and along the sides. Returns the hit-log phrase.
+        """
+        engine_this_end = False
+        if side == "front" and self.engine_at_front:
+            engine_this_end = True
+        elif side == "rear" and self.engine_at_front is False:
+            engine_this_end = True
+
+        candidates = []
+        if engine_this_end and len(self.engines) > 0:
+            candidates.append("engine")
+        if side in ("left", "right", "rear") and len(self.fuel_tanks) > 0:
+            candidates.append("fuel_tank")
+        if len(candidates) == 0:
+            return ""
+        # the component fills part of that face, not the whole plate
+        if random.randint(0, 1) == 0:
+            return ""
+        choice = random.choice(candidates)
+        self.handle_component_damage(choice, projectile)
+        if choice == "engine":
+            return "engine"
+        return "fuel tank"
+
+    # ---------------------------------------------------------------------------
+    def handle_spalling_damage(self, compartment, projectile, attempts=None, keep_all=False):
+        """throw armor fragments into the compartment.
+
+        attempts None is the near-miss roll: 1-3 tries, one in three kept.
+        A perforation passes an attempt count and keep_all, because the plug
+        is already inside. Returns how many fragments were spawned.
+        """
+        if attempts is None:
+            attempts = random.randint(1, 3)
+            keep_all = False
+
+        spawned = 0
+        for _ in range(attempts):
+            if keep_all or random.randint(0, 2) == 0:
                 shrapnel = engine.world_builder.spawn_object(
                     self.owner.world, self.owner.world_coords, "projectile", False
                 )
@@ -708,9 +779,10 @@ class AIVehicle:
 
                 if compartment == "passenger_compartment":
                     self.handle_component_damage("random_crew_projectile", shrapnel)
-
                 else:  # vehicle_body
                     self.handle_component_damage("driver_projectile", shrapnel)
+                spawned += 1
+        return spawned
 
     # ---------------------------------------------------------------------------
     def handle_rudder_left(self):
@@ -923,12 +995,13 @@ class AIVehicle:
         distance = engine.math_2d.get_distance(
             self.owner.world_coords, projectile.ai.starting_coords
         )
+        plate = self.passenger_compartment_armor[side]
         penetration, pen_value, armor_value, spaced_effect = (
             engine.penetration_calculator.calculate_penetration(
                 projectile,
                 distance,
                 "steel",
-                self.passenger_compartment_armor[side],
+                plate,
                 side,
                 relative_angle,
             )
@@ -938,42 +1011,57 @@ class AIVehicle:
         if spaced_effect == "destabilized":
             result = "destabilized by spaced armor"
 
+        thickness = plate[0]
+        diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        overmatch = engine.penetration_calculator.overmatch_ratio(pen_value, armor_value)
+        internal = (
+            thickness >= 1
+            and engine.penetration_calculator.is_internal_burst(projectile)
+        )
+        join = engine.penetration_calculator.join_hit_result
+
         if penetration:
-            damage_options = ["random_crew_projectile"]
-
-            if self.fuel_leak:
-                damage_options.append("random_crew_fire")
-
-            # no armor also means no spalling
-            # chance for bullets to just sail through without hitting
-            if self.passenger_compartment_armor["left"][0] < 1:
-                damage_options.append("miraculously unharmed")
-
-            if self.passenger_compartment_ammo_racks:
-                damage_options.append("ammo_rack")
-
-            # cramped crew compartment greatly increases chance of crew damage
-            if self.cramped_crew_compartment:
-                # double the weight for crew damage options
-                damage_options.append("random_crew_projectile")
-                if self.fuel_leak:
-                    damage_options.append("random_crew_fire")
-                    damage_options.append("random_crew_fire")
+            # no plate: the shot may pass through empty volume, and a base
+            # fuze is not started by canvas
+            if thickness < 1:
                 if random.randint(0, 1) == 0:
-                    damage_options.append("all_crew")
-
-                # extra damage
-                if random.randint(0, 2) == 2:
-                    self.handle_component_damage(
-                        random.choice(damage_options), projectile
+                    self.handle_component_damage("random_crew_projectile", projectile)
+                    result = join(result, "crew")
+                else:
+                    result = join(result, "sailed through")
+            else:
+                attempts = engine.penetration_calculator.perforation_fragment_attempts(
+                    thickness, diameter, pen_value, armor_value
+                )
+                if attempts > 0:
+                    count = self.handle_spalling_damage(
+                        "passenger_compartment", projectile, attempts, True
                     )
+                    result = join(result, f"spall x{count}")
+                if internal:
+                    self.handle_internal_burst(projectile)
+                    result = join(result, "internal burst")
+                else:
+                    self.handle_component_damage("random_crew_projectile", projectile)
+                    result = join(result, "crew")
+                if self.cramped_crew_compartment:
+                    self.handle_component_damage("random_crew_projectile", projectile)
+                    result = join(result, "cramped compartment")
+                if self.fuel_leak and random.randint(0, 1) == 0:
+                    self.handle_component_damage("random_crew_fire", projectile)
+                    result = join(result, "crew fire")
+                has_racks = (
+                    self.passenger_compartment_ammo_racks and len(self.ammo_rack) > 0
+                )
+                if self.roll_ammo_detonation(projectile, has_racks, internal):
+                    result = join(result, "ammo rack")
 
-            result = random.choice(damage_options)
-            self.handle_component_damage(result, projectile)
-
-            # chance to richochet into the body
-            if random.randint(0, 3) == 3:
-                self.projectile_hit_vehicle_body(projectile, side, relative_angle)
+            # a large overmatch still has speed after the first plate.
+            # a shell that already burst does not burst again; the residual is inert.
+            # log this plate first so the follow-on hull line reads after it.
+            continued = overmatch >= 2 and random.randint(0, 1) == 0
+            if continued:
+                result = join(result, "continued into hull")
             else:
                 projectile.wo_stop()
 
@@ -987,13 +1075,22 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
+            if continued:
+                self.projectile_hit_vehicle_body(
+                    projectile, side, relative_angle, burst_already=internal
+                )
 
         else:
-            # check for partial penetration causing spalling
-            # destabilized rounds lack coherent energy for spalling
-            if pen_value >= armor_value * 0.9 and spaced_effect != "destabilized":
-                self.handle_spalling_damage("passenger_compartment", projectile)
-                result = "spalling"
+            # near the ballistic limit, thick plate can scab with the shot still outside
+            if (
+                pen_value >= armor_value * 0.9
+                and spaced_effect != "destabilized"
+                and engine.penetration_calculator.plate_throws_fragments(
+                    thickness, diameter
+                )
+            ):
+                count = self.handle_spalling_damage("passenger_compartment", projectile)
+                result = join(result, f"spalling x{count}")
             self.add_hit_data(
                 projectile,
                 penetration,
@@ -1007,8 +1104,14 @@ class AIVehicle:
             self.projectile_bounce(projectile)
 
     # ---------------------------------------------------------------------------
-    def projectile_hit_vehicle_body(self, projectile, side, relative_angle, armor_override=None):
-        """handle a projectile hit to the vehicle body"""
+    def projectile_hit_vehicle_body(
+        self, projectile, side, relative_angle, armor_override=None, burst_already=False
+    ):
+        """handle a projectile hit to the vehicle body.
+
+        burst_already is set when an APHE shell already broke up in the
+        compartment it first defeated, so the residual does not burst again.
+        """
         distance = engine.math_2d.get_distance(
             self.owner.world_coords, projectile.ai.starting_coords
         )
@@ -1030,13 +1133,37 @@ class AIVehicle:
         if spaced_effect == "destabilized":
             result = "destabilized by spaced armor"
 
+        # the plate that can flake is the hull plate, not a wheel stacked on it
+        thickness = self.vehicle_armor[side][0]
+        diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        internal = (
+            thickness >= 1
+            and burst_already is False
+            and engine.penetration_calculator.is_internal_burst(projectile)
+        )
+        join = engine.penetration_calculator.join_hit_result
+
         if penetration:
             projectile.wo_stop()
-            damage_options = ["driver_projectile", "engine", "ammo_rack"]
-            if len(self.fuel_tanks) > 0:
-                damage_options.append("fuel_tank")
-            result = random.choice(damage_options)
-            self.handle_component_damage(result, projectile)
+            attempts = engine.penetration_calculator.perforation_fragment_attempts(
+                thickness, diameter, pen_value, armor_value
+            )
+            if attempts > 0:
+                count = self.handle_spalling_damage(
+                    "vehicle_body", projectile, attempts, True
+                )
+                result = join(result, f"spall x{count}")
+            if internal:
+                self.handle_internal_burst(projectile)
+                result = join(result, "internal burst")
+            else:
+                self.handle_component_damage("driver_projectile", projectile)
+                result = join(result, "driver")
+            if self.roll_ammo_detonation(
+                projectile, len(self.ammo_rack) > 0, internal
+            ):
+                result = join(result, "ammo rack")
+            result = join(result, self.hull_machinery_hit(side, projectile))
 
             self.add_hit_data(
                 projectile,
@@ -1050,11 +1177,16 @@ class AIVehicle:
             )
 
         else:
-            # check for partial penetration causing spalling
-            # destabilized rounds lack coherent energy for spalling
-            if pen_value >= armor_value * 0.9 and spaced_effect != "destabilized":
-                self.handle_spalling_damage("vehicle_body", projectile)
-                result = "spalling"
+            # near the ballistic limit, thick plate can scab with the shot still outside
+            if (
+                pen_value >= armor_value * 0.9
+                and spaced_effect != "destabilized"
+                and engine.penetration_calculator.plate_throws_fragments(
+                    thickness, diameter
+                )
+            ):
+                count = self.handle_spalling_damage("vehicle_body", projectile)
+                result = join(result, f"spalling x{count}")
             self.add_hit_data(
                 projectile,
                 penetration,

@@ -15,7 +15,9 @@ slot cost so leftover points cannot buy hundreds of rifle squads.
 # import built in modules
 import random
 
-# squad types that should not clone when rare
+# vehicles that stay at one copy when their year chance is under 50.
+# a towed gun is not one of these: the chance roll already decides whether
+# the battery is available, and the gun limit below caps how many are bought.
 vehicle_squad_types = [
     "tank",
     "antitank_vehicle",
@@ -24,9 +26,14 @@ vehicle_squad_types = [
     "recon",
     "utility",
     "air",
+]
+
+# one name of towed gun per battle, past this, is the same carriage repeated
+towed_gun_types = [
     "towed_antitank",
     "towed_antiair",
 ]
+towed_gun_limit = 2
 
 gun_squad_types = [
     "towed_antitank",
@@ -232,10 +239,15 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
             return False
         if cat_spent[cat_name] + acct > cat_budget[cat_name]:
             return False
+        already = count_related_squads(battlegroup, squad_name, camo_groups)
+        if unit_type in towed_gun_types and already >= towed_gun_limit:
+            return False
+        # a scarce tank or armored vehicle is bought once. the year chance
+        # already kept it out of most battles.
         if (
             unit_chance < 50
             and unit_type in vehicle_squad_types
-            and count_related_squads(battlegroup, squad_name, camo_groups) >= 1
+            and already >= 1
         ):
             return False
         base = squad_name
@@ -275,7 +287,7 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
                 unit_cost = cat_dict[random_key]["cost"]
                 unit_chance = cat_dict[random_key].get(year_chance_key, 0)
                 unit_type = cat_dict[random_key].get("type", "")
-                # rare vehicles (year chance < 50) are bought one at a time
+                # scarce armored vehicles are bought one at a time
                 if (
                     unit_chance < 50
                     and unit_type in vehicle_squad_types

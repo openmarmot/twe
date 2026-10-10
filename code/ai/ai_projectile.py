@@ -77,7 +77,7 @@ class AIProjectile():
 
         self.flightTime+=time_passed
         if(self.flightTime>self.maxTime):
-            if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
+            if engine.penetration_calculator.bursts_on_contact(self.projectile_type):
                 self.contact_effect()
             else:
                 engine.world_builder.spawn_object(self.owner.world,self.owner.world_coords,'dirt',True)
@@ -103,8 +103,10 @@ class AIProjectile():
                     if self.weapon.is_gun:
                         self.weapon.ai.rounds_hit+=1
 
-                    if engine.penetration_calculator.projectile_data[self.projectile_type]['contact_effect']!='none':
-                        # bullet has collided and exploded
+                    if engine.penetration_calculator.bursts_on_contact(self.projectile_type):
+                        # bullet has collided and exploded on the surface.
+                        # APHE (internal_burst) is handed to the target so the
+                        # fuze can run after a perforation.
                         self.contact_effect()
                     else:
                         # tell the object that there has been a collision

@@ -97,10 +97,15 @@ def create(world, world_coords):
     for b in range(10):
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "dtm_magazine", False))
     z.ai.ammo_rack_capacity = 77
-    for b in range(60):
+    # BR-350B is the usual APHE. 76x385_AP is the solid BR-350SP substitute.
+    for b in range(48):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
         )
+    for b in range(12):
+        temp = engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "76x385_AP")
+        z.ai.ammo_rack.append(temp)
     for b in range(17):
         temp = engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
         engine.world_builder.load_magazine(world, temp, "OF-350M")
