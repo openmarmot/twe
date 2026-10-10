@@ -113,7 +113,7 @@ class AIHuman:
         # objects that are large_human_pickup. only one at a time
         self.large_pickup = None
 
-        # -- skills --
+        # -- skills and attributes--
         self.is_pilot = False
         self.is_expert_marksman = False
         self.is_afv_trained = False  # afv=armored fighting vehicle
@@ -121,6 +121,7 @@ class AIHuman:
         self.is_mechanic = False
         self.is_small_arms_trained = False  # this is true for soldiers. determines if they will pick up a gun with no enemy
         self.is_civilian = False
+        self.is_wearing_camo = False # used by waffen ss at the moment
         # used by calculate_engagement. lower is better
         self.armor_knowledge = 0.3
         # -- stats --
@@ -548,11 +549,33 @@ class AIHuman:
         )
 
     # ---------------------------------------------------------------------------
-    def terrain_hides_human(self, target, vegetation_hides):
+    def wearing_camo_still(self):
+        """True when this human's smock conceals them in vegetation.
+
+        Holding still qualifies. Walking, a step in the last half second
+        (player WASD stamps the noise time every frame), and being indoors
+        do not. A recent shot is handled by the caller.
+        """
+        if self.is_wearing_camo is False:
+            return False
+        if self.in_building:
+            return False
+        if self.memory["current_task"] == "task_move_to_location":
+            return False
+        # half a second, not the 30s noise flag. a halt gets the smock back
+        if self.recent_noise_or_move:
+            if self.owner.world.world_seconds - self.last_noise_or_move_time < 0.5:
+                return False
+        return True
+
+    # ---------------------------------------------------------------------------
+    def terrain_hides_human(self, target, vegetation_hides, allow_camo=True):
         """True when this human is concealed by the terrain under them.
 
         0 open and 3 road do not conceal. 2 tree does. 1 vegetation does
         when vegetation_hides is set. A recent shot cancels the concealment.
+        A still human in a camo smock is also concealed by vegetation, unless
+        allow_camo is false.
         """
         if target.is_human is False:
             return False
@@ -561,7 +584,9 @@ class AIHuman:
         terrain = target.ai.terrain
         if terrain == 2:
             return True
-        if vegetation_hides and terrain == 1:
+        if terrain == 1 and vegetation_hides:
+            return True
+        if terrain == 1 and allow_camo and target.ai.wearing_camo_still():
             return True
         return False
 
@@ -572,7 +597,8 @@ class AIHuman:
             # close enough that terrain does not matter
             return True
         if distance < 800:
-            # trees hide a human who has not fired recently
+            # trees hide a human who has not fired recently.
+            # a still camo soldier is also hidden in vegetation
             if self.terrain_hides_human(target, False):
                 return False
             # humans see everything else at this range
@@ -595,7 +621,8 @@ class AIHuman:
                 # buildings hide completely at this range
                 if target.ai.in_building:
                     return False
-                # a shot gives away a human in the trees. walking does not
+                # a shot gives away a human in the trees. walking does not.
+                # a still camo soldier in vegetation is hidden like the trees
                 if target.ai.recently_fired():
                     return True
                 if self.terrain_hides_human(target, False):
@@ -617,8 +644,9 @@ class AIHuman:
         if distance < 200:
             return True
         if distance < 400:
-            # trees hide a human who has not fired recently
-            if self.terrain_hides_human(target, False):
+            # trees hide a human who has not fired recently.
+            # camo does not: a vehicle still resolves infantry inside 400
+            if self.terrain_hides_human(target, False, allow_camo=False):
                 return False
             return True
         if distance < 800:
@@ -652,7 +680,8 @@ class AIHuman:
             if target.is_human:
                 if target.ai.in_building or target.ai.prone:
                     return False
-                # a shot gives away a human in the trees. walking does not
+                # a shot gives away a human in the trees. walking does not.
+                # a still camo soldier in vegetation is hidden like the trees
                 if target.ai.recently_fired():
                     return True
                 if self.terrain_hides_human(target, False):

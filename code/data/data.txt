@@ -36,3 +36,23 @@ Columns:
 
 The fixed squad list is the core force. random_points buys a small
 random attachment so replays of the same scenario are not identical.
+
+# names table
+
+Male first and last names. name_gen pairs every first with every last
+for that ethnicity at startup.
+
+ethnicity: german, soviet, polish.
+Civilians use polish.
+name_type: first or last.
+
+The name column is unique across the whole table. The same spelling
+cannot be stored twice, even for a different ethnicity or name_type.
+Local spellings are how shared names stay distinct (Karl / Karol,
+Josef / Józef, Alexander / Aleksander / Aleksandr).
+
+German names are the 1910-1925 male cohort, including Austrian
+surname spellings (Mayer, Huber, Gruber). Soviet is Russian
+transliteration, with Ukrainian surnames and a smaller share of
+other Red Army surnames in the same pool. Polish is the civilian
+pool for the eastern-front maps.

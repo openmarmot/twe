@@ -1,0 +1,18 @@
+"""
+german_waffen_ss_mp35_panzerschreck object definition
+
+repo : https://github.com/openmarmot/twe
+"""
+
+# import custom packages
+import engine.world_builder
+from engine.object_registry import register_object
+
+
+@register_object("german_waffen_ss_mp35_panzerschreck")
+def create(world, world_coords):
+    z = engine.world_builder.spawn_object(world, world_coords, "german_waffen_ss_soldier", False)
+    engine.world_builder.add_standard_loadout(z, world, "standard_german_gear")
+    engine.world_builder.add_standard_loadout(z, world, "panzerschreck")
+    engine.world_builder.add_standard_loadout(z, world, "mp35")
+    return z

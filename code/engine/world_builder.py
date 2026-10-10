@@ -187,6 +187,9 @@ list_guns = [
     "mp40",
     "mg34",
     "mg42",
+    "mg26t",
+    "mp35",
+    "stg44-zf4",
     "mosin_nagant",
     "mosin_nagant-sniper",
     "pps43",
@@ -212,7 +215,7 @@ list_guns = [
     "nagant_m1895",
 ]
 list_guns_common = ["kar98k", "mosin_nagant", "pps43", "ppsh41", "tt33", "svt40"]
-list_guns_rare = ["mp40", "ppk", "stg44", "mg34", "dp28", "k43", "g41w", "c96", "kar98k-zf41", "vg1_5", "mp3008"]
+list_guns_rare = ["mp40", "mp35", "ppk", "stg44", "mg34", "mg26t", "dp28", "k43", "g41w", "c96", "kar98k-zf41", "vg1_5", "mp3008"]
 list_guns_ultra_rare = [
     "fg42-type1",
     "fg42-type2",
@@ -220,6 +223,7 @@ list_guns_ultra_rare = [
     "kar98k-sniper",
     "k43-sniper",
     "mosin_nagant-sniper",
+    "stg44-zf4",
     "1911",
     "mg15",
     "c96_red_9",
@@ -249,9 +253,9 @@ list_guns_rifles = [
     "svt40",
     "svt40-sniper",
 ]
-list_guns_smg = ["mp40", "mp3008", "pps43", "ppsh41"]
-list_guns_assault_rifles = ["stg44"]
-list_guns_machine_guns = ["mg34", "mg42", "dp28", "mg15", "fg42-type1", "fg42-type2"]
+list_guns_smg = ["mp40", "mp35", "mp3008", "pps43", "ppsh41"]
+list_guns_assault_rifles = ["stg44", "stg44-zf4"]
+list_guns_machine_guns = ["mg34", "mg42", "mg26t", "dp28", "mg15", "fg42-type1", "fg42-type2"]
 list_guns_pistols = [
     "1911",
     "ppk",
@@ -343,6 +347,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "mg42", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "mg34_drum_magazine", False))
+    elif loadout == "mg26t":
+        wo.add_inventory(spawn_object(world, [0, 0], "mg26t", False))
+        for _ in range(8):
+            wo.add_inventory(spawn_object(world, [0, 0], "mg26t_magazine", False))
     elif loadout == "mosin_nagant":
         wo.add_inventory(spawn_object(world, [0, 0], "mosin_nagant", False))
         for _ in range(12):
@@ -351,6 +359,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "mp40", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "mp40_magazine", False))
+    elif loadout == "mp35":
+        wo.add_inventory(spawn_object(world, [0, 0], "mp35", False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world, [0, 0], "mp35_magazine", False))
     elif loadout == "panzerschreck":
         wo.add_inventory(spawn_object(world, [0, 0], "panzerschreck", False))
         for _ in range(6):
