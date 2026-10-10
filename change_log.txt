@@ -4,6 +4,8 @@ TWE Project : Change Log
 October 09 2026
 - ai-play can now optionally use decision models. tested with cloudflares clef model
 - ai-play now uses disabled reasoning and faster cycles with the LLM
+- a small turret miss hits the plate that mount sits on. a top mount misses into the passenger plate on the side the shot came from, not the lower hull
+- StuG III Ausf. G gun shield is the late Topfblende: 80 mm at 0° instead of the 50 mm box face. no stored slope
 
 clef did not end up being useful for this. about a 1 second response vs 2 seconds for deepseek v4 flash vision with reasoning turned off.
 

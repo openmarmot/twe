@@ -967,14 +967,26 @@ class AIVehicle:
             self.projectile_hit_wheel(projectile, hit_side, relative_angle)
         elif area_hit == "turret":
             turret = random.choice(possible_turrets)
-            # small gives a 50% chance to miss and hit the vehicle body instead
+            # small gives a 50% chance to miss the mount and strike the plate it sits on.
+            # a top mount sits on the passenger compartment, on the side the shot came from.
+            # a side mount sits on the vehicle body of its vehicle_mount_side.
             if turret.ai.small:
                 if random.randint(0, 1) == 1:
                     turret.ai.handle_event("collision", projectile)
                 else:
-                    self.projectile_hit_vehicle_body(
-                        projectile, hit_side, relative_angle
-                    )
+                    mount_side = turret.ai.vehicle_mount_side
+                    if mount_side == "top":
+                        self.projectile_hit_passenger_compartment(
+                            projectile, hit_side, relative_angle
+                        )
+                    elif mount_side in ("front", "rear", "left", "right", "bottom"):
+                        self.projectile_hit_vehicle_body(
+                            projectile, mount_side, relative_angle
+                        )
+                    else:
+                        self.projectile_hit_vehicle_body(
+                            projectile, hit_side, relative_angle
+                        )
             else:
                 turret.ai.handle_event("collision", projectile)
         else:
