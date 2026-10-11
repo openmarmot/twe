@@ -25,6 +25,7 @@ from ai.ai_human_vehicle import AIHumanVehicle
 from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 from ai.ai_human_radio_operator import AIHumanRadioOperator
 from ai.ai_human_squad_leader import AIHumanSquadLeader
+from ai.ai_human_command import AIHumanCommand
 from ai.ai_human_trader import AIHumanTrader
 # import engine.global_exchange_rates
 
@@ -38,6 +39,7 @@ class AIHuman:
         self.in_vehicle_ai = AIHumanVehicle(self.owner)
         self.radio_operator_ai = AIHumanRadioOperator(self.owner)
         self.squad_leader_ai = AIHumanSquadLeader(self.owner)
+        self.command_ai = AIHumanCommand(self.owner)
         self.trader_ai = AIHumanTrader(self.owner)
 
         self.task_map = {
@@ -51,6 +53,7 @@ class AIHuman:
             "task_think": self.update_task_think,
             "task_think_idle": self.update_task_think_idle,
             "task_squad_leader": self.squad_leader_ai.update_task_squad_leader,
+            "task_command": self.command_ai.update_task_command,
             "task_loot_container": self.update_task_loot_container,
             "task_sit_down": self.update_task_sit_down,
             "task_medic": self.update_task_medic,
@@ -119,6 +122,8 @@ class AIHuman:
         self.is_afv_trained = False  # afv=armored fighting vehicle
         self.is_medic = False
         self.is_mechanic = False
+        # leads a command group. the squad is marked from this flag at creation
+        self.is_field_commander = False
         self.is_small_arms_trained = False  # this is true for soldiers. determines if they will pick up a gun with no enemy
         self.is_civilian = False
         self.is_wearing_camo = False # used by waffen ss at the moment
@@ -2049,6 +2054,53 @@ class AIHuman:
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
+    def give_squad_order(self, order):
+        """write a tactical order onto this squad leader.
+
+        a vehicle crew keeps its current task and reads the order when it
+        has no vehicle order. a soldier who is fighting, treating, or
+        fixing keeps that task and picks the order up afterward.
+        """
+
+        task_name = "task_squad_leader"
+        if task_name not in self.memory:
+            self.memory[task_name] = {
+                "last_think_time": 0,
+                "think_interval": 0,
+                "orders": [],
+            }
+        self.memory[task_name]["orders"] = [order]
+        # review the new order on the next squad-leader think
+        self.memory[task_name]["last_think_time"] = 0
+        self.memory[task_name]["think_interval"] = 0
+
+        if self.in_vehicle():
+            return
+        current = self.memory.get("current_task")
+        if current in (
+            "task_engage_enemy",
+            "task_player_control",
+            "task_medic",
+            "task_mechanic",
+        ):
+            return
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
+    def switch_task_command(self):
+        """switch to the command group task"""
+
+        task_name = "task_command"
+        if task_name not in self.memory:
+            # last_think_time in the past so the first think assigns immediately
+            self.memory[task_name] = {
+                "last_think_time": -100,
+                "think_interval": 0,
+                "hold_coords": None,
+            }
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
     def switch_task_squad_leader(self, order):
         """switch task"""
         # order - a TacticalOrder object. can be none
@@ -3573,12 +3625,16 @@ class AIHuman:
             return
 
         # -- squad stuff (lower importance)--
-        # could maybe have some logic to this if i ever add ranks
         if self.squad.squad_leader is None:
             self.squad.squad_leader = self.owner
 
         if self.squad.squad_leader == self.owner:
-            self.switch_task_squad_leader(None)
+            # only the field commander writes orders for other squads.
+            # a replacement squad leader runs the normal squad-leader task.
+            if self.is_field_commander:
+                self.switch_task_command()
+            else:
+                self.switch_task_squad_leader(None)
             return
 
         # being in a squad wwhen we aren't lead basically just means staying close to the squad lead

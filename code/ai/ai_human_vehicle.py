@@ -270,9 +270,11 @@ class AIHumanVehicle:
                 and self.owner.ai.in_vehicle()
                 and not self.owner.ai.is_civilian
             ):
-                # if we don't have a vehicle order, check to see if we can create
-                # one from tactical orders
-                if self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] is None:
+                # a field commander keeps assigning objectives from the vehicle.
+                # everyone else turns a tactical order into a drive order.
+                if self.owner.ai.is_field_commander:
+                    self.owner.ai.command_ai.maybe_think()
+                elif self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] is None:
                     self.owner.ai.squad_leader_ai.review_orders()
 
         else:

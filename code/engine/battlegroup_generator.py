@@ -57,14 +57,17 @@ cheap_slot_types = [
 ]
 
 # share of battlegroup funds each category may spend
+# command is a field commander and his group. the count cap below
+# keeps a side to one group on a small fight and two on a larger one.
 category_share = {
-    "infantry": 0.40,
+    "infantry": 0.38,
     "tanks": 0.26,
     "antitank": 0.12,
     "support_infantry": 0.05,
     "support_vehicle": 0.08,
     "artillery": 0.07,
     "other": 0.02,
+    "command": 0.02,
 }
 
 # ------------------------------------------------------------------------------
@@ -118,6 +121,29 @@ def related_squad_names(squad_name, camo_groups):
     return names
 
 
+def command_squad_limit(funds):
+    """How many command groups one battlegroup purchase may include"""
+
+    if funds < 4000:
+        return 1
+    return 2
+
+
+def count_squads_of_type(battlegroup, squad_data, unit_type):
+    """How many squads of this type are already in the force"""
+
+    count = 0
+    for squad_name in battlegroup:
+        info = squad_data.get(squad_name)
+        if info is None:
+            base = get_camo_base_name(squad_name)
+            if base is not None:
+                info = squad_data.get(base)
+        if info is not None and info.get("type") == unit_type:
+            count += 1
+    return count
+
+
 def count_related_squads(battlegroup, squad_name, camo_groups):
     """How many of this squad (including camo skins) are already in the force"""
 
@@ -150,6 +176,8 @@ def accounting_cost(unit_cost, unit_type, funds):
 def name_share_for_type(unit_type):
     """Max fraction of a category one squad name may consume"""
 
+    if unit_type == "command":
+        return 1
     if unit_type in gun_squad_types:
         return 0.5
     if unit_type == "tank":
@@ -180,6 +208,7 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
     squad_options_support_vehicle = {}
     squad_options_artillery = {}
     squad_options_other = {}
+    squad_options_command = {}
 
     for key, value in squad_data.items():
         if get_camo_base_name(key) in camo_groups:
@@ -214,6 +243,8 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
                 squad_options_support_vehicle[key] = value
             elif value["type"] in ["artillery"]:
                 squad_options_artillery[key] = value
+            elif value["type"] == "command":
+                squad_options_command[key] = value
             elif value["type"] in [
                 "antitank_vehicle",
                 "antitank_infantry",
@@ -242,6 +273,10 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
         already = count_related_squads(battlegroup, squad_name, camo_groups)
         if unit_type in towed_gun_types and already >= towed_gun_limit:
             return False
+        if unit_type == "command":
+            owned = count_squads_of_type(battlegroup, squad_data, "command")
+            if owned >= command_squad_limit(funds):
+                return False
         # a scarce tank or armored vehicle is bought once. the year chance
         # already kept it out of most battles.
         if (
@@ -262,6 +297,7 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
 
     # Define categories with their batch ranges (min, max)
     categories = [
+        (squad_options_command, 1, 1, "command"),
         (squad_options_infantry, 3, 5, "infantry"),
         (squad_options_tanks, 1, 3, "tanks"),
         (squad_options_antitank, 0, 2, "antitank"),
@@ -287,8 +323,12 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
                 unit_cost = cat_dict[random_key]["cost"]
                 unit_chance = cat_dict[random_key].get(year_chance_key, 0)
                 unit_type = cat_dict[random_key].get("type", "")
-                # scarce armored vehicles are bought one at a time
-                if (
+                # buy the command groups first, before other categories spend
+                # the points. the count cap and the command budget still apply.
+                # scarce armored vehicles are bought one at a time.
+                if unit_type == "command":
+                    batch_count = command_squad_limit(funds)
+                elif (
                     unit_chance < 50
                     and unit_type in vehicle_squad_types
                 ):

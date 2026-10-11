@@ -242,6 +242,14 @@ def check_task_sit_down(b, issues, world):
             issues.append(f'{b.name} sit furniture not in world')
 
 #---------------------------------------------------------------------------
+def check_task_command(b, issues, _world):
+    '''sanity for task_command'''
+    task_mem = b.ai.memory.get('task_command', {})
+    for key in ('last_think_time', 'think_interval', 'hold_coords'):
+        if key not in task_mem:
+            issues.append(f'{b.name} missing {key} in task_command memory')
+
+#---------------------------------------------------------------------------
 def check_task_squad_leader(b, issues, _world):
     '''sanity for task_squad_leader (orders are TacticalOrder objects, not world objs)'''
     task_mem = b.ai.memory.get('task_squad_leader', {})
@@ -433,6 +441,7 @@ def run_wo_objects_check(world):
                 'task_reload': check_task_reload,
                 'task_sit_down': check_task_sit_down,
                 'task_squad_leader': check_task_squad_leader,
+                'task_command': check_task_command,
                 'task_think': check_task_think,
                 'task_think_idle': check_task_think_idle,
                 'task_wait': check_task_wait,

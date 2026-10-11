@@ -1235,8 +1235,16 @@ class World_Menu:
                 self.text_queue.append("Marksman")
             if self.selected_object.ai.memory.get("current_task") == "task_trader":
                 self.text_queue.append("Trader")
-            if self.selected_object.ai.squad.squad_leader == self.selected_object:
+            if self.selected_object.ai.is_field_commander:
+                commanded = len(self.selected_object.ai.squad.commanded_squads)
+                self.text_queue.append(f"Field Commander ({commanded} squads)")
+            elif self.selected_object.ai.squad.squad_leader == self.selected_object:
                 self.text_queue.append("Squad Leader")
+            command_squad = self.selected_object.ai.squad.command_squad
+            if command_squad is not None:
+                commander = command_squad.field_commander()
+                if commander is not None:
+                    self.text_queue.append("Orders from " + commander.name)
 
             self.text_queue.append("")
             self.text_queue.append("--- Stats ---")

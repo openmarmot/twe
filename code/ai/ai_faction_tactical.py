@@ -190,9 +190,14 @@ class AIFactionTactical:
                 for c in b:
                     squad.add_to_squad(c)
 
-                # set the initial squad leader
+                # set the initial squad leader. a field commander leads his
+                # own group even when he is not the first member listed
                 if len(squad.members) > 0:
                     squad.squad_leader = squad.members[0]
+                    for member in squad.members:
+                        if member.is_human and member.ai.is_field_commander:
+                            squad.squad_leader = member
+                            break
                 else:
                     # some squads end up vehicle only due to the current squad creation algo.
                     # set the spawn location so the vehicles end up in the right area
@@ -308,6 +313,20 @@ class AIFactionTactical:
         if not reinforcement_squads:
             return
 
+        # a command group stays in the rear instead of marching onto an objective
+        command_squads = [
+            s for s in reinforcement_squads if s.field_commander() is not None
+        ]
+        reinforcement_squads = [
+            s for s in reinforcement_squads if s.field_commander() is None
+        ]
+        if command_squads:
+            self.place_command_squads(
+                command_squads, self.get_reinforcement_spawn_location()
+            )
+        if not reinforcement_squads:
+            return
+
         motorized_squads = [s for s in reinforcement_squads if len(s.vehicles) > 0]
         foot_squads = [s for s in reinforcement_squads if len(s.vehicles) == 0]
         random.shuffle(motorized_squads)
@@ -356,6 +375,9 @@ class AIFactionTactical:
 
         # main force only - reinforcements are handled separately farther back
         main_squads = [s for s in self.squads if not s.is_reinforcement]
+        # command groups are placed at the spawn and hand out objectives later
+        command_squads = [s for s in main_squads if s.field_commander() is not None]
+        main_squads = [s for s in main_squads if s.field_commander() is None]
 
         # Sort all squads by type first
         motorized_squads = [s for s in main_squads if len(s.vehicles) > 0]
@@ -462,6 +484,9 @@ class AIFactionTactical:
                         squad, spawn_location, threat_direction
                     )
 
+        # command groups hold at the spawn. their men follow the field commander
+        self.place_command_squads(command_squads, self.spawn_location)
+
         # --- Reinforcements: far behind spawn, march to world areas ---
         reinforcement_squads = [s for s in self.squads if s.is_reinforcement]
         self.set_reinforcement_orders_and_positions(reinforcement_squads)
@@ -481,6 +506,22 @@ class AIFactionTactical:
         if enemy_spawn:
             return engine.math_2d.get_rotation(from_coords, enemy_spawn)
         return None
+
+    # ---------------------------------------------------------------------------
+    def place_command_squads(self, command_squads, origin):
+        """put command groups on a grid and start their command task"""
+
+        if len(command_squads) == 0:
+            return
+
+        squad_grid = engine.math_2d.get_grid_coords(origin, 250, len(command_squads))
+        for squad in command_squads:
+            position = squad_grid.pop()
+            threat_direction = self.get_threat_direction(position)
+            self.set_squad_starting_position(squad, position, threat_direction)
+            commander = squad.field_commander()
+            if commander is not None:
+                commander.ai.switch_task_command()
 
     # ---------------------------------------------------------------------------
     def set_squad_defend_order(
@@ -514,17 +555,19 @@ class AIFactionTactical:
         # - handle squad attached vehicles -
 
         # set an initial vehicle order. after this vehicle orders will be
-        # created by ai_human dynamically based on what the ai is trying to do
+        # created by ai_human dynamically based on what the ai is trying to do.
+        # a command-group leader is on task_command and has no squad-leader
+        # order, so his vehicles stay where they were placed.
         vehicle_order = None
         if squad.squad_leader:
-            if squad.squad_leader.ai.memory["task_squad_leader"]["orders"]:
+            task_mem = squad.squad_leader.ai.memory.get("task_squad_leader")
+            orders = []
+            if task_mem is not None:
+                orders = task_mem.get("orders") or []
+            if orders:
                 vehicle_order = VehicleOrder()
                 vehicle_order.order_drive_to_coords = True
-                vehicle_order.world_coords = copy.copy(
-                    squad.squad_leader.ai.memory["task_squad_leader"]["orders"][
-                        0
-                    ].world_coords
-                )
+                vehicle_order.world_coords = copy.copy(orders[0].world_coords)
 
         for vehicle in squad.vehicles:
             # each vehicle needs its own list; sharing position aliases them all

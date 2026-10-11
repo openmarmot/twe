@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 --------------------------------
+October 11 2026
+- added command groups. a field commander plus a few existing soldiers. one on a small fight, two on a larger one. they hold in the rear and send idle squads to defend a contested or enemy-held area
+- only the soldier with is_field_commander runs the command task. killing him stops new orders from that group
+
+--------------------------------
 October 10 2026
 - added waffen ss soldiers and squads
 - added mp35 and mg26t

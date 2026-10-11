@@ -14,6 +14,11 @@ Scaled from 1944-45 inventory and production share of the field army
 (Eastern Front weighted), not from "did this vehicle exist."
 Camo skins share the base squad's chance in the battlegroup generator.
 
+type `command` is a command group: a field commander plus existing
+soldiers (German: Feldfu operator and two StG 44. Soviet: two PPSh-41
+and an SVT-40). The generator buys at most one under 4000 points and
+two from 4000 up. A reinforcement budget is too small to buy one.
+
 # scenario_data table
 
 Predefined tactical scenarios for the Scenario menu.
