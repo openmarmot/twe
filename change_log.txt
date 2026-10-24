@@ -1,6 +1,22 @@
 TWE Project : Change Log
 
 --------------------------------
+October 24 2026
+- added custom scenario. pick a year and a point budget, then each side gets a squad list rolled the same way as a quick battle. soviets still get 50% more points. counts can be changed and the point total updates. there is no reinforcement roll. up and down select a squad, left and right change page
+- finished initial work on is2.
+
+is-2 is a beast. I will also note that 85mm equipped soviet vehicles are doing ok against tigers now.
+I am using my new color schemes. there is a decent change from the old ones. this is OK imo. soviet and german paints had a wide spread of
+color ranges in the war. soviet colors are especially hard to tie down. seems like they change color a ton as they weather.
+
+
+--------------------------------
+October 23 2026
+- added the IS-2 model 1944. 122mm D-25T with BR-471, BR-471B, and OF-471
+- IS-2 squad is a heavy attachment: cost 700, chance 18 in 1944 and 28 in 1945, one per battle
+- chassis and turret sprites are still the art in progress. export is_2_chassis.png and is_2_turret.png
+
+--------------------------------
 October 11 2026
 - added command groups. a field commander plus a few existing soldiers. one on a small fight, two on a larger one. they hold in the rear and send idle squads to defend a contested or enemy-held area
 - only the soldier with is_field_commander runs the command task. killing him stops new orders from that group

@@ -523,6 +523,7 @@ class World_Menu:
             self.text_queue.append("7 - german_rso_pak")
             self.text_queue.append("8 - t34-76 model 1943")
             self.text_queue.append("9 - t34-85")
+            self.text_queue.append("i - IS-2")
             if key == "0":
                 engine.world_builder.spawn_object(
                     self.world,
@@ -622,6 +623,16 @@ class World_Menu:
                         self.world.player.world_coords[1],
                     ],
                     "soviet_t34_85",
+                    True,
+                )
+            elif key == "i":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "soviet_is_2",
                     True,
                 )
         if self.menu_state == "spawn_weapons":

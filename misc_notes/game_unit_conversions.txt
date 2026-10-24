@@ -6,8 +6,12 @@ Image-> configure grid
 set spacing to 8 pixels (0.027in)
 this is now considered a 1 foot grid for game dimensions purposes
 
+colors should use the color guides here : twe/art/color_guide
+
 For determining size when creating images it is best to use a diagram image and scale by width.
-It is never clear whether length measurements include gun barrels and there is a lot of variation of length measurements
+If I determine the correct with in pixels (8 pixels to a foot) I can crop the diagram close and then scale the image by pixels to get the right scale.
+
+It is never clear whether length measurements include gun barrels and there is a lot of variation of length measurements, so use width as the standard.
 
 # -- game units --
 
