@@ -25,6 +25,7 @@ from ai.ai_human_vehicle import AIHumanVehicle
 from ai.ai_human_vehicle_crew_action import VehicleCrewAction
 from ai.ai_human_radio_operator import AIHumanRadioOperator
 from ai.ai_human_squad_leader import AIHumanSquadLeader
+from ai.ai_human_command import AIHumanCommand
 from ai.ai_human_trader import AIHumanTrader
 # import engine.global_exchange_rates
 
@@ -38,6 +39,7 @@ class AIHuman:
         self.in_vehicle_ai = AIHumanVehicle(self.owner)
         self.radio_operator_ai = AIHumanRadioOperator(self.owner)
         self.squad_leader_ai = AIHumanSquadLeader(self.owner)
+        self.command_ai = AIHumanCommand(self.owner)
         self.trader_ai = AIHumanTrader(self.owner)
 
         self.task_map = {
@@ -51,6 +53,7 @@ class AIHuman:
             "task_think": self.update_task_think,
             "task_think_idle": self.update_task_think_idle,
             "task_squad_leader": self.squad_leader_ai.update_task_squad_leader,
+            "task_command": self.command_ai.update_task_command,
             "task_loot_container": self.update_task_loot_container,
             "task_sit_down": self.update_task_sit_down,
             "task_medic": self.update_task_medic,
@@ -113,14 +116,17 @@ class AIHuman:
         # objects that are large_human_pickup. only one at a time
         self.large_pickup = None
 
-        # -- skills --
+        # -- skills and attributes--
         self.is_pilot = False
         self.is_expert_marksman = False
         self.is_afv_trained = False  # afv=armored fighting vehicle
         self.is_medic = False
         self.is_mechanic = False
+        # leads a command group. the squad is marked from this flag at creation
+        self.is_field_commander = False
         self.is_small_arms_trained = False  # this is true for soldiers. determines if they will pick up a gun with no enemy
         self.is_civilian = False
+        self.is_wearing_camo = False # used by waffen ss at the moment
         # used by calculate_engagement. lower is better
         self.armor_knowledge = 0.3
         # -- stats --
@@ -548,11 +554,33 @@ class AIHuman:
         )
 
     # ---------------------------------------------------------------------------
-    def terrain_hides_human(self, target, vegetation_hides):
+    def wearing_camo_still(self):
+        """True when this human's smock conceals them in vegetation.
+
+        Holding still qualifies. Walking, a step in the last half second
+        (player WASD stamps the noise time every frame), and being indoors
+        do not. A recent shot is handled by the caller.
+        """
+        if self.is_wearing_camo is False:
+            return False
+        if self.in_building:
+            return False
+        if self.memory["current_task"] == "task_move_to_location":
+            return False
+        # half a second, not the 30s noise flag. a halt gets the smock back
+        if self.recent_noise_or_move:
+            if self.owner.world.world_seconds - self.last_noise_or_move_time < 0.5:
+                return False
+        return True
+
+    # ---------------------------------------------------------------------------
+    def terrain_hides_human(self, target, vegetation_hides, allow_camo=True):
         """True when this human is concealed by the terrain under them.
 
         0 open and 3 road do not conceal. 2 tree does. 1 vegetation does
         when vegetation_hides is set. A recent shot cancels the concealment.
+        A still human in a camo smock is also concealed by vegetation, unless
+        allow_camo is false.
         """
         if target.is_human is False:
             return False
@@ -561,7 +589,9 @@ class AIHuman:
         terrain = target.ai.terrain
         if terrain == 2:
             return True
-        if vegetation_hides and terrain == 1:
+        if terrain == 1 and vegetation_hides:
+            return True
+        if terrain == 1 and allow_camo and target.ai.wearing_camo_still():
             return True
         return False
 
@@ -572,7 +602,8 @@ class AIHuman:
             # close enough that terrain does not matter
             return True
         if distance < 800:
-            # trees hide a human who has not fired recently
+            # trees hide a human who has not fired recently.
+            # a still camo soldier is also hidden in vegetation
             if self.terrain_hides_human(target, False):
                 return False
             # humans see everything else at this range
@@ -595,7 +626,8 @@ class AIHuman:
                 # buildings hide completely at this range
                 if target.ai.in_building:
                     return False
-                # a shot gives away a human in the trees. walking does not
+                # a shot gives away a human in the trees. walking does not.
+                # a still camo soldier in vegetation is hidden like the trees
                 if target.ai.recently_fired():
                     return True
                 if self.terrain_hides_human(target, False):
@@ -617,8 +649,9 @@ class AIHuman:
         if distance < 200:
             return True
         if distance < 400:
-            # trees hide a human who has not fired recently
-            if self.terrain_hides_human(target, False):
+            # trees hide a human who has not fired recently.
+            # camo does not: a vehicle still resolves infantry inside 400
+            if self.terrain_hides_human(target, False, allow_camo=False):
                 return False
             return True
         if distance < 800:
@@ -652,7 +685,8 @@ class AIHuman:
             if target.is_human:
                 if target.ai.in_building or target.ai.prone:
                     return False
-                # a shot gives away a human in the trees. walking does not
+                # a shot gives away a human in the trees. walking does not.
+                # a still camo soldier in vegetation is hidden like the trees
                 if target.ai.recently_fired():
                     return True
                 if self.terrain_hides_human(target, False):
@@ -2017,6 +2051,53 @@ class AIHuman:
         }
 
         self.memory[task_name] = task_details
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
+    def give_squad_order(self, order):
+        """write a tactical order onto this squad leader.
+
+        a vehicle crew keeps its current task and reads the order when it
+        has no vehicle order. a soldier who is fighting, treating, or
+        fixing keeps that task and picks the order up afterward.
+        """
+
+        task_name = "task_squad_leader"
+        if task_name not in self.memory:
+            self.memory[task_name] = {
+                "last_think_time": 0,
+                "think_interval": 0,
+                "orders": [],
+            }
+        self.memory[task_name]["orders"] = [order]
+        # review the new order on the next squad-leader think
+        self.memory[task_name]["last_think_time"] = 0
+        self.memory[task_name]["think_interval"] = 0
+
+        if self.in_vehicle():
+            return
+        current = self.memory.get("current_task")
+        if current in (
+            "task_engage_enemy",
+            "task_player_control",
+            "task_medic",
+            "task_mechanic",
+        ):
+            return
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
+    def switch_task_command(self):
+        """switch to the command group task"""
+
+        task_name = "task_command"
+        if task_name not in self.memory:
+            # last_think_time in the past so the first think assigns immediately
+            self.memory[task_name] = {
+                "last_think_time": -100,
+                "think_interval": 0,
+                "hold_coords": None,
+            }
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
@@ -3544,12 +3625,16 @@ class AIHuman:
             return
 
         # -- squad stuff (lower importance)--
-        # could maybe have some logic to this if i ever add ranks
         if self.squad.squad_leader is None:
             self.squad.squad_leader = self.owner
 
         if self.squad.squad_leader == self.owner:
-            self.switch_task_squad_leader(None)
+            # only the field commander writes orders for other squads.
+            # a replacement squad leader runs the normal squad-leader task.
+            if self.is_field_commander:
+                self.switch_task_command()
+            else:
+                self.switch_task_squad_leader(None)
             return
 
         # being in a squad wwhen we aren't lead basically just means staying close to the squad lead

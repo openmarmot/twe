@@ -2,9 +2,12 @@
 '''
 repo : https://github.com/openmarmot/twe
 
-notes : 
+notes :
 
-basic name generator
+basic name generator. each ethnicity has a draw pool that is
+shuffled once and then consumed, so a name is not repeated until
+every name for that ethnicity has been used. civilian and polish
+share one pool.
 '''
 
 
@@ -16,9 +19,13 @@ import sqlite3
 
 
 #global variables
+# full lists. draw pools are copied from these and consumed
 german_names=[]
 soviet_names=[]
 polish_names=[]
+german_draw=[]
+soviet_draw=[]
+polish_draw=[]
 
 # whether the data is loaded 
 loaded=False
@@ -60,6 +67,9 @@ def load_data():
         german_names=generate_names('german')
         soviet_names=generate_names('soviet')
         polish_names=generate_names('polish')
+        refill(german_draw, german_names)
+        refill(soviet_draw, soviet_names)
+        refill(polish_draw, polish_names)
 
         loaded=True
 
@@ -68,18 +78,27 @@ def load_data():
         print('Error: name data is already loaded')
 
 #------------------------------------------------------------------------------
-def get_name(ethnicity):
-    '''get a random name'''
-    global german_names
-    global soviet_names
-    global polish_names
+def refill(draw, source):
+    '''fill draw with a shuffled copy of source'''
+    draw.extend(source)
+    random.shuffle(draw)
 
+#------------------------------------------------------------------------------
+def take_name(draw, source):
+    '''pop a name. when the pool is empty, start a new shuffled cycle'''
+    if len(draw)==0:
+        refill(draw, source)
+    return draw.pop()
+
+#------------------------------------------------------------------------------
+def get_name(ethnicity):
+    '''get a random name that is not repeated until the pool restarts'''
     if ethnicity=='german':
-        return random.choice(german_names)
+        return take_name(german_draw, german_names)
     elif ethnicity=='soviet':
-        return random.choice(soviet_names)
+        return take_name(soviet_draw, soviet_names)
     elif ethnicity=='civilian' or ethnicity=='polish':
-        return random.choice(polish_names)
+        return take_name(polish_draw, polish_names)
     
 
 # init 

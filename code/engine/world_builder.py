@@ -187,6 +187,9 @@ list_guns = [
     "mp40",
     "mg34",
     "mg42",
+    "mg26t",
+    "mp35",
+    "stg44-zf4",
     "mosin_nagant",
     "mosin_nagant-sniper",
     "pps43",
@@ -212,7 +215,7 @@ list_guns = [
     "nagant_m1895",
 ]
 list_guns_common = ["kar98k", "mosin_nagant", "pps43", "ppsh41", "tt33", "svt40"]
-list_guns_rare = ["mp40", "ppk", "stg44", "mg34", "dp28", "k43", "g41w", "c96", "kar98k-zf41", "vg1_5", "mp3008"]
+list_guns_rare = ["mp40", "mp35", "ppk", "stg44", "mg34", "mg26t", "dp28", "k43", "g41w", "c96", "kar98k-zf41", "vg1_5", "mp3008"]
 list_guns_ultra_rare = [
     "fg42-type1",
     "fg42-type2",
@@ -220,6 +223,7 @@ list_guns_ultra_rare = [
     "kar98k-sniper",
     "k43-sniper",
     "mosin_nagant-sniper",
+    "stg44-zf4",
     "1911",
     "mg15",
     "c96_red_9",
@@ -249,9 +253,9 @@ list_guns_rifles = [
     "svt40",
     "svt40-sniper",
 ]
-list_guns_smg = ["mp40", "mp3008", "pps43", "ppsh41"]
-list_guns_assault_rifles = ["stg44"]
-list_guns_machine_guns = ["mg34", "mg42", "dp28", "mg15", "fg42-type1", "fg42-type2"]
+list_guns_smg = ["mp40", "mp35", "mp3008", "pps43", "ppsh41"]
+list_guns_assault_rifles = ["stg44", "stg44-zf4"]
+list_guns_machine_guns = ["mg34", "mg42", "mg26t", "dp28", "mg15", "fg42-type1", "fg42-type2"]
 list_guns_pistols = [
     "1911",
     "ppk",
@@ -343,6 +347,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "mg42", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "mg34_drum_magazine", False))
+    elif loadout == "mg26t":
+        wo.add_inventory(spawn_object(world, [0, 0], "mg26t", False))
+        for _ in range(8):
+            wo.add_inventory(spawn_object(world, [0, 0], "mg26t_magazine", False))
     elif loadout == "mosin_nagant":
         wo.add_inventory(spawn_object(world, [0, 0], "mosin_nagant", False))
         for _ in range(12):
@@ -351,6 +359,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "mp40", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "mp40_magazine", False))
+    elif loadout == "mp35":
+        wo.add_inventory(spawn_object(world, [0, 0], "mp35", False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world, [0, 0], "mp35_magazine", False))
     elif loadout == "panzerschreck":
         wo.add_inventory(spawn_object(world, [0, 0], "panzerschreck", False))
         for _ in range(6):
@@ -751,6 +763,157 @@ def assemble_battle_map_objects(
 
 
 # ------------------------------------------------------------------------------
+def squad_unit_cost(name):
+    """Point cost of one squad. Unknown names cost nothing."""
+
+    info = squad_data.get(name)
+    if info is None:
+        return 0
+    try:
+        return int(info.get("cost", 0) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+# ------------------------------------------------------------------------------
+def squad_counts_from_names(names):
+    """Collapse a squad name list into first-seen order and counts"""
+
+    order = []
+    counts = {}
+    if names is None:
+        return order, counts
+    for name in names:
+        if name is None:
+            continue
+        name = str(name).strip()
+        if name == "":
+            continue
+        if name not in counts:
+            order.append(name)
+            counts[name] = 0
+        counts[name] += 1
+    return order, counts
+
+
+# ------------------------------------------------------------------------------
+def squad_force_cost(order, counts):
+    """Point total for a counted squad list"""
+
+    total = 0
+    if order is None or counts is None:
+        return total
+    for name in order:
+        try:
+            count = int(counts.get(name, 0))
+        except (TypeError, ValueError):
+            continue
+        if count < 1:
+            continue
+        total += squad_unit_cost(name) * count
+    return total
+
+
+# ------------------------------------------------------------------------------
+def expand_squad_counts(order, counts):
+    """Expand counted squads into the name list the map loader expects"""
+
+    squads = []
+    if order is None or counts is None:
+        return squads
+    for name in order:
+        try:
+            count = int(counts.get(name, 0))
+        except (TypeError, ValueError):
+            continue
+        if count < 1:
+            continue
+        if name not in squad_data:
+            engine.log.add_data(
+                "error", "expand_squad_counts unknown squad: " + str(name), True
+            )
+            continue
+        for _ in range(count):
+            squads.append(name)
+    return squads
+
+
+# ------------------------------------------------------------------------------
+def custom_scenario_budgets(points):
+    """German budget and the soviet budget with the quick battle advantage"""
+
+    # load_quick_battle_map_objects gives the soviets half again as many
+    # points. custom scenario uses that same split.
+    try:
+        german_budget = int(points)
+    except (TypeError, ValueError):
+        german_budget = 0
+    if german_budget < 0:
+        german_budget = 0
+    soviet_budget = int(german_budget * 1.5)
+    return german_budget, soviet_budget
+
+
+# ------------------------------------------------------------------------------
+def custom_scenario_squad_choices(faction, year):
+    """Base squads a faction can field in this year. Camo skins are left out."""
+
+    # the generator rolls a camo skin from the base squad. the editor adds
+    # the base name, and a skin already in the rolled list stays as its own row.
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = 1944
+    year_key = "chance_" + str(year)
+    names = []
+    for name, info in squad_data.items():
+        if info.get("faction") != faction:
+            continue
+        try:
+            chance = int(info.get(year_key, 0) or 0)
+        except (TypeError, ValueError):
+            chance = 0
+        if chance <= 0:
+            continue
+        base = engine.battlegroup_generator.get_camo_base_name(name)
+        if base and base in squad_data:
+            continue
+        names.append(name)
+    names.sort(key=lambda squad_name: (
+        str(squad_data[squad_name].get("type", "")),
+        squad_name,
+    ))
+    return names
+
+
+# ------------------------------------------------------------------------------
+def generate_custom_scenario_forces(points, year):
+    """Roll a german and soviet squad list the way a quick battle does.
+
+    No reinforcement roll. The editor that follows is the whole force.
+    """
+
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = 1944
+    german_budget, soviet_budget = custom_scenario_budgets(points)
+    german = engine.battlegroup_generator.create_random_battlegroup(
+        "german", german_budget, squad_data, year
+    )
+    soviet = engine.battlegroup_generator.create_random_battlegroup(
+        "soviet", soviet_budget, squad_data, year
+    )
+    return {
+        "german": german,
+        "soviet": soviet,
+        "german_budget": german_budget,
+        "soviet_budget": soviet_budget,
+        "year": year,
+    }
+
+
+# ------------------------------------------------------------------------------
 def load_quick_battle_map_objects(battle_option, result_container):
     """load quick battle map objects. called by game menu"""
 
@@ -890,6 +1053,40 @@ def load_scenario_map_objects(scenario, result_container):
 
     result_container[0] = assemble_battle_map_objects(
         map_areas, squads, [], defending_faction, name, year
+    )
+
+
+# ------------------------------------------------------------------------------
+def load_custom_scenario_map_objects(
+    year, german_squads, soviet_squads, result_container
+):
+    """load a custom scenario from the edited squad lists"""
+
+    # called in a thread by graphics_2d_pygame.load_custom_scenario
+    # map and who is defending are picked the same way as a quick battle
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = 1944
+    if german_squads is None:
+        german_squads = []
+    if soviet_squads is None:
+        soviet_squads = []
+    squads = list(german_squads) + list(soviet_squads)
+
+    world_area_options = []
+    world_area_options.append(["town", "town", "town"])
+    world_area_options.append(["airport", "town"])
+    map_areas = random.choice(world_area_options)
+    defending_faction = random.choice(["german", "soviet", "none", "contested"])
+
+    result_container[0] = assemble_battle_map_objects(
+        map_areas,
+        squads,
+        [],
+        defending_faction,
+        "Custom scenario",
+        year,
     )
 
 

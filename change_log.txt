@@ -1,6 +1,56 @@
 TWE Project : Change Log
 
 --------------------------------
+October 24 2026
+- added custom scenario. pick a year and a point budget, then each side gets a squad list rolled the same way as a quick battle. soviets still get 50% more points. counts can be changed and the point total updates. there is no reinforcement roll. up and down select a squad, left and right change page
+- finished initial work on is2.
+
+is-2 is a beast. I will also note that 85mm equipped soviet vehicles are doing ok against tigers now.
+I am using my new color schemes. there is a decent change from the old ones. this is OK imo. soviet and german paints had a wide spread of
+color ranges in the war. soviet colors are especially hard to tie down. seems like they change color a ton as they weather.
+
+
+--------------------------------
+October 23 2026
+- added the IS-2 model 1944. 122mm D-25T with BR-471, BR-471B, and OF-471
+- IS-2 squad is a heavy attachment: cost 700, chance 18 in 1944 and 28 in 1945, one per battle
+- chassis and turret sprites are still the art in progress. export is_2_chassis.png and is_2_turret.png
+
+--------------------------------
+October 11 2026
+- added command groups. a field commander plus a few existing soldiers. one on a small fight, two on a larger one. they hold in the rear and send idle squads to defend a contested or enemy-held area
+- only the soldier with is_field_commander runs the command task. killing him stops new orders from that group
+
+--------------------------------
+October 10 2026
+- added waffen ss soldiers and squads
+- added mp35 and mg26t
+- added soldier camo mechanic
+- soviet afv uniforms
+- expanded the names table. german, soviet, and polish each have a much larger first and last name pool, including austrian surnames and ukrainian red army surnames. fixed johanne, gunther, and konig spellings
+- name_gen draws without replacement. a pool is shuffled again only after every name in it has been used. civilians share the polish pool
+
+--------------------------------
+October 09 2026
+- ai-play can now optionally use decision models. tested with cloudflares clef model
+- ai-play now uses disabled reasoning and faster cycles with the LLM
+- a small turret miss hits the plate that mount sits on. a top mount misses into the passenger plate on the side the shot came from, not the lower hull
+- StuG III Ausf. G gun shield is the late Topfblende: 80 mm at 0° instead of the 50 mm box face. no stored slope
+- slight bump to soviet 14.5 pen at range
+
+clef did not end up being useful for this. about a 1 second response vs 2 seconds for deepseek v4 flash vision with reasoning turned off.
+
+--------------------------------
+October 04 2026
+- 1945 towed Pak 40 chance is 25, and the Sd.Kfz. 10 towed version is 40. 1944 is unchanged
+- towed guns are no longer capped by the rare-vehicle rule. a quick battle buys at most two of one towed gun
+- Soviet ZiS-3 Antitank year chance is 80/70, so the direct-fire gun shows up in a normal quick battle
+- added BR-350B for the F-34 and ZiS-3, and a few Pzgr.40 rounds for the 5 cm, 7.5 cm, and 8.8 cm L/56
+- vehicle penetrations throw plate fragments, and near-miss spall requires plate thick enough to flake
+- APHE bursts inside the compartment after it defeats the plate. the hit log lists each effect
+- hull penetrations hit the crew in that compartment. the engine is only damaged from the end where it is mounted
+
+--------------------------------
 October 03 2026
 - set per-vehicle turret traverse speeds instead of the shared 20 deg/s default
 - panzer iv g/h/j now use a maybach hl 120 trm on gasoline instead of the v-2 diesel

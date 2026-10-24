@@ -53,6 +53,7 @@ def create(world, world_coords):
         engine.world_builder.spawn_object(world, world_coords, "volkswagen_type_82_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [65, 10]
+    z.ai.engine_at_front = True
     z.ai.batteries.append(
         engine.world_builder.spawn_object(world, world_coords, "battery_vehicle_6v", False)
     )

@@ -5,10 +5,10 @@ repo : https://github.com/openmarmot/twe
 
 notes :
 The divisional gun is two spawn identities on the same carriage.
-soviet_zis_3_artillery carries 6 AP and 24 HE and starts laid for
-indirect fire. soviet_zis_3_antitank carries 22 AP and 8 HE and starts
-in direct fire. Both keep indirect fire available. The T-34-76 still
-uses 76mm_m1940_f34 and is not part of this split.
+soviet_zis_3_artillery carries 5 BR-350B, 1 solid 76x385_AP, and 24 HE
+and starts laid for indirect fire. soviet_zis_3_antitank carries 18 BR-350B,
+4 solid 76x385_AP, and 8 HE and starts in direct fire. Both keep indirect
+fire available. The T-34-76 still uses 76mm_m1940_f34 and is not part of this split.
 """
 
 # import built in modules
@@ -22,8 +22,8 @@ import engine.world_builder
 from engine.object_registry import register_object
 
 
-def _build(world, world_coords, display_name, ap_rounds, he_rounds, indirect_fire_mode):
-    """Shared ZiS-3 carriage. ap_rounds load 76x385_AP, he_rounds load OF-350M."""
+def _build(world, world_coords, display_name, ap_b_rounds, ap_sp_rounds, he_rounds, indirect_fire_mode):
+    """Shared ZiS-3 carriage. BR-350B is the usual AP, 76x385_AP is solid shot, OF-350M is HE."""
     z = WorldObject(world, ["zis_3_carriage"], AIVehicle)
     z.name = display_name
     z.is_vehicle = True
@@ -73,11 +73,15 @@ def _build(world, world_coords, display_name, ap_rounds, he_rounds, indirect_fir
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.rotation_angle = float(random.randint(0, 359))
-    z.ai.ammo_rack_capacity = ap_rounds + he_rounds
-    for b in range(ap_rounds):
+    z.ai.ammo_rack_capacity = ap_b_rounds + ap_sp_rounds + he_rounds
+    for b in range(ap_b_rounds):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
         )
+    for b in range(ap_sp_rounds):
+        temp = engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "76x385_AP")
+        z.ai.ammo_rack.append(temp)
     for b in range(he_rounds):
         temp = engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34_magazine", False)
         engine.world_builder.load_magazine(world, temp, "OF-350M")
@@ -98,10 +102,10 @@ def _build(world, world_coords, display_name, ap_rounds, he_rounds, indirect_fir
 @register_object("soviet_zis_3_artillery")
 def create_artillery(world, world_coords):
     """Divisional battery load. Mostly OF-350M, starts in indirect fire."""
-    return _build(world, world_coords, "ZiS-3 76mm Artillery", 6, 24, True)
+    return _build(world, world_coords, "ZiS-3 76mm Artillery", 5, 1, 24, True)
 
 
 @register_object("soviet_zis_3_antitank")
 def create_antitank(world, world_coords):
-    """Antitank battery load. Mostly 76x385 AP, starts in direct fire."""
-    return _build(world, world_coords, "ZiS-3 76mm Antitank", 22, 8, False)
+    """Antitank battery load. Mostly BR-350B, starts in direct fire."""
+    return _build(world, world_coords, "ZiS-3 76mm Antitank", 18, 4, 8, False)

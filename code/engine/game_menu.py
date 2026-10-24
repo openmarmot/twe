@@ -3,6 +3,7 @@ repo : https://github.com/openmarmot/twe
 
 notes :
 this class contains code for the main game menu
+custom scenario rolls a quick-battle list, then the player edits counts
 
 
 
@@ -14,6 +15,7 @@ import os
 
 #import custom packages
 import engine.world_builder
+import engine.battlegroup_generator
 import engine.math_2d
 
 
@@ -46,6 +48,47 @@ def wrap_menu_text(text, width=58):
     return lines
 
 
+# rows on one custom-scenario page. up and down move the selection.
+# left and right change page.
+CUSTOM_PAGE_SIZE = 8
+
+
+# ------------------------------------------------------------------------------
+def format_squad_amount_header(cost_label):
+    '''column titles aligned with format_squad_amount_line'''
+    return (
+        '  # x'
+        + '    '
+        + str(cost_label).rjust(6)
+        + '  '
+        + 'type'.ljust(22)
+        + '  squad'
+    )
+
+
+# ------------------------------------------------------------------------------
+def format_squad_amount_line(selected, slot, count, cost, squad_type, name):
+    '''one custom-scenario row. the point figure sits on the left.'''
+    if selected:
+        marker = '>'
+    else:
+        marker = ' '
+    type_text = str(squad_type)
+    if len(type_text) > 22:
+        type_text = type_text[:22]
+    return (
+        marker
+        + str(slot)
+        + '  x'
+        + str(count).ljust(4)
+        + str(cost).rjust(6)
+        + '  '
+        + type_text.ljust(22)
+        + '  '
+        + str(name)
+    )
+
+
 class GameMenu():
     ''' in game menu '''
 
@@ -69,6 +112,18 @@ class GameMenu():
         # index into world_builder.scenario_data for the Scenario menu
         self.scenario_index=0
 
+        # custom scenario. reset again each time that menu is opened
+        self.custom_year = 1944
+        self.custom_points = 5000
+        self.custom_side = 'german'
+        self.custom_order = {'german': [], 'soviet': []}
+        self.custom_counts = {'german': {}, 'soviet': {}}
+        self.custom_budget = {'german': 5000, 'soviet': 7500}
+        self.custom_index = {'german': 0, 'soviet': 0}
+        self.custom_add_index = 0
+        self.custom_catalog = []
+        self.custom_notice = ''
+
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -87,6 +142,8 @@ class GameMenu():
             self.load_save_menu(key)
         elif self.active_menu=='scenario':
             self.scenario_menu(key)
+        elif self.active_menu=='custom_scenario':
+            self.custom_scenario_menu(key)
 
         else:
             print('Error : active menu not recognized ',self.active_menu)
@@ -175,7 +232,8 @@ class GameMenu():
             self.text_queue.append('2 - Load Campaign (preview)')
             self.text_queue.append('3 - Quick Battle (choose this)')
             self.text_queue.append('4 - Scenario')
-            self.text_queue.append('5 - Exit')
+            self.text_queue.append('5 - Custom Scenario')
+            self.text_queue.append('6 - Exit')
 
             if key=='1':
                 self.graphics_engine.mode=2
@@ -189,6 +247,8 @@ class GameMenu():
             elif key=='4':
                 self.change_menu('scenario')
             elif key=='5':
+                self.change_menu('custom_scenario')
+            elif key=='6':
                 print('----------------------')
                 print('Good Bye!')
                 self.graphics_engine.quit=True
@@ -311,6 +371,590 @@ class GameMenu():
             self.player_spawn_faction = faction
             self.deactivate_menu()
             self.graphics_engine.load_scenario(faction, s)
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_menu(self, key):
+        '''pick a year and points, edit the rolled squad lists, then start'''
+
+        # change_menu sets menu_state to none before the first draw
+        if self.menu_state == 'none':
+            self.custom_scenario_reset()
+            self.menu_state = 'setup'
+
+        if self.menu_state == 'setup':
+            self.custom_scenario_handle_setup(key)
+        elif self.menu_state == 'edit':
+            self.custom_scenario_handle_edit(key)
+        elif self.menu_state == 'add':
+            self.custom_scenario_handle_add(key)
+        elif self.menu_state == 'confirm_roll':
+            self.custom_scenario_handle_confirm_roll(key)
+        elif self.menu_state == 'play_as':
+            self.custom_scenario_handle_play_as(key)
+
+        # starting the battle deactivates the menu. do not draw over that.
+        if self.active_menu != 'custom_scenario':
+            return
+
+        if self.menu_state == 'setup':
+            self.custom_scenario_draw_setup()
+        elif self.menu_state == 'edit':
+            self.custom_scenario_draw_edit()
+        elif self.menu_state == 'add':
+            self.custom_scenario_draw_add()
+        elif self.menu_state == 'confirm_roll':
+            self.custom_scenario_draw_confirm_roll()
+        elif self.menu_state == 'play_as':
+            self.custom_scenario_draw_play_as()
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_reset(self):
+        '''default year, points, and empty lists'''
+        self.custom_year = 1944
+        self.custom_points = 5000
+        self.custom_side = 'german'
+        self.custom_order = {'german': [], 'soviet': []}
+        self.custom_counts = {'german': {}, 'soviet': {}}
+        self.custom_budget = {'german': 5000, 'soviet': 7500}
+        self.custom_index = {'german': 0, 'soviet': 0}
+        self.custom_add_index = 0
+        self.custom_catalog = []
+        self.custom_notice = ''
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_set_points(self, points):
+        '''keep the budget on a 500 point step between 500 and 20000'''
+        try:
+            points = int(points)
+        except (TypeError, ValueError):
+            return
+        if points < 500:
+            points = 500
+        if points > 20000:
+            points = 20000
+        self.custom_points = int(points / 500) * 500
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_apply_roll(self, result):
+        '''store a fresh roll for both sides'''
+        for side in ('german', 'soviet'):
+            order, counts = engine.world_builder.squad_counts_from_names(
+                result[side]
+            )
+            self.custom_order[side] = order
+            self.custom_counts[side] = counts
+            self.custom_index[side] = 0
+        self.custom_budget['german'] = result['german_budget']
+        self.custom_budget['soviet'] = result['soviet_budget']
+        self.custom_year = result['year']
+        self.custom_side = 'german'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_side_total_line(self, side, mark=True):
+        '''live point total for one side, next to the budget it was rolled from'''
+        total = engine.world_builder.squad_force_cost(
+            self.custom_order[side], self.custom_counts[side]
+        )
+        if side == 'german':
+            label = 'German'
+        else:
+            label = 'Soviet'
+        if mark and side == self.custom_side:
+            marker = '>'
+        else:
+            marker = ' '
+        budget = self.custom_budget.get(side, 0)
+        return (
+            marker
+            + ' '
+            + label
+            + '  '
+            + str(total)
+            + ' pts'
+            + '   (budget '
+            + str(budget)
+            + ')'
+        )
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_clamp_index(self):
+        '''keep the selected row inside the side that is on screen'''
+        side = self.custom_side
+        order = self.custom_order[side]
+        index = self.custom_index.get(side, 0)
+        if not order:
+            self.custom_index[side] = 0
+            return
+        if index >= len(order):
+            index = len(order) - 1
+        if index < 0:
+            index = 0
+        self.custom_index[side] = index
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_selected_name(self):
+        '''squad name on the selected row, or None when that side is empty'''
+        order = self.custom_order[self.custom_side]
+        if not order:
+            return None
+        self.custom_scenario_clamp_index()
+        return order[self.custom_index[self.custom_side]]
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_page(self, length, index):
+        '''page, page count, and the slice of rows that fit on one screen'''
+        page_size = CUSTOM_PAGE_SIZE
+        if length <= 0:
+            return 0, 1, 0, 0
+        if index < 0:
+            index = 0
+        if index >= length:
+            index = length - 1
+        page = int(index / page_size)
+        pages = int((length + page_size - 1) / page_size)
+        start = page * page_size
+        end = start + page_size
+        if end > length:
+            end = length
+        return page, pages, start, end
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_shift_index(self, index, length, key):
+        '''move a list cursor. up and down by one, left and right by a page.'''
+        if length <= 0:
+            return 0
+        if index < 0:
+            index = 0
+        if index >= length:
+            index = length - 1
+        if key == 'up':
+            if index > 0:
+                index -= 1
+        elif key == 'down':
+            if index < length - 1:
+                index += 1
+        elif key in ['left', 'right']:
+            page, pages, start, _end = self.custom_scenario_page(length, index)
+            offset = index - start
+            if key == 'left':
+                new_page = page - 1
+            else:
+                new_page = page + 1
+            if new_page < 0 or new_page >= pages:
+                return index
+            index = new_page * CUSTOM_PAGE_SIZE + offset
+            if index >= length:
+                index = length - 1
+        return index
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_related_count(self, name):
+        '''copies of this squad already fielded, including camo skins'''
+        counts = self.custom_counts[self.custom_side]
+        groups = engine.battlegroup_generator.get_camo_groups(
+            engine.world_builder.squad_data
+        )
+        related = engine.battlegroup_generator.related_squad_names(name, groups)
+        total = 0
+        for related_name in related:
+            total += counts.get(related_name, 0)
+        return total
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_give_squad(self, name, amount):
+        '''add or remove copies of one squad on the side being edited'''
+        if name is None or amount == 0:
+            return
+        side = self.custom_side
+        order = self.custom_order[side]
+        counts = self.custom_counts[side]
+        if name not in counts:
+            if amount < 0:
+                return
+            order.append(name)
+            counts[name] = 0
+        counts[name] += amount
+        if counts[name] <= 0:
+            del counts[name]
+            if name in order:
+                order.remove(name)
+            self.custom_scenario_clamp_index()
+        else:
+            self.custom_index[side] = order.index(name)
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_open_add(self):
+        '''catalog of squads this side can field in the chosen year'''
+        self.custom_catalog = engine.world_builder.custom_scenario_squad_choices(
+            self.custom_side, self.custom_year
+        )
+        self.custom_add_index = 0
+        self.menu_state = 'add'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_choice_line(self, key_label, text, selected):
+        '''a setup-screen choice. the current one is marked'''
+        line = key_label + ' - ' + text
+        if selected:
+            line = line + '   <'
+        return line
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_draw_setup(self):
+        '''year and point budget'''
+        german_budget, soviet_budget = engine.world_builder.custom_scenario_budgets(
+            self.custom_points
+        )
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append('Custom Scenario')
+        self.text_queue.append('---------------')
+        self.text_queue.append('Pick a year and a point budget.')
+        self.text_queue.append('Each side gets a squad list rolled')
+        self.text_queue.append('the same way as a quick battle.')
+        self.text_queue.append('Soviets get 50% more points.')
+        self.text_queue.append('You can change the squad counts next.')
+        self.text_queue.append('---------------')
+        self.text_queue.append('Year')
+        self.text_queue.append(self.custom_scenario_choice_line(
+            '1', '1944', self.custom_year == 1944
+        ))
+        self.text_queue.append(self.custom_scenario_choice_line(
+            '2', '1945', self.custom_year == 1945
+        ))
+        self.text_queue.append('---------------')
+        self.text_queue.append('Points  ' + str(self.custom_points))
+        self.text_queue.append(self.custom_scenario_choice_line(
+            '3', '2500', self.custom_points == 2500
+        ))
+        self.text_queue.append(self.custom_scenario_choice_line(
+            '4', '5000', self.custom_points == 5000
+        ))
+        self.text_queue.append(self.custom_scenario_choice_line(
+            '5', '10000', self.custom_points == 10000
+        ))
+        self.text_queue.append('+ - Add 500 points')
+        self.text_queue.append('- - Subtract 500 points')
+        self.text_queue.append('500 to 20000')
+        self.text_queue.append('---------------')
+        self.text_queue.append('German budget  ' + str(german_budget))
+        self.text_queue.append('Soviet budget  ' + str(soviet_budget))
+        self.text_queue.append('---------------')
+        self.text_queue.append('6 - Generate forces')
+        self.text_queue.append('Esc - Main menu')
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_draw_edit(self):
+        '''squad counts for the side being edited, and both point totals'''
+        self.custom_scenario_clamp_index()
+        side = self.custom_side
+        order = self.custom_order[side]
+        counts = self.custom_counts[side]
+        index = self.custom_index[side]
+        page, pages, start, end = self.custom_scenario_page(len(order), index)
+
+        units = 0
+        for squad_name in order:
+            units += counts.get(squad_name, 0)
+        if side == 'german':
+            side_label = 'German'
+        else:
+            side_label = 'Soviet'
+
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append('Custom Scenario    Year ' + str(self.custom_year))
+        self.text_queue.append(self.custom_scenario_side_total_line('german'))
+        self.text_queue.append(self.custom_scenario_side_total_line('soviet'))
+        self.text_queue.append('---------------')
+        self.text_queue.append(
+            side_label
+            + ' list    '
+            + str(units)
+            + ' squads    page '
+            + str(page + 1)
+            + ' / '
+            + str(pages)
+        )
+        if not order:
+            self.text_queue.append('No squads on this side yet')
+        else:
+            self.text_queue.append(format_squad_amount_header('total'))
+            slot = 1
+            for row_index in range(start, end):
+                name = order[row_index]
+                count = counts.get(name, 0)
+                info = engine.world_builder.squad_data.get(name, {})
+                line_cost = engine.world_builder.squad_unit_cost(name) * count
+                self.text_queue.append(format_squad_amount_line(
+                    row_index == index,
+                    slot,
+                    count,
+                    line_cost,
+                    info.get('type', ''),
+                    name,
+                ))
+                slot += 1
+
+        self.text_queue.append('---------------')
+        selected = self.custom_scenario_selected_name()
+        if selected is not None:
+            each = engine.world_builder.squad_unit_cost(selected)
+            self.text_queue.append(
+                'Selected  ' + selected + '    ' + str(each) + ' pts each'
+            )
+        self.text_queue.append('Up / Down - Select a squad')
+        self.text_queue.append('+ - Add one of the selected squad')
+        self.text_queue.append('- - Remove one of the selected squad')
+        self.text_queue.append('[ - German list')
+        self.text_queue.append('] - Soviet list')
+        self.text_queue.append('Left / Right - Change page')
+        self.text_queue.append('9 - Add a squad that is not listed')
+        self.text_queue.append('r - Roll both sides again')
+        self.text_queue.append('0 - Start battle')
+        self.text_queue.append('Esc - Main menu')
+        if self.custom_notice:
+            self.text_queue.append(self.custom_notice)
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_draw_add(self):
+        '''every squad this side can field. adding one updates the point total.'''
+        length = len(self.custom_catalog)
+        if length <= 0:
+            self.custom_add_index = 0
+        elif self.custom_add_index >= length:
+            self.custom_add_index = length - 1
+        elif self.custom_add_index < 0:
+            self.custom_add_index = 0
+        page, pages, start, end = self.custom_scenario_page(
+            length, self.custom_add_index
+        )
+
+        if self.custom_side == 'german':
+            side_label = 'German'
+        else:
+            side_label = 'Soviet'
+
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append(
+            'Add a ' + side_label + ' squad    ' + str(self.custom_year)
+        )
+        self.text_queue.append(self.custom_scenario_side_total_line('german'))
+        self.text_queue.append(self.custom_scenario_side_total_line('soviet'))
+        self.text_queue.append('Squads this side can field in this year.')
+        self.text_queue.append('The count includes a camo skin of that squad.')
+        self.text_queue.append(
+            'page '
+            + str(page + 1)
+            + ' / '
+            + str(pages)
+        )
+        if length == 0:
+            self.text_queue.append('No squads for this side')
+        else:
+            self.text_queue.append(format_squad_amount_header('each'))
+            slot = 1
+            for row_index in range(start, end):
+                name = self.custom_catalog[row_index]
+                info = engine.world_builder.squad_data.get(name, {})
+                self.text_queue.append(format_squad_amount_line(
+                    row_index == self.custom_add_index,
+                    slot,
+                    self.custom_scenario_related_count(name),
+                    engine.world_builder.squad_unit_cost(name),
+                    info.get('type', ''),
+                    name,
+                ))
+                slot += 1
+        self.text_queue.append('---------------')
+        if length > 0:
+            selected = self.custom_catalog[self.custom_add_index]
+            each = engine.world_builder.squad_unit_cost(selected)
+            self.text_queue.append(
+                'Selected  ' + selected + '    ' + str(each) + ' pts each'
+            )
+        self.text_queue.append('Up / Down - Select a squad')
+        self.text_queue.append('+ - Add one of the selected squad')
+        self.text_queue.append('- - Remove one of the selected squad')
+        self.text_queue.append('[ - German squads')
+        self.text_queue.append('] - Soviet squads')
+        self.text_queue.append('Left / Right - Change page')
+        self.text_queue.append('0 - Back to the lists')
+        self.text_queue.append('Esc - Main menu')
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_draw_confirm_roll(self):
+        '''confirm replacing both edited lists'''
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append('Custom Scenario')
+        self.text_queue.append('---------------')
+        self.text_queue.append('Roll again?')
+        self.text_queue.append('This replaces the German and Soviet lists.')
+        self.text_queue.append('Year ' + str(self.custom_year))
+        self.text_queue.append(
+            'German budget  ' + str(self.custom_budget.get('german', 0))
+        )
+        self.text_queue.append(
+            'Soviet budget  ' + str(self.custom_budget.get('soviet', 0))
+        )
+        self.text_queue.append('---------------')
+        self.text_queue.append('1 - Roll again')
+        self.text_queue.append('0 - Keep the current lists')
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_draw_play_as(self):
+        '''who the player spawns as'''
+        self.text_queue = []
+        self.text_queue.append('TWE: To Whatever End')
+        self.text_queue.append('Custom Scenario')
+        self.text_queue.append('Year ' + str(self.custom_year))
+        self.text_queue.append(
+            self.custom_scenario_side_total_line('german', False)
+        )
+        self.text_queue.append(
+            self.custom_scenario_side_total_line('soviet', False)
+        )
+        self.text_queue.append('---------------')
+        self.text_queue.append('Pick who you play')
+        self.text_queue.append('1 - German')
+        self.text_queue.append('2 - Soviet')
+        self.text_queue.append('3 - Civilian/Neutral')
+        self.text_queue.append('0 - Back')
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_handle_setup(self, key):
+        '''year, budget, then roll'''
+        if key is None or key == 'none':
+            return
+        if key == '1':
+            self.custom_year = 1944
+        elif key == '2':
+            self.custom_year = 1945
+        elif key == '3':
+            self.custom_scenario_set_points(2500)
+        elif key == '4':
+            self.custom_scenario_set_points(5000)
+        elif key == '5':
+            self.custom_scenario_set_points(10000)
+        elif key == '+':
+            self.custom_scenario_set_points(self.custom_points + 500)
+        elif key == '-':
+            self.custom_scenario_set_points(self.custom_points - 500)
+        elif key == '6':
+            result = engine.world_builder.generate_custom_scenario_forces(
+                self.custom_points, self.custom_year
+            )
+            self.custom_scenario_apply_roll(result)
+            self.custom_notice = ''
+            self.menu_state = 'edit'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_handle_edit(self, key):
+        '''change counts, switch side, or leave for add / roll / start'''
+        if key is None or key == 'none':
+            return
+        self.custom_notice = ''
+        self.custom_scenario_clamp_index()
+        order = self.custom_order[self.custom_side]
+        if key in ['up', 'down', 'left', 'right']:
+            self.custom_index[self.custom_side] = self.custom_scenario_shift_index(
+                self.custom_index[self.custom_side], len(order), key
+            )
+        elif key == '+':
+            self.custom_scenario_give_squad(
+                self.custom_scenario_selected_name(), 1
+            )
+        elif key == '-':
+            self.custom_scenario_give_squad(
+                self.custom_scenario_selected_name(), -1
+            )
+        elif key == '[':
+            self.custom_side = 'german'
+        elif key == ']':
+            self.custom_side = 'soviet'
+        elif key == '9':
+            self.custom_scenario_open_add()
+        elif key == 'r':
+            self.menu_state = 'confirm_roll'
+        elif key == '0':
+            german_units = sum(self.custom_counts['german'].values())
+            soviet_units = sum(self.custom_counts['soviet'].values())
+            if german_units <= 0 and soviet_units <= 0:
+                self.custom_notice = 'Add at least one squad before starting'
+            else:
+                self.menu_state = 'play_as'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_handle_add(self, key):
+        '''add one copy of a catalog squad. the point total updates on the draw.'''
+        if key is None or key == 'none':
+            return
+        length = len(self.custom_catalog)
+        if key in ['up', 'down', 'left', 'right']:
+            self.custom_add_index = self.custom_scenario_shift_index(
+                self.custom_add_index, length, key
+            )
+        elif key == '+' and length > 0:
+            self.custom_scenario_give_squad(
+                self.custom_catalog[self.custom_add_index], 1
+            )
+        elif key == '-' and length > 0:
+            self.custom_scenario_give_squad(
+                self.custom_catalog[self.custom_add_index], -1
+            )
+        elif key == '[':
+            self.custom_side = 'german'
+            self.custom_scenario_open_add()
+        elif key == ']':
+            self.custom_side = 'soviet'
+            self.custom_scenario_open_add()
+        elif key == '0':
+            self.menu_state = 'edit'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_handle_confirm_roll(self, key):
+        '''replace both lists, or go back'''
+        if key is None or key == 'none':
+            return
+        if key == '1':
+            result = engine.world_builder.generate_custom_scenario_forces(
+                self.custom_points, self.custom_year
+            )
+            self.custom_scenario_apply_roll(result)
+            self.custom_notice = 'Rolled a new list for both sides'
+            self.menu_state = 'edit'
+        elif key == '0':
+            self.menu_state = 'edit'
+
+    #---------------------------------------------------------------------------
+    def custom_scenario_handle_play_as(self, key):
+        '''spawn faction, then load the battle from the edited lists'''
+        if key is None or key == 'none':
+            return
+        if key == '0':
+            self.menu_state = 'edit'
+            return
+        if key == '1':
+            faction = 'german'
+        elif key == '2':
+            faction = 'soviet'
+        elif key == '3':
+            faction = 'civilian'
+        else:
+            return
+        german = engine.world_builder.expand_squad_counts(
+            self.custom_order['german'], self.custom_counts['german']
+        )
+        soviet = engine.world_builder.expand_squad_counts(
+            self.custom_order['soviet'], self.custom_counts['soviet']
+        )
+        year = self.custom_year
+        self.deactivate_menu()
+        self.graphics_engine.load_custom_scenario(
+            faction, year, german, soviet
+        )
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):

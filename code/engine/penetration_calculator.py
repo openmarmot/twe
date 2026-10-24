@@ -69,6 +69,79 @@ def evaluate_spaced_armor(projectile_type, max_penetration, spaced_armor_thickne
         return max_penetration, 'defeated'
 
 #---------------------------------------------------------------------------
+def projectile_diameter(projectile):
+    '''projectile diameter in mm'''
+    return projectile_data[projectile.ai.projectile_type]['diameter']
+
+#---------------------------------------------------------------------------
+def is_internal_burst(projectile):
+    '''True for APHE that bursts only after it has defeated the plate'''
+    effect = projectile_data[projectile.ai.projectile_type]['contact_effect']
+    return effect == 'internal_burst'
+
+#---------------------------------------------------------------------------
+def bursts_on_contact(projectile_type):
+    '''True when the round detonates on the surface instead of penetrating.
+
+    internal_burst is APHE. The base fuze runs after a perforation, so the
+    round has to be handed to the vehicle like inert shot.
+    '''
+    effect = projectile_data[projectile_type]['contact_effect']
+    if effect == 'none' or effect == 'internal_burst':
+        return False
+    return True
+
+#---------------------------------------------------------------------------
+def plate_throws_fragments(thickness_mm, diameter_mm):
+    '''raw plate thickness, not the sloped path.
+
+    Spall and plugging need a plate thick enough to fail in shear.
+    Plate thinner than half the projectile petals, and a failed hit
+    throws nothing. No plate means there is nothing to throw.
+    '''
+    if thickness_mm < 1 or diameter_mm <= 0:
+        return False
+    return thickness_mm >= (0.5 * diameter_mm)
+
+#---------------------------------------------------------------------------
+def overmatch_ratio(pen_value, armor_value):
+    '''penetration divided by effective armor. a missing plate is a gross overmatch.'''
+    if armor_value <= 0:
+        return 999
+    return pen_value / armor_value
+
+#---------------------------------------------------------------------------
+def perforation_fragment_attempts(thickness_mm, diameter_mm, pen_value, armor_value):
+    '''how many plate fragments a perforation throws. the caller keeps all of them.
+
+    Just above the ballistic limit of thick plate is the dirtiest failure
+    (plug plus a breaking penetrator). A large overmatch leaves a cleaner hole.
+    Thin plate contributes a plug only when a cannon round barely makes it through.
+    '''
+    if thickness_mm < 1:
+        return 0
+    overmatch = overmatch_ratio(pen_value, armor_value)
+    # petalling. one light plug for a cannon round near the limit.
+    if thickness_mm < (0.5 * diameter_mm):
+        if diameter_mm >= 20 and overmatch < 1.3:
+            return 1
+        return 0
+    if overmatch < 1.25:
+        return random.randint(2, 4)
+    if overmatch < 2.0:
+        return random.randint(1, 3)
+    return 1
+
+#---------------------------------------------------------------------------
+def join_hit_result(result, phrase):
+    '''append one effect to the hit-log result string'''
+    if phrase is None or phrase == '':
+        return result
+    if result == '':
+        return phrase
+    return result + ', ' + phrase
+
+#---------------------------------------------------------------------------
 def calculate_penetration(projectile, distance, armor_type, armor, side, relative_angle):
     '''calculate penetration
     Returns: (penetrated: bool, pen_value: float, armor_value: float, spaced_effect: str)

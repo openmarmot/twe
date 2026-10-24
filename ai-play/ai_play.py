@@ -11,7 +11,7 @@ from pathlib import Path
 from tkinter import ttk
 
 from game_session import GameSession
-from player import Player
+from player import CLEF_ENDPOINT, Player
 
 HERE = Path(__file__).resolve().parent
 TWE_ROOT = HERE.parent
@@ -22,6 +22,7 @@ FG = "#efe8dc"
 MUTED = "#b3a898"
 ACCENT = "#d7a15e"
 DANGER = "#e07a62"
+CLEF_ON = "#8fbf7f"
 # The pygame surface is 1280x720. A smaller dock crops that surface from the
 # center, which cuts off the text along the left edge.
 GAME_W = 1280
@@ -55,6 +56,7 @@ class App:
         self.battle = tk.StringVar(value="1")
         self.endpoint = tk.StringVar(value="http://10.12.0.50:8000/v1")
         self.model = tk.StringVar(value="deepseek-ai/DeepSeek-V4-Flash-Vision-Exp")
+        self.clef_endpoint = tk.StringVar(value=CLEF_ENDPOINT)
         self.status = tk.StringVar(value="Launch a quick battle, then start the player.")
 
         self._label(bar, "Faction")
@@ -74,6 +76,13 @@ class App:
         self.play_button = self._button(bar, "Start player", self._start_player)
         self.stop_button = self._button(bar, "Stop player", self._stop_player)
         self.play_button.configure(state=tk.DISABLED)
+        # Off by default. DeepSeek takes every turn until this is pressed.
+        self.clef_button = tk.Button(
+            bar, text="Clef off", command=self._toggle_clef,
+            bg=PANEL, fg=FG, activebackground="#3a332c", activeforeground=FG,
+            relief=tk.FLAT, padx=10, pady=4,
+        )
+        self.clef_button.pack(side=tk.LEFT, padx=(0, 8))
 
         endpoint_row = tk.Frame(self.root, bg=BG)
         endpoint_row.pack(side=tk.TOP, fill=tk.X, padx=10, pady=(6, 0))
@@ -86,7 +95,14 @@ class App:
         tk.Entry(
             endpoint_row, textvariable=self.model, width=52,
             bg=PANEL, fg=FG, insertbackground=FG, relief=tk.FLAT,
+        ).pack(side=tk.LEFT, padx=(4, 10))
+        self._label(endpoint_row, "Clef")
+        tk.Entry(
+            endpoint_row, textvariable=self.clef_endpoint, width=36,
+            bg=PANEL, fg=FG, insertbackground=FG, relief=tk.FLAT,
         ).pack(side=tk.LEFT, padx=(4, 0))
+        self.clef_endpoint.trace_add("write", self._clef_endpoint_changed)
+        self.player.set_clef_url(self.clef_endpoint.get())
 
         tk.Label(
             self.root, textvariable=self.status, bg=BG, fg=MUTED, anchor="w",
@@ -195,7 +211,31 @@ class App:
         model = self.model.get().strip()
         self.player.start(endpoint, model)
         self.play_button.configure(state=tk.DISABLED)
-        self.status.set(f"Player running. {model}")
+        if self.player.clef_enabled():
+            self.status.set(f"Player running. {model}. Clef walks the simple frames.")
+        else:
+            self.status.set(f"Player running. {model}.")
+
+    def _clef_endpoint_changed(self, *_args):
+        self.player.set_clef_url(self.clef_endpoint.get())
+
+    def _toggle_clef(self):
+        enabled = not self.player.clef_enabled()
+        self.player.set_clef(enabled)
+        if enabled:
+            self.clef_button.configure(
+                text="Clef on", bg=CLEF_ON, fg="#1a1613",
+                activebackground="#a5d09a", activeforeground="#1a1613",
+            )
+            self.status.set(
+                "Clef on. It walks the simple frames. DeepSeek takes enemies, vehicles, menus, and death screens."
+            )
+        else:
+            self.clef_button.configure(
+                text="Clef off", bg=PANEL, fg=FG,
+                activebackground="#3a332c", activeforeground=FG,
+            )
+            self.status.set("Clef off. DeepSeek takes every turn.")
 
     def _stop_player(self):
         self.player.stop()
@@ -243,6 +283,8 @@ class App:
 
     def _show_decision(self, decision):
         parts = [decision["time"]]
+        if decision.get("source"):
+            parts.append(decision["source"])
         response_s = _span(decision.get("response_s"))
         since_s = _span(decision.get("since_s"))
         if response_s:
@@ -261,9 +303,10 @@ class App:
         if decision.get("error"):
             self.status.set(decision.get("text") or "The player hit an error.")
         elif response_s:
-            detail = f"Last response {response_s}."
+            who = decision.get("source") or "model"
+            detail = f"Last {who} response {response_s}."
             if since_s:
-                detail = f"Last response {response_s} ({since_s} since the previous)."
+                detail = f"Last {who} response {response_s} ({since_s} since the previous)."
             self.status.set(detail)
 
     def _append(self, widget, text):

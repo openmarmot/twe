@@ -36,6 +36,14 @@ class AISquad():
         # however if the squad is busy it might take a minute
         self.squad_leader=None
 
+        # squads whose leaders take orders from this group's field commander.
+        # the commander himself is the human with is_field_commander.
+        self.commanded_squads=[]
+        # the command group this squad takes orders from, or None
+        self.command_squad=None
+        # world_seconds of the last objective this squad was given
+        self.last_command_order_time=0
+
         # faction - german/soviet/american/civilian
         self.faction='none'
 
@@ -51,6 +59,14 @@ class AISquad():
         # this is adjusted by ai_human_squad_leader.py
         self.max_distance_human = 300
         self.max_distance_vehicle = 300
+
+    #---------------------------------------------------------------------------
+    def field_commander(self):
+        '''the living member with is_field_commander, or None'''
+        for member in self.members:
+            if member.is_human and member.ai.is_field_commander:
+                return member
+        return None
 
     #---------------------------------------------------------------------------
     def add_to_squad(self, WORLD_OBJECT):

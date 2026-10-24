@@ -80,6 +80,7 @@ def create(world, world_coords):
         engine.world_builder.spawn_object(world, world_coords, "deutz_diesel_65hp_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [75, 10]
+    z.ai.engine_at_front = True
     z.ai.batteries.append(
         engine.world_builder.spawn_object(world, world_coords, "battery_vehicle_6v", False)
     )
@@ -89,10 +90,14 @@ def create(world, world_coords):
         engine.world_builder.get_random_from_list(world, world_coords, engine.world_builder.list_consumables, False)
     )
     z.ai.ammo_rack_capacity = 24
-    for b in range(20):
+    for b in range(17):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "75mm_pak40_magazine", False)
         )
+    for b in range(3):
+        temp = engine.world_builder.spawn_object(world, world_coords, "75mm_pak40_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "PzGr40_75_PAK40")
+        z.ai.ammo_rack.append(temp)
     for b in range(4):
         temp = engine.world_builder.spawn_object(world, world_coords, "75mm_pak40_magazine", False)
         engine.world_builder.load_magazine(world, temp, "Sprgr_34_75_L48")

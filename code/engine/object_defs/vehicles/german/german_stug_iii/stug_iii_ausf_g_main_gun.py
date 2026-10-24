@@ -20,12 +20,15 @@ def create(world, world_coords):
     z.is_turret = True
     z.ai.vehicle_mount_side = "front"
     z.ai.turret_accuracy = 1
+    # late Topfblende (Saukopf): 80 mm cast, face nearly vertical.
+    # a stored slope would thicken a center hit. off-square shots already
+    # pick up horizontal obliquity. top and bottom are the 30 mm lid.
     z.ai.turret_armor["top"] = [30, 0, 0]
     z.ai.turret_armor["bottom"] = [30, 0, 0]
-    z.ai.turret_armor["left"] = [50, 0, 0]
-    z.ai.turret_armor["right"] = [50, 0, 0]
-    z.ai.turret_armor["front"] = [50, 0, 0]
-    z.ai.turret_armor["rear"] = [50, 0, 0]
+    z.ai.turret_armor["left"] = [80, 0, 0]
+    z.ai.turret_armor["right"] = [80, 0, 0]
+    z.ai.turret_armor["front"] = [80, 0, 0]
+    z.ai.turret_armor["rear"] = [80, 0, 0]
     # gun port is front-right of the casemate. pivot is the mantlet face
     # so the recoil housing sits in the port and the barrel extends forward
     z.ai.position_offset = [-22, 2.4]

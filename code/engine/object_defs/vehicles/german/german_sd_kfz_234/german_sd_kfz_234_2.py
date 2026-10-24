@@ -52,10 +52,14 @@ def create(world, world_coords):
 
     z.ai.ammo_rack_capacity = 55
     # AP
-    for b in range(40):
+    for b in range(35):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "5cm_kwk39_l60_magazine", False)
         )
+    for b in range(5):
+        temp = engine.world_builder.spawn_object(world, world_coords, "5cm_kwk39_l60_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "PzGr40_50_L60")
+        z.ai.ammo_rack.append(temp)
     # HE
     for b in range(15):
         temp = engine.world_builder.spawn_object(world, world_coords, "5cm_kwk39_l60_magazine", False)

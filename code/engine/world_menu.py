@@ -523,6 +523,7 @@ class World_Menu:
             self.text_queue.append("7 - german_rso_pak")
             self.text_queue.append("8 - t34-76 model 1943")
             self.text_queue.append("9 - t34-85")
+            self.text_queue.append("i - IS-2")
             if key == "0":
                 engine.world_builder.spawn_object(
                     self.world,
@@ -622,6 +623,16 @@ class World_Menu:
                         self.world.player.world_coords[1],
                     ],
                     "soviet_t34_85",
+                    True,
+                )
+            elif key == "i":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "soviet_is_2",
                     True,
                 )
         if self.menu_state == "spawn_weapons":
@@ -1235,8 +1246,16 @@ class World_Menu:
                 self.text_queue.append("Marksman")
             if self.selected_object.ai.memory.get("current_task") == "task_trader":
                 self.text_queue.append("Trader")
-            if self.selected_object.ai.squad.squad_leader == self.selected_object:
+            if self.selected_object.ai.is_field_commander:
+                commanded = len(self.selected_object.ai.squad.commanded_squads)
+                self.text_queue.append(f"Field Commander ({commanded} squads)")
+            elif self.selected_object.ai.squad.squad_leader == self.selected_object:
                 self.text_queue.append("Squad Leader")
+            command_squad = self.selected_object.ai.squad.command_squad
+            if command_squad is not None:
+                commander = command_squad.field_commander()
+                if commander is not None:
+                    self.text_queue.append("Orders from " + commander.name)
 
             self.text_queue.append("")
             self.text_queue.append("--- Stats ---")

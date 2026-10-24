@@ -222,6 +222,10 @@ class Graphics_2D_Pygame:
             pygame.K_x: "x",
             pygame.K_LEFTBRACKET: "[",
             pygame.K_RIGHTBRACKET: "]",
+            pygame.K_UP: "up",
+            pygame.K_DOWN: "down",
+            pygame.K_LEFT: "left",
+            pygame.K_RIGHT: "right",
             pygame.K_SPACE: "space",
             pygame.K_LCTRL: "l_ctrl",
             pygame.K_m: "m",
@@ -465,6 +469,21 @@ class Graphics_2D_Pygame:
             engine.world_builder.load_scenario_map_objects,
             (scenario,),
             "Creating scenario map objects...",
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_custom_scenario(
+        self, player_spawn_faction, year, german_squads, soviet_squads
+    ):
+        """load a custom scenario from edited squad lists"""
+
+        # called by game_menu.custom_scenario_menu
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_custom_scenario_map_objects,
+            (year, german_squads, soviet_squads),
+            "Creating custom scenario...",
         )
 
     # ------------------------------------------------------------------------------
