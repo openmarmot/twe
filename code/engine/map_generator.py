@@ -270,27 +270,44 @@ def generate_map_area_town(world_coords,name):
     return map_objects
 
 #------------------------------------------------------------------------------
-def generate_road(start_coords,end_coords,road_type,segment_height):
-    #road_type string, the world_builder_identity of the road segment
-    # rotation is in degrees
-    actual_rotation=engine.math_2d.get_rotation(start_coords,end_coords)
+# road_300.png is 300x300. the beige strip runs the full height and is 113px
+# wide, centered on the sprite. one segment is 300 world units long.
+ROAD_SEGMENT_LENGTH=300
+ROAD_WIDTH=113
+
+#------------------------------------------------------------------------------
+def generate_road(start_coords,end_coords,road_type,segment_height,anchor='start'):
+    '''lay straight road segments from start_coords toward end_coords.
+
+    road_type: world_builder_identity of the road segment
+    anchor 'start': the first segment begins on start_coords. the last
+    segment can run past end_coords.
+    anchor 'end': the leading edge of the last segment stops on end_coords.
+    extra length hangs past start_coords instead, so a spur can meet a
+    crossing road without sticking out the far side.
+    '''
     actual_distance=engine.math_2d.get_distance(start_coords,end_coords)
+    if actual_distance<1:
+        return []
 
-    # for now calculated_rotation is the closest angle of 0,90,180,270
-    #calculated_rotation = round(actual_rotation / 90) * 90 % 360
-
-    # determine the number of segments needed and the overlap
-    # overlap defaults to the segment type_height
-    # if there is a remainder we will go one over and slightly overlap them
-    number_of_segments = math.ceil(actual_distance / segment_height)
-
+    actual_rotation=engine.math_2d.get_rotation(start_coords,end_coords)
+    direction=engine.math_2d.get_heading_vector(start_coords,end_coords)
+    number_of_segments=math.ceil(actual_distance/segment_height)
+    half=segment_height/2.0
     segments=[]
 
-    # fill out the segments array
-    dir = engine.math_2d.get_heading_vector(start_coords, end_coords)
     for i in range(number_of_segments):
-        center_pos = [start_coords[0] + (i * segment_height + segment_height / 2) * dir[0], 
-                        start_coords[1] + (i * segment_height + segment_height / 2) * dir[1]]
+        if anchor=='end':
+            # i=0 is the junction segment. step back toward the start.
+            along=half+i*segment_height
+            center_pos=[
+                end_coords[0]-direction[0]*along,
+                end_coords[1]-direction[1]*along]
+        else:
+            along=i*segment_height+half
+            center_pos=[
+                start_coords[0]+direction[0]*along,
+                start_coords[1]+direction[1]*along]
         segments.append(MapObject(road_type,road_type,center_pos,actual_rotation,[]))
 
     return segments
@@ -305,11 +322,21 @@ def generate_dynamic_roads(map_objects):
     y_mean=sum(ys)/len(ys)
     x_min=min(xs)-2000
     x_max=max(xs)+2000
-    roads=generate_road([x_min,y_mean],[x_max,y_mean],'road_300',300)
+    roads=generate_road([x_min,y_mean],[x_max,y_mean],'road_300',ROAD_SEGMENT_LENGTH)
+    # stop each spur just inside the far edge of the main road. aiming short
+    # by a fixed 150 and then letting the last 300-long segment run past that
+    # point left either a gap or a stub, depending on the leftover distance.
+    end_inset=12
+    half_width=ROAD_WIDTH/2.0
     for t in towns:
-        offset=150 if t.world_coords[1]>y_mean else -150
-        target=[t.world_coords[0],y_mean+offset]
-        roads+=generate_road(t.world_coords,target,'road_300',300)
+        dy=t.world_coords[1]-y_mean
+        if abs(dy)<1:
+            continue
+        side=1 if dy>0 else -1
+        tip_y=y_mean-side*(half_width-end_inset)
+        tip=[t.world_coords[0],tip_y]
+        roads+=generate_road(
+            t.world_coords,tip,'road_300',ROAD_SEGMENT_LENGTH,'end')
     return roads
 
 #------------------------------------------------------------------------------

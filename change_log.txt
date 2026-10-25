@@ -1,5 +1,15 @@
 TWE Project : Change Log
 
+-------------------------------
+October 26 2026
+- road intersection fix
+- add more data to engine screen for vehicle diagnostics
+- updated quick battle squad summary printout
+- he armor piercing fixed
+
+he shells previously ignored their armor piercing values
+this became important with the IS2, which has a primarily HE loadout
+
 --------------------------------
 October 24 2026
 - added custom scenario. pick a year and a point budget, then each side gets a squad list rolled the same way as a quick battle. soviets still get 50% more points. counts can be changed and the point total updates. there is no reinforcement roll. up and down select a squad, left and right change page

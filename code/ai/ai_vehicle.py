@@ -1026,16 +1026,20 @@ class AIVehicle:
         thickness = plate[0]
         diameter = engine.penetration_calculator.projectile_diameter(projectile)
         overmatch = engine.penetration_calculator.overmatch_ratio(pen_value, armor_value)
+        explosive = engine.penetration_calculator.is_explosive(projectile)
         internal = (
             thickness >= 1
             and engine.penetration_calculator.is_internal_burst(projectile)
         )
+        # an impact fuze bursts in an open compartment. a base fuze does not.
+        if explosive and penetration:
+            internal = True
         join = engine.penetration_calculator.join_hit_result
 
         if penetration:
             # no plate: the shot may pass through empty volume, and a base
             # fuze is not started by canvas
-            if thickness < 1:
+            if thickness < 1 and internal is False:
                 if random.randint(0, 1) == 0:
                     self.handle_component_damage("random_crew_projectile", projectile)
                     result = join(result, "crew")
@@ -1070,11 +1074,16 @@ class AIVehicle:
 
             # a large overmatch still has speed after the first plate.
             # a shell that already burst does not burst again; the residual is inert.
+            # HE bursts in this compartment and does not continue as an intact shell.
             # log this plate first so the follow-on hull line reads after it.
-            continued = overmatch >= 2 and random.randint(0, 1) == 0
+            continued = (
+                explosive is False
+                and overmatch >= 2
+                and random.randint(0, 1) == 0
+            )
             if continued:
                 result = join(result, "continued into hull")
-            else:
+            elif explosive is False:
                 projectile.wo_stop()
 
             self.add_hit_data(
@@ -1091,6 +1100,8 @@ class AIVehicle:
                 self.projectile_hit_vehicle_body(
                     projectile, side, relative_angle, burst_already=internal
                 )
+            elif explosive:
+                projectile.ai.contact_effect()
 
         else:
             # near the ballistic limit, thick plate can scab with the shot still outside
@@ -1103,6 +1114,8 @@ class AIVehicle:
             ):
                 count = self.handle_spalling_damage("passenger_compartment", projectile)
                 result = join(result, f"spalling x{count}")
+            if explosive:
+                result = join(result, "surface burst")
             self.add_hit_data(
                 projectile,
                 penetration,
@@ -1113,7 +1126,10 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
-            self.projectile_bounce(projectile)
+            if explosive:
+                projectile.ai.contact_effect()
+            else:
+                self.projectile_bounce(projectile)
 
     # ---------------------------------------------------------------------------
     def projectile_hit_vehicle_body(
@@ -1148,15 +1164,22 @@ class AIVehicle:
         # the plate that can flake is the hull plate, not a wheel stacked on it
         thickness = self.vehicle_armor[side][0]
         diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        explosive = engine.penetration_calculator.is_explosive(projectile)
         internal = (
             thickness >= 1
             and burst_already is False
             and engine.penetration_calculator.is_internal_burst(projectile)
         )
+        # HE that has already burst is a residual. a first HE plate bursts inside,
+        # including a hit into an open mount with no plate.
+        if explosive and penetration and burst_already is False:
+            internal = True
         join = engine.penetration_calculator.join_hit_result
 
         if penetration:
-            projectile.wo_stop()
+            # HE is removed by the burst after the log. a residual does not burst again.
+            if explosive is False or burst_already:
+                projectile.wo_stop()
             attempts = engine.penetration_calculator.perforation_fragment_attempts(
                 thickness, diameter, pen_value, armor_value
             )
@@ -1187,6 +1210,8 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
+            if explosive and burst_already is False:
+                projectile.ai.contact_effect()
 
         else:
             # near the ballistic limit, thick plate can scab with the shot still outside
@@ -1199,6 +1224,8 @@ class AIVehicle:
             ):
                 count = self.handle_spalling_damage("vehicle_body", projectile)
                 result = join(result, f"spalling x{count}")
+            if explosive:
+                result = join(result, "surface burst")
             self.add_hit_data(
                 projectile,
                 penetration,
@@ -1209,7 +1236,9 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
-            if armor_override is not None:
+            if explosive:
+                projectile.ai.contact_effect()
+            elif armor_override is not None:
                 projectile.wo_stop()
             else:
                 self.projectile_bounce(projectile)
@@ -1249,6 +1278,8 @@ class AIVehicle:
             result = ""
             if spaced_effect == "destabilized":
                 result = "destabilized by spaced armor"
+            explosive = engine.penetration_calculator.is_explosive(projectile)
+            join = engine.penetration_calculator.join_hit_result
 
             if penetration:
                 if wheel.ai.destroyed:
@@ -1274,13 +1305,16 @@ class AIVehicle:
                     self.projectile_hit_vehicle_body(
                         projectile, side, relative_angle, armor_override=augmented_armor
                     )
-                    # body handler records its own hit data + stops the projectile
+                    # body handler records its own hit data and stops or bursts the shell
 
                 # check if that was enough damage to disable the vehicle
                 self.check_wheel_health()
 
             else:
-                self.projectile_bounce(projectile)
+                if explosive:
+                    result = join(result, "surface burst")
+                else:
+                    self.projectile_bounce(projectile)
 
             self.add_hit_data(
                 projectile,
@@ -1292,6 +1326,10 @@ class AIVehicle:
                 pen_value,
                 armor_value,
             )
+            # a holed wheel is judged by the hull behind it, and that call bursts.
+            # a wheel that stops HE bursts here.
+            if penetration is False and explosive:
+                projectile.ai.contact_effect()
         else:
             # no wheels hit
             # pass it to the vehicle body

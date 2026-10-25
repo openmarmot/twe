@@ -103,10 +103,18 @@ class AIProjectile():
                     if self.weapon.is_gun:
                         self.weapon.ai.rounds_hit+=1
 
-                    if engine.penetration_calculator.bursts_on_contact(self.projectile_type):
-                        # bullet has collided and exploded on the surface.
-                        # APHE (internal_burst) is handed to the target so the
-                        # fuze can run after a perforation.
+                    # HEAT and other contact bursts go off on the skin.
+                    # HE against a vehicle is handed over so the plate can be
+                    # tested. Infantry, buildings, and anything else still burst here.
+                    # APHE (internal_burst) is handed over like inert shot.
+                    explosive_armor = (
+                        collide_obj.is_vehicle
+                        and engine.penetration_calculator.is_explosive(self.owner)
+                    )
+                    if (
+                        engine.penetration_calculator.bursts_on_contact(self.projectile_type)
+                        and explosive_armor is False
+                    ):
                         self.contact_effect()
                     else:
                         # tell the object that there has been a collision

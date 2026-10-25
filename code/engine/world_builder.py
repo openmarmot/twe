@@ -1090,11 +1090,43 @@ def load_custom_scenario_map_objects(
     )
 
 
+# print order for the battle squad summary. follows the battlegroup
+# buckets (command, infantry, tanks, antitank, support, artillery),
+# then anything else alphabetically.
+quick_battle_summary_type_order = (
+    "command",
+    "infantry",
+    "motorized_infantry",
+    "mechanized_infantry",
+    "tank",
+    "antitank_vehicle",
+    "antitank_infantry",
+    "towed_antitank",
+    "medic",
+    "mechanic",
+    "sniper",
+    "infantry radio",
+    "mg",
+    "fire_support_vehicle",
+    "towed_antiair",
+    "recon",
+    "afv",
+    "utility",
+    "air",
+    "artillery",
+    "civilian",
+)
+quick_battle_summary_type_rank = {
+    unit_type: index
+    for index, unit_type in enumerate(quick_battle_summary_type_order)
+}
+
+
 # ------------------------------------------------------------------------------
 def print_quick_battle_squad_summary(
     year, squads, reinforcement_squads, title="QUICK BATTLE SUMMARY"
 ):
-    """print a clean terminal summary of battle forces by faction"""
+    """print a clean terminal summary of battle forces by faction and type"""
 
     def count_squads(squad_list):
         counts = {}
@@ -1114,6 +1146,25 @@ def print_quick_battle_squad_summary(
             return "american"
         return "unknown"
 
+    def squad_type_of(squad_name):
+        info = squad_data.get(squad_name)
+        if info is None:
+            base = engine.battlegroup_generator.get_camo_base_name(squad_name)
+            if base:
+                info = squad_data.get(base)
+        if info is None:
+            return "unknown"
+        unit_type = info.get("type", "")
+        if unit_type is None or str(unit_type).strip() == "":
+            return "unknown"
+        return str(unit_type)
+
+    def type_sort_key(unit_type):
+        rank = quick_battle_summary_type_rank.get(unit_type)
+        if rank is None:
+            return (1, unit_type)
+        return (0, rank)
+
     def filter_faction(counts, faction):
         return {k: v for k, v in counts.items() if faction_of(k) == faction}
 
@@ -1122,11 +1173,22 @@ def print_quick_battle_squad_summary(
             return
         total = sum(counts.values())
         print(f"  {label}  ({total} squad{'s' if total != 1 else ''})")
-        print(f"  {'#':>4}  Squad")
-        print(f"  {'----':>4}  {'-' * (width - 10)}")
-        for name, count in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
-            print(f"  {count:>4}  {name}")
+        by_type = {}
+        for name, count in counts.items():
+            unit_type = squad_type_of(name)
+            if unit_type not in by_type:
+                by_type[unit_type] = []
+            by_type[unit_type].append((name, count))
         print()
+        for unit_type in sorted(by_type, key=type_sort_key):
+            rows = by_type[unit_type]
+            rows.sort(key=lambda row: (-row[1], row[0]))
+            type_total = sum(count for _, count in rows)
+            type_word = "squad" if type_total == 1 else "squads"
+            print(f"    {unit_type.replace('_', ' ')}  ({type_total} {type_word})")
+            for name, count in rows:
+                print(f"    {count:>4}  {name}")
+            print()
 
     main_counts = count_squads(squads)
     rein_counts = count_squads(reinforcement_squads)
