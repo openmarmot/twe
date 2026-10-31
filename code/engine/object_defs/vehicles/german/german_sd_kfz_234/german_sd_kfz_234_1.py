@@ -17,6 +17,8 @@ from engine.object_registry import register_object
 def create(world, world_coords):
     z = engine.world_builder.spawn_object(world, world_coords, "german_sd_kfz_234_base", False)
     z.name = "Sd.Kfz.234/1"
+    # open 2 cm turret. the base weight is the Puma
+    z.weight = 10500
     z.ai.passenger_compartment_ammo_racks = True
     z.ai.requires_afv_training = True
     z.ai.is_transport = False

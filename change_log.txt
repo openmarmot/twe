@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 -------------------------------
+October 27 2026
+- updated vehicle engines and weight stats
+
+-------------------------------
 October 26 2026
 - road intersection fix
 - add more data to engine screen for vehicle diagnostics

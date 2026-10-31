@@ -69,7 +69,8 @@ def _build(world, world_coords, display_name, ap_b_rounds, ap_sp_rounds, he_roun
     z.ai.rotation_speed = 40.0
     z.collision_radius = 50
     z.bounding_circles.append([[0.0, 0.0], 25])
-    z.weight = 1400
+    # combat weight of the piece. 1400 was the Pak 40 carriage
+    z.weight = 1120
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.rotation_angle = float(random.randint(0, 359))

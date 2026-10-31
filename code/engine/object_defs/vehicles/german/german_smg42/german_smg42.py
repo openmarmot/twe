@@ -55,7 +55,8 @@ def create(world, world_coords):
     z.ai.rotation_speed = 40.0
     z.collision_radius = 50
     z.bounding_circles.append([[0.0, 0.0], 25])
-    z.weight = 1400
+    # MG 42 plus the Lafette 42. the old 1400 was the Pak 40 carriage
+    z.weight = 32
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.rotation_angle = float(random.randint(0, 359))

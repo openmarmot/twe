@@ -65,7 +65,8 @@ def create(world, world_coords):
     z.bounding_circles.append([[-23.0, 0.0], 40])
     z.bounding_circles.append([[13.0, 0.0], 40])
     z.bounding_circles.append([[52.0, 0.0], 40])
-    z.weight = 29600
+    # SU-100 hull. the 85 mm gun is a little lighter than the D-10
+    z.weight = 31000
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(

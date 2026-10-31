@@ -89,18 +89,23 @@ def create(world, world_coords):
     z.bounding_circles.append([[-80.47619047619047, 35.238095238095234], 10])
     z.bounding_circles.append([[81.9047619047619, -37.14285714285714], 10])
     z.bounding_circles.append([[82.85714285714285, 33.33333333333333], 10])
-    z.weight = 26500
+    z.weight = 65000
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(
         engine.world_builder.spawn_object(world, world_coords, "vehicle_fuel_tank", False)
     )
     z.ai.fuel_tanks[0].volume = 114
-    engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "diesel")
+    engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "gas_80_octane")
+    # two Maybach HL 120 TRM, driving the electric transmission
     z.ai.engines.append(
-        engine.world_builder.spawn_object(world, world_coords, "kharkiv_v2-34_engine", False)
+        engine.world_builder.spawn_object(world, world_coords, "maybach_hl120_trm_engine", False)
+    )
+    z.ai.engines.append(
+        engine.world_builder.spawn_object(world, world_coords, "maybach_hl120_trm_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [75, 10]
+    z.ai.engines[1].ai.exhaust_position_offset = [75, -10]
     z.ai.batteries.append(
         engine.world_builder.spawn_object(world, world_coords, "battery_vehicle_6v", False)
     )
