@@ -18,6 +18,8 @@ def create(world, world_coords):
         "german_panzer_iv_ausf_g",
         "german_panzer_iv_ausf_h",
         "german_panzer_iv_ausf_j",
+        "german_jagdpanzer_iv",
+        "german_jagdpanzer_iv_late",
     ]
     z.ai.armor = [10, 0, 0]
     return z

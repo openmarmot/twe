@@ -1,6 +1,15 @@
 TWE Project : Change Log
 
 -------------------------------
+November 01 2026
+- added the Jagdpanzer IV (Sd.Kfz. 162, 7.5 cm Pak 39 L/48). this is not the IV/70
+- 60 mm casemate at 50 degrees, 50 mm nose at 55, 80 mm Saukopf. four crew, 79 rounds
+- squad German Jagdpanzer IV, cost 400, chance 40 in 1944 and 25 in 1945, one per battle
+- Jagdpanzer IV roof gun is a remote MG 42 mount. it reuses the remote MG 34 sprite
+- Jagdpanzer IV Late is the May 1944 batch. casemate front 80 mm at 50 degrees, casemate sides 40 mm. the early vehicle casemate sides are 30 mm. lower nose stays 50 mm on both
+- early squad chance is 22/6. late squad is cost 450, chance 32/20
+
+-------------------------------
 October 27 2026
 - updated vehicle engines and weight stats
 
