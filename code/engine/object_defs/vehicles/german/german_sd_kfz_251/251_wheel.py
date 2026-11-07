@@ -20,6 +20,8 @@ def create(world, world_coords):
         "german_sd_kfz_251/2",
         "german_sd_kfz_251/9",
         "german_sd_kfz_251/9_late",
+        "german_sd_kfz_251/21",
+        "german_sd_kfz_251/21_15",
         "german_sd_kfz_251/22",
         "german_sd_kfz_251/23",
         "german_sd_kfz_222",

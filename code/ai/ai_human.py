@@ -511,7 +511,9 @@ class AIHuman:
         # check_inventory - bool. if true also check inventory
         # return [ammo in gun, ammo in inventory]
         ammo_gun = 0
-        if gun.ai.magazine is not None:
+        if getattr(gun.ai, "multi_barrel", False):
+            ammo_gun = gun.ai.rounds_loaded()
+        elif gun.ai.magazine is not None:
             ammo_gun = len(gun.ai.magazine.ai.projectiles)
 
         ammo_inventory = 0
@@ -1765,6 +1767,18 @@ class AIHuman:
         self.add_journal_entry(f"Reloaded: {weapon.name}")
         self.speak("reloading!")
         if weapon.is_gun or weapon.is_handheld_antitank:
+            # one reload fills every barrel. the gunner still calls this once.
+            if getattr(weapon.ai, "multi_barrel", False):
+                success = weapon.ai.reload_all(obj_with_inventory, new_magazine)
+                if success is False:
+                    self.speak("No new magazines available")
+                    engine.log.add_data(
+                        "error",
+                        f"ai_human.reload_weapon {weapon.name}- no suitable magazines found",
+                        True,
+                    )
+                return success
+
             # first get the current magazine
             old_magazine = None
             if weapon.ai.magazine is not None:

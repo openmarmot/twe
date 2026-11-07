@@ -3,6 +3,8 @@
 repo : https://github.com/openmarmot/twe
 
 notes :
+multi-barrel mounts use AIGunMulti in ai_gun_multi.py.
+The turret still holds one weapon, and the gunner still calls fire() once.
 '''
 
 

@@ -22,7 +22,7 @@ def create(world, world_coords):
     z.description = "A 200-round disintegrating belt for the MG 151/20"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
-    z.ai.compatible_guns = ["mg151_20"]
+    z.ai.compatible_guns = ["mg151_20", "mg151_20_drilling"]
     z.ai.compatible_projectiles = [
         "20x82_Pzgr",
         "20x82_Pzsprgr",

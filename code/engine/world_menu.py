@@ -526,6 +526,8 @@ class World_Menu:
             self.text_queue.append("i - IS-2")
             self.text_queue.append("j - german_jagdpanzer_iv")
             self.text_queue.append("k - german_jagdpanzer_iv_late")
+            self.text_queue.append("l - german_sd_kfz_251/21")
+            self.text_queue.append("m - german_sd_kfz_251/21 15mm")
             if key == "0":
                 engine.world_builder.spawn_object(
                     self.world,
@@ -655,6 +657,26 @@ class World_Menu:
                         self.world.player.world_coords[1],
                     ],
                     "german_jagdpanzer_iv_late",
+                    True,
+                )
+            elif key == "l":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "german_sd_kfz_251/21",
+                    True,
+                )
+            elif key == "m":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "german_sd_kfz_251/21_15",
                     True,
                 )
         if self.menu_state == "spawn_weapons":

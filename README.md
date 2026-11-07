@@ -87,6 +87,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
 | German | Sd.kfz.251/9 'Stummel' | AFV | 75mm L24 |
 | German | Sd.kfz.251/9 Late | AFV | gains a MG |
+| German | Sd.kfz.251/22 | AFV | Drilling 3 gun turret. both 15mm and 20mm versions |
 | German | Sd.kfz.251/22 | AFV | Pak 40 |
 | German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
 | German | sMG42 | mg | mg42 on Lafette mount |

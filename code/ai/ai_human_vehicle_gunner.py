@@ -496,6 +496,11 @@ class AIHumanVehicleGunner:
             self.owner.ai.memory["task_vehicle_crew"]["current_action"]
             == VehicleCrewAction.RELOADING_PRIMARY
         ):
+            # a belt change for a fight that is already over. an empty gun
+            # still finishes, so the weapon is loaded for the next contact.
+            if self.reload_is_still_useful(turret.ai.primary_weapon, vehicle) is False:
+                self.cancel_reload()
+                return
             if (
                 self.owner.world.world_seconds
                 - self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"]
@@ -505,12 +510,18 @@ class AIHumanVehicleGunner:
                     VehicleCrewAction.NONE
                 )
                 self.think_reload(turret.ai.primary_weapon)
+                # the belts just changed. decide the next action on the next think,
+                # so this same pass cannot start another reload immediately.
+                return
             else:
                 return
         if (
             self.owner.ai.memory["task_vehicle_crew"]["current_action"]
             == VehicleCrewAction.RELOADING_COAX
         ):
+            if self.reload_is_still_useful(turret.ai.coaxial_weapon, vehicle) is False:
+                self.cancel_reload()
+                return
             if (
                 self.owner.world.world_seconds
                 - self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"]
@@ -520,6 +531,7 @@ class AIHumanVehicleGunner:
                     VehicleCrewAction.NONE
                 )
                 self.think_reload(turret.ai.coaxial_weapon)
+                return
 
             else:
                 return
@@ -674,6 +686,33 @@ class AIHumanVehicleGunner:
                 self.think_fire_mission()
             else:
                 self.think_idle()
+
+    # ---------------------------------------------------------------------------
+    def reload_is_still_useful(self, weapon, vehicle):
+        """False when a loaded gun is being changed for a fight that is over.
+
+        An empty gun keeps reloading. A fire mission keeps reloading.
+        Spotted infantry or vehicles keep a type-change going.
+        """
+        ammo_gun, _ammo_inventory, _magazine_count = self.owner.ai.check_ammo(
+            weapon, vehicle
+        )
+        if ammo_gun == 0:
+            return True
+        crew = self.owner.ai.memory["task_vehicle_crew"]
+        if crew.get("fire_missions"):
+            return True
+        if self.owner.ai.human_targets or self.owner.ai.vehicle_targets:
+            return True
+        return False
+
+    # ---------------------------------------------------------------------------
+    def cancel_reload(self):
+        """drop a reload and the target that caused it"""
+        crew = self.owner.ai.memory["task_vehicle_crew"]
+        crew["current_action"] = VehicleCrewAction.SCANNING
+        crew["target"] = None
+        crew.pop("reload_judge", None)
 
     # ---------------------------------------------------------------------------
     def think_examine_target(self, out_of_ammo_primary, out_of_ammo_coax):
@@ -1122,6 +1161,20 @@ class AIHumanVehicleGunner:
         chosen_type = self.magazine_projectile_type(chosen)
         if loaded_type == chosen_type:
             return False
+
+        loaded_pens = self.magazine_can_pen_vehicle(loaded, target)
+        chosen_pens = self.magazine_can_pen_vehicle(chosen, target)
+        # the belt in the gun already penetrates. leave it there.
+        if loaded_pens:
+            return False
+        # neither belt penetrates. keep a full-caliber AP round.
+        # tungsten and HEAT are still put away for that full-caliber belt.
+        if chosen_pens is False:
+            if (
+                self.is_subcaliber(loaded_type) is False
+                and loaded.ai.use_antipersonnel is False
+            ):
+                return False
 
         self.owner.ai.memory["task_vehicle_crew"]["reload_start_time"] = (
             self.owner.world.world_seconds
