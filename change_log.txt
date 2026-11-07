@@ -1,6 +1,13 @@
 TWE Project : Change Log
 
 -------------------------------
+November 07 2026
+- added the Mauser MG 151/15 and MG 151/20. both reuse the mg34 sprite
+- 15x96 belt is 200 rounds: Pzgr AP-T, H-Pzgr tungsten, and HEI. the 15mm AP stays under the 20x138 API-T, and the Hartkern stays under Pzgr.40
+- 20x82 belt is 200 rounds: Pzgr AP-T, Pzsprgr APHE, and the Minengeschoss. the 20mm AP is weaker than the 15mm AP
+- these are mounted cannons. they are not on the infantry gun lists
+
+-------------------------------
 November 01 2026
 - added the Jagdpanzer IV (Sd.Kfz. 162, 7.5 cm Pak 39 L/48). this is not the IV/70
 - 60 mm casemate at 50 degrees, 50 mm nose at 55, 80 mm Saukopf. four crew, 79 rounds
