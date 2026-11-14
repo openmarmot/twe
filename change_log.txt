@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 -------------------------------
+November 14 2026
+- some grenade updates
+
+-------------------------------
 November 13 2026
 - added the SU-76M. closed casemate roof, 6 mm. ZiS-3, two GAZ-202 engines, crew of four. 60 rounds, mostly HE. most SU-76M were open. this sprite is one of the late roofed ones
 - added a bunch of art for todo vehicles

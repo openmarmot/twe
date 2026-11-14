@@ -53,7 +53,17 @@ class AIThrowable():
         self.explosive=False
         # amount of shrapnel (basically grenade power)
         self.shrapnel_count=0
-        self.explosion_radious=15
+        # blast casualty radius. power falls to edge_power here.
+        self.explosion_radius=15
+        # inside this, a standing man is killed. None uses the shell curve:
+        # 100 at the center, 0 at explosion_radius.
+        self.lethal_radius=None
+        # power at the casualty edge. 0 is a scratch. 40 is a wound.
+        self.edge_power=0
+        # how far splinters travel, in game units. 0 keeps the short shell cloud.
+        self.fragment_range=0
+        # closest an infantryman will throw this. vehicle throws still close to 60.
+        self.min_range=150
 
         # explode when it hits something
         self.explode_on_contact=False
@@ -99,8 +109,35 @@ class AIThrowable():
         self.owner.world.remove_queue.append(self.owner)
 
     #---------------------------------------------------------------------------
-    def explode(self):        
-        self.owner.world.create_explosion(self.owner.world_coords,self.explosion_radious,self.shrapnel_count,self.equipper,self.owner,0.5,1)
+    def explode(self):
+        fragment_range=None
+        if self.fragment_range>0:
+            fragment_range=self.fragment_range
+        self.owner.world.create_explosion(
+            self.owner.world_coords,
+            self.explosion_radius,
+            self.shrapnel_count,
+            self.equipper,
+            self.owner,
+            0.5,
+            1,
+            fragment_range,
+            self.lethal_radius,
+            self.edge_power,
+        )
+
+    #---------------------------------------------------------------------------
+    def set_flight_distance(self, distance):
+        '''land a time-fuse grenade at distance. contact weapons are unchanged.'''
+        if self.has_fuse==False or self.explode_on_contact:
+            return
+        if self.max_speed<=0:
+            return
+        if distance>self.range:
+            distance=self.range
+        if distance<0:
+            distance=0
+        self.max_flight_time=distance/self.max_speed
 
     #---------------------------------------------------------------------------
     def explode_flame(self):

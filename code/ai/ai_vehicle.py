@@ -475,9 +475,8 @@ class AIVehicle:
     def event_throwable_explosion_on_top_of_vehicle(self, throwable):
         """handle a throwable exploding on the top of the vehicle"""
 
-        if self.open_top:
-            # extra damage as it likely fell inside before exploding
-            self.handle_component_damage("random_crew_explosion", None)
+        # the blast already reached this vehicle. open crew are handled there.
+        # what remains is splinters into the roof, which a thin can does not pierce.
 
         compartment = random.choice(["vehicle_body", "passenger_compartment"])
 
@@ -679,9 +678,10 @@ class AIVehicle:
             self.vehicle_armor[hit_side][0] + self.vehicle_armor[hit_side][2]
         )
 
-        # honestly not sure how to handle explosions yet, this is mostly a placeholder function
-
-        if armor_thickness < 5:
+        # plate stops the blast. an open compartment, or a skin under 5 mm, does not.
+        # power under 40 is the fringe of a burst and does not reach open crew.
+        # a thick plate still needs the shell body to defeat it. tracks are not modeled.
+        if armor_thickness < 5 or (self.open_top and power >= 40):
             self.handle_component_damage("random_crew_explosion", None)
 
     # ---------------------------------------------------------------------------

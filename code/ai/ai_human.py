@@ -887,6 +887,15 @@ class AIHuman:
         """Handle collision event processing for projectiles"""
 
         if event_data.is_projectile:
+            # a man on the ground is a poor target for grenade and shell splinters
+            if (
+                event_data.ai.projectile_type == "shrapnel"
+                and self.prone
+                and random.randint(0, 1) == 0
+            ):
+                self.collision_log.append("shrapnel passed over")
+                return
+
             distance = engine.math_2d.get_distance(
                 self.owner.world_coords, event_data.ai.starting_coords
             )
@@ -1061,18 +1070,24 @@ class AIHuman:
     # ---------------------------------------------------------------------------
     def event_explosion(self, event_data):
         """explosion event"""
-        # event_data is the explosion power as a float
-
-        # this will likely just kill the human
+        # event_data is the explosion power as a float.
+        # a man already on the ground takes less of the blast.
+        power = event_data
+        if self.prone:
+            power = power * 0.5
 
         self.morale = max(0, self.morale - random.randint(20, 40))
 
-        self.blood_pressure -= event_data
+        self.blood_pressure -= power
         engine.world_builder.spawn_object(
             self.owner.world, self.owner.world_coords, "blood_splatter", True
         )
 
         self.collision_log.append("hurt by explosion")
+
+        # a standing man close to the burst is knocked down
+        if power >= 40 and self.prone is False and self.in_vehicle() is False:
+            self.prone_state_change()
 
         # short move to simulate being stunned
         if self.owner.is_player is False:
@@ -2307,6 +2322,20 @@ class AIHuman:
                 self.throwable.heading = engine.math_2d.get_heading_vector(
                     self.owner.screen_coords, mouse_screen_coords
                 )
+                # screen position is world position times scale, so the cursor
+                # distance is a throw distance. past the grenade's range it
+                # lands at maximum.
+                if mouse_screen_coords is not None and self.owner.world.scale:
+                    scale = self.owner.world.scale
+                    dx = (
+                        mouse_screen_coords[0] - self.owner.screen_coords[0]
+                    ) / scale
+                    dy = (
+                        mouse_screen_coords[1] - self.owner.screen_coords[1]
+                    ) / scale
+                    self.throwable.ai.set_flight_distance(
+                        engine.math_2d.get_distance([0, 0], [dx, dy])
+                    )
             else:
                 self.throwable.rotation_angle = engine.math_2d.get_rotation(
                     self.owner.world_coords, target_coords
@@ -2314,6 +2343,10 @@ class AIHuman:
                 self.throwable.heading = engine.math_2d.get_heading_vector(
                     self.owner.world_coords, target_coords
                 )
+                distance = engine.math_2d.get_distance(
+                    self.owner.world_coords, target_coords
+                )
+                self.throwable.ai.set_flight_distance(distance)
 
             self.drop_object(self.throwable)
 
@@ -2717,7 +2750,10 @@ class AIHuman:
 
             # also check if we should chuck a grenade at it
             if self.throwable is not None:
-                if distance < self.throwable.ai.range and distance > 150:
+                if (
+                    distance < self.throwable.ai.range
+                    and distance > self.throwable.ai.min_range
+                ):
                     if enemy.is_human:
                         aim_coords = enemy.world_coords
                         if enemy.ai.in_vehicle():

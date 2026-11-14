@@ -1576,18 +1576,30 @@ def spawn_shrapnel(
 
 
 # ------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(world, world_coords, amount, originator, weapon):
+def spawn_shrapnel_cloud(
+    world, world_coords, amount, originator, weapon, fragment_range=None
+):
     """creates a shrapnel starburst pattern. used for grenades"""
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+    # fragment_range - game units a splinter can travel. None keeps the old
+    # short cloud (0.1-0.4 s at 300 units/s, about 1-4.5 m) used by shells.
     ignore_list = []
-    if world.friendly_fire_explosive is False:
+    if originator is not None and world.friendly_fire_explosive is False:
         if originator.is_human:
             ignore_list += originator.ai.squad.faction_tactical.allied_humans
 
-    elif world.friendly_fire_explosive_squad is False:
+    elif originator is not None and world.friendly_fire_explosive_squad is False:
         if originator.is_human:
             # just add the squad
             ignore_list += originator.ai.squad.members
+
+    # splinters move at 300 units/s. flight time is what sets the reach.
+    min_time = 0.1
+    max_time = 0.4
+    if fragment_range is not None and fragment_range > 0:
+        max_time = fragment_range / 300.0
+        # some pieces are light and fall short. the far ones make the radius.
+        min_time = max_time * 0.4
 
     for x in range(amount):
         target_coords = [
@@ -1600,8 +1612,8 @@ def spawn_shrapnel_cloud(world, world_coords, amount, originator, weapon):
             target_coords,
             ignore_list,
             "shrapnel",
-            0.1,
-            0.4,
+            min_time,
+            max_time,
             originator,
             weapon,
         )
