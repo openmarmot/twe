@@ -1,0 +1,6 @@
+ISU-152. Heavy assault gun on the IS hull. A standard 1945 Soviet vehicle. The ISU-122 uses the same hull with a longer 122 mm gun. No separate ISU-122 plan turned up.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/ussr/su009isu152p.html
+
+Use the top view and scale by width (8 pixels to a foot).

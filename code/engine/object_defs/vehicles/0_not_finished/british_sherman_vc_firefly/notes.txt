@@ -1,0 +1,6 @@
+Sherman VC Firefly. 17-pounder Sherman. A standard British tank of 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/uk/uk017fireflyp.html
+
+Use the top view and scale by width (8 pixels to a foot).

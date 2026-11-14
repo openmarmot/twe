@@ -1,0 +1,6 @@
+Valentine Mk III, 2-pounder, three-man turret. The Red Army used Valentines into 1945, mostly the later 6-pounder and 75 mm marks, which share this hull and have a different turret.
+
+Plan:
+https://drawingdatabase.com/valentine/
+
+Use the top view and scale by width (8 pixels to a foot).

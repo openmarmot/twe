@@ -1,0 +1,6 @@
+Panzer IV/70 (A), the Alkett L/70 tank destroyer. Taller superstructure than the more common Vomag IV/70 (V). Both were in service in 1945. No separate top view of the (V) turned up.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/germany/ge053pz470ap.html
+
+Use the top view and scale by width (8 pixels to a foot).

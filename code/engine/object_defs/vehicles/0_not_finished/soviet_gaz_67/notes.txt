@@ -1,0 +1,6 @@
+GAZ-67A. Soviet jeep, in service through 1945. The sheet is labeled 67A and prints the width as 1690 mm. The 67B was the slightly later body.
+
+Plan:
+https://drawingdatabase.com/gaz-67/
+
+Use the top view and scale by width (8 pixels to a foot).

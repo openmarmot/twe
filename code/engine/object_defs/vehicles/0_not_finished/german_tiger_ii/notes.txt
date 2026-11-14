@@ -1,0 +1,6 @@
+Tiger II (Sd.Kfz. 182). Production heavy tank of 1945. This is the series turret.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/germany/ge068tiger2p.html
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -1,6 +1,11 @@
 TWE Project : Change Log
 
 -------------------------------
+November 13 2026
+- added the SU-76M. closed casemate roof, 6 mm. ZiS-3, two GAZ-202 engines, crew of four. 60 rounds, mostly HE. most SU-76M were open. this sprite is one of the late roofed ones
+- added a bunch of art for todo vehicles
+
+-------------------------------
 November 09 2026
 - MG 151/15 and MG 151/20 penetration now holds through the 4000 gun range and drops to zero at 4500, same as the other cannon rounds. muzzle figures are unchanged. the 15mm AP stays under the 20x138 API-T, the Hartkern stays under Pzgr.40, and the 20x82 AP stays under the 15mm AP
 - added code/tools/projectile_data_tool.py. it reads projectile_data and draws the penetration columns as curves and as a heat-colored table

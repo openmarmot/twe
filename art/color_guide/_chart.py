@@ -236,7 +236,7 @@ def render_chart(spec):
             draw,
             mx,
             y,
-            "OFFICIAL SCHEME COMBINATIONS",
+            spec.get("scheme_title", "OFFICIAL SCHEME COMBINATIONS"),
             spec.get("scheme_sub", "Bars show typical mix, not a pattern."),
             W,
         )

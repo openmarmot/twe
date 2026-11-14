@@ -1,0 +1,5 @@
+SU-122. 122 mm howitzer on the T-34 hull. Production ended in 1943. A few were still in units in 1945. The later SU-85 and SU-100 are already in the game.
+
+https://drawingdatabase.com/su-122/
+
+Use the top view and scale by width (8 pixels to a foot).

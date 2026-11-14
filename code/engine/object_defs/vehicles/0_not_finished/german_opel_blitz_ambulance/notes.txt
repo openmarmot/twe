@@ -1,0 +1,6 @@
+Opel Blitz ambulance. The cargo truck was everywhere in 1945 and uses this same cab. This sheet is the enclosed ambulance body, and it does include a top view. No cargo-bed top view turned up.
+
+Plan:
+https://drawingdatabase.com/opel-blitz/
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -228,7 +228,12 @@ class Graphics_2D_Pygame:
             pygame.K_RIGHT: "right",
             pygame.K_SPACE: "space",
             pygame.K_LCTRL: "l_ctrl",
+            pygame.K_i: "i",
+            pygame.K_j: "j",
+            pygame.K_k: "k",
+            pygame.K_l: "l",
             pygame.K_m: "m",
+            pygame.K_n: "n",
         }
 
         # load all images. object_defs is the source of truth (typically

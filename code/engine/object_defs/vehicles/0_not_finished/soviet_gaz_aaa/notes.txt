@@ -1,0 +1,5 @@
+GAZ-AAA, the 6x4 truck. gaz_aaa_cargo.gif is the 1941 cargo body and has a top view and a 3 m scale bar. gaz_aaa_tanker.jpg is the flammable-cargo tank on the same chassis, also with a top view. Both were still around in 1945, mostly behind the divisions.
+
+https://drawingdatabase.com/gaz-aaa/
+
+Use the top view and scale by width (8 pixels to a foot).

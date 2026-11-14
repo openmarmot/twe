@@ -1,0 +1,6 @@
+Flakpanzer IV Kugelblitz. Closed turret with twin 3 cm guns on a Panzer IV hull. Only a handful were finished in 1945, and it is unclear that any fought. Included because the plan is a real top view and the type existed.
+
+Plan:
+https://drawingdatabase.com/kugelblitz/
+
+Use the top view and scale by width (8 pixels to a foot).

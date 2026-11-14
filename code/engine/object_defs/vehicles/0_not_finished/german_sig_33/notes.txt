@@ -1,0 +1,6 @@
+15 cm sIG 33, the towed heavy infantry gun. Still a standard German infantry piece in 1945. Traveling and firing positions, including a top view.
+
+Plan:
+https://drawingdatabase.com/15-cm-sig-33/
+
+Use the top view and scale by width (8 pixels to a foot).

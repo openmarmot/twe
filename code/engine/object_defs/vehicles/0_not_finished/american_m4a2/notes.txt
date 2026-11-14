@@ -1,0 +1,6 @@
+M4A2 Sherman, 75 mm, welded hull, diesel. This is the Sherman the Red Army actually had in 1945, and it was also a US Marine tank.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/usa/us013m4a2p.html
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -1,0 +1,6 @@
+KV-85. Built in late 1943. Most were gone by 1945, so this is a remnant rather than a 1945 type.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/ussr/su015kv85p.html
+
+Use the top view and scale by width (8 pixels to a foot).

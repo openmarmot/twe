@@ -1,0 +1,6 @@
+L6/40. Italian light tank. Germany kept some in Italy and the Balkans into 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/italy/it002l640p.html
+
+Use the top view and scale by width (8 pixels to a foot).

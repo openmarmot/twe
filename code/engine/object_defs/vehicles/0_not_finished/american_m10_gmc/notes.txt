@@ -1,0 +1,6 @@
+M10 3-inch GMC. US and Allied tank destroyer. Still in service in 1945, alongside the 17-pounder Achilles.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/usa/us021m10p.html
+
+Use the top view and scale by width (8 pixels to a foot).

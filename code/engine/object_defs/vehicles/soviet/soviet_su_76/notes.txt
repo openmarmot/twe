@@ -1,0 +1,14 @@
+Soviet SU 76
+
+Late-war SU-76 (the main production SU-76M from mid-1943 onward) had an overall width of 2714 mm (2.714 m). Some sources round to 2.7 m or list 2720–2740 mm for earlier variants, but 2714 mm is the consistent figure for the SU-76M.At your 8 pixels per foot scale:
+2714 mm ≈ 8.90 feet
+8.90 × 8 = 71.2 pixels
+
+This drawing is closed-topped. Most SU-76M were open. Some late ones
+had a thin roof: a 4 mm factory trial that was not adopted, the early
+series 6 mm roof, or a field plate of about 10 mm boiler steel.
+The game roof is 6 mm. open_top is false.
+
+Gun pivot is the trunnion at the center of su_76_gun.png.
+position_offset [-8, 0] puts it on the casemate front wall.
+Barrel points up. Nudge the offset in image_tool if the shield sits off the plate.

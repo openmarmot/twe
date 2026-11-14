@@ -1,0 +1,6 @@
+SU-152. 152 mm howitzer on the KV hull. Mostly replaced by the ISU-152 by 1945, but some were still in units.
+
+Plan:
+https://drawingdatabase.com/su-152/
+
+Use the top view and scale by width (8 pixels to a foot).

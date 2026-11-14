@@ -1,0 +1,6 @@
+17-pounder Achilles (M10 with the 17-pdr). British and Canadian tank destroyer of 1944-45.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/uk/uk001achilles2cp.html
+
+Use the top view and scale by width (8 pixels to a foot).

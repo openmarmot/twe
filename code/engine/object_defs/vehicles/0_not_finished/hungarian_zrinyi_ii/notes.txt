@@ -1,0 +1,6 @@
+Zrinyi II. Hungarian 105 mm assault gun on the Turan hull. Used in 1944-45.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/hungary/hu006zrinyi2p.html
+
+Use the top view and scale by width (8 pixels to a foot).

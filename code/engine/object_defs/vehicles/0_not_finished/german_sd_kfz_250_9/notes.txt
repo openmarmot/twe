@@ -1,0 +1,6 @@
+Sd.Kfz. 250/9. Same light halftrack with the 2 cm turret. Recon vehicle, still in service in 1945.
+
+Plan:
+https://drawingdatabase.com/sd-kfz-250/
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -1,0 +1,6 @@
+Type 97 Shinhoto Chi-Ha, the new high-velocity turret. This was the main Japanese medium tank still in service in 1945. Front, top, and side.
+
+Plan:
+https://drawingdatabase.com/type-97/
+
+Use the top view and scale by width (8 pixels to a foot).

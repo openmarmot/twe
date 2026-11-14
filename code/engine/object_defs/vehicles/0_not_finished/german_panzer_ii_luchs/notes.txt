@@ -1,0 +1,6 @@
+Panzer II Ausf. L Luchs (Sd.Kfz. 123). Recon tank. About 100 built, and some were still running in 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/germany/ge033pz2lp.html
+
+Use the top view and scale by width (8 pixels to a foot).
