@@ -696,6 +696,14 @@ class AIHumanVehicleDriver:
                 )
 
         if current_action == VehicleCrewAction.WAITING_FOR_BETTER_ANGLE:
+            # crew-pushed gun. do not start a flank even if a gunner asks.
+            if vehicle.ai.is_towed_gun:
+                vehicle.ai.brake_power = 1
+                vehicle.ai.throttle = 0
+                self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                    VehicleCrewAction.WAITING
+                )
+                return True
             target = gunner_role.human.ai.memory["task_vehicle_crew"]["target"]
             if target is not None:
                 # hold roughly current range (slight close if very far) and swing

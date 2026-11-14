@@ -812,6 +812,40 @@ class AIHumanVehicleGunner:
                             ] = f"Waiting for driver to close distance with {target.name}"
                             return
                 elif engage_primary_reason == "need better angle":
+                    # a towed gun stays in its firing position. laying the
+                    # piece on the target is normal; walking a Pak 40 around
+                    # for a side shot is not.
+                    if vehicle.ai.is_towed_gun:
+                        cooldown = self.owner.ai.memory["task_vehicle_crew"].get(
+                            "rotate_cooldown_until", 0
+                        )
+                        if (
+                            rotation_check is False
+                            and turret.ai.primary_turret
+                            and self.crew_has_driver(vehicle)
+                            and self.owner.world.world_seconds >= cooldown
+                        ):
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "think_interval"
+                            ] = random.uniform(1.5, 2)
+                            self.owner.ai.memory["task_vehicle_crew"][
+                                "current_action"
+                            ] = VehicleCrewAction.WAITING_FOR_ROTATE
+                            return
+                        if turret.ai.primary_weapon:
+                            self.calculate_turret_aim(
+                                turret, target, turret.ai.primary_weapon
+                            )
+                        self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (
+                            random.uniform(0.5, 1)
+                        )
+                        self.owner.ai.memory["task_vehicle_crew"]["current_action"] = (
+                            VehicleCrewAction.SCANNING
+                        )
+                        self.owner.ai.memory["task_vehicle_crew"][
+                            "current_action_details"
+                        ] = f"Holding fire on {target.name}; the gun stays put"
+                        return
                     if turret.ai.primary_turret:
                         if self.crew_has_driver(vehicle):
                             self.owner.ai.memory["task_vehicle_crew"]["think_interval"] = (

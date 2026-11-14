@@ -3,6 +3,11 @@ TWE Project : Change Log
 -------------------------------
 November 14 2026
 - some grenade updates
+- fix morale caps + morale mechanism adjustments
+- adjusted speeds of vehicles that are pushed by humans (non-motorized)
+- soviet 37mm AA gun got some love. new ammo, new rate of fire, minor fixes
+- towed weapons no longer try to flank as they are too slow
+- minor fixes
 
 -------------------------------
 November 13 2026
