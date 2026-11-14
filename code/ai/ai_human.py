@@ -101,6 +101,8 @@ class AIHuman:
         self.prone = False
         self.speed = 0
         self.morale = 100  # lower is worse
+        # recovery stops here. human defs set this instead of morale
+        self.max_morale = 100
 
         # -- distance tuning --
         # max distance that is walkable before deciding a vehicle is better
@@ -2531,10 +2533,13 @@ class AIHuman:
                                     break
                 # possibly have a random stop bleed even if you don't have medical
             else:
-                # regain morale if not bleeding
+                # regain morale if not bleeding. stop at this soldier's own cap
                 self.morale = max(
                     0,
-                    min(100, self.morale + 0.5 * self.owner.world.time_passed_seconds),
+                    min(
+                        self.max_morale,
+                        self.morale + 0.5 * self.owner.world.time_passed_seconds,
+                    ),
                 )
 
             # -- body attribute stuff --

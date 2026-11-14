@@ -12,7 +12,8 @@ from engine.object_registry import register_object
 @register_object("german_luftwaffe_ground_crew_kar98k")
 def create(world, world_coords):
     z = engine.world_builder.spawn_object(world, world_coords, "german_soldier", False)
-    z.ai.morale = 95
+    z.ai.max_morale = 95
+    z.ai.morale = z.ai.max_morale
     z.image_list = [
         "luftwaffe_ground_crew",
         "luftwaffe_ground_crew_prone",
