@@ -2533,12 +2533,12 @@ class AIHuman:
                                     break
                 # possibly have a random stop bleed even if you don't have medical
             else:
-                # regain morale if not bleeding. stop at this soldier's own cap
+                # regain morale if not bleeding. 0.1 per second, stop at this soldier's cap
                 self.morale = max(
                     0,
                     min(
                         self.max_morale,
-                        self.morale + 0.5 * self.owner.world.time_passed_seconds,
+                        self.morale + 0.1 * self.owner.world.time_passed_seconds,
                     ),
                 )
 
@@ -2618,6 +2618,11 @@ class AIHuman:
             # remove from squad
             if self.squad is not None:
                 if self.owner in self.squad.members:
+                    # one death. the rest of the squad loses morale
+                    for member in self.squad.members:
+                        if member is self.owner:
+                            continue
+                        member.ai.morale = max(0, member.ai.morale - 10)
                     self.squad.members.remove(self.owner)
 
                     if self.owner == self.squad.squad_leader:

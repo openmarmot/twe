@@ -19,10 +19,11 @@ def create(world, world_coords):
         world, ["37mm_m1939_61k_turret", "37mm_m1939_61k_turret"], AITurret
     )
     z.name = "37mm_m1939_61k_turret"
-    z.ai.gun_sight = engine.world_builder.spawn_object(world, world_coords, "optic_iron_sights", False)
+    z.ai.gun_sight = engine.world_builder.spawn_object(world, world_coords, "optic_azp_37", False)
     z.is_turret = True
     z.ai.vehicle_mount_side = "top"
-    z.ai.turret_accuracy = 3
+    z.ai.turret_accuracy = 2
+    # splinter shield waits on the sprite. see note.txt
     z.ai.turret_armor["top"] = [0, 0, 0]
     z.ai.turret_armor["bottom"] = [0, 0, 0]
     z.ai.turret_armor["left"] = [0, 0, 0]
@@ -39,6 +40,7 @@ def create(world, world_coords):
     z.ai.primary_weapon.ai.smoke_offset = [-54, 1]
     z.ai.primary_weapon.ai.spawn_case = False
     z.ai.primary_turret = True
-    z.ai.primary_weapon_reload_speed = 5
+    # five-round clip change. the loader can feed the next clip as the gun fires
+    z.ai.primary_weapon_reload_speed = 3
     z.no_save = True
     return z

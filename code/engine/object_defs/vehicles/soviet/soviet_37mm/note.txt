@@ -1,0 +1,24 @@
+37 mm M1939 (61-K)
+
+The gun is missing its shield. From 1943 the carriage had a splinter
+shield for the crew. This sim is 1944-45, so the shield belongs on it.
+
+Leave the turret armor at zero until the art is redrawn. The current
+turret sprite is a barrel on a disc and does not show a shield. Armor
+on a plate the picture does not have will wait.
+
+When the art is done, the shield is a few millimeters, about 4-5 mm.
+It covers the front and wraps the sides. The rear stays open for the
+loaders. The carriage body stays unarmored. Thickness is not in the
+firing tables.
+
+Crew-push speed. Road and off road use the same cap. Heavier piece,
+lower cap. 367 game units is about 50 km/h.
+
+- 61-K, 2100 kg: 65 (about 9 km/h)
+- Pak 40, 1400 kg: 75 (about 10 km/h)
+- ZiS-3, 1120 kg: 85 (about 11.5 km/h). Artillery and antitank share it.
+- sMG 42 on the Lafette, 32 kg: 90 (about 12 km/h). Smaller cut than the guns.
+
+The 8 cm and 82 mm mortars are already at 20. Bicycles are ridden, not
+pushed: 177.6 on the road (about 24 km/h) and 142 off road. Leave those.

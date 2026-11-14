@@ -17,11 +17,12 @@ from engine.object_registry import register_object
 @register_object("37mm_m1939_k61_magazine")
 def create(world, world_coords):
     z = WorldObject(world, ["stg44_magazine"], AIMagazine)
-    z.name = "37mm_m1939_k61_magazine"
+    z.name = "37 mm 61-K clip"
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
     z.ai.compatible_guns = ["37mm_m1939_k61"]
-    z.ai.compatible_projectiles = ["37x252_Frag", "37x252_AP-T"]
+    z.ai.compatible_projectiles = ["37x252_Frag", "37x252_AP-T", "37x252_APCR"]
+    z.ai.disintegrating = True
     z.ai.capacity = 5
     z.rotation_angle = float(random.randint(0, 359))
     engine.world_builder.load_magazine(world, z)

@@ -53,8 +53,9 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     z.ai.engines.append(engine.world_builder.spawn_object(world, world_coords, "bicycle_pedals", False))
-    z.ai.max_speed = 100
-    z.ai.max_offroad_speed = 100
+    # crew push, 1400 kg. about 10 km/h. the 2100 kg 61-K is 65
+    z.ai.max_speed = 75
+    z.ai.max_offroad_speed = 75
     z.ai.open_top = True
     # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
     z.ai.rotation_speed = 40.0
