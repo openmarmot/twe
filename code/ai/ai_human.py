@@ -49,6 +49,8 @@ class AIHuman:
             "task_move_to_location": self.update_task_move_to_location,
             "task_vehicle_crew": self.in_vehicle_ai.update_task_vehicle_crew,
             "task_engage_enemy": self.update_task_engage_enemy,
+            "task_get_object_from_human": self.update_task_get_object_from_human,
+            "task_out_of_ammo": self.update_task_out_of_ammo,
             "task_pickup_objects": self.update_task_pickup_objects,
             "task_think": self.update_task_think,
             "task_think_idle": self.update_task_think_idle,
@@ -545,6 +547,171 @@ class AIHuman:
         if ammo_inventory > 0:
             return True
         # default
+        return False
+
+    # ---------------------------------------------------------------------------
+    def find_squad_magazine(self, gun):
+        """closest squadmate's fullest compatible magazine that still has rounds.
+
+        Skips this soldier, the dead, and anyone past max_walk_distance.
+        The magazine seated in a gun is not in inventory, so it is not taken.
+        """
+        if gun is None or self.squad is None:
+            return None, None
+
+        gun_id = gun.world_builder_identity
+        best_human = None
+        best_magazine = None
+        best_distance = None
+        for member in self.squad.members:
+            if member is self.owner or member.is_human is False:
+                continue
+            if member.ai.blood_pressure < 1:
+                continue
+            if self.owner.world.check_object_exists(member) is False:
+                continue
+
+            distance = engine.math_2d.get_distance(
+                self.owner.world_coords, member.world_coords
+            )
+            if distance > self.max_walk_distance:
+                continue
+            # a closer squadmate is already chosen
+            if best_distance is not None and distance >= best_distance:
+                continue
+
+            loaded_magazine = None
+            if member.ai.primary_weapon is not None:
+                loaded_magazine = member.ai.primary_weapon.ai.magazine
+
+            fullest = None
+            fullest_count = 0
+            for item in member.ai.inventory:
+                if item is loaded_magazine or item.is_gun_magazine is False:
+                    continue
+                if gun_id not in item.ai.compatible_guns:
+                    continue
+                count = len(item.ai.projectiles)
+                if count > fullest_count:
+                    fullest = item
+                    fullest_count = count
+            if fullest is None:
+                continue
+
+            best_human = member
+            best_magazine = fullest
+            best_distance = distance
+
+        return best_human, best_magazine
+
+    # ---------------------------------------------------------------------------
+    def weapon_is_useful(self, gun):
+        """True when the gun has rounds, or someone or a nearby body can feed it."""
+        if gun is None:
+            return False
+        if getattr(gun.ai, "multi_barrel", False):
+            if gun.ai.rounds_loaded() > 0:
+                return True
+        elif gun.ai.magazine is not None and len(gun.ai.magazine.ai.projectiles) > 0:
+            return True
+
+        _human, magazine = self.find_squad_magazine(gun)
+        if magazine is not None:
+            return True
+        # the gun is on the ground next to the body that still has its magazines
+        if len(self.containers_with_ammo(gun.world_coords, 60, gun)) > 0:
+            return True
+        return False
+
+    # ---------------------------------------------------------------------------
+    def containers_within(self, world_coords, max_distance):
+        """containers within max_distance of world_coords, closest first"""
+        squares = self.owner.world.grid_manager.get_grid_squares_near_world_coords(
+            world_coords, max_distance
+        )
+        found = []
+        for square in squares:
+            for container in square.wo_objects_container:
+                distance = engine.math_2d.get_distance(
+                    world_coords, container.world_coords
+                )
+                if distance <= max_distance:
+                    found.append((distance, container))
+        found.sort(key=lambda pair: pair[0])
+        return [container for _distance, container in found]
+
+    # ---------------------------------------------------------------------------
+    def containers_with_ammo(self, world_coords, max_distance, gun):
+        """nearby containers that hold rounds.
+
+        gun set: a loaded magazine compatible with that gun.
+        gun None: any gun, or any loaded magazine.
+        """
+        matches = []
+        gun_id = None
+        if gun is not None:
+            gun_id = gun.world_builder_identity
+        for container in self.containers_within(world_coords, max_distance):
+            inventory = getattr(container.ai, "inventory", [])
+            for item in inventory:
+                if gun is None and item.is_gun:
+                    matches.append(container)
+                    break
+                if item.is_gun_magazine is False:
+                    continue
+                if len(item.ai.projectiles) == 0:
+                    continue
+                if gun_id is None or gun_id in item.ai.compatible_guns:
+                    matches.append(container)
+                    break
+        return matches
+
+    # ---------------------------------------------------------------------------
+    def find_weapon_in_grid_square(self):
+        """closest useful gun lying in this grid square, or None."""
+        grid_square = self.owner.grid_square
+        if grid_square is None:
+            return None
+
+        best = None
+        best_distance = None
+        for gun in grid_square.wo_objects_gun:
+            # an empty gun nobody can feed is dropped again on the next think
+            if self.weapon_is_useful(gun) is False:
+                continue
+            distance = engine.math_2d.get_distance(
+                self.owner.world_coords, gun.world_coords
+            )
+            if best is None or distance < best_distance:
+                best = gun
+                best_distance = distance
+        return best
+
+    # ---------------------------------------------------------------------------
+    def get_object_from_human_failed(self):
+        """True when the magazine can no longer be collected from that soldier.
+
+        False when task_get_object_from_human is not running.
+        """
+        if "task_get_object_from_human" not in self.memory:
+            return False
+
+        human = self.memory["task_get_object_from_human"]["human"]
+        obj = self.memory["task_get_object_from_human"]["object"]
+        if human is None or obj is None:
+            return True
+        if human.ai.blood_pressure < 1:
+            return True
+        if self.owner.world.check_object_exists(human) is False:
+            return True
+        if obj not in human.ai.inventory or len(obj.ai.projectiles) == 0:
+            return True
+
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, human.world_coords
+        )
+        if distance > self.max_walk_distance:
+            return True
         return False
 
     # ---------------------------------------------------------------------------
@@ -1326,20 +1493,6 @@ class AIHuman:
         self.switch_task_move_to_location(self.get_civilian_flee_destination(), None)
 
     # ---------------------------------------------------------------------------
-    def get_compatible_magazines_within_range(self, gun, max_distance):
-        """Find compatible magazines within max distance"""
-
-        compatible_magazines = []
-        for b in self.owner.grid_square.wo_objects_gun_magazine:
-            if gun.name in b.ai.compatible_guns:
-                if (
-                    engine.math_2d.get_distance(self.owner.world_coords, b.world_coords)
-                    < max_distance
-                ):
-                    compatible_magazines.append(b)
-        return compatible_magazines
-
-    # ---------------------------------------------------------------------------
     def get_nearby_damaged_vehicles(self, max_range):
         """return a list of nearby disabled vehicles"""
         # this could be modified to return damaged vehicles that are not fully disabled
@@ -1673,14 +1826,6 @@ class AIHuman:
                 self.large_pickup = world_object
                 self.add_journal_entry(f"Picked up large item: {world_object.name}")
         else:
-            if world_object.is_gun:
-                if self.owner.is_player is False:
-                    near_magazines = self.get_compatible_magazines_within_range(
-                        world_object, 500
-                    )
-                    if len(near_magazines) > 0:
-                        self.switch_task_pickup_objects(near_magazines)
-
             self.speak("Picking up a " + world_object.name)
             self.add_journal_entry(f"Picked up: {world_object.name}")
 
@@ -1952,11 +2097,24 @@ class AIHuman:
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
-    def switch_task_loot_container(self, container):
-        """switch task"""
+    def switch_task_loot_container(self, container, containers=None, then_think=False):
+        """switch task. containers is an optional queue, closest first.
+
+        then_think: when the queue is done, or the primary has rounds, go
+        back to think instead of waiting. used by the ammo search.
+        """
         task_name = "task_loot_container"
+        if containers is None:
+            containers = [container]
+        else:
+            containers = list(containers)
+        if len(containers) == 0:
+            return
+
         task_details = {
-            "container": container,
+            "container": containers[0],
+            "containers": containers,
+            "then_think": then_think,
         }
 
         self.memory[task_name] = task_details
@@ -2022,6 +2180,23 @@ class AIHuman:
         self.owner.reset_image = True
 
     # ---------------------------------------------------------------------------
+    def switch_task_get_object_from_human(self, human, world_object):
+        """switch to task_get_object_from_human"""
+        task_name = "task_get_object_from_human"
+        self.memory[task_name] = {
+            "human": human,
+            "object": world_object,
+        }
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
+    def switch_task_out_of_ammo(self):
+        """switch to task_out_of_ammo"""
+        task_name = "task_out_of_ammo"
+        self.memory[task_name] = {}
+        self.memory["current_task"] = task_name
+
+    # ---------------------------------------------------------------------------
     def switch_task_pickup_objects(self, objects):
         """switch task"""
 
@@ -2035,7 +2210,7 @@ class AIHuman:
         else:
             # otherwise create a new one
 
-            task_details = {"objects": objects}
+            task_details = {"objects": objects, "picked_gun": False}
 
             self.memory[task_name] = task_details
 
@@ -3087,108 +3262,152 @@ class AIHuman:
             ]
 
     # ---------------------------------------------------------------------------
+    def next_loot_container(self, wait_when_done):
+        """finish the current container and open the next one in the queue.
+
+        An ammo search (then_think) stops once the primary has rounds.
+        An ordinary loot waits when it is done. A container that is too far
+        away, or already gone, does not wait.
+        """
+        details = self.memory.get("task_loot_container")
+        if details is None:
+            self.switch_task_think()
+            return
+
+        containers = list(details.get("containers", []))
+        current = details.get("container")
+        if current in containers:
+            containers.remove(current)
+        remaining = []
+        for container in containers:
+            if self.owner.world.check_object_exists(container):
+                remaining.append(container)
+
+        if details.get("then_think"):
+            if (
+                self.primary_weapon is not None
+                and self.check_ammo_bool(self.primary_weapon, self.owner)
+            ):
+                remaining = []
+            if len(remaining) > 0:
+                details["containers"] = remaining
+                details["container"] = remaining[0]
+                return
+
+        self.memory.pop("task_loot_container", None)
+        if wait_when_done and details.get("then_think") is not True:
+            self.switch_task_wait(random.randint(14, 30))
+        else:
+            self.switch_task_think()
+
+    # ---------------------------------------------------------------------------
     def update_task_loot_container(self):
         """loot a container or object with ai.inventory"""
         container = self.memory["task_loot_container"]["container"]
 
         if self.owner.world.check_object_exists(container) is False:
-            self.memory.pop("task_loot_container", None)
-            self.switch_task_think()
-        else:
-            distance = engine.math_2d.get_distance(
-                self.owner.world_coords, container.world_coords
-            )
-            if distance < self.max_distance_to_interact_with_object:
-                # done with this task
-                self.memory.pop("task_loot_container", None)
-                self.switch_task_wait(random.randint(14, 30))
+            self.next_loot_container(False)
+            return
 
-                # -- loot container --
-                need_medical = True
-                need_consumable = True
-                need_grenade = True
-                need_antitank = False
-                need_gun = self.primary_weapon is None
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, container.world_coords
+        )
+        if distance < self.max_distance_to_interact_with_object:
+            then_think = self.memory["task_loot_container"].get("then_think", False)
 
-                # check our inventory
-                for b in self.inventory:
-                    if b.is_medical:
-                        need_medical = False
-                    elif b.is_consumable:
-                        need_consumable = False
-                    elif b.is_grenade:
-                        need_grenade = False
-                    elif b.is_handheld_antitank:
-                        need_antitank = False
+            # -- loot container --
+            need_medical = True
+            need_consumable = True
+            need_grenade = True
+            need_antitank = False
+            need_gun = self.primary_weapon is None
 
-                # grab stuff based on what we want
-                take = []
-                gun_magazines = []
-                for b in container.ai.inventory:
-                    if b.is_medical and need_medical:
-                        take.append(b)
-                        need_medical = False
-                    elif b.is_consumable and need_consumable:
-                        take.append(b)
-                        need_consumable = False
-                    elif b.is_grenade and need_grenade:
-                        take.append(b)
-                        need_grenade = False
-                    elif b.is_handheld_antitank and need_antitank:
-                        take.append(b)
-                        need_antitank = False
-                    elif b.is_gun and need_gun:
-                        take.append(b)
-                        need_gun = False
-                    elif b.is_gun_magazine:
-                        gun_magazines.append(b)
+            # check our inventory
+            for b in self.inventory:
+                if b.is_medical:
+                    need_medical = False
+                elif b.is_consumable:
+                    need_consumable = False
+                elif b.is_grenade:
+                    need_grenade = False
+                elif b.is_handheld_antitank:
+                    need_antitank = False
 
-                # handle gun magazine decisions
-                if len(gun_magazines) > 0:
-                    gun = None
+            # grab stuff based on what we want
+            take = []
+            gun_magazines = []
+            for b in container.ai.inventory:
+                if b.is_medical and need_medical:
+                    take.append(b)
+                    need_medical = False
+                elif b.is_consumable and need_consumable:
+                    take.append(b)
+                    need_consumable = False
+                elif b.is_grenade and need_grenade:
+                    take.append(b)
+                    need_grenade = False
+                elif b.is_handheld_antitank and need_antitank:
+                    take.append(b)
+                    need_antitank = False
+                elif b.is_gun and need_gun:
+                    take.append(b)
+                    need_gun = False
+                elif b.is_gun_magazine:
+                    gun_magazines.append(b)
 
-                    # check if we are grabbing a gun
-                    for b in take:
-                        if b.is_gun:
-                            gun = b
+            # handle gun magazine decisions
+            if len(gun_magazines) > 0:
+                gun = None
 
-                    # if not, set it to the gun we have, if we have one
-                    if gun is None:
-                        if self.primary_weapon is not None:
-                            gun = self.primary_weapon
+                # check if we are grabbing a gun
+                for b in take:
+                    if b.is_gun:
+                        gun = b
 
-                    # if we have a gun now, grab compatible magazines
-                    # only grab 2 magazines though
-                    grabbed = 0
-                    if gun is not None:
-                        for b in gun_magazines:
-                            if gun.world_builder_identity in b.ai.compatible_guns:
-                                if grabbed < 2:
-                                    take.append(b)
-                                    grabbed += 1
+                # if not, set it to the gun we have, if we have one
+                if gun is None:
+                    if self.primary_weapon is not None:
+                        gun = self.primary_weapon
 
-                # do this only after we've figured out what we want to grab
-                if len(take) == 0:
-                    # nothing we wanted. lets grab something random
-                    chance = random.randint(1, 5)
-                    if chance == 1 and len(container.ai.inventory) > 0:
-                        take.append(container.ai.inventory[0])
+                # if we have a gun now, grab compatible magazines
+                # only grab 2 magazines though
+                grabbed = 0
+                if gun is not None:
+                    for b in gun_magazines:
+                        if gun.world_builder_identity in b.ai.compatible_guns:
+                            if grabbed < 2:
+                                take.append(b)
+                                grabbed += 1
 
-                # take items!
-                for c in take:
-                    container.remove_inventory(c)
-                    self.event_add_inventory(c)
-                    self.speak("Grabbed a " + c.name)
-                    self.add_journal_entry(f"Looted from {container.name}: {c.name}")
+            # do this only after we've figured out what we want to grab
+            # an ammo search does not take a random object
+            if len(take) == 0 and then_think is False:
+                chance = random.randint(1, 5)
+                if chance == 1 and len(container.ai.inventory) > 0:
+                    take.append(container.ai.inventory[0])
 
-            elif distance > self.max_walk_distance:
-                # maybe should add a option to ignore this but for the most part you want to forget distant objects
-                # done with this task
+            # take items!
+            for c in take:
+                container.remove_inventory(c)
+                self.event_add_inventory(c)
+                self.speak("Grabbed a " + c.name)
+                self.add_journal_entry(f"Looted from {container.name}: {c.name}")
+
+            self.next_loot_container(True)
+            return
+
+        if distance > self.max_walk_distance:
+            # maybe should add a option to ignore this but for the most part you want to forget distant objects
+            # an ammo queue skips this one and tries the next
+            if self.memory["task_loot_container"].get("then_think"):
+                self.next_loot_container(False)
+            else:
                 self.memory.pop("task_loot_container", None)
                 self.switch_task_think()
-            else:
-                # the distance is intermediate. we still want to pick the item up
-                self.switch_task_move_to_location(container.world_coords, None)
+            return
+
+        # the distance is intermediate. we still want to pick the item up
+        self.switch_task_move_to_location(container.world_coords, None)
 
     # ---------------------------------------------------------------------------
     def update_task_mechanic(self):
@@ -3318,6 +3537,14 @@ class AIHuman:
                 )
                 self.owner.reset_image = True
 
+            # the walk is the subtask of fetching a magazine. bail out of both
+            # when the squadmate, the magazine, or the distance gives up.
+            if self.get_object_from_human_failed():
+                self.memory.pop("task_move_to_location", None)
+                self.memory.pop("task_get_object_from_human", None)
+                self.switch_task_think()
+                return
+
             # -- think about walking --
             distance = engine.math_2d.get_distance(
                 self.owner.world_coords,
@@ -3362,6 +3589,81 @@ class AIHuman:
             self.fatigue += self.fatigue_add_rate * self.owner.world.time_passed_seconds
 
     # ---------------------------------------------------------------------------
+    def update_task_get_object_from_human(self):
+        """walk to a soldier and take a specific object from their inventory"""
+
+        if self.get_object_from_human_failed():
+            self.memory.pop("task_get_object_from_human", None)
+            self.switch_task_think()
+            return
+
+        human = self.memory["task_get_object_from_human"]["human"]
+        obj = self.memory["task_get_object_from_human"]["object"]
+        distance = engine.math_2d.get_distance(
+            self.owner.world_coords, human.world_coords
+        )
+        if distance > self.max_distance_to_interact_with_object:
+            self.speak("I need ammunition")
+            self.add_journal_entry(f"Getting {obj.name} from {human.name}")
+            self.switch_task_move_to_location(human.world_coords, human)
+            return
+
+        human.ai.event_remove_inventory(obj)
+        self.event_add_inventory(obj)
+        self.speak("Grabbed a " + obj.name)
+        self.add_journal_entry(f"Took {obj.name} from {human.name}")
+        self.memory.pop("task_get_object_from_human", None)
+        self.switch_task_think()
+
+    # ---------------------------------------------------------------------------
+    def update_task_out_of_ammo(self):
+        """resupply the primary gun from the squad, or replace the gun"""
+
+        # rounds in the gun or in inventory. engage/reload handles the rest.
+        if self.primary_weapon is not None:
+            if self.check_ammo_bool(self.primary_weapon, self.owner):
+                self.memory.pop("task_out_of_ammo", None)
+                self.switch_task_think()
+                return
+
+            human, magazine = self.find_squad_magazine(self.primary_weapon)
+            if magazine is not None:
+                self.memory.pop("task_out_of_ammo", None)
+                self.switch_task_get_object_from_human(human, magazine)
+                return
+
+            # squad has no rounds. search crates and bodies before dropping the gun,
+            # so a magazine in one of them can still be loaded into it.
+            containers = self.containers_with_ammo(
+                self.owner.world_coords, 500, self.primary_weapon
+            )
+            if len(containers) > 0:
+                self.memory.pop("task_out_of_ammo", None)
+                self.switch_task_loot_container(containers[0], containers, True)
+                return
+
+            # no squadmate and no nearby container can feed this gun
+            self.drop_object(self.primary_weapon)
+            # dropping clears the slot, then equips the next gun in inventory
+            if self.primary_weapon is not None:
+                self.memory.pop("task_out_of_ammo", None)
+                self.switch_task_think()
+                return
+
+        gun = self.find_weapon_in_grid_square()
+        self.memory.pop("task_out_of_ammo", None)
+        if gun is not None:
+            self.switch_task_pickup_objects([gun])
+            return
+
+        # still nothing. a container may hold a gun, or magazines for one.
+        containers = self.containers_with_ammo(self.owner.world_coords, 500, None)
+        if len(containers) > 0:
+            self.switch_task_loot_container(containers[0], containers, True)
+            return
+        self.switch_task_think()
+
+    # ---------------------------------------------------------------------------
     def update_task_pickup_objects(self):
         """Pick up and process nearby objects from task memory"""
 
@@ -3380,6 +3682,8 @@ class AIHuman:
                     # -- pickup object --
                     # remove as we will be picking it up
                     remove_queue.append(b)
+                    if b.is_gun:
+                        self.memory["task_pickup_objects"]["picked_gun"] = True
                     self.pickup_object(b)
                     # we want to break here because pickup_object can add more objects to our objects list
                     break
@@ -3402,7 +3706,25 @@ class AIHuman:
             self.switch_task_move_to_location(nearest_object.world_coords, None)
         else:
             if len(objects) == 0:
+                picked_gun = self.memory["task_pickup_objects"].get(
+                    "picked_gun", False
+                )
                 self.memory.pop("task_pickup_objects", None)
+                # a dropped gun lands within 15 of the body. the body is a
+                # container and still has that gun's magazines.
+                if (
+                    picked_gun
+                    and self.owner.is_player is False
+                    and self.primary_weapon is not None
+                ):
+                    containers = self.containers_with_ammo(
+                        self.owner.world_coords, 60, self.primary_weapon
+                    )
+                    if len(containers) > 0:
+                        self.switch_task_loot_container(
+                            containers[0], containers, True
+                        )
+                        return
                 self.switch_task_wait(random.randint(5, 15))
 
     # ---------------------------------------------------------------------------
@@ -3593,9 +3915,13 @@ class AIHuman:
 
             # this also means that humans that are not small armed trained, and have no targets will not pickup guns
             if distance < 4000:
+                candidates = []
+                for gun in self.owner.grid_square.wo_objects_gun:
+                    if self.weapon_is_useful(gun):
+                        candidates.append(gun)
                 gun = self.owner.world.get_closest_object(
                     self.owner.world_coords,
-                    self.owner.grid_square.wo_objects_gun,
+                    candidates,
                     distance,
                 )
 
@@ -3612,27 +3938,15 @@ class AIHuman:
                     return
 
             else:
-                # need to get ammo. check for nearby magazines
-                near_magazines = self.get_compatible_magazines_within_range(
-                    self.primary_weapon, 500
-                )
-                if len(near_magazines) > 0:
-                    self.switch_task_pickup_objects(near_magazines)
+                # a fetch already in progress resumes after the walk
+                if "task_get_object_from_human" in self.memory:
+                    self.memory["current_task"] = "task_get_object_from_human"
                     return
-
-                # check containers for spare ammo
-                containers = self.owner.world.get_objects_within_range(
-                    self.owner.world_coords,
-                    self.owner.grid_square.wo_objects_container,
-                    500,
-                )
-                if len(containers) > 0:
-                    self.switch_task_loot_container(random.choice(containers))
+                if "task_loot_container" in self.memory:
+                    self.memory["current_task"] = "task_loot_container"
                     return
-
-                # no ammo left for this gun — drop it so we can pick up something usable
-                # (clearing the slot alone left an empty gun in inventory forever)
-                self.drop_object(self.primary_weapon)
+                self.switch_task_out_of_ammo()
+                return
 
         # -- check if we have older tasks to resume --
         # this is important for compound tasks
@@ -3644,6 +3958,9 @@ class AIHuman:
             return
         if "task_pickup_objects" in self.memory:
             self.memory["current_task"] = "task_pickup_objects"
+            return
+        if "task_get_object_from_human" in self.memory:
+            self.memory["current_task"] = "task_get_object_from_human"
             return
         if "task_loot_container" in self.memory:
             self.memory["current_task"] = "task_loot_container"

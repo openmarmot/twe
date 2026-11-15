@@ -21,4 +21,9 @@ def create(world, world_coords):
     z.collision_radius = 15
     z.is_human = True
     z.ai.is_small_arms_trained = True
+
+    # belt of MG ammo. fairly rare, waffen ss get a second chance at this
+    if random.randint(0, 8) == 0:
+        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
+
     return z

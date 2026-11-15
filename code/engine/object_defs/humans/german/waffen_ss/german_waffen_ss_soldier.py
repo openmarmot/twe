@@ -20,4 +20,9 @@ def create(world, world_coords):
         "ss_soldier_prone",
         "ss_soldier_dead",
     ]
+
+    # second chance at belt of MG ammo. Also get a chance from base german_soldier
+    if random.randint(0, 4) == 0:
+        z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
+
     return z
