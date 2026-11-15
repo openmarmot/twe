@@ -4,6 +4,9 @@ german_waffen_ss_soldier object definition
 repo : https://github.com/openmarmot/twe
 """
 
+# import built in modules
+import random
+
 # import custom packages
 import engine.world_builder
 from engine.object_registry import register_object

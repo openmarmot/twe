@@ -4,7 +4,11 @@ german_soldier object definition (base)
 repo : https://github.com/openmarmot/twe
 """
 
+# import built in modules
+import random
+
 # import custom packages
+import engine.world_builder
 from engine.world_object import WorldObject
 from ai.ai_human import AIHuman
 import engine.name_gen
