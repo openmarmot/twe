@@ -1,0 +1,20 @@
+"""
+german_luftwaffe_ground_crew_mg42 object definition
+
+repo : https://github.com/openmarmot/twe
+
+notes :
+Issued once flak and alarm units were put into the line, mostly 1945.
+"""
+
+# import custom packages
+import engine.world_builder
+from engine.object_registry import register_object
+
+
+@register_object("german_luftwaffe_ground_crew_mg42")
+def create(world, world_coords):
+    z = engine.world_builder.spawn_object(world, world_coords, "german_luftwaffe_ground_crew", False)
+    engine.world_builder.add_standard_loadout(z, world, "standard_german_gear")
+    engine.world_builder.add_standard_loadout(z, world, "mg42")
+    return z

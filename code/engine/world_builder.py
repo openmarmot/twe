@@ -304,6 +304,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "dp28", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "dp28_magazine", False))
+    elif loadout == "fg42-type1":
+        wo.add_inventory(spawn_object(world, [0, 0], "fg42-type1", False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world, [0, 0], "fg42_type1_magazine", False))
     elif loadout == "fg42-type2":
         wo.add_inventory(spawn_object(world, [0, 0], "fg42-type2", False))
         for _ in range(6):

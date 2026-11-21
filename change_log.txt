@@ -1,13 +1,14 @@
 TWE Project : Change Log
 
 -------------------------------
-November 21 2026
-- added code/tools/squad_data_tool.py and run_squad_data_tool.sh. it reads squad_data and shows each squad, the 1944 and 1945 chances, and the soldiers and vehicles named in members
-
--------------------------------
 November 20 2026
+- added code/tools/squad_data_tool.py and run_squad_data_tool.sh. it reads squad_data and shows each squad, the 1944 and 1945 chances, and the soldiers and vehicles named in members
+- Luftwaffe soldiers now spawn from a base body, the same way Heer and Waffen-SS do. Ground crew stay at morale 95. Fallschirmjäger are morale 110 on the same blue-grey uniform. The jump smock is not drawn yet.
+- Ground crew weapons: Kar98k, MP40, MG15, MG34, MG42, Panzerfaust 60 and 100, captured PPSh-41, and a P38 or P08. Fallschirmjäger: FG42 type 1 and type 2, MG34, MG42, MP40, G41(W), K43, StG 44, Kar98k, Schiessbecher, Panzerfaust 60 and 100.
+- German 1944 Fallschirmjager and the FG42 section use the Fallschirmjäger body. One FG42 in the 1944 squad is a type 1. New squads: German Luftwaffe Ground Defense (chance 16/24) and German Luftwaffe 1945 Alarm (0/28). German 1945 Fallschirmjager (0/16). The MG-15 crew and the MG 151 crew each include one Panzerfaust 60 rifleman.
 - quick battle shows both sides' squads before the map is built.
 - quick battle reinforcements are about 10% of each side's squads, pulled from that side's full list
+- added a single MG 151/20 ground mount. improvised Luftwaffe airfield gun, crew pushed, sprite is the sMG42. squad German Luftwaffe MG 151, cost 40, chance 12 in 1944 and 30 in 1945. three Luftwaffe riflemen and one MG 15. the gun starts on the mine shell. 1,600 rounds. debug spawn key o
 
 
 -------------------------------

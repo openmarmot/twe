@@ -234,6 +234,7 @@ class Graphics_2D_Pygame:
             pygame.K_l: "l",
             pygame.K_m: "m",
             pygame.K_n: "n",
+            pygame.K_o: "o",
         }
 
         # load all images. object_defs is the source of truth (typically

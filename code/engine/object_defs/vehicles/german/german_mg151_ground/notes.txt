@@ -1,0 +1,13 @@
+Single MG 151/20 on an improvised ground mount.
+
+Luftwaffe ground troops used surplus aircraft guns this way late in
+the war, mostly for airfield and local object defense. A pipe or logs
+set in the ground, sometimes a crude shield. Single and twin mounts
+show up in photos. The triple Drilling was the systematic mount.
+
+This object is the 20mm gun. The 15mm came first and was largely
+dropped once 15mm ammunition ran down. The sprite is the sMG42.
+Armor is zero until a shield is drawn.
+
+Crew push. 75 kg, speed cap 85. Full traverse. The gun starts on
+Minengeschoss. Stored belts are in inventory, same as the sMG42.
