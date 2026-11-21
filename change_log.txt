@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 -------------------------------
+November 21 2026
+- added code/tools/squad_data_tool.py and run_squad_data_tool.sh. it reads squad_data and shows each squad, the 1944 and 1945 chances, and the soldiers and vehicles named in members
+
+-------------------------------
 November 20 2026
 - quick battle shows both sides' squads before the map is built.
 - quick battle reinforcements are about 10% of each side's squads, pulled from that side's full list
