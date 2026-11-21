@@ -1,0 +1,6 @@
+M4A3(76)W HVSS, the Easy Eight. US Army tank of 1945. Wider tracks than the earlier Shermans.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/usa/us020m4a376wp.html
+
+Use the top view and scale by width (8 pixels to a foot).

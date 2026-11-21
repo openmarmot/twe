@@ -1,0 +1,6 @@
+Soviet IS2
+
+Note that early IS-2 had a FIXED hull gun. It could not be moved or aimed and was there for supression.
+it seems it was later removed
+
+I am also not modelling the rear turret MG. this was also later removed

@@ -48,14 +48,16 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     z.ai.engines.append(engine.world_builder.spawn_object(world, world_coords, "bicycle_pedals", False))
-    z.ai.max_speed = 100
-    z.ai.max_offroad_speed = 100
+    # crew push, 32 kg on the Lafette. about 12 km/h. a smaller cut than the field guns
+    z.ai.max_speed = 90
+    z.ai.max_offroad_speed = 90
     z.ai.open_top = True
     # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
     z.ai.rotation_speed = 40.0
     z.collision_radius = 50
     z.bounding_circles.append([[0.0, 0.0], 25])
-    z.weight = 1400
+    # MG 42 plus the Lafette 42. the old 1400 was the Pak 40 carriage
+    z.weight = 32
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.rotation_angle = float(random.randint(0, 359))

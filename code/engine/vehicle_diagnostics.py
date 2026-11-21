@@ -95,8 +95,16 @@ class VehicleDiagnostics:
             coord[1] += spacing
 
     # ---------------------------------------------------------------------------
+    def queue_line(self, coord, spacing, text, color=None):
+        """append one diagnostics line and advance the y coordinate"""
+        if color is None:
+            color = self.text_black
+        self.text_queue.append([text, copy.copy(coord), color])
+        coord[1] += spacing
+
+    # ---------------------------------------------------------------------------
     def load_engine_screen(self):
-        """load main screen text and image"""
+        """load engine screen text and image"""
 
         self.image_objects = []
         # add the main object
@@ -108,29 +116,285 @@ class VehicleDiagnostics:
         self.text_queue = []
         spacing = 15
         coord = [40, 15]
+        ai = self.vehicle.ai
 
-        self.text_queue.append([self.menu_string, copy.copy(coord), self.text_black])
-        coord[1] += spacing
+        self.queue_line(coord, spacing, self.menu_string)
         coord[1] += spacing
 
-        # - engine data -
-        # this should move to its own page
+        # fuel and electrical sit in a second column when the window is wide
+        # enough that the lines clear the vehicle sprite
+        if self.screen_center[0] >= 520:
+            side = [self.screen_center[0] + 180, coord[1]]
+        else:
+            side = None
 
-        coord = [40, 200]
-        self.text_queue.append(["-- engine data --", copy.copy(coord), self.text_black])
+        # - drivetrain -
+        # drive force matches ai_vehicle.update_physics: each running engine
+        # contributes max_engine_force * throttle_control, then that sum is
+        # multiplied by the vehicle throttle again
+        total_engine_force = 0.0
+        for eng in ai.engines:
+            if eng.ai.engine_on and eng.ai.damaged is False:
+                total_engine_force += (
+                    eng.ai.max_engine_force * eng.ai.throttle_control
+                )
+        drive_force = total_engine_force * ai.throttle
+
+        if ai.engine_at_front:
+            mount = "front"
+        else:
+            mount = "rear"
+        gear_ratio = ai.transmission.get(ai.current_gear, ["?"])[0]
+
+        self.queue_line(coord, spacing, "-- drivetrain --")
+        self.queue_line(
+            coord,
+            spacing,
+            f"engines on: {ai.engines_on}   engine mount: {mount}",
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            f"throttle: {ai.throttle:.2f}   returns to zero: {ai.throttle_zero}",
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"brake: {ai.brake_power:.2f}   strength: {ai.brake_strength}"
+                f"   returns to zero: {ai.brake_zero}"
+            ),
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"steering: {ai.wheel_steering:.2f}"
+                f"   hull rotation: {ai.rotation_speed}"
+            ),
+        )
+        self.queue_line(coord, spacing, f"gear: {ai.current_gear} ({gear_ratio})")
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"speed: {ai.current_speed:.1f}"
+                f"   acceleration: {ai.acceleration:.2f}"
+            ),
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"max road: {ai.max_speed:.1f}   offroad: {ai.max_offroad_speed:.1f}"
+                f"   dynamic: {ai.max_dynamic_speed:.1f}"
+            ),
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            f"rolling resistance: {ai.rolling_resistance_coeff:.3f}",
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"weight: {self.vehicle.weight} kg"
+                f"   drag: {self.vehicle.drag_coefficient}"
+                f"   frontal area: {self.vehicle.frontal_area}"
+            ),
+        )
+        self.queue_line(
+            coord,
+            spacing,
+            (
+                f"engine force: {total_engine_force:.0f} N"
+                f"   drive force: {drive_force:.0f} N"
+            ),
+        )
+        leak_color = self.text_black
+        if ai.fuel_leak:
+            leak_color = self.text_red
+        self.queue_line(coord, spacing, f"fuel leak: {ai.fuel_leak}", leak_color)
+        disabled_color = self.text_black
+        if ai.vehicle_disabled:
+            disabled_color = self.text_red
+        self.queue_line(
+            coord, spacing, f"disabled: {ai.vehicle_disabled}", disabled_color
+        )
+
+        # - engines -
         coord[1] += spacing
-        for b in self.vehicle.ai.engines:
-            self.text_queue.append(
-                [f"Engine: {b.name}", copy.copy(coord), self.text_black]
-            )
-            coord[1] += spacing
-            self.text_queue.append(
-                [f"-> engine on: {b.ai.engine_on}", copy.copy(coord), self.text_black]
-            )
-            coord[1] += spacing
+        self.queue_line(coord, spacing, "-- engines --")
+        if len(ai.engines) == 0:
+            self.queue_line(coord, spacing, "no engines")
+        for b in ai.engines:
+            if b.ai.engine_on and b.ai.damaged is False:
+                output_force = b.ai.max_engine_force * b.ai.throttle_control
+            else:
+                output_force = 0.0
+            # max_engine_force = (horsepower * 745.7) / 0.7375
+            horsepower = b.ai.max_engine_force * 0.7375 / 745.7
+            if b.ai.fuel_type:
+                fuels = ", ".join(b.ai.fuel_type)
+            else:
+                fuels = "none"
+            loaded_per_min = b.ai.fuel_consumption_rate * 60
+            idle_per_min = b.ai.idle_fuel_consumption_rate * 60
+
+            self.queue_line(coord, spacing, b.name)
+            on_color = self.text_black
             if b.ai.damaged:
-                self.text_queue.append([f"-> damaged", copy.copy(coord), self.text_red])
-                coord[1] += spacing
+                on_color = self.text_red
+            self.queue_line(
+                coord,
+                spacing,
+                (
+                    f"-> on: {b.ai.engine_on}   damaged: {b.ai.damaged}"
+                    f"   combustion: {b.ai.internal_combustion}"
+                ),
+                on_color,
+            )
+            self.queue_line(coord, spacing, f"-> fuel: {fuels}")
+            self.queue_line(
+                coord,
+                spacing,
+                (
+                    f"-> burn: {b.ai.fuel_consumption_rate:.4f} L/s"
+                    f" ({loaded_per_min:.2f} L/min)"
+                    f"   idle: {b.ai.idle_fuel_consumption_rate:.4f} L/s"
+                    f" ({idle_per_min:.2f} L/min)"
+                ),
+            )
+            self.queue_line(
+                coord,
+                spacing,
+                (
+                    f"-> reservoir: {b.ai.fuel_reservoir:.3f} L"
+                    f"   pending: {b.ai.fuel_consumed:.3f} L"
+                ),
+            )
+            self.queue_line(
+                coord,
+                spacing,
+                (
+                    f"-> throttle control: {b.ai.throttle_control:.2f}"
+                    f"   output: {output_force:.0f} N"
+                ),
+            )
+            self.queue_line(
+                coord,
+                spacing,
+                (
+                    f"-> max force: {b.ai.max_engine_force:.0f} N"
+                    f"   ({horsepower:.0f} hp)   weight: {b.weight} kg"
+                ),
+            )
+            self.queue_line(
+                coord,
+                spacing,
+                f"-> exhaust offset: {b.ai.exhaust_position_offset}",
+            )
+
+        # - fuel -
+        # narrow windows continue down the left column
+        if side is None:
+            coord[1] += spacing
+            side = coord
+        self.queue_line(side, spacing, "-- fuel --")
+        current_volume, max_volume = ai.read_fuel_gauge()
+        self.queue_line(
+            side,
+            spacing,
+            f"total: {current_volume:.1f} / {max_volume:.1f} L",
+        )
+        if len(ai.fuel_tanks) == 0:
+            self.queue_line(side, spacing, "no fuel tanks")
+        for tank in ai.fuel_tanks:
+            self.queue_line(side, spacing, f"Fuel Tank: {tank.name}")
+            self.queue_line(side, spacing, f"-> capacity: {tank.volume} L")
+            if len(tank.ai.inventory) == 0:
+                self.queue_line(side, spacing, "-> contents: empty", self.text_red)
+            else:
+                for item in tank.ai.inventory:
+                    if item.is_liquid:
+                        self.queue_line(
+                            side,
+                            spacing,
+                            f"-> {item.name}: {item.volume:.2f} L",
+                        )
+                    else:
+                        self.queue_line(
+                            side,
+                            spacing,
+                            f"-> {item.name} (not liquid)",
+                            self.text_red,
+                        )
+            if tank.ai.punctured:
+                self.queue_line(
+                    side,
+                    spacing,
+                    f"-> punctured   integrity: {tank.ai.container_integrity:.2f}",
+                    self.text_red,
+                )
+            else:
+                self.queue_line(
+                    side,
+                    spacing,
+                    f"-> integrity: {tank.ai.container_integrity:.2f}",
+                )
+            if tank.ai.contaminated:
+                self.queue_line(side, spacing, "-> contaminated", self.text_red)
+            self.queue_line(side, spacing, f"-> self sealing: {tank.ai.self_sealing}")
+            # update_fuel_system only drinks inventory[0], and only when the
+            # name is in the engine fuel_type list
+            if len(tank.ai.inventory) > 0:
+                first = tank.ai.inventory[0]
+                for eng in ai.engines:
+                    rejects = (
+                        first.is_liquid is False
+                        or first.name not in eng.ai.fuel_type
+                    )
+                    if rejects:
+                        self.queue_line(
+                            side,
+                            spacing,
+                            f"-> {eng.name} rejects {first.name}",
+                            self.text_red,
+                        )
+
+        # - electrical -
+        # engines charge the batteries, and an internal-combustion start
+        # requires a functioning electrical system
+        side[1] += spacing
+        self.queue_line(side, spacing, "-- electrical --")
+        electrical_color = self.text_black
+        if ai.electrical_system_functioning is False:
+            electrical_color = self.text_red
+        self.queue_line(
+            side,
+            spacing,
+            f"electrical system: {ai.electrical_system_functioning}",
+            electrical_color,
+        )
+        self.queue_line(side, spacing, f"alternator: {ai.alternator_amps} A")
+        if len(ai.batteries) == 0:
+            self.queue_line(side, spacing, "no batteries")
+        for battery in ai.batteries:
+            charge_color = self.text_black
+            if battery.ai.state_of_charge <= 0:
+                charge_color = self.text_red
+            self.queue_line(
+                side,
+                spacing,
+                (
+                    f"{battery.name}: {battery.ai.state_of_charge:.1f}"
+                    f"/{battery.ai.max_capacity:.0f} Ah"
+                    f"   {battery.ai.voltage} V {battery.ai.type}"
+                    f"   health {battery.ai.health:.2f}"
+                ),
+                charge_color,
+            )
 
     # ---------------------------------------------------------------------------
     def load_main_screen(self):

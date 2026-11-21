@@ -67,6 +67,8 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Bicycle | Bike | A military bicycle |
 | German | Fa223 Drache | Helicopter | |
 | German | Jagdpanzer 38t 'Hetzer' | Tank | |
+| German | Jagdpanzer IV | Tank | 75mm Pak 39 L/48. 60mm front. Not the IV/70 |
+| German | Jagdpanzer IV Late | Tank | May 1944. 80mm casemate front |
 | German | Ju 88 | Airplane | |
 | German | Kubelwagen | Utility | unarmored light all terrain car | 
 | German | Pak 40 | AT Gun | Towed gun |
@@ -85,6 +87,7 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | German | Sd.kfz.251/2 | APC | 8 cm mortar carrier |
 | German | Sd.kfz.251/9 'Stummel' | AFV | 75mm L24 |
 | German | Sd.kfz.251/9 Late | AFV | gains a MG |
+| German | Sd.kfz.251/22 | AFV | Drilling 3 gun turret. both 15mm and 20mm versions |
 | German | Sd.kfz.251/22 | AFV | Pak 40 |
 | German | Sd.kfz.251/23 | AFV | has the 234/1 2cm turret |
 | German | sMG42 | mg | mg42 on Lafette mount |
@@ -94,6 +97,8 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Soviet | BA-64 | AFV | Light armored car |
 | Soviet | Lend Lease American Truck | Utility | |
 | Soviet | GAZ-61 | Utility | off-road staff car|
+| Soviet | IS-2 | Tank | Soviet heavy tank |
+| Soviet | Su-76 | AFV | Soviet support vehicle with 76mm gun |
 | Soviet | Su-85 | Tank | Basically a turretless T34-85 |
 | Soviet | Su-85M | Tank | SU-100 armor with a SU-85 gun|
 | Soviet | Su-100 | Tank | Better armor and gun than the Su-85 |

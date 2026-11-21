@@ -45,7 +45,8 @@ def create(world, world_coords):
     z.bounding_circles.append([[-8.0, 0.0], 25])
     z.bounding_circles.append([[10.0, 0.0], 25])
     z.bounding_circles.append([[35.0, 0.0], 25])
-    z.weight = 2380
+    # WC-62/63 6x6 curb weight. 2380 was the 3/4-ton WC-51
+    z.weight = 3330
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(

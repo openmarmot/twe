@@ -43,7 +43,7 @@ def create(world, world_coords):
     )
     z.ai.fuel_tanks[0].volume = 415
     engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "gas_80_octane")
-    z.ai.engines.append(engine.world_builder.spawn_object(world, world_coords, "jumo_211", False))
+    z.ai.engines.append(engine.world_builder.spawn_object(world, world_coords, "bramo_323_engine", False))
     z.ai.engines[0].ai.exhaust_position_offset = [-10, 65]
     z.ai.batteries.append(
         engine.world_builder.spawn_object(world, world_coords, "battery_vehicle_24v", False)

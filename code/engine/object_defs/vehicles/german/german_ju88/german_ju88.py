@@ -42,7 +42,8 @@ def create(world, world_coords):
     z.is_airplane = True
     z.is_vehicle = True
     z.rotation_angle = float(random.randint(0, 359))
-    z.weight = 9800
+    # Ju 88 A-4 normal loaded weight. fuel mass is not added on top of this
+    z.weight = 12100
     z.drag_coefficient = 0.8
     z.frontal_area = 6
     z.ai.fuel_tanks.append(

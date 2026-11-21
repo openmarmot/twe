@@ -1,0 +1,6 @@
+Flakpanzer 38(t). Open 2 cm Flak 38 on a 38(t) hull. Some were still in use in 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/germany/ge006flkpz38tp.html
+
+Use the top view and scale by width (8 pixels to a foot).

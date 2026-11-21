@@ -27,6 +27,27 @@ import engine.self_debug_world
 # global variables
 
 
+def explosion_power(distance, explosion_radius, lethal_radius=None, edge_power=0):
+    """blast power at distance. 100 is a kill on a standing man. 0 is outside the burst.
+
+    With no lethal radius the power falls in a straight line from 100 at the
+    center to 0 at explosion_radius. That is the cannon-shell curve.
+
+    A grenade passes a lethal radius. Inside it the power stays 100. From
+    there it falls to edge_power at explosion_radius, which is the casualty
+    edge, not a scratch.
+    """
+    if explosion_radius <= 0 or distance >= explosion_radius:
+        return 0
+    if lethal_radius is None or lethal_radius <= 0 or lethal_radius >= explosion_radius:
+        return 100 * (1 - (distance / explosion_radius))
+    if distance <= lethal_radius:
+        return 100
+    span = explosion_radius - lethal_radius
+    fraction = (distance - lethal_radius) / span
+    return 100 - fraction * (100 - edge_power)
+
+
 class World:
     """world class. holds everything to do with simulating the living world"""
 
@@ -318,10 +339,16 @@ class World:
         weapon,
         fire_duration,
         smoke_duration,
+        fragment_range=None,
+        lethal_radius=None,
+        edge_power=0,
     ):
         """create a explosion that deals damage"""
         # originator - the ai_human that fired the weapon
         # weaponName - the weapon that created the explosion
+        # fragment_range - how far splinters travel, in game units.
+        #   None keeps the short cannon-shell cloud.
+        # lethal_radius, edge_power - grenade blast curve. see explosion_power.
 
         # damage objects within damage radius
         possible = self.grid_manager.get_objects_from_grid_squares_near_world_coords(
@@ -331,8 +358,9 @@ class World:
         for b in possible:
             distance = engine.math_2d.get_distance(world_coords, b.world_coords)
             if distance < explosion_radius:
-                # power reverse scales with distance
-                power = 100 * (1 - (distance / explosion_radius))
+                power = explosion_power(
+                    distance, explosion_radius, lethal_radius, edge_power
+                )
                 if b.is_human and not b.ai.in_vehicle():
                     b.ai.handle_event("explosion", power)
                 # vehicle will also handle any passengers
@@ -346,7 +374,12 @@ class World:
         # shrapnel
         if shrapnel_count > 0:
             engine.world_builder.spawn_shrapnel_cloud(
-                self, world_coords, shrapnel_count, originator, weapon
+                self,
+                world_coords,
+                shrapnel_count,
+                originator,
+                weapon,
+                fragment_range,
             )
 
         # spawn effects

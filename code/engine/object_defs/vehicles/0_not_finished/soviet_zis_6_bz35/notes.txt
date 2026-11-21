@@ -1,0 +1,5 @@
+ZiS-6 with a BZ-35 fuel tank. 6x4 tanker on the early ZiS cab. The cargo ZiS-5 is already in the game. This is the fuel body, and it has a top view.
+
+https://drawingdatabase.com/zis-6-bz-35-tanker-1944/
+
+Use the top view and scale by width (8 pixels to a foot).

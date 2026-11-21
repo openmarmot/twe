@@ -1,0 +1,6 @@
+Cromwell Mk IV. British cruiser tank, still the main cruiser in early 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/uk/uk009cromwell4p.html
+
+Use the top view and scale by width (8 pixels to a foot).

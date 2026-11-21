@@ -1,2 +1,8 @@
 https://wiki.warthunder.com/unit/germ_sdkfz_251_9
 
+251/21 Drilling
+- https://www.pietvanhees.nl/251/04-251-21.htm
+- US Aberdeen report (Lone Sentry): three MG 151, shoulder aim, -5 to +49 deg, 360 deg, 3,000 rounds, 3x sight with an 8 deg field
+- In 6, 28 September 1944 (Panzer Tracts 15-3): 15mm load 325 AP and 2,675 incendiary
+- wardrawings: combat weight 8,800 kg, crew 4-6
+- the game uses 200-round belts, so the AP stash is three belts

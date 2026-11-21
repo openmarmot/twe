@@ -68,7 +68,8 @@ def create(world, world_coords):
     z.bounding_circles.append([[-10.0, 0.0], 25])
     z.bounding_circles.append([[18.0, 0.0], 25])
     z.bounding_circles.append([[35.0, 0.0], 25])
-    z.weight = 2500
+    # 7.5 cm Pak 40/4 auf RSO. sources give 5.2 or 5.4 tonnes
+    z.weight = 5200
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(

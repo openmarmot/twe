@@ -1,0 +1,6 @@
+T-44. About 200 were built by the end of the war and issued to training units. They did not fight in 1945.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/ussr/su036t44p.html
+
+Use the top view and scale by width (8 pixels to a foot).

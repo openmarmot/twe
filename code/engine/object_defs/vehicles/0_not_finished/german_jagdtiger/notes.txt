@@ -1,0 +1,6 @@
+Jagdtiger (Sd.Kfz. 186). Small numbers, still fighting in 1945. 12.8 cm Pak 44.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/germany/ge012jagdtigerp.html
+
+Use the top view and scale by width (8 pixels to a foot).

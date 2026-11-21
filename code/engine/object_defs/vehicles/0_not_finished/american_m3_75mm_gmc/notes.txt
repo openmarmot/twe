@@ -1,0 +1,6 @@
+75 mm GMC on the M3 halftrack hull. The 75 mm gun version itself was mostly converted away before 1945. The hull top view is the M3 halftrack. In 1945 the troop-carrier M3A1 was the common US vehicle, and the Red Army still had the SU-57 (T48), which is a 57 mm gun on this same hull.
+
+Plan:
+https://drawingdatabase.com/m3-half-track/
+
+Use the top view and scale by width (8 pixels to a foot).

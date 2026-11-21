@@ -52,7 +52,7 @@ def create(world, world_coords):
     z.ai.fuel_tanks[0].volume = 114
     engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "gas_80_octane")
     z.ai.engines.append(
-        engine.world_builder.spawn_object(world, world_coords, "maybach_hl42_engine", False)
+        engine.world_builder.spawn_object(world, world_coords, "horch_38_v8_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [75, 10]
     z.ai.batteries.append(

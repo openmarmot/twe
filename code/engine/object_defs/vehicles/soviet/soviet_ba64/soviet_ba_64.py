@@ -44,7 +44,7 @@ def create(world, world_coords):
     z.bounding_circles.append([[0.0, 0.0], 25])
     z.bounding_circles.append([[21.0, 0.0], 25])
     z.bounding_circles.append([[39.0, 0.0], 25])
-    z.weight = 4800
+    z.weight = 2400
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.ai.fuel_tanks.append(
@@ -53,7 +53,7 @@ def create(world, world_coords):
     z.ai.fuel_tanks[0].volume = 114
     engine.world_builder.fill_container(world, z.ai.fuel_tanks[0], "gas_80_octane")
     z.ai.engines.append(
-        engine.world_builder.spawn_object(world, world_coords, "maybach_hl42_engine", False)
+        engine.world_builder.spawn_object(world, world_coords, "gaz_mm_engine", False)
     )
     z.ai.engines[0].ai.exhaust_position_offset = [75, 10]
     z.ai.engine_at_front = True

@@ -1,0 +1,6 @@
+Flakpanzer IV Ostwind. About 44 were built and some fought in 1945. Production Ostwind I has a single 3.7 cm Flak 43 in an open turret. This sheet is labeled Ostwind, but the side view looks like it may show two barrels, so compare it with a photo before tracing the gun. A twin 3.7 cm was the Ostwind II prototype. Wirbelwind was the four-barrel 2 cm on a similar hull.
+
+Plan:
+https://drawingdatabase.com/ostwind/
+
+Use the top view and scale by width (8 pixels to a foot).

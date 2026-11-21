@@ -178,10 +178,13 @@ class AITurret:
                     armor_value,
                 )
             # hull line follows the turret line. a burst already logged above does not repeat.
+            # HE bursts in this turret and does not continue as an intact shell.
             if into_hull and self.vehicle is not None:
                 self.vehicle.ai.projectile_hit_vehicle_body(
                     projectile, side, relative_angle, burst_already=burst_already
                 )
+            elif engine.penetration_calculator.is_explosive(projectile):
+                projectile.ai.contact_effect()
             elif penetration:
                 projectile.wo_stop()
 
@@ -309,17 +312,23 @@ class AITurret:
         """handle projectile penetration of turret armor.
 
         The crew in this turret are hit by the penetrator, or by the shell
-        burst if it is APHE. Hardware damage is additional. A large overmatch
-        can continue down into the hull. Returns (result, into_hull, burst_already).
+        burst if it is APHE or HE. Hardware damage is additional. A large
+        overmatch of shot can continue down into the hull. HE bursts here.
+        Returns (result, into_hull, burst_already).
         The caller logs this hit before applying the hull follow-through.
         """
         thickness = self.turret_armor[side][0]
         diameter = engine.penetration_calculator.projectile_diameter(projectile)
         overmatch = engine.penetration_calculator.overmatch_ratio(pen_value, armor_value)
-        internal = (
-            thickness >= 1
-            and self.remote_operated is False
-            and engine.penetration_calculator.is_internal_burst(projectile)
+        explosive = engine.penetration_calculator.is_explosive(projectile)
+        # HE bursts inside this turret, including an open mount. a remote mount
+        # has no crew in the fragment path. APHE still needs a plate.
+        internal = self.remote_operated is False and (
+            (
+                thickness >= 1
+                and engine.penetration_calculator.is_internal_burst(projectile)
+            )
+            or explosive
         )
         join = engine.penetration_calculator.join_hit_result
 
@@ -330,7 +339,7 @@ class AITurret:
             count = self.handle_spalling_damage(projectile, attempts, True)
             result = join(result, f"spall x{count}")
 
-        if thickness < 1:
+        if thickness < 1 and internal is False:
             # no plate and no fuze. half the time the shot misses the crew entirely.
             if self.remote_operated or self.vehicle is None:
                 result = join(result, "sailed through")
@@ -387,7 +396,8 @@ class AITurret:
             result = join(result, "ammo rack")
 
         into_hull = (
-            overmatch >= 2
+            explosive is False
+            and overmatch >= 2
             and self.vehicle is not None
             and random.randint(0, 1) == 0
         )
@@ -406,6 +416,7 @@ class AITurret:
 
         thickness = self.turret_armor[side][0]
         diameter = engine.penetration_calculator.projectile_diameter(projectile)
+        explosive = engine.penetration_calculator.is_explosive(projectile)
         join = engine.penetration_calculator.join_hit_result
         # near the ballistic limit, thick plate can scab with the shot still outside
         if (
@@ -415,8 +426,10 @@ class AITurret:
         ):
             count = self.handle_spalling_damage(projectile)
             result = join(result, f"spalling x{count}")
-        elif self.vehicle is not None:
+        elif self.vehicle is not None and explosive is False:
             self.vehicle.ai.projectile_bounce(projectile)
+        if explosive:
+            result = join(result, "surface burst")
 
         return result
 

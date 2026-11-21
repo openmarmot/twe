@@ -1,0 +1,6 @@
+8.8 cm Flak 18, towed. Side and top of the gun on its cruciform, with a 1 m scale bar. The Flak 36 and 37 were the common 1945 pieces. From above they are the same gun on the same style of carriage. This plate is a numbered mechanism drawing, not a clean external outline.
+
+Plan:
+https://drawingdatabase.com/flak-18/
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -228,7 +228,13 @@ class Graphics_2D_Pygame:
             pygame.K_RIGHT: "right",
             pygame.K_SPACE: "space",
             pygame.K_LCTRL: "l_ctrl",
+            pygame.K_i: "i",
+            pygame.K_j: "j",
+            pygame.K_k: "k",
+            pygame.K_l: "l",
             pygame.K_m: "m",
+            pygame.K_n: "n",
+            pygame.K_o: "o",
         }
 
         # load all images. object_defs is the source of truth (typically
@@ -447,14 +453,29 @@ class Graphics_2D_Pygame:
 
     # ------------------------------------------------------------------------------
     def load_quick_battle(self, player_spawn_faction, battle_option):
-        """load a quick battle"""
+        """load a quick battle, skipping the pre-battle squad screen"""
 
-        # called by game_menu.start_menu
+        # --quick-battle and --ai-test. the menu shows the forces first
+        # and then calls load_quick_battle_forces.
 
         self.load_battle_from_thread(
             player_spawn_faction,
             engine.world_builder.load_quick_battle_map_objects,
             (battle_option,),
+            "Creating quick battle map objects...",
+        )
+
+    # ------------------------------------------------------------------------------
+    def load_quick_battle_forces(self, player_spawn_faction, forces):
+        """load a quick battle from the roll already shown on the menu"""
+
+        # called by game_menu.quick_battle_start. the squad lists are the
+        # ones on the briefing screen. this does not roll again.
+
+        self.load_battle_from_thread(
+            player_spawn_faction,
+            engine.world_builder.load_quick_battle_from_forces,
+            (forces,),
             "Creating quick battle map objects...",
         )
 
@@ -538,9 +559,315 @@ class Graphics_2D_Pygame:
         elif self.mode == 3:
             self.render_mode_3()
 
+    # squad rows use the menu small font. the header is measured from the
+    # real fonts so a large title does not collide with the columns.
+    BRIEFING_LINE = 15
+    BRIEFING_MARGIN_X = 48
+    BRIEFING_TOP = 26
+    BRIEFING_KICKER_GAP = 6
+    BRIEFING_TITLE_GAP = 16
+    BRIEFING_FACT_LINE = 22
+    BRIEFING_FACTS_GAP = 22
+    BRIEFING_FOOTER_GAP = 16
+    BRIEFING_FOOTER_ITEM_GAP = 36
+    BRIEFING_FACT_PAD = 14
+
+    # ------------------------------------------------------------------------------
+    def _font_height(self, font):
+        """pixel height of a menu font, from a line with ascenders and descenders"""
+
+        return font.get_rect("Ag").height
+
+    # ------------------------------------------------------------------------------
+    def briefing_fact_rows(self, facts, width):
+        """wrap the header facts into rows that fit the screen"""
+
+        rows = []
+        row = []
+        row_width = 0
+        dot_width = self.small_font.get_rect("·").width
+        gap = self.BRIEFING_FACT_PAD + dot_width + self.BRIEFING_FACT_PAD
+        for fact in facts or []:
+            fact = str(fact)
+            fact_width = self.small_font.get_rect(fact).width
+            extra = gap if row else 0
+            if row and row_width + extra + fact_width > width:
+                rows.append(row)
+                row = [fact]
+                row_width = fact_width
+            else:
+                row.append(fact)
+                row_width += extra + fact_width
+        if row:
+            rows.append(row)
+        return rows
+
+    # ------------------------------------------------------------------------------
+    def briefing_footer_rows(self, items, width):
+        """lay the control hints in rows, keeping each hint in one piece"""
+
+        rows = []
+        row = []
+        row_width = 0
+        gap = self.BRIEFING_FOOTER_ITEM_GAP
+        for item in items or []:
+            item = str(item)
+            item_width = self.small_font.get_rect(item).width
+            extra = gap if row else 0
+            if row and row_width + extra + item_width > width:
+                rows.append(row)
+                row = [item]
+                row_width = item_width
+            else:
+                row.append(item)
+                row_width += extra + item_width
+        if row:
+            rows.append(row)
+        return rows
+
+    # ------------------------------------------------------------------------------
+    def briefing_layout(self, banner, footer_items):
+        """pixel positions and page size for the quick battle squad screen"""
+
+        if banner is None:
+            banner = {}
+        width = int(self.screen_size[0])
+        height = int(self.screen_size[1])
+        inner = width - self.BRIEFING_MARGIN_X * 2
+        if inner < 40:
+            inner = 40
+        kicker_h = self._font_height(self.small_font)
+        title_h = self._font_height(self.large_font)
+        fact_rows = self.briefing_fact_rows(banner.get("facts"), inner)
+        if not fact_rows:
+            fact_rows = [[]]
+        footer_rows = self.briefing_footer_rows(footer_items, inner)
+        if not footer_rows:
+            footer_rows = [[]]
+
+        kicker_y = self.BRIEFING_TOP
+        battle_y = kicker_y + kicker_h + self.BRIEFING_KICKER_GAP
+        facts_y = battle_y + title_h + self.BRIEFING_TITLE_GAP
+        header_bottom = facts_y + len(fact_rows) * self.BRIEFING_FACT_LINE
+        title_y = header_bottom + self.BRIEFING_FACTS_GAP
+        column_title_h = self._font_height(self.medium_font)
+        underline_y = title_y + column_title_h + 5
+        body_top = underline_y + 12
+        footer_count = len(footer_rows)
+        footer_y = height - 20 - self.BRIEFING_LINE * (footer_count - 1)
+        body_bottom = footer_y - self.BRIEFING_FOOTER_GAP
+        page_size = int((body_bottom - body_top) / self.BRIEFING_LINE)
+        if page_size < 1:
+            page_size = 1
+        return {
+            "kicker_y": kicker_y,
+            "battle_y": battle_y,
+            "facts_y": facts_y,
+            "title_y": title_y,
+            "underline_y": underline_y,
+            "body_top": body_top,
+            "body_bottom": body_bottom,
+            "footer_y": footer_y,
+            "page_size": page_size,
+            "fact_rows": fact_rows,
+            "footer_rows": footer_rows,
+            "inner_width": inner,
+        }
+
+    # ------------------------------------------------------------------------------
+    def fit_menu_line(self, text, max_width, font=None):
+        """shorten a menu line so it stays inside a column"""
+
+        if font is None:
+            font = self.small_font
+        if text is None:
+            return ""
+        text = str(text)
+        if text == "" or max_width < 12:
+            return text
+        if font.get_rect(text).width <= max_width:
+            return text
+        trimmed = text
+        while trimmed:
+            trimmed = trimmed[:-1]
+            if font.get_rect(trimmed + "...").width <= max_width:
+                return trimmed + "..."
+        return ""
+
+    # ------------------------------------------------------------------------------
+    def render_quick_battle_briefing(self):
+        """both sides' squads, on white so the names stay readable"""
+
+        data = self.game_menu.quick_columns
+        if not data:
+            return
+        banner = data.get("banner") or {}
+        footer = data.get("footer") or []
+        columns = data.get("columns") or []
+        layout = self.briefing_layout(banner, footer)
+
+        self.screen.fill((255, 255, 255))
+        width = int(self.screen_size[0])
+        margin = self.BRIEFING_MARGIN_X
+        quiet = (110, 110, 110)
+        rule = (210, 210, 210)
+        ink = self.color_black
+
+        kicker = banner.get("kicker") or ""
+        if kicker:
+            self.small_font.render_to(
+                self.screen, (margin, layout["kicker_y"]), kicker, quiet
+            )
+
+        title = banner.get("title") or ""
+        page = banner.get("page") or ""
+        page_width = self.small_font.get_rect(page).width if page else 0
+        title_limit = layout["inner_width"] - page_width - 24
+        if title_limit < 40:
+            title_limit = 40
+        self.large_font.render_to(
+            self.screen,
+            (margin, layout["battle_y"]),
+            self.fit_menu_line(title, title_limit, self.large_font),
+            ink,
+        )
+        if page:
+            page_x = width - margin - page_width
+            page_y = layout["battle_y"] + (
+                self._font_height(self.large_font)
+                - self._font_height(self.small_font)
+            ) // 2
+            self.small_font.render_to(
+                self.screen, (page_x, page_y), page, quiet
+            )
+
+        dot_width = self.small_font.get_rect("·").width
+        fact_y = layout["facts_y"]
+        for row in layout["fact_rows"]:
+            x = margin
+            for index, fact in enumerate(row):
+                if index:
+                    x += self.BRIEFING_FACT_PAD
+                    self.small_font.render_to(
+                        self.screen, (x, fact_y), "·", quiet
+                    )
+                    x += dot_width + self.BRIEFING_FACT_PAD
+                self.small_font.render_to(self.screen, (x, fact_y), fact, ink)
+                x += self.small_font.get_rect(fact).width
+            fact_y += self.BRIEFING_FACT_LINE
+
+        gap = 40
+        column_count = len(columns)
+        if column_count > 1:
+            column_gaps = gap * (column_count - 1)
+        else:
+            column_gaps = 0
+        usable = width - margin * 2 - column_gaps
+        if usable < 40:
+            usable = 40
+        if column_count < 1:
+            col_w = usable
+        else:
+            col_w = int(usable / column_count)
+
+        title_y = layout["title_y"]
+        underline_y = layout["underline_y"]
+        body_top = layout["body_top"]
+        body_bottom = layout["body_bottom"]
+        if body_bottom < body_top:
+            body_bottom = body_top + self.BRIEFING_LINE
+
+        for index, column in enumerate(columns):
+            col_x = margin + index * (col_w + gap)
+            column_title = self.fit_menu_line(
+                column.get("title", ""), col_w - 12, self.medium_font
+            )
+            self.medium_font.render_to(
+                self.screen, (col_x, title_y), column_title, ink
+            )
+            pygame.draw.line(
+                self.screen,
+                (50, 50, 50),
+                (col_x, underline_y),
+                (col_x + col_w - 12, underline_y),
+                1,
+            )
+            if index > 0:
+                div_x = col_x - gap // 2
+                pygame.draw.line(
+                    self.screen,
+                    rule,
+                    (div_x, title_y),
+                    (div_x, body_bottom),
+                    1,
+                )
+            clip = pygame.Rect(
+                col_x, body_top, col_w - 8, body_bottom - body_top
+            )
+            self.screen.set_clip(clip)
+            line_y = body_top
+            for line in column.get("lines") or []:
+                section = False
+                if isinstance(line, dict):
+                    text = line.get("text", "")
+                    section = line.get("rule", False)
+                else:
+                    text = line
+                shown = self.fit_menu_line(text, col_w - 16)
+                self.small_font.render_to(
+                    self.screen, (col_x, line_y), shown, ink
+                )
+                if section and shown:
+                    # stop at the words, so this stays shorter than the
+                    # faction rule above the column
+                    text_width = self.small_font.get_rect(shown).width
+                    cap = int((col_w - 16) * 0.55)
+                    if text_width > cap:
+                        text_width = cap
+                    rule_y = line_y + self._font_height(self.small_font) + 2
+                    pygame.draw.line(
+                        self.screen,
+                        (150, 150, 150),
+                        (col_x, rule_y),
+                        (col_x + text_width, rule_y),
+                        1,
+                    )
+                    line_y += self.BRIEFING_LINE + 4
+                else:
+                    line_y += self.BRIEFING_LINE
+            self.screen.set_clip(None)
+
+        footer_y = layout["footer_y"]
+        pygame.draw.line(
+            self.screen,
+            rule,
+            (margin, footer_y - 10),
+            (width - margin, footer_y - 10),
+            1,
+        )
+        for row in layout["footer_rows"]:
+            x = margin
+            for index, item in enumerate(row):
+                if index:
+                    x += self.BRIEFING_FOOTER_ITEM_GAP
+                self.small_font.render_to(self.screen, (x, footer_y), item, ink)
+                x += self.small_font.get_rect(item).width
+            footer_y += self.BRIEFING_LINE
+
+        if self.double_buffering:
+            pygame.display.flip()
+        else:
+            pygame.display.update()
+
     # ------------------------------------------------------------------------------
     def render_mode_0(self):
         """render mode 0 : main game menu"""
+        if (
+            self.game_menu.menu_state == "briefing"
+            and self.game_menu.quick_columns
+        ):
+            self.render_quick_battle_briefing()
+            return
         self.screen.fill((255, 255, 255))
         self.screen.blit(self.menu_background_image, self.menu_background_rect)
         h = 0

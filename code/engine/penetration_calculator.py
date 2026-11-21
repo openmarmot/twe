@@ -80,11 +80,23 @@ def is_internal_burst(projectile):
     return effect == 'internal_burst'
 
 #---------------------------------------------------------------------------
+def is_explosive(projectile):
+    '''True for HE. The plate is tested, then the shell bursts once.
+
+    A defeated plate, or no plate, bursts inside. A plate that holds bursts
+    on the face. HEAT is a different fuze: its jet is a separate projectile.
+    '''
+    effect = projectile_data[projectile.ai.projectile_type]['contact_effect']
+    return effect == 'explosion'
+
+#---------------------------------------------------------------------------
 def bursts_on_contact(projectile_type):
-    '''True when the round detonates on the surface instead of penetrating.
+    '''True when the round detonates on the surface instead of being handed over as shot.
 
     internal_burst is APHE. The base fuze runs after a perforation, so the
-    round has to be handed to the vehicle like inert shot.
+    round has to be handed to the vehicle like inert shot. explosion is HE.
+    A vehicle still receives that shell so the plate can be tested. Infantry,
+    buildings, and a round that times out burst here.
     '''
     effect = projectile_data[projectile_type]['contact_effect']
     if effect == 'none' or effect == 'internal_burst':

@@ -1,0 +1,6 @@
+Churchill Mk VII. British heavy infantry tank of 1944-45. Cast turret, heavier armor than the Mk IV.
+
+Four-view plan (side, top, front, rear), OnWar.com:
+http://www.onwar.com/wwii/tanks/uk/uk004churchill7p.html
+
+Use the top view and scale by width (8 pixels to a foot).

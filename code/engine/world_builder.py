@@ -304,6 +304,10 @@ def add_standard_loadout(wo, world, loadout):
         wo.add_inventory(spawn_object(world, [0, 0], "dp28", False))
         for _ in range(6):
             wo.add_inventory(spawn_object(world, [0, 0], "dp28_magazine", False))
+    elif loadout == "fg42-type1":
+        wo.add_inventory(spawn_object(world, [0, 0], "fg42-type1", False))
+        for _ in range(6):
+            wo.add_inventory(spawn_object(world, [0, 0], "fg42_type1_magazine", False))
     elif loadout == "fg42-type2":
         wo.add_inventory(spawn_object(world, [0, 0], "fg42-type2", False))
         for _ in range(6):
@@ -913,11 +917,80 @@ def generate_custom_scenario_forces(points, year):
     }
 
 
-# ------------------------------------------------------------------------------
-def load_quick_battle_map_objects(battle_option, result_container):
-    """load quick battle map objects. called by game menu"""
+# share of each side's squads held back to arrive as reinforcements.
+# counted in squads, not points, so a tank is as likely as a rifle squad
+# of the same count. the old 10% point roll could buy rifles only.
+QUICK_BATTLE_REINFORCEMENT_FRACTION = 0.1
 
-    # this is called in a thread by graphics_2d_pygame.load_quick_battle
+
+# ------------------------------------------------------------------------------
+def pull_reinforcements(squad_names, fraction=QUICK_BATTLE_REINFORCEMENT_FRACTION):
+    """Hold back a random share of a battlegroup as reinforcements.
+
+    Squads keep their relative order. The held-back squads are a sample of
+    the full list, so the reinforcement mix matches the force.
+    """
+
+    if not squad_names:
+        return [], []
+    try:
+        fraction = float(fraction)
+    except (TypeError, ValueError):
+        fraction = QUICK_BATTLE_REINFORCEMENT_FRACTION
+    if fraction <= 0:
+        return list(squad_names), []
+    count = int(len(squad_names) * fraction + 0.5)
+    if count < 1:
+        return list(squad_names), []
+    # the side that is already on the map keeps at least one squad
+    if count >= len(squad_names):
+        count = len(squad_names) - 1
+    if count < 1:
+        return list(squad_names), []
+    picked = set(random.sample(range(len(squad_names)), count))
+    main = []
+    reinforcements = []
+    for index, name in enumerate(squad_names):
+        if index in picked:
+            reinforcements.append(name)
+        else:
+            main.append(name)
+    return main, reinforcements
+
+
+# ------------------------------------------------------------------------------
+def split_reinforcements_by_faction(
+    squad_names, fraction=QUICK_BATTLE_REINFORCEMENT_FRACTION
+):
+    """Pull reinforcements from each faction's own squads."""
+
+    grouped = {}
+    order = []
+    for name in squad_names:
+        faction = squad_summary_faction(name)
+        if faction not in grouped:
+            grouped[faction] = []
+            order.append(faction)
+        grouped[faction].append(name)
+    main = []
+    reinforcements = []
+    for faction in order:
+        faction_main, faction_rein = pull_reinforcements(
+            grouped[faction], fraction
+        )
+        main.extend(faction_main)
+        reinforcements.extend(faction_rein)
+    return main, reinforcements
+
+
+# ------------------------------------------------------------------------------
+def roll_quick_battle_forces(battle_option):
+    """Roll the quick battle year, map, defender, and squad lists.
+
+    Does not build the map. The menu shows this roll before the battle
+    starts. --quick-battle and --ai-test skip that screen and load at once.
+    """
+
     # normalize - game menu passes string keys; --ai-test / --quick-battle pass ints
     battle_option = str(battle_option)
 
@@ -993,27 +1066,61 @@ def load_quick_battle_map_objects(battle_option, result_container):
             squads.append("Soviet T34-76 Model 1943")
             squads.append("German Panzer IV Ausf G")
 
-    # -- reinforcements (10% of main force points, battle options 1-3) --
+    # reinforcements are a sample of the full selection, not a second
+    # purchase. a small extra point roll could only afford rifle squads.
     if points > 0:
-        rein_points = int(points * 0.1)
-        rein_soviet_advantage = soviet_advantage * 0.1
-        print(f"reinforcement points: {rein_points}")
-        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", rein_points, squad_data, year
-        )
-        reinforcement_squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", rein_points + rein_soviet_advantage, squad_data, year
-        )
+        squads, reinforcement_squads = split_reinforcements_by_faction(squads)
+        soviet_budget = int(points + soviet_advantage)
+    else:
+        soviet_budget = 0
 
     defending_faction = random.choice(["german", "soviet", "none", "contested"])
+    return {
+        "battle_option": battle_option,
+        "year": year,
+        "german_budget": points,
+        "soviet_budget": soviet_budget,
+        "map_areas": map_areas,
+        "defending_faction": defending_faction,
+        "squads": squads,
+        "reinforcement_squads": reinforcement_squads,
+    }
+
+
+# ------------------------------------------------------------------------------
+def load_quick_battle_from_forces(forces, result_container):
+    """Build the map from a quick battle roll the menu already showed"""
+
+    # called in a thread by graphics_2d_pygame.load_quick_battle_forces
+    if forces is None:
+        forces = {}
+    year = forces.get("year", 1944)
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = 1944
+    map_areas = forces.get("map_areas")
+    if not map_areas:
+        map_areas = ["town"]
     result_container[0] = assemble_battle_map_objects(
         map_areas,
-        squads,
-        reinforcement_squads,
-        defending_faction,
+        list(forces.get("squads") or []),
+        list(forces.get("reinforcement_squads") or []),
+        forces.get("defending_faction", "none"),
         "Quick battle",
         year,
     )
+
+
+# ------------------------------------------------------------------------------
+def load_quick_battle_map_objects(battle_option, result_container):
+    """load quick battle map objects without the pre-battle squad screen"""
+
+    # this is called in a thread by graphics_2d_pygame.load_quick_battle
+    # --quick-battle and --ai-test use it. the menu rolls first, shows the
+    # forces, then calls load_quick_battle_from_forces with that same roll.
+    forces = roll_quick_battle_forces(battle_option)
+    load_quick_battle_from_forces(forces, result_container)
 
 
 # ------------------------------------------------------------------------------
@@ -1090,46 +1197,156 @@ def load_custom_scenario_map_objects(
     )
 
 
+# print order for the battle squad summary. follows the battlegroup
+# buckets (command, infantry, tanks, antitank, support, artillery),
+# then anything else alphabetically.
+quick_battle_summary_type_order = (
+    "command",
+    "infantry",
+    "motorized_infantry",
+    "mechanized_infantry",
+    "tank",
+    "antitank_vehicle",
+    "antitank_infantry",
+    "towed_antitank",
+    "medic",
+    "mechanic",
+    "sniper",
+    "infantry radio",
+    "mg",
+    "fire_support_vehicle",
+    "towed_antiair",
+    "recon",
+    "afv",
+    "utility",
+    "air",
+    "artillery",
+    "civilian",
+)
+quick_battle_summary_type_rank = {
+    unit_type: index
+    for index, unit_type in enumerate(quick_battle_summary_type_order)
+}
+
+# factions the pre-battle screen and the terminal summary list, in order.
+# anything else with a known faction is appended after these.
+quick_battle_summary_factions = (
+    ("german", "GERMAN"),
+    ("soviet", "SOVIET"),
+    ("american", "AMERICAN"),
+)
+
+
+# ------------------------------------------------------------------------------
+def squad_summary_faction(squad_name):
+    """Faction key for a squad name. Unknown names stay unknown."""
+
+    if squad_name in squad_data:
+        return squad_data[squad_name].get("faction", "unknown")
+    lower = str(squad_name).lower()
+    if lower.startswith("german"):
+        return "german"
+    if lower.startswith("soviet"):
+        return "soviet"
+    if lower.startswith("american"):
+        return "american"
+    return "unknown"
+
+
+# ------------------------------------------------------------------------------
+def squad_summary_type(squad_name):
+    """Squad type for the battle summary. Camo names use the base squad."""
+
+    info = squad_data.get(squad_name)
+    if info is None:
+        base = engine.battlegroup_generator.get_camo_base_name(str(squad_name))
+        if base:
+            info = squad_data.get(base)
+    if info is None:
+        return "unknown"
+    unit_type = info.get("type", "")
+    if unit_type is None or str(unit_type).strip() == "":
+        return "unknown"
+    return str(unit_type)
+
+
+# ------------------------------------------------------------------------------
+def squad_summary_type_sort_key(unit_type):
+    """Known types keep the summary order. Anything else sorts after them."""
+
+    rank = quick_battle_summary_type_rank.get(unit_type)
+    if rank is None:
+        return (1, unit_type)
+    return (0, rank)
+
+
+# ------------------------------------------------------------------------------
+def count_squad_names(squad_list):
+    """Count squad names. Missing lists count as empty."""
+
+    counts = {}
+    if not squad_list:
+        return counts
+    for squad_name in squad_list:
+        counts[squad_name] = counts.get(squad_name, 0) + 1
+    return counts
+
+
+# ------------------------------------------------------------------------------
+def group_squad_counts(counts):
+    """Group counted squads by type, summary order, then count and name."""
+
+    by_type = {}
+    if not counts:
+        return []
+    for name, count in counts.items():
+        unit_type = squad_summary_type(name)
+        if unit_type not in by_type:
+            by_type[unit_type] = []
+        by_type[unit_type].append((name, count))
+    grouped = []
+    for unit_type in sorted(by_type, key=squad_summary_type_sort_key):
+        rows = by_type[unit_type]
+        rows.sort(key=lambda row: (-row[1], row[0]))
+        grouped.append((unit_type, rows))
+    return grouped
+
+
+# ------------------------------------------------------------------------------
+def filter_squad_counts(counts, faction):
+    """Keep the squads that belong to one faction."""
+
+    if not counts:
+        return {}
+    return {
+        name: count
+        for name, count in counts.items()
+        if squad_summary_faction(name) == faction
+    }
+
+
 # ------------------------------------------------------------------------------
 def print_quick_battle_squad_summary(
     year, squads, reinforcement_squads, title="QUICK BATTLE SUMMARY"
 ):
-    """print a clean terminal summary of battle forces by faction"""
-
-    def count_squads(squad_list):
-        counts = {}
-        for s in squad_list:
-            counts[s] = counts.get(s, 0) + 1
-        return counts
-
-    def faction_of(squad_name):
-        if squad_name in squad_data:
-            return squad_data[squad_name].get("faction", "unknown")
-        lower = squad_name.lower()
-        if lower.startswith("german"):
-            return "german"
-        if lower.startswith("soviet"):
-            return "soviet"
-        if lower.startswith("american"):
-            return "american"
-        return "unknown"
-
-    def filter_faction(counts, faction):
-        return {k: v for k, v in counts.items() if faction_of(k) == faction}
+    """print a clean terminal summary of battle forces by faction and type"""
 
     def print_force_block(label, counts):
         if not counts:
             return
         total = sum(counts.values())
         print(f"  {label}  ({total} squad{'s' if total != 1 else ''})")
-        print(f"  {'#':>4}  Squad")
-        print(f"  {'----':>4}  {'-' * (width - 10)}")
-        for name, count in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
-            print(f"  {count:>4}  {name}")
         print()
+        for unit_type, rows in group_squad_counts(counts):
+            type_total = sum(count for _, count in rows)
+            type_word = "squad" if type_total == 1 else "squads"
+            print(f"    {unit_type.replace('_', ' ')}  ({type_total} {type_word})")
+            for name, count in rows:
+                print(f"    {count:>4}  {name}")
+            print()
 
-    main_counts = count_squads(squads)
-    rein_counts = count_squads(reinforcement_squads)
+    main_counts = count_squad_names(squads)
+    rein_counts = count_squad_names(reinforcement_squads)
     width = 62
 
     print()
@@ -1137,14 +1354,9 @@ def print_quick_battle_squad_summary(
     print(f"  {title}  |  Year {year}")
     print("=" * width)
 
-    faction_labels = (
-        ("german", "GERMAN"),
-        ("soviet", "SOVIET"),
-        ("american", "AMERICAN"),
-    )
-    for faction, label in faction_labels:
-        main_f = filter_faction(main_counts, faction)
-        rein_f = filter_faction(rein_counts, faction)
+    for faction, label in quick_battle_summary_factions:
+        main_f = filter_squad_counts(main_counts, faction)
+        rein_f = filter_squad_counts(rein_counts, faction)
         if not main_f and not rein_f:
             continue
 
@@ -1514,18 +1726,30 @@ def spawn_shrapnel(
 
 
 # ------------------------------------------------------------------------------
-def spawn_shrapnel_cloud(world, world_coords, amount, originator, weapon):
+def spawn_shrapnel_cloud(
+    world, world_coords, amount, originator, weapon, fragment_range=None
+):
     """creates a shrapnel starburst pattern. used for grenades"""
     # ORIGINATOR - the world object (human?) that is ultimately responsible for throwing/shooting the object that created the shrapnel
+    # fragment_range - game units a splinter can travel. None keeps the old
+    # short cloud (0.1-0.4 s at 300 units/s, about 1-4.5 m) used by shells.
     ignore_list = []
-    if world.friendly_fire_explosive is False:
+    if originator is not None and world.friendly_fire_explosive is False:
         if originator.is_human:
             ignore_list += originator.ai.squad.faction_tactical.allied_humans
 
-    elif world.friendly_fire_explosive_squad is False:
+    elif originator is not None and world.friendly_fire_explosive_squad is False:
         if originator.is_human:
             # just add the squad
             ignore_list += originator.ai.squad.members
+
+    # splinters move at 300 units/s. flight time is what sets the reach.
+    min_time = 0.1
+    max_time = 0.4
+    if fragment_range is not None and fragment_range > 0:
+        max_time = fragment_range / 300.0
+        # some pieces are light and fall short. the far ones make the radius.
+        min_time = max_time * 0.4
 
     for x in range(amount):
         target_coords = [
@@ -1538,8 +1762,8 @@ def spawn_shrapnel_cloud(world, world_coords, amount, originator, weapon):
             target_coords,
             ignore_list,
             "shrapnel",
-            0.1,
-            0.4,
+            min_time,
+            max_time,
             originator,
             weapon,
         )

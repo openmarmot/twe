@@ -2,6 +2,11 @@
 soviet_37mm_m1939_61k_aa_gun_carriage object definition
 
 repo : https://github.com/openmarmot/twe
+
+notes :
+37 mm M1939 (61-K) on the ZU-7 carriage.
+Rack is 24 frag clips, 10 AP-T clips, and 2 BR-167P clips.
+The splinter shield waits on the sprite. See note.txt.
 """
 
 # import built in modules
@@ -22,7 +27,7 @@ def create(world, world_coords):
     z.is_vehicle = True
     z.is_towable = True
     z.ai.is_towed_gun = True
-    z.ai.requires_afv_training = True
+    z.ai.requires_afv_training = False
     z.ai.vehicle_armor["top"] = [0, 0, 0]
     z.ai.vehicle_armor["bottom"] = [0, 0, 0]
     z.ai.vehicle_armor["left"] = [0, 0, 0]
@@ -53,8 +58,9 @@ def create(world, world_coords):
     z.ai.vehicle_crew.append(role)
 
     z.ai.engines.append(engine.world_builder.spawn_object(world, world_coords, "bicycle_pedals", False))
-    z.ai.max_speed = 100
-    z.ai.max_offroad_speed = 100
+    # crew push. about 9 km/h. heavier than the ZiS-3, so slower than that cap
+    z.ai.max_speed = 65
+    z.ai.max_offroad_speed = 65
     z.ai.open_top = True
     # z.ai.rotation_speed=30. # !! note rotation speeds <40 seem to cause ai to lose control
     z.ai.rotation_speed = 40.0
@@ -64,17 +70,24 @@ def create(world, world_coords):
     z.drag_coefficient = 0.9
     z.frontal_area = 5
     z.rotation_angle = float(random.randint(0, 359))
-    z.ai.ammo_rack_capacity = 15
-    for b in range(10):
+    # 24 frag, 10 AP-T, 2 BR-167P. the gun starts with one more frag clip
+    z.ai.ammo_rack_capacity = 36
+    for b in range(24):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "37mm_m1939_k61_magazine", False)
         )
-    for b in range(5):
+    for b in range(10):
         temp = engine.world_builder.spawn_object(world, world_coords, "37mm_m1939_k61_magazine", False)
         engine.world_builder.load_magazine(world, temp, "37x252_AP-T")
         z.ai.ammo_rack.append(temp)
+    for b in range(2):
+        temp = engine.world_builder.spawn_object(world, world_coords, "37mm_m1939_k61_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "37x252_APCR")
+        z.ai.ammo_rack.append(temp)
     z.ai.min_wheels_per_side_front = 1
-    z.ai.min_wheels_per_side_rear = 1
+    # all four wheels are on the front lists. a rear minimum with no rear
+    # wheels disables the gun on the first wheel hit
+    z.ai.min_wheels_per_side_rear = 0
     z.ai.max_wheels = 4
     z.ai.max_spare_wheels = 0
     for b in range(2):

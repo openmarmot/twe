@@ -1,0 +1,6 @@
+Willys MB jeep. Standard Allied light car of 1945, and widely used by the Red Army. This is the Soviet-edition sheet. It has a top view, a chassis top view, and a 1 m scale bar. The GAZ-67 is the Soviet-built cousin.
+
+Plan:
+https://drawingdatabase.com/willys-mb/
+
+Use the top view and scale by width (8 pixels to a foot).

@@ -1,0 +1,62 @@
+Jagdpanzer IV (Sd.Kfz. 162)
+
+Not the Panzer IV/70. That one has the 7.5 cm Pak 42 L/70 and is a separate vehicle.
+
+-- ref ---
+https://tanks-encyclopedia.com/ww2/nazi_germany/jagdpanzer-iv.php
+https://web.archive.org/web/20100313170412/http://afvdb.50megs.com/germany/jagdpz4.html
+
+Vomag, January-November 1944, about 769. Crew of 4.
+Gun is the 7.5 cm Pak 39 L/48 (same rounds as the KwK 40 L/48).
+Traverse 10 degrees left and right, handwheel. Sight Sfl.ZF 1a.
+Stowage 79 rounds. Engine Maybach HL 120 TRM, 300 PS, gasoline.
+Road speed 40 km/h. Combat weight about 24 tonnes. Fuel 470 liters
+(the game tank uses the shared 114, same as the Panzer IV).
+
+Two game vehicles share this art.
+
+german_jagdpanzer_iv is January-April 1944, about chassis 320001-320300.
+german_jagdpanzer_iv_late is from chassis 320301 (May 1944). Chamberlain
+and Doyle: the upper hull front and the superstructure front went to
+80 mm, and the superstructure sides went from 30 mm to 40 mm. The lower
+nose stayed 50 mm. Weight is the heavy end of the published 24-25 tonnes.
+
+The May vehicles usually left the factory without a muzzle brake. Both
+variants use the same gun sprite, which still has the brake. Dust from
+the brake is not modeled. Speed, rack, crew, and the roof MG are the same.
+Return rollers dropping from four to three, and steel-rimmed wheels, are
+not modeled. The 45 degree upper hull front (60 mm, then 80 mm) sits
+between the nose and the casemate. Low hits use the 50 mm nose.
+
+Armor, degrees from vertical.
+
+Plate              Early          Late
+Casemate front     60 mm at 50    80 mm at 50
+Casemate sides     30 mm at 30    40 mm at 30
+Casemate rear      30 mm at 10    same
+Casemate roof      20 mm          same
+Crew floor         20 mm          same
+Lower nose         50 mm at 55    same
+Lower sides        30 mm plus 5 mm schuerzen
+Engine rear        20 mm at 11
+Engine deck        10 mm
+Hull floor         10 mm
+Saukopf            80 mm, face stored vertical
+
+Line of sight: early casemate about 93 mm, late casemate about 124 mm.
+Nose about 87 mm on both. Mantlet 80 mm.
+
+Roof gun is remote_mg42_turret. It reuses the remote_mg34_turret sprite.
+The loader's seat mans it. Belts are mg34_belt, which also fits the MG 42.
+
+--------
+
+Measurement,Real,Pixels
+Width,3.17 m,~86 px
+Hull length,~6.0 m,~161 px
+Chassis image,168 x 168,
+Gun image,88 x 88, barrel toward the top, saukopf at the bottom
+
+Gun pivot is the saukopf. position_offset [-60, 18] puts it on the
+glacis port, right of center. image_rotation_offset [-0.5, 28.5].
+Roof MG position_offset [6, 17]. Nudge either in image_tool.

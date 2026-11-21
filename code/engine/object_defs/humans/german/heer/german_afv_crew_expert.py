@@ -22,7 +22,8 @@ def create(world, world_coords):
     ]
     z.ai.is_afv_trained = True
     z.ai.armor_knowledge = 0.1
-    z.ai.morale += 10
+    z.ai.max_morale += 10
+    z.ai.morale = z.ai.max_morale
     z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "bandage", False))
     if random.randint(0, 1) == 0:
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "schokakola", False))

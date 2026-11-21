@@ -1,0 +1,5 @@
+Ya-12 artillery tractor. The common late-war light tracked tractor for divisional guns. The sheet prints the width as 2440 mm and has a scale bar.
+
+https://drawingdatabase.com/ya-12/
+
+Use the top view and scale by width (8 pixels to a foot).

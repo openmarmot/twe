@@ -18,5 +18,6 @@ def create(world, world_coords):
     engine.world_builder.add_standard_loadout(z, world, "standard_german_gear")
     engine.world_builder.add_standard_loadout(z, world, "mp40")
     z.ai.is_field_commander = True
-    z.ai.morale = 110
+    z.ai.max_morale = 110
+    z.ai.morale = z.ai.max_morale
     return z
