@@ -1,6 +1,18 @@
 TWE Project : Change Log
 
 -------------------------------
+November 20 2026
+- quick battle shows both sides' squads before the map is built.
+- quick battle reinforcements are about 10% of each side's squads, pulled from that side's full list
+
+
+-------------------------------
+November 15 2026
+- new out_of_ammo task
+
+soldiers will now check if squad mates have ammo and are smarter about checking containers
+
+-------------------------------
 November 14 2026
 - some grenade updates
 - fix morale caps + morale mechanism adjustments

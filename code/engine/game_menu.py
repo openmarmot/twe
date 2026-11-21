@@ -4,6 +4,7 @@ repo : https://github.com/openmarmot/twe
 notes :
 this class contains code for the main game menu
 custom scenario rolls a quick-battle list, then the player edits counts
+quick battle shows both sides' squads before the map is built
 
 
 
@@ -52,6 +53,9 @@ def wrap_menu_text(text, width=58):
 # left and right change page.
 CUSTOM_PAGE_SIZE = 8
 
+# wide enough for a German column and a Soviet column on the briefing
+QUICK_BATTLE_TWO_COLUMN_WIDTH = 1000
+
 
 # ------------------------------------------------------------------------------
 def format_squad_amount_header(cost_label):
@@ -89,6 +93,115 @@ def format_squad_amount_line(selected, slot, count, cost, squad_type, name):
     )
 
 
+# ------------------------------------------------------------------------------
+def quick_battle_side_label(faction):
+    '''display name for a quick-battle faction key'''
+    if faction == 'german':
+        return 'German'
+    if faction == 'soviet':
+        return 'Soviet'
+    if faction == 'american':
+        return 'American'
+    if faction == 'civilian':
+        return 'Civilian/Neutral'
+    return str(faction).capitalize()
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_names_for_faction(names, faction):
+    '''squad names from a mixed list that belong to one faction'''
+    picked = []
+    if not names:
+        return picked
+    for name in names:
+        if engine.world_builder.squad_summary_faction(name) == faction:
+            picked.append(name)
+    return picked
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_force_lines(names):
+    '''count lines for one force list, still grouped by squad type'''
+    if not names:
+        return ['  none']
+    counts = engine.world_builder.count_squad_names(names)
+    lines = []
+    # group_squad_counts keeps the summary type order. the type name itself
+    # is left off so the briefing stays a short list of squads.
+    groups = engine.world_builder.group_squad_counts(counts)
+    for index, (_unit_type, rows) in enumerate(groups):
+        # a blank line between types. the type name stays off the list.
+        if index:
+            lines.append('')
+        for name, count in rows:
+            lines.append('  ' + str(count) + '  ' + name)
+    return lines
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_count_label(count):
+    '''squad count for a section header'''
+    if count == 1:
+        word = 'squad'
+    else:
+        word = 'squads'
+    return str(count) + ' ' + word
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_section_line(label, count):
+    '''a section header the briefing underlines. the rule is shorter than
+    the line under the faction name.'''
+    return {
+        'text': label + '  ·  ' + quick_battle_count_label(count),
+        'rule': True,
+    }
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_side_lines(main_names, rein_names):
+    '''main force, then reinforcements when that side has any'''
+    if main_names:
+        main_count = len(main_names)
+    else:
+        main_count = 0
+    lines = [quick_battle_section_line('Main force', main_count)]
+    lines.extend(quick_battle_force_lines(main_names))
+    if rein_names:
+        lines.append('')
+        lines.append(quick_battle_section_line('Reinforcements', len(rein_names)))
+        lines.extend(quick_battle_force_lines(rein_names))
+    return lines
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_page_count(lengths, page_size):
+    '''how many pages the longer column needs'''
+    if page_size < 1:
+        page_size = 1
+    pages = 1
+    for length in lengths:
+        if length <= 0:
+            continue
+        count = (length + page_size - 1) // page_size
+        if count > pages:
+            pages = count
+    return pages
+
+
+# ------------------------------------------------------------------------------
+def quick_battle_page_slice(lines, page, page_size):
+    '''one page of column lines. a short column is blank on later pages.'''
+    if page < 0:
+        page = 0
+    if page_size < 1:
+        page_size = 1
+    start = page * page_size
+    if start >= len(lines):
+        return []
+    return lines[start:start + page_size]
+
+
 class GameMenu():
     ''' in game menu '''
 
@@ -124,6 +237,13 @@ class GameMenu():
         self.custom_catalog = []
         self.custom_notice = ''
 
+        # quick battle briefing. the roll is shown before the map is built.
+        self.quick_battle_option = '1'
+        self.quick_forces = None
+        self.quick_page = 0
+        self.quick_side = 'german'
+        self.quick_columns = None
+
         # get the initial text going
         self.start_menu('none')
     #---------------------------------------------------------------------------
@@ -155,6 +275,7 @@ class GameMenu():
         self.current_page=0
         # clear this just in case as it is rather inconsistently done
         self.text_queue=[]
+        self.quick_columns = None
         self.active_menu=menu_name
         self.handle_input(None)
 
@@ -164,6 +285,7 @@ class GameMenu():
         self.active_menu='none'
         self.menu_state='none'
         self.text_queue=[]
+        self.quick_columns = None
 
     #---------------------------------------------------------------------------
     def load_save_menu(self, key):
@@ -283,6 +405,7 @@ class GameMenu():
             self.text_queue.append('---------------')
             self.text_queue.append('Pick a Quick Battle Scenario')
             self.text_queue.append('Note - balance varies wildly with code updates.')
+            self.text_queue.append('The next screen lists each side.')
 
             self.text_queue.append('1 - 5k point random battle ')
             self.text_queue.append('2 - 10k point random battle')
@@ -291,8 +414,17 @@ class GameMenu():
             self.text_queue.append('5 - 100v100 tank battle for benchmarking')
 
             if key in ['1','2','3','4','5']:
-                self.deactivate_menu()
-                self.graphics_engine.load_quick_battle(self.player_spawn_faction,key)
+                self.quick_battle_option = key
+                self.quick_battle_roll()
+                self.menu_state = 'briefing'
+                key = None
+
+        if self.menu_state == 'briefing':
+            self.quick_battle_handle_briefing(key)
+            # starting the battle deactivates the menu. do not draw over that.
+            if self.active_menu != 'start':
+                return
+            self.quick_battle_draw_briefing()
 
     #---------------------------------------------------------------------------
     def scenario_menu(self, key):
@@ -955,6 +1087,219 @@ class GameMenu():
         self.graphics_engine.load_custom_scenario(
             faction, year, german, soviet
         )
+
+    #---------------------------------------------------------------------------
+    def quick_battle_roll(self):
+        '''roll both sides. the map is built later, when the battle starts.'''
+        self.quick_forces = engine.world_builder.roll_quick_battle_forces(
+            self.quick_battle_option
+        )
+        self.quick_page = 0
+        self.quick_side = 'german'
+
+    #---------------------------------------------------------------------------
+    def quick_battle_two_columns(self):
+        '''true when the window can show German and Soviet side by side'''
+        size = self.graphics_engine.screen_size
+        if size is None:
+            return True
+        return int(size[0]) >= QUICK_BATTLE_TWO_COLUMN_WIDTH
+
+    #---------------------------------------------------------------------------
+    def quick_battle_sides(self):
+        '''german and soviet, plus any other faction that actually rolled'''
+        sides = ['german', 'soviet']
+        if self.quick_forces is None:
+            return sides
+        names = list(self.quick_forces.get('squads') or [])
+        names += list(self.quick_forces.get('reinforcement_squads') or [])
+        for name in names:
+            faction = engine.world_builder.squad_summary_faction(name)
+            if faction == 'unknown':
+                continue
+            if faction not in sides:
+                sides.append(faction)
+        return sides
+
+    #---------------------------------------------------------------------------
+    def quick_battle_side_names(self, faction):
+        '''main-force names and reinforcement names for one side'''
+        forces = self.quick_forces
+        if forces is None:
+            return [], []
+        main = quick_battle_names_for_faction(
+            forces.get('squads'), faction
+        )
+        rein = quick_battle_names_for_faction(
+            forces.get('reinforcement_squads'), faction
+        )
+        return main, rein
+
+    #---------------------------------------------------------------------------
+    def quick_battle_defender_line(self):
+        '''who holds the map, using the same words as the scenario menu'''
+        faction = 'none'
+        if self.quick_forces is not None:
+            faction = self.quick_forces.get('defending_faction', 'none')
+        if faction in ['none', 'contested', 'mixed']:
+            return 'Meeting engagement (' + str(faction) + ')'
+        return quick_battle_side_label(faction) + ' defending'
+
+    #---------------------------------------------------------------------------
+    def quick_battle_map_line(self):
+        '''map areas picked with this roll'''
+        areas = []
+        if self.quick_forces is not None:
+            areas = self.quick_forces.get('map_areas') or []
+        parts = []
+        for area in areas:
+            parts.append(str(area).replace('_', ' ').title())
+        if not parts:
+            parts.append('Town')
+        return 'Map: ' + ', '.join(parts)
+
+    #---------------------------------------------------------------------------
+    def quick_battle_faction_budget(self, faction):
+        '''point budget rolled for this side. test battles have none.'''
+        forces = self.quick_forces
+        if forces is None:
+            return 0
+        if faction == 'german':
+            budget = forces.get('german_budget', 0)
+        elif faction == 'soviet':
+            budget = forces.get('soviet_budget', 0)
+        else:
+            budget = 0
+        if not budget:
+            return 0
+        return budget
+
+    #---------------------------------------------------------------------------
+    def quick_battle_title(self):
+        '''heading for the battle that was picked'''
+        option = str(self.quick_battle_option)
+        if option == '4':
+            return 'Test battle'
+        if option == '5':
+            return '100 vs 100 tanks'
+        return 'Quick Battle'
+
+    #---------------------------------------------------------------------------
+    def quick_battle_handle_briefing(self, key):
+        '''page, roll again, or start the battle with the forces on screen'''
+        if key is None or key == 'none':
+            return
+        if self.quick_forces is None:
+            return
+        if key in ['right', 'down']:
+            self.quick_page += 1
+        elif key in ['left', 'up']:
+            self.quick_page -= 1
+        elif key == 'r':
+            self.quick_battle_roll()
+        elif key in ['[', ']'] and not self.quick_battle_two_columns():
+            sides = self.quick_battle_sides()
+            if self.quick_side not in sides:
+                index = 0
+            else:
+                index = sides.index(self.quick_side)
+            if key == ']':
+                index += 1
+            else:
+                index -= 1
+            self.quick_side = sides[index % len(sides)]
+            self.quick_page = 0
+        elif key == 'space':
+            self.quick_battle_start()
+
+    #---------------------------------------------------------------------------
+    def quick_battle_start(self):
+        '''load the map from the roll on screen. do not roll again.'''
+        if self.quick_forces is None:
+            return
+        forces = self.quick_forces
+        faction = self.player_spawn_faction
+        self.deactivate_menu()
+        self.graphics_engine.load_quick_battle_forces(faction, forces)
+
+    #---------------------------------------------------------------------------
+    def quick_battle_draw_briefing(self):
+        '''header, one column per side, and the keys that leave this screen'''
+        if self.quick_forces is None:
+            self.quick_columns = None
+            self.text_queue = ['No forces rolled']
+            return
+
+        year = self.quick_forces.get('year', '')
+        banner = {
+            'kicker': 'TWE: To Whatever End',
+            'title': self.quick_battle_title(),
+            'page': '',
+            'facts': [
+                'Year ' + str(year),
+                'Playing as ' + quick_battle_side_label(
+                    self.player_spawn_faction
+                ),
+                self.quick_battle_defender_line(),
+                self.quick_battle_map_line(),
+            ],
+        }
+
+        footer = ['[Left] [Right] page']
+        if not self.quick_battle_two_columns():
+            footer.append('<[> <]> switch side')
+        footer.append('[r] roll again')
+        footer.append('[Space] start')
+        footer.append('[Esc] main menu')
+
+        layout = self.graphics_engine.briefing_layout(banner, footer)
+        page_size = layout['page_size']
+        sides = self.quick_battle_sides()
+        if self.quick_battle_two_columns():
+            shown = sides
+        else:
+            if self.quick_side not in sides:
+                self.quick_side = sides[0]
+            shown = [self.quick_side]
+
+        full_lines = []
+        for faction in shown:
+            main, rein = self.quick_battle_side_names(faction)
+            full_lines.append(quick_battle_side_lines(main, rein))
+
+        lengths = []
+        for lines in full_lines:
+            lengths.append(len(lines))
+        pages = quick_battle_page_count(lengths, page_size)
+        if self.quick_page < 0:
+            self.quick_page = 0
+        if self.quick_page >= pages:
+            self.quick_page = pages - 1
+        banner['page'] = (
+            'Page ' + str(self.quick_page + 1) + ' / ' + str(pages)
+        )
+
+        columns = []
+        for index, faction in enumerate(shown):
+            title = quick_battle_side_label(faction).upper()
+            budget = self.quick_battle_faction_budget(faction)
+            if budget:
+                title = title + ': Budget ' + str(budget)
+            columns.append({
+                'title': title,
+                'lines': quick_battle_page_slice(
+                    full_lines[index], self.quick_page, page_size
+                ),
+            })
+
+        self.text_queue = [banner['title']]
+        for fact in banner['facts']:
+            self.text_queue.append(fact)
+        self.quick_columns = {
+            'banner': banner,
+            'footer': footer,
+            'columns': columns,
+        }
 
     #---------------------------------------------------------------------------
     def update(self,time_passed_seconds):
