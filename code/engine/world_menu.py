@@ -530,6 +530,7 @@ class World_Menu:
             self.text_queue.append("m - german_sd_kfz_251/21 15mm")
             self.text_queue.append("n - SU-76")
             self.text_queue.append("o - german_mg151_ground")
+            self.text_queue.append("p - german_ig_18")
             if key == "0":
                 engine.world_builder.spawn_object(
                     self.world,
@@ -699,6 +700,16 @@ class World_Menu:
                         self.world.player.world_coords[1],
                     ],
                     "german_mg151_ground",
+                    True,
+                )
+            elif key == "p":
+                engine.world_builder.spawn_object(
+                    self.world,
+                    [
+                        self.world.player.world_coords[0] + 50,
+                        self.world.player.world_coords[1],
+                    ],
+                    "german_ig_18",
                     True,
                 )
         if self.menu_state == "spawn_weapons":

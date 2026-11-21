@@ -90,7 +90,7 @@ CATEGORY_TYPES = {
     'tanks': ('tank',),
     'antitank': ('antitank_vehicle', 'antitank_infantry', 'towed_antitank'),
     'support': ('medic', 'mechanic', 'sniper', 'infantry radio', 'mg'),
-    'vehicles': ('fire_support_vehicle', 'towed_antiair', 'recon', 'afv'),
+    'vehicles': ('fire_support_vehicle', 'towed_antiair', 'recon'),
     'artillery': ('artillery',),
     'command': ('command',),
 }

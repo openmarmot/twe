@@ -843,18 +843,28 @@ def expand_squad_counts(order, counts):
 
 
 # ------------------------------------------------------------------------------
-def custom_scenario_budgets(points):
-    """German budget and the soviet budget with the quick battle advantage"""
+def custom_scenario_budget_range(points, year):
+    """German budget and the low and high soviet budgets. No roll."""
 
-    # load_quick_battle_map_objects gives the soviets half again as many
-    # points. custom scenario uses that same split.
     try:
         german_budget = int(points)
     except (TypeError, ValueError):
         german_budget = 0
     if german_budget < 0:
         german_budget = 0
-    soviet_budget = int(german_budget * 1.5)
+    low, high = engine.battlegroup_generator.soviet_advantage_percent_range(year)
+    soviet_low = int(german_budget * (100 + low) / 100)
+    soviet_high = int(german_budget * (100 + high) / 100)
+    return german_budget, soviet_low, soviet_high
+
+
+def custom_scenario_budgets(points, year=1944):
+    """German budget and a soviet budget rolled like a quick battle"""
+
+    german_budget, _, _ = custom_scenario_budget_range(points, year)
+    soviet_budget = engine.battlegroup_generator.roll_soviet_budget(
+        german_budget, year
+    )
     return german_budget, soviet_budget
 
 
@@ -901,7 +911,7 @@ def generate_custom_scenario_forces(points, year):
         year = int(year)
     except (TypeError, ValueError):
         year = 1944
-    german_budget, soviet_budget = custom_scenario_budgets(points)
+    german_budget, soviet_budget = custom_scenario_budgets(points, year)
     german = engine.battlegroup_generator.create_random_battlegroup(
         "german", german_budget, squad_data, year
     )
@@ -1005,44 +1015,12 @@ def roll_quick_battle_forces(battle_option):
     squads = []
     reinforcement_squads = []
     points = 0
-    soviet_advantage = 0
-    soviet_advantage_multiplier = 0.5
     if battle_option == "1":
         points = 2500
-        soviet_advantage = points * soviet_advantage_multiplier
-        print(f"soviet advantage: {soviet_advantage}")
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data, year
-        )
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data, year
-        )
-
     elif battle_option == "2":
         points = 5000
-        soviet_advantage = points * soviet_advantage_multiplier
-        print(f"soviet advantage: {soviet_advantage}")
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data, year
-        )
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data, year
-        )
-        # squads.append('German Panzerjager Tiger P camo1')
-        # squads.append('Soviet SU-85')
-        # squads.append('Soviet SU-85')
-        # squads.append('Soviet SU-85')
-
     elif battle_option == "3":
         points = 10000
-        soviet_advantage = points * soviet_advantage_multiplier
-        print(f"soviet advantage: {soviet_advantage}")
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "german", points, squad_data, year
-        )
-        squads += engine.battlegroup_generator.create_random_battlegroup(
-            "soviet", points + soviet_advantage, squad_data, year
-        )
 
     # testing
     elif battle_option == "4":
@@ -1056,10 +1034,6 @@ def roll_quick_battle_forces(battle_option):
             squads.append("German Sd.kfz.251/2")
             squads.append("German 1944 Rifle")
 
-        # squads.append('Soviet T34-76 Model 1943')
-
-        # squads.append('German Sd.kfz.251/9')
-
     # bench mark
     elif battle_option == "5":
         for _ in range(100):
@@ -1069,8 +1043,20 @@ def roll_quick_battle_forces(battle_option):
     # reinforcements are a sample of the full selection, not a second
     # purchase. a small extra point roll could only afford rifle squads.
     if points > 0:
+        soviet_budget = engine.battlegroup_generator.roll_soviet_budget(
+            points, year
+        )
+        print(
+            f"soviet advantage: {soviet_budget - points} "
+            f"(year {year}, german {points})"
+        )
+        squads += engine.battlegroup_generator.create_random_battlegroup(
+            "german", points, squad_data, year
+        )
+        squads += engine.battlegroup_generator.create_random_battlegroup(
+            "soviet", soviet_budget, squad_data, year
+        )
         squads, reinforcement_squads = split_reinforcements_by_faction(squads)
-        soviet_budget = int(points + soviet_advantage)
     else:
         soviet_budget = 0
 
@@ -1217,7 +1203,6 @@ quick_battle_summary_type_order = (
     "fire_support_vehicle",
     "towed_antiair",
     "recon",
-    "afv",
     "utility",
     "air",
     "artillery",

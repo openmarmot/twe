@@ -66,11 +66,13 @@ Hit data is saved and can be viewed with green and orange arrows showing hits th
 | Civilian | Red Bicycle | Bike | |
 | German | Bicycle | Bike | A military bicycle |
 | German | Fa223 Drache | Helicopter | |
+| German | IG 18 | Infantry Gun | 7.5cm light infantry gun |
 | German | Jagdpanzer 38t 'Hetzer' | Tank | |
 | German | Jagdpanzer IV | Tank | 75mm Pak 39 L/48. 60mm front. Not the IV/70 |
 | German | Jagdpanzer IV Late | Tank | May 1944. 80mm casemate front |
 | German | Ju 88 | Airplane | |
 | German | Kubelwagen | Utility | unarmored light all terrain car | 
+| German | MG 151/20 Ground Mount | Cannon  | Converted aircraft cannon |
 | German | Pak 40 | AT Gun | Towed gun |
 | German | Panzer IV Ausf G | Tank | 75mm L43 |
 | German | Panzer IV Ausf H | Tank | 75mm L48 |

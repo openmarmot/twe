@@ -22,7 +22,6 @@ vehicle_squad_types = [
     "tank",
     "antitank_vehicle",
     "fire_support_vehicle",
-    "afv",
     "recon",
     "utility",
     "air",
@@ -68,6 +67,28 @@ category_share = {
     "artillery": 0.07,
     "other": 0.02,
     "command": 0.02,
+}
+
+# each battle multiplies a share by a factor in this range, then scales
+# the shares so they still sum to the same total. command's own factor
+# is 1. scaling still nudges it when the other shares change.
+# the count cap already picks one group or two.
+category_share_fuzz = {
+    "infantry": (0.80, 1.25),
+    "tanks": (0.75, 1.40),
+    "antitank": (0.75, 1.40),
+    "support_infantry": (0.90, 1.20),
+    "support_vehicle": (0.75, 1.35),
+    "artillery": (0.75, 1.40),
+    "other": (0.70, 1.40),
+    "command": (1.0, 1.0),
+}
+
+# extra soviet points as a percent of the german budget.
+# 1944 stays around the old flat 50. 1945 is the larger red army.
+soviet_advantage_percent = {
+    1944: (35, 65),
+    1945: (55, 85),
 }
 
 # ------------------------------------------------------------------------------
@@ -185,6 +206,86 @@ def name_share_for_type(unit_type):
     return 0.5
 
 
+def category_budget_floor(cat_name, funds):
+    """Lowest cap that still buys one squad, when the normal cap could"""
+
+    if cat_name == "support_infantry":
+        return min_slot_cost(funds)
+    if cat_name == "artillery":
+        return 100
+    if cat_name == "command":
+        return 22
+    return 0
+
+
+def roll_category_budgets(funds):
+    """Point cap for each category on this battlegroup.
+
+    Shares are nudged, then scaled so they still sum to the normal
+    total. A category that could buy one squad at its normal share
+    keeps at least enough for that squad.
+    """
+
+    try:
+        funds = int(funds)
+    except (TypeError, ValueError):
+        funds = 0
+    if funds < 0:
+        funds = 0
+
+    weights = {}
+    for name, share in category_share.items():
+        low, high = category_share_fuzz.get(name, (1.0, 1.0))
+        factor = 1.0
+        if high > low:
+            factor = random.uniform(low, high)
+        weights[name] = share * factor
+    total_weight = 0.0
+    for weight in weights.values():
+        total_weight += weight
+    if total_weight <= 0:
+        total_weight = 1.0
+
+    budgets = {}
+    for name, share in category_share.items():
+        normal = int(funds * share)
+        budget = int(funds * weights[name] / total_weight)
+        floor = category_budget_floor(name, funds)
+        if normal >= floor and budget < floor:
+            budget = floor
+        budgets[name] = budget
+    return budgets
+
+
+def soviet_advantage_percent_range(year):
+    """Low and high extra percent for the soviet side this year"""
+
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = 1944
+    if year >= 1945:
+        return soviet_advantage_percent[1945]
+    return soviet_advantage_percent[1944]
+
+
+def roll_soviet_budget(german_budget, year):
+    """Soviet points for a german budget. Rolled inside the year range."""
+
+    try:
+        german_budget = int(german_budget)
+    except (TypeError, ValueError):
+        german_budget = 0
+    if german_budget < 0:
+        german_budget = 0
+    low, high = soviet_advantage_percent_range(year)
+    soviet_low = int(german_budget * (100 + low) / 100)
+    soviet_high = int(german_budget * (100 + high) / 100)
+    if soviet_high <= soviet_low:
+        return soviet_low
+    return random.randint(soviet_low, soviet_high)
+
+
 # ------------------------------------------------------------------------------
 
 
@@ -238,7 +339,6 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
                 "fire_support_vehicle",
                 "towed_antiair",
                 "recon",
-                "afv",
             ]:
                 squad_options_support_vehicle[key] = value
             elif value["type"] in ["artillery"]:
@@ -254,10 +354,9 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
             else:
                 squad_options_other[key] = value
 
-    cat_budget = {}
+    cat_budget = roll_category_budgets(funds)
     cat_spent = {}
-    for cat_name, share in category_share.items():
-        cat_budget[cat_name] = int(funds * share)
+    for cat_name in category_share:
         cat_spent[cat_name] = 0
     name_spent = {}
 
@@ -289,7 +388,13 @@ def create_random_battlegroup(faction, funds, squad_data, year=1944):
         camo_base = get_camo_base_name(squad_name)
         if camo_base:
             base = camo_base
+        # half of a small bucket can be less than one squad. a mortar
+        # billed at 100 cannot pass an 87-point cap, and the bucket
+        # buys nothing. lift the cap to one squad when the category
+        # budget can still pay that squad.
         name_cap = int(cat_budget[cat_name] * name_share_for_type(unit_type))
+        if acct > name_cap and acct <= cat_budget[cat_name]:
+            name_cap = acct
         spent = name_spent.get(base, 0)
         if spent + acct > name_cap:
             return False

@@ -734,8 +734,13 @@ class GameMenu():
     #---------------------------------------------------------------------------
     def custom_scenario_draw_setup(self):
         '''year and point budget'''
-        german_budget, soviet_budget = engine.world_builder.custom_scenario_budgets(
-            self.custom_points
+        german_budget, soviet_low, soviet_high = (
+            engine.world_builder.custom_scenario_budget_range(
+                self.custom_points, self.custom_year
+            )
+        )
+        low, high = engine.battlegroup_generator.soviet_advantage_percent_range(
+            self.custom_year
         )
         self.text_queue = []
         self.text_queue.append('TWE: To Whatever End')
@@ -744,7 +749,9 @@ class GameMenu():
         self.text_queue.append('Pick a year and a point budget.')
         self.text_queue.append('Each side gets a squad list rolled')
         self.text_queue.append('the same way as a quick battle.')
-        self.text_queue.append('Soviets get 50% more points.')
+        self.text_queue.append(
+            'Soviets get ' + str(low) + '% to ' + str(high) + '% more points.'
+        )
         self.text_queue.append('You can change the squad counts next.')
         self.text_queue.append('---------------')
         self.text_queue.append('Year')
@@ -770,7 +777,9 @@ class GameMenu():
         self.text_queue.append('500 to 20000')
         self.text_queue.append('---------------')
         self.text_queue.append('German budget  ' + str(german_budget))
-        self.text_queue.append('Soviet budget  ' + str(soviet_budget))
+        self.text_queue.append(
+            'Soviet budget  ' + str(soviet_low) + ' to ' + str(soviet_high)
+        )
         self.text_queue.append('---------------')
         self.text_queue.append('6 - Generate forces')
         self.text_queue.append('Esc - Main menu')

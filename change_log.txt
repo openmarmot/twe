@@ -1,6 +1,14 @@
 TWE Project : Change Log
 
 -------------------------------
+November 21 2026
+- added the 7.5 cm leIG 18. crew-pushed infantry gun, 400 kg. turret traverse is the real axle slide, 6 degrees each way. squad German leIG 18, cost 110, chance 60 in 1944 and 35 in 1945. 20 HE and 4 Igr. 38 Hl/A. starts on HE. debug spawn key p
+- squad types: German 1944 and 1945 PanzerJager and the Bike AT Squad are antitank_infantry. Aufklaren Kubelwagen is motorized_infantry. Sd.kfz.251/23 is recon. Luftwaffe MG 151 is towed_antiair. dropped the unused afv squad type
+- a category name cap now rises to one squad when that squad fits in the category budget. small quick battles can buy a mortar, a medic or MG, and a 251/9
+- quick battle category budgets vary around the usual shares, so one fight can be tank-heavy and the next infantry-heavy. a share that could buy one squad still can
+- soviet points are no longer a flat 50% more. 1944 rolls 35% to 65% more. 1945 rolls 55% to 85% more
+
+-------------------------------
 November 20 2026
 - added code/tools/squad_data_tool.py and run_squad_data_tool.sh. it reads squad_data and shows each squad, the 1944 and 1945 chances, and the soldiers and vehicles named in members
 - Luftwaffe soldiers now spawn from a base body, the same way Heer and Waffen-SS do. Ground crew stay at morale 95. Fallschirmjäger are morale 110 on the same blue-grey uniform. The jump smock is not drawn yet.
