@@ -2,7 +2,7 @@ TWE Project : Change Log
 
 -------------------------------
 November 21 2026
-- added the 7.5 cm leIG 18. crew-pushed infantry gun, 400 kg. turret traverse is the real axle slide, 6 degrees each way. squad German leIG 18, cost 110, chance 60 in 1944 and 35 in 1945. 20 HE and 4 Igr. 38 Hl/A. starts on HE. debug spawn key p
+- added the 7.5 cm leIG 18. crew-pushed infantry gun
 - squad types: German 1944 and 1945 PanzerJager and the Bike AT Squad are antitank_infantry. Aufklaren Kubelwagen is motorized_infantry. Sd.kfz.251/23 is recon. Luftwaffe MG 151 is towed_antiair. dropped the unused afv squad type
 - a category name cap now rises to one squad when that squad fits in the category budget. small quick battles can buy a mortar, a medic or MG, and a 251/9
 - quick battle category budgets vary around the usual shares, so one fight can be tank-heavy and the next infantry-heavy. a share that could buy one squad still can
