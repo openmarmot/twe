@@ -69,6 +69,27 @@ class AISquad():
         return None
 
     #---------------------------------------------------------------------------
+    def command_order_text(self):
+        '''the field commander's current order, or None.
+
+        only orders he wrote carry order_text. a squad leader's own
+        decision leaves it empty, so the menu does not invent a destination.
+        '''
+        leader = self.squad_leader
+        if leader is None or leader.is_human is False:
+            return None
+        task_mem = leader.ai.memory.get('task_squad_leader')
+        if task_mem is None:
+            return None
+        orders = task_mem.get('orders')
+        if orders is None or len(orders) == 0:
+            return None
+        text = orders[0].order_text
+        if text is None or text == '':
+            return None
+        return text
+
+    #---------------------------------------------------------------------------
     def add_to_squad(self, WORLD_OBJECT):
         ''' add a world_object to the squad. DOES NOT SPAWN AT THE MOMENT'''
         if WORLD_OBJECT.is_human:

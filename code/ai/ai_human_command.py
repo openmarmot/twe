@@ -58,6 +58,14 @@ class AIHumanCommand:
             plan["objective"] = None
 
     # ---------------------------------------------------------------------------
+    def announce_order(self, leader, spoken, net_line):
+        """the leader says the order, and this side hears it across the map"""
+
+        if self.owner.world.player is not None:
+            leader.ai.speak(spoken)
+        self.send_order_net(net_line)
+
+    # ---------------------------------------------------------------------------
     def area_is_ours(self, area):
         """true when our faction holds the area and nobody is fighting for it"""
 
@@ -133,6 +141,30 @@ class AIHumanCommand:
             if distance == my_distance and commander.name < self.owner.name:
                 return True
         return False
+
+    # ---------------------------------------------------------------------------
+    def command_radio(self):
+        """a radio this command group can transmit on, or None"""
+
+        for member in self.owner.ai.squad.members:
+            pickup = member.ai.large_pickup
+            if pickup is not None and pickup.is_radio:
+                return pickup
+            if member.ai.in_vehicle() is False:
+                continue
+            crew = member.ai.memory.get("task_vehicle_crew")
+            if crew is None:
+                continue
+            role = crew.get("vehicle_role")
+            if role is None or role.vehicle is None:
+                continue
+            radio = role.vehicle.ai.radio
+            if radio is None:
+                continue
+            # the radio operator's set, or the one in the commander's vehicle
+            if role.is_radio_operator or member is self.owner:
+                return radio
+        return None
 
     # ---------------------------------------------------------------------------
     def command_range(self):
@@ -479,6 +511,7 @@ class AIHumanCommand:
             order = TacticalOrder()
             order.order_move_to_location = True
             order.world_coords = copy.copy(dest_coords)
+            order.order_text = f"fall back to {dest_name}"
             leader.ai.give_squad_order(order)
             self.release_leader(leader, order.world_coords)
             squad.last_command_order_time = self.owner.world.world_seconds
@@ -487,6 +520,12 @@ class AIHumanCommand:
             )
             leader.ai.add_journal_entry(
                 f"Order from {self.owner.name}: fall back to {dest_name}"
+            )
+            self.announce_order(
+                leader,
+                f"Order from {self.owner.name}: fall back to {dest_name}",
+                f"{self.owner.name} to {leader.name}'s squad: "
+                f"fall back from {area.name} to {dest_name}",
             )
             self.owner.ai.speak(f"{leader.name}, fall back to {dest_name}")
             ordered = True
@@ -668,6 +707,31 @@ class AIHumanCommand:
                 plan["strength"].pop(key, None)
 
     # ---------------------------------------------------------------------------
+    def send_order_net(self, line):
+        """print an order for this faction's player, and transmit it if we can.
+
+        the player hears his own side anywhere on the map. another faction
+        hears it only by standing near a set that is actually in the world.
+        """
+
+        shown = "[radio] " + line
+        player = self.owner.world.player
+        if player is not None and player.ai.squad is not None:
+            if player.ai.squad.faction == self.owner.ai.squad.faction:
+                if shown not in self.owner.world.text_queue:
+                    self.owner.world.text_queue.insert(0, shown)
+
+        radio = self.command_radio()
+        tactical = self.owner.ai.squad.faction_tactical
+        if radio is None or tactical is None:
+            return
+        frequency = tactical.radio_frequency
+        if radio.ai.power_on is False or radio.ai.current_frequency != frequency:
+            radio.ai.current_frequency = frequency
+            radio.ai.turn_power_on()
+        radio.ai.send_message(line)
+
+    # ---------------------------------------------------------------------------
     def squad_has_player(self, squad):
         """true when the player is in this squad"""
 
@@ -764,6 +828,7 @@ class AIHumanCommand:
         order.world_area = area
         order.world_coords = destination
         order.threat_direction = tactical.get_threat_direction(destination)
+        order.order_text = f"defend {area.name}"
 
         leader = squad.squad_leader
         leader.ai.give_squad_order(order)
@@ -773,5 +838,10 @@ class AIHumanCommand:
         )
         leader.ai.add_journal_entry(
             f"Order from {self.owner.name}: defend {area.name}"
+        )
+        self.announce_order(
+            leader,
+            f"Order from {self.owner.name}: defend {area.name}",
+            f"{self.owner.name} to {leader.name}'s squad: defend {area.name}",
         )
         self.owner.ai.speak(f"{leader.name}, defend {area.name}")

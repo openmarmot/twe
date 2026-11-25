@@ -1,6 +1,10 @@
 TWE Project : Change Log
 
 -------------------------------
+November 25 2026
+- field commander orders now show on your side's battle text from anywhere on the map. the squad leader says the order when you are next to him. inspecting his men shows the destination
+
+-------------------------------
 November 21 2026
 - added the 7.5 cm leIG 18. crew-pushed infantry gun
 - squad types: German 1944 and 1945 PanzerJager and the Bike AT Squad are antitank_infantry. Aufklaren Kubelwagen is motorized_infantry. Sd.kfz.251/23 is recon. Luftwaffe MG 151 is towed_antiair. dropped the unused afv squad type

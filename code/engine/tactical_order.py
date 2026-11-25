@@ -29,3 +29,7 @@ class TacticalOrder():
         # direction enemies are expected from (rotation angle in degrees)
         # used so defenders can face the right direction
         self.threat_direction=None
+
+        # short player-facing line, set when a field commander writes the order.
+        # "defend east", "fall back to west". squad leaders leave this empty.
+        self.order_text=None

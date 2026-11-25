@@ -48,10 +48,16 @@ class AIRadio():
         if self.power_on:
             # prevents echos. we don't want to receive our own message
             if message!=self.last_message:
-                distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
-                if distance<(50*self.volume):
-                    self.owner.world.text_queue.append('[radio] '+message)
-                    print(message)
+                # a set that was never placed in the world (the faction HQ
+                # radio sits at the origin) must not leak traffic to anyone
+                # standing near that coordinate. a carried or vehicle set does.
+                if self.owner.in_world and self.owner.world.player is not None:
+                    distance=engine.math_2d.get_distance(self.owner.world_coords,self.owner.world.player.world_coords)
+                    shown='[radio] '+message
+                    # one line even when several sets near the player all hear it
+                    if distance<(50*self.volume) and shown not in self.owner.world.text_queue:
+                        self.owner.world.text_queue.append(shown)
+                        print(message)
                 self.receive_queue.append(message)
 
     #---------------------------------------------------------------------------
