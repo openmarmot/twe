@@ -1,6 +1,20 @@
 TWE Project : Change Log
 
 -------------------------------
+November 26 2026
+- O-240 frag round for the 45 mm. the T-70 rack is 17 BR-240 and 28 O-240, plus the BR-240 already in the gun
+- Tiger I turret face is the 120 mm mantlet
+- Panzer IV hull MG ball is 80 mm at 11 degrees, the superstructure plate it sits in
+- T-34-76 and T-34-85 lower nose is 45 mm at 53 degrees. floor is 15 mm. the hull DT ball matches the 45 mm glacis
+- Sd.Kfz. 222 has its own open 8 mm turret. 100 rounds of 2 cm API-T, 120 HE, and about 1,050 rounds for the MG 34
+- SU-85 casemate sides are 45 mm at 21 degrees. rack is 48 rounds counting the chambered round, half of them HE
+- SU-85M keeps 60 rounds and uses a 75 mm gun collar. casemate sides match the SU-85
+- SU-100 casemate sides are 45 mm at 21 degrees. rack is 33 rounds counting the chambered round, split about even
+- Hetzer gun mount is 60 mm at 40 degrees, about 78 mm line of sight, in the same class as the lower nose. the glacis stays 60 mm at 60 degrees
+- Hetzer gun traverse is 5 degrees left and 11 right. crew is four, and the loader has the roof MG and the radio
+- Pak 40 traverse is about 65 degrees total. ZiS-3 traverse is about 54 degrees total
+
+-------------------------------
 November 25 2026
 - field commanders now concentrate multiple squads onto their objective and reinforce outnumbered fights, redirect squads marching to quiet or oversupplied areas (including pivoting vehicles right away), and issue up to three orders per think
 - ordered foot retreats now disengage the whole squad upright to the fallback point instead of getting pulled back into combat, and commanded squad leaders follow their commander's objective and stay out of abandoned areas

@@ -23,6 +23,7 @@ def create(world, world_coords):
     z.is_towable = True
     z.ai.requires_afv_training = True
     z.ai.passenger_compartment_ammo_racks = True
+    z.ai.cramped_crew_compartment = True
     z.ai.vehicle_armor["top"] = [8, 0, 0]
     z.ai.vehicle_armor["bottom"] = [12, 0, 0]
     z.ai.vehicle_armor["left"] = [20, 40, 5]
@@ -53,7 +54,9 @@ def create(world, world_coords):
     role.turret = main_turret
     z.ai.vehicle_crew.append(role)
 
-    role = VehicleRole("radio_operator", z)
+    # four crew. the loader mans the roof MG and the radio.
+    # one seat does one gun, so this seat stays on the MG.
+    role = VehicleRole("loader", z)
     role.is_gunner = True
     role.turret = mg_turret
     role.is_radio_operator = True
@@ -62,10 +65,6 @@ def create(world, world_coords):
 
     role = VehicleRole("commander", z)
     role.is_commander = True
-    z.ai.vehicle_crew.append(role)
-
-    role = VehicleRole("assistant_gunner", z)
-    role.is_assistant_gunner = True
     z.ai.vehicle_crew.append(role)
 
     z.ai.max_speed = 367.04

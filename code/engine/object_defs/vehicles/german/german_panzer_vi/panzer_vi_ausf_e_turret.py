@@ -24,7 +24,8 @@ def create(world, world_coords):
     z.ai.turret_armor["bottom"] = [26, 0, 0]
     z.ai.turret_armor["left"] = [82, 0, 0]
     z.ai.turret_armor["right"] = [82, 0, 0]
-    z.ai.turret_armor["front"] = [100, 0, 0]
+    # 120 mm mantlet. It covers most of the turret face, and this one value is that face.
+    z.ai.turret_armor["front"] = [120, 0, 0]
     z.ai.turret_armor["rear"] = [82, 0, 0]
     z.ai.position_offset = [-14, 0]
     z.ai.rotation_range = [-360, 360]

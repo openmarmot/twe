@@ -25,7 +25,8 @@ def create(world, world_coords):
     z.ai.turret_armor["bottom"] = [8, 0, 0]
     z.ai.turret_armor["left"] = [30, 23, 0]
     z.ai.turret_armor["right"] = [30, 23, 0]
-    z.ai.turret_armor["front"] = [50, 11, 0]
+    # ball sits in the 80 mm superstructure front. G, H, and J all use that plate.
+    z.ai.turret_armor["front"] = [80, 11, 0]
     z.ai.turret_armor["rear"] = [30, 15, 0]
     z.ai.position_offset = [-50, 19]
     z.ai.rotation_range = [-30, 30]

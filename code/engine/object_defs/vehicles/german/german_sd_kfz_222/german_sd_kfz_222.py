@@ -22,6 +22,7 @@ def create(world, world_coords):
     z.is_vehicle = True
     z.is_towable = True
     z.ai.cramped_crew_compartment = True
+    z.ai.open_top = True
     z.ai.vehicle_armor["top"] = [5, 0, 0]
     z.ai.vehicle_armor["bottom"] = [5, 0, 0]
     z.ai.vehicle_armor["left"] = [8, 35, 0]
@@ -86,7 +87,7 @@ def create(world, world_coords):
     z.ai.passenger_compartment_ammo_racks = True
     z.ai.requires_afv_training = True
     z.ai.is_transport = False
-    turret = engine.world_builder.spawn_object(world, world_coords, "234_1_turret", True)
+    turret = engine.world_builder.spawn_object(world, world_coords, "sd_kfz_222_turret", True)
     z.ai.turrets.append(turret)
     turret.ai.vehicle = z
     z.ai.turrets[0].ai.position_offset = [0, 0]
@@ -105,26 +106,17 @@ def create(world, world_coords):
     role.is_commander = True
     z.ai.vehicle_crew.append(role)
 
-    # mg ammo
-    for b in range(10):
+    # 4 belts plus the 50-round drum on the coax is about 1,050 rounds
+    for b in range(4):
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False))
 
-    # armor piercing belt
-    if random.randint(0, 1) == 1:
-        belt = engine.world_builder.spawn_object(world, world_coords, "mg34_belt", False)
-        engine.world_builder.load_magazine(world, belt, "7.92x57_SMK")
-        z.add_inventory(belt)
-
-    z.ai.ammo_rack_capacity = 25
-    for b in range(8):
+    # 100 API-T and 120 HE. The gun already holds one 10-round API-T magazine.
+    z.ai.ammo_rack_capacity = 21
+    for b in range(9):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
         )
-    for b in range(2):
-        temp = engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
-        engine.world_builder.load_magazine(world, temp, "20x138_PzGr40")
-        z.ai.ammo_rack.append(temp)
-    for b in range(5):
+    for b in range(12):
         temp = engine.world_builder.spawn_object(world, world_coords, "2cm_kwk38_l55_magazine", False)
         engine.world_builder.load_magazine(world, temp, "20x138_HE")
         z.ai.ammo_rack.append(temp)

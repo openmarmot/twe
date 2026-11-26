@@ -88,11 +88,17 @@ def create(world, world_coords):
     z.rotation_angle = float(random.randint(0, 359))
     for b in range(10):
         z.add_inventory(engine.world_builder.spawn_object(world, world_coords, "dtm_magazine", False))
+    # 45-round rack stays. The gun already holds one BR-240.
+    # O-240 is the larger share of that rack: 17 BR-240 and 28 O-240.
     z.ai.ammo_rack_capacity = 45
-    for b in range(45):
+    for b in range(17):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "45mm_19k_magazine", False)
         )
+    for b in range(28):
+        temp = engine.world_builder.spawn_object(world, world_coords, "45mm_19k_magazine", False)
+        engine.world_builder.load_magazine(world, temp, "O-240")
+        z.ai.ammo_rack.append(temp)
     z.ai.min_wheels_per_side_front = 2
     z.ai.min_wheels_per_side_rear = 2
     z.ai.max_wheels = 12

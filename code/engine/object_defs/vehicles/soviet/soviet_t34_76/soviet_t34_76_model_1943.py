@@ -25,13 +25,13 @@ def create(world, world_coords):
     z.ai.requires_afv_training = True
     z.ai.passenger_compartment_ammo_racks = True
     z.ai.vehicle_armor["top"] = [16, 0, 0]
-    z.ai.vehicle_armor["bottom"] = [8, 0, 0]
+    z.ai.vehicle_armor["bottom"] = [15, 0, 0]
     z.ai.vehicle_armor["left"] = [45, 0, 0]
     z.ai.vehicle_armor["right"] = [45, 0, 0]
-    z.ai.vehicle_armor["front"] = [45, 61, 0]
+    z.ai.vehicle_armor["front"] = [45, 53, 0]  # lower nose. glacis stays 61 degrees
     z.ai.vehicle_armor["rear"] = [40, 47, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
-    z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]
+    z.ai.passenger_compartment_armor["bottom"] = [15, 0, 0]
     z.ai.passenger_compartment_armor["left"] = [40, 40, 0]
     z.ai.passenger_compartment_armor["right"] = [40, 40, 0]
     z.ai.passenger_compartment_armor["front"] = [45, 61, 0]

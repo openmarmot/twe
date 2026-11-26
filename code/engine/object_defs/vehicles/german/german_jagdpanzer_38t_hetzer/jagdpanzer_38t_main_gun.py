@@ -20,14 +20,18 @@ def create(world, world_coords):
     z.ai.gun_sight = engine.world_builder.spawn_object(world, world_coords, "optic_sfl_zf_1", False)
     z.ai.vehicle_mount_side = "front"
     z.ai.turret_accuracy = 1
-    z.ai.turret_armor["top"] = [60, 60, 0]
-    z.ai.turret_armor["bottom"] = [60, 60, 0]
-    z.ai.turret_armor["left"] = [60, 60, 0]
-    z.ai.turret_armor["right"] = [60, 60, 0]
-    z.ai.turret_armor["front"] = [60, 60, 0]
-    z.ai.turret_armor["rear"] = [60, 60, 0]
+    # 60 mm cast mantlet. 40 degrees puts a square hit near the lower nose
+    # (~78 mm line of sight). the 60 degree glacis angle made this face as
+    # hard as the upper plate. off-square shots still pick up horizontal angle.
+    z.ai.turret_armor["top"] = [60, 40, 0]
+    z.ai.turret_armor["bottom"] = [60, 40, 0]
+    z.ai.turret_armor["left"] = [60, 40, 0]
+    z.ai.turret_armor["right"] = [60, 40, 0]
+    z.ai.turret_armor["front"] = [60, 40, 0]
+    z.ai.turret_armor["rear"] = [60, 40, 0]
     z.ai.position_offset = [-45, 10]
-    z.ai.rotation_range = [-20, 20]
+    # positive rotation is left. 5 degrees left, 11 degrees right.
+    z.ai.rotation_range = [-11, 5]
     z.ai.rotation_speed = 4  # handwheel
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "7.5cm_pak39_L48", False)
     z.ai.primary_weapon.ai.equipper = z

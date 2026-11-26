@@ -21,7 +21,7 @@ def create(world, world_coords):
     z.minimum_visible_scale = 0.4
     z.is_gun_magazine = True
     z.ai.compatible_guns = ["45mm_19k"]
-    z.ai.compatible_projectiles = ["BR-240"]
+    z.ai.compatible_projectiles = ["BR-240", "O-240"]
     z.ai.capacity = 1
     z.ai.disintegrating = True
     z.rotation_angle = float(random.randint(0, 359))

@@ -25,7 +25,8 @@ def create(world, world_coords):
     z.ai.turret_armor["bottom"] = [8, 0, 0]
     z.ai.turret_armor["left"] = [53, 21, 0]
     z.ai.turret_armor["right"] = [53, 21, 0]
-    z.ai.turret_armor["front"] = [53, 20, 0]
+    # ball sits in the 45 mm glacis at 61 degrees, not the turret face
+    z.ai.turret_armor["front"] = [45, 61, 0]
     z.ai.turret_armor["rear"] = [53, 20, 0]
     z.ai.position_offset = [-65, 13]
     z.ai.rotation_range = [-12, 12]

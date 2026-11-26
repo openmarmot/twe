@@ -32,8 +32,8 @@ def create(world, world_coords):
     z.ai.vehicle_armor["rear"] = [45, 47, 0]
     z.ai.passenger_compartment_armor["top"] = [16, 0, 0]
     z.ai.passenger_compartment_armor["bottom"] = [8, 0, 0]
-    z.ai.passenger_compartment_armor["left"] = [45, 40, 0]
-    z.ai.passenger_compartment_armor["right"] = [45, 40, 0]
+    z.ai.passenger_compartment_armor["left"] = [45, 21, 0]  # casemate side
+    z.ai.passenger_compartment_armor["right"] = [45, 21, 0]
     z.ai.passenger_compartment_armor["front"] = [75, 50, 0]
     z.ai.passenger_compartment_armor["rear"] = [40, 47, 0]
     main_turret = engine.world_builder.spawn_object(world, world_coords, "su_100_turret", True)
@@ -86,12 +86,13 @@ def create(world, world_coords):
         engine.world_builder.get_random_from_list(world, world_coords, engine.world_builder.list_consumables, False)
     )
     z.rotation_angle = float(random.randint(0, 359))
-    z.ai.ammo_rack_capacity = 30
-    for b in range(25):
+    # Stowage was 33, counting the BR-412 already in the gun. Split is about even.
+    z.ai.ammo_rack_capacity = 32
+    for b in range(16):
         z.ai.ammo_rack.append(
             engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)
         )
-    for b in range(5):
+    for b in range(16):
         temp = engine.world_builder.spawn_object(world, world_coords, "100mm_d_10_magazine", False)
         engine.world_builder.load_magazine(world, temp, "OF-412")
         z.ai.ammo_rack.append(temp)

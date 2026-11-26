@@ -28,7 +28,8 @@ def create(world, world_coords):
     z.ai.turret_armor["front"] = [6, 36, 0]
     z.ai.turret_armor["rear"] = [0, 0, 0]
     z.ai.position_offset = [0, 0]
-    z.ai.rotation_range = [-60, 60]
+    # carriage traverse is about 54 degrees total
+    z.ai.rotation_range = [-27, 27]
     z.ai.rotation_speed = 8  # handwheel
     z.ai.primary_weapon = engine.world_builder.spawn_object(world, world_coords, "76mm_m1940_f34", False)
     z.ai.primary_weapon.ai.equipper = z
