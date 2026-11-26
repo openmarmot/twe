@@ -401,11 +401,20 @@ class VehicleDiagnostics:
         """load main screen text and image"""
 
         self.image_objects = []
-        # add the main object
+        # hull at rotation 0. screen_center is the rotation origin
         v = VehicleDiagnosticObject()
         v.image_list = self.vehicle.image_list
+        v.image_index = self.vehicle.image_index
+        v.image_rotation_offset = [
+            self.vehicle.image_rotation_offset[0],
+            self.vehicle.image_rotation_offset[1],
+        ]
         v.screen_coords = self.screen_center
         self.image_objects.append(v)
+
+        # turrets sit on the hull in the same frame (rotation 0), so a
+        # traversed gun shows its yaw relative to the vehicle
+        self.add_turret_sprites()
 
         # load collision markers
         for hit in self.vehicle.ai.collision_log:
@@ -613,6 +622,36 @@ class VehicleDiagnostics:
             else:
                 self.text_queue.append([pen_text, copy.copy(coord), self.text_black])
                 coord[1] += spacing
+
+    # ---------------------------------------------------------------------------
+    def add_turret_sprites(self):
+        """draw each visible turret on the hull at its mount.
+
+        the hull sprite is shown at rotation 0, so position_offset is
+        applied in that frame and the sprite uses turret_rotation instead
+        of the world angle (vehicle rotation + turret_rotation).
+        image_rotation_offset keeps the pivot on the mount.
+        """
+        for turret in self.vehicle.ai.turrets:
+            # hidden mounts (Nahverteidigungswaffe) are not drawn in tactical
+            if turret.render is False:
+                continue
+            if len(turret.image_list) == 0:
+                continue
+            v = VehicleDiagnosticObject()
+            v.image_list = turret.image_list
+            v.image_index = turret.image_index
+            v.image_rotation_offset = [
+                turret.image_rotation_offset[0],
+                turret.image_rotation_offset[1],
+            ]
+            v.rotation_angle = engine.math_2d.get_normalized_angle(
+                turret.ai.turret_rotation
+            )
+            v.world_coords = engine.math_2d.calculate_relative_position(
+                self.vehicle.world_coords, 0, turret.ai.position_offset
+            )
+            self.image_objects.append(v)
 
     # ---------------------------------------------------------------------------
     def get_turret_ammo_types(self, weapon, vehicle):
@@ -905,5 +944,6 @@ class VehicleDiagnosticObject:
         self.image_index = 0
         self.image_list = []
         self.image_size = None
+        self.image_rotation_offset = [0, 0]
         self.rotation_angle = 0
         self.reset_image = True

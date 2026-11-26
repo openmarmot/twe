@@ -3,6 +3,8 @@ TWE Project : Change Log
 -------------------------------
 November 25 2026
 - field commander orders now show on your side's battle text from anywhere on the map. the squad leader says the order when you are next to him. inspecting his men shows the destination
+- vehicle diagnostics main screen now shows turrets
+- some fixes and cleanup for image_tool
 
 -------------------------------
 November 21 2026
