@@ -16,9 +16,6 @@ from engine.tactical_order import TacticalOrder
 from engine.vehicle_order import VehicleOrder
 
 
-# a squad this close to its order point has arrived
-ARRIVED_DISTANCE = 300
-
 # the command group starts walking once it is farther than this from its hold
 HOLD_DISTANCE = 400
 
@@ -31,16 +28,22 @@ CONTROL_DISTANCE = 10000
 RADIO_CONTROL_DISTANCE = 20000
 
 # seconds before the same squad can be given another attack order
-RETASK_SECONDS = 90
+RETASK_SECONDS = 60
 
 # watch a fight this long before it can be called lost
-SETTLE_SECONDS = 60
+SETTLE_SECONDS = 45
 
 # do not march back into an area given up until this long has passed
 ABANDON_SECONDS = 180
 
 # enemy count at or above this multiple of the friendly count is a loss
 LOST_OUTNUMBER = 2
+
+# maximum new attack orders a commander writes in one think cycle
+MAX_ORDERS_PER_THINK = 3
+
+# minimum controlled squads before holding one back as a reserve
+RESERVE_MIN_CONTROLLED = 4
 
 
 class AIHumanCommand:
@@ -201,6 +204,18 @@ class AIHumanCommand:
         return False
 
     # ---------------------------------------------------------------------------
+    def desired_objective_squads(self, objective, controlled):
+        """how many squads to concentrate on the main objective"""
+
+        base = min(3, max(2, len(controlled) // 2))
+        tactical = self.owner.ai.squad.faction_tactical
+        friendly = tactical.get_area_friendly_count(objective) or 0
+        enemy = tactical.get_area_enemy_count(objective) or 0
+        if enemy > friendly:
+            return min(4, max(base + 1, 2), max(2, len(controlled) - 1))
+        return base
+
+    # ---------------------------------------------------------------------------
     def ensure_memory(self):
         """task_command memory, including the plan kept on this commander"""
 
@@ -315,7 +330,7 @@ class AIHumanCommand:
 
     # ---------------------------------------------------------------------------
     def issue_objectives(self):
-        """give one idle squad a defend order. the plan's objective comes first"""
+        """concentrate squads on the plan's objective, then cover or reinforce priority areas"""
 
         controlled = self.owner.ai.squad.commanded_squads
         if len(controlled) == 0:
@@ -324,40 +339,37 @@ class AIHumanCommand:
         if len(priority) == 0:
             return
 
-        plan = self.plan()
         counts = self.cover_counts(controlled)
-        target = None
-        objective = plan["objective"]
-        if objective is not None and objective in priority:
-            if counts.get(objective, 0) == 0:
-                if self.area_on_cooldown(objective) is False:
-                    target = objective
+        issued = 0
+        while issued < MAX_ORDERS_PER_THINK:
+            target = self.pick_target(priority, counts, controlled)
+            if target is None:
+                break
 
-        if target is None:
-            target = self.pick_uncovered(priority, counts, objective)
-        if target is None:
-            return
-
-        eligible = []
-        for squad in controlled:
-            if self.subordinate_eligible(squad, priority) is False:
-                continue
-            order = self.subordinate_order(squad)
-            if order is not None and order.world_area is target:
-                continue
-            eligible.append(squad)
-        if len(eligible) == 0:
-            return
-
-        # with several squads, the one closest to the commander stays back
-        if len(controlled) >= 3 and len(eligible) > 1:
-            reserve = self.nearest_squad(eligible, self.owner.world_coords)
-            eligible.remove(reserve)
+            eligible = []
+            for squad in controlled:
+                if self.subordinate_eligible(squad, priority, counts, target) is False:
+                    continue
+                eligible.append(squad)
             if len(eligible) == 0:
-                return
+                break
 
-        chosen = self.nearest_squad(eligible, target.world_coords)
-        self.write_defend(chosen, target)
+            # with several squads, the one closest to the commander stays back
+            if len(controlled) >= RESERVE_MIN_CONTROLLED and len(eligible) > 1:
+                reserve = self.nearest_squad(eligible, self.owner.world_coords)
+                eligible.remove(reserve)
+                if len(eligible) == 0:
+                    break
+
+            chosen = self.nearest_squad(eligible, target.world_coords)
+            old_order = self.subordinate_order(chosen)
+            if old_order is not None and old_order.world_area is not None:
+                old_area = old_order.world_area
+                counts[old_area] = max(0, counts.get(old_area, 0) - 1)
+            counts[target] = counts.get(target, 0) + 1
+
+            self.write_defend(chosen, target)
+            issued += 1
 
     # ---------------------------------------------------------------------------
     def keep_hold_position(self):
@@ -398,7 +410,7 @@ class AIHumanCommand:
             return
 
         task_mem["last_think_time"] = self.owner.world.world_seconds
-        task_mem["think_interval"] = random.uniform(20, 45)
+        task_mem["think_interval"] = random.uniform(15, 30)
 
         controlled = self.refresh_controlled_squads()
         self.sample_plan(controlled)
@@ -443,6 +455,46 @@ class AIHumanCommand:
             )
         )
         return choices[0]
+
+    # ---------------------------------------------------------------------------
+    def pick_target(self, priority, counts, controlled):
+        """next priority area needing squads: objective push, uncovered, or outnumbered"""
+
+        plan = self.plan()
+        objective = plan["objective"]
+        if (
+            objective is not None
+            and objective in priority
+            and self.area_on_cooldown(objective) is False
+        ):
+            if counts.get(objective, 0) < self.desired_objective_squads(
+                objective, controlled
+            ):
+                return objective
+
+        uncovered = self.pick_uncovered(priority, counts, objective)
+        if uncovered is not None:
+            return uncovered
+
+        # reinforce another contested area where we are outnumbered
+        tactical = self.owner.ai.squad.faction_tactical
+        outnumbered = []
+        for area in priority:
+            if area.is_contested is False:
+                continue
+            if self.area_on_cooldown(area):
+                continue
+            if counts.get(area, 0) >= 2:
+                continue
+            friendly = tactical.get_area_friendly_count(area) or 0
+            enemy = tactical.get_area_enemy_count(area) or 0
+            if enemy > friendly:
+                outnumbered.append((enemy - friendly, area))
+        if len(outnumbered) > 0:
+            outnumbered.sort(key=lambda item: -item[0])
+            return outnumbered[0][1]
+
+        return None
 
     # ---------------------------------------------------------------------------
     def pick_uncovered(self, priority, counts, objective):
@@ -512,8 +564,9 @@ class AIHumanCommand:
             order.order_move_to_location = True
             order.world_coords = copy.copy(dest_coords)
             order.order_text = f"fall back to {dest_name}"
+            order.is_retreat = True
             leader.ai.give_squad_order(order)
-            self.release_leader(leader, order.world_coords)
+            self.release_squad(squad, order.world_coords)
             squad.last_command_order_time = self.owner.world.world_seconds
             self.owner.ai.add_journal_entry(
                 f"Ordered {leader.name} to fall back from {area.name} to {dest_name}"
@@ -570,6 +623,64 @@ class AIHumanCommand:
             self.pull_back(controlled, area)
 
     # ---------------------------------------------------------------------------
+    def redirect_squad_vehicles(self, squad, destination):
+        """pivot squad vehicles currently driving elsewhere to the new destination"""
+
+        seen_vehicles = []
+        for member in squad.members:
+            if member.is_player or member.ai.blood_pressure < 1:
+                continue
+            if member.ai.in_vehicle() is False:
+                continue
+            crew = member.ai.memory.get("task_vehicle_crew")
+            if crew is None:
+                continue
+            role = crew.get("vehicle_role")
+            if role is None or role.vehicle is None:
+                continue
+            vehicle = role.vehicle
+            if vehicle in seen_vehicles:
+                continue
+            seen_vehicles.append(vehicle)
+
+            # do not override a player crew, an active retreat, or combat close-with
+            busy = False
+            for vrole in vehicle.ai.vehicle_crew:
+                if not vrole.role_occupied:
+                    continue
+                if vrole.human.is_player:
+                    busy = True
+                    break
+                vmem = vrole.human.ai.memory.get("task_vehicle_crew")
+                if vmem is None:
+                    continue
+                vorder = vmem.get("vehicle_order")
+                if vorder is not None and (
+                    vorder.is_retreat or vorder.order_close_with_enemy
+                ):
+                    busy = True
+                    break
+            if busy:
+                continue
+
+            # clear stale drive orders so the driver adopts the new destination immediately
+            for vrole in vehicle.ai.vehicle_crew:
+                if not vrole.role_occupied:
+                    continue
+                vmem = vrole.human.ai.memory.get("task_vehicle_crew")
+                if vmem is not None:
+                    vorder = vmem.get("vehicle_order")
+                    if vorder is not None and vorder.order_drive_to_coords:
+                        vmem["vehicle_order"] = None
+
+            new_order = VehicleOrder()
+            new_order.order_drive_to_coords = True
+            new_order.world_coords = copy.copy(destination)
+            if vehicle.ai.is_transport:
+                new_order.exit_vehicle_when_finished = True
+            crew["vehicle_order"] = new_order
+
+    # ---------------------------------------------------------------------------
     def refresh_controlled_squads(self):
         """claim squads near this commander and release the ones who have left.
 
@@ -624,23 +735,45 @@ class AIHumanCommand:
         return controlled
 
     # ---------------------------------------------------------------------------
-    def release_leader(self, leader, dest_coords):
-        """drop the current fight so a fall-back order is acted on"""
+    def release_squad(self, squad, dest_coords):
+        """pull every living squad member out of combat onto the fallback move"""
 
-        if leader.ai.in_vehicle():
-            crew = leader.ai.memory.get("task_vehicle_crew")
-            if crew is None:
-                return
-            # is_retreat is kept by the driver ahead of a close-with order
-            vehicle_order = VehicleOrder()
-            vehicle_order.order_drive_to_coords = True
-            vehicle_order.world_coords = copy.copy(dest_coords)
-            vehicle_order.is_retreat = True
-            crew["vehicle_order"] = vehicle_order
-            return
-        if leader.ai.memory.get("current_task") == "task_engage_enemy":
-            leader.ai.memory.pop("task_engage_enemy", None)
-            leader.ai.memory["current_task"] = "task_squad_leader"
+        seen_vehicles = []
+        for member in squad.members:
+            if member.is_player or member.ai.blood_pressure < 1:
+                continue
+            if member.ai.in_vehicle():
+                crew = member.ai.memory.get("task_vehicle_crew")
+                if crew is None:
+                    continue
+                role = crew.get("vehicle_role")
+                if role is None or role.vehicle is None:
+                    continue
+                vehicle = role.vehicle
+                if vehicle in seen_vehicles:
+                    continue
+                seen_vehicles.append(vehicle)
+                # clear any non-retreat orders on this vehicle's crew
+                for vrole in vehicle.ai.vehicle_crew:
+                    if not vrole.role_occupied:
+                        continue
+                    vmem = vrole.human.ai.memory.get("task_vehicle_crew")
+                    if vmem is not None:
+                        vmem["vehicle_order"] = None
+                # is_retreat is kept by the driver ahead of a close-with order
+                vehicle_order = VehicleOrder()
+                vehicle_order.order_drive_to_coords = True
+                vehicle_order.world_coords = copy.copy(dest_coords)
+                vehicle_order.is_retreat = True
+                crew["vehicle_order"] = vehicle_order
+                continue
+
+            if member.ai.memory.get("current_task") == "task_exit_vehicle":
+                continue
+            member.ai.memory.pop("task_engage_enemy", None)
+            member.ai.switch_task_move_to_location(
+                dest_coords, None, is_retreat=True
+            )
 
     # ---------------------------------------------------------------------------
     def revise_plan(self):
@@ -754,7 +887,7 @@ class AIHumanCommand:
         return found
 
     # ---------------------------------------------------------------------------
-    def subordinate_eligible(self, squad, priority):
+    def subordinate_eligible(self, squad, priority, counts=None, target=None):
         """true when this squad can take a new attack order"""
 
         leader = squad.squad_leader
@@ -777,13 +910,30 @@ class AIHumanCommand:
         order = self.subordinate_order(squad)
         if order is None:
             return True
-        if order.world_coords is not None:
-            distance = engine.math_2d.get_distance(
-                leader.world_coords, order.world_coords
-            )
-            if distance > ARRIVED_DISTANCE:
-                return False
-        if order.world_area is not None and order.world_area in priority:
+        if order.is_retreat:
+            return False
+        if target is not None and order.world_area is target:
+            return False
+
+        # squads on a quiet area or random move can be redirected right away
+        if order.world_area is None or order.world_area not in priority:
+            return True
+
+        # keep squads already assigned to the main objective
+        objective = self.plan().get("objective")
+        if order.world_area is objective:
+            return False
+
+        # only redirect off another priority area to reinforce the main objective,
+        # and only when that area has spare squads and this squad hasn't arrived there
+        if target is None or target is not objective:
+            return False
+        if counts is None or counts.get(order.world_area, 0) <= 1:
+            return False
+        dist_to_area = engine.math_2d.get_distance(
+            leader.world_coords, order.world_area.world_coords
+        )
+        if dist_to_area <= order.world_area.size:
             return False
         return True
 
@@ -832,6 +982,7 @@ class AIHumanCommand:
 
         leader = squad.squad_leader
         leader.ai.give_squad_order(order)
+        self.redirect_squad_vehicles(squad, destination)
         squad.last_command_order_time = self.owner.world.world_seconds
         self.owner.ai.add_journal_entry(
             f"Ordered {leader.name} to defend {area.name}"

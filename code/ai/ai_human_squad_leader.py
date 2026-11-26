@@ -108,6 +108,7 @@ class AIHumanSquadLeader:
                     vehicle_order = VehicleOrder()
                     vehicle_order.order_drive_to_coords = True
                     vehicle_order.world_coords = copy.copy(order.world_coords)
+                    vehicle_order.is_retreat = order.is_retreat
                     if self.owner.ai.memory["task_vehicle_crew"][
                         "vehicle_role"
                     ].vehicle.ai.is_transport:
@@ -117,7 +118,9 @@ class AIHumanSquadLeader:
                     self.owner.ai.memory["task_vehicle_crew"]["vehicle_order"] = vehicle_order
                     return True
                 # we must be on foot
-                self.owner.ai.switch_task_move_to_location(order.world_coords, None)
+                self.owner.ai.switch_task_move_to_location(
+                    order.world_coords, None, is_retreat=order.is_retreat
+                )
                 return True
             else:
                 # close enough. order is complete
@@ -159,10 +162,39 @@ class AIHumanSquadLeader:
             # default - stay and fight. do we need a order here ?
             return
 
+        # respect a living field commander's objective and abandoned areas so
+        # idle or newly retreated squads don't wander back into a lost fight
+        command_ai = None
+        command_squad = self.owner.ai.squad.command_squad
+        if command_squad is not None:
+            commander = command_squad.field_commander()
+            if commander is not None:
+                command_ai = commander.ai.command_ai
+
+        if command_ai is not None:
+            objective = command_ai.plan().get("objective")
+            if (
+                objective is not None
+                and objective in self.owner.world.world_areas
+                and command_ai.area_is_ours(objective) is False
+                and command_ai.area_on_cooldown(objective) is False
+            ):
+                tactical_order = TacticalOrder()
+                tactical_order.order_defend_area = True
+                tactical_order.world_coords = copy.copy(objective.get_location())
+                tactical_order.world_area = objective
+                self.owner.ai.memory["task_squad_leader"]["orders"].append(tactical_order)
+                self.owner.ai.add_journal_entry(
+                    f"Ordered squad to defend {objective.name}"
+                )
+                return
+
         # - defend a contested area -
         contested_area = None
         for area in self.owner.world.world_areas:
             if area.is_contested:
+                if command_ai is not None and command_ai.area_on_cooldown(area):
+                    continue
                 contested_area = area
                 break
         if contested_area is not None:
@@ -175,7 +207,16 @@ class AIHumanSquadLeader:
             return
 
         # - move to a random area -
-        random_area = random.choice(self.owner.world.world_areas)
+        candidate_areas = self.owner.world.world_areas
+        if command_ai is not None:
+            candidate_areas = [
+                area
+                for area in self.owner.world.world_areas
+                if command_ai.area_on_cooldown(area) is False
+            ]
+        if len(candidate_areas) == 0:
+            return
+        random_area = random.choice(candidate_areas)
         tactical_order = TacticalOrder()
         tactical_order.order_move_to_location = True
         tactical_order.world_coords = copy.copy(random_area.get_location())
@@ -196,6 +237,8 @@ class AIHumanSquadLeader:
         building = self.owner.ai.closest_building
         if building is not None:
             orders = self.owner.ai.memory["task_squad_leader"]["orders"]
+            if any(o.is_retreat for o in orders):
+                return
             has_defend_order = any(o.order_defend_area for o in orders)
 
             recent_fire = (

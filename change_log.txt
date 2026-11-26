@@ -2,6 +2,8 @@ TWE Project : Change Log
 
 -------------------------------
 November 25 2026
+- field commanders now concentrate multiple squads onto their objective and reinforce outnumbered fights, redirect squads marching to quiet or oversupplied areas (including pivoting vehicles right away), and issue up to three orders per think
+- ordered foot retreats now disengage the whole squad upright to the fallback point instead of getting pulled back into combat, and commanded squad leaders follow their commander's objective and stay out of abandoned areas
 - field commander orders now show on your side's battle text from anywhere on the map. the squad leader says the order when you are next to him. inspecting his men shows the destination
 - vehicle diagnostics main screen now shows turrets
 - some fixes and cleanup for image_tool

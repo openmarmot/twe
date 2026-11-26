@@ -33,3 +33,7 @@ class TacticalOrder():
         # short player-facing line, set when a field commander writes the order.
         # "defend east", "fall back to west". squad leaders leave this empty.
         self.order_text=None
+
+        # commander-ordered fallback: infantry and vehicles disengage instead of
+        # re-locking onto nearby enemies or ducking into local cover
+        self.is_retreat=False

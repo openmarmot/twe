@@ -1038,8 +1038,11 @@ class AIHuman:
                 # vehicle gunners have a lot of logic to pick new targets now
                 pass
             else:
-                # don't want to over ride exiting a vehicle
-                if self.memory["current_task"] != "task_exit_vehicle":
+                # don't override exiting a vehicle or an ordered foot retreat
+                if (
+                    self.memory["current_task"] != "task_exit_vehicle"
+                    and self.is_retreating_on_foot() is False
+                ):
                     if self.primary_weapon is not None:
                         if self.check_ammo_bool(self.primary_weapon, self.owner):
                             self.switch_task_engage_enemy(closest_object)
@@ -2158,7 +2161,36 @@ class AIHuman:
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
-    def switch_task_move_to_location(self, destination, moving_object):
+    def is_retreating_on_foot(self):
+        """true while walking on an ordered fallback"""
+        if self.memory.get("current_task") != "task_move_to_location":
+            return False
+        task_mem = self.memory.get("task_move_to_location")
+        if task_mem is None:
+            return False
+        return bool(task_mem.get("is_retreat", False))
+
+    # ---------------------------------------------------------------------------
+    def squad_retreat_order(self):
+        """the squad leader's active retreat TacticalOrder, or None"""
+        if self.squad is None:
+            return None
+        leader = self.squad.squad_leader
+        if leader is None or leader.is_human is False:
+            return None
+        task_mem = leader.ai.memory.get("task_squad_leader")
+        if task_mem is None:
+            return None
+        orders = task_mem.get("orders")
+        if not orders:
+            return None
+        order = orders[0]
+        if order.is_retreat:
+            return order
+        return None
+
+    # ---------------------------------------------------------------------------
+    def switch_task_move_to_location(self, destination, moving_object, is_retreat=False):
         """switch task"""
         # moving_object : optional game_object. set when we are moving to something that may move position
         # destination : this is a world_coords
@@ -2168,7 +2200,11 @@ class AIHuman:
             "moving_object": moving_object,
             "last_think_time": 0,
             "think_interval": 0.5,
+            "is_retreat": is_retreat,
         }
+
+        if is_retreat and self.prone:
+            self.prone_state_change()
 
         self.memory[task_name] = task_details
         self.memory["current_task"] = task_name
@@ -2290,6 +2326,8 @@ class AIHuman:
             "task_mechanic",
         ):
             return
+        if current == "task_move_to_location":
+            self.memory.pop("task_move_to_location", None)
         self.memory["current_task"] = task_name
 
     # ---------------------------------------------------------------------------
@@ -3566,6 +3604,9 @@ class AIHuman:
                         self.memory["task_move_to_location"]["destination"]
                     )
                     vehicle_order.exit_vehicle_when_finished = True
+                    vehicle_order.is_retreat = self.memory["task_move_to_location"].get(
+                        "is_retreat", False
+                    )
                     self.switch_task_enter_vehicle(b, vehicle_order)
 
                 else:
@@ -3834,6 +3875,19 @@ class AIHuman:
         if self.is_civilian and recent_danger:
             self.civilian_flee_gunfire()
             return
+
+        # honor an active squad fallback order before stopping to fight or go prone
+        if not self.is_civilian and not self.in_vehicle():
+            retreat_order = self.squad_retreat_order()
+            if retreat_order is not None and retreat_order.world_coords is not None:
+                retreat_dist = engine.math_2d.get_distance(
+                    self.owner.world_coords, retreat_order.world_coords
+                )
+                if retreat_dist > 300:
+                    self.switch_task_move_to_location(
+                        retreat_order.world_coords, None, is_retreat=True
+                    )
+                    return
 
         has_target = bool(self.human_targets)
         in_range = False
